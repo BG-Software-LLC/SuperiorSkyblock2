@@ -1,0 +1,135 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Here you can set the amount of time between auto saves.
+# If you want to disable this feature, set interval to 0
+# Disabling auto save is not recommended, as it's done async.
+save-interval: 6000
+
+# Here you can set the amount of time between auto calculations of all islands.
+# If you want to disable this feature, set interval to 0
+# It's recommended to set the task to a high interval, as it might cause lag.
+calc-interval: 6000
+
+# Set the maximum island size. Island distances is 3 times bigger than the max size.
+# Please, do not change it while you have a running islands world!
+max-island-size: 200
+
+# The default island size of all islands.
+# This island size can be expanded by using the /is admin setsize command.
+default-island-size: 20
+
+# Set the default hoppers limit of islands.
+# This limit can be expanded by using the /is admin sethopperslimit command.
+default-hoppers-limit: 8
+
+# Set the default team limit of islands.
+# This limit can be expanded by using the /is admin setteamlimit command.
+default-team-limit: 4
+
+# Set the default crop-growth multiplier of islands.
+# This multiplier can be expanded by using the /is admin setcropgrowth command.
+default-crop-growth: 1
+
+# Set the default spawner-rates multiplier of islands.
+# This multiplier can be expanded by using the /is admin setspawnerrates command.
+default-spawner-rates: 1
+
+# Set the default mob-drops multiplier of islands.
+# This multiplier can be expanded by using the /is admin setmobdrops command.
+default-mob-drops: 1
+
+# Feature that adds per player world border in islands.
+# If you want to globally disable it, set this section to false.
+# World borders can be toggled by using the /is toggle border command.
+world-borders: true
+
+# All settings related to stacked blocks.
+stacked-blocks:
+  # If you want to globally disable stacked blocks, set this section to false.
+  # Placement of stacked blocks can be toggled by using the /is toggle blocks command.
+  enabled: true
+
+  # Custom name for the blocks.
+  custom-name: '&ex{0} {1}'
+
+  # A list of whitelisted blocks that will get stacked when players have stack mode toggled on.
+  whitelisted:
+  - 'DIAMOND_BLOCK'
+
+# Set a formula to calculate the island level by it's worth.
+# Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
+island-level-formula: '{} / 2'
+
+# How should the island top be ordered by?
+# Set 'WORTH' if you want it to be ordered by island worth, or 'LEVEL' if you want it to be ordered by island levels.
+island-top-order: 'WORTH'
+
+# Set a set of default permissions for each role to be added to new islands.
+# Players can edit these permissions using the /is setpermission command.
+default-permissions:
+  # A list of default permissions for guests.
+  guest: []
+
+  # A list of default permissions for members.
+  # Members have all permissions of guests!
+  member:
+  - ANIMAL_BREED
+  - ANIMAL_DAMAGE
+  - BREAK
+  - BUILD
+  - CHEST_ACCESS
+  - DEPOSIT_MONEY
+  - DROP_ITEMS
+  - EXPEL_BYPASS
+  - INTERACT
+  - ITEM_FRAME
+  - PAINTING
+  - PICKUP_DROPS
+  - USE
+
+  # A list of default permissions for moderators.
+  # Moderators have all permissions of members!
+  mod:
+  - BAN_MEMBER
+  - DELETE_WARP
+  - EXPEL_PLAYERS
+  - INVITE_MEMBER
+  - KICK_MEMBER
+  - SET_WARP
+  - WITHDRAW_MONEY
+
+  # A list of default permissions for admins.
+  # Admins have all permissions of moderators!
+  admin:
+  - CHECK_PERMISSION
+  - DEMOTE_MEMBERS
+  - DISCORD_SHOW
+  - PAYPAL_SHOW
+  - PROMOTE_MEMBERS
+  - SET_BIOME
+  - SET_DISCORD
+  - SET_PAYPAL
+  - SET_PERMISSION
+  - SET_ROLE
+
+  # A list of default permissions for leaders.
+  # Leaders have all permissions of admins!
+  # Note: Permissions of leaders cannot be changed!
+  leader:
+  - ALL
+
+# Set the lines of the island warp.
+sign-warp:
+- '&a[Island Warp]'
+- ''
+- ''
+- ''
+
+# Set the divider for the island bank money in the total island worth.
+# You can set it to 0 to disable island bank money to be calculated in island worth.
+bank-worth-rate: 1000

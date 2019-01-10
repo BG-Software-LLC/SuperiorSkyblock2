@@ -1,0 +1,144 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# In this file you can manage all of the upgrades of the server.
+#
+# Here is some information about the built-in upgrades:
+# Crop Growth: Will make your crop grow faster than usual.
+# Spawner Rates: Will make your spawners spawn faster than usual.
+# Mob Drops: Will make your entities drop more items than usual.
+# Hoppers Limit: Will limit the amount of hoppers in your island.
+#
+# Here is an example of how to create a custom upgrade:
+# upgrades:
+#   upgrade-name:                     // Custom name for your upgrade. Will be used as an identifier for the upgrade (also in commands)
+#     '1':                            // The level of the upgrade. Level 1 is the default one. Make sure you add ''.
+#       price: 100.0                  // The price for ranking up to the next upgrade.
+#       commands:                     // A list of commands to be executed from console. Use %player% for player's name.
+#       - 'give %player% diamond 1'
+#       - 'island admin setupgrade %player% upgrade-name 2'     // You need to execute this command manually.
+#     '2':
+#       price: 0.0
+#       commands:
+#       - 'island admin msg %player% &cReached maximum level!'  // If you don't call the setupgrade command, it's like the player didn't level up.
+
+upgrades:
+  hoppers-limit:
+    '1':
+      price: 1000000.0
+      commands:
+        - 'island admin setupgrade %player% hoppers-limit 2'
+        - 'island admin sethopperslimit %player% 16'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 16!'
+    '2':
+      price: 3000000.0
+      commands:
+        - 'island admin setupgrade %player% hoppers-limit 3'
+        - 'island admin sethopperslimit %player% 32'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 32!'
+    '3':
+      price: 9000000.0
+      commands:
+        - 'island admin setupgrade %player% hoppers-limit 4'
+        - 'island admin sethopperslimit %player% 64'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 64!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for hoppers limit.'
+  crop-growth:
+    '1':
+      price: 100000.0
+      commands:
+        - 'island admin setupgrade %player% crop-growth 2'
+        - 'island admin setcropgrowth %player% 2'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x2!'
+    '2':
+      price: 500000.0
+      commands:
+        - 'island admin setupgrade %player% crop-growth 3'
+        - 'island admin setcropgrowth %player% 3'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x3!'
+    '3':
+      price: 1000000.0
+      commands:
+        - 'island admin setupgrade %player% crop-growth 4'
+        - 'island admin setcropgrowth %player% 4'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x4!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for crop growth.'
+  spawner-rates:
+    '1':
+      price: 500000.0
+      commands:
+        - 'island admin setupgrade %player% spawner-rates 2'
+        - 'island admin setspawnerrates %player% 2'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x2!'
+    '2':
+      price: 1000000.0
+      commands:
+        - 'island admin setupgrade %player% spawner-rates 3'
+        - 'island admin setspawnerrates %player% 3'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x3!'
+    '3':
+      price: 2500000.0
+      commands:
+        - 'island admin setupgrade %player% spawner-rates 4'
+        - 'island admin setspawnerrates %player% 4'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x4!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for spawner-rates.'
+  mob-drops:
+    '1':
+      price: 100000.0
+      commands:
+        - 'island admin setupgrade %player% mob-drops 2'
+        - 'island admin setmobdrops %player% 2'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your mob-drops multiplier was increased to x2!'
+    '2':
+      price: 2000000.0
+      commands:
+        - 'island admin setupgrade %player% mob-drops 3'
+        - 'island admin setmobdrops %player% 3'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your mob-drops multiplier was increased to x3!'
+    '3':
+      price: 5000000.0
+      commands:
+        - 'island admin setupgrade %player% mob-drops 4'
+        - 'island admin setmobdrops %player% 4'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your mob-drops multiplier was increased to x4!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for mob-drops.'
+  members-limit:
+    '1':
+      price: 100000.0
+      commands:
+        - 'island admin setupgrade %player% members-limit 2'
+        - 'island admin setteamlimit %player% 8'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 8!'
+    '2':
+      price: 300000.0
+      commands:
+        - 'island admin setupgrade %player% members-limit 3'
+        - 'island admin setteamlimit %player% 16'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 16!'
+    '3':
+      price: 500000.0
+      commands:
+        - 'island admin setupgrade %player% members-limit 4'
+        - 'island admin setteamlimit %player% 32'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 32!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for members limit.'

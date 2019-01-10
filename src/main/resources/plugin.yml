@@ -1,0 +1,125 @@
+name: SuperiorSkyblock2
+version: 0.0.1-ALPHA
+author: Ome_R
+load: STARTUP
+main: com.ome_r.superiorskyblock.SuperiorSkyblock
+api-version: 1.13
+commands:
+  island:
+    aliases: [is]
+    description: Island commands
+permissions:
+  superior.*:
+    description: Permission for all admin & island commands
+    default: op
+    children:
+      superior.island.*:
+        description: Permission for all island commands
+        default: true
+        children:
+          superior.island.accept:
+            description: Accept an invitation from a player.
+          superior.island.ban:
+            description: Ban a player from your island.
+          superior.island.biome:
+            description: Change the biome of the island.
+          superior.island.create:
+            description: Create a new island.
+          superior.island.delwarp:
+            description: Delete an island warp.
+          superior.island.demote:
+            description: Demote a member in your island.
+          superior.island.deposit:
+            description: Deposit money from your personal account into the island's bank.
+          superior.island.disband:
+            description: Disband your island permanently.
+          superior.island.expel:
+            description: Kick a visitor from your island.
+          superior.island.invite:
+            description: Invite a player to your island.
+          superior.island.kick:
+            description: Kick a player from your island.
+          superior.island.leave:
+            description: Leave your island.
+          superior.island.panel:
+            description: Open island panel.
+          superior.island.permissions:
+            description: Get all permissions for an island role.
+          superior.island.promote:
+            description: Promote a member in your island.
+          superior.island.recalc:
+            description: Re-calculates the island worth.
+          superior.island.setdiscord:
+            description: Set the discord of the island for island payouts.
+          superior.island.setpaypal:
+            description: Set the paypal email of the island for island payouts.
+          superior.island.setbiome:
+            description: Change the biome of your island.
+          superior.island.setpermission:
+            description: Change permission for a role in your island.
+          superior.island.setrole:
+            description: Change the role of a player in your island.
+          superior.island.setwarp:
+            description: Create a new island warp.
+          superior.island.show:
+            description: Get information about an island.
+          superior.island.team:
+            description: Get information about island members status.
+          superior.island.teamchat:
+            description: Toggle team chat mode.
+          superior.island.teleport:
+            description: Teleport to your island.
+          superior.island.toggle:
+            description: Toggle island borders and stacked blocks placements.
+          superior.island.top:
+            description: Open top islands panel.
+          superior.island.upgrade:
+            description: Open upgrades panel.
+          superior.island.value:
+            description: Get the worth value of a block.
+          superior.island.warp:
+            description: Warp to an island warp.
+          superior.island.withdraw:
+            description: Withdraw money from your island's bank into your personal account.
+      superior.admin.*:
+        description: Permission for all admin commands
+        default: op
+        children:
+          superior.admin:
+            description: Use the admin commands.
+          superior.admin.demote:
+            description: Demote a member in another player's island.
+          superior.admin.deposit:
+            description: Deposit money into another player's island bank.
+          superior.admin.disband:
+            description: Disband another player's island permanently.
+          superior.admin.join:
+            description: Join an island without an invitation.
+          superior.admin.msg:
+            description: Send a player a message without any prefixes.
+          superior.admin.msgall:
+            description: Send to all island members a message without any prefixes.
+          superior.admin.promote:
+            description: Promote a member in another player's island.
+          superior.admin.reload:
+            description: Reload all configurations and tasks of the plugin.
+          superior.admin.save:
+            description: Save the entire database to disk (async)
+          superior.admin.schematic:
+            description: Create schematics for the plugin.
+          superior.admin.setcropgrowth:
+            description: Set the crop growth multiplier for another player's island.
+          superior.admin.sethopperslimit:
+            description: Set hoppers limit for another player's island.
+          superior.admin.setmobdrops:
+            description: Set the mob drops multiplier for another player's island.
+          superior.admin.setsize:
+            description: Change another player's island size.
+          superior.admin.setspawnerrates:
+            description: Set the spawner rates multiplier for another player's island.
+          superior.admin.setteamlimit:
+            description: Set members limit for another player's island.
+          superior.admin.setupgrade:
+            description: Set the level of an upgrade for another player's island.
+          superior.admin.withdraw:
+            description: Withdraw money from another player's island bank.
