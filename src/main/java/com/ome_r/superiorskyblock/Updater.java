@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@SuppressWarnings("WeakerAccess")
 public final class Updater {
 
     private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
@@ -54,7 +55,7 @@ public final class Updater {
                 Object jsonObject = gsonClass.getMethod("fromJson", Reader.class, Class.class)
                         .invoke(gsonClass.newInstance(), new InputStreamReader(reader), jsonObjectClass);
 
-                Object jsonElement = jsonObjectClass.getMethod("get", String.class).invoke(jsonObject, "superiorskyblock");
+                Object jsonElement = jsonObjectClass.getMethod("get", String.class).invoke(jsonObject, "superiorskyblock2");
                 Object plugin = jsonElement.getClass().getMethod("getAsJsonObject").invoke(jsonElement);
 
                 Object versionElement = plugin.getClass().getMethod("get", String.class).invoke(plugin, "version");

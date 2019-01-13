@@ -61,6 +61,13 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTask(plugin, () -> {
             reloadPlugin(true);
             getServer().setWhitelist(isWhitelisted);
+
+            if(Updater.isOutdated()) {
+                log("");
+                log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+                log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+                log("");
+            }
         });
 
     }
