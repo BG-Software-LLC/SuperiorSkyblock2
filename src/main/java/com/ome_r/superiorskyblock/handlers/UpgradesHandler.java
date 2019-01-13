@@ -177,10 +177,10 @@ public class UpgradesHandler {
                 UpgradeData upgradeData = this.upgrades.get(_upgrade);
 
                 for(String level : upgrades.getConfigurationSection(_upgrade).getKeys(false)) {
-                    int slot = upgrades.getInt(_upgrade + "." + level + "." + "slot");
+                    int slot = upgrades.getInt(_upgrade + "." + level + ".slot");
                     upgradeData.items.put(Integer.valueOf(level), new ItemData(
-                            cfg.getItemStack("upgrades-gui.upgrades." + _upgrade + "." + level + ".has-next-level"),
-                            cfg.getItemStack("upgrades-gui.upgrades." + _upgrade + "." + level + ".no-next-level"),
+                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
+                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
                             slot,
                             getSound(upgrades.getString(_upgrade + "." + level + ".has-next-level.sound", "")),
                             getSound(upgrades.getString(_upgrade + "." + level + ".no-next-level.sound", ""))));
