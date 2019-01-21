@@ -15,6 +15,9 @@ JOINED_ISLAND: '&aYou joined {0}''s island.'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Admin Commands List:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
+# Called when running the /is admin bypass command.
+TOGGLED_BYPASS_ON: '&aToggling bypass mode ON.'
+TOGGLED_BYPASS_OFF: '&aToggling bypass mode OFF.'
 # Called when running the /is admin deposit command.
 ADMIN_DEPOSIT_MONEY: '&aYou deposited ${0}} into {1}''s island bank.'
 # Called when running the /is admin msg command.

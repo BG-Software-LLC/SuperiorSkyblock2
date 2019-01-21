@@ -186,10 +186,13 @@ public enum Locale {
     NO_DELETE_WARP_PERMISSION,
     NO_EXPEL_PERMISSION,
     NO_SET_WARP_PERMISSION,
-    PERMISSION_SPACER;
+    PERMISSION_SPACER,
+    TOGGLED_BYPASS_ON,
+    TOGGLED_BYPASS_OFF;
 
     private String message;
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEmpty(){
         return message == null || message.isEmpty();
     }

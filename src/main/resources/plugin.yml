@@ -87,6 +87,8 @@ permissions:
         children:
           superior.admin:
             description: Use the admin commands.
+          superior.admin.bypass:
+            description: Toggle bypass mode.
           superior.admin.demote:
             description: Demote a member in another player's island.
           superior.admin.deposit:

@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Island implements Comparable<Island> {
 
     protected static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
@@ -224,7 +225,7 @@ public class Island implements Comparable<Island> {
 
     public boolean hasPermission(WrappedPlayer wrappedPlayer, IslandPermission islandPermission){
         IslandRole islandRole = isMember(wrappedPlayer) ? wrappedPlayer.getIslandRole() : IslandRole.GUEST;
-        return permissionNodes.get(islandRole).hasPermission(islandPermission);
+        return wrappedPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
     }
 
     public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value){

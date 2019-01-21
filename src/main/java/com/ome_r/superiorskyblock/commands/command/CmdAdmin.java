@@ -3,6 +3,7 @@ package com.ome_r.superiorskyblock.commands.command;
 import com.ome_r.superiorskyblock.Locale;
 import com.ome_r.superiorskyblock.SuperiorSkyblock;
 import com.ome_r.superiorskyblock.commands.ICommand;
+import com.ome_r.superiorskyblock.commands.command.admin.CmdAdminBypass;
 import com.ome_r.superiorskyblock.commands.command.admin.CmdAdminDemote;
 import com.ome_r.superiorskyblock.commands.command.admin.CmdAdminDeposit;
 import com.ome_r.superiorskyblock.commands.command.admin.CmdAdminDisband;
@@ -36,6 +37,7 @@ public class CmdAdmin implements ICommand {
     private List<ICommand> subCommands = new ArrayList<>();
 
     public CmdAdmin(){
+        subCommands.add(new CmdAdminBypass());
         subCommands.add(new CmdAdminDemote());
         subCommands.add(new CmdAdminDeposit());
         subCommands.add(new CmdAdminDisband());

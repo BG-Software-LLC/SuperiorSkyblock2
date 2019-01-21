@@ -10,8 +10,8 @@ public class WrappedLocation {
     private final int x, y, z;
     private final String world;
 
-    private WrappedLocation(World world, int x, int y, int z){
-        this.world = world.getName();
+    private WrappedLocation(String world, int x, int y, int z){
+        this.world = world;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -66,11 +66,15 @@ public class WrappedLocation {
 
     public static WrappedLocation of(String location){
         String[] sections = location.split(", ");
-        return of(new Location(Bukkit.getWorld(sections[0]), Integer.valueOf(sections[1]), Integer.valueOf(sections[2]), Integer.valueOf(sections[3])));
+        return of(sections[0], Integer.valueOf(sections[1]), Integer.valueOf(sections[2]), Integer.valueOf(sections[3]));
     }
 
     public static WrappedLocation of(Location location){
-        return new WrappedLocation(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return of(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
+
+    public static WrappedLocation of(String world, int x, int y, int z){
+        return new WrappedLocation(world, x, y, z);
     }
 
 }

@@ -35,6 +35,7 @@ public class WrappedPlayer {
     private boolean worldBorderEnabled = true;
     private boolean blocksStackerEnabled = true;
     private boolean schematicModeEnabled = false;
+    private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
     private WrappedLocation schematicPos1 = null, schematicPos2 = null;
 
@@ -146,6 +147,14 @@ public class WrappedPlayer {
 
     public boolean hasTeamChatEnabled() {
         return teamChatEnabled;
+    }
+
+    public void toggleBypassMode(){
+        bypassModeEnabled = !bypassModeEnabled;
+    }
+
+    public boolean hasBypassModeEnabled() {
+        return bypassModeEnabled;
     }
 
     public void toggleTeamChat() {
