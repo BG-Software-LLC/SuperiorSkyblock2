@@ -10,6 +10,7 @@ import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockFlowerPot;
 import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.Chunk;
+import net.minecraft.server.v1_13_R1.EntityHuman;
 import net.minecraft.server.v1_13_R1.EntityLiving;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
 import net.minecraft.server.v1_13_R1.IBlockData;
@@ -152,10 +153,10 @@ public class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        World world = ((CraftWorld) bukkitChunk).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : chunk.getWorld().players){
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
-        }
+        for(EntityHuman entityHuman : world.players)
+            ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override

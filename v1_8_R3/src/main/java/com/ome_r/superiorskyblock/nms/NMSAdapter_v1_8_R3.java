@@ -10,6 +10,7 @@ import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
+import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.IBlockData;
@@ -61,16 +62,10 @@ public class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
     @Override
     public void setBlock(Location location, int combinedId) {
-        if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(SuperiorSkyblock.getPlugin(), () -> setBlock(location, combinedId));
-            return;
-        }
-
-        if(!location.getChunk().isLoaded())
-            location.getChunk().load();
         World world = ((CraftWorld) location.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 2);
+        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
     }
 
     @Override
@@ -146,10 +141,10 @@ public class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : chunk.getWorld().players){
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
-        }
+        for(EntityHuman entityHuman : world.players)
+            ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
     }
 
     @Override

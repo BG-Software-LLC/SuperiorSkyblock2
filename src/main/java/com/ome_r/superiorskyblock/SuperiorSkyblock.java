@@ -20,10 +20,15 @@ import com.ome_r.superiorskyblock.tasks.SaveTask;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
 
 public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
@@ -59,6 +64,8 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         getServer().setWhitelist(true);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
+            loadWorld();
+
             reloadPlugin(true);
             getServer().setWhitelist(isWhitelisted);
 
@@ -89,6 +96,14 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
             nmsAdapter = (NMSAdapter) Class.forName("com.ome_r.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
         }catch(Exception ex){
             ex.printStackTrace();
+        }
+    }
+
+    private void loadWorld(){
+        String worldName = (settingsHandler = new SettingsHandler(this)).islandWorld;
+        if(!new File(getDataFolder().getParentFile().getParentFile(), worldName).exists()){
+            //Bukkit.createWorld(new WorldCreator(worldName).generator(new WorldGenerator()));
+            WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
         }
     }
 

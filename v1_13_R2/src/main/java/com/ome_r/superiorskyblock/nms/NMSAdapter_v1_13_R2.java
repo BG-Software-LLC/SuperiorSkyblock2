@@ -10,6 +10,7 @@ import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockFlowerPot;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.Chunk;
+import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityLiving;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IBlockData;
@@ -144,17 +145,17 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
     @Override
     public int getSpawnerDelay(CreatureSpawner creatureSpawner) {
         Location location = creatureSpawner.getLocation();
-        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld())
-                .getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld()).getHandle().getTileEntity(blockPosition);
         return mobSpawner.getSpawner().spawnDelay;
     }
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        World world = ((CraftWorld) bukkitChunk).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : chunk.getWorld().players){
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
-        }
+        for(EntityHuman entityHuman : world.players)
+            ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override
@@ -195,7 +196,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public byte getNBTByteValue(Object object) {
-        return ((NBTTagByte) object).g();
+        return ((NBTTagByte) object).asByte();
     }
 
     @Override
@@ -210,7 +211,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public float getNBTFloatValue(Object object) {
-        return ((NBTTagFloat) object).i();
+        return ((NBTTagFloat) object).asFloat();
     }
 
     @Override
@@ -220,7 +221,7 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public int getNBTIntValue(Object object) {
-        return ((NBTTagInt) object).e();
+        return ((NBTTagInt) object).asInt();
     }
 
     @Override
@@ -230,17 +231,17 @@ public class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public long getNBTLongValue(Object object) {
-        return ((NBTTagLong) object).d();
+        return ((NBTTagLong) object).asLong();
     }
 
     @Override
     public short getNBTShortValue(Object object) {
-        return ((NBTTagShort) object).f();
+        return ((NBTTagShort) object).asShort();
     }
 
     @Override
     public String getNBTStringValue(Object object) {
-        return ((NBTTagString) object).b_();
+        return ((NBTTagString) object).asString();
     }
 
 }

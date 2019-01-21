@@ -33,7 +33,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
-import javax.swing.text.Keymap;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +60,7 @@ public class GridHandler {
 
     public GridHandler(SuperiorSkyblock plugin){
         this.plugin = plugin;
-        lastIsland = WrappedLocation.of(new Location(Bukkit.getWorld("world"), 0, 100, 0));
+        lastIsland = WrappedLocation.of(new Location(Bukkit.getWorld(plugin.getSettings().islandWorld), 0, 100, 0));
         spawnIsland = new SpawnIsland(lastIsland.getWorld());
     }
 

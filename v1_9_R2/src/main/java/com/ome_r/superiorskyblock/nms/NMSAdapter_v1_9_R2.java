@@ -9,6 +9,7 @@ import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 import net.minecraft.server.v1_9_R2.Block;
 import net.minecraft.server.v1_9_R2.BlockPosition;
 import net.minecraft.server.v1_9_R2.Chunk;
+import net.minecraft.server.v1_9_R2.EntityHuman;
 import net.minecraft.server.v1_9_R2.EntityLiving;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.IBlockData;
@@ -132,10 +133,10 @@ public class NMSAdapter_v1_9_R2 implements NMSAdapter {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        World world = ((CraftWorld) bukkitChunk).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : chunk.getWorld().players){
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
-        }
+        for(EntityHuman entityHuman : world.players)
+            ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override

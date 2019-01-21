@@ -89,6 +89,10 @@ public class ConfigComments {
     @Comment("Set 'WORTH' if you want it to be ordered by island worth, or 'LEVEL' if you want it to be ordered by island levels.")
     public static String ISLAND_TOP_ORDER = "island-top-order";
 
+    @Comment("")
+    @Comment("Set the name of the islands world.")
+    public static String ISLAND_WORLD = "island-world";
+
 
 
 }

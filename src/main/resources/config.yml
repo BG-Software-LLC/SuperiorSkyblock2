@@ -133,3 +133,6 @@ sign-warp:
 # Set the divider for the island bank money in the total island worth.
 # You can set it to 0 to disable island bank money to be calculated in island worth.
 bank-worth-rate: 1000
+
+# Set the name of the islands world.
+island-world: SuperiorWorld

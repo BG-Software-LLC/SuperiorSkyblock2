@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 public class SettingsHandler {
 
     public final int maxIslandSize;
@@ -31,6 +32,7 @@ public class SettingsHandler {
     public final List<String> guestPermissions, memberPermissions, modPermissions, adminPermission, leaderPermissions;
     public final List<String> signWarp;
     public final int bankWorthRate;
+    public final String islandWorld;
 
     public SettingsHandler(SuperiorSkyblock plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -66,6 +68,7 @@ public class SettingsHandler {
         leaderPermissions = cfg.getStringList("default-permissions.leader");
         signWarp = colorize(cfg.getStringList("sign-warp"));
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
+        islandWorld = cfg.getString("island-world");
     }
 
     private List<String> colorize(List<String> list){
