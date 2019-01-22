@@ -20,7 +20,7 @@ public class SpawnIsland extends Island {
     }
 
     @Override
-    public int getIslandLevel() {
+    public int getIslandSize() {
         return plugin.getSettings().maxIslandSize;
     }
 

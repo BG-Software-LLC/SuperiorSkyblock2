@@ -206,7 +206,7 @@ public enum Locale {
 
             return msg;
         }
-        
+
         return null;
     }
 
