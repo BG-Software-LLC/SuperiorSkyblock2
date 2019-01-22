@@ -98,6 +98,11 @@ public class ConfigComments {
     @Comment("Make sure you follow the format: <world>, <x>, <y>, <z>")
     public static String SPAWN_LOCATION = "spawn-location";
 
+    @Comment("")
+    @Comment("When enabled, the islands protection will be on the spawn too.")
+    @Comment("If disabled, it's your responsibility to protect the spawn!")
+    public static String SPAWN_PROTECTION = "spawn-location";
+
 
 
 }

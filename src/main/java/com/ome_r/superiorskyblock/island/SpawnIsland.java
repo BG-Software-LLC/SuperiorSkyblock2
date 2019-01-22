@@ -25,6 +25,11 @@ public class SpawnIsland extends Island {
     }
 
     @Override
+    public boolean hasPermission(WrappedPlayer wrappedPlayer, IslandPermission islandPermission) {
+        return !plugin.getSettings().spawnProtection || super.hasPermission(wrappedPlayer, islandPermission);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return false;
     }

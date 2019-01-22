@@ -34,6 +34,7 @@ public class SettingsHandler {
     public final int bankWorthRate;
     public final String islandWorld;
     public final String spawnLocation;
+    public final boolean spawnProtection;
 
     public SettingsHandler(SuperiorSkyblock plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -71,6 +72,7 @@ public class SettingsHandler {
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorld = cfg.getString("island-world", "SuperiorWorld");
         spawnLocation = cfg.getString("spawn-location", "SuperiorWorld, 0, 100, 0");
+        spawnProtection = cfg.getBoolean("spawn-protection", true);
     }
 
     private List<String> colorize(List<String> list){
