@@ -101,10 +101,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
     private void loadWorld(){
         String worldName = (settingsHandler = new SettingsHandler(this)).islandWorld;
-        if(!new File(getDataFolder().getParentFile().getParentFile(), worldName).exists()){
-            //Bukkit.createWorld(new WorldCreator(worldName).generator(new WorldGenerator()));
-            WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
-        }
+        WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
     }
 
     @Override
