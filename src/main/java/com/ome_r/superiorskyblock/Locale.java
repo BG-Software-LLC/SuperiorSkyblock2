@@ -206,8 +206,7 @@ public enum Locale {
 
             return msg;
         }
-
-        Bukkit.broadcastMessage("1");
+        
         return null;
     }
 
