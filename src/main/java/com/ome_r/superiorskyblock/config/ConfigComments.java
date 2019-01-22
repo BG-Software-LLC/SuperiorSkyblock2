@@ -93,6 +93,11 @@ public class ConfigComments {
     @Comment("Set the name of the islands world.")
     public static String ISLAND_WORLD = "island-world";
 
+    @Comment("")
+    @Comment("Set the location of the spawn of the server.")
+    @Comment("Make sure you follow the format: <world>, <x>, <y>, <z>")
+    public static String SPAWN_LOCATION = "spawn-location";
+
 
 
 }

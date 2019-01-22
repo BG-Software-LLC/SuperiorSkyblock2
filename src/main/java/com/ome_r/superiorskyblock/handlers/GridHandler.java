@@ -61,7 +61,7 @@ public class GridHandler {
     public GridHandler(SuperiorSkyblock plugin){
         this.plugin = plugin;
         lastIsland = WrappedLocation.of(plugin.getSettings().islandWorld, 0, 100, 0);
-        spawnIsland = new SpawnIsland(lastIsland.getWorld());
+        spawnIsland = new SpawnIsland(WrappedLocation.of(plugin.getSettings().spawnLocation));
     }
 
     public void createIsland(CompoundTag tag){

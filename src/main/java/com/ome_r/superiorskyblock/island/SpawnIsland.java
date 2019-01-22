@@ -1,13 +1,12 @@
 package com.ome_r.superiorskyblock.island;
 
+import com.ome_r.superiorskyblock.wrappers.WrappedLocation;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
-import org.bukkit.Location;
-import org.bukkit.World;
 
 public class SpawnIsland extends Island {
 
-    public SpawnIsland(World world){
-        super(null, new Location(world, 0, 100, 0));
+    public SpawnIsland(WrappedLocation wrappedLocation){
+        super(null, wrappedLocation);
     }
 
     @Override

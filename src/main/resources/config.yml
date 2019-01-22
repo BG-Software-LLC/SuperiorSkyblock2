@@ -136,3 +136,7 @@ bank-worth-rate: 1000
 
 # Set the name of the islands world.
 island-world: SuperiorWorld
+
+# Set the location of the spawn of the server.
+# Make sure you follow the format: <world>, <x>, <y>, <z>
+spawn-location: SuperiorWorld, 0, 100, 0

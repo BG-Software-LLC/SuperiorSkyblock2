@@ -117,13 +117,17 @@ public class Island implements Comparable<Island> {
     }
 
     public Island(WrappedPlayer wrappedPlayer, Location location){
+        this(wrappedPlayer, WrappedLocation.of(location));
+    }
+
+    public Island(WrappedPlayer wrappedPlayer, WrappedLocation wrappedLocation){
         if(wrappedPlayer != null){
             this.owner = wrappedPlayer.getTeamLeader();
             wrappedPlayer.setIslandRole(IslandRole.LEADER);
         }else{
             this.owner = null;
         }
-        this.center = WrappedLocation.of(location);
+        this.center = wrappedLocation;
         assignPermissionNodes();
     }
 
