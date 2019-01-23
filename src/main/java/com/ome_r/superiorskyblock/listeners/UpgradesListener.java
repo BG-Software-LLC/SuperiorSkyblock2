@@ -113,7 +113,7 @@ public class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     @Deprecated
-    @SuppressWarnings("JavaReflectionMemberAccess")
+    @SuppressWarnings({"JavaReflectionMemberAccess", "JavaReflectionInvocation"})
     public void onGrow(BlockGrowEvent e) {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
@@ -134,7 +134,7 @@ public class UpgradesListener implements Listener {
                         e.getBlock().getClass().getMethod("setBlockData", BlockData.class).invoke(e.getBlock(), blockData);
                     }catch(Exception ignored){}
                 }else{
-                    //e.getBlock().setData(newData);
+                    e.getBlock().setData(newData);
                 }
                 e.getBlock().getState().update();
             }, 2L);
