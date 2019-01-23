@@ -9,6 +9,7 @@ import com.ome_r.superiorskyblock.handlers.PlayersHandler;
 import com.ome_r.superiorskyblock.handlers.SchematicsHandler;
 import com.ome_r.superiorskyblock.handlers.SettingsHandler;
 import com.ome_r.superiorskyblock.handlers.UpgradesHandler;
+import com.ome_r.superiorskyblock.hooks.PlaceholderHook_PAPI;
 import com.ome_r.superiorskyblock.listeners.BlocksListener;
 import com.ome_r.superiorskyblock.listeners.PanelListener;
 import com.ome_r.superiorskyblock.listeners.UpgradesListener;
@@ -27,8 +28,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
@@ -65,6 +64,8 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             loadWorld();
+
+            PlaceholderHook_PAPI.register();
 
             reloadPlugin(true);
             getServer().setWhitelist(isWhitelisted);

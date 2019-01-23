@@ -7,19 +7,21 @@ import com.ome_r.superiorskyblock.utils.StringUtil;
 import com.ome_r.superiorskyblock.wrappers.WrappedLocation;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 import me.clip.placeholderapi.external.EZPlaceholderHook;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("deprecation")
-public class PlaceholderHook extends EZPlaceholderHook {
+public class PlaceholderHook_PAPI extends EZPlaceholderHook {
 
     private SuperiorSkyblock plugin;
 
-    public PlaceholderHook(SuperiorSkyblock plugin){
+    private PlaceholderHook_PAPI(SuperiorSkyblock plugin){
         super(plugin, "superior");
         this.plugin = plugin;
+        hook();
     }
 
     @Override
@@ -28,7 +30,7 @@ public class PlaceholderHook extends EZPlaceholderHook {
             return "";
 
         WrappedPlayer wrappedPlayer = WrappedPlayer.of(player);
-        Island island = plugin.getGrid().getIsland(wrappedPlayer);
+        Island island = wrappedPlayer.getIsland();
         Matcher matcher;
 
         if((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()){
@@ -113,4 +115,10 @@ public class PlaceholderHook extends EZPlaceholderHook {
 
         return null;
     }
+
+    public static void register(){
+        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+            new PlaceholderHook_PAPI(SuperiorSkyblock.getPlugin());
+    }
+
 }
