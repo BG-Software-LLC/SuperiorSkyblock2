@@ -16,6 +16,7 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
         this.map = new HashMap<>();
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Set<Entry<Key, V>> entrySet() {
         return asKeyMap().entrySet();
@@ -24,10 +25,6 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
     @Override
     public int size() {
         return map.size();
-    }
-
-    public boolean containsKey(String key) {
-        return containsKey(Key.of(key));
     }
 
     @Override
@@ -55,6 +52,15 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
     @Override
     public V remove(Object key) {
+        if(key instanceof Key) {
+            String keyStr = key.toString();
+            if(map.containsKey(keyStr))
+                return map.remove(keyStr);
+            else if(keyStr.contains(":") && map.containsKey(keyStr.split(":")[0]))
+                return map.remove(keyStr.split(":")[0]);
+            else if(keyStr.contains(";") && map.containsKey(keyStr.split(";")[0]))
+                return map.remove(keyStr.split(";")[0]);
+        }
         return map.remove(key);
     }
 
@@ -84,14 +90,6 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
                 return map.get(key.split(";")[0]);
         }
         return super.get(o);
-    }
-
-    public V getOrDefault(ItemStack itemStack, V defaultValue) {
-        return getOrDefault(Key.of(itemStack), defaultValue);
-    }
-
-    public V getOrDefault(String key, V defaultValue) {
-        return getOrDefault(Key.of(key), defaultValue);
     }
 
     @Override
