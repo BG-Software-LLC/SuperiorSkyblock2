@@ -18,7 +18,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -114,6 +113,7 @@ public class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     @Deprecated
+    @SuppressWarnings("JavaReflectionMemberAccess")
     public void onGrow(BlockGrowEvent e) {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
@@ -193,19 +193,6 @@ public class UpgradesListener implements Listener {
      *   HOPPERS LIMIT
      */
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onHopperPlaceMonitor(BlockPlaceEvent e){
-        if(e.getBlockPlaced().getType() != Material.HOPPER)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getBlockPlaced().getLocation());
-
-        if(island == null)
-            return;
-
-        island.handleBlockPlace(e.getBlockPlaced());
-    }
-
     private Set<UUID> noRightClickTwice = new HashSet<>();
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -223,19 +210,6 @@ public class UpgradesListener implements Listener {
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
         island.handleBlockPlace(Key.of("HOPPER"));
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onHopperBreakMonitor(BlockBreakEvent e){
-        if(e.getBlock().getType() != Material.HOPPER)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island == null)
-            return;
-
-        island.handleBlockBreak(e.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -263,7 +237,7 @@ public class UpgradesListener implements Listener {
 
         int hoppersLimit = island.getHoppersLimit();
 
-        if(hoppersLimit >= 0 && island.getHoppersAmount() > hoppersLimit){
+        if(hoppersLimit >= 0 && island.getHoppersAmount() >= hoppersLimit){
             e.setCancelled(true);
             Locale.REACHED_HOPPERS_LIMIT.send(e.getPlayer());
         }
@@ -283,7 +257,7 @@ public class UpgradesListener implements Listener {
 
         int hoppersLimit = island.getHoppersLimit();
 
-        if(hoppersLimit >= 0 && island.getHoppersAmount() > hoppersLimit){
+        if(hoppersLimit >= 0 && island.getHoppersAmount() >= hoppersLimit){
             e.setCancelled(true);
             Locale.REACHED_HOPPERS_LIMIT.send(e.getPlayer());
         }

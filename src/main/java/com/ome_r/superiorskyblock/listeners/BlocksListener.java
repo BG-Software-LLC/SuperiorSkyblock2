@@ -11,7 +11,6 @@ import com.ome_r.superiorskyblock.utils.ItemUtil;
 import com.ome_r.superiorskyblock.wrappers.WrappedLocation;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;

@@ -18,6 +18,21 @@ public class Key {
         return key;
     }
 
+    @Override
+    @SuppressWarnings("all")
+    public boolean equals(Object obj) {
+        if(obj instanceof Key){
+            String key = obj.toString();
+            if(this.key.equals(key))
+                return true;
+            else if(key.contains(":") && this.key.equals(key.split(":")[0]))
+                return true;
+            else if(key.contains(";") && this.key.equals(key.split(";")[0]))
+                return true;
+        }
+        return false;
+    }
+
     public static Key of(EntityType entityType){
         return of(entityType.name());
     }
