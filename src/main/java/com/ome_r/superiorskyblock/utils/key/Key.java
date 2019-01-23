@@ -1,7 +1,9 @@
 package com.ome_r.superiorskyblock.utils.key;
 
+import com.ome_r.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,7 +40,8 @@ public class Key {
     }
 
     public static Key of(Block block){
-        return of(block.getState().getData().toItemStack());
+        return block.getType() == Materials.SPAWNER.toBukkitType() ? of(block.getType() + ":" + ((CreatureSpawner) block.getState()).getSpawnedType()) :
+                of(block.getState().getData().toItemStack());
     }
 
     public static Key of(ItemStack itemStack){
