@@ -330,30 +330,38 @@ public class Island implements Comparable<Island> {
     }
 
     public void handleBlockPlace(Block block){
-        handleBlockPlace(Key.of(block));
+        handleBlockPlace(Key.of(block), 1);
     }
 
-    public void handleBlockPlace(Key key){
+    public void handleBlockPlace(Block block, int amount){
+        handleBlockPlace(Key.of(block), amount);
+    }
+
+    public void handleBlockPlace(Key key, int amount){
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
-            blocksCalculations.put(key, currentAmount + 1);
+            blocksCalculations.put(key, currentAmount + amount);
             islandWorth += blockValue;
         }
     }
 
     public void handleBlockBreak(Block block){
-        handleBlockBreak(Key.of(block));
+        handleBlockBreak(Key.of(block), 1);
     }
 
-    public void handleBlockBreak(Key key){
+    public void handleBlockBreak(Block block, int amount){
+        handleBlockBreak(Key.of(block), amount);
+    }
+
+    public void handleBlockBreak(Key key, int amount){
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
-            if(currentAmount <= 1)
+            if(currentAmount <= amount) {
                 blocksCalculations.remove(key);
-            else
-                blocksCalculations.put(key, currentAmount - 1);
+            }else
+                blocksCalculations.put(key, currentAmount - amount);
             if((islandWorth -= blockValue) < 0)
                 islandWorth = 0;
         }
