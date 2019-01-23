@@ -7,6 +7,7 @@ import com.ome_r.superiorskyblock.utils.FileUtil;
 import com.ome_r.superiorskyblock.utils.HeadUtil;
 import com.ome_r.superiorskyblock.utils.ItemBuilder;
 import com.ome_r.superiorskyblock.utils.ItemUtil;
+import com.ome_r.superiorskyblock.utils.StringUtil;
 import com.ome_r.superiorskyblock.utils.key.Key;
 import com.ome_r.superiorskyblock.utils.key.KeyMap;
 import com.ome_r.superiorskyblock.utils.legacy.Materials;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public class PanelHandler {
 
     private SuperiorSkyblock plugin;
@@ -341,7 +343,7 @@ public class PanelHandler {
                 ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
                 int slot = countedBlocks.get(key);
 
-                String typeName = ItemUtil.getFormattedType(sections[0]);
+                String typeName = StringUtil.format(sections[0]);
                 int amount = island.getBlockCount(Key.of(itemStack));
 
                 if(sections.length == 2) {
@@ -349,7 +351,7 @@ public class PanelHandler {
                         EntityType entityType = EntityType.valueOf(sections[1]);
                         amount = island.getBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
                         itemStack = HeadUtil.getEntityHead(entityType);
-                        typeName = ItemUtil.getFormattedType(sections[1]) + " Spawner";
+                        typeName = StringUtil.format(sections[1]) + " Spawner";
                     }
                     else {
                         itemStack.setDurability(Short.valueOf(sections[1]));

@@ -4,6 +4,7 @@ import com.ome_r.superiorskyblock.Locale;
 import com.ome_r.superiorskyblock.SuperiorSkyblock;
 import com.ome_r.superiorskyblock.commands.ICommand;
 import com.ome_r.superiorskyblock.utils.ItemUtil;
+import com.ome_r.superiorskyblock.utils.StringUtil;
 import com.ome_r.superiorskyblock.utils.key.Key;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 import org.bukkit.Material;
@@ -65,7 +66,7 @@ public class CmdValue implements ICommand {
         }
 
         int value = plugin.getGrid().getBlockValue(toCheck);
-        String key = ItemUtil.getFormattedType(toCheck.toString().split(":")[0]);
+        String key = StringUtil.format(toCheck.toString().split(":")[0]);
 
         if(value == 0)
             Locale.BLOCK_VALUE_WORTHLESS.send(wrappedPlayer, key);

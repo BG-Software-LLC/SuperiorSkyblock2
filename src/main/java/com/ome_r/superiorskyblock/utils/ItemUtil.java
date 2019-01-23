@@ -7,6 +7,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 public class ItemUtil {
 
+    @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, BlockPlaceEvent event){
         try{
             EquipmentSlot equipmentSlot = (EquipmentSlot) BlockPlaceEvent.class.getMethod("getHand").invoke(event);
@@ -22,15 +23,6 @@ public class ItemUtil {
         }catch(Exception ignored){}
 
         event.getPlayer().getInventory().removeItem(itemStack);
-    }
-
-    public static String getFormattedType(String type){
-        StringBuilder formattedKey = new StringBuilder();
-
-        for(String subKey : type.split("_"))
-            formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase()).append(subKey.substring(1).toLowerCase());
-
-        return formattedKey.toString().substring(1);
     }
 
 }
