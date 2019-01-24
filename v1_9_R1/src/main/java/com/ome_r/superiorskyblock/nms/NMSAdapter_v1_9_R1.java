@@ -134,7 +134,7 @@ public class NMSAdapter_v1_9_R1 implements NMSAdapter {
     @Override
     @SuppressWarnings("ConstantConditions")
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk).getHandle();
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(EntityHuman entityHuman : world.players)
             ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));

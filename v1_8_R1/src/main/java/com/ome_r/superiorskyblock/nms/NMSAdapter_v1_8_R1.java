@@ -134,7 +134,7 @@ public class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk).getHandle();
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         //noinspection ConstantConditions
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(Object object : world.players)
