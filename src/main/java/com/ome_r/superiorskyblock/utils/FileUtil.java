@@ -13,10 +13,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtil {
+
+    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static boolean v1_13 = Bukkit.getBukkitVersion().contains("1.13");
 
     public static ItemStack getItemStack(ConfigurationSection section){
         if(section == null)
@@ -101,6 +105,25 @@ public class FileUtil {
         String[] sections = location.split(",");
         return new Location(Bukkit.getWorld(sections[0]), Double.valueOf(sections[1]), Double.valueOf(sections[2]),
                 Double.valueOf(sections[3]), Float.valueOf(sections[1]), Float.valueOf(sections[1]));
+    }
+
+    public static void saveResource(String resourcePath){
+        try {
+            String destination = resourcePath;
+
+            if(v1_13) resourcePath = resourcePath.replace(".yml", "1_13.yml");
+
+            File file = new File(plugin.getDataFolder(), resourcePath);
+            plugin.saveResource(resourcePath, true);
+
+            if(!destination.equals(resourcePath)){
+                File dest = new File(plugin.getDataFolder(), destination);
+                //noinspection ResultOfMethodCallIgnored
+                file.renameTo(dest);
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private static Sound getSound(String sound){

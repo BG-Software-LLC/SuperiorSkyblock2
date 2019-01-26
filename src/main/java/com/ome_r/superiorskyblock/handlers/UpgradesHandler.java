@@ -159,7 +159,7 @@ public class UpgradesHandler {
         File file = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/upgrades-gui.yml", false);
+            FileUtil.saveResource("guis/upgrades-gui.yml");
 
         CommentedConfiguration cfg = new CommentedConfiguration(null);
         cfg.load(file);

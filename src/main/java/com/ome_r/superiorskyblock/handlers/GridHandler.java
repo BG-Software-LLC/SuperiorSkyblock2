@@ -341,7 +341,7 @@ public class GridHandler {
             File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
             if(!file.exists())
-                plugin.saveResource("guis/top-islands.yml", false);
+                FileUtil.saveResource("guis/top-islands.yml");
 
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 

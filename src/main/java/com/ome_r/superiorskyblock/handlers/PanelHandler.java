@@ -53,7 +53,7 @@ public class PanelHandler {
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/panel-gui.yml", false);
+            FileUtil.saveResource("guis/panel-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -66,7 +66,7 @@ public class PanelHandler {
         file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/creation-gui.yml", false);
+            FileUtil.saveResource("guis/creation-gui.yml");
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -75,7 +75,7 @@ public class PanelHandler {
         file = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/biomes-gui.yml", false);
+            FileUtil.saveResource("guis/biomes-gui.yml");
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -84,7 +84,7 @@ public class PanelHandler {
         file = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/warps-gui.yml", false);
+            FileUtil.saveResource("guis/warps-gui.yml");
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -93,7 +93,7 @@ public class PanelHandler {
         file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
 
         if(!file.exists())
-            plugin.saveResource("guis/values-gui.yml", false);
+            FileUtil.saveResource("guis/values-gui.yml");
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
