@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -301,17 +302,33 @@ public class Island implements Comparable<Island> {
         for (Chunk chunk : getAllChunks())
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
 
+        blocksCalculations.clear();
         islandWorth = 0;
+
+        World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
         new Thread(() -> {
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
+                boolean emptyChunk = true;
+
+                for(int i = 0; i < 16 && emptyChunk; i++){
+                    if(!chunkSnapshot.isSectionEmpty(i)){
+                        emptyChunk = false;
+                    }
+                }
+
+                if(emptyChunk)
+                    continue;
+
                 int highestBlock;
 
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
                         for (int y = 0; y <= highestBlock; y++) {
-                            islandWorth += plugin.getGrid().getBlockValue(plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z));
+                            Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                            handleBlockPlace(blockKey, 1);
+                            islandWorth += plugin.getGrid().getBlockValue(blockKey);
                         }
                     }
                 }
@@ -339,6 +356,8 @@ public class Island implements Comparable<Island> {
 
     public void handleBlockPlace(Key key, int amount){
         int blockValue;
+        if(key.toString().endsWith(":0"))
+            key = Key.of(key.toString().replace(":0", ""));
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
             blocksCalculations.put(key, currentAmount + amount);
