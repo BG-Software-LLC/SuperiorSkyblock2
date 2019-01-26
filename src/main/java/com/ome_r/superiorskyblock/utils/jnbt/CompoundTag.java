@@ -52,7 +52,52 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
      * @param value The value.
      */
     public CompoundTag(Map<String, Tag> value) {
-        super(Collections.unmodifiableMap(value));
+        super(new HashMap<>(value));
+    }
+
+    public void setByteArray(String key, byte[] value){
+        this.value.put(key, new ByteArrayTag(value));
+    }
+
+    public void setByte(String key, byte value){
+        this.value.put(key, new ByteTag(value));
+    }
+
+    public void setDouble(String key, double value){
+        this.value.put(key, new DoubleTag(value));
+    }
+
+    public void setFloat(String key, float value){
+        this.value.put(key, new FloatTag(value));
+    }
+
+    public void setIntArray(String key, int[] value){
+        this.value.put(key, new IntArrayTag(value));
+    }
+
+    public void setInt(String key, int value){
+        this.value.put(key, new IntTag(value));
+    }
+
+    public void setLong(String key, long value){
+        this.value.put(key, new LongTag(value));
+    }
+
+    public void setShort(String key, short value){
+        this.value.put(key, new ShortTag(value));
+    }
+
+    public void setString(String key, String value){
+        this.value.put(key, new StringTag(value));
+    }
+
+    public void setTag(String key, Tag value){
+        this.value.put(key, value);
+    }
+
+    @Override
+    public Map<String, Tag> getValue() {
+        return Collections.unmodifiableMap(value);
     }
 
     @Override

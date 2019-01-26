@@ -57,7 +57,7 @@ public final class ListTag extends Tag<List<Tag>> {
      * @param value The value.
      */
     public ListTag(Class<? extends Tag> type, List<Tag> value) {
-        super(Collections.unmodifiableList(value));
+        super(new ArrayList<>(value));
         this.type = type;
     }
 
@@ -68,6 +68,15 @@ public final class ListTag extends Tag<List<Tag>> {
      */
     public Class<? extends Tag> getType() {
         return type;
+    }
+
+    public void addTag(Tag tag){
+        value.add(tag);
+    }
+
+    @Override
+    public List<Tag> getValue() {
+        return Collections.unmodifiableList(value);
     }
 
     @Override
