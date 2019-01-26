@@ -1,18 +1,21 @@
 package com.ome_r.superiorskyblock.utils;
 
+import com.ome_r.superiorskyblock.SuperiorSkyblock;
+import com.ome_r.superiorskyblock.utils.jnbt.CompoundTag;
+import com.ome_r.superiorskyblock.utils.jnbt.ListTag;
 import com.ome_r.superiorskyblock.utils.legacy.Materials;
-import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public class HeadUtil {
 
+    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
     private static Map<String, String> entityNames = new HashMap<>();
 
     static {
@@ -67,29 +70,34 @@ public class HeadUtil {
     }
 
     public static ItemStack getPlayerHead(String texture){
-        UUID uuid = new UUID(texture.hashCode(), texture.hashCode());
-        return Bukkit.getUnsafe().modifyItemStack(Materials.PLAYER_HEAD.toBukkitItem(),
-                "{SkullOwner:{Id:\"" + uuid.toString() + "\",Properties:{textures:[{Value:\"" + texture + "\"}]}}}"
-        );
+        return getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(), texture);
     }
 
-    public static ItemStack getPlayerHead(WrappedPlayer wrappedPlayer){
-        return getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(), wrappedPlayer);
+    public static ItemStack getPlayerHead(ItemStack itemStack, String texture){
+        CompoundTag compoundTag = plugin.getNMSAdapter().getNBTTag(itemStack);
+
+        CompoundTag skullOwner = (CompoundTag) compoundTag.getValue().getOrDefault("SkullOwner", new CompoundTag(new HashMap<>()));
+
+        skullOwner.setString("Id", new UUID(texture.hashCode(), texture.hashCode()).toString());
+
+        CompoundTag properties = new CompoundTag(new HashMap<>());
+
+        ListTag textures = new ListTag(CompoundTag.class, new ArrayList<>());
+        CompoundTag signature = new CompoundTag(new HashMap<>());
+        signature.setString("Value", texture);
+        textures.addTag(signature);
+
+        properties.setTag("textures", textures);
+
+        skullOwner.setTag("Properties", properties);
+
+        compoundTag.setTag("SkullOwner", skullOwner);
+
+        return plugin.getNMSAdapter().getFromNBTTag(itemStack, compoundTag);
     }
 
-    public static ItemStack getPlayerHead(ItemStack itemStack, WrappedPlayer wrappedPlayer){
-        return Bukkit.getUnsafe().modifyItemStack(itemStack,
-                "{SkullOwner:{" +
-                        "Id:\"" + wrappedPlayer.getUniqueId().toString() + "\"," +
-                            "Properties:{" +
-                                "textures:[" +
-                                    "{" +
-                                        "Value:\"" + wrappedPlayer.getTextureValue() + "\"" +
-                                    "}" +
-                                "]" +
-                            "}" +
-                        "}" +
-                    "}");
+    public static String getNullPlayerTexture(){
+        return "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
     }
 
 }
