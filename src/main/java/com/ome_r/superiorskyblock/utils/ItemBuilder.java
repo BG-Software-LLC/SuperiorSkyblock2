@@ -1,6 +1,5 @@
 package com.ome_r.superiorskyblock.utils;
 
-import com.ome_r.superiorskyblock.utils.legacy.Materials;
 import com.ome_r.superiorskyblock.wrappers.WrappedPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,6 +17,7 @@ public final class ItemBuilder {
 
     private ItemStack itemStack;
     private ItemMeta itemMeta;
+    private String textureValue = "";
 
     public ItemBuilder(ItemStack itemStack){
         this(itemStack.getType(), itemStack.getDurability());
@@ -34,22 +34,8 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder asSkullOf(WrappedPlayer wrappedPlayer){
-        if(!itemStack.isSimilar(Materials.PLAYER_HEAD.toBukkitItem()))
-            return this;
-
-        String texture = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
-
-        if(wrappedPlayer != null)
-            texture = wrappedPlayer.getTextureValue();
-
-        ItemBuilder itemBuilder = new ItemBuilder(HeadUtil.getPlayerHead(texture));
-
-        if(itemMeta.hasDisplayName())
-            itemBuilder.withName(itemMeta.getDisplayName());
-        if(itemMeta.hasLore())
-            itemBuilder.withLore(itemMeta.getLore());
-
-        return itemBuilder;
+        textureValue = wrappedPlayer == null ? HeadUtil.getNullPlayerTexture() :  wrappedPlayer.getTextureValue();
+        return this;
     }
 
     public ItemBuilder withName(String name){
@@ -110,11 +96,7 @@ public final class ItemBuilder {
 
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
-        return itemStack;
-    }
-
-    public static ItemBuilder asHead(WrappedPlayer wrappedPlayer){
-        return new ItemBuilder(HeadUtil.getPlayerHead(wrappedPlayer.getTextureValue()));
+        return textureValue.isEmpty() ? itemStack : HeadUtil.getPlayerHead(itemStack, textureValue);
     }
 
 }
