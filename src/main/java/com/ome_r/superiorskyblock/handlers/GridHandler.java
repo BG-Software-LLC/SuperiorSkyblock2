@@ -130,6 +130,9 @@ public class GridHandler {
     }
 
     public Island getIslandAt(Location location){
+        if(!location.getWorld().getName().equals(plugin.getSettings().islandWorld))
+            return null;
+
         if(spawnIsland.isInside(location))
             return spawnIsland;
 
