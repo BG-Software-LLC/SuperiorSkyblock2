@@ -1,0 +1,27 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+biomes-gui:
+  title: '&lSelect a biome'
+  size: 1
+  open-sound: 'CHEST_OPEN'
+  close-sound: 'CHEST_CLOSE'
+
+  biomes:
+    plains:
+      required-permission: ''
+      slot: 0
+      has-access-item:
+        type: GRASS
+        name: '&ePlains Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to plains.'
+      no-access-item:
+        type: GRASS
+        name: '&ePlains Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to plains.'
