@@ -9,6 +9,8 @@ import com.ome_r.superiorskyblock.handlers.PlayersHandler;
 import com.ome_r.superiorskyblock.handlers.SchematicsHandler;
 import com.ome_r.superiorskyblock.handlers.SettingsHandler;
 import com.ome_r.superiorskyblock.handlers.UpgradesHandler;
+import com.ome_r.superiorskyblock.hooks.BlocksProvider;
+import com.ome_r.superiorskyblock.hooks.BlocksProvider_Default;
 import com.ome_r.superiorskyblock.hooks.PlaceholderHook_PAPI;
 import com.ome_r.superiorskyblock.listeners.BlocksListener;
 import com.ome_r.superiorskyblock.listeners.PanelListener;
@@ -29,6 +31,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
     private static SuperiorSkyblock plugin;
@@ -40,6 +45,8 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
     private DataHandler dataHandler;
     private PanelHandler panelHandler;
     private UpgradesHandler upgradesHandler;
+
+    private List<BlocksProvider> blocksProviders = new ArrayList<>();
 
     private NMSAdapter nmsAdapter;
 
@@ -66,6 +73,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
             loadWorld();
 
             PlaceholderHook_PAPI.register();
+            registerBlocksProvider(new BlocksProvider_Default());
 
             reloadPlugin(true);
             getServer().setWhitelist(isWhitelisted);
@@ -159,6 +167,14 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
+    }
+
+    public List<BlocksProvider> getBlocksProviders() {
+        return blocksProviders;
+    }
+
+    public void registerBlocksProvider(BlocksProvider blocksProvider){
+        blocksProviders.add(blocksProvider);
     }
 
     public static void log(String message){

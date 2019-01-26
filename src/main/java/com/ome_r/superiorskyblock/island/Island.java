@@ -2,6 +2,7 @@ package com.ome_r.superiorskyblock.island;
 
 import com.ome_r.superiorskyblock.Locale;
 import com.ome_r.superiorskyblock.SuperiorSkyblock;
+import com.ome_r.superiorskyblock.hooks.BlocksProvider;
 import com.ome_r.superiorskyblock.utils.FileUtil;
 import com.ome_r.superiorskyblock.utils.queue.Queue;
 import com.ome_r.superiorskyblock.utils.key.Key;
@@ -327,6 +328,13 @@ public class Island implements Comparable<Island> {
                         highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
                         for (int y = 0; y <= highestBlock; y++) {
                             Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                            int blockCount = 1;
+
+                            for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
+                                blockCount = Math.max(blockCount, blocksProvider.getBlockCount(
+                                        new Location(world, chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z)));
+                            }
+
                             handleBlockPlace(blockKey, 1);
                             islandWorth += plugin.getGrid().getBlockValue(blockKey);
                         }
