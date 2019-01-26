@@ -24,14 +24,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 
+@SuppressWarnings("unused")
 public class PlayersListener implements Listener {
 
     private SuperiorSkyblock plugin;
 
     public PlayersListener(SuperiorSkyblock plugin){
         this.plugin = plugin;
+        new PlayerArrowPickup();
     }
 
     @EventHandler
@@ -172,15 +173,33 @@ public class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerArrowPickup(PlayerPickupArrowEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(wrappedPlayer.getLocation());
+    class PlayerArrowPickup implements Listener{
 
-        if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.PICKUP_DROPS)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(wrappedPlayer);
+        PlayerArrowPickup(){
+            if(load())
+                plugin.getServer().getPluginManager().registerEvents(this, plugin);
         }
+
+        boolean load(){
+            try{
+                Class.forName("org.bukkit.event.player.PlayerPickupArrowEvent");
+                return true;
+            }catch(ClassNotFoundException ex){
+                return false;
+            }
+        }
+
+        @EventHandler
+        public void onPlayerArrowPickup(PlayerPickupArrowEvent e){
+            WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+            Island island = plugin.getGrid().getIslandAt(wrappedPlayer.getLocation());
+
+            if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.PICKUP_DROPS)){
+                e.setCancelled(true);
+                Locale.sendProtectionMessage(wrappedPlayer);
+            }
+        }
+
     }
 
 }
