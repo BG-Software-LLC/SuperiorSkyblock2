@@ -273,10 +273,11 @@ public class PanelListener implements Listener {
                     Island island = plugin.getGrid().getIsland(i);
 
                     if(island != null) {
+                        wrappedPlayer.asPlayer().closeInventory();
                         if(e.getAction() == InventoryAction.PICKUP_HALF){
-                            Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island warp " + island.getOwner().getName());
+                            Bukkit.getScheduler().runTaskLater(plugin, () ->
+                                    Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
                         } else {
-                            wrappedPlayer.asPlayer().closeInventory();
                             Bukkit.getScheduler().runTaskLater(plugin, () ->
                                 plugin.getPanel().openValuesPanel(wrappedPlayer, island), 1L);
                         }
