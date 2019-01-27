@@ -90,6 +90,44 @@ public class ConfigComments {
     public static String ISLAND_TOP_ORDER = "island-top-order";
 
     @Comment("")
+    @Comment("Set a set of default permissions for each role to be added to new islands.")
+    @Comment("Players can edit these permissions using the /is setpermission command.")
+    public static String DEFAULT_PERMISSIONS = "default-permissions";
+
+    @Comment("A list of default permissions for guests.")
+    public static String DEFAULT_PERMISSIONS_GUEST = "default-permissions.guest";
+
+    @Comment("")
+    @Comment("A list of default permissions for members.")
+    @Comment("Members have all permissions of guests!")
+    public static String DEFAULT_PERMISSIONS_MEMBER = "default-permissions.member";
+
+    @Comment("")
+    @Comment("A list of default permissions for moderators.")
+    @Comment("Moderators have all permissions of members!")
+    public static String DEFAULT_PERMISSIONS_MOD = "default-permissions.mod";
+
+    @Comment("")
+    @Comment("A list of default permissions for admins.")
+    @Comment("Admins have all permissions of moderators!")
+    public static String DEFAULT_PERMISSIONS_ADMIN = "default-permissions.admin";
+
+    @Comment("")
+    @Comment("A list of default permissions for leaders.")
+    @Comment("Leaders have all permissions of admins!")
+    @Comment("Note: Permissions of leaders cannot be changed!")
+    public static String DEFAULT_PERMISSIONS_LEADER = "default-permissions.leader";
+
+    @Comment("")
+    @Comment("Set the lines of the island warp.")
+    public static String SIGN_WARP = "sign-warp";
+
+    @Comment("")
+    @Comment("Set the divider for the island bank money in the total island worth.")
+    @Comment("You can set it to 0 to disable island bank money to be calculated in island worth.")
+    public static String BANK_WORTH_RATE = "bank-worth-rate";
+
+    @Comment("")
     @Comment("Set the name of the islands world.")
     public static String ISLAND_WORLD = "island-world";
 
