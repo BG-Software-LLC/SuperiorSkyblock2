@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 public enum Materials {
 
-    PLAYER_HEAD("SKULL", 3),
+    PLAYER_HEAD("SKULL_ITEM", 3),
     GOLDEN_AXE("GOLD_AXE"),
     SPAWNER("MOB_SPAWNER");
 
