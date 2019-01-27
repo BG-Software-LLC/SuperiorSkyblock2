@@ -19,6 +19,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -72,7 +73,7 @@ public class TagUtil {
         WrappedLocation offset = WrappedLocation.of(((StringTag) compoundValue.get("offset")).getValue());
         CompoundTag nbtTagCompound = (CompoundTag) compoundValue.get("NBT");
 
-        LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(offset.parse().add(center), entityType);
+        LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(offset.parse(center.getWorld()).add(center), entityType);
         plugin.getNMSAdapter().getFromNBTTag(livingEntity, nbtTagCompound);
     }
 
@@ -143,7 +144,22 @@ public class TagUtil {
     }
 
     private static List<Pattern> getPatternsFromTag(CompoundTag tag){
-        return new ArrayList<>();
+        List<Pattern> patterns = new ArrayList<>();
+        Map<String, Tag> compoundValues = tag.getValue();
+        int counter = 0;
+
+        while(compoundValues.containsKey(counter + "")){
+            Map<String, Tag> patternValues = ((CompoundTag) compoundValues.get(counter + "")).getValue();
+
+            DyeColor dyeColor = DyeColor.valueOf(((StringTag) patternValues.get("color")).getValue());
+            PatternType patternType = PatternType.valueOf(((StringTag) patternValues.get("type")).getValue());
+
+            patterns.add(new Pattern(dyeColor, patternType));
+
+            counter++;
+        }
+
+        return patterns;
     }
 
 }
