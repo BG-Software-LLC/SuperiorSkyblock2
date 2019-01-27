@@ -95,6 +95,7 @@ public class GridHandler {
         if(wrappedPlayer.asOfflinePlayer().isOnline()) {
             Locale.CREATE_ISLAND.send(wrappedPlayer, WrappedLocation.of(islandLocation), System.currentTimeMillis() - startTime);
             wrappedPlayer.asPlayer().teleport(islandLocation);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(wrappedPlayer, island), 20L);
         }
 
         new Thread(() -> island.calcIslandWorth(null)).start();
