@@ -11,6 +11,7 @@ import com.ome_r.superiorskyblock.handlers.SettingsHandler;
 import com.ome_r.superiorskyblock.handlers.UpgradesHandler;
 import com.ome_r.superiorskyblock.hooks.BlocksProvider;
 import com.ome_r.superiorskyblock.hooks.BlocksProvider_Default;
+import com.ome_r.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.ome_r.superiorskyblock.hooks.PlaceholderHook_PAPI;
 import com.ome_r.superiorskyblock.listeners.BlocksListener;
 import com.ome_r.superiorskyblock.listeners.PanelListener;
@@ -74,6 +75,8 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
 
             PlaceholderHook_PAPI.register();
             registerBlocksProvider(new BlocksProvider_Default());
+            if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+                registerBlocksProvider(new BlocksProvider_WildStacker());
 
             reloadPlugin(true);
             getServer().setWhitelist(isWhitelisted);

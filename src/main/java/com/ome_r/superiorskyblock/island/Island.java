@@ -328,11 +328,12 @@ public class Island implements Comparable<Island> {
                         highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
                         for (int y = 0; y <= highestBlock; y++) {
                             Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                            Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                             int blockCount = 1;
 
                             for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
-                                blockCount = Math.max(blockCount, blocksProvider.getBlockCount(
-                                        new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z)));
+                                blockCount = Math.max(blockCount, blocksProvider.getBlockCount(location));
+                                blockKey = blocksProvider.getBlockKey(location, blockKey);
                             }
 
                             handleBlockPlace(blockKey, blockCount);
