@@ -332,11 +332,11 @@ public class Island implements Comparable<Island> {
 
                             for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
                                 blockCount = Math.max(blockCount, blocksProvider.getBlockCount(
-                                        new Location(world, chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z)));
+                                        new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z)));
                             }
 
-                            handleBlockPlace(blockKey, 1);
-                            islandWorth += plugin.getGrid().getBlockValue(blockKey);
+                            handleBlockPlace(blockKey, blockCount);
+                            islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
                         }
                     }
                 }
@@ -385,10 +385,12 @@ public class Island implements Comparable<Island> {
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
-            if(currentAmount <= amount) {
+
+            if(currentAmount <= amount)
                 blocksCalculations.remove(key);
-            }else
+            else
                 blocksCalculations.put(key, currentAmount - amount);
+
             if((islandWorth -= blockValue) < 0)
                 islandWorth = 0;
         }

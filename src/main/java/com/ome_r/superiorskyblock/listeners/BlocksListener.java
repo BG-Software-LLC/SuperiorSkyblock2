@@ -32,10 +32,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings("unused")
 public class BlocksListener implements Listener {
@@ -178,6 +175,7 @@ public class BlocksListener implements Listener {
         if(!wrappedPlayer.hasBlocksStackerEnabled())
             return;
 
+        //noinspection deprecation
         if(e.getBlockAgainst().getType() != e.getBlock().getType() || e.getBlockAgainst().getData() != e.getBlock().getData())
             return;
 
@@ -187,6 +185,11 @@ public class BlocksListener implements Listener {
         int amount = !e.getPlayer().isSneaking() ? 1 : e.getItemInHand().getAmount();
 
         plugin.getGrid().setBlockAmount(e.getBlockAgainst(), plugin.getGrid().getBlockAmount(e.getBlockAgainst()) + amount);
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlockAgainst().getLocation());
+        if(island != null){
+            island.handleBlockPlace(e.getBlockAgainst(), amount);
+        }
 
         ItemStack inHand = e.getItemInHand().clone();
         inHand.setAmount(amount);
@@ -209,6 +212,11 @@ public class BlocksListener implements Listener {
         amount = Math.min(amount, blockAmount);
 
         plugin.getGrid().setBlockAmount(e.getBlock(), (leftAmount = blockAmount - amount));
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null){
+            island.handleBlockBreak(e.getBlock(), amount);
+        }
 
         ItemStack blockItem = e.getBlock().getState().getData().toItemStack(amount);
 

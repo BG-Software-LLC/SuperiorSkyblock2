@@ -54,12 +54,9 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
     public V remove(Object key) {
         if(key instanceof Key) {
             String keyStr = key.toString();
-            if(map.containsKey(keyStr))
-                return map.remove(keyStr);
-            else if(keyStr.contains(":") && map.containsKey(keyStr.split(":")[0]))
-                return map.remove(keyStr.split(":")[0]);
-            else if(keyStr.contains(";") && map.containsKey(keyStr.split(";")[0]))
-                return map.remove(keyStr.split(";")[0]);
+            map.remove(keyStr);
+            map.remove(keyStr.split(":")[0]);
+            map.remove(keyStr.split(";")[0]);
         }
         return map.remove(key);
     }
