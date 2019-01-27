@@ -10,7 +10,7 @@ public class BlocksProvider_Default implements BlocksProvider {
 
     @Override
     public int getBlockCount(Location location) {
-        return plugin.getGrid().getBlockAmount(location.getBlock());
+        return plugin.getGrid().getBlockAmount(location);
     }
 
     @Override

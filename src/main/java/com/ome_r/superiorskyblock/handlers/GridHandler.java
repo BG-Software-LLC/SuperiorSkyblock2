@@ -192,7 +192,11 @@ public class GridHandler {
     }
 
     public int getBlockAmount(Block block){
-        return stackedBlocks.getOrDefault(WrappedLocation.of(block.getLocation()), 1);
+        return getBlockAmount(block.getLocation());
+    }
+
+    public int getBlockAmount(Location location){
+        return stackedBlocks.getOrDefault(WrappedLocation.of(location), 1);
     }
 
     public void setBlockAmount(Block block, int amount){
