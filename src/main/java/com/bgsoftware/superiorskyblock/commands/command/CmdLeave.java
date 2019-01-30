@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -61,6 +62,12 @@ public final class CmdLeave implements ICommand {
             Locale.LEAVE_ISLAND_AS_LEADER.send(superiorPlayer);
             return;
         }
+
+        IslandQuitEvent islandQuitEvent = new IslandQuitEvent(superiorPlayer, island);
+        Bukkit.getPluginManager().callEvent(islandQuitEvent);
+
+        if(islandQuitEvent.isCancelled())
+            return;
 
         island.kickMember(superiorPlayer);
 

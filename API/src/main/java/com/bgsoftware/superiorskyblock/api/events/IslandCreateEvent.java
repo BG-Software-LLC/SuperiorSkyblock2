@@ -1,29 +1,34 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("unused")
-public final class IslandLeaveEvent extends Event {
+public final class IslandCreateEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
-    private final Island island;
+    private boolean cancelled = false;
 
-    public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandCreateEvent(SuperiorPlayer superiorPlayer){
         this.superiorPlayer = superiorPlayer;
-        this.island = island;
     }
 
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
 
-    public Island getIsland() {
-        return island;
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     @Override

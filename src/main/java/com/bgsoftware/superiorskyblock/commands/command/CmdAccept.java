@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -69,6 +70,12 @@ public final class CmdAccept implements ICommand {
             island.revokeInvite(superiorPlayer);
             return;
         }
+
+        IslandJoinEvent islandJoinEvent = new IslandJoinEvent(superiorPlayer, island);
+        Bukkit.getPluginManager().callEvent(islandJoinEvent);
+
+        if(islandJoinEvent.isCancelled())
+            return;
 
         for(UUID uuid : island.getAllMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){

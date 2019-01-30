@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -93,6 +94,12 @@ public final class CmdInvite implements ICommand {
                 Locale.INVITE_TO_FULL_ISLAND.send(superiorPlayer);
                 return;
             }
+
+            IslandInviteEvent islandInviteEvent = new IslandInviteEvent(superiorPlayer, island);
+            Bukkit.getPluginManager().callEvent(islandInviteEvent);
+
+            if(islandInviteEvent.isCancelled())
+                return;
 
             island.inviteMember(targetPlayer);
             message = Locale.INVITE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName());

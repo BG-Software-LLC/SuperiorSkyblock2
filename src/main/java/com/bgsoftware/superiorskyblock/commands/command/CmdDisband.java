@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -61,6 +62,12 @@ public final class CmdDisband implements ICommand {
             Locale.NO_DISBAND_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.DISBAND_ISLAND));
             return;
         }
+
+        IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
+        Bukkit.getPluginManager().callEvent(islandDisbandEvent);
+
+        if(islandDisbandEvent.isCancelled())
+            return;
 
         for(UUID uuid : island.getMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){

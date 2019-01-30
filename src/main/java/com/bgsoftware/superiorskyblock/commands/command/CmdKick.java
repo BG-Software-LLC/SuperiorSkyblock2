@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -73,6 +74,9 @@ public final class CmdKick implements ICommand {
             Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
+
+        IslandKickEvent islandKickEvent = new IslandKickEvent(superiorPlayer, island);
+        Bukkit.getPluginManager().callEvent(islandKickEvent);
 
         island.kickMember(targetPlayer);
 

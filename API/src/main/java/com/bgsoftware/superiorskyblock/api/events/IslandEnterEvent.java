@@ -6,12 +6,12 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("unused")
-public class IslandEnterEvent extends Event {
+public final class IslandEnterEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private SuperiorPlayer superiorPlayer;
-    private Island island;
+    private final SuperiorPlayer superiorPlayer;
+    private final Island island;
 
     public IslandEnterEvent(SuperiorPlayer superiorPlayer, Island island){
         this.superiorPlayer = superiorPlayer;

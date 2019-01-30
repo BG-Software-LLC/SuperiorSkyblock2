@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -81,32 +82,37 @@ public final class GridHandler implements GridManager {
             return;
         }
 
-        long startTime = System.currentTimeMillis();
-        creationProgress = true;
+        IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer);
+        Bukkit.getPluginManager().callEvent(islandCreateEvent);
 
-        Location islandLocation = getNextLocation();
-        SIsland island = new SIsland(superiorPlayer, islandLocation);
+        if(!islandCreateEvent.isCancelled()) {
+            long startTime = System.currentTimeMillis();
+            creationProgress = true;
 
-        islands.add(superiorPlayer.getUniqueId(), island);
-        lastIsland = SBlockPosition.of(getNextLocation());
+            Location islandLocation = getNextLocation();
+            SIsland island = new SIsland(superiorPlayer, islandLocation);
 
-        for(Chunk chunk : island.getAllChunks()) {
-            chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-            plugin.getNMSAdapter().refreshChunk(chunk);
+            islands.add(superiorPlayer.getUniqueId(), island);
+            lastIsland = SBlockPosition.of(getNextLocation());
+
+            for (Chunk chunk : island.getAllChunks()) {
+                chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
+                plugin.getNMSAdapter().refreshChunk(chunk);
+            }
+
+            Schematic schematic = plugin.getSchematics().getSchematic(schemName);
+            schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation());
+
+            if (superiorPlayer.asOfflinePlayer().isOnline()) {
+                Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
+                superiorPlayer.asPlayer().teleport(islandLocation);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+            }
+
+            new Thread(() -> island.calcIslandWorth(null)).start();
+
+            creationProgress = false;
         }
-
-        Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-        schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation());
-
-        if(superiorPlayer.asOfflinePlayer().isOnline()) {
-            Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
-            superiorPlayer.asPlayer().teleport(islandLocation);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
-        }
-
-        new Thread(() -> island.calcIslandWorth(null)).start();
-
-        creationProgress = false;
 
         if(islandCreationsQueue.size() != 0){
             CreateIslandData data = islandCreationsQueue.pop();

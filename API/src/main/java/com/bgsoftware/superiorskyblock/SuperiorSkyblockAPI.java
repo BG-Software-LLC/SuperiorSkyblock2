@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
-public class SuperiorSkyblockAPI {
+public final class SuperiorSkyblockAPI {
 
 
 
