@@ -2,7 +2,7 @@ name: SuperiorSkyblock2
 version: 0.0.4-ALPHA
 author: Ome_R
 load: STARTUP
-main: com.ome_r.superiorskyblock.SuperiorSkyblock
+main: SuperiorSkyblock
 api-version: 1.13
 commands:
   island:
