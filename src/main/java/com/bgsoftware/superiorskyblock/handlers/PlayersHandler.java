@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
@@ -12,11 +13,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
-public final class PlayersHandler {
+public final class PlayersHandler implements PlayersManager {
 
     private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
 
-    public SuperiorPlayer getWrappedPlayer(String name){
+    @Override
+    public SuperiorPlayer getSuperiorPlayer(String name){
         for(SuperiorPlayer superiorPlayer : players.values()){
             if(superiorPlayer.getName().equalsIgnoreCase(name))
                 return superiorPlayer;
@@ -25,7 +27,8 @@ public final class PlayersHandler {
         return null;
     }
 
-    public SuperiorPlayer getWrappedPlayer(UUID uuid){
+    @Override
+    public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         if(!players.containsKey(uuid))
             players.put(uuid, new SSuperiorPlayer(uuid));
         return players.get(uuid);

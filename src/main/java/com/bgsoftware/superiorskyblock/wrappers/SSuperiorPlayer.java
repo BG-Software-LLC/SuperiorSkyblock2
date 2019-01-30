@@ -226,11 +226,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public static SuperiorPlayer of(UUID player){
-        return plugin.getPlayers().getWrappedPlayer(player);
+        return plugin.getPlayers().getSuperiorPlayer(player);
     }
 
     public static SuperiorPlayer of(String name){
-        return plugin.getPlayers().getWrappedPlayer(name);
+        return plugin.getPlayers().getSuperiorPlayer(name);
     }
 
 }
