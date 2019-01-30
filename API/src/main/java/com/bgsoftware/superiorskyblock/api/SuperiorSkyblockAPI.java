@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock;
+package com.bgsoftware.superiorskyblock.api;
 
-import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
