@@ -1,16 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdWarp implements ICommand {
+public final class CmdWarp implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -43,39 +44,39 @@ public class CmdWarp implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island;
 
         if(args.length == 1){
-            island = wrappedPlayer.getIsland();
+            island = superiorPlayer.getIsland();
 
             if(island == null){
-                Locale.INVALID_ISLAND.send(wrappedPlayer);
+                Locale.INVALID_ISLAND.send(superiorPlayer);
                 return;
             }
         }
         else{
-            WrappedPlayer targetPlayer = WrappedPlayer.of(args[1]);
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
             if(targetPlayer == null){
-                Locale.INVALID_PLAYER.send(wrappedPlayer, args[1]);
+                Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
                 return;
             }
 
             island = targetPlayer.getIsland();
 
             if(island == null){
-                Locale.INVALID_ISLAND_OTHER.send(wrappedPlayer, targetPlayer.getName());
+                Locale.INVALID_ISLAND_OTHER.send(superiorPlayer, targetPlayer.getName());
                 return;
             }
         }
 
-        plugin.getPanel().openWarpsPanel(wrappedPlayer, island, 1);
+        plugin.getPanel().openWarpsPanel(superiorPlayer, island, 1);
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

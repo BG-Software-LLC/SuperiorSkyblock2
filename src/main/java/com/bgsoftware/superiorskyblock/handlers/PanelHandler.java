@@ -1,18 +1,20 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
-import com.bgsoftware.superiorskyblock.island.Island;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,21 +36,21 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
-public class PanelHandler {
+public final class PanelHandler {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
     public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage,
             islandCreationPage, biomesPage, warpsPage, valuesPage;
 
     Map<UUID, PanelType> openedPanel = new HashMap<>();
     public Map<UUID, UUID> islands = new HashMap<>();
 
-    public PanelHandler(SuperiorSkyblock plugin){
+    public PanelHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadMenus(plugin);
     }
 
-    private void loadMenus(SuperiorSkyblock plugin) {
+    private void loadMenus(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
@@ -107,24 +109,24 @@ public class PanelHandler {
         }
     }
 
-    public void openPanel(WrappedPlayer wrappedPlayer){
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.GENERAL);
-        mainPage.openInventory(wrappedPlayer);
+    public void openPanel(SuperiorPlayer superiorPlayer){
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.GENERAL);
+        mainPage.openInventory(superiorPlayer);
     }
 
-    public void openMembersPanel(WrappedPlayer wrappedPlayer, int page){
+    public void openMembersPanel(SuperiorPlayer superiorPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openMembersPanel(wrappedPlayer, page)).start();
+            new Thread(() -> openMembersPanel(superiorPlayer, page)).start();
             return;
         }
 
         Inventory inventory = membersPage.getInventory();
         List<UUID> members = new ArrayList<>();
 
-        if(wrappedPlayer.getIsland() != null)
-            members.addAll(wrappedPlayer.getIsland().getAllMembers());
+        if(superiorPlayer.getIsland() != null)
+            members.addAll(superiorPlayer.getIsland().getAllMembers());
 
-        members.sort(Comparator.comparing(o -> WrappedPlayer.of(o).getName()));
+        members.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
 
         //noinspection unchecked
         List<Integer> slots = membersPage.get("slots", List.class);
@@ -132,10 +134,10 @@ public class PanelHandler {
         ItemStack memberItem = membersPage.get("memberItem", ItemStack.class);
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < members.size(); i++){
-            WrappedPlayer _wrappedPlayer = WrappedPlayer.of(members.get(i + (slots.size() * (page - 1))));
+            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(members.get(i + (slots.size() * (page - 1))));
             inventory.setItem(slots.get(i), new ItemBuilder(memberItem)
-                    .replaceAll("{0}", _wrappedPlayer.getName())
-                    .asSkullOf(_wrappedPlayer).build());
+                    .replaceAll("{0}", _superiorPlayer.getName())
+                    .asSkullOf(_superiorPlayer).build());
         }
 
         int previousSlot = membersPage.get("previousSlot", Integer.class);
@@ -153,23 +155,23 @@ public class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.MEMBERS);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.MEMBERS);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openVisitorsPanel(WrappedPlayer wrappedPlayer, int page){
+    public void openVisitorsPanel(SuperiorPlayer superiorPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openVisitorsPanel(wrappedPlayer, page)).start();
+            new Thread(() -> openVisitorsPanel(superiorPlayer, page)).start();
             return;
         }
 
         Inventory inventory = visitorsPage.getInventory();
         List<UUID> visitors = new ArrayList<>();
 
-        if(wrappedPlayer.getIsland() != null)
-            visitors.addAll(wrappedPlayer.getIsland().getVisitors());
+        if(superiorPlayer.getIsland() != null)
+            visitors.addAll(superiorPlayer.getIsland().getVisitors());
 
-        visitors.sort(Comparator.comparing(o -> WrappedPlayer.of(o).getName()));
+        visitors.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
 
         //noinspection unchecked
         List<Integer> slots = visitorsPage.get("slots", List.class);
@@ -177,14 +179,14 @@ public class PanelHandler {
         ItemStack visitorItem = visitorsPage.get("visitorItem", ItemStack.class);
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < visitors.size(); i++){
-            WrappedPlayer _wrappedPlayer = WrappedPlayer.of(visitors.get(i + (slots.size() * (page - 1))));
+            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(visitors.get(i + (slots.size() * (page - 1))));
             String islandOwner = "None";
-            if(_wrappedPlayer.getIsland() != null)
-                islandOwner = _wrappedPlayer.getIsland().getOwner().getName();
+            if(_superiorPlayer.getIsland() != null)
+                islandOwner = _superiorPlayer.getIsland().getOwner().getName();
             inventory.setItem(slots.get(i), new ItemBuilder(visitorItem)
-                    .replaceAll("{0}", _wrappedPlayer.getName())
+                    .replaceAll("{0}", _superiorPlayer.getName())
                     .replaceAll("{1}", islandOwner)
-                    .asSkullOf(_wrappedPlayer).build());
+                    .asSkullOf(_superiorPlayer).build());
         }
 
         int previousSlot = visitorsPage.get("previousSlot", Integer.class);
@@ -202,27 +204,27 @@ public class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.VISITORS);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.VISITORS);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openPlayerPanel(WrappedPlayer wrappedPlayer, WrappedPlayer targetPlayer){
+    public void openPlayerPanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         Inventory inventory = Bukkit.createInventory(null, playerPage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(playerPage.getContents());
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.PLAYER);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.PLAYER);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openRolePanel(WrappedPlayer wrappedPlayer, WrappedPlayer targetPlayer){
+    public void openRolePanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         Inventory inventory = Bukkit.createInventory(null, rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(rolePage.getContents());
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.ROLE);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.ROLE);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openIslandCreationPanel(WrappedPlayer wrappedPlayer){
+    public void openIslandCreationPanel(SuperiorPlayer superiorPlayer){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openIslandCreationPanel(wrappedPlayer)).start();
+            new Thread(() -> openIslandCreationPanel(superiorPlayer)).start();
             return;
         }
 
@@ -234,22 +236,22 @@ public class PanelHandler {
                 String permission = islandCreationPage.get(schematic + "-permission", String.class);
                 int slot = islandCreationPage.get(schematic + "-slot", Integer.class);
 
-                if(!wrappedPlayer.hasPermission(permission))
+                if(!superiorPlayer.hasPermission(permission))
                     schematicItem = islandCreationPage.get(schematic + "-no-access-item", ItemStack.class);
 
                 inventory.setItem(slot, schematicItem);
             }
         }
 
-        islandCreationPage.playOpenSound(wrappedPlayer);
+        islandCreationPage.playOpenSound(superiorPlayer);
 
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.SCHEMATICS);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.SCHEMATICS);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openBiomesPanel(WrappedPlayer wrappedPlayer){
+    public void openBiomesPanel(SuperiorPlayer superiorPlayer){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openBiomesPanel(wrappedPlayer)).start();
+            new Thread(() -> openBiomesPanel(superiorPlayer)).start();
             return;
         }
 
@@ -262,30 +264,30 @@ public class PanelHandler {
                 String permission = biomesPage.get(biomeName + "-permission", String.class);
                 int slot = biomesPage.get(biomeName + "-slot", Integer.class);
 
-                if(!wrappedPlayer.hasPermission(permission))
+                if(!superiorPlayer.hasPermission(permission))
                     biomeItem = biomesPage.get(biomeName + "-no-access-item", ItemStack.class);
 
                 inventory.setItem(slot, biomeItem);
             }
         }
 
-        biomesPage.playOpenSound(wrappedPlayer);
+        biomesPage.playOpenSound(superiorPlayer);
 
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.BIOMES);
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.BIOMES);
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openWarpsPanel(WrappedPlayer wrappedPlayer, int page) {
-        openWarpsPanel(wrappedPlayer, getIsland(wrappedPlayer), page);
+    public void openWarpsPanel(SuperiorPlayer superiorPlayer, int page) {
+        openWarpsPanel(superiorPlayer, getIsland(superiorPlayer), page);
     }
 
-    public Island getIsland(WrappedPlayer wrappedPlayer){
-        return plugin.getGrid().getIsland(WrappedPlayer.of(islands.get(wrappedPlayer.getUniqueId())));
+    public Island getIsland(SuperiorPlayer superiorPlayer){
+        return plugin.getGrid().getIsland(SSuperiorPlayer.of(islands.get(superiorPlayer.getUniqueId())));
     }
 
-    public void openWarpsPanel(WrappedPlayer wrappedPlayer, Island island, int page) {
+    public void openWarpsPanel(SuperiorPlayer superiorPlayer, Island island, int page) {
         if (Bukkit.isPrimaryThread()) {
-            new Thread(() -> openWarpsPanel(wrappedPlayer, island, page)).start();
+            new Thread(() -> openWarpsPanel(superiorPlayer, island, page)).start();
             return;
         }
 
@@ -303,7 +305,7 @@ public class PanelHandler {
             String warpName = warps.get(i + (slots.size() * (page - 1)));
             inventory.setItem(slots.get(i), new ItemBuilder(warpItem)
                     .replaceAll("{0}", warpName)
-                    .replaceAll("{1}", WrappedLocation.of(island.getWarpLocation(warpName)).toString()).build());
+                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString()).build());
         }
 
         int previousSlot = warpsPage.get("previousSlot", Integer.class);
@@ -321,12 +323,12 @@ public class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (warps.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.WARPS);
-        islands.put(wrappedPlayer.getUniqueId(), island.getOwner().getUniqueId());
-        openInventory(wrappedPlayer, inventory);
+        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.WARPS);
+        islands.put(superiorPlayer.getUniqueId(), island.getOwner().getUniqueId());
+        openInventory(superiorPlayer, inventory);
     }
 
-    public void openValuesPanel(WrappedPlayer wrappedPlayer, Island island){
+    public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
         Inventory valuesPageInventory = valuesPage.getInventory();
         Inventory inventory = Bukkit.createInventory(null, valuesPageInventory.getSize(),
                 valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
@@ -343,18 +345,18 @@ public class PanelHandler {
                 int slot = countedBlocks.get(key);
 
                 String typeName = StringUtil.format(sections[0]);
-                int amount = island.getBlockCount(Key.of(itemStack));
+                int amount = island.getBlockCount(SKey.of(itemStack));
 
                 if(sections.length == 2) {
                     if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
                         EntityType entityType = EntityType.valueOf(sections[1]);
-                        amount = island.getBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
+                        amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
                         itemStack = HeadUtil.getEntityHead(entityType);
                         typeName = StringUtil.format(sections[1]) + " Spawner";
                     }
                     else {
                         itemStack.setDurability(Short.valueOf(sections[1]));
-                        amount = island.getBlockCount(Key.of(itemStack));
+                        amount = island.getBlockCount(SKey.of(itemStack));
                     }
                 }
 
@@ -375,19 +377,19 @@ public class PanelHandler {
                 inventory.setItem(slot, itemStack);
             }
 
-            openedPanel.put(wrappedPlayer.getUniqueId(), PanelType.VALUES);
+            openedPanel.put(superiorPlayer.getUniqueId(), PanelType.VALUES);
 
-            openInventory(wrappedPlayer, inventory);
+            openInventory(superiorPlayer, inventory);
         }).start();
     }
 
-    public PanelType getOpenedPanelType(WrappedPlayer wrappedPlayer){
-        return openedPanel.getOrDefault(wrappedPlayer.getUniqueId(), PanelType.NONE);
+    public PanelType getOpenedPanelType(SuperiorPlayer superiorPlayer){
+        return openedPanel.getOrDefault(superiorPlayer.getUniqueId(), PanelType.NONE);
     }
 
-    public void closeInventory(WrappedPlayer wrappedPlayer){
-        openedPanel.remove(wrappedPlayer.getUniqueId());
-        islands.remove(wrappedPlayer.getUniqueId());
+    public void closeInventory(SuperiorPlayer superiorPlayer){
+        openedPanel.remove(superiorPlayer.getUniqueId());
+        islands.remove(superiorPlayer.getUniqueId());
     }
 
     private void initMainPage(YamlConfiguration cfg){
@@ -628,12 +630,12 @@ public class PanelHandler {
         valuesPage.put("countedBlocks", countedBlocks);
     }
 
-    private void openInventory(WrappedPlayer wrappedPlayer, Inventory inventory){
+    private void openInventory(SuperiorPlayer superiorPlayer, Inventory inventory){
         if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> openInventory(wrappedPlayer, inventory));
+            Bukkit.getScheduler().runTask(plugin, () -> openInventory(superiorPlayer, inventory));
             return;
         }
-        wrappedPlayer.asPlayer().openInventory(inventory);
+        superiorPlayer.asPlayer().openInventory(inventory);
     }
 
     public enum PanelType{

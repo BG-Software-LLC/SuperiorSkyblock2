@@ -1,23 +1,19 @@
 package com.bgsoftware.superiorskyblock.gui;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.collect.Maps;
 import org.bukkit.Sound;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class SyncGUIInventory {
+@SuppressWarnings({"WeakerAccess", "unused"})
+public final class SyncGUIInventory {
 
     private Inventory inventory;
-    private Sound openSound = null, closeSound = null;
-    private Map<String, Object> data = new HashMap<>();
-
-    public SyncGUIInventory(Inventory inventory){
-        this.inventory = inventory;
-    }
+    private Sound openSound, closeSound;
+    private Map<String, Object> data;
 
     public SyncGUIInventory(GUIInventory guiInventory){
         this.inventory = guiInventory.getInventory();
@@ -32,9 +28,9 @@ public class SyncGUIInventory {
         return this;
     }
 
-    public void openInventory(WrappedPlayer wrappedPlayer){
-        playOpenSound(wrappedPlayer);
-        wrappedPlayer.asPlayer().openInventory(inventory);
+    public void openInventory(SuperiorPlayer superiorPlayer){
+        playOpenSound(superiorPlayer);
+        superiorPlayer.asPlayer().openInventory(inventory);
     }
 
     public Inventory getInventory(){
@@ -53,14 +49,14 @@ public class SyncGUIInventory {
         return inventory.getSize();
     }
 
-    public void playOpenSound(WrappedPlayer wrappedPlayer){
+    public void playOpenSound(SuperiorPlayer superiorPlayer){
         if(openSound != null)
-            wrappedPlayer.asPlayer().playSound(wrappedPlayer.getLocation(), openSound, 1, 1);
+            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
     }
 
-    public void playCloseSound(WrappedPlayer wrappedPlayer){
+    public void playCloseSound(SuperiorPlayer superiorPlayer){
         if(closeSound != null)
-            wrappedPlayer.asPlayer().playSound(wrappedPlayer.getLocation(), closeSound, 1, 1);
+            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), closeSound, 1, 1);
     }
 
     public Map<String, Object> getData() {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
+public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
     private Map<String, V> map;
 
@@ -16,7 +17,6 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
         this.map = new HashMap<>();
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public Set<Entry<Key, V>> entrySet() {
         return asKeyMap().entrySet();
@@ -42,7 +42,7 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
     }
 
     public V put(String key, V value) {
-        return put(Key.of(key), value);
+        return put(SKey.of(key), value);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
     @Override
     public V remove(Object key) {
-        if(key instanceof Key) {
+        if(key instanceof SKey) {
             String keyStr = key.toString();
             map.remove(keyStr);
             map.remove(keyStr.split(":")[0]);
@@ -62,22 +62,22 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
     }
 
     public V get(ItemStack itemStack) {
-        return get(Key.of(itemStack));
+        return get(SKey.of(itemStack));
     }
 
     public V get(Material material, short data) {
-        return get(Key.of(material, data));
+        return get(SKey.of(material, data));
     }
 
     public V get(String key) {
-        return get(Key.of(key));
+        return get(SKey.of(key));
     }
 
     @Override
     public V get(Object o) {
         if(map.containsKey("all"))
             return map.get("all");
-        if(o instanceof Key) {
+        if(o instanceof SKey) {
             String key = o.toString();
             if(map.containsKey(key))
                 return map.get(key);
@@ -96,7 +96,7 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : super.getOrDefault(key, defaultValue);
+        return key instanceof SKey ? containsKey(key) ? get(key) : defaultValue : super.getOrDefault(key, defaultValue);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
     private Map<Key, V> asKeyMap(){
         Map<Key, V> map = new HashMap<>();
-        this.map.forEach((key, value) -> map.put(Key.of(key), value));
+        this.map.forEach((key, value) -> map.put(SKey.of(key), value));
         return map;
     }
 

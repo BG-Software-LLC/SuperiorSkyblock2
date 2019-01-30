@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.LangComments;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -192,7 +192,6 @@ public enum Locale {
 
     private String message;
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isEmpty(){
         return message == null || message.isEmpty();
     }
@@ -210,8 +209,8 @@ public enum Locale {
         return null;
     }
 
-    public void send(WrappedPlayer wrappedPlayer, Object... objects){
-        send(wrappedPlayer.asPlayer(), objects);
+    public void send(SuperiorPlayer superiorPlayer, Object... objects){
+        send(superiorPlayer.asPlayer(), objects);
     }
 
     public void send(CommandSender sender, Object... objects){
@@ -224,10 +223,10 @@ public enum Locale {
         this.message = message;
     }
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void reload(){
-        SuperiorSkyblock.log("Loading messages started...");
+        SuperiorSkyblockPlugin.log("Loading messages started...");
         long startTime = System.currentTimeMillis();
         int messagesAmount = 0;
         File file = new File(plugin.getDataFolder(), "lang.yml");
@@ -245,12 +244,12 @@ public enum Locale {
             messagesAmount++;
         }
 
-        SuperiorSkyblock.log(" - Found " + messagesAmount + " messages in lang.yml.");
-        SuperiorSkyblock.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
+        SuperiorSkyblockPlugin.log(" - Found " + messagesAmount + " messages in lang.yml.");
+        SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
-    public static void sendMessage(WrappedPlayer wrappedPlayer, String message){
-        sendMessage(wrappedPlayer.asPlayer(), message);
+    public static void sendMessage(SuperiorPlayer superiorPlayer, String message){
+        sendMessage(superiorPlayer.asPlayer(), message);
     }
 
     public static void sendMessage(CommandSender sender, String message){
@@ -259,8 +258,8 @@ public enum Locale {
 
     private static Set<UUID> noInteractMessages = new HashSet<>();
 
-    public static void sendProtectionMessage(WrappedPlayer wrappedPlayer){
-        sendProtectionMessage(wrappedPlayer.asPlayer());
+    public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
+        sendProtectionMessage(superiorPlayer.asPlayer());
     }
 
     public static void sendProtectionMessage(Player player){

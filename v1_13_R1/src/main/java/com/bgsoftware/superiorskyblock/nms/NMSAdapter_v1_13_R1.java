@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.mojang.authlib.properties.Property;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockFlowerPot;
 import net.minecraft.server.v1_13_R1.BlockPosition;
@@ -49,9 +49,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public class NMSAdapter_v1_13_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
-    private SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public int getCombinedId(Location location) {
@@ -136,11 +136,11 @@ public class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
-    public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+    public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
         Material type = chunkSnapshot.getBlockType(x, y, z);
         short data = (short) (Block.getCombinedId(blockData) >> 12 & 15);
-        return Key.of(type, data);
+        return SKey.of(type, data);
     }
 
     @Override
@@ -160,34 +160,34 @@ public class NMSAdapter_v1_13_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setWorldBorder(WrappedPlayer wrappedPlayer, Island island) {
+    public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         if(!plugin.getSettings().worldBordersEnabled)
             return;
 
-        boolean disabled = !wrappedPlayer.hasWorldBorderEnabled();
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
         WorldBorder worldBorder = new WorldBorder();
 
-        worldBorder.world = ((CraftWorld) wrappedPlayer.getWorld()).getHandle();
+        worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
         worldBorder.setSize(disabled || island == null ? Integer.MAX_VALUE : island.getIslandSize() * 2);
 
-        Location center = island == null ? wrappedPlayer.getLocation() : island.getCenter();
+        Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
 
-        if (wrappedPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+        if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
             worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
         } else {
             worldBorder.setCenter(center.getX(), center.getZ());
         }
 
         PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
-        ((CraftPlayer) wrappedPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
+        ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
     }
 
     @Override
-    public void setSkinTexture(WrappedPlayer wrappedPlayer) {
-        EntityPlayer entityPlayer = ((CraftPlayer) wrappedPlayer.asPlayer()).getHandle();
+    public void setSkinTexture(SuperiorPlayer superiorPlayer) {
+        EntityPlayer entityPlayer = ((CraftPlayer) superiorPlayer.asPlayer()).getHandle();
         Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
-        optional.ifPresent(property -> wrappedPlayer.setTexture(property.getValue()));
+        optional.ifPresent(property -> superiorPlayer.setTextureValue(property.getValue()));
     }
 
     @Override

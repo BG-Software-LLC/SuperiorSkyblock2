@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.TagUtil;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Sign;
@@ -21,9 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TagBuilder {
+@SuppressWarnings("UnusedReturnValue")
+public final class TagBuilder {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private Map<String, Tag> compoundValue = new HashMap<>();
 
     public TagBuilder withBlockPosition(BlockPosition blockPosition){
@@ -66,7 +67,7 @@ public class TagBuilder {
     }
 
     public TagBuilder applyEntity(LivingEntity livingEntity, Location center){
-        WrappedLocation offset = WrappedLocation.of(livingEntity.getLocation().subtract(center));
+        SBlockPosition offset = SBlockPosition.of(livingEntity.getLocation().subtract(center));
         compoundValue.put("entityType", new StringTag(livingEntity.getType().name()));
         compoundValue.put("offset", new StringTag(offset.toString()));
         compoundValue.put("NBT", plugin.getNMSAdapter().getNBTTag(livingEntity));

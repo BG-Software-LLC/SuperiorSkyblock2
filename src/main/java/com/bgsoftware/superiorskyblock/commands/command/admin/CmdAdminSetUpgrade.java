@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class CmdAdminSetUpgrade implements ICommand {
+public final class CmdAdminSetUpgrade implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -46,8 +47,8 @@ public class CmdAdminSetUpgrade implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[2]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[2]);
@@ -89,13 +90,13 @@ public class CmdAdminSetUpgrade implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         List<String> list = new ArrayList<>();
 
         if(args.length == 3){
-            WrappedPlayer targetPlayer;
+            SuperiorPlayer targetPlayer;
             for(UUID uuid : plugin.getGrid().getAllIslands()) {
-                targetPlayer = WrappedPlayer.of(uuid);
+                targetPlayer = SSuperiorPlayer.of(uuid);
                 if(targetPlayer.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                     list.add(targetPlayer.getName());
             }
@@ -110,7 +111,7 @@ public class CmdAdminSetUpgrade implements ICommand {
         return list;
     }
 
-    private String getUpgradesString(SuperiorSkyblock plugin){
+    private String getUpgradesString(SuperiorSkyblockPlugin plugin){
         StringBuilder stringBuilder = new StringBuilder();
 
         for(String upgrade : plugin.getUpgrades().getAllUpgrades())

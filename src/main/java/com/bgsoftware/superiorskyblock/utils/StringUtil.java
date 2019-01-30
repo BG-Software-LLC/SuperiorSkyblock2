@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-public class StringUtil {
+public final class StringUtil {
 
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();

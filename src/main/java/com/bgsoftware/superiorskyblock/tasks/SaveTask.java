@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.tasks;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class SaveTask extends BukkitRunnable {
+public final class SaveTask extends BukkitRunnable {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static int id = -1;
 
     private SaveTask(){
@@ -19,10 +19,10 @@ public class SaveTask extends BukkitRunnable {
     @Override
     public void run() {
         if(Bukkit.getOnlinePlayers().size() > 0){
-            announceToOps("&7&o[SuperiorSkyblock] Saving database...");
+            announceToOps("&7&o[SuperiorSkyblockPlugin] Saving database...");
             plugin.getDataHandler().saveDatabase(false);
             announceToPlayers();
-            announceToOps("&7&o[SuperiorSkyblock] Saving database done!");
+            announceToOps("&7&o[SuperiorSkyblockPlugin] Saving database done!");
         }
     }
 

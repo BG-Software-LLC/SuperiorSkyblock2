@@ -1,16 +1,17 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSetMobDrops implements ICommand {
+public final class CmdAdminSetMobDrops implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -43,8 +44,8 @@ public class CmdAdminSetMobDrops implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[2]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[2]);
@@ -72,7 +73,7 @@ public class CmdAdminSetMobDrops implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.wrappers;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-public class BlockPosition {
+public final class BlockPosition {
 
     private int x, y, z;
 

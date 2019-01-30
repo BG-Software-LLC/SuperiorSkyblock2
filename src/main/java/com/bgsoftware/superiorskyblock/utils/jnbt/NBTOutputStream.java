@@ -54,6 +54,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Graham Edgecombe
  *
  */
+@SuppressWarnings("WeakerAccess")
 public final class NBTOutputStream implements Closeable {
 
 	/**
@@ -218,9 +219,8 @@ public final class NBTOutputStream implements Closeable {
 
 		os.writeByte(NBTUtils.getTypeCode(clazz));
 		os.writeInt(size);
-		for (int i = 0; i < size; i++) {
-			writeTagPayload(tags.get(i));
-		}
+		for (Tag _tag : tags)
+			writeTagPayload(_tag);
 	}
 
 	/**
@@ -302,9 +302,8 @@ public final class NBTOutputStream implements Closeable {
 	 *
 	 * @param tag
 	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
+	@SuppressWarnings("unused")
 	private void writeEndTagPayload(EndTag tag) {
 		/* empty */
 	}

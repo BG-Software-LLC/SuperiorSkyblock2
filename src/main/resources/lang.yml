@@ -1,6 +1,6 @@
 ######################################################
 ##                                                  ##
-##                SuperiorSkyblock 2                ##
+##                SuperiorSkyblockPlugin 2                ##
 ##                Developed by Ome_R                ##
 ##                                                  ##
 ######################################################
@@ -163,7 +163,7 @@ ISLAND_INFO_MEMBERS: |
 ISLAND_INFO_PLAYER_LINE: '&a - {0}'
 ISLAND_INFO_FOOTER: ''
 # Called when running the /is team command.
-ISLAND_TEAM_STATUS_HEADER: '&e&l(!) &7Members of {0}''s Island &8[&e{1}&8/&e{2}&8]&7:'
+ISLAND_TEAM_STATUS_HEADER: '&e&l(!) &7Members of {0}''s SIsland &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_LEADER: '&e * [Leader] {0} {1}'
 ISLAND_TEAM_STATUS_ADMINS: '&e * [Leader] {0} {1}'
 ISLAND_TEAM_STATUS_MODS: '&e * [Leader] {0} {1}'

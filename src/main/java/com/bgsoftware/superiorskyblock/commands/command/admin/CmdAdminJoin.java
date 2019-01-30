@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandRole;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -13,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdAdminJoin implements ICommand {
+public final class CmdAdminJoin implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -46,41 +47,41 @@ public class CmdAdminJoin implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
-        if(wrappedPlayer.getIsland() != null){
-            Locale.ALREADY_IN_ISLAND.send(wrappedPlayer);
+        if(superiorPlayer.getIsland() != null){
+            Locale.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
 
         if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(wrappedPlayer, args[2]);
+            Locale.INVALID_PLAYER.send(superiorPlayer, args[2]);
             return;
         }
 
         Island island = targetPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND_OTHER.send(wrappedPlayer, targetPlayer.getName());
+            Locale.INVALID_ISLAND_OTHER.send(superiorPlayer, targetPlayer.getName());
             return;
         }
 
         for(UUID uuid : island.getAllMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.JOIN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), wrappedPlayer.getName());
+                Locale.JOIN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
             }
         }
 
-        island.addMember(wrappedPlayer, IslandRole.MEMBER);
+        island.addMember(superiorPlayer, IslandRole.MEMBER);
 
-        Locale.JOINED_ISLAND.send(wrappedPlayer, island.getOwner().getName());
+        Locale.JOINED_ISLAND.send(superiorPlayer, island.getOwner().getName());
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

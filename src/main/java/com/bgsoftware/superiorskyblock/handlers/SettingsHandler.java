@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.ConfigComments;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
-public class SettingsHandler {
+public final class SettingsHandler {
 
     public final int maxIslandSize;
     public final int defaultIslandSize;
@@ -36,7 +36,7 @@ public class SettingsHandler {
     public final String spawnLocation;
     public final boolean spawnProtection;
 
-    public SettingsHandler(SuperiorSkyblock plugin){
+    public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if(!file.exists())

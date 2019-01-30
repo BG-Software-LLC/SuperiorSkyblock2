@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.config;
 
-public class LangComments {
+@SuppressWarnings("unused")
+public final class LangComments {
 
     @Comment("######################################################")
     @Comment("##                                                  ##")
-    @Comment("##                SuperiorSkyblock 2                ##")
+    @Comment("##                SuperiorSkyblockPlugin 2                ##")
     @Comment("##                Developed by Ome_R                ##")
     @Comment("##                                                  ##")
     @Comment("######################################################")

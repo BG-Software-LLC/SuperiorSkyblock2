@@ -5,7 +5,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class ItemUtil {
+public final class ItemUtil {
 
     @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, BlockPlaceEvent event){

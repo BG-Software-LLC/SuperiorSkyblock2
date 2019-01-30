@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public class EconomyHook {
+public final class EconomyHook {
 
     private static Economy econ;
 
@@ -23,8 +23,8 @@ public class EconomyHook {
         }
     }
 
-    public static double getMoneyInBank(WrappedPlayer wrappedPlayer){
-        return getMoneyInBank(wrappedPlayer.asPlayer());
+    public static double getMoneyInBank(SuperiorPlayer superiorPlayer){
+        return getMoneyInBank(superiorPlayer.asPlayer());
     }
 
     public static double getMoneyInBank(Player player){
@@ -38,14 +38,15 @@ public class EconomyHook {
         econ.depositPlayer(player, amount);
     }
 
-    public static void withdrawMoney(WrappedPlayer wrappedPlayer, double amount){
-        withdrawMoney(wrappedPlayer.asPlayer(), amount);
+    public static void withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
+        withdrawMoney(superiorPlayer.asPlayer(), amount);
     }
 
     public static void withdrawMoney(Player player, double amount){
         econ.withdrawPlayer(player, amount);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isVaultEnabled(){
         return econ != null;
     }

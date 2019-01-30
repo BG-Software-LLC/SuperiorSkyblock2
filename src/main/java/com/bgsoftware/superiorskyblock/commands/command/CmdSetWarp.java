@@ -1,18 +1,19 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdSetWarp implements ICommand {
+public final class CmdSetWarp implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -45,31 +46,31 @@ public class CmdSetWarp implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND.send(wrappedPlayer);
+            Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
         }
 
-        if(!wrappedPlayer.hasPermission(IslandPermission.SET_WARP)){
-            Locale.NO_SET_WARP_PERMISSION.send(wrappedPlayer, island.getRequiredRole(IslandPermission.SET_WARP));
+        if(!superiorPlayer.hasPermission(IslandPermission.SET_WARP)){
+            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_WARP));
             return;
         }
 
         if(island.getWarpLocation(args[1]) != null){
-            Locale.WARP_ALREADY_EXIST.send(wrappedPlayer);
+            Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
             return;
         }
 
-        island.setWarpLocation(args[1], wrappedPlayer.getLocation());
-        Locale.SET_WARP.send(wrappedPlayer, WrappedLocation.of(wrappedPlayer.getLocation()));
+        island.setWarpLocation(args[1], superiorPlayer.getLocation());
+        Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

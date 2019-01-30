@@ -1,18 +1,19 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdSetDiscord implements ICommand {
+public final class CmdSetDiscord implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -45,17 +46,17 @@ public class CmdSetDiscord implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND.send(wrappedPlayer);
+            Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
         }
 
-        if(!wrappedPlayer.hasPermission(IslandPermission.SET_DISCORD)){
-            Locale.NO_SET_DISCORD_PERMISSION.send(wrappedPlayer, island.getRequiredRole(IslandPermission.SET_DISCORD));
+        if(!superiorPlayer.hasPermission(IslandPermission.SET_DISCORD)){
+            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_DISCORD));
             return;
         }
 
@@ -67,11 +68,11 @@ public class CmdSetDiscord implements ICommand {
         String discord = stringBuilder.toString().substring(1);
 
         island.setDiscord(discord);
-        Locale.CHANGED_DISCORD.send(wrappedPlayer, discord);
+        Locale.CHANGED_DISCORD.send(superiorPlayer, discord);
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
 }

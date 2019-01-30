@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.island.IslandRole;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -15,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdSetRole implements ICommand {
+public final class CmdSetRole implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -48,8 +49,8 @@ public class CmdSetRole implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
         IslandRole islandRole;
 
         if(targetPlayer == null){
@@ -72,16 +73,16 @@ public class CmdSetRole implements ICommand {
         Island island = targetPlayer.getIsland();
 
         if(sender instanceof Player){
-            WrappedPlayer wrappedPlayer = WrappedPlayer.of((Player) sender);
-            island = wrappedPlayer.getIsland();
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) sender);
+            island = superiorPlayer.getIsland();
 
             if(island == null){
-                Locale.INVALID_ISLAND.send(wrappedPlayer);
+                Locale.INVALID_ISLAND.send(superiorPlayer);
                 return;
             }
 
-            if(!wrappedPlayer.hasPermission(IslandPermission.SET_ROLE)){
-                Locale.NO_SET_ROLE_PERMISSION.send(wrappedPlayer, island.getRequiredRole(IslandPermission.SET_ROLE));
+            if(!superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
+                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_ROLE));
                 return;
             }
 
@@ -90,7 +91,7 @@ public class CmdSetRole implements ICommand {
                 return;
             }
 
-            if(!islandRole.isLessThan(wrappedPlayer.getIslandRole()) || islandRole == IslandRole.GUEST){
+            if(!islandRole.isLessThan(superiorPlayer.getIslandRole()) || islandRole == IslandRole.GUEST){
                 Locale.CANNOT_SET_ROLE.send(sender, islandRole);
                 return;
             }
@@ -124,17 +125,17 @@ public class CmdSetRole implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
-        if(island != null && wrappedPlayer.hasPermission(IslandPermission.SET_ROLE)){
+        if(island != null && superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
             List<String> list = new ArrayList<>();
-            WrappedPlayer targetPlayer;
+            SuperiorPlayer targetPlayer;
 
             if(args.length == 2) {
                 for(UUID uuid : island.getAllMembers()){
-                    targetPlayer = WrappedPlayer.of(uuid);
+                    targetPlayer = SSuperiorPlayer.of(uuid);
                     if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(targetPlayer.getName());
                 }

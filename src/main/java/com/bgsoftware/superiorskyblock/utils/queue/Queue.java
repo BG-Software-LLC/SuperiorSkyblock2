@@ -3,13 +3,9 @@ package com.bgsoftware.superiorskyblock.utils.queue;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Queue<E> {
+public final class Queue<E> {
 
     private List<E> list = new ArrayList<>();
-
-    public Queue(){
-
-    }
 
     public void push(E element){
         list.add(element);

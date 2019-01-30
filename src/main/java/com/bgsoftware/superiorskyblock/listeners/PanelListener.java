@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.handlers.PanelHandler;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,11 +23,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class PanelListener implements Listener {
+@SuppressWarnings("unused")
+public final class PanelListener implements Listener {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
-    public PanelListener(SuperiorSkyblock plugin){
+    public PanelListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
     }
 
@@ -37,8 +39,8 @@ public class PanelListener implements Listener {
         if(!(e.getWhoClicked() instanceof Player) || e.getClickedInventory() == null)
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getWhoClicked());
-        PanelHandler.PanelType openedPanel = plugin.getPanel().getOpenedPanelType(wrappedPlayer);
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+        PanelHandler.PanelType openedPanel = plugin.getPanel().getOpenedPanelType(superiorPlayer);
 
         GUIInventory guiInventory;
 
@@ -47,17 +49,17 @@ public class PanelListener implements Listener {
             guiInventory = plugin.getPanel().mainPage;
 
             if(e.getRawSlot() == guiInventory.get("membersSlot", Integer.class)){
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openMembersPanel(wrappedPlayer, 1);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openMembersPanel(superiorPlayer, 1);
             }
 
-            else if(e.getRawSlot() == guiInventory.get("settingsSlot", Integer.class)){
-
-            }
+//            else if(e.getRawSlot() == guiInventory.get("settingsSlot", Integer.class)){
+//
+//            }
 
             else if(e.getRawSlot() == guiInventory.get("visitorsSlot", Integer.class)){
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openVisitorsPanel(wrappedPlayer, 1);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openVisitorsPanel(superiorPlayer, 1);
             }
         }
 
@@ -80,8 +82,8 @@ public class PanelListener implements Listener {
                         .getItemMeta().getLore().get(0)).split(" ")[1]);
                 int nextPage = guiInventory.get("nextSlot", Integer.class);
 
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openMembersPanel(wrappedPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openMembersPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
             }
 
             else{
@@ -89,11 +91,11 @@ public class PanelListener implements Listener {
                     return;
 
                 if(e.getCurrentItem().hasItemMeta()) {
-                    WrappedPlayer targetPlayer = WrappedPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
+                    SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
 
                     if (targetPlayer != null) {
-                        movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                        plugin.getPanel().openPlayerPanel(wrappedPlayer, targetPlayer);
+                        movingBetweenPages.add(superiorPlayer.getUniqueId());
+                        plugin.getPanel().openPlayerPanel(superiorPlayer, targetPlayer);
                     }
                 }
             }
@@ -103,19 +105,19 @@ public class PanelListener implements Listener {
             e.setCancelled(true);
             guiInventory = plugin.getPanel().playerPage;
 
-            WrappedPlayer targetPlayer = WrappedPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
 
             if(e.getRawSlot() == guiInventory.get("rolesSlot", Integer.class)){
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openRolePanel(wrappedPlayer, targetPlayer);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openRolePanel(superiorPlayer, targetPlayer);
             }
 
             else if(e.getRawSlot() == guiInventory.get("banSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island ban " + targetPlayer.getName());
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island ban " + targetPlayer.getName());
             }
 
             else if(e.getRawSlot() == guiInventory.get("kickSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island kick " + targetPlayer.getName());
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island kick " + targetPlayer.getName());
             }
         }
 
@@ -123,22 +125,22 @@ public class PanelListener implements Listener {
             e.setCancelled(true);
             guiInventory = plugin.getPanel().rolePage;
 
-            WrappedPlayer targetPlayer = WrappedPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
 
             if(e.getRawSlot() == guiInventory.get("memberSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " member");
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " member");
             }
 
             else if(e.getRawSlot() == guiInventory.get("modSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " moderator");
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " moderator");
             }
 
             else if(e.getRawSlot() == guiInventory.get("adminSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " admin");
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " admin");
             }
 
             else if(e.getRawSlot() == guiInventory.get("leaderSlot", Integer.class)){
-                Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island transfer " + targetPlayer.getName());
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island transfer " + targetPlayer.getName());
             }
         }
 
@@ -162,8 +164,8 @@ public class PanelListener implements Listener {
                         .getItemMeta().getLore().get(0)).split(" ")[1]);
                 int nextPage = guiInventory.get("nextSlot", Integer.class);
 
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openVisitorsPanel(wrappedPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openVisitorsPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
             }
 
             else{
@@ -171,13 +173,13 @@ public class PanelListener implements Listener {
                     return;
 
                 if(e.getCurrentItem().hasItemMeta()) {
-                    WrappedPlayer targetPlayer = WrappedPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
+                    SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
 
                     if (targetPlayer != null) {
                         if (e.getClick().name().contains("RIGHT")) {
-                            Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island invite " + targetPlayer.getName());
+                            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
                         } else if (e.getClick().name().contains("LEFT")) {
-                            Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island expel " + targetPlayer.getName());
+                            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island expel " + targetPlayer.getName());
                         }
                     }
                 }
@@ -193,10 +195,10 @@ public class PanelListener implements Listener {
                     int slot = guiInventory.get(schematic + "-slot", Integer.class);
                     String permission = guiInventory.get(schematic + "-permission", String.class);
 
-                    if (wrappedPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                        wrappedPlayer.asPlayer().closeInventory();
-                        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(wrappedPlayer);
-                        plugin.getGrid().createIsland(wrappedPlayer, schematic);
+                    if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
+                        superiorPlayer.asPlayer().closeInventory();
+                        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
+                        plugin.getGrid().createIsland(superiorPlayer, schematic);
                         break;
                     }
                 }
@@ -214,9 +216,9 @@ public class PanelListener implements Listener {
                     int slot = guiInventory.get(biomeName + "-slot", Integer.class);
                     String permission = guiInventory.get(biomeName + "-permission", String.class);
 
-                    if (wrappedPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                        wrappedPlayer.getIsland().setBiome(biome);
-                        Locale.CHANGED_BIOME.send(wrappedPlayer, biomeName);
+                    if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
+                        superiorPlayer.getIsland().setBiome(biome);
+                        Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
                         break;
                     }
                 }
@@ -243,8 +245,8 @@ public class PanelListener implements Listener {
                         .getItemMeta().getLore().get(0)).split(" ")[1]);
                 int nextPage = guiInventory.get("nextSlot", Integer.class);
 
-                movingBetweenPages.add(wrappedPlayer.getUniqueId());
-                plugin.getPanel().openWarpsPanel(wrappedPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
+                movingBetweenPages.add(superiorPlayer.getUniqueId());
+                plugin.getPanel().openWarpsPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
             }
 
             else{
@@ -253,11 +255,11 @@ public class PanelListener implements Listener {
 
                 if(e.getCurrentItem().hasItemMeta()) {
                     String warpName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-                    Island island = plugin.getPanel().getIsland(wrappedPlayer);
+                    Island island = plugin.getPanel().getIsland(superiorPlayer);
                     Location location = island.getWarpLocation(warpName);
 
                     if(location != null) {
-                        island.warpPlayer(wrappedPlayer, warpName);
+                        island.warpPlayer(superiorPlayer, warpName);
                     }
                 }
             }
@@ -273,13 +275,13 @@ public class PanelListener implements Listener {
                     Island island = plugin.getGrid().getIsland(i);
 
                     if(island != null) {
-                        wrappedPlayer.asPlayer().closeInventory();
+                        superiorPlayer.asPlayer().closeInventory();
                         if(e.getAction() == InventoryAction.PICKUP_HALF){
                             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                    Bukkit.dispatchCommand(wrappedPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
+                                    Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
                         } else {
                             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                plugin.getPanel().openValuesPanel(wrappedPlayer, island), 1L);
+                                plugin.getPanel().openValuesPanel(superiorPlayer, island), 1L);
                         }
                         break;
                     }
@@ -300,26 +302,26 @@ public class PanelListener implements Listener {
         if(!(e.getPlayer() instanceof Player))
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        PanelHandler.PanelType panelType = plugin.getPanel().getOpenedPanelType(wrappedPlayer);
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        PanelHandler.PanelType panelType = plugin.getPanel().getOpenedPanelType(superiorPlayer);
         String title = e.getInventory().getName();
 
-        if(movingBetweenPages.contains(wrappedPlayer.getUniqueId())){
-            movingBetweenPages.remove(wrappedPlayer.getUniqueId());
+        if(movingBetweenPages.contains(superiorPlayer.getUniqueId())){
+            movingBetweenPages.remove(superiorPlayer.getUniqueId());
             return;
         }
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if(panelType == PanelHandler.PanelType.MEMBERS || panelType == PanelHandler.PanelType.VISITORS){
-                plugin.getPanel().openPanel(wrappedPlayer);
+                plugin.getPanel().openPanel(superiorPlayer);
             }else if(panelType == PanelHandler.PanelType.PLAYER){
-                plugin.getPanel().openMembersPanel(wrappedPlayer, 1);
+                plugin.getPanel().openMembersPanel(superiorPlayer, 1);
             }else if(panelType == PanelHandler.PanelType.ROLE) {
-                plugin.getPanel().openPlayerPanel(wrappedPlayer, WrappedPlayer.of(ChatColor.stripColor(title)));
+                plugin.getPanel().openPlayerPanel(superiorPlayer, SSuperiorPlayer.of(ChatColor.stripColor(title)));
             }else if(panelType == PanelHandler.PanelType.VALUES){
-                plugin.getGrid().openTopIslands(wrappedPlayer);
+                plugin.getGrid().openTopIslands(superiorPlayer);
             }else {
-                plugin.getPanel().closeInventory(WrappedPlayer.of(e.getPlayer()));
+                plugin.getPanel().closeInventory(SSuperiorPlayer.of(e.getPlayer()));
             }
         }, 1L);
     }

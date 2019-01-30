@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ItemUtil;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,25 +36,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public class BlocksListener implements Listener {
+public final class BlocksListener implements Listener {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
-    public BlocksListener(SuperiorSkyblock plugin){
+    public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(island == null || !wrappedPlayer.hasPermission(IslandPermission.BUILD))
+        if(island == null || !superiorPlayer.hasPermission(IslandPermission.BUILD))
             return;
 
         if(!island.isInsideRange(e.getBlock().getLocation())){
             e.setCancelled(true);
-            Locale.BUILD_OUTSIDE_ISLAND.send(wrappedPlayer);
+            Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
         }
 
     }
@@ -69,14 +70,14 @@ public class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(island == null || !wrappedPlayer.hasPermission(IslandPermission.BUILD))
+        if(island == null || !superiorPlayer.hasPermission(IslandPermission.BUILD))
             return;
 
         if(!island.isInsideRange(e.getBlock().getLocation())){
             e.setCancelled(true);
-            Locale.DESTROY_OUTSIDE_ISLAND.send(wrappedPlayer);
+            Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -103,7 +104,7 @@ public class BlocksListener implements Listener {
         IslandPermission islandPermission = clickedBlock.getState() instanceof InventoryHolder ?
                 clickedBlock.getState() instanceof Chest ? IslandPermission.CHEST_ACCESS : IslandPermission.USE : IslandPermission.INTERACT;
 
-        if(!island.hasPermission(WrappedPlayer.of(e.getPlayer()), islandPermission)){
+        if(!island.hasPermission(SSuperiorPlayer.of(e.getPlayer()), islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
         }
@@ -114,28 +115,28 @@ public class BlocksListener implements Listener {
         if(!(e.getRemover() instanceof Player))
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of((Player) e.getRemover());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getRemover());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null)
             return;
 
         IslandPermission islandPermission = e.getEntity() instanceof ItemFrame ? IslandPermission.ITEM_FRAME : IslandPermission.PAINTING;
-        if(!wrappedPlayer.hasPermission(islandPermission)){
+        if(!superiorPlayer.hasPermission(islandPermission)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(wrappedPlayer);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameRotate(ItemFrameRotationEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null)
             return;
 
-        if(!wrappedPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
+        if(!superiorPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
         }
@@ -143,13 +144,13 @@ public class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameBreak(ItemFrameBreakEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null)
             return;
 
-        if(!wrappedPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
+        if(!superiorPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
         }
@@ -170,9 +171,9 @@ public class BlocksListener implements Listener {
         if(!plugin.getSettings().whitelistedStackedBlocks.contains(e.getBlock().getType().name()))
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(!wrappedPlayer.hasBlocksStackerEnabled())
+        if(!superiorPlayer.hasBlocksStackerEnabled())
             return;
 
         //noinspection deprecation
@@ -278,12 +279,12 @@ public class BlocksListener implements Listener {
     }
 
     /*
-     *  Island Warps
+     *  SIsland Warps
      */
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSignPlace(SignChangeEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island == null)
@@ -293,7 +294,7 @@ public class BlocksListener implements Listener {
             String warpName = e.getLine(1);
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
-                Locale.WARP_ALREADY_EXIST.send(wrappedPlayer);
+                Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
                 e.setLine(0, "");
             }
             else {
@@ -301,21 +302,21 @@ public class BlocksListener implements Listener {
                 for (int i = 0; i < signWarp.size(); i++)
                     e.setLine(i, signWarp.get(i));
                 island.setWarpLocation(warpName, e.getBlock().getLocation());
-                Locale.SET_WARP.send(wrappedPlayer, WrappedLocation.of(e.getBlock().getLocation()));
+                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(e.getBlock().getLocation()));
             }
         }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSignBreak(SignBreakEvent e){
-        WrappedPlayer wrappedPlayer = e.getPlayer();
+        SuperiorPlayer superiorPlayer = e.getPlayer();
         Sign sign = e.getSign();
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
         if(island == null || !isWarpSign(sign.getLines()))
             return;
 
-        island.deleteWarp(wrappedPlayer, sign.getLocation());
+        island.deleteWarp(superiorPlayer, sign.getLocation());
     }
 
     private boolean isWarpSign(String[] lines){

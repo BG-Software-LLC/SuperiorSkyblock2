@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
@@ -21,23 +22,22 @@ import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.SaveTask;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuperiorSkyblock extends JavaPlugin implements Listener {
+public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
-    private static SuperiorSkyblock plugin;
+    private static SuperiorSkyblockPlugin plugin;
 
     private GridHandler gridHandler;
     private PlayersHandler playersHandler;
@@ -96,7 +96,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         dataHandler.saveDatabase(false);
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
-            nmsAdapter.setWorldBorder(WrappedPlayer.of(player), null);
+            nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), null);
         }
         SaveTask.cancelTask();
         CalcTask.cancelTask();
@@ -133,7 +133,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         schematicsHandler = new SchematicsHandler(this);
 
         for(Player player : Bukkit.getOnlinePlayers())
-            nmsAdapter.setWorldBorder(WrappedPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
+            nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
 
         Locale.reload();
         SaveTask.startTask();
@@ -176,6 +176,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         return blocksProviders;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void registerBlocksProvider(BlocksProvider blocksProvider){
         blocksProviders.add(blocksProvider);
     }
@@ -184,7 +185,7 @@ public class SuperiorSkyblock extends JavaPlugin implements Listener {
         plugin.getLogger().info(message);
     }
 
-    public static SuperiorSkyblock getPlugin(){
+    public static SuperiorSkyblockPlugin getPlugin(){
         return plugin;
     }
 

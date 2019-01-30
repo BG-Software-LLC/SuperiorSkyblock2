@@ -2,12 +2,12 @@ name: SuperiorSkyblock2
 version: 0.0.4-ALPHA
 author: Ome_R
 load: STARTUP
-main: SuperiorSkyblock
+main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 api-version: 1.13
 commands:
   island:
-    aliases: [is]
-    description: Island commands
+    aliases: [is, islands]
+    description: SIsland commands
 permissions:
   superior.*:
     description: Permission for all admin & island commands

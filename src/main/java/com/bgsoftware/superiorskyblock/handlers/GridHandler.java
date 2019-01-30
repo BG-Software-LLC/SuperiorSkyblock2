@@ -1,20 +1,25 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.schematics.Schematic;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.schematics.SSchematic;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.gui.SyncGUIInventory;
-import com.bgsoftware.superiorskyblock.island.Island;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
@@ -43,9 +48,9 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class GridHandler {
+public final class GridHandler implements GridManager {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
     private Queue<CreateIslandData> islandCreationsQueue = new Queue<>();
     private boolean creationProgress = false;
@@ -55,23 +60,24 @@ public class GridHandler {
     private IslandTopHandler topIslands = new IslandTopHandler();
     private BlockValuesHandler blockValues = new BlockValuesHandler();
 
-    private Island spawnIsland;
-    private WrappedLocation lastIsland;
+    private SIsland spawnIsland;
+    private SBlockPosition lastIsland;
 
-    public GridHandler(SuperiorSkyblock plugin){
+    public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        lastIsland = WrappedLocation.of(plugin.getSettings().islandWorld, 0, 100, 0);
-        spawnIsland = new SpawnIsland(WrappedLocation.of(plugin.getSettings().spawnLocation));
+        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
+        spawnIsland = new SpawnIsland(SBlockPosition.of(plugin.getSettings().spawnLocation));
     }
 
     public void createIsland(CompoundTag tag){
         UUID owner = UUID.fromString(((StringTag) tag.getValue().get("owner")).getValue());
-        islands.add(owner, new Island(tag));
+        islands.add(owner, new SIsland(tag));
     }
 
-    public void createIsland(WrappedPlayer wrappedPlayer, String schemName){
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName){
         if(creationProgress) {
-            islandCreationsQueue.push(new CreateIslandData(wrappedPlayer.getUniqueId(), schemName));
+            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName));
             return;
         }
 
@@ -79,10 +85,10 @@ public class GridHandler {
         creationProgress = true;
 
         Location islandLocation = getNextLocation();
-        Island island = new Island(wrappedPlayer, islandLocation);
+        SIsland island = new SIsland(superiorPlayer, islandLocation);
 
-        islands.add(wrappedPlayer.getUniqueId(), island);
-        lastIsland = WrappedLocation.of(getNextLocation());
+        islands.add(superiorPlayer.getUniqueId(), island);
+        lastIsland = SBlockPosition.of(getNextLocation());
 
         for(Chunk chunk : island.getAllChunks()) {
             chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
@@ -92,10 +98,10 @@ public class GridHandler {
         Schematic schematic = plugin.getSchematics().getSchematic(schemName);
         schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation());
 
-        if(wrappedPlayer.asOfflinePlayer().isOnline()) {
-            Locale.CREATE_ISLAND.send(wrappedPlayer, WrappedLocation.of(islandLocation), System.currentTimeMillis() - startTime);
-            wrappedPlayer.asPlayer().teleport(islandLocation);
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(wrappedPlayer, island), 20L);
+        if(superiorPlayer.asOfflinePlayer().isOnline()) {
+            Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
+            superiorPlayer.asPlayer().teleport(islandLocation);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
         }
 
         new Thread(() -> island.calcIslandWorth(null)).start();
@@ -104,32 +110,37 @@ public class GridHandler {
 
         if(islandCreationsQueue.size() != 0){
             CreateIslandData data = islandCreationsQueue.pop();
-            createIsland(WrappedPlayer.of(data.player), data.schemName);
+            createIsland(SSuperiorPlayer.of(data.player), data.schemName);
         }
     }
 
+    @Override
     public void deleteIsland(Island island){
-        WrappedPlayer targetPlayer;
+        SuperiorPlayer targetPlayer;
         for(UUID uuid : island.allPlayersInside()){
-            targetPlayer = WrappedPlayer.of(uuid);
+            targetPlayer = SSuperiorPlayer.of(uuid);
             targetPlayer.asPlayer().teleport(spawnIsland.getCenter());
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(targetPlayer);
         }
         islands.remove(island.getOwner().getUniqueId());
     }
 
-    public Island getIsland(WrappedPlayer wrappedPlayer){
-        return getIsland(wrappedPlayer.getTeamLeader());
+    @Override
+    public Island getIsland(SuperiorPlayer superiorPlayer){
+        return getIsland(superiorPlayer.getTeamLeader());
     }
 
-    private Island getIsland(UUID uuid){
+    @Override
+    public Island getIsland(UUID uuid){
         return islands.get(uuid);
     }
 
+    @Override
     public Island getIsland(int index){
         return index >= islands.size() ? null : islands.get(index);
     }
 
+    @Override
     public Island getIslandAt(Location location){
         if(!location.getWorld().getName().equals(plugin.getSettings().islandWorld))
             return null;
@@ -149,10 +160,12 @@ public class GridHandler {
         return null;
     }
 
+    @Override
     public Island getSpawnIsland(){
         return spawnIsland;
     }
 
+    @Override
     public Location getNextLocation(){
         Location location = lastIsland.parse().clone();
         BlockFace islandFace = getIslandFace();
@@ -183,24 +196,29 @@ public class GridHandler {
         return location;
     }
 
+    @Override
     public List<UUID> getAllIslands(){
         return Lists.newArrayList(islands.uuidIterator());
     }
 
+    @Override
     public int getBlockValue(Key key){
         return blockValues.getBlockValue(key);
     }
 
+    @Override
     public int getBlockAmount(Block block){
         return getBlockAmount(block.getLocation());
     }
 
+    @Override
     public int getBlockAmount(Location location){
-        return stackedBlocks.getOrDefault(WrappedLocation.of(location), 1);
+        return stackedBlocks.getOrDefault(SBlockPosition.of(location), 1);
     }
 
+    @Override
     public void setBlockAmount(Block block, int amount){
-        stackedBlocks.put(WrappedLocation.of(block.getLocation()), amount);
+        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount);
         stackedBlocks.updateName(block);
     }
 
@@ -208,26 +226,28 @@ public class GridHandler {
         return topIslands.topIslands;
     }
 
-    public void openTopIslands(WrappedPlayer wrappedPlayer){
-        topIslands.openTopIslands(wrappedPlayer);
+    @Override
+    public void openTopIslands(SuperiorPlayer superiorPlayer){
+        topIslands.openTopIslands(superiorPlayer);
+    }
+
+    @Override
+    public void calcAllIslands(){
+        for (Island island : islands)
+            island.calcIslandWorth(null);
     }
 
     public void loadGrid(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue(), _compoundValues;
 
-        lastIsland = WrappedLocation.of(((StringTag) compoundValues.get("lastIsland")).getValue());
+        lastIsland = SBlockPosition.of(((StringTag) compoundValues.get("lastIsland")).getValue());
 
         for(Tag _tag : ((ListTag) compoundValues.get("stackedBlocks")).getValue()){
             _compoundValues = ((CompoundTag) _tag).getValue();
             String location = ((StringTag) _compoundValues.get("location")).getValue();
             int stackAmount = ((IntTag) _compoundValues.get("stackAmount")).getValue();
-            stackedBlocks.put(WrappedLocation.of(location), stackAmount);
+            stackedBlocks.put(SBlockPosition.of(location), stackAmount);
         }
-    }
-
-    public void calcAllIslands(){
-        for (Island island : islands)
-            island.calcIslandWorth(null);
     }
 
     public CompoundTag getAsTag(){
@@ -236,7 +256,7 @@ public class GridHandler {
 
         compoundValues.put("lastIsland", new StringTag(lastIsland.toString()));
 
-        for(Map.Entry<WrappedLocation, Integer> entry : this.stackedBlocks.entrySet()){
+        for(Map.Entry<SBlockPosition, Integer> entry : this.stackedBlocks.entrySet()){
             _compoundValues = Maps.newHashMap();
             _compoundValues.put("location", new StringTag(entry.getKey().toString()));
             _compoundValues.put("stackAmount", new IntTag(entry.getValue()));
@@ -273,18 +293,18 @@ public class GridHandler {
 
     private class StackedBlocksHandler {
 
-        private Map<WrappedLocation, Integer> stackedBlocks = Maps.newHashMap();
+        private Map<SBlockPosition, Integer> stackedBlocks = Maps.newHashMap();
 
-        void put(WrappedLocation location, int amount){
+        void put(SBlockPosition location, int amount){
             stackedBlocks.put(location, amount);
         }
 
         @SuppressWarnings("SameParameterValue")
-        int getOrDefault(WrappedLocation location, int def){
+        int getOrDefault(SBlockPosition location, int def){
             return stackedBlocks.getOrDefault(location, def);
         }
 
-        Set<Map.Entry<WrappedLocation, Integer>> entrySet(){
+        Set<Map.Entry<SBlockPosition, Integer>> entrySet(){
             return stackedBlocks.entrySet();
         }
 
@@ -293,7 +313,7 @@ public class GridHandler {
             ArmorStand armorStand = getHologram(block);
 
             if(amount <= 1){
-                stackedBlocks.remove(WrappedLocation.of(block.getLocation()));
+                stackedBlocks.remove(SBlockPosition.of(block.getLocation()));
                 armorStand.remove();
             }else{
                 armorStand.setCustomName(plugin.getSettings().stackedBlocksName
@@ -344,7 +364,7 @@ public class GridHandler {
         private SyncGUIInventory topIslands;
 
         public IslandTopHandler(){
-            SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+            SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
             File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
@@ -369,15 +389,15 @@ public class GridHandler {
             reloadGUI();
         }
 
-        void openTopIslands(WrappedPlayer wrappedPlayer){
+        void openTopIslands(SuperiorPlayer superiorPlayer){
             if(!Bukkit.isPrimaryThread()){
-                Bukkit.getScheduler().runTask(plugin, () -> openTopIslands(wrappedPlayer));
+                Bukkit.getScheduler().runTask(plugin, () -> openTopIslands(superiorPlayer));
                 return;
             }
 
             islands.sort();
-            plugin.getPanel().openedPanel.put(wrappedPlayer.getUniqueId(), PanelHandler.PanelType.TOP);
-            topIslands.openInventory(wrappedPlayer);
+            plugin.getPanel().openedPanel.put(superiorPlayer.getUniqueId(), PanelHandler.PanelType.TOP);
+            topIslands.openInventory(superiorPlayer);
 
             reloadGUI();
         }
@@ -398,7 +418,7 @@ public class GridHandler {
         }
 
         private ItemStack getTopItem(Island island, int place){
-            WrappedPlayer islandOwner = island == null ? null : island.getOwner();
+            SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
 
             ItemStack itemStack;
 
@@ -429,7 +449,7 @@ public class GridHandler {
                             }
                             else {
                                 for (UUID memberUUID : island.getMembers()) {
-                                    lore.add(memberFormat.replace("{}", WrappedPlayer.of(memberFormat).getName()));
+                                    lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberFormat).getName()));
                                 }
                             }
                         }else{
@@ -455,7 +475,7 @@ public class GridHandler {
         private final KeyMap<Integer> blockValues = new KeyMap<>();
 
         private BlockValuesHandler(){
-            SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+            SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
             File file = new File(plugin.getDataFolder(), "blockvalues.yml");
 
@@ -465,7 +485,7 @@ public class GridHandler {
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
             for(String key : cfg.getConfigurationSection("block-values").getKeys(false))
-                blockValues.put(Key.of(key), cfg.getInt("block-values." + key));
+                blockValues.put(SKey.of(key), cfg.getInt("block-values." + key));
         }
 
         int getBlockValue(Key key) {

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,9 +17,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileUtil {
+public final class FileUtil {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static boolean v1_13 = Bukkit.getBukkitVersion().contains("1.13");
 
     public static ItemStack getItemStack(ConfigurationSection section){
@@ -33,7 +33,7 @@ public class FileUtil {
             type = Material.valueOf(section.getString("type"));
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
-            SuperiorSkyblock.log("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+            SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
             return null;
         }
 
@@ -58,7 +58,7 @@ public class FileUtil {
                 try {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
-                    SuperiorSkyblock.log("Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
+                    SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
                     continue;
                 }
 

@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Location;
 
-public class BlocksProvider_Default implements BlocksProvider {
+public final class BlocksProvider_Default implements BlocksProvider {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public int getBlockCount(Location location) {

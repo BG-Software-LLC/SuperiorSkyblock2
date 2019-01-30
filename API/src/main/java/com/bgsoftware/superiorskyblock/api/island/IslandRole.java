@@ -1,6 +1,4 @@
-package com.bgsoftware.superiorskyblock.island;
-
-import com.bgsoftware.superiorskyblock.Locale;
+package com.bgsoftware.superiorskyblock.api.island;
 
 import java.util.Arrays;
 
@@ -22,24 +20,6 @@ public enum IslandRole {
 
     public IslandRole getPreviousRole(){
         return ordinal() - 1 < 0 ? IslandRole.values()[0] : IslandRole.values()[ordinal() - 1];
-    }
-
-    @Override
-    public String toString() {
-        switch (this){
-            case GUEST:
-                return Locale.ROLE_GUEST.getMessage();
-            case MEMBER:
-                return Locale.ROLE_MEMBER.getMessage();
-            case MODERATOR:
-                return Locale.ROLE_MOD.getMessage();
-            case ADMIN:
-                return Locale.ROLE_ADMIN.getMessage();
-            case LEADER:
-                return Locale.ROLE_LEADER.getMessage();
-        }
-
-        return "";
     }
 
     public static String getValuesString(){

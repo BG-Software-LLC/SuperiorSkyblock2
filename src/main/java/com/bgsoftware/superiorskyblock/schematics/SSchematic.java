@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
@@ -8,14 +9,15 @@ import com.bgsoftware.superiorskyblock.utils.TagUtil;
 
 import org.bukkit.Location;
 
-public class Schematic{
+public final class SSchematic implements Schematic {
 
     private CompoundTag compoundTag;
 
-    public Schematic(CompoundTag compoundTag){
+    public SSchematic(CompoundTag compoundTag){
         this.compoundTag = compoundTag;
     }
 
+    @Override
     public void pasteSchematic(Location location){
         byte xSize = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
         byte ySize = ((ByteTag) compoundTag.getValue().get("ySize")).getValue();

@@ -1,14 +1,15 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.events.IslandEnterEvent;
-import com.bgsoftware.superiorskyblock.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,36 +27,36 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 @SuppressWarnings("unused")
-public class PlayersListener implements Listener {
+public final class PlayersListener implements Listener {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
-    public PlayersListener(SuperiorSkyblock plugin){
+    public PlayersListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         new PlayerArrowPickup();
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        WrappedPlayer wrappedPlayer = plugin.getPlayers().getWrappedPlayer(e.getPlayer().getUniqueId());
-        if(!wrappedPlayer.getName().equals(e.getPlayer().getName())){
-            wrappedPlayer.updateName();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getWrappedPlayer(e.getPlayer().getUniqueId());
+        if(!superiorPlayer.getName().equals(e.getPlayer().getName())){
+            superiorPlayer.updateName();
         }
-        plugin.getNMSAdapter().setSkinTexture(wrappedPlayer);
+        plugin.getNMSAdapter().setSkinTexture(superiorPlayer);
 
-        Island island = wrappedPlayer.getIsland();
+        Island island = superiorPlayer.getIsland();
 
         if(island != null)
-            island.sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT.getMessage(wrappedPlayer.getName()), wrappedPlayer.getUniqueId());
+            island.sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        Island island = wrappedPlayer.getIsland();
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = superiorPlayer.getIsland();
 
         if(island != null)
-            island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(wrappedPlayer.getName()), wrappedPlayer.getUniqueId());
+            island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
     }
 
     @EventHandler
@@ -73,8 +74,8 @@ public class PlayersListener implements Listener {
         if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Player))
             return;
 
-        WrappedPlayer targetPlayer = WrappedPlayer.of((Player) e.getEntity());
-        WrappedPlayer damagerPlayer = WrappedPlayer.of((Player) e.getDamager());
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
 
         if(targetPlayer.getIsland() != null && targetPlayer.getIsland().equals(damagerPlayer.getIsland())){
             e.setCancelled(true);
@@ -88,7 +89,7 @@ public class PlayersListener implements Listener {
         if(e.getEntity() instanceof Player || !(e.getDamager() instanceof Player))
             return;
 
-        WrappedPlayer damagerPlayer = WrappedPlayer.of((Player) e.getDamager());
+        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island != null && !island.hasPermission(damagerPlayer, IslandPermission.ANIMAL_DAMAGE)){
@@ -99,23 +100,23 @@ public class PlayersListener implements Listener {
 
     @EventHandler
     public void onEntityInteract(PlayerInteractAtEntityEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
-        if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.ANIMAL_BREED)){
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.ANIMAL_BREED)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(wrappedPlayer);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        Island island = wrappedPlayer.getIsland();
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = superiorPlayer.getIsland();
 
-        if(wrappedPlayer.hasTeamChatEnabled()){
+        if(superiorPlayer.hasTeamChatEnabled()){
             e.setCancelled(true);
-            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(wrappedPlayer.getIslandRole(), wrappedPlayer.getName(), e.getMessage()));
+            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage()));
         }
 
         else {
@@ -131,45 +132,45 @@ public class PlayersListener implements Listener {
                 !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_BLOCK))
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(!wrappedPlayer.hasSchematicModeEnabled())
+        if(!superiorPlayer.hasSchematicModeEnabled())
             return;
 
         e.setCancelled(true);
 
         if(e.getAction().name().contains("RIGHT")){
-            Locale.SCHEMATIC_RIGHT_SELECT.send(wrappedPlayer, WrappedLocation.of(e.getClickedBlock().getLocation()));
-            wrappedPlayer.setSchematicPos1(e.getClickedBlock());
+            Locale.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            superiorPlayer.setSchematicPos1(e.getClickedBlock());
         }
         else{
-            Locale.SCHEMATIC_LEFT_SELECT.send(wrappedPlayer, WrappedLocation.of(e.getClickedBlock().getLocation()));
-            wrappedPlayer.setSchematicPos2(e.getClickedBlock());
+            Locale.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            superiorPlayer.setSchematicPos2(e.getClickedBlock());
         }
 
-        if(wrappedPlayer.getSchematicPos1() != null && wrappedPlayer.getSchematicPos2() != null)
-            Locale.SCHEMATIC_READY_TO_CREATE.send(wrappedPlayer);
+        if(superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null)
+            Locale.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
     }
 
     @EventHandler
     public void onPlayerDropItem(PlayerDropItemEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(wrappedPlayer.getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-        if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.DROP_ITEMS)){
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.DROP_ITEMS)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(wrappedPlayer);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 
     @EventHandler
     public void onPlayerItemPickup(PlayerPickupItemEvent e){
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(wrappedPlayer.getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-        if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.PICKUP_DROPS)){
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(wrappedPlayer);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 
@@ -191,12 +192,12 @@ public class PlayersListener implements Listener {
 
         @EventHandler
         public void onPlayerArrowPickup(PlayerPickupArrowEvent e){
-            WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getPlayer());
-            Island island = plugin.getGrid().getIslandAt(wrappedPlayer.getLocation());
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+            Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-            if(island != null && !island.hasPermission(wrappedPlayer, IslandPermission.PICKUP_DROPS)){
+            if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
                 e.setCancelled(true);
-                Locale.sendProtectionMessage(wrappedPlayer);
+                Locale.sendProtectionMessage(superiorPlayer);
             }
         }
 

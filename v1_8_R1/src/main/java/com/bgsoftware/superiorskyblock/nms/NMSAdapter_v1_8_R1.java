@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.mojang.authlib.properties.Property;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.EntityLiving;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
@@ -47,9 +47,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("unused")
-public class NMSAdapter_v1_8_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
-    private SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public int getCombinedId(Location location) {
@@ -117,10 +117,10 @@ public class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
     @Override
     @Deprecated
-    public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+    public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
         short data = (short) chunkSnapshot.getBlockData(x, y, z);
-        return Key.of(type, data);
+        return SKey.of(type, data);
     }
 
     @Override
@@ -134,42 +134,41 @@ public class NMSAdapter_v1_8_R1 implements NMSAdapter {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        //noinspection ConstantConditions
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(Object object : world.players)
             ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
     }
 
     @Override
-    public void setWorldBorder(WrappedPlayer wrappedPlayer, Island island) {
+    public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         if(!plugin.getSettings().worldBordersEnabled)
             return;
 
-        boolean disabled = !wrappedPlayer.hasWorldBorderEnabled();
+        boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
         WorldBorder worldBorder = new WorldBorder();
 
-        worldBorder.world = ((CraftWorld) wrappedPlayer.getWorld()).getHandle();
+        worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
         double size = disabled || island == null ? Integer.MAX_VALUE : island.getIslandSize();
         worldBorder.a(size, size, 0L);
 
-        Location center = island == null ? wrappedPlayer.getLocation() : island.getCenter();
+        Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
 
-        if (wrappedPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+        if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
             worldBorder.c(center.getX() * 8, center.getZ() * 8);
         } else {
             worldBorder.c(center.getX(), center.getZ());
         }
 
         PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, EnumWorldBorderAction.INITIALIZE);
-        ((CraftPlayer) wrappedPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
+        ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
     }
 
     @Override
-    public void setSkinTexture(WrappedPlayer wrappedPlayer) {
-        EntityPlayer entityPlayer = ((CraftPlayer) wrappedPlayer.asPlayer()).getHandle();
+    public void setSkinTexture(SuperiorPlayer superiorPlayer) {
+        EntityPlayer entityPlayer = ((CraftPlayer) superiorPlayer.asPlayer()).getHandle();
         Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
-        optional.ifPresent(property -> wrappedPlayer.setTexture(property.getValue()));
+        optional.ifPresent(property -> superiorPlayer.setTextureValue(property.getValue()));
     }
 
     @Override

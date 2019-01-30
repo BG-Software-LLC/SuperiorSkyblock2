@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms;
 
-import com.bgsoftware.superiorskyblock.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -37,9 +37,9 @@ public interface NMSAdapter {
 
     void refreshChunk(Chunk chunk);
 
-    void setWorldBorder(WrappedPlayer wrappedPlayer, Island island);
+    void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
-    void setSkinTexture(WrappedPlayer wrappedPlayer);
+    void setSkinTexture(SuperiorPlayer superiorPlayer);
 
     byte[] getNBTByteArrayValue(Object object);
 

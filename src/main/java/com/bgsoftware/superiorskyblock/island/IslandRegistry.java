@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class IslandRegistry implements Iterable<Island> {
+public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
     private List<UUID> ownershipList = Lists.newArrayList();

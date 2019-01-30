@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandRole;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdLeave implements ICommand {
+public final class CmdLeave implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -47,33 +48,33 @@ public class CmdLeave implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND.send(wrappedPlayer);
+            Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
         }
 
-        if(wrappedPlayer.getIslandRole() == IslandRole.LEADER){
-            Locale.LEAVE_ISLAND_AS_LEADER.send(wrappedPlayer);
+        if(superiorPlayer.getIslandRole() == IslandRole.LEADER){
+            Locale.LEAVE_ISLAND_AS_LEADER.send(superiorPlayer);
             return;
         }
 
-        island.kickMember(wrappedPlayer);
+        island.kickMember(superiorPlayer);
 
         for(UUID uuid : island.getMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.LEAVE_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), wrappedPlayer.getName());
+                Locale.LEAVE_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
             }
         }
 
-        Locale.LEFT_ISLAND.send(wrappedPlayer);
+        Locale.LEFT_ISLAND.send(superiorPlayer);
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
 }

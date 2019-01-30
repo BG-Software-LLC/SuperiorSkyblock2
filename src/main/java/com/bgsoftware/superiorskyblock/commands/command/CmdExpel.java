@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdExpel implements ICommand {
+public final class CmdExpel implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -47,8 +48,8 @@ public class CmdExpel implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[1]);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
         if(targetPlayer == null || !targetPlayer.asOfflinePlayer().isOnline()){
             Locale.INVALID_PLAYER.send(sender, args[1]);
@@ -58,16 +59,21 @@ public class CmdExpel implements ICommand {
         Player target = targetPlayer.asPlayer();
         Island island = plugin.getGrid().getIslandAt(target.getLocation());
 
+        if(island == null){
+            Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
+            return;
+        }
+
         if(sender instanceof Player){
-            WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-            Island playerIsland = plugin.getGrid().getIsland(wrappedPlayer);
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+            Island playerIsland = plugin.getGrid().getIsland(superiorPlayer);
 
             if(playerIsland == null){
                 Locale.INVALID_ISLAND.send(sender);
                 return;
             }
 
-            if(!wrappedPlayer.hasPermission(IslandPermission.EXPEL_PLAYERS)){
+            if(!superiorPlayer.hasPermission(IslandPermission.EXPEL_PLAYERS)){
                 Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredRole(IslandPermission.EXPEL_PLAYERS));
                 return;
             }
@@ -89,16 +95,16 @@ public class CmdExpel implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && wrappedPlayer.hasPermission(IslandPermission.EXPEL_BYPASS)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.EXPEL_BYPASS)){
             List<String> list = new ArrayList<>();
-            WrappedPlayer targetPlayer;
+            SuperiorPlayer targetPlayer;
 
-            for (UUID uuid : wrappedPlayer.getIsland().getVisitors()) {
-                targetPlayer = WrappedPlayer.of(uuid);
+            for (UUID uuid : superiorPlayer.getIsland().getVisitors()) {
+                targetPlayer = SSuperiorPlayer.of(uuid);
                 if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                     list.add(targetPlayer.getName());
             }

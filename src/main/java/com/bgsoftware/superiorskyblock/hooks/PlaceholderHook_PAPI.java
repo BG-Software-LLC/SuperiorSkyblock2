@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import me.clip.placeholderapi.external.EZPlaceholderHook;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,11 +15,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("deprecation")
-public class PlaceholderHook_PAPI extends EZPlaceholderHook {
+public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
-    private PlaceholderHook_PAPI(SuperiorSkyblock plugin){
+    private PlaceholderHook_PAPI(SuperiorSkyblockPlugin plugin){
         super(plugin, "superior");
         this.plugin = plugin;
         hook();
@@ -29,8 +30,8 @@ public class PlaceholderHook_PAPI extends EZPlaceholderHook {
         if(player == null)
             return "";
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(player);
-        Island island = wrappedPlayer.getIsland();
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        Island island = superiorPlayer.getIsland();
         Matcher matcher;
 
         if((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()){
@@ -51,7 +52,7 @@ public class PlaceholderHook_PAPI extends EZPlaceholderHook {
 
                 try {
                     IslandPermission islandPermission = IslandPermission.valueOf(permission.toUpperCase());
-                    return String.valueOf(island.hasPermission(wrappedPlayer, islandPermission));
+                    return String.valueOf(island.hasPermission(superiorPlayer, islandPermission));
                 }catch(IllegalArgumentException ex){
                     return "";
                 }
@@ -65,7 +66,7 @@ public class PlaceholderHook_PAPI extends EZPlaceholderHook {
 
             switch (subPlaceholder.toLowerCase()){
                 case "center":
-                    return WrappedLocation.of(island.getCenter()).toString();
+                    return SBlockPosition.of(island.getCenter()).toString();
                 case "x":
                     return String.valueOf(island.getCenter().getBlockX());
                 case "y":
@@ -101,9 +102,9 @@ public class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 case "drops_multiplier":
                     return String.valueOf(island.getMobDropsMultiplier());
                 case "discord":
-                    return island.hasPermission(wrappedPlayer, IslandPermission.DISCORD_SHOW) ? island.getDiscord() : "None";
+                    return island.hasPermission(superiorPlayer, IslandPermission.DISCORD_SHOW) ? island.getDiscord() : "None";
                 case "paypal":
-                    return island.hasPermission(wrappedPlayer, IslandPermission.PAYPAL_SHOW) ? island.getPaypal() : "None";
+                    return island.hasPermission(superiorPlayer, IslandPermission.PAYPAL_SHOW) ? island.getPaypal() : "None";
                 case "discord_all":
                     return island.getDiscord();
                 case "paypal_all":
@@ -118,7 +119,7 @@ public class PlaceholderHook_PAPI extends EZPlaceholderHook {
 
     public static void register(){
         if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-            new PlaceholderHook_PAPI(SuperiorSkyblock.getPlugin());
+            new PlaceholderHook_PAPI(SuperiorSkyblockPlugin.getPlugin());
     }
 
 }

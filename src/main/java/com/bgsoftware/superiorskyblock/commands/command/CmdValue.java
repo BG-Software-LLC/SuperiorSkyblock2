@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdValue implements ICommand {
+public final class CmdValue implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -46,35 +47,35 @@ public class CmdValue implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
-        Key toCheck;
+        SKey toCheck;
 
         if(args.length == 1){
-            ItemStack inHand = wrappedPlayer.asPlayer().getItemInHand();
+            ItemStack inHand = superiorPlayer.asPlayer().getItemInHand();
 
             if(inHand == null){
                 inHand = new ItemStack(Material.AIR);
             }
 
-            toCheck = Key.of(inHand);
+            toCheck = SKey.of(inHand);
         }
         else{
-            toCheck = Key.of(args[1]);
+            toCheck = SKey.of(args[1]);
         }
 
         int value = plugin.getGrid().getBlockValue(toCheck);
         String key = StringUtil.format(toCheck.toString().split(":")[0]);
 
         if(value == 0)
-            Locale.BLOCK_VALUE_WORTHLESS.send(wrappedPlayer, key);
+            Locale.BLOCK_VALUE_WORTHLESS.send(superiorPlayer, key);
         else
-            Locale.BLOCK_VALUE.send(wrappedPlayer, key, value);
+            Locale.BLOCK_VALUE.send(superiorPlayer, key, value);
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

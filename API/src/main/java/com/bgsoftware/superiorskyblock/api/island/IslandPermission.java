@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.island;
+package com.bgsoftware.superiorskyblock.api.island;
 
 import java.util.Arrays;
 

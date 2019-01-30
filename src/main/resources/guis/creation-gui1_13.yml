@@ -1,6 +1,6 @@
 ######################################################
 ##                                                  ##
-##                SuperiorSkyblock 2                ##
+##                SuperiorSkyblockPlugin 2                ##
 ##                Developed by Ome_R                ##
 ##                                                  ##
 ######################################################
@@ -17,11 +17,11 @@ creation-gui:
       slot: 0
       has-access-item:
         type: GRASS_BLOCK
-        name: '&eDefault Island &a(Available)'
+        name: '&eDefault SIsland &a(Available)'
         lore:
           - '&7The old and the original island.'
       no-access-item:
         type: GRASS_BLOCK
-        name: '&eDefault Island &c(Unavailable)'
+        name: '&eDefault SIsland &c(Unavailable)'
         lore:
           - '&7The old and the original island.'

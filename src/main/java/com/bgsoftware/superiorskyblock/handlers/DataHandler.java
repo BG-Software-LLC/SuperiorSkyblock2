@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.island.Island;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTOutputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 
 import java.io.EOFException;
@@ -17,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public class DataHandler {
+public final class DataHandler {
 
-    public SuperiorSkyblock plugin;
+    public SuperiorSkyblockPlugin plugin;
 
-    public DataHandler(SuperiorSkyblock plugin){
+    public DataHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadDatabase();
     }
@@ -33,8 +35,8 @@ public class DataHandler {
         }
 
         List<Island> islands = new ArrayList<>();
-        plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(WrappedPlayer.of(uuid))));
-        List<WrappedPlayer> players = plugin.getPlayers().getAllPlayers();
+        plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
+        List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
         NBTOutputStream outputStream;
         File file;
 
@@ -66,7 +68,7 @@ public class DataHandler {
                 }
 
                 outputStream = new NBTOutputStream(new FileOutputStream(file));
-                outputStream.writeTag(island.getAsTag());
+                outputStream.writeTag(((SIsland) island).getAsTag());
                 outputStream.close();
             }catch(Exception ex){
                 ex.printStackTrace();
@@ -77,8 +79,8 @@ public class DataHandler {
          * Save all players from cache
          */
 
-        for(WrappedPlayer wrappedPlayer : players){
-            file = new File(plugin.getDataFolder(), "data/players/" + wrappedPlayer.getUniqueId());
+        for(SuperiorPlayer superiorPlayer : players){
+            file = new File(plugin.getDataFolder(), "data/players/" + superiorPlayer.getUniqueId());
 
             try {
                 if(!file.exists()){
@@ -87,7 +89,7 @@ public class DataHandler {
                 }
 
                 outputStream = new NBTOutputStream(new FileOutputStream(file));
-                outputStream.writeTag(wrappedPlayer.getAsTag());
+                outputStream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
                 outputStream.close();
             }catch(Exception ex){
                 ex.printStackTrace();
@@ -131,7 +133,7 @@ public class DataHandler {
                     Tag tag = inputStream.readTag();
                     plugin.getGrid().createIsland((CompoundTag) tag);
                 }catch(EOFException ex){
-                    SuperiorSkyblock.log("Couldn't load the island of " + file.getName() + ".");
+                    SuperiorSkyblockPlugin.log("Couldn't load the island of " + file.getName() + ".");
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }

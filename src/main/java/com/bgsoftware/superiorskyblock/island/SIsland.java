@@ -1,13 +1,17 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
@@ -16,6 +20,8 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -39,29 +45,29 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
-public class Island implements Comparable<Island> {
+@SuppressWarnings("unused")
+public class SIsland implements Island{
 
-    protected static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static boolean calcProcess = false;
     private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
     private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     /*
-     * Island identifiers
+     * SIsland identifiers
      */
 
     private final UUID owner;
-    private final WrappedLocation center;
+    private final BlockPosition center;
 
     /*
-     * Island data
+     * SIsland data
      */
 
     private final Set<UUID> members = new HashSet<>();
     private final Set<UUID> banned = new HashSet<>();
-    private final Map<IslandRole, PermissionNode> permissionNodes = new HashMap<>();
+    private final Map<IslandRole, SPermissionNode> permissionNodes = new HashMap<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
@@ -71,7 +77,7 @@ public class Island implements Comparable<Island> {
     private String discord = "None", paypal = "None";
 
     /*
-     * Island multipliers & limits
+     * SIsland multipliers & limits
      */
 
     private int hoppersLimit = plugin.getSettings().defaultHoppersLimit;
@@ -80,10 +86,10 @@ public class Island implements Comparable<Island> {
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
 
-    public Island(CompoundTag tag){
+    public SIsland(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
         this.owner = UUID.fromString(((StringTag) compoundValues.get("owner")).getValue());
-        this.center = WrappedLocation.of(((StringTag) compoundValues.get("center")).getValue());
+        this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
 
         List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
         for(Tag _tag : members)
@@ -95,7 +101,7 @@ public class Island implements Comparable<Island> {
 
         Map<String, Tag> permissionNodes = ((CompoundTag) compoundValues.get("permissionNodes")).getValue();
         for(String islandRole : permissionNodes.keySet())
-            this.permissionNodes.put(IslandRole.valueOf(islandRole), new PermissionNode((ListTag) permissionNodes.get(islandRole)));
+            this.permissionNodes.put(IslandRole.valueOf(islandRole), new SPermissionNode((ListTag) permissionNodes.get(islandRole)));
 
         Map<String, Tag> upgrades = ((CompoundTag) compoundValues.get("upgrades")).getValue();
         for(String upgrade : upgrades.keySet())
@@ -118,14 +124,14 @@ public class Island implements Comparable<Island> {
         calcIslandWorth(null);
     }
 
-    public Island(WrappedPlayer wrappedPlayer, Location location){
-        this(wrappedPlayer, WrappedLocation.of(location));
+    public SIsland(SuperiorPlayer superiorPlayer, Location location){
+        this(superiorPlayer, SBlockPosition.of(location));
     }
 
-    public Island(WrappedPlayer wrappedPlayer, WrappedLocation wrappedLocation){
-        if(wrappedPlayer != null){
-            this.owner = wrappedPlayer.getTeamLeader();
-            wrappedPlayer.setIslandRole(IslandRole.LEADER);
+    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation){
+        if(superiorPlayer != null){
+            this.owner = superiorPlayer.getTeamLeader();
+            superiorPlayer.setIslandRole(IslandRole.LEADER);
         }else{
             this.owner = null;
         }
@@ -133,49 +139,64 @@ public class Island implements Comparable<Island> {
         assignPermissionNodes();
     }
 
-    public WrappedPlayer getOwner() {
-        return WrappedPlayer.of(owner);
+    @Override
+    public SuperiorPlayer getOwner() {
+        return SSuperiorPlayer.of(owner);
     }
 
+    @Override
     public List<UUID> getMembers() {
         return new ArrayList<>(members);
     }
 
-    public void inviteMember(WrappedPlayer wrappedPlayer){
-        if(invitedPlayers.contains(wrappedPlayer.getUniqueId()))
+    @Override
+    public boolean isSpawn() {
+        return false;
+    }
+
+    @Override
+    public void inviteMember(SuperiorPlayer superiorPlayer){
+        if(invitedPlayers.contains(superiorPlayer.getUniqueId()))
             return;
 
-        invitedPlayers.add(wrappedPlayer.getUniqueId());
+        invitedPlayers.add(superiorPlayer.getUniqueId());
     }
 
-    public void revokeInvite(WrappedPlayer wrappedPlayer){
-        invitedPlayers.remove(wrappedPlayer.getUniqueId());
+    @Override
+    public void revokeInvite(SuperiorPlayer superiorPlayer){
+        invitedPlayers.remove(superiorPlayer.getUniqueId());
     }
 
-    public boolean isInvited(WrappedPlayer wrappedPlayer){
-        return invitedPlayers.contains(wrappedPlayer.getUniqueId());
+    @Override
+    public boolean isInvited(SuperiorPlayer superiorPlayer){
+        return invitedPlayers.contains(superiorPlayer.getUniqueId());
     }
 
-    public void addMember(WrappedPlayer wrappedPlayer, IslandRole islandRole){
-        members.add(wrappedPlayer.getUniqueId());
-        wrappedPlayer.setTeamLeader(owner);
-        wrappedPlayer.setIslandRole(islandRole);
+    @Override
+    public void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole){
+        members.add(superiorPlayer.getUniqueId());
+        superiorPlayer.setTeamLeader(owner);
+        superiorPlayer.setIslandRole(islandRole);
     }
 
-    public void kickMember(WrappedPlayer wrappedPlayer){
-        members.remove(wrappedPlayer.getUniqueId());
-        wrappedPlayer.setTeamLeader(wrappedPlayer.getUniqueId());
+    @Override
+    public void kickMember(SuperiorPlayer superiorPlayer){
+        members.remove(superiorPlayer.getUniqueId());
+        superiorPlayer.setTeamLeader(superiorPlayer.getUniqueId());
     }
 
-    public void banMember(WrappedPlayer wrappedPlayer){
-        if(isMember(wrappedPlayer)) kickMember(wrappedPlayer);
-        banned.add(wrappedPlayer.getUniqueId());
+    @Override
+    public void banMember(SuperiorPlayer superiorPlayer){
+        if(isMember(superiorPlayer)) kickMember(superiorPlayer);
+        banned.add(superiorPlayer.getUniqueId());
     }
 
-    public boolean isBanned(WrappedPlayer wrappedPlayer){
-        return banned.contains(wrappedPlayer.getUniqueId());
+    @Override
+    public boolean isBanned(SuperiorPlayer superiorPlayer){
+        return banned.contains(superiorPlayer.getUniqueId());
     }
 
+    @Override
     public List<UUID> getAllMembers() {
         List<UUID> members = new ArrayList<>();
 
@@ -185,17 +206,19 @@ public class Island implements Comparable<Island> {
         return members;
     }
 
+    @Override
     public List<UUID> getVisitors(){
         List<UUID> visitors = new ArrayList<>();
 
         for(Player player : Bukkit.getOnlinePlayers()){
-            if(!isMember(WrappedPlayer.of(player)) && isInside(player.getLocation()))
+            if(!isMember(SSuperiorPlayer.of(player)) && isInside(player.getLocation()))
                 visitors.add(player.getUniqueId());
         }
 
         return visitors;
     }
 
+    @Override
     public List<UUID> allPlayersInside(){
         List<UUID> visitors = new ArrayList<>();
 
@@ -207,41 +230,50 @@ public class Island implements Comparable<Island> {
         return visitors;
     }
 
-    public boolean isMember(WrappedPlayer wrappedPlayer){
-        return owner.equals(wrappedPlayer.getTeamLeader());
+    @Override
+    public boolean isMember(SuperiorPlayer superiorPlayer){
+        return owner.equals(superiorPlayer.getTeamLeader());
     }
 
+    @Override
     public Location getCenter(){
         return center.parse().add(0.5, 0, 0.5);
     }
 
+    @Override
     public Location getMinimum(){
         int islandDistance = plugin.getSettings().maxIslandSize;
         return getCenter().subtract(islandDistance, 0, islandDistance);
     }
 
+    @Override
     public Location getMaximum(){
         int islandDistance = plugin.getSettings().maxIslandSize;
         return getCenter().add(islandDistance, 0, islandDistance);
     }
 
+    @Override
     public boolean hasPermission(CommandSender sender, IslandPermission islandPermission){
-        return sender instanceof ConsoleCommandSender || hasPermission(WrappedPlayer.of(sender), islandPermission);
+        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
     }
 
-    public boolean hasPermission(WrappedPlayer wrappedPlayer, IslandPermission islandPermission){
-        IslandRole islandRole = isMember(wrappedPlayer) ? wrappedPlayer.getIslandRole() : IslandRole.GUEST;
-        return wrappedPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
+    @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
+        IslandRole islandRole = isMember(superiorPlayer) ? superiorPlayer.getIslandRole() : IslandRole.GUEST;
+        return superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
     }
 
+    @Override
     public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value){
         permissionNodes.get(islandRole).setPermission(islandPermission, value);
     }
 
-    public PermissionNode getPermisisonNode(IslandRole islandRole){
+    @Override
+    public SPermissionNode getPermisisonNode(IslandRole islandRole){
         return permissionNodes.get(islandRole).clone();
     }
 
+    @Override
     public IslandRole getRequiredRole(IslandPermission islandPermission){
         IslandRole islandRole = IslandRole.LEADER;
 
@@ -253,11 +285,13 @@ public class Island implements Comparable<Island> {
         return islandRole;
     }
 
+    @Override
     public void disbandIsland(){
-        members.forEach(member -> kickMember(WrappedPlayer.of(member)));
+        members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
     }
 
+    @Override
     public List<Chunk> getAllChunks(){
         Set<Chunk> chunks = new HashSet<>();
         Chunk minChunk = getMinimum().getChunk(), maxChunk = getMaximum().getChunk();
@@ -271,20 +305,24 @@ public class Island implements Comparable<Island> {
         return new ArrayList<>(chunks);
     }
 
+    @Override
     public double getMoneyInBank(){
         if(islandBank < 0) islandBank = 0;
         return islandBank;
     }
 
+    @Override
     public void depositMoney(double amount){
         islandBank += amount;
     }
 
+    @Override
     public void withdrawMoney(double amount){
         islandBank -= amount;
     }
 
-    public void calcIslandWorth(WrappedPlayer asker) {
+    @Override
+    public void calcIslandWorth(SuperiorPlayer asker) {
         if(!Bukkit.isPrimaryThread()){
             Bukkit.getScheduler().runTask(plugin, () -> calcIslandWorth(asker));
             return;
@@ -349,42 +387,48 @@ public class Island implements Comparable<Island> {
 
             if(islandCalcsQueue.size() != 0){
                 CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                plugin.getGrid().getIsland(WrappedPlayer.of(calcIslandData.owner))
-                        .calcIslandWorth(calcIslandData.asker == null ? null : WrappedPlayer.of(calcIslandData.asker));
+                plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
+                        .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
             }
         }).start();
     }
 
+    @Override
     public void handleBlockPlace(Block block){
-        handleBlockPlace(Key.of(block), 1);
+        handleBlockPlace(SKey.of(block), 1);
     }
 
+    @Override
     public void handleBlockPlace(Block block, int amount){
-        handleBlockPlace(Key.of(block), amount);
+        handleBlockPlace(SKey.of(block), amount);
     }
 
+    @Override
     public void handleBlockPlace(Key key, int amount){
         int blockValue;
         if(key.toString().endsWith(":0"))
-            key = Key.of(key.toString().replace(":0", ""));
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+            key = SKey.of(key.toString().replace(":0", ""));
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
             blocksCalculations.put(key, currentAmount + amount);
             islandWorth += blockValue;
         }
     }
 
+    @Override
     public void handleBlockBreak(Block block){
-        handleBlockBreak(Key.of(block), 1);
+        handleBlockBreak(SKey.of(block), 1);
     }
 
+    @Override
     public void handleBlockBreak(Block block, int amount){
-        handleBlockBreak(Key.of(block), amount);
+        handleBlockBreak(SKey.of(block), amount);
     }
 
+    @Override
     public void handleBlockBreak(Key key, int amount){
         int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
 
             if(currentAmount <= amount)
@@ -397,23 +441,28 @@ public class Island implements Comparable<Island> {
         }
     }
 
+    @Override
     public int getHoppersAmount(){
-        return getBlockCount(Key.of("HOPPER"));
+        return getBlockCount(SKey.of("HOPPER"));
     }
 
+    @Override
     public int getBlockCount(Key key){
         return blocksCalculations.getOrDefault(key, 0);
     }
 
+    @Override
     public double getWorth(){
         int bankWorthRate = plugin.getSettings().bankWorthRate;
         return bankWorthRate <= 0 ? islandWorth : islandWorth + (islandBank / bankWorthRate);
     }
 
+    @Override
     public double getRawWorth(){
         return islandWorth;
     }
 
+    @Override
     public int getIslandLevel(){
         double worth = getWorth();
         try {
@@ -424,13 +473,14 @@ public class Island implements Comparable<Island> {
         }
     }
 
+    @Override
     public boolean isInside(Location location){
         Location min = getMinimum(), max = getMaximum();
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    @Override
     public boolean isInsideRange(Location location){
         int islandSize = getIslandSize();
         Location min = center.parse().subtract(islandSize, 0, islandSize);
@@ -439,78 +489,97 @@ public class Island implements Comparable<Island> {
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
 
+    @Override
     public int getUpgradeLevel(String upgradeName){
         return upgrades.getOrDefault(upgradeName, 1);
     }
 
+    @Override
     public void setUpgradeLevel(String upgradeName, int level){
         upgrades.put(upgradeName, Math.min(plugin.getUpgrades().getMaxUpgradeLevel(upgradeName), level));
     }
 
+    @Override
     public int getIslandSize() {
         return getOwner().getIslandSize();
     }
 
+    @Override
     public int getHoppersLimit(){
         return hoppersLimit;
     }
 
+    @Override
     public int getTeamLimit() {
         return teamLimit;
     }
 
+    @Override
     public double getCropGrowthMultiplier() {
         return cropGrowth;
     }
 
+    @Override
     public double getSpawnerRatesMultiplier() {
         return spawnerRates;
     }
 
+    @Override
     public double getMobDropsMultiplier() {
         return mobDrops;
     }
 
+    @Override
     public void setIslandSize(int islandSize) {
         getOwner().setIslandSize(islandSize);
     }
 
+    @Override
     public void setHoppersLimit(int hoppersLimit){
         this.hoppersLimit = hoppersLimit;
     }
 
+    @Override
     public void setTeamLimit(int teamLimit) {
         this.teamLimit = teamLimit;
     }
 
+    @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
         this.cropGrowth = cropGrowth;
     }
 
+    @Override
     public void setSpawnerRatesMultiplier(double spawnerRates) {
         this.spawnerRates = spawnerRates;
     }
 
+    @Override
     public void setMobDropsMultiplier(double mobDrops) {
         this.mobDrops = mobDrops;
     }
 
+    @Override
     public String getDiscord() {
         return discord;
     }
 
+    @Override
     public void setDiscord(String discord) {
         this.discord = discord;
     }
 
+    @Override
     public String getPaypal() {
         return paypal;
     }
 
+    @Override
     public void setPaypal(String paypal) {
         this.paypal = paypal;
     }
 
+    @Override
     public void setBiome(Biome biome){
         Location min = getMinimum(), max = getMaximum();
         for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
@@ -520,56 +589,63 @@ public class Island implements Comparable<Island> {
         }
     }
 
+    @Override
     public void sendMessage(String message, UUID... ignoredMembers){
         List<UUID> ignoredList = Arrays.asList(ignoredMembers);
-        WrappedPlayer targetPlayer;
+        SuperiorPlayer targetPlayer;
         for(UUID uuid : getAllMembers()){
             if(!ignoredList.contains(uuid)) {
-                if ((targetPlayer = WrappedPlayer.of(uuid)).asOfflinePlayer().isOnline())
+                if ((targetPlayer = SSuperiorPlayer.of(uuid)).asOfflinePlayer().isOnline())
                     Locale.sendMessage(targetPlayer, message);
             }
         }
     }
 
+    @Override
     public Location getWarpLocation(String name){
         return warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).clone() : null;
     }
 
+    @Override
     public void setWarpLocation(String name, Location location){
         warps.put(name.toLowerCase(), location.clone());
     }
 
-    public void warpPlayer(WrappedPlayer wrappedPlayer, String warp){
+    @Override
+    public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
         Location location = warps.get(warp.toLowerCase()).clone();
         Block warpBlock = location.getBlock();
 
         if(!warpBlock.getRelative(BlockFace.DOWN).getType().isSolid() &&
                 !warpBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType().isSolid()){
-            Locale.UNSAFE_WARP.send(wrappedPlayer);
+            Locale.UNSAFE_WARP.send(superiorPlayer);
             return;
         }
 
-        wrappedPlayer.asPlayer().teleport(location.add(0.5, 0, 0.5));
+        superiorPlayer.asPlayer().teleport(location.add(0.5, 0, 0.5));
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if(wrappedPlayer.getLocation().distanceSquared(location) < 25)
-                Locale.TELEPORTED_TO_WARP.send(wrappedPlayer);
+            if(superiorPlayer.getLocation().distanceSquared(location) < 25)
+                Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
         }, 2L);
     }
 
-    public void deleteWarp(WrappedPlayer wrappedPlayer, Location location){
+    @Override
+    public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
         for(String warpName : warps.keySet()){
             if(warps.get(warpName).distanceSquared(location) < 2){
                 warps.remove(warpName);
-                Locale.DELETE_WARP.send(wrappedPlayer, warpName);
+                Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
         }
     }
 
+    @Override
     public void deleteWarp(String name){
         warps.remove(name);
     }
 
+    @Override
     public List<String> getAllWarps(){
         return new ArrayList<>(warps.keySet());
     }
@@ -618,11 +694,11 @@ public class Island implements Comparable<Island> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Island ? owner.equals(((Island) obj).owner) : super.equals(obj);
+        return obj instanceof SIsland ? owner.equals(((SIsland) obj).owner) : super.equals(obj);
     }
 
-    @Override
     @SuppressWarnings("NullableProblems")
+    @Override
     public int compareTo(Island other) {
         if(other == null)
             return -1;
@@ -643,15 +719,15 @@ public class Island implements Comparable<Island> {
     }
 
     private void assignPermissionNodes(){
-        permissionNodes.put(IslandRole.GUEST, new PermissionNode(null, plugin.getSettings().guestPermissions));
+        permissionNodes.put(IslandRole.GUEST, new SPermissionNode(null, plugin.getSettings().guestPermissions));
         permissionNodes.put(IslandRole.MEMBER,
-                new PermissionNode(permissionNodes.get(IslandRole.GUEST), plugin.getSettings().memberPermissions));
+                new SPermissionNode(permissionNodes.get(IslandRole.GUEST), plugin.getSettings().memberPermissions));
         permissionNodes.put(IslandRole.MODERATOR,
-                new PermissionNode(permissionNodes.get(IslandRole.MEMBER), plugin.getSettings().modPermissions));
+                new SPermissionNode(permissionNodes.get(IslandRole.MEMBER), plugin.getSettings().modPermissions));
         permissionNodes.put(IslandRole.ADMIN,
-                new PermissionNode(permissionNodes.get(IslandRole.MODERATOR), plugin.getSettings().adminPermission));
+                new SPermissionNode(permissionNodes.get(IslandRole.MODERATOR), plugin.getSettings().adminPermission));
         permissionNodes.put(IslandRole.LEADER,
-                new PermissionNode(permissionNodes.get(IslandRole.ADMIN), plugin.getSettings().leaderPermissions));
+                new SPermissionNode(permissionNodes.get(IslandRole.ADMIN), plugin.getSettings().leaderPermissions));
     }
 
     private class CalcIslandData{

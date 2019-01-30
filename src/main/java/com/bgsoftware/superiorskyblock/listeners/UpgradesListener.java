@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -36,13 +37,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public class UpgradesListener implements Listener {
+public final class UpgradesListener implements Listener {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
 
     private Map<String, Byte> maxGrowthData = new HashMap<>();
 
-    public UpgradesListener(SuperiorSkyblock plugin){
+    public UpgradesListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         maxGrowthData.put("BEETROOT_BLOCK", (byte) 3);
         maxGrowthData.put("NETHER_WARTS", (byte) 3);
@@ -62,28 +63,28 @@ public class UpgradesListener implements Listener {
                 !e.getClickedInventory().getName().equals(plugin.getUpgrades().getTitle()))
             return;
 
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(e.getWhoClicked());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
         e.setCancelled(true);
 
         String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
         if(!upgradeName.isEmpty()){
             Island island;
-            int level = (island = wrappedPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgradeName);
+            int level = (island = superiorPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgradeName);
             double nextUpgradePrice = plugin.getUpgrades().getUpgradePrice(upgradeName, level);
             boolean hasNextLevel;
 
-            if(EconomyHook.getMoneyInBank(wrappedPlayer) < nextUpgradePrice){
-                Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(wrappedPlayer);
+            if(EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice){
+                Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                 hasNextLevel = false;
             }
 
             else{
                 List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);
 
-                EconomyHook.withdrawMoney(wrappedPlayer, nextUpgradePrice);
+                EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
                 for (String command : commands) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", wrappedPlayer.getName()));
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName()));
                 }
 
                 hasNextLevel = true;
@@ -103,7 +104,7 @@ public class UpgradesListener implements Listener {
                 !e.getInventory().getName().equals(plugin.getUpgrades().getTitle()))
             return;
 
-        plugin.getUpgrades().playCloseSound(WrappedPlayer.of(e.getPlayer()));
+        plugin.getUpgrades().playCloseSound(SSuperiorPlayer.of(e.getPlayer()));
     }
 
 
@@ -209,7 +210,7 @@ public class UpgradesListener implements Listener {
         noRightClickTwice.add(e.getPlayer().getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
-        island.handleBlockPlace(Key.of("HOPPER"), 1);
+        island.handleBlockPlace(SKey.of("HOPPER"), 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -222,7 +223,7 @@ public class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(Key.of("HOPPER"), 1);
+        island.handleBlockBreak(SKey.of("HOPPER"), 1);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

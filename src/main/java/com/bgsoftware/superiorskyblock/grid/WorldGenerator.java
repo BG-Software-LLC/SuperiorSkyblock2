@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class WorldGenerator extends ChunkGenerator {
+public final class WorldGenerator extends ChunkGenerator {
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
@@ -56,6 +56,7 @@ public class WorldGenerator extends ChunkGenerator {
         return new ArrayList<>();
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void setBlock(byte[][] blocks, int x, int y, int z, int blockId){
         if(blocks[y >> 4] == null)
             blocks[y >> 4] = new byte[4096];

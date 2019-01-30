@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
-public class TagUtil {
+public final class TagUtil {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void assignIntoBlock(CompoundTag compoundTag, Location offset){
         Map<String, Tag> compoundValue = compoundTag.getValue();
@@ -70,7 +70,7 @@ public class TagUtil {
     public static void spawnEntity(CompoundTag compoundTag, Location center){
         Map<String, Tag> compoundValue = compoundTag.getValue();
         EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
-        WrappedLocation offset = WrappedLocation.of(((StringTag) compoundValue.get("offset")).getValue());
+        SBlockPosition offset = SBlockPosition.of(((StringTag) compoundValue.get("offset")).getValue());
         CompoundTag nbtTagCompound = (CompoundTag) compoundValue.get("NBT");
 
         LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(offset.parse(center.getWorld()).add(center), entityType);

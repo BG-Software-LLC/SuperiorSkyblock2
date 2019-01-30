@@ -20,7 +20,7 @@ import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetTeamLim
 import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetUpgrade;
 import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminWithdraw;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -31,9 +31,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdmin implements ICommand {
+public final class CmdAdmin implements ICommand {
 
-    private SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private List<ICommand> subCommands = new ArrayList<>();
 
     public CmdAdmin(){
@@ -89,7 +89,7 @@ public class CmdAdmin implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if(args.length > 1){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[1].toLowerCase())){
@@ -135,7 +135,7 @@ public class CmdAdmin implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         List<String> list = new ArrayList<>();
 
         if(args.length > 1){

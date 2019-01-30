@@ -1,24 +1,25 @@
 package com.bgsoftware.superiorskyblock.listeners.events;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.block.Sign;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class SignBreakEvent extends Event {
+@SuppressWarnings("unused")
+public final class SignBreakEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private WrappedPlayer wrappedPlayer;
+    private SuperiorPlayer superiorPlayer;
     private Sign sign;
 
-    public SignBreakEvent(WrappedPlayer wrappedPlayer, Sign sign){
-        this.wrappedPlayer = wrappedPlayer;
+    public SignBreakEvent(SuperiorPlayer superiorPlayer, Sign sign){
+        this.superiorPlayer = superiorPlayer;
         this.sign = sign;
     }
 
-    public WrappedPlayer getPlayer() {
-        return wrappedPlayer;
+    public SuperiorPlayer getPlayer() {
+        return superiorPlayer;
     }
 
     public Sign getSign() {

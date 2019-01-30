@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.config;
 
-public class ConfigComments {
+@SuppressWarnings("unused")
+public final class ConfigComments {
 
     @Comment("######################################################")
     @Comment("##                                                  ##")
-    @Comment("##                SuperiorSkyblock 2                ##")
+    @Comment("##                SuperiorSkyblockPlugin 2                ##")
     @Comment("##                Developed by Ome_R                ##")
     @Comment("##                                                  ##")
     @Comment("######################################################")
@@ -23,7 +24,7 @@ public class ConfigComments {
     public static String CALC_INTERVAL = "calc-interval";
 
     @Comment("")
-    @Comment("Set the maximum island size. Island distances is 3 times bigger than the max size.")
+    @Comment("Set the maximum island size. SIsland distances is 3 times bigger than the max size.")
     @Comment("Please, do not change it while you have a running islands world!")
     public static String MAX_ISLAND_SIZE = "max-island-size";
 

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
@@ -12,11 +14,11 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
-public class PermissionNode implements Cloneable {
+public final class SPermissionNode implements PermissionNode {
 
     private Set<IslandPermission> nodes = new HashSet<>();
 
-    public PermissionNode(ListTag tag){
+    public SPermissionNode(ListTag tag){
         List<Tag> list = tag.getValue();
 
         for(Tag _tag : list)
@@ -24,7 +26,7 @@ public class PermissionNode implements Cloneable {
 
     }
 
-    public PermissionNode(PermissionNode other, List<String> permissions){
+    public SPermissionNode(SPermissionNode other, List<String> permissions){
         if(other != null) {
             this.nodes = new HashSet<>(other.nodes);
         }
@@ -57,19 +59,22 @@ public class PermissionNode implements Cloneable {
             stringBuilder.append(Locale.PERMISSION_SPACER.getMessage()).append(isEnabled ? "&a" : "&c").append(islandPermission.name().toLowerCase());
         }
 
-        String message = stringBuilder.toString().substring(Locale.PERMISSION_SPACER.getMessage().length());
+        //noinspection ConstantConditions
+        int length = Locale.PERMISSION_SPACER.getMessage() == null ? 0 : Locale.PERMISSION_SPACER.getMessage().length();
+
+        String message = stringBuilder.toString().substring(length);
 
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     @Override
-    public PermissionNode clone() {
+    public SPermissionNode clone() {
         try {
-            PermissionNode permissionNode = (PermissionNode) super.clone();
+            SPermissionNode permissionNode = (SPermissionNode) super.clone();
             permissionNode.nodes = new HashSet<>(nodes);
             return permissionNode;
         }catch(CloneNotSupportedException ex){
-            return new PermissionNode(this, new ArrayList<>());
+            return new SPermissionNode(this, new ArrayList<>());
         }
     }
 

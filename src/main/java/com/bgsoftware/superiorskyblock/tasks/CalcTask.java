@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.tasks;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class CalcTask extends BukkitRunnable {
+public final class CalcTask extends BukkitRunnable {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static int id = -1;
 
     private CalcTask(){
@@ -19,10 +19,10 @@ public class CalcTask extends BukkitRunnable {
     @Override
     public void run() {
         if(Bukkit.getOnlinePlayers().size() > 0){
-            announceToOps("&7&o[SuperiorSkyblock] Calculating islands...");
+            announceToOps("&7&o[SuperiorSkyblockPlugin] Calculating islands...");
             plugin.getGrid().calcAllIslands();
             announceToPlayers();
-            announceToOps("&7&o[SuperiorSkyblock] Calculating islands done!");
+            announceToOps("&7&o[SuperiorSkyblockPlugin] Calculating islands done!");
         }
     }
 

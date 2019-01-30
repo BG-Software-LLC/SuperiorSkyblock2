@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.island.IslandRole;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdPromote implements ICommand {
+public final class CmdPromote implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -47,57 +48,57 @@ public class CmdPromote implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND.send(wrappedPlayer);
+            Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
         }
 
-        if(!wrappedPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
-            Locale.NO_PROMOTE_PERMISSION.send(wrappedPlayer, island.getRequiredRole(IslandPermission.PROMOTE_MEMBERS));
+        if(!superiorPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
+            Locale.NO_PROMOTE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.PROMOTE_MEMBERS));
             return;
         }
 
-        WrappedPlayer targetPlayer = WrappedPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
         if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(wrappedPlayer, args[1]);
+            Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
             return;
         }
 
-        if(!targetPlayer.getIslandRole().isLessThan(wrappedPlayer.getIslandRole()) ||
-                targetPlayer.getIslandRole().getNextRole().isHigherThan(wrappedPlayer.getIslandRole())){
-            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(wrappedPlayer);
+        if(!targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) ||
+                targetPlayer.getIslandRole().getNextRole().isHigherThan(superiorPlayer.getIslandRole())){
+            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
 
         if(targetPlayer.getIslandRole().getNextRole() == IslandRole.LEADER){
-            Locale.LAST_ROLE_PROMOTE.send(wrappedPlayer);
+            Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
         targetPlayer.setIslandRole(targetPlayer.getIslandRole().getNextRole());
 
-        Locale.PROMOTED_MEMBER.send(wrappedPlayer, targetPlayer.getName(), targetPlayer.getIslandRole());
+        Locale.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getIslandRole());
         Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getIslandRole());
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
-        Island island = wrappedPlayer.getIsland();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && wrappedPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
             List<String> list = new ArrayList<>();
-            WrappedPlayer targetPlayer;
+            SuperiorPlayer targetPlayer;
 
             for(UUID uuid : island.getAllMembers()){
-                targetPlayer = WrappedPlayer.of(uuid);
-                if(targetPlayer.getIslandRole().isLessThan(wrappedPlayer.getIslandRole()) &&
-                        !targetPlayer.getIslandRole().getNextRole().isHigherThan(wrappedPlayer.getIslandRole()) &&
+                targetPlayer = SSuperiorPlayer.of(uuid);
+                if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
+                        !targetPlayer.getIslandRole().getNextRole().isHigherThan(superiorPlayer.getIslandRole()) &&
                         targetPlayer.getIslandRole().getNextRole() != IslandRole.LEADER &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());

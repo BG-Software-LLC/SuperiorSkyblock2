@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,10 +19,10 @@ import xyz.wildseries.wildstacker.api.objects.StackedBarrel;
 import xyz.wildseries.wildstacker.api.objects.StackedObject;
 
 @SuppressWarnings("unused")
-public class BlocksProvider_WildStacker implements BlocksProvider, Listener {
+public final class BlocksProvider_WildStacker implements BlocksProvider, Listener {
 
     private static WildStackerPlugin stacker = WildStackerPlugin.getPlugin();
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public BlocksProvider_WildStacker(){
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -36,28 +37,28 @@ public class BlocksProvider_WildStacker implements BlocksProvider, Listener {
     @Override
     public Key getBlockKey(Location location, Key def) {
         StackedObject stackedObject = stacker.getDataHandler().CACHED_OBJECTS.get(location);
-        return !(stackedObject instanceof StackedBarrel) ? def : Key.of(((StackedBarrel) stackedObject).getBarrelItem(1));
+        return !(stackedObject instanceof StackedBarrel) ? def : SKey.of(((StackedBarrel) stackedObject).getBarrelItem(1));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBarrelPlace(BarrelPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
         if(island != null)
-            island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
+            island.handleBlockPlace(SKey.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBarrelStack(BarrelStackEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
         if(island != null)
-            island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
+            island.handleBlockPlace(SKey.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBarrelUnstack(BarrelUnstackEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
         if(island != null)
-            island.handleBlockBreak(Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
+            island.handleBlockBreak(SKey.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

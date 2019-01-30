@@ -33,7 +33,7 @@ import com.bgsoftware.superiorskyblock.commands.command.CmdValue;
 import com.bgsoftware.superiorskyblock.commands.command.CmdWarp;
 import com.bgsoftware.superiorskyblock.commands.command.CmdWithdraw;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -45,12 +45,12 @@ import org.bukkit.permissions.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandsHandler implements CommandExecutor, TabCompleter {
+public final class CommandsHandler implements CommandExecutor, TabCompleter {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
     private List<ICommand> subCommands = new ArrayList<>();
 
-    public CommandsHandler(SuperiorSkyblock plugin){
+    public CommandsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         subCommands.add(new CmdAccept());
         subCommands.add(new CmdAdmin());

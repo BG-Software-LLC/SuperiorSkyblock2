@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -15,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdShow implements ICommand {
+public final class CmdShow implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -48,8 +49,8 @@ public class CmdShow implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer targetPlayer;
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer;
 
         if(args.length == 1){
             if(!(sender instanceof Player)){
@@ -57,10 +58,10 @@ public class CmdShow implements ICommand {
                 return;
             }
 
-            targetPlayer = WrappedPlayer.of(sender);
+            targetPlayer = SSuperiorPlayer.of(sender);
         }
         else{
-            targetPlayer = WrappedPlayer.of(args[1]);
+            targetPlayer = SSuperiorPlayer.of(args[1]);
 
             if(targetPlayer == null){
                 Locale.INVALID_PLAYER.send(sender, args[1]);
@@ -82,7 +83,7 @@ public class CmdShow implements ICommand {
         if(!Locale.ISLAND_INFO_OWNER.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_OWNER.getMessage(island.getOwner().getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(WrappedLocation.of(island.getCenter()))).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
         if(!Locale.ISLAND_INFO_BANK.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyInBank())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty())
@@ -98,16 +99,16 @@ public class CmdShow implements ICommand {
 
         if(!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty()) {
             for (UUID uuid : members) {
-                WrappedPlayer wrappedPlayer = WrappedPlayer.of(uuid);
-                switch (wrappedPlayer.getIslandRole()) {
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
+                switch (superiorPlayer.getIslandRole()) {
                     case ADMIN:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(WrappedPlayer.of(uuid).getName())).append("\n");
+                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                     case MODERATOR:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(WrappedPlayer.of(uuid).getName())).append("\n");
+                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                     case MEMBER:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(WrappedPlayer.of(uuid).getName())).append("\n");
+                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                 }
             }
@@ -124,7 +125,7 @@ public class CmdShow implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
 }

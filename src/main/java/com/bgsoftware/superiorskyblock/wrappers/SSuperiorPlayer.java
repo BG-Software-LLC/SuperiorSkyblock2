@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
-import com.bgsoftware.superiorskyblock.island.Island;
-import com.bgsoftware.superiorskyblock.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.island.IslandRole;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
@@ -21,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SSuperiorPlayer {
+public final class SSuperiorPlayer implements SuperiorPlayer {
 
-    private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final UUID player;
 
@@ -37,7 +39,7 @@ public class SSuperiorPlayer {
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
-    private WrappedLocation schematicPos1 = null, schematicPos2 = null;
+    private SBlockPosition schematicPos1 = null, schematicPos2 = null;
 
     public SSuperiorPlayer(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
@@ -71,10 +73,6 @@ public class SSuperiorPlayer {
 
     public String getTextureValue() {
         return textureValue;
-    }
-
-    public void setTexture(String texture){
-        setTextureValue(texture);
     }
 
     public void setTextureValue(String textureValue) {
@@ -161,20 +159,20 @@ public class SSuperiorPlayer {
         teamChatEnabled = !teamChatEnabled;
     }
 
-    public WrappedLocation getSchematicPos1() {
+    public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
 
     public void setSchematicPos1(Block block) {
-        this.schematicPos1 = block == null ? null : WrappedLocation.of(block.getLocation());
+        this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
     }
 
-    public WrappedLocation getSchematicPos2() {
+    public SBlockPosition getSchematicPos2() {
         return schematicPos2;
     }
 
     public void setSchematicPos2(Block block) {
-        this.schematicPos2 = block == null ? null : WrappedLocation.of(block.getLocation());
+        this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
     }
 
     public Player asPlayer(){
@@ -219,19 +217,19 @@ public class SSuperiorPlayer {
                 "}";
     }
 
-    public static SSuperiorPlayer of(CommandSender sender){
+    public static SuperiorPlayer of(CommandSender sender){
         return of((Player) sender);
     }
 
-    public static SSuperiorPlayer of(Player player){
+    public static SuperiorPlayer of(Player player){
         return of(player.getUniqueId());
     }
 
-    public static SSuperiorPlayer of(UUID player){
+    public static SuperiorPlayer of(UUID player){
         return plugin.getPlayers().getWrappedPlayer(player);
     }
 
-    public static SSuperiorPlayer of(String name){
+    public static SuperiorPlayer of(String name){
         return plugin.getPlayers().getWrappedPlayer(name);
     }
 

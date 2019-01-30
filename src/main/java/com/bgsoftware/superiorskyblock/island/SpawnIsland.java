@@ -1,22 +1,29 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedLocation;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
-public class SpawnIsland extends Island {
+public final class SpawnIsland extends SIsland {
 
-    public SpawnIsland(WrappedLocation wrappedLocation){
+    public SpawnIsland(SBlockPosition wrappedLocation){
         super(null, wrappedLocation);
     }
 
     @Override
-    public boolean isMember(WrappedPlayer wrappedPlayer) {
+    public boolean isMember(SuperiorPlayer superiorPlayer) {
         return false;
     }
 
     @Override
-    public WrappedPlayer getOwner() {
+    public SSuperiorPlayer getOwner() {
         return null;
+    }
+
+    @Override
+    public boolean isSpawn() {
+        return true;
     }
 
     @Override
@@ -25,8 +32,8 @@ public class SpawnIsland extends Island {
     }
 
     @Override
-    public boolean hasPermission(WrappedPlayer wrappedPlayer, IslandPermission islandPermission) {
-        return !plugin.getSettings().spawnProtection || super.hasPermission(wrappedPlayer, islandPermission);
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
+        return !plugin.getSettings().spawnProtection || super.hasPermission(superiorPlayer, islandPermission);
     }
 
     @Override

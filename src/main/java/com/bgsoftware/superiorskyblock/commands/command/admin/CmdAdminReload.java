@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminReload implements ICommand {
+public final class CmdAdminReload implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -41,7 +41,7 @@ public class CmdAdminReload implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         new Thread(() -> {
             Locale.RELOAD_PROCCESS_REQUEST.send(sender);
             plugin.reloadPlugin(false);
@@ -50,7 +50,7 @@ public class CmdAdminReload implements ICommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return null;
     }
 }

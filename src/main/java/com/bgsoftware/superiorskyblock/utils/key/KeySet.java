@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class KeySet extends AbstractSet<Key> implements Set<Key> {
+public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
     private Set<String> set;
 
@@ -28,20 +29,20 @@ public class KeySet extends AbstractSet<Key> implements Set<Key> {
     }
 
     public boolean contains(ItemStack itemStack) {
-        return contains(Key.of(itemStack));
+        return contains(SKey.of(itemStack));
     }
 
     public boolean contains(Material material, short data) {
-        return contains(Key.of(material, data));
+        return contains(SKey.of(material, data));
     }
 
     public boolean contains(String key) {
-        return contains(Key.of(key));
+        return contains(SKey.of(key));
     }
 
     @Override
     public boolean contains(Object o) {
-        if(o instanceof Key){
+        if(o instanceof SKey){
             String key = o.toString();
             if(set.contains(key))
                 return true;
@@ -63,13 +64,9 @@ public class KeySet extends AbstractSet<Key> implements Set<Key> {
         return set.remove(o);
     }
 
-    public Set<String> asStringSet(){
-        return new HashSet<>(set);
-    }
-
     private Set<Key> asKeySet(){
         Set<Key> set = new HashSet<>();
-        this.set.forEach(string -> set.add(Key.of(string)));
+        this.set.forEach(string -> set.add(SKey.of(string)));
         return set;
     }
 

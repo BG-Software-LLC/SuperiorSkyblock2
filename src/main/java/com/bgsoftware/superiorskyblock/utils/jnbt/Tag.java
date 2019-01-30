@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.jnbt;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
 
 /**
@@ -43,7 +43,7 @@ import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
  */
 public abstract class Tag<E> {
 
-    protected static final SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
+    protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     /**
      * The value.

@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 
 import org.bukkit.command.CommandSender;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdCreate implements ICommand {
+public final class CmdCreate implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -44,19 +45,19 @@ public class CmdCreate implements ICommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
-        WrappedPlayer wrappedPlayer = WrappedPlayer.of(sender);
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
-        if(wrappedPlayer.getIsland() != null){
-            Locale.ALREADY_IN_ISLAND.send(wrappedPlayer);
+        if(superiorPlayer.getIsland() != null){
+            Locale.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
-        plugin.getPanel().openIslandCreationPanel(wrappedPlayer);
+        plugin.getPanel().openIslandCreationPanel(superiorPlayer);
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args) {
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
 }

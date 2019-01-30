@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
-import com.bgsoftware.superiorskyblock.island.Island;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.wrappers.WrappedPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -20,22 +20,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UpgradesHandler {
+public final class UpgradesHandler {
 
-    private SuperiorSkyblock plugin;
+    private SuperiorSkyblockPlugin plugin;
     private Map<String, UpgradeData> upgrades = new HashMap<>();
 
     private GUIInventory upgradesMenu;
 
-    public UpgradesHandler(SuperiorSkyblock plugin){
+    public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadUpgrades();
         loadMenu();
     }
 
-    public void openUpgradesMenu(WrappedPlayer wrappedPlayer){
+    public void openUpgradesMenu(SuperiorPlayer superiorPlayer){
         if(!Bukkit.isPrimaryThread()){
-            new Thread(() -> openUpgradesMenu(wrappedPlayer));
+            new Thread(() -> openUpgradesMenu(superiorPlayer));
             return;
         }
 
@@ -44,20 +44,20 @@ public class UpgradesHandler {
         Island island;
 
         for(String upgrade : upgrades.keySet()){
-            int level = (island = wrappedPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgrade);
+            int level = (island = superiorPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgrade);
             double nextLevelPrice = getUpgradePrice(upgrade, level);
             UpgradeData upgradeData = upgrades.get(upgrade);
             if(upgradeData.items.containsKey(level)) {
                 ItemData itemData = upgradeData.items.get(level);
 
-                inventory.setItem(itemData.slot, EconomyHook.getMoneyInBank(wrappedPlayer) >= nextLevelPrice ?
+                inventory.setItem(itemData.slot, EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
                                 itemData.hasNextLevel : itemData.noNextLevel);
             }
         }
 
-        upgradesMenu.playOpenSound(wrappedPlayer);
+        upgradesMenu.playOpenSound(superiorPlayer);
 
-        wrappedPlayer.asPlayer().openInventory(inventory);
+        superiorPlayer.asPlayer().openInventory(inventory);
     }
 
     public String getTitle() {
@@ -129,8 +129,8 @@ public class UpgradesHandler {
         return sound;
     }
 
-    public void playCloseSound(WrappedPlayer wrappedPlayer){
-        upgradesMenu.playCloseSound(wrappedPlayer);
+    public void playCloseSound(SuperiorPlayer superiorPlayer){
+        upgradesMenu.playCloseSound(superiorPlayer);
     }
 
     private void loadUpgrades(){
