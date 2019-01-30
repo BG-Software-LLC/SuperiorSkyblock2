@@ -38,7 +38,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getWrappedPlayer(e.getPlayer().getUniqueId());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         if(!superiorPlayer.getName().equals(e.getPlayer().getName())){
             superiorPlayer.updateName();
         }
