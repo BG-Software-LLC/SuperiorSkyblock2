@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class WrappedPlayer {
+public class SuperiorPlayer {
 
     private static SuperiorSkyblock plugin = SuperiorSkyblock.getPlugin();
 
@@ -39,7 +39,7 @@ public class WrappedPlayer {
     private boolean teamChatEnabled = false;
     private WrappedLocation schematicPos1 = null, schematicPos2 = null;
 
-    public WrappedPlayer(CompoundTag tag){
+    public SuperiorPlayer(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
 
         player = UUID.fromString(((StringTag) compoundValues.get("player")).getValue());
@@ -49,11 +49,11 @@ public class WrappedPlayer {
         islandSize  = ((IntTag) compoundValues.get("islandSize")).getValue();
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
 
-        if(plugin.getGrid().getIsland(WrappedPlayer.of(teamLeader)) == null)
+        if(plugin.getGrid().getIsland(SuperiorPlayer.of(teamLeader)) == null)
             teamLeader = player;
     }
 
-    public WrappedPlayer(UUID player){
+    public SuperiorPlayer(UUID player){
         OfflinePlayer offlinePlayer;
         this.player = player;
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null ? "null" : offlinePlayer.getName();
@@ -213,25 +213,25 @@ public class WrappedPlayer {
 
     @Override
     public String toString() {
-        return "WrappedPlayer{" +
+        return "SuperiorPlayer{" +
                 "uuid=[" + player + "]," +
                 "name=[" + name + "]" +
                 "}";
     }
 
-    public static WrappedPlayer of(CommandSender sender){
+    public static SuperiorPlayer of(CommandSender sender){
         return of((Player) sender);
     }
 
-    public static WrappedPlayer of(Player player){
+    public static SuperiorPlayer of(Player player){
         return of(player.getUniqueId());
     }
 
-    public static WrappedPlayer of(UUID player){
+    public static SuperiorPlayer of(UUID player){
         return plugin.getPlayers().getWrappedPlayer(player);
     }
 
-    public static WrappedPlayer of(String name){
+    public static SuperiorPlayer of(String name){
         return plugin.getPlayers().getWrappedPlayer(name);
     }
 
