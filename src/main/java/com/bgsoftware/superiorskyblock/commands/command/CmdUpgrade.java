@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public final class CmdUpgrade implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("upgrade");
+        return Arrays.asList("upgrade", "upgrades");
     }
 
     @Override

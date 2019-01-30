@@ -16,7 +16,7 @@ public final class CmdRecalc implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("recalc", "recalculate");
+        return Arrays.asList("recalc", "recalculate", "level");
     }
 
     @Override
