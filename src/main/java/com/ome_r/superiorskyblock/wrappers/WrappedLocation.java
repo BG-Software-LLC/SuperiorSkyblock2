@@ -37,6 +37,10 @@ public class WrappedLocation {
         return parse().getBlock();
     }
 
+    public Location parse(World world){
+        return new Location(world, getX(), getY(), getZ());
+    }
+
     public Location parse(){
         return new Location(getWorld(), getX(), getY(), getZ());
     }
