@@ -150,6 +150,8 @@ public final class DataHandler {
                     inputStream = new NBTInputStream(new FileInputStream(file));
                     Tag tag = inputStream.readTag();
                     plugin.getPlayers().loadPlayer((CompoundTag) tag);
+                }catch(EOFException ex){
+                    SuperiorSkyblockPlugin.log("Couldn't load the player data of " + file.getName() + ".");
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }
@@ -163,6 +165,8 @@ public final class DataHandler {
                 inputStream = new NBTInputStream(new FileInputStream(gridFile));
                 Tag tag = inputStream.readTag();
                 plugin.getGrid().loadGrid((CompoundTag) tag);
+            }catch(EOFException ex){
+                SuperiorSkyblockPlugin.log("Couldn't load the grid data.");
             }catch(Exception ex){
                 ex.printStackTrace();
             }
