@@ -31,7 +31,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import xyz.wildseries.wildstacker.utils.async.AsyncCallback;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,12 +81,8 @@ public final class SchematicsHandler implements SchematicManager {
     }
 
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName){
-        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(), schematicName, new AsyncCallback() {
-            @Override
-            public void run(Object o) {
-                Locale.SCHEMATIC_SAVED.send(superiorPlayer);
-            }
-        });
+        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(), schematicName, () ->
+                Locale.SCHEMATIC_SAVED.send(superiorPlayer));
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
     }
@@ -96,9 +91,9 @@ public final class SchematicsHandler implements SchematicManager {
         saveSchematic(pos1, pos2, schematicName, null);
     }
 
-    public void saveSchematic(Location pos1, Location pos2, String schematicName, AsyncCallback callback){
+    public void saveSchematic(Location pos1, Location pos2, String schematicName, Runnable runnable){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> saveSchematic(pos1, pos2, schematicName, callback)).start();
+            new Thread(() -> saveSchematic(pos1, pos2, schematicName, runnable)).start();
             return;
         }
 
@@ -159,9 +154,8 @@ public final class SchematicsHandler implements SchematicManager {
         schematics.put(schematicName, schematic);
         saveIntoFile(schematicName, schematic);
 
-        if(callback != null)
-            //noinspection unchecked
-            callback.run(null);
+        if(runnable != null)
+            runnable.run();
     }
 
     private int getCombinedId(Block block) {
