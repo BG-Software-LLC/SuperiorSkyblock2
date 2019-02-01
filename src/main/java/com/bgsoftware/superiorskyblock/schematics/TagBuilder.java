@@ -9,12 +9,14 @@ import com.bgsoftware.superiorskyblock.utils.TagUtil;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -57,7 +59,8 @@ public final class TagBuilder {
     public TagBuilder applySkull(Skull skull){
         compoundValue.put("skullType", new StringTag(skull.getSkullType().name()));
         compoundValue.put("rotation", new StringTag(skull.getRotation().name()));
-        compoundValue.put("owner", new StringTag(skull.getOwner()));
+        if(skull.getOwner() != null)
+             compoundValue.put("owner", new StringTag(skull.getOwner()));
         return this;
     }
 
@@ -67,10 +70,12 @@ public final class TagBuilder {
     }
 
     public TagBuilder applyEntity(LivingEntity livingEntity, Location center){
-        SBlockPosition offset = SBlockPosition.of(livingEntity.getLocation().subtract(center));
-        compoundValue.put("entityType", new StringTag(livingEntity.getType().name()));
-        compoundValue.put("offset", new StringTag(offset.toString()));
-        compoundValue.put("NBT", plugin.getNMSAdapter().getNBTTag(livingEntity));
+        if(!(livingEntity instanceof Player)) {
+            SBlockPosition offset = SBlockPosition.of(livingEntity.getLocation().subtract(center));
+            compoundValue.put("entityType", new StringTag(livingEntity.getType().name()));
+            compoundValue.put("offset", new StringTag(offset.toString()));
+            compoundValue.put("NBT", plugin.getNMSAdapter().getNBTTag(livingEntity));
+        }
         return this;
     }
 

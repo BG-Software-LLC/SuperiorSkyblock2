@@ -55,9 +55,12 @@ public final class TagUtil {
         }
         else if(block.getState() instanceof Skull){
             Skull skull = (Skull) block.getState();
-            skull.setSkullType(SkullType.valueOf(((StringTag) compoundValue.get("skullType")).getValue()));
+            try {
+                skull.setSkullType(SkullType.valueOf(((StringTag) compoundValue.get("skullType")).getValue()));
+            }catch(UnsupportedOperationException ignored){}
             skull.setRotation(BlockFace.valueOf(((StringTag) compoundValue.get("rotation")).getValue()));
-            skull.setOwner(((StringTag) compoundValue.get("owner")).getValue());
+            if(compoundValue.containsKey("owner"))
+                skull.setOwner(((StringTag) compoundValue.get("owner")).getValue());
             skull.update();
         }else if(block.getState() instanceof Sign){
             Sign sign = (Sign) block.getState();
