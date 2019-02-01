@@ -17,11 +17,11 @@ creation-gui:
       slot: 0
       has-access-item:
         type: GRASS_BLOCK
-        name: '&eDefault SIsland &a(Available)'
+        name: '&eDefault Island &a(Available)'
         lore:
           - '&7The old and the original island.'
       no-access-item:
         type: GRASS_BLOCK
-        name: '&eDefault SIsland &c(Unavailable)'
+        name: '&eDefault Island &c(Unavailable)'
         lore:
           - '&7The old and the original island.'

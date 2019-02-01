@@ -15,7 +15,7 @@ save-interval: 6000
 # It's recommended to set the task to a high interval, as it might cause lag.
 calc-interval: 6000
 
-# Set the maximum island size. SIsland distances is 3 times bigger than the max size.
+# Set the maximum island size. Island distances is 3 times bigger than the max size.
 # Please, do not change it while you have a running islands world!
 max-island-size: 200
 
@@ -125,7 +125,7 @@ default-permissions:
 
 # Set the lines of the island warp.
 sign-warp:
-- '&a[SIsland Warp]'
+- '&a[Island Warp]'
 - ''
 - ''
 - ''

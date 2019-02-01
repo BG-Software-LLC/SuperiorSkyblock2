@@ -7,7 +7,7 @@ api-version: 1.13
 commands:
   island:
     aliases: [is, islands]
-    description: SIsland commands
+    description: Island commands
 permissions:
   superior.*:
     description: Permission for all admin & island commands

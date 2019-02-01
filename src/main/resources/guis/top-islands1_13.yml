@@ -30,7 +30,7 @@ top-islands:
 
   island-item:
     type: PLAYER_HEAD
-    name: '&e&l[!] SIsland: &6&n{0}&7 (#{1})'
+    name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
     lore:
       - '&7'
       - '&6&l* &e&lIsland Level &7{2}'
@@ -46,7 +46,7 @@ top-islands:
 
   no-island-item:
     type: PLAYER_HEAD
-    name: '&cInvalid SIsland'
+    name: '&cInvalid Island'
 
   slots: '4,12,14,19,20,21,22,23,24,25'
 
