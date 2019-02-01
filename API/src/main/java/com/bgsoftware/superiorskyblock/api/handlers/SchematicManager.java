@@ -15,6 +15,6 @@ public interface SchematicManager {
 
     void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName);
 
-    void saveSchematic(Location pos1, Location pos2, String schematicName);
+    void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName);
 
 }

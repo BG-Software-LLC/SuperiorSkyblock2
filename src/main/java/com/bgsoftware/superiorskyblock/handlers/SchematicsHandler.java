@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -81,19 +82,24 @@ public final class SchematicsHandler implements SchematicManager {
     }
 
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName){
-        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(), schematicName, () ->
+        Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();
+        Location min = new Location(pos1.getWorld(),
+                Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
+        Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
+        saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
+                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), schematicName, () ->
                 Locale.SCHEMATIC_SAVED.send(superiorPlayer));
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
     }
 
-    public void saveSchematic(Location pos1, Location pos2, String schematicName){
-        saveSchematic(pos1, pos2, schematicName, null);
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName){
+        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, null);
     }
 
-    public void saveSchematic(Location pos1, Location pos2, String schematicName, Runnable runnable){
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> saveSchematic(pos1, pos2, schematicName, runnable)).start();
+            new Thread(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable)).start();
             return;
         }
 
@@ -149,6 +155,9 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("zSize", new ByteTag((byte) zSize));
         compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
         compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
+        compoundValue.put("offsetX", new IntTag(offsetX));
+        compoundValue.put("offsetY", new IntTag(offsetY));
+        compoundValue.put("offsetZ", new IntTag(offsetZ));
 
         SSchematic schematic = new SSchematic(new CompoundTag(compoundValue));
         schematics.put(schematicName, schematic);

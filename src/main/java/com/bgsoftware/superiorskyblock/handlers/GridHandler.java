@@ -90,10 +90,10 @@ public final class GridHandler implements GridManager {
             creationProgress = true;
 
             Location islandLocation = getNextLocation();
-            SIsland island = new SIsland(superiorPlayer, islandLocation);
+            SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
 
             islands.add(superiorPlayer.getUniqueId(), island);
-            lastIsland = SBlockPosition.of(getNextLocation());
+            lastIsland = SBlockPosition.of(islandLocation);
 
             for (Chunk chunk : island.getAllChunks()) {
                 chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());

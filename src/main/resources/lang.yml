@@ -36,7 +36,9 @@ TOGGLED_SCHEMATIC_ON: '&aToggling schematic mode ON. Select an area using a gold
 TOGGLED_SCHEMATIC_OFF: '&aToggling schematic mode OFF.'
 SCHEMATIC_RIGHT_SELECT: '&eSelected position #1 ({0})'
 SCHEMATIC_LEFT_SELECT: '&eSelected position #2 ({0})'
-SCHEMATIC_READY_TO_CREATE: '&eYou have selected two positions. Run /is admin schematic <name> to create a new schematic.'
+SCHEMATIC_READY_TO_CREATE: |
+  &eYou have selected two positions. Run /is admin schematic <name> to create a new schematic.
+  &eMake sure you stand at the teleport location when executing the command.
 SCHEMATIC_NOT_READY: '&cYou haven''t selected two positions.'
 SCHEMATIC_PROCCESS_REQUEST: '&aProcessing your request...'
 SCHEMATIC_SAVED: '&aSuccessfully saved schematic!'
