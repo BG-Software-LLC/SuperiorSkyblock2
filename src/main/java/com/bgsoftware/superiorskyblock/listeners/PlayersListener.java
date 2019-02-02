@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -71,17 +72,31 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerAttack(EntityDamageByEntityEvent e){
-        if(!(e.getEntity() instanceof Player) || !(e.getDamager() instanceof Player))
+        if(!(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
 
-        if(plugin.getGrid().getIslandAt(targetPlayer.getLocation()) != null){
-            e.setCancelled(true);
-            Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
+        if(plugin.getGrid().getIslandAt(targetPlayer.getLocation()) == null)
+            return;
+
+        SuperiorPlayer damagerPlayer;
+
+        if(e.getDamager() instanceof Player){
+            damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
         }
 
+        else if(e.getDamager() instanceof Projectile){
+            damagerPlayer = SSuperiorPlayer.of(((Player) ((Projectile) e.getDamager()).getShooter()));
+        }
+
+        else return;
+
+        if(damagerPlayer.equals(targetPlayer))
+            return;
+
+        e.setCancelled(true);
+        Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
     }
 
     @EventHandler
