@@ -86,9 +86,9 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 case "biome":
                     return StringUtil.format(island.getCenter().getBlock().getBiome().name());
                 case "level":
-                    return String.valueOf(island.getIslandLevel());
+                    return island.getLevelAsString();
                 case "worth":
-                    return String.valueOf(island.getWorth());
+                    return island.getWorthAsString();
                 case "raw_worth":
                     return String.valueOf(island.getRawWorth());
                 case "bank":

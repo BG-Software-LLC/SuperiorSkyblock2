@@ -439,8 +439,8 @@ public final class GridHandler implements GridManager {
             if(island != null && islandOwner != null) {
                 itemBuilder.replaceName("{0}", islandOwner.getName())
                         .replaceName("{1}", String.valueOf(place))
-                        .replaceName("{2}", String.valueOf(island.getIslandLevel()))
-                        .replaceName("{3}", String.valueOf(island.getWorth()));
+                        .replaceName("{2}", island.getLevelAsString())
+                        .replaceName("{3}", island.getWorthAsString());
 
                 if(itemStack.getItemMeta().hasLore()){
                     List<String> lore = new ArrayList<>();
@@ -460,8 +460,8 @@ public final class GridHandler implements GridManager {
                             lore.add(line
                                     .replace("{0}", island.getOwner().getName())
                                     .replace("{1}", String.valueOf(place))
-                                    .replace("{2}", String.valueOf(island.getIslandLevel()))
-                                    .replace("{3}", String.valueOf(island.getWorth())));
+                                    .replace("{2}", island.getLevelAsString())
+                                    .replace("{3}", island.getWorthAsString()));
                         }
                     }
 

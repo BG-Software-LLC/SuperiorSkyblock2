@@ -38,6 +38,9 @@ import org.bukkit.entity.Player;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,7 +78,7 @@ public class SIsland implements Island{
     private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
     private final Map<String, Location> warps = new HashMap<>();
     private double islandBank = 0;
-    private double islandWorth = 0;
+    private BigDecimal islandWorth = new BigDecimal(0);
     private String discord = "None", paypal = "None";
 
     /*
@@ -343,7 +346,7 @@ public class SIsland implements Island{
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
 
         blocksCalculations.clear();
-        islandWorth = 0;
+        islandWorth = new BigDecimal(0);
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
@@ -413,11 +416,11 @@ public class SIsland implements Island{
                         Key key = SKey.of(creatureSpawner.getType() + ":" + creatureSpawner.getSpawnedType());
                         int blockCount = spawnersToCheck.get(location);
                         handleBlockPlace(key, blockCount);
-                        islandWorth += plugin.getGrid().getBlockValue(key) * blockCount;
+                        islandWorth = islandWorth.add(new BigDecimal(plugin.getGrid().getBlockValue(key) * blockCount));
                     }
                 }
                 if(asker != null)
-                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorth(), getIslandLevel());
+                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsString(), getLevelAsString());
             });
 
             if(islandCalcsQueue.size() != 0){
@@ -446,7 +449,7 @@ public class SIsland implements Island{
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
             blocksCalculations.put(key, currentAmount + amount);
-            islandWorth += blockValue * amount;
+            islandWorth = islandWorth.add(new BigDecimal(blockValue * amount));
         }
     }
 
@@ -471,8 +474,8 @@ public class SIsland implements Island{
             else
                 blocksCalculations.put(key, currentAmount - amount);
 
-            if((islandWorth -= blockValue) < 0)
-                islandWorth = 0;
+            if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue))).doubleValue() < 0)
+                islandWorth = new BigDecimal(0);
         }
     }
 
@@ -489,12 +492,17 @@ public class SIsland implements Island{
     @Override
     public double getWorth(){
         int bankWorthRate = plugin.getSettings().bankWorthRate;
-        return bankWorthRate <= 0 ? islandWorth : islandWorth + (islandBank / bankWorthRate);
+        return bankWorthRate <= 0 ? islandWorth.doubleValue() : islandWorth.add(new BigDecimal(islandBank / bankWorthRate)).doubleValue();
     }
 
     @Override
     public double getRawWorth(){
-        return islandWorth;
+        return islandWorth.doubleValue();
+    }
+
+    public String getWorthAsString(){
+        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
+        return numberFormatter.format(getWorth());
     }
 
     @Override
@@ -506,6 +514,12 @@ public class SIsland implements Island{
         }catch(Exception ex){
             return (int) worth;
         }
+    }
+
+    @Override
+    public String getLevelAsString() {
+        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0");
+        return numberFormatter.format(getIslandLevel());
     }
 
     @Override
