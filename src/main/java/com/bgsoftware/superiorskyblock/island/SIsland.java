@@ -331,7 +331,6 @@ public class SIsland implements Island{
         }
 
         if(calcProcess) {
-
             islandCalcsQueue.push(new CalcIslandData(owner, asker == null ? null : asker.getUniqueId()));
             return;
         }
@@ -390,7 +389,7 @@ public class SIsland implements Island{
                                 }
 
                                 handleBlockPlace(blockKey, blockCount);
-                                islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
+                                //islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
                             }
                         }
                     }
