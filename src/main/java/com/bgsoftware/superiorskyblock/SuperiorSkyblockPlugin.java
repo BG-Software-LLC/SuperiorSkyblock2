@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
@@ -32,6 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +64,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
 
         loadNMSAdapter();
+        loadAPI();
 
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("island").setExecutor(commandsHandler);
@@ -114,6 +117,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private void loadWorld(){
         String worldName = (settingsHandler = new SettingsHandler(this)).islandWorld;
         WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
+    }
+
+    private void loadAPI(){
+        try{
+            Field plugin = SuperiorSkyblockAPI.class.getDeclaredField("plugin");
+            plugin.setAccessible(true);
+            plugin.set(null, this);
+            plugin.setAccessible(false);
+        }catch(Exception ignored){}
     }
 
     @Override
