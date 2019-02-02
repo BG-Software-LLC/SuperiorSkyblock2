@@ -260,20 +260,34 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         for(Block block : e.getBlocks()){
             if(plugin.getGrid().getBlockAmount(block) > 1) {
                 e.setCancelled(true);
                 break;
+            }
+            else if(island != null){
+                if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
+                    e.setCancelled(true);
+                    break;
+                }
             }
         }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         for(Block block : e.getBlocks()){
             if(plugin.getGrid().getBlockAmount(block) > 1) {
                 e.setCancelled(true);
                 break;
+            }
+            else if(island != null){
+                if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
+                    e.setCancelled(true);
+                    break;
+                }
             }
         }
     }
