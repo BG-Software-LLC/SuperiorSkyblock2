@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SIsland implements Island{
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -615,6 +615,12 @@ public class SIsland implements Island{
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
         Location location = warps.get(warp.toLowerCase()).clone();
         Block warpBlock = location.getBlock();
+
+        if(!isInsideRange(location)){
+            Locale.UNSAFE_WARP.send(superiorPlayer);
+            deleteWarp(warp);
+            return;
+        }
 
         if(!warpBlock.getRelative(BlockFace.DOWN).getType().isSolid() &&
                 !warpBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType().isSolid()){
