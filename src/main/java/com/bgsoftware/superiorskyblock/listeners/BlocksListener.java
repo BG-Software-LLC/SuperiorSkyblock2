@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.ItemUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -22,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -289,6 +291,16 @@ public final class BlocksListener implements Listener {
                     break;
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void on(BlockFromToEvent e){
+        Island fromIsland = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        Location toLocation = e.getBlock().getRelative(e.getFace()).getLocation();
+
+        if(fromIsland != null && !fromIsland.isInsideRange(toLocation)){
+            e.setCancelled(true);
         }
     }
 
