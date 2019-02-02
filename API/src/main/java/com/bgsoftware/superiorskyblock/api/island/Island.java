@@ -90,7 +90,11 @@ public interface Island extends Comparable<Island> {
 
     double getRawWorth();
 
+    String getWorthAsString();
+
     int getIslandLevel();
+
+    String getLevelAsString();
 
     boolean isInside(Location location);
 
