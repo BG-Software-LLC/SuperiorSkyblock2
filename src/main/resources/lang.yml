@@ -215,7 +215,7 @@ ISLAND_PROTECTED: '&cThis island is protected.'
 BUILD_OUTSIDE_ISLAND: '&cYou cannot build outside of your protection range.'
 DESTROY_OUTSIDE_ISLAND: '&cYou cannot destroy outside of your protection range.'
 # Called when hitting a team-mate.
-HIT_TEAM_MEMBER: '&cYou cannot your island team-mates.'
+HIT_PLAYER_IN_ISLAND: '&cYou cannot hit players inside islands.'
 # Called when an error is occurred because of a player already in an island.
 ALREADY_IN_ISLAND: '&cYou are already in an island.'
 ALREADY_IN_ISLAND_OTHER: '&cThis player is already a member of your island.'

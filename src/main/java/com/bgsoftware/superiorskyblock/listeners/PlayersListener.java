@@ -77,9 +77,9 @@ public final class PlayersListener implements Listener {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
 
-        if(targetPlayer.getIsland() != null && targetPlayer.getIsland().equals(damagerPlayer.getIsland())){
+        if(plugin.getGrid().getIslandAt(targetPlayer.getLocation()) != null){
             e.setCancelled(true);
-            Locale.HIT_TEAM_MEMBER.send(targetPlayer);
+            Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
         }
 
     }
