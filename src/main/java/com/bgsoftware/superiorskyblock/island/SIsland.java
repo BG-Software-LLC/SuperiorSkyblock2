@@ -350,44 +350,59 @@ public class SIsland implements Island{
 
         new Thread(() -> {
             Map<Location, Integer> spawnersToCheck = new HashMap<>();
+            Set<Thread> threads = new HashSet<>();
 
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
-                boolean emptyChunk = true;
+                Thread thread = new Thread(() -> {
+                    boolean emptyChunk = true;
 
-                for(int i = 0; i < 16 && emptyChunk; i++){
-                    if(!chunkSnapshot.isSectionEmpty(i)){
-                        emptyChunk = false;
-                    }
-                }
+                    double islandWorth = 0;
 
-                if(emptyChunk)
-                    continue;
-
-                int highestBlock;
-
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
-                        for (int y = 0; y <= highestBlock; y++) {
-                            Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
-                            Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
-                            int blockCount = 1;
-
-                            for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
-                                blockCount = Math.max(blockCount, blocksProvider.getBlockCount(location));
-                                blockKey = blocksProvider.getBlockKey(location, blockKey);
-                            }
-
-                            if(blockKey.toString().contains("SPAWNER")){
-                                spawnersToCheck.put(location, blockCount);
-                                continue;
-                            }
-
-                            handleBlockPlace(blockKey, blockCount);
-                            islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
+                    for(int i = 0; i < 16 && emptyChunk; i++){
+                        if(!chunkSnapshot.isSectionEmpty(i)){
+                            emptyChunk = false;
                         }
                     }
-                }
+
+                    if(emptyChunk)
+                        return;
+
+                    int highestBlock;
+
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
+                            for (int y = 0; y <= highestBlock; y++) {
+                                Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                if(blockKey.toString().contains("AIR"))
+                                    continue;
+                                Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
+                                int blockCount = 1;
+
+                                for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
+                                    blockCount = Math.max(blockCount, blocksProvider.getBlockCount(location));
+                                    blockKey = blocksProvider.getBlockKey(location, blockKey);
+                                }
+
+                                if(blockKey.toString().contains("SPAWNER")){
+                                    spawnersToCheck.put(location, blockCount);
+                                    continue;
+                                }
+
+                                handleBlockPlace(blockKey, blockCount);
+                                islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
+                            }
+                        }
+                    }
+                });
+                thread.start();
+                threads.add(thread);
+            }
+
+            for(Thread th : threads){
+                try{
+                    th.join();
+                }catch(Exception ignored){}
             }
 
             calcProcess = false;
@@ -425,14 +440,14 @@ public class SIsland implements Island{
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount){
+    public synchronized void handleBlockPlace(Key key, int amount){
         int blockValue;
         if(key.toString().endsWith(":0"))
             key = SKey.of(key.toString().replace(":0", ""));
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
             blocksCalculations.put(key, currentAmount + amount);
-            islandWorth += blockValue;
+            islandWorth += blockValue * amount;
         }
     }
 
