@@ -448,12 +448,12 @@ public final class GridHandler implements GridManager {
                     for(String line : itemStack.getItemMeta().getLore()){
                         if(line.contains("{4}")){
                             String memberFormat = line.split("\\{4}:")[1];
-                            if(island.getMembers().size() == 1){
+                            if(island.getMembers().size() == 0){
                                 lore.add(memberFormat.replace("{}", "None"));
                             }
                             else {
                                 for (UUID memberUUID : island.getMembers()) {
-                                    lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberFormat).getName()));
+                                    lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberUUID).getName()));
                                 }
                             }
                         }else{
