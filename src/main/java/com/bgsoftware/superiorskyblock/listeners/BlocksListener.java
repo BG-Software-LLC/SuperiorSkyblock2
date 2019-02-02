@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.ItemUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
@@ -35,7 +37,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
@@ -232,6 +237,48 @@ public final class BlocksListener implements Listener {
         e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), blockItem);
     }
 
+    private Set<UUID> recentlyClicked = new HashSet<>();
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockUnstack(PlayerInteractEvent e){
+        if(e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() != null ||
+                recentlyClicked.contains(e.getPlayer().getUniqueId()))
+            return;
+
+        int blockAmount = plugin.getGrid().getBlockAmount(e.getClickedBlock());
+
+        if(blockAmount <= 1)
+            return;
+
+        recentlyClicked.add(e.getPlayer().getUniqueId());
+        Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
+
+        e.setCancelled(true);
+
+        // When sneaking, you'll break 64 from the stack. Otherwise, 1.
+        int amount = !e.getPlayer().isSneaking() ? 1 : 64, leftAmount;
+
+        // Fix amount so it won't be more than the stack's amount
+        amount = Math.min(amount, blockAmount);
+
+        plugin.getGrid().setBlockAmount(e.getClickedBlock(), (leftAmount = blockAmount - amount));
+
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+        if(island != null){
+            island.handleBlockBreak(e.getClickedBlock(), amount);
+        }
+
+        ItemStack blockItem = e.getClickedBlock().getState().getData().toItemStack(amount);
+
+        // If the amount of the stack is less than 0, it should be air.
+        if(leftAmount <= 0){
+            e.getClickedBlock().setType(Material.AIR);
+        }
+
+        // Dropping the item
+        e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), blockItem);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onExplode(EntityExplodeEvent e){
         List<Block> blockList = new ArrayList<>(e.blockList());
@@ -295,7 +342,7 @@ public final class BlocksListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void on(BlockFromToEvent e){
+    public void onBlockFlow(BlockFromToEvent e){
         if(plugin == null || plugin.getGrid() == null)
             return;
 
