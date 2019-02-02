@@ -30,6 +30,8 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -347,6 +349,8 @@ public class SIsland implements Island{
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
         new Thread(() -> {
+            Map<Location, Integer> spawnersToCheck = new HashMap<>();
+
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 boolean emptyChunk = true;
 
@@ -374,6 +378,11 @@ public class SIsland implements Island{
                                 blockKey = blocksProvider.getBlockKey(location, blockKey);
                             }
 
+                            if(blockKey.toString().contains("SPAWNER")){
+                                spawnersToCheck.put(location, blockCount);
+                                continue;
+                            }
+
                             handleBlockPlace(blockKey, blockCount);
                             islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
                         }
@@ -382,8 +391,20 @@ public class SIsland implements Island{
             }
 
             calcProcess = false;
-            if(asker != null)
-                Locale.ISLAND_WORTH_RESULT.send(asker, getWorth(), getIslandLevel());
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                for(Location location : spawnersToCheck.keySet()){
+                    BlockState blockState = location.getBlock().getState();
+                    if(blockState instanceof CreatureSpawner){
+                        CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
+                        Key key = SKey.of(creatureSpawner.getType() + ":" + creatureSpawner.getSpawnedType());
+                        int blockCount = spawnersToCheck.get(location);
+                        handleBlockPlace(key, blockCount);
+                        islandWorth += plugin.getGrid().getBlockValue(key) * blockCount;
+                    }
+                }
+                if(asker != null)
+                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorth(), getIslandLevel());
+            });
 
             if(islandCalcsQueue.size() != 0){
                 CalcIslandData calcIslandData = islandCalcsQueue.pop();
