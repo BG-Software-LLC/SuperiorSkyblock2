@@ -65,6 +65,11 @@ public final class CmdSetWarp implements ICommand {
             return;
         }
 
+        if(!island.isInsideRange(superiorPlayer.getLocation())){
+            Locale.SET_WARP_OUTSIDE.send(superiorPlayer);
+            return;
+        }
+
         island.setWarpLocation(args[1], superiorPlayer.getLocation());
         Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
     }
