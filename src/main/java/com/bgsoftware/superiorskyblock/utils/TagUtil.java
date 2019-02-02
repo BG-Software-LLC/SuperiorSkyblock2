@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.schematics.SchematicBlock;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
@@ -9,6 +10,7 @@ import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,11 +37,37 @@ public final class TagUtil {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
+        new Thread(() -> {
+            List<SchematicBlock> schematicBlocks = new ArrayList<>();
+            for(Tag tag : blocks){
+                Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
+                Location blockLocation = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+                schematicBlocks.add(new SchematicBlock(((IntTag) compoundValue.get("combinedId")).getValue(), blockLocation));
+            }
+            setBlocks(schematicBlocks, () -> {
+                for(Tag tag : blocks){
+                    assignIntoBlock((CompoundTag) tag, offset);
+                }
+                callback.run();
+            });
+        }).start();
+    }
+
+    private static void setBlocks(List<SchematicBlock> blocks, Runnable callback){
+        for(SchematicBlock schematicBlock : blocks){
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getNMSAdapter().setBlock(schematicBlock.getLocation(), schematicBlock.getCombinedId());
+                if(blocks.indexOf(schematicBlock) == blocks.size() - 1)
+                    callback.run();
+            });
+        }
+    }
+
     public static void assignIntoBlock(CompoundTag compoundTag, Location offset){
         Map<String, Tag> compoundValue = compoundTag.getValue();
         Location blockLocation = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
         Block block = blockLocation.getBlock();
-        plugin.getNMSAdapter().setBlock(blockLocation, ((IntTag) compoundValue.get("combinedId")).getValue());
         if(block.getState() instanceof Banner){
             Banner banner = (Banner) block.getState();
             banner.setBaseColor(DyeColor.valueOf(((StringTag) compoundValue.get("baseColor")).getValue()));

@@ -4,6 +4,6 @@ import org.bukkit.Location;
 
 public interface Schematic {
 
-    void pasteSchematic(Location location);
+    void pasteSchematic(Location location, Runnable callback);
 
 }

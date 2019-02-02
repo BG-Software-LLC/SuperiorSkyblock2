@@ -19,7 +19,7 @@ public final class SSchematic implements Schematic {
     }
 
     @Override
-    public void pasteSchematic(Location location){
+    public void pasteSchematic(Location location, Runnable callback){
         byte xSize = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
         byte ySize = ((ByteTag) compoundTag.getValue().get("ySize")).getValue();
         byte zSize = ((ByteTag) compoundTag.getValue().get("zSize")).getValue();
@@ -30,9 +30,7 @@ public final class SSchematic implements Schematic {
         Location min = location.clone().subtract(offsetX, offsetY, offsetZ);
 
         if(compoundTag.getValue().containsKey("blocks")) {
-            for (Tag tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()) {
-                TagUtil.assignIntoBlock((CompoundTag) tag, min);
-            }
+            TagUtil.assignIntoBlocks(((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
         }
 
         if(compoundTag.getValue().containsKey("entities")) {
