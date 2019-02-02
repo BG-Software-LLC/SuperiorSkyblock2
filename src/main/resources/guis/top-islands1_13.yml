@@ -49,36 +49,3 @@ top-islands:
     name: '&cInvalid Island'
 
   slots: '4,12,14,19,20,21,22,23,24,25'
-
-counted-blocks:
-  title: '{0} &n${1}'
-  size: 5
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
-
-  fill-items:
-    '1':
-      type: LIGHT_BLUE_STAINED_GLASS_PANE
-      name: '&f'
-      slots: 0,8,36,37,44
-    '2':
-      type: BLUE_STAINED_GLASS_PANE
-      name: '&f'
-      slots: 9,10,17,27,35
-    '3':
-      type: CYAN_STAINED_GLASS_PANE
-      name: '&f'
-      slots: 18,19,20,21,22,23,24,25,26
-    '4':
-      type: SPAWNER
-      name: '&e&lSPAWNERS ->'
-      slots: 1
-    '5':
-      type: BOOK_AND_QUILL
-      name: '&e&lITEMS ->'
-      slots: 28
-
-  block-item:
-    name: '&e&l[!] &7{0}'
-    lore:
-      - '&6&l* &e&lQuantity &fx{1}'

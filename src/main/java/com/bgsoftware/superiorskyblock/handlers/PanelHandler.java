@@ -607,7 +607,7 @@ public final class PanelHandler {
     }
 
     private void initValuesPage(YamlConfiguration cfg){
-        valuesPage = FileUtil.getGUI(cfg.getConfigurationSection("values-gui"), 6, "&lIsland Warps");
+        valuesPage = FileUtil.getGUI(cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
 
         Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
