@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.projectiles.ProjectileSource;
 
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
@@ -87,7 +88,10 @@ public final class PlayersListener implements Listener {
         }
 
         else if(e.getDamager() instanceof Projectile){
-            damagerPlayer = SSuperiorPlayer.of(((Player) ((Projectile) e.getDamager()).getShooter()));
+            ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
+            if(shooter instanceof Player)
+                damagerPlayer = SSuperiorPlayer.of((Player) ((Projectile) e.getDamager()).getShooter());
+            else return;
         }
 
         else return;
