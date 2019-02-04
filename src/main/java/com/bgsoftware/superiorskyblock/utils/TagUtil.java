@@ -45,12 +45,13 @@ public final class TagUtil {
                 Location blockLocation = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
                 schematicBlocks.add(new SchematicBlock(((IntTag) compoundValue.get("combinedId")).getValue(), blockLocation));
             }
-            setBlocks(schematicBlocks, () -> {
-                for(Tag tag : blocks){
-                    assignIntoBlock((CompoundTag) tag, offset);
-                }
-                callback.run();
-            });
+            setBlocks(schematicBlocks, () ->
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    for(Tag tag : blocks){
+                        assignIntoBlock((CompoundTag) tag, offset);
+                    }
+                    callback.run();
+                }, 1L));
         }).start();
     }
 
