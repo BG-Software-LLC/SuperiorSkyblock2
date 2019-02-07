@@ -58,7 +58,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public SSuperiorPlayer(UUID player){
         OfflinePlayer offlinePlayer;
         this.player = player;
-        this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null ? "null" : offlinePlayer.getName();
+        this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
         this.teamLeader = player;
         this.islandRole = IslandRole.GUEST;
     }
