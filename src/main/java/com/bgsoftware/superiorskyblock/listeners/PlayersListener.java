@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -63,7 +64,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandJoin(IslandEnterEvent e){
-        plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), e.getIsland());
+        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), e.getIsland()), 5L);
     }
 
     @EventHandler
@@ -78,7 +79,7 @@ public final class PlayersListener implements Listener {
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
 
-        if(plugin.getGrid().getIslandAt(targetPlayer.getLocation()) == null)
+        if(plugin.getGrid().getIslandAt(e.getEntity().getLocation()) == null)
             return;
 
         SuperiorPlayer damagerPlayer;
