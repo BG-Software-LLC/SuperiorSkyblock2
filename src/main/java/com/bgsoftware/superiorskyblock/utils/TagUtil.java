@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematics.SchematicBlock;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
@@ -56,12 +57,17 @@ public final class TagUtil {
     }
 
     private static void setBlocks(List<SchematicBlock> blocks, Runnable callback){
-        for(SchematicBlock schematicBlock : blocks){
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                plugin.getNMSAdapter().setBlock(schematicBlock.getLocation(), schematicBlock.getCombinedId());
-                if(blocks.indexOf(schematicBlock) == blocks.size() - 1)
-                    callback.run();
-            });
+        if(FAWEHook.isEnabled()){
+            FAWEHook.setBlocks(blocks, callback);
+        }
+        else {
+            for (SchematicBlock schematicBlock : blocks) {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    plugin.getNMSAdapter().setBlock(schematicBlock.getLocation(), schematicBlock.getCombinedId());
+                    if (blocks.indexOf(schematicBlock) == blocks.size() - 1)
+                        callback.run();
+                });
+            }
         }
     }
 

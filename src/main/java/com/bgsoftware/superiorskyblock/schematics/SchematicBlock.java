@@ -19,4 +19,25 @@ public final class SchematicBlock {
     public Location getLocation() {
         return location;
     }
+
+    public int getX(){
+        return location.getBlockX();
+    }
+
+    public int getY(){
+        return location.getBlockY();
+    }
+
+    public int getZ(){
+        return location.getBlockZ();
+    }
+
+    public int getId(){
+        return combinedId & 4095;
+    }
+
+    public int getData(){
+        return combinedId >> 12 & 15;
+    }
+
 }
