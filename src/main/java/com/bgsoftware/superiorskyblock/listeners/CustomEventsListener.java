@@ -118,6 +118,9 @@ public final class CustomEventsListener implements Listener {
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);
 
+        if(fromIsland != null && fromIsland.equals(toIsland))
+            return;
+
         if (fromIsland != null && !(fromIsland instanceof SpawnIsland)) {
             IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
