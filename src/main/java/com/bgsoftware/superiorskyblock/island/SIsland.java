@@ -294,6 +294,8 @@ public class SIsland implements Island{
     public void disbandIsland(){
         members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
+        for(Chunk chunk : getAllChunks())
+            chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
 
     @Override
