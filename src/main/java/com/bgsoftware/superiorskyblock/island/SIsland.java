@@ -476,7 +476,7 @@ public class SIsland implements Island{
             else
                 blocksCalculations.put(key, currentAmount - amount);
 
-            if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue))).doubleValue() < 0)
+            if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue * amount))).doubleValue() < 0)
                 islandWorth = new BigDecimal(0);
         }
     }
