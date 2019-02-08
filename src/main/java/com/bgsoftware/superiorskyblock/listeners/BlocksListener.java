@@ -69,7 +69,7 @@ public final class BlocksListener implements Listener {
         if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(e.getBlock().getWorld().getName()))
             return;
 
-        if(!plugin.getSettings().whitelistedStackedBlocks.contains(e.getBlock().getType().name()))
+        if(!plugin.getSettings().whitelistedStackedBlocks.contains(e.getBlock()))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
@@ -78,7 +78,8 @@ public final class BlocksListener implements Listener {
             return;
 
         //noinspection deprecation
-        if(e.getBlockAgainst().getType() != e.getBlock().getType() || e.getBlockAgainst().getData() != e.getBlock().getData())
+        if(e.getBlockAgainst().getType() != e.getBlock().getType() || e.getBlockAgainst().getData() != e.getBlock().getData() ||
+                e.getBlockReplacedState().getType() != Material.AIR)
             return;
 
         e.setCancelled(true);
@@ -96,6 +97,10 @@ public final class BlocksListener implements Listener {
         ItemStack inHand = e.getItemInHand().clone();
         inHand.setAmount(amount);
         ItemUtil.removeItem(inHand, e);
+
+//        if(!e.getBlockReplacedState().getType().isSolid()){
+//            plugin.getGrid().setBlockAmount(e.getBlockAgainst(), plugin.getGrid().getBlockAmount(e.getBlockAgainst()) - 1);
+//        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -180,7 +185,7 @@ public final class BlocksListener implements Listener {
 
         for(Block block : blockList){
             // Check if block is stackable
-            if(!plugin.getSettings().whitelistedStackedBlocks.contains(block.getType().name()))
+            if(!plugin.getSettings().whitelistedStackedBlocks.contains(block))
                 continue;
 
             int amount = plugin.getGrid().getBlockAmount(block);
@@ -224,7 +229,7 @@ public final class BlocksListener implements Listener {
     }
 
     /*
-     *  SIsland Warps
+     *  Island Warps
      */
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
