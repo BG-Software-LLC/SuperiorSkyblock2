@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -22,15 +23,21 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.projectiles.ProjectileSource;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
@@ -202,6 +209,34 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
+    }
+
+    private Set<UUID> noFallDamage = new HashSet<>();
+
+    @EventHandler
+    public void onPlayerFall(PlayerMoveEvent e){
+        if(!plugin.getSettings().voidTeleport)
+            return;
+
+        Location from = e.getFrom(), to = e.getTo();
+
+        if(from.getBlockY() == to.getBlockY() || to.getBlockY() >= 0)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+
+        if(island == null)
+            island = plugin.getGrid().getSpawnIsland();
+
+        noFallDamage.add(e.getPlayer().getUniqueId());
+        e.getPlayer().teleport(island.getCenter().add(0, 1, 0));
+        Bukkit.getScheduler().runTaskLater(plugin, () -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
+    }
+
+    @EventHandler
+    public void onPlayerFall(EntityDamageEvent e){
+        if(e.getEntity() instanceof Player && e.getCause() == EntityDamageEvent.DamageCause.FALL && noFallDamage.contains(e.getEntity().getUniqueId()))
+            e.setCancelled(true);
     }
 
     class PlayerArrowPickup implements Listener{

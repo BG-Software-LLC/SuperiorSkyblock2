@@ -147,6 +147,11 @@ public final class ConfigComments {
     @Comment("Can be disabled using other plugins.")
     public static String SPAWN_PVP = "spawn-pvp";
 
+    @Comment("")
+    @Comment("When enabled, players will get teleported upon void fall.")
+    @Comment("If they fall not in an island, they will be teleported to spawn.")
+    public static String VOID_TELEPORT = "void-teleport";
+
 
 
 }

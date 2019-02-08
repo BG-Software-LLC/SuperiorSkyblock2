@@ -36,6 +36,7 @@ public final class SettingsHandler {
     public final String spawnLocation;
     public final boolean spawnProtection;
     public final boolean spawnPvp;
+    public final boolean voidTeleport;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -75,6 +76,7 @@ public final class SettingsHandler {
         spawnLocation = cfg.getString("spawn-location", "SuperiorWorld, 0, 100, 0");
         spawnProtection = cfg.getBoolean("spawn-protection", true);
         spawnPvp = cfg.getBoolean("spawn-pvp", false);
+        voidTeleport = cfg.getBoolean("void-teleport", true);
     }
 
     private List<String> colorize(List<String> list){
