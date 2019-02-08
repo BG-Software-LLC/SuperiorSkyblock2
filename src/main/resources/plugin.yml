@@ -47,6 +47,8 @@ permissions:
             description: Get all permissions for an island role.
           superior.island.promote:
             description: Promote a member in your island.
+          superior.island.rankup:
+            description: Try to rankup an upgrade level.
           superior.island.recalc:
             description: Re-calculates the island worth.
           superior.island.setdiscord:

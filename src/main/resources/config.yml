@@ -148,3 +148,7 @@ spawn-protection: true
 # When enabled, pvp will be enabled in the spawn.
 # Can be disabled using other plugins.
 spawn-pvp: false
+
+# When enabled, players will get teleported upon void fall.
+# If they fall not in an island, they will be teleported to spawn.
+void-teleport: true

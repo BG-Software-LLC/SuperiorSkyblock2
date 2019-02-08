@@ -189,7 +189,8 @@ public enum Locale {
     NO_SET_WARP_PERMISSION,
     PERMISSION_SPACER,
     TOGGLED_BYPASS_ON,
-    TOGGLED_BYPASS_OFF;
+    TOGGLED_BYPASS_OFF,
+    NO_RANKUP_PERMISSION;
 
     private String message;
 

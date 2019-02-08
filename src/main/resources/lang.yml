@@ -122,6 +122,8 @@ PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&cYou can only promote players with a lower is
 LAST_ROLE_PROMOTE: '&cYou cannot promote this player anymore.'
 PROMOTED_MEMBER: '&aYou promoted {0} to a {1} in his island.'
 GOT_PROMOTED: '&aYou were promoted to a {0} in your island.'
+# Called when running the /is rankup command.
+NO_RANKUP_PERMISSION: '&cYou must be at least {0} in order to rankup upgrades.'
 # Called when running the /is recalc command.
 RECALC_PROCCESS_REQUEST: '&aProcessing your request...'
 ISLAND_WORTH_RESULT: '&aYour island worth is {0} [Level {1}]'

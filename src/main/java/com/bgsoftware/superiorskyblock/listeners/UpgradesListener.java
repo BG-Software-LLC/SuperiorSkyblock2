@@ -4,13 +4,11 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.UnsafeValues;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -31,7 +29,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -69,31 +66,7 @@ public final class UpgradesListener implements Listener {
         String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
         if(!upgradeName.isEmpty()){
-            Island island;
-            int level = (island = superiorPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgradeName);
-            double nextUpgradePrice = plugin.getUpgrades().getUpgradePrice(upgradeName, level);
-            boolean hasNextLevel;
-
-            if(EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice){
-                Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
-                hasNextLevel = false;
-            }
-
-            else{
-                List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);
-
-                EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
-                for (String command : commands) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName()));
-                }
-
-                hasNextLevel = true;
-            }
-
-            Sound sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
-            if(sound != null)
-                ((Player) e.getWhoClicked()).playSound(e.getWhoClicked().getLocation(), sound, 1, 1);
-
+            Bukkit.dispatchCommand(e.getWhoClicked(), "is rankup " + upgradeName);
             e.getWhoClicked().closeInventory();
         }
     }

@@ -21,7 +21,6 @@ public enum IslandPermission {
     EXPEL_BYPASS,
     EXPEL_PLAYERS,
     INTERACT,
-    SIGN_INTERACT,
     INVITE_MEMBER,
     ITEM_FRAME,
     KICK_MEMBER,
@@ -29,12 +28,14 @@ public enum IslandPermission {
     PAYPAL_SHOW,
     PICKUP_DROPS,
     PROMOTE_MEMBERS,
+    RANKUP,
     SET_BIOME,
     SET_DISCORD,
     SET_PAYPAL,
     SET_PERMISSION,
     SET_ROLE,
     SET_WARP,
+    SIGN_INTERACT,
     USE,
     WITHDRAW_MONEY;
 
