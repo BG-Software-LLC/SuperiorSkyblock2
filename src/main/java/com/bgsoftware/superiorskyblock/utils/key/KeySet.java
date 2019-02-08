@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.key;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.AbstractSet;
@@ -28,6 +29,10 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
         return set.size();
     }
 
+
+    public boolean contains(Block block) {
+        return contains(block.getState().getData().toItemStack());
+    }
     public boolean contains(ItemStack itemStack) {
         return contains(SKey.of(itemStack));
     }
