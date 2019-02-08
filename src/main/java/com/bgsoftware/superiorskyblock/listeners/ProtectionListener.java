@@ -23,6 +23,8 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -218,6 +220,34 @@ public final class ProtectionListener implements Listener {
 
         if(fromIsland != null && !fromIsland.isInsideRange(toLocation)){
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBucketEmpty(PlayerBucketEmptyEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBucketFill(PlayerBucketFillEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
         }
     }
 
