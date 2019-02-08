@@ -8,7 +8,7 @@ import org.bukkit.World;
 
 import java.util.List;
 
-public class FAWEHook {
+public final class FAWEHook {
 
     private static boolean enabled = false;
 
@@ -20,6 +20,7 @@ public class FAWEHook {
         enabled = true;
     }
 
+    @SuppressWarnings("deprecation")
     public static void setBlocks(List<SchematicBlock> blocks, Runnable callback){
         World world = blocks.get(0).getLocation().getWorld();
         EditSession editSession = new EditSessionBuilder(world.getName()).fastmode(true).autoQueue(false).build();
