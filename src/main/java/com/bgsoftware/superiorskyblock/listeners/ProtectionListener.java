@@ -8,9 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
@@ -31,6 +29,7 @@ import org.bukkit.inventory.InventoryHolder;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
     private SuperiorSkyblockPlugin plugin;
