@@ -144,3 +144,7 @@ spawn-location: SuperiorWorld, 0, 100, 0
 # When enabled, the islands protection will be on the spawn too.
 # If disabled, it's your responsibility to protect the spawn!
 spawn-protection: true
+
+# When enabled, pvp will be enabled in the spawn.
+# Can be disabled using other plugins.
+spawn-pvp: false

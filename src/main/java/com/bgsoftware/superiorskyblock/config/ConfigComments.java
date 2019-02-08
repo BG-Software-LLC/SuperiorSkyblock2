@@ -142,6 +142,11 @@ public final class ConfigComments {
     @Comment("If disabled, it's your responsibility to protect the spawn!")
     public static String SPAWN_PROTECTION = "spawn-protection";
 
+    @Comment("")
+    @Comment("When enabled, pvp will be enabled in the spawn.")
+    @Comment("Can be disabled using other plugins.")
+    public static String SPAWN_PVP = "spawn-pvp";
+
 
 
 }

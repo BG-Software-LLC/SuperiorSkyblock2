@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -80,8 +81,9 @@ public final class PlayersListener implements Listener {
             return;
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(plugin.getGrid().getIslandAt(e.getEntity().getLocation()) == null)
+        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland))
             return;
 
         SuperiorPlayer damagerPlayer;
