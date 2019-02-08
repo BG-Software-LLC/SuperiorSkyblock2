@@ -10,6 +10,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class CmdAdminSetSize implements ICommand {
 
@@ -70,6 +71,11 @@ public final class CmdAdminSetSize implements ICommand {
 
         island.setIslandSize(size);
         Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
+
+        for(UUID uuid : island.allPlayersInside()){
+            plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), island);
+        }
+
     }
 
     @Override
