@@ -136,7 +136,7 @@ public final class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakByEntityEvent e){
         if(!(e.getRemover() instanceof Player))
             return;
