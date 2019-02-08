@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.PanelListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
+import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -60,6 +61,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
+        getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new PanelListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);

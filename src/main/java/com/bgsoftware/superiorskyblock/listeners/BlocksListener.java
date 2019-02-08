@@ -51,21 +51,6 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(island == null || !superiorPlayer.hasPermission(IslandPermission.BUILD))
-            return;
-
-        if(!island.isInsideRange(e.getBlock().getLocation())){
-            e.setCancelled(true);
-            Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
-        }
-
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
@@ -74,93 +59,12 @@ public final class BlocksListener implements Listener {
             island.handleBlockPlace(e.getBlockPlaced());
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockBreak(BlockBreakEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(island == null || !superiorPlayer.hasPermission(IslandPermission.BUILD))
-            return;
-
-        if(!island.isInsideRange(e.getBlock().getLocation())){
-            e.setCancelled(true);
-            Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
-        }
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakMonitor(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null)
             island.handleBlockBreak(e.getBlock());
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockInteract(PlayerInteractEvent e){
-        if(e.getClickedBlock() == null)
-            return;
-
-        Block clickedBlock = e.getClickedBlock();
-
-        Island island = plugin.getGrid().getIslandAt(clickedBlock.getLocation());
-
-        if(island == null)
-            return;
-
-        IslandPermission islandPermission = clickedBlock.getState() instanceof InventoryHolder ?
-                clickedBlock.getState() instanceof Chest ? IslandPermission.CHEST_ACCESS : IslandPermission.USE : IslandPermission.INTERACT;
-
-        if(!island.hasPermission(SSuperiorPlayer.of(e.getPlayer()), islandPermission)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onHangingBreak(HangingBreakByEntityEvent e){
-        if(!(e.getRemover() instanceof Player))
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getRemover());
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        if(island == null)
-            return;
-
-        IslandPermission islandPermission = e.getEntity() instanceof ItemFrame ? IslandPermission.ITEM_FRAME : IslandPermission.PAINTING;
-        if(!superiorPlayer.hasPermission(islandPermission)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemFrameRotate(ItemFrameRotationEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
-
-        if(island == null)
-            return;
-
-        if(!superiorPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemFrameBreak(ItemFrameBreakEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
-
-        if(island == null)
-            return;
-
-        if(!superiorPlayer.hasPermission(IslandPermission.ITEM_FRAME)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-        }
     }
 
     /*
@@ -315,12 +219,6 @@ public final class BlocksListener implements Listener {
                 e.setCancelled(true);
                 break;
             }
-            else if(island != null){
-                if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
-                    e.setCancelled(true);
-                    break;
-                }
-            }
         }
     }
 
@@ -332,25 +230,6 @@ public final class BlocksListener implements Listener {
                 e.setCancelled(true);
                 break;
             }
-            else if(island != null){
-                if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
-                    e.setCancelled(true);
-                    break;
-                }
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockFlow(BlockFromToEvent e){
-        if(plugin == null || plugin.getGrid() == null)
-            return;
-
-        Island fromIsland = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        Location toLocation = e.getBlock().getRelative(e.getFace()).getLocation();
-
-        if(fromIsland != null && !fromIsland.isInsideRange(toLocation)){
-            e.setCancelled(true);
         }
     }
 

@@ -12,6 +12,8 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -106,6 +108,9 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onEntityAttack(EntityDamageByEntityEvent e){
+        if(e.getEntity() instanceof Painting || e.getEntity() instanceof ItemFrame)
+            return;
+
         if(e.getEntity() instanceof Player || !(e.getDamager() instanceof Player))
             return;
 
@@ -120,6 +125,9 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onEntityInteract(PlayerInteractAtEntityEvent e){
+        if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
+            return;
+
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
