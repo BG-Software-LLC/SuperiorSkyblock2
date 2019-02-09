@@ -121,6 +121,8 @@ public final class CmdShow implements ICommand {
         if(!Locale.ISLAND_INFO_MEMBERS.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_MEMBERS.getMessage(membersString));
 
+        infoMessage.append(Locale.ISLAND_INFO_FOOTER.getMessage());
+
         Locale.sendMessage(sender, infoMessage.toString());
     }
 
