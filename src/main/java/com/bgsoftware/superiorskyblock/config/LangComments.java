@@ -5,7 +5,7 @@ public final class LangComments {
 
     @Comment("######################################################")
     @Comment("##                                                  ##")
-    @Comment("##                SuperiorSkyblockPlugin 2                ##")
+    @Comment("##                SuperiorSkyblock 2                ##")
     @Comment("##                Developed by Ome_R                ##")
     @Comment("##                                                  ##")
     @Comment("######################################################")
