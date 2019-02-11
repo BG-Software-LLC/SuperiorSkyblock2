@@ -61,11 +61,10 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
 
     @Override
     public void setBlock(Location location, int combinedId) {
-        if(!location.getChunk().isLoaded())
-            location.getChunk().load();
         World world = ((CraftWorld) location.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        world.setTypeAndData(blockPosition, Block.getByCombinedId(combinedId), 2);
+        chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
     }
 
     @Override
