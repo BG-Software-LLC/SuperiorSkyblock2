@@ -36,6 +36,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunkSnapshot;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -117,7 +118,14 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     @Override
     @Deprecated
     public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
+        Material type;
+        try {
+            type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
+        }catch(ArrayIndexOutOfBoundsException ex){
+            System.out.println("X: " + x + ", Y: " + y + ", Z: " + z);
+            ex.printStackTrace();
+            type = Material.AIR;
+        }
         short data = (short) chunkSnapshot.getBlockData(x, y, z);
         return SKey.of(type, data);
     }
