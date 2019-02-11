@@ -37,6 +37,7 @@ public final class SettingsHandler {
     public final boolean spawnProtection;
     public final boolean spawnPvp;
     public final boolean voidTeleport;
+    public final List<String> interactables;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -77,6 +78,7 @@ public final class SettingsHandler {
         spawnProtection = cfg.getBoolean("spawn-protection", true);
         spawnPvp = cfg.getBoolean("spawn-pvp", false);
         voidTeleport = cfg.getBoolean("void-teleport", true);
+        interactables = cfg.getStringList("interactables");
     }
 
     private List<String> colorize(List<String> list){

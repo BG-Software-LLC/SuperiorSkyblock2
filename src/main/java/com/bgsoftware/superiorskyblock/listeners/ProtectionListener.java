@@ -28,44 +28,10 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.Arrays;
-import java.util.List;
-
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
     private SuperiorSkyblockPlugin plugin;
-
-    private List<String> interactableBlocks = Arrays.asList(
-            "ACACIA_BUTTON", "ACACIA_DOOR", "ACACIA_FENCE", "ACACIA_FENCE_GATE", "ACACIA_TRAPDOOR", "ANVIL", "BEACON",
-            "BIRCH_BUTTON", "BIRCH_DOOR", "BIRCH_FENCE", "BIRCH_FENCE_GATE", "BIRCH_TRAPDOOR", "BLACK_BED",
-            "BLACK_SHULKER_BOX", "BLUE_BED", "BLUE_SHULKER_BOX", "BREWING_STAND", "BROWN_BED", "BROWN_SHULKER_BOX",
-            "CAKE", "CAULDRON", "CHAIN_COMMAND_BLOCK", "CHEST", "CHIPPED_ANVIL", "COMMAND_BLOCK", "COMPARATOR",
-            "CRAFTING_TABLE", "CYAN_BED","CYAN_SHULKER_BOX", "DAMAGED_ANVIL", "DARK_OAK_BUTTON", "DARK_OAK_DOOR",
-            "DARK_OAK_FENCE", "DARK_OAK_FENCE_GATE", "DARK_OAK_TRAPDOOR", "DAYLIGHT_DETECTOR", "DISPENSER", "DRAGON_EGG",
-            "DROPPER", "ENCHANTING_TABLE", "ENDER_CHEST", "FLOWER_POT", "FURNACE", "GRAY_BED", "GRAY_SHULKER_BOX",
-            "GREEN_BED", "GREEN_SHULKER_BOX", "HOPPER", "IRON_DOOR", "IRON_TRAPDOOR", "JUKEBOX", "JUNGLE_BUTTON",
-            "JUNGLE_DOOR", "JUNGLE_FENCE", "JUNGLE_FENCE_GATE", "JUNGLE_TRAPDOOR", "LEVER", "LIGHT_BLUE_BED",
-            "LIGHT_BLUE_SHULKER_BOX", "LIGHT_GRAY_BED", "LIGHT_GRAY_SHULKER_BOX", "LIME_BED", "LIME_SHULKER_BOX",
-            "LIGHT_BLUE_SHULKER_BOX", "LIGHT_GRAY_BED", "LIGHT_GRAY_SHULKER_BOX", "LIME_BED", "LIME_SHULKER_BOX",
-            "MAGENTA_BED", "MAGENTA_SHULKER_BOX", "NETHER_BRICK_FENCE", "NOTE_BLOCK", "OAK_BUTTON", "OAK_DOOR",
-            "OAK_FENCE", "OAK_FENCE_GATE", "OAK_TRAPDOOR", "ORANGE_BED", "ORANGE_SHULKER_BOX", "PINK_BED",
-            "PINK_SHULKER_BOX", "POTTED_ACACIA_SAPLING", "POTTED_ALLIUM", "POTTED_AZURE_BLUET", "POTTED_BIRCH_SAPLING",
-            "POTTED_BLUE_ORCHID", "POTTED_BROWN_MUSHROOM", "POTTED_CACTUS", "POTTED_DANDELION", "POTTED_DARK_OAK_SAPLING",
-            "POTTED_DEAD_BUSH", "POTTED_FERN", "POTTED_JUNGLE_SAPLING", "POTTED_OAK_SAPLING", "POTTED_ORANGE_TULIP",
-            "POTTED_OXEYE_DAISY", "POTTED_PINK_TULIP", "POTTED_POPPY", "POTTED_RED_MUSHROOM", "POTTED_RED_TULIP",
-            "POTTED_SPRUCE_SAPLING", "POTTED_WHITE_TULIP", "PUMPKIN", "PURPLE_BED", "PURPLE_SHULKER_BOX", "REDSTONE_ORE",
-            "RED_BED", "RED_SHULKER_BOX", "REPEATER", "REPEATING_COMMAND_BLOCK", "SHULKER_BOX", "SIGN", "SPRUCE_BUTTON",
-            "SPRUCE_DOOR", "SPRUCE_FENCE", "SPRUCE_FENCE_GATE", "SPRUCE_TRAPDOOR", "STONE_BUTTON", "STRUCTURE_BLOCK",
-            "TNT", "TRAPPED_CHEST", "WALL_SIGN", "WHITE_BED", "WHITE_SHULKER_BOX", "YELLOW_BED", "YELLOW_SHULKER_BOX",
-            "BED_BLOCK", "WORKBENCH", "BURNING_FURNACE", "SIGN_POST", "WOODEN_DOOR", "IRON_DOOR_BLOCK", "IRON_FENCE",
-            "GLOWING_REDSTONE_ORE", "FENCE", "CAKE_BLOCK", "DIODE_BLOCK_OFF", "DIODE_BLOCK_ON", "TRAP_DOOR", "FENCE_GATE",
-            "NETHER_FENCE", "ENCHANTMENT_TABLE", "ENDER_PORTAL_FRAME", "COMMAND", "WOOD_BUTTON", "GOLD_PLATE", "IRON_PLATE",
-            "REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR_ON", "DAYLIGHT_DETECTOR_INVERTED", "COMMAND_REPEATING",
-            "COMMAND_CHAIN", "STRUCTURE_VOID", "ACACIA_PRESSURE_PLATE", "BIRCH_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE",
-            "HEAVY_WEIGHTED_PRESSURE_PLATE", "JUNGLE_PRESSURE_PLATE", "LIGHT_WEIGHTED_PRESSURE_PLATE", "OAK_PRESSURE_PLATE",
-            "SPRUCE_PRESSURE_PLATE", "STONE_PRESSURE_PLATE"
-    );
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -115,7 +81,11 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e){
-        if(e.getClickedBlock() == null || !interactableBlocks.contains(e.getClickedBlock().getType().name()))
+        if(e.getClickedBlock() == null)
+            return;
+
+        if(!plugin.getSettings().interactables.contains(e.getClickedBlock().getType().name()) &&
+                plugin.getGrid().getBlockAmount(e.getClickedBlock()) <= 1)
             return;
 
         Block clickedBlock = e.getClickedBlock();

@@ -152,6 +152,11 @@ public final class ConfigComments {
     @Comment("If they fall not in an island, they will be teleported to spawn.")
     public static String VOID_TELEPORT = "void-teleport";
 
+    @Comment("")
+    @Comment("A list of interactable blocks.")
+    @Comment("Only interactable blocks & stacked blocks will be blocked from being interacted.")
+    public static String INTERACTABLES = "interactables";
+
 
 
 }
