@@ -154,6 +154,9 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
+        if(e.getEntity() instanceof Player)
+            return;
+
         double mobDropsMultiplier = island.getMobDropsMultiplier();
 
         if(mobDropsMultiplier > 1){
