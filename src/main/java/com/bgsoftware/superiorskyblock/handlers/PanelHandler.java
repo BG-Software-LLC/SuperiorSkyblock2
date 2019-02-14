@@ -42,7 +42,6 @@ public final class PanelHandler {
     public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage,
             islandCreationPage, biomesPage, warpsPage, valuesPage;
 
-    Map<UUID, PanelType> openedPanel = new HashMap<>();
     public Map<UUID, UUID> islands = new HashMap<>();
 
     public PanelHandler(SuperiorSkyblockPlugin plugin){
@@ -110,8 +109,7 @@ public final class PanelHandler {
     }
 
     public void openPanel(SuperiorPlayer superiorPlayer){
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.GENERAL);
-        mainPage.openInventory(superiorPlayer);
+        mainPage.openInventory(superiorPlayer, true);
     }
 
     public void openMembersPanel(SuperiorPlayer superiorPlayer, int page){
@@ -120,7 +118,7 @@ public final class PanelHandler {
             return;
         }
 
-        Inventory inventory = membersPage.getInventory();
+        Inventory inventory = membersPage.clonedInventory();
         List<UUID> members = new ArrayList<>();
 
         if(superiorPlayer.getIsland() != null)
@@ -155,8 +153,7 @@ public final class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.MEMBERS);
-        openInventory(superiorPlayer, inventory);
+        membersPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openVisitorsPanel(SuperiorPlayer superiorPlayer, int page){
@@ -165,7 +162,7 @@ public final class PanelHandler {
             return;
         }
 
-        Inventory inventory = visitorsPage.getInventory();
+        Inventory inventory = visitorsPage.clonedInventory();
         List<UUID> visitors = new ArrayList<>();
 
         if(superiorPlayer.getIsland() != null)
@@ -204,22 +201,19 @@ public final class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.VISITORS);
-        openInventory(superiorPlayer, inventory);
+        visitorsPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openPlayerPanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         Inventory inventory = Bukkit.createInventory(null, playerPage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(playerPage.getContents());
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.PLAYER);
-        openInventory(superiorPlayer, inventory);
+        playerPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openRolePanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         Inventory inventory = Bukkit.createInventory(null, rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(rolePage.getContents());
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.ROLE);
-        openInventory(superiorPlayer, inventory);
+        rolePage.openInventory(superiorPlayer, inventory);
     }
 
     public void openIslandCreationPanel(SuperiorPlayer superiorPlayer){
@@ -228,7 +222,7 @@ public final class PanelHandler {
             return;
         }
 
-        Inventory inventory = islandCreationPage.getInventory();
+        Inventory inventory = islandCreationPage.clonedInventory();
 
         for(String schematic : plugin.getSchematics().getSchematics()){
             if(islandCreationPage.contains(schematic + "-has-access-item")) {
@@ -243,10 +237,7 @@ public final class PanelHandler {
             }
         }
 
-        islandCreationPage.playOpenSound(superiorPlayer);
-
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.SCHEMATICS);
-        openInventory(superiorPlayer, inventory);
+        islandCreationPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openBiomesPanel(SuperiorPlayer superiorPlayer){
@@ -255,7 +246,7 @@ public final class PanelHandler {
             return;
         }
 
-        Inventory inventory = biomesPage.getInventory();
+        Inventory inventory = biomesPage.clonedInventory();
 
         for(Biome biome : Biome.values()){
             String biomeName = biome.name().toLowerCase();
@@ -271,10 +262,7 @@ public final class PanelHandler {
             }
         }
 
-        biomesPage.playOpenSound(superiorPlayer);
-
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.BIOMES);
-        openInventory(superiorPlayer, inventory);
+        biomesPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openWarpsPanel(SuperiorPlayer superiorPlayer, int page) {
@@ -291,7 +279,7 @@ public final class PanelHandler {
             return;
         }
 
-        Inventory inventory = warpsPage.getInventory();
+        Inventory inventory = warpsPage.clonedInventory();
         List<String> warps = new ArrayList<>(island.getAllWarps());
 
         warps.sort(String::compareTo);
@@ -323,13 +311,12 @@ public final class PanelHandler {
         inventory.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (warps.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        openedPanel.put(superiorPlayer.getUniqueId(), PanelType.WARPS);
+        warpsPage.openInventory(superiorPlayer, inventory);
         islands.put(superiorPlayer.getUniqueId(), island.getOwner().getUniqueId());
-        openInventory(superiorPlayer, inventory);
     }
 
     public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
-        Inventory valuesPageInventory = valuesPage.getInventory();
+        Inventory valuesPageInventory = valuesPage.clonedInventory();
         Inventory inventory = Bukkit.createInventory(null, valuesPageInventory.getSize(),
                 valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
                         .replace("{1}", island.getWorthAsString()));
@@ -377,23 +364,17 @@ public final class PanelHandler {
                 inventory.setItem(slot, itemStack);
             }
 
-            openedPanel.put(superiorPlayer.getUniqueId(), PanelType.VALUES);
-
-            openInventory(superiorPlayer, inventory);
+            valuesPage.openInventory(superiorPlayer, inventory);
         }).start();
     }
 
-    public PanelType getOpenedPanelType(SuperiorPlayer superiorPlayer){
-        return openedPanel.getOrDefault(superiorPlayer.getUniqueId(), PanelType.NONE);
-    }
-
     public void closeInventory(SuperiorPlayer superiorPlayer){
-        openedPanel.remove(superiorPlayer.getUniqueId());
+        GUIInventory.from(superiorPlayer).closeInventory(superiorPlayer);
         islands.remove(superiorPlayer.getUniqueId());
     }
 
     private void initMainPage(YamlConfiguration cfg){
-        mainPage = FileUtil.getGUI(cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
+        mainPage = FileUtil.getGUI(GUIInventory.MAIN_PAGE_IDENTIFIER, cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
 
         ItemStack membersButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.members"));
         ItemStack settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
@@ -418,7 +399,7 @@ public final class PanelHandler {
     }
 
     private void initMembersPage(YamlConfiguration cfg){
-        membersPage = FileUtil.getGUI(cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
+        membersPage = FileUtil.getGUI(GUIInventory.MEMBERS_PAGE_IDENTIFIER, cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
 
         ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.previous-page"));
         ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.current-page"));
@@ -452,7 +433,7 @@ public final class PanelHandler {
     }
 
     private void initVisitorsPage(YamlConfiguration cfg){
-        visitorsPage = FileUtil.getGUI(cfg.getConfigurationSection("visitors-panel"), 6, "&lIsland Visitors");
+        visitorsPage = FileUtil.getGUI(GUIInventory.VISITORS_PAGE_IDENTIFIER, cfg.getConfigurationSection("visitors-panel"), 6, "&lIsland Visitors");
 
         ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.previous-page"));
         ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.current-page"));
@@ -486,7 +467,7 @@ public final class PanelHandler {
     }
 
     private void initPlayerPage(YamlConfiguration cfg){
-        playerPage = FileUtil.getGUI(cfg.getConfigurationSection("players-panel"), 6, "");
+        playerPage = FileUtil.getGUI(GUIInventory.PLAYER_PAGE_IDENTIFIER, cfg.getConfigurationSection("players-panel"), 6, "");
 
         ItemStack rolesButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.roles"));
         ItemStack banButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.ban"));
@@ -511,7 +492,7 @@ public final class PanelHandler {
     }
 
     private void initRolePage(YamlConfiguration cfg){
-        rolePage = FileUtil.getGUI(cfg.getConfigurationSection("roles-panel"), 5, "");
+        rolePage = FileUtil.getGUI(GUIInventory.ROLE_PAGE_IDENTIFIER, cfg.getConfigurationSection("roles-panel"), 5, "");
 
         ItemStack memberButton = FileUtil.getItemStack(cfg.getConfigurationSection("roles-panel.member-role"));
         ItemStack modButton = FileUtil.getItemStack(cfg.getConfigurationSection("roles-panel.mod-role"));
@@ -542,7 +523,7 @@ public final class PanelHandler {
     }
 
     private void initIslandCreationPage(YamlConfiguration cfg){
-        islandCreationPage = FileUtil.getGUI(cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
+        islandCreationPage = FileUtil.getGUI(GUIInventory.ISLAND_CREATION_PAGE_IDENTIFIER, cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
 
         ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics");
 
@@ -557,7 +538,7 @@ public final class PanelHandler {
     }
 
     private void initBiomesPage(YamlConfiguration cfg){
-        biomesPage = FileUtil.getGUI(cfg.getConfigurationSection("biomes-gui"), 1, "&lSelect a biome");
+        biomesPage = FileUtil.getGUI(GUIInventory.BIOMES_PAGE_IDENTIFIER, cfg.getConfigurationSection("biomes-gui"), 1, "&lSelect a biome");
 
         ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes");
 
@@ -573,7 +554,7 @@ public final class PanelHandler {
     }
 
     private void initWarpsPage(YamlConfiguration cfg){
-        warpsPage = FileUtil.getGUI(cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
+        warpsPage = FileUtil.getGUI(GUIInventory.WARPS_PAGE_IDENTIFIER, cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
 
         ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.previous-page"));
         ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.current-page"));
@@ -607,7 +588,7 @@ public final class PanelHandler {
     }
 
     private void initValuesPage(YamlConfiguration cfg){
-        valuesPage = FileUtil.getGUI(cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
+        valuesPage = FileUtil.getGUI(GUIInventory.VALUES_PAGE_IDENTIFIER, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
 
         Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
@@ -628,18 +609,6 @@ public final class PanelHandler {
         valuesPage.put("blockName", blockName);
         valuesPage.put("blockLore", blockLore);
         valuesPage.put("countedBlocks", countedBlocks);
-    }
-
-    private void openInventory(SuperiorPlayer superiorPlayer, Inventory inventory){
-        if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> openInventory(superiorPlayer, inventory));
-            return;
-        }
-        superiorPlayer.asPlayer().openInventory(inventory);
-    }
-
-    public enum PanelType{
-        NONE, GENERAL, MEMBERS, VISITORS, PLAYER, ROLE, SCHEMATICS, BIOMES, WARPS, VALUES, TOP
     }
 
 }

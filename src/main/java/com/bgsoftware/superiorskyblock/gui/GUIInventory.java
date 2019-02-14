@@ -8,56 +8,82 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.UUID;
 
 public final class GUIInventory {
 
-    private ItemStack[] contents;
-    private String title;
-    Sound openSound = null, closeSound = null;
-    Map<String, Object> data = Maps.newHashMap();
+    public static final String MAIN_PAGE_IDENTIFIER = "mainPage";
+    public static final String MEMBERS_PAGE_IDENTIFIER = "membersPage";
+    public static final String VISITORS_PAGE_IDENTIFIER = "visitorsPage";
+    public static final String PLAYER_PAGE_IDENTIFIER = "playerPage";
+    public static final String ROLE_PAGE_IDENTIFIER = "rolePage";
+    public static final String ISLAND_CREATION_PAGE_IDENTIFIER = "islandCreationPage";
+    public static final String BIOMES_PAGE_IDENTIFIER = "biomesPage";
+    public static final String WARPS_PAGE_IDENTIFIER = "warpsPage";
+    public static final String VALUES_PAGE_IDENTIFIER = "valuesPage";
+    public static final String ISLAND_TOP_PAGE_IDENTIFIER = "islandTop";
+    public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
 
-    public GUIInventory(Inventory inventory){
-        contents = inventory.getContents();
-        title = inventory.getTitle();
+    private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
+
+    private Inventory inventory;
+    private Map<String, Object> data = Maps.newHashMap();
+
+    private GUIInventory(String identifier, Inventory inventory){
+        this.inventory = Bukkit.createInventory(null, inventory.getSize(), inventory.getTitle());
+        this.inventory.setContents(inventory.getContents());
+        put("identifier", identifier);
     }
 
     public GUIInventory withSounds(Sound openSound, Sound closeSound){
-        this.openSound = openSound;
-        this.closeSound = closeSound;
+        put("openSound", openSound);
+        put("closeSound", closeSound);
         return this;
     }
 
-    public void openInventory(SuperiorPlayer superiorPlayer){
-        playOpenSound(superiorPlayer);
-        superiorPlayer.asPlayer().openInventory(getInventory());
+    public void openInventory(SuperiorPlayer superiorPlayer, boolean cloned){
+        openInventory(superiorPlayer, cloned ? clonedInventory() : getInventory());
     }
 
-    public Inventory getInventory(){
-        Inventory inventory = Bukkit.createInventory(null, contents.length, title);
-        inventory.setContents(contents);
-        return inventory;
+    public void openInventory(SuperiorPlayer superiorPlayer, Inventory inventory){
+        playOpenSound(superiorPlayer);
+        superiorPlayer.asPlayer().openInventory(inventory);
+        openedInventories.put(superiorPlayer.getUniqueId(), this);
+    }
+
+    public void closeInventory(SuperiorPlayer superiorPlayer){
+        openedInventories.remove(superiorPlayer.getUniqueId());
+        playCloseSound(superiorPlayer);
     }
 
     public ItemStack[] getContents() {
-        return contents;
+        return inventory.getContents();
     }
 
     public String getTitle() {
-        return title;
+        return inventory.getTitle();
     }
 
     public int getSize(){
-        return contents.length;
+        return inventory.getSize();
     }
 
-    public void playOpenSound(SuperiorPlayer superiorPlayer){
-        if(openSound != null)
+    public String getIdentifier(){
+        return get("identifier", String.class);
+    }
+
+    private void playOpenSound(SuperiorPlayer superiorPlayer){
+        if(contains("openSound")) {
+            Sound openSound = get("openSound", Sound.class);
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
+        }
     }
 
-    public void playCloseSound(SuperiorPlayer superiorPlayer){
-        if(closeSound != null)
+    private void playCloseSound(SuperiorPlayer superiorPlayer){
+        if(contains("closeSound")) {
+            Sound closeSound = get("closeSound", Sound.class);
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), closeSound, 1, 1);
+        }
     }
 
     public <T> T get(String key, Class<T> classType){
@@ -73,11 +99,25 @@ public final class GUIInventory {
     }
 
     public void setItem(int slot, ItemStack itemStack){
-        contents[slot] = itemStack;
+        inventory.setItem(slot, itemStack);
     }
 
-    public SyncGUIInventory toSyncGUI(){
-        return new SyncGUIInventory(this);
+    public Inventory clonedInventory(){
+        Inventory inventory = Bukkit.createInventory(null, this.inventory.getSize(), this.inventory.getTitle());
+        inventory.setContents(this.inventory.getContents());
+        return inventory;
+    }
+
+    private Inventory getInventory(){
+        return inventory;
+    }
+
+    public static GUIInventory from(SuperiorPlayer superiorPlayer){
+        return openedInventories.get(superiorPlayer.getUniqueId());
+    }
+
+    public static GUIInventory from(String identifier, Inventory inventory){
+        return new GUIInventory(identifier, inventory);
     }
 
 }

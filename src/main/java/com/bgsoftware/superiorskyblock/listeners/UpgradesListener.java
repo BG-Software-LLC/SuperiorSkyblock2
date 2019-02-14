@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -22,7 +23,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
@@ -56,11 +56,15 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e){
-        if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player) ||
-                !e.getClickedInventory().getName().equals(plugin.getUpgrades().getTitle()))
+        if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+        GUIInventory guiInventory = GUIInventory.from(superiorPlayer);
+
+        if(guiInventory == null || !guiInventory.getIdentifier().equals(GUIInventory.UPGRADES_PAGE_IDENTIFIER))
+            return;
+
         e.setCancelled(true);
 
         String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
@@ -70,16 +74,6 @@ public final class UpgradesListener implements Listener {
             e.getWhoClicked().closeInventory();
         }
     }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e) {
-        if (!(e.getPlayer() instanceof Player) ||
-                !e.getInventory().getName().equals(plugin.getUpgrades().getTitle()))
-            return;
-
-        plugin.getUpgrades().playCloseSound(SSuperiorPlayer.of(e.getPlayer()));
-    }
-
 
     /*
      *   CROP GROWTH

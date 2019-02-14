@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -14,7 +15,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.gui.SyncGUIInventory;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
@@ -226,7 +226,7 @@ public final class GridHandler implements GridManager {
         stackedBlocks.updateName(block);
     }
 
-    public SyncGUIInventory getTopIslands(){
+    public GUIInventory getTopIslands(){
         return topIslands.topIslands;
     }
 
@@ -365,7 +365,7 @@ public final class GridHandler implements GridManager {
 
     private class IslandTopHandler {
 
-        private SyncGUIInventory topIslands;
+        private GUIInventory topIslands;
 
         public IslandTopHandler(){
             SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -377,7 +377,8 @@ public final class GridHandler implements GridManager {
 
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-            topIslands = FileUtil.getGUI(cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands").toSyncGUI();
+            topIslands = FileUtil.getGUI(GUIInventory.ISLAND_TOP_PAGE_IDENTIFIER,
+                    cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
 
             ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
             ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
@@ -386,9 +387,9 @@ public final class GridHandler implements GridManager {
             Arrays.stream(cfg.getString("top-islands.slots").split(","))
                     .forEach(slot -> slots.add(Integer.valueOf(slot)));
 
-            topIslands.getData().put("islandItem", islandItem);
-            topIslands.getData().put("noIslandItem", noIslandItem);
-            topIslands.getData().put("slots", slots.toArray(new Integer[0]));
+            topIslands.put("islandItem", islandItem);
+            topIslands.put("noIslandItem", noIslandItem);
+            topIslands.put("slots", slots.toArray(new Integer[0]));
 
             reloadGUI();
         }
@@ -400,8 +401,7 @@ public final class GridHandler implements GridManager {
             }
 
             islands.sort();
-            plugin.getPanel().openedPanel.put(superiorPlayer.getUniqueId(), PanelHandler.PanelType.TOP);
-            topIslands.openInventory(superiorPlayer);
+            topIslands.openInventory(superiorPlayer, false);
 
             reloadGUI();
         }
@@ -412,7 +412,7 @@ public final class GridHandler implements GridManager {
                 return;
             }
 
-            Integer[] slots = (Integer[]) topIslands.getData().get("slots");
+            Integer[] slots = topIslands.get("slots", Integer[].class);
 
             for(int i = 0; i < slots.length; i++){
                 Island island = i >= islands.size() ? null : islands.get(i);
@@ -427,11 +427,11 @@ public final class GridHandler implements GridManager {
             ItemStack itemStack;
 
             if(islandOwner == null){
-                itemStack = ((ItemStack) topIslands.getData().get("noIslandItem")).clone();
+                itemStack = topIslands.get("noIslandItem", ItemStack.class).clone();
             }
 
             else{
-                itemStack = ((ItemStack) topIslands.getData().get("islandItem")).clone();
+                itemStack = topIslands.get("islandItem", ItemStack.class).clone();
             }
 
             ItemBuilder itemBuilder = new ItemBuilder(itemStack).asSkullOf(islandOwner);
