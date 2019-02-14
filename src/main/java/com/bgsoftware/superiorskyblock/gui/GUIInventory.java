@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.gui;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class GUIInventory {
@@ -25,6 +28,8 @@ public final class GUIInventory {
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
 
     private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
+    private static Set<UUID> recentlyOpened = Sets.newHashSet();
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private Inventory inventory;
     private Map<String, Object> data = Maps.newHashMap();
@@ -46,9 +51,13 @@ public final class GUIInventory {
     }
 
     public void openInventory(SuperiorPlayer superiorPlayer, Inventory inventory){
-        playOpenSound(superiorPlayer);
-        superiorPlayer.asPlayer().openInventory(inventory);
-        openedInventories.put(superiorPlayer.getUniqueId(), this);
+        if(!recentlyOpened.contains(superiorPlayer.getUniqueId())) {
+            recentlyOpened.add(superiorPlayer.getUniqueId());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyOpened.remove(superiorPlayer.getUniqueId()), 20L);
+            playOpenSound(superiorPlayer);
+            superiorPlayer.asPlayer().openInventory(inventory);
+            openedInventories.put(superiorPlayer.getUniqueId(), this);
+        }
     }
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
