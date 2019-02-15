@@ -123,13 +123,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void loadWorld(){
         String worldName = (settingsHandler = new SettingsHandler(this)).islandWorld;
+        WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
 
-        if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core") && Bukkit.getWorld(worldName) == null){
-            getServer().dispatchCommand(getServer().getConsoleSender(), "mc import " + worldName + " normal -g " + getName());
+        if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core")){
+            getServer().dispatchCommand(getServer().getConsoleSender(), "mv import " + worldName + " normal -g " + getName());
             getServer().dispatchCommand(getServer().getConsoleSender(), "mv modify set generator " + getName() + " " + worldName);
         }
-
-        WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
     }
 
     private void loadAPI(){
