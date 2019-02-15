@@ -18,6 +18,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -55,6 +56,15 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockBreak(e.getBlock());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockFormMonitor(BlockFromToEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
+
+        if(island != null){
+            Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getToBlock(), 1),1L);
+        }
     }
 
     /*
