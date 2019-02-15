@@ -14,16 +14,19 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -33,6 +36,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.HashSet;
@@ -113,6 +117,29 @@ public final class PlayersListener implements Listener {
 
         e.setCancelled(true);
         Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
+    }
+
+    @EventHandler
+    public void onPoisonAttack(ProjectileHitEvent e){
+        if(!(e.getEntity() instanceof SplashPotion) || !(e.getEntity().getShooter() instanceof Player))
+            return;
+
+        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland))
+            return;
+
+        for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){
+            if(entity instanceof Player){
+                SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) entity);
+
+                if(damagerPlayer.equals(targetPlayer))
+                    continue;
+
+                targetPlayer.asPlayer().removePotionEffect(PotionEffectType.POISON);
+            }
+        }
     }
 
     @EventHandler
