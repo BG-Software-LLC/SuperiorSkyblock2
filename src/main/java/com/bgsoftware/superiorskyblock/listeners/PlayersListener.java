@@ -133,6 +133,18 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler
+    public void onVisitorDamage(EntityDamageEvent e){
+        if(!(e.getEntity() instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
     public void onEntityInteract(PlayerInteractAtEntityEvent e){
         if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
             return;

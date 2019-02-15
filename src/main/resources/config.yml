@@ -315,3 +315,6 @@ interactables:
 - 'WORKBENCH'
 - 'YELLOW_BED'
 - 'YELLOW_SHULKER_BOX'
+
+# When disabled, visitors won't get damaged in other islands.
+visitors-damage: false

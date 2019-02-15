@@ -157,6 +157,10 @@ public final class ConfigComments {
     @Comment("Only interactable blocks & stacked blocks will be blocked from being interacted.")
     public static String INTERACTABLES = "interactables";
 
+    @Comment("")
+    @Comment("When disabled, visitors won't get damaged in other islands.")
+    public static String VISITORS_DAMAGE = "visitors-damage";
+
 
 
 }
