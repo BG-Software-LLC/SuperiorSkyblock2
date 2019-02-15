@@ -74,7 +74,7 @@ public final class FileUtil {
         return itemBuilder.build();
     }
 
-    public static GUIInventory getGUI(ConfigurationSection section, int defaultSize, String defaultTitle){
+    public static GUIInventory getGUI(String identifier, ConfigurationSection section, int defaultSize, String defaultTitle){
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
         int size = section.getInt("size", defaultSize);
 
@@ -93,7 +93,7 @@ public final class FileUtil {
             }
         }
 
-        return new GUIInventory(inventory).withSounds(openSound, closeSound);
+        return GUIInventory.from(identifier, inventory).withSounds(openSound, closeSound);
     }
 
     public static String fromLocation(Location location){

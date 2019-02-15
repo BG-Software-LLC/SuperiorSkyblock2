@@ -39,7 +39,7 @@ public final class UpgradesHandler {
             return;
         }
 
-        Inventory inventory = upgradesMenu.getInventory();
+        Inventory inventory = upgradesMenu.clonedInventory();
 
         Island island;
 
@@ -55,9 +55,7 @@ public final class UpgradesHandler {
             }
         }
 
-        upgradesMenu.playOpenSound(superiorPlayer);
-
-        superiorPlayer.asPlayer().openInventory(inventory);
+        upgradesMenu.openInventory(superiorPlayer, inventory);
     }
 
     public String getTitle() {
@@ -129,10 +127,6 @@ public final class UpgradesHandler {
         return sound;
     }
 
-    public void playCloseSound(SuperiorPlayer superiorPlayer){
-        upgradesMenu.playCloseSound(superiorPlayer);
-    }
-
     private void loadUpgrades(){
         File file = new File(plugin.getDataFolder(), "upgrades.yml");
 
@@ -166,7 +160,7 @@ public final class UpgradesHandler {
 
         ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
 
-        upgradesMenu = FileUtil.getGUI(section, 4, "&lIsland Upgrades");
+        upgradesMenu = FileUtil.getGUI(GUIInventory.UPGRADES_PAGE_IDENTIFIER, section, 4, "&lIsland Upgrades");
 
         if(section.contains("upgrades")){
             ConfigurationSection upgrades = section.getConfigurationSection("upgrades");
