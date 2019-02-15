@@ -180,7 +180,7 @@ public final class UpgradesListener implements Listener {
         noRightClickTwice.add(e.getPlayer().getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
-        island.handleBlockPlace(SKey.of("HOPPER"), 1);
+        island.handleBlockPlace(SKey.of("HOPPER:0"), 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -193,7 +193,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(SKey.of("HOPPER"), 1);
+        island.handleBlockBreak(SKey.of("HOPPER:0"), 1);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
