@@ -20,6 +20,7 @@ public enum IslandPermission {
     DROP_ITEMS,
     EXPEL_BYPASS,
     EXPEL_PLAYERS,
+    FARM_TRAMPING,
     INTERACT,
     INVITE_MEMBER,
     ITEM_FRAME,

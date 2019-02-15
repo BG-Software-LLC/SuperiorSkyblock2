@@ -100,6 +100,7 @@ public final class ProtectionListener implements Listener {
         if(clickedBlock.getState() instanceof Chest) islandPermission = IslandPermission.CHEST_ACCESS;
         else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPermission.USE;
         else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPermission.SIGN_INTERACT;
+        else if(clickedBlock.getType().name().equals("SOIL") || clickedBlock.getType().name().equals("FARMLAND")) islandPermission = IslandPermission.FARM_TRAMPING;
         else islandPermission = IslandPermission.INTERACT;
 
         if(!island.hasPermission(SSuperiorPlayer.of(e.getPlayer()), islandPermission)){
