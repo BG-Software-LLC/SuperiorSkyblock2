@@ -59,11 +59,13 @@ public final class BlocksListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockFormMonitor(BlockFromToEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
+    public void onBlockFromToMonitor(BlockFromToEvent e){
+        if(plugin != null && plugin.getGrid() != null) {
+            Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
 
-        if(island != null){
-            Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getToBlock(), 1),1L);
+            if (island != null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
+            }
         }
     }
 
