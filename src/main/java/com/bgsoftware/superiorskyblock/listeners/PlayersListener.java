@@ -19,7 +19,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.SplashPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -121,7 +120,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPoisonAttack(ProjectileHitEvent e){
-        if(!(e.getEntity() instanceof SplashPotion) || !(e.getEntity().getShooter() instanceof Player))
+        if(e.getEntityType().name().equals("SPLASH_POTION") || !(e.getEntity().getShooter() instanceof Player))
             return;
 
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
