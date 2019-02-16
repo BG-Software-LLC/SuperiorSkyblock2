@@ -28,8 +28,8 @@ public final class GUIInventory {
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
 
     private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
-    private static Set<UUID> recentlyOpened = Sets.newHashSet();
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static Map<GUIInventory, Set<UUID>> recentlyOpened = Maps.newHashMap();
 
     private Inventory inventory;
     private Map<String, Object> data = Maps.newHashMap();
@@ -38,6 +38,7 @@ public final class GUIInventory {
         this.inventory = Bukkit.createInventory(null, inventory.getSize(), inventory.getTitle());
         this.inventory.setContents(inventory.getContents());
         put("identifier", identifier);
+        recentlyOpened.put(this, Sets.newHashSet());
     }
 
     public GUIInventory withSounds(Sound openSound, Sound closeSound){
@@ -51,9 +52,13 @@ public final class GUIInventory {
     }
 
     public void openInventory(SuperiorPlayer superiorPlayer, Inventory inventory){
-        if(!recentlyOpened.contains(superiorPlayer.getUniqueId())) {
-            recentlyOpened.add(superiorPlayer.getUniqueId());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyOpened.remove(superiorPlayer.getUniqueId()), 20L);
+        if(!Bukkit.isPrimaryThread()){
+            Bukkit.getScheduler().runTask(plugin, () -> openInventory(superiorPlayer, inventory));
+            return;
+        }
+        if(!recentlyOpened.get(this).contains(superiorPlayer.getUniqueId())) {
+            recentlyOpened(superiorPlayer.getUniqueId());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyOpened.get(this).remove(superiorPlayer.getUniqueId()), 20L);
             playOpenSound(superiorPlayer);
             superiorPlayer.asPlayer().openInventory(inventory);
             openedInventories.put(superiorPlayer.getUniqueId(), this);
@@ -119,6 +124,13 @@ public final class GUIInventory {
 
     private Inventory getInventory(){
         return inventory;
+    }
+
+    private void recentlyOpened(UUID uuid){
+        for(GUIInventory gui : recentlyOpened.keySet()){
+            recentlyOpened.get(gui).remove(uuid);
+        }
+        recentlyOpened.get(this).add(uuid);
     }
 
     public static GUIInventory from(SuperiorPlayer superiorPlayer){
