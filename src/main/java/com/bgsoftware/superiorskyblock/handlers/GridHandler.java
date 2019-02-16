@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -167,6 +168,11 @@ public final class GridHandler implements GridManager {
     @Override
     public Island getSpawnIsland(){
         return spawnIsland;
+    }
+
+    @Override
+    public World getIslandsWorld() {
+        return Bukkit.getWorld(plugin.getSettings().islandWorld);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.List;
@@ -25,6 +26,8 @@ public interface GridManager {
 
     Island getSpawnIsland();
 
+    World getIslandsWorld();
+
     Location getNextLocation();
 
     List<UUID> getAllIslands();
@@ -40,7 +43,4 @@ public interface GridManager {
     void openTopIslands(SuperiorPlayer superiorPlayer);
 
     void calcAllIslands();
-
-
-
 }

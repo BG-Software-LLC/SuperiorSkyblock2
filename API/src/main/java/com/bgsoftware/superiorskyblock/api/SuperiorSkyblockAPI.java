@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -84,6 +85,15 @@ public final class SuperiorSkyblockAPI {
      */
     public static Island getSpawnIsland(){
         return plugin.getGrid().getSpawnIsland();
+    }
+
+    /**
+     * Get the islands world.
+     *
+     * @return the spawn island.
+     */
+    public static World getIslandsWorld(){
+        return plugin.getGrid().getIslandsWorld();
     }
 
     /**
