@@ -132,6 +132,7 @@ public final class DataHandler {
                     inputStream = new NBTInputStream(new FileInputStream(file));
                     Tag tag = inputStream.readTag();
                     plugin.getGrid().createIsland((CompoundTag) tag);
+                    inputStream.close();
                 }catch(EOFException ex){
                     SuperiorSkyblockPlugin.log("Couldn't load the island of " + file.getName() + ".");
                 }catch(Exception ex){
@@ -150,6 +151,7 @@ public final class DataHandler {
                     inputStream = new NBTInputStream(new FileInputStream(file));
                     Tag tag = inputStream.readTag();
                     plugin.getPlayers().loadPlayer((CompoundTag) tag);
+                    inputStream.close();
                 }catch(EOFException ex){
                     SuperiorSkyblockPlugin.log("Couldn't load the player data of " + file.getName() + ".");
                 }catch(Exception ex){
@@ -165,6 +167,7 @@ public final class DataHandler {
                 inputStream = new NBTInputStream(new FileInputStream(gridFile));
                 Tag tag = inputStream.readTag();
                 plugin.getGrid().loadGrid((CompoundTag) tag);
+                inputStream.close();
             }catch(EOFException ex){
                 SuperiorSkyblockPlugin.log("Couldn't load the grid data.");
             }catch(Exception ex){
