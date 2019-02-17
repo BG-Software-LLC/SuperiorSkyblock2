@@ -32,6 +32,8 @@ public interface Island extends Comparable<Island> {
 
     void banMember(SuperiorPlayer superiorPlayer);
 
+    void unbanMember(SuperiorPlayer superiorPlayer);
+
     boolean isBanned(SuperiorPlayer superiorPlayer);
 
     List<UUID> getAllMembers();

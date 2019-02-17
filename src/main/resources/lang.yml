@@ -110,6 +110,10 @@ GOT_KICKED: '&aYou were kicked from your island by {0}.'
 LEAVE_ISLAND_AS_LEADER: '&cYou cannot leave your island when you own it.'
 LEAVE_ANNOUNCEMENT: '&a{0} left the island.'
 LEFT_ISLAND: '&aYou left your island.'
+# Called when running the /is pardon command.
+PLAYER_NOT_BANNED: '&cThis player is not banned.'
+UNBAN_ANNOUNCEMENT: '&a{0} was UNBANNED from the island by {1}.'
+GOT_UNBANNED: '&aYou were UNBANNED from {0}''s island.'
 # Called when running the /is permissions command.
 NO_PERMISSION_CHECK_PERMISSION: '&cYou must be at least {0} in order to get information about permissions.'
 PERMISSION_CHECK: |

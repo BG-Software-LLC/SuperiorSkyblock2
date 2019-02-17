@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.commands.command.CmdInvite;
 import com.bgsoftware.superiorskyblock.commands.command.CmdKick;
 import com.bgsoftware.superiorskyblock.commands.command.CmdLeave;
 import com.bgsoftware.superiorskyblock.commands.command.CmdPanel;
+import com.bgsoftware.superiorskyblock.commands.command.CmdPardon;
 import com.bgsoftware.superiorskyblock.commands.command.CmdPermissions;
 import com.bgsoftware.superiorskyblock.commands.command.CmdPromote;
 import com.bgsoftware.superiorskyblock.commands.command.CmdRankup;
@@ -67,6 +68,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdKick());
         subCommands.add(new CmdLeave());
         subCommands.add(new CmdPanel());
+        subCommands.add(new CmdPardon());
         subCommands.add(new CmdPermissions());
         subCommands.add(new CmdPromote());
         subCommands.add(new CmdRankup());

@@ -43,6 +43,8 @@ permissions:
             description: Leave your island.
           superior.island.panel:
             description: Open island panel.
+          superior.island.pardon:
+            description: Unban a player from your island.
           superior.island.permissions:
             description: Get all permissions for an island role.
           superior.island.promote:

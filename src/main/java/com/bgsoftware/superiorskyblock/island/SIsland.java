@@ -197,6 +197,11 @@ public class SIsland implements Island{
     }
 
     @Override
+    public void unbanMember(SuperiorPlayer superiorPlayer) {
+        banned.remove(superiorPlayer.getUniqueId());
+    }
+
+    @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer){
         return banned.contains(superiorPlayer.getUniqueId());
     }
