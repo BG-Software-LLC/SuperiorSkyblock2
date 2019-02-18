@@ -299,14 +299,18 @@ public class SIsland implements Island{
     public void disbandIsland(){
         members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
-        for(Chunk chunk : getAllChunks())
+        for(Chunk chunk : getAllChunks(false))
             chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
 
     @Override
-    public List<Chunk> getAllChunks(){
-        Set<Chunk> chunks = new HashSet<>();
-        Chunk minChunk = getMinimum().getChunk(), maxChunk = getMaximum().getChunk();
+    public List<Chunk> getAllChunks(boolean onlyProtected){
+        int islandSize = getIslandSize();
+        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
+        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
+        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+
+        List<Chunk> chunks = new ArrayList<>();
 
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
@@ -314,7 +318,7 @@ public class SIsland implements Island{
             }
         }
 
-        return new ArrayList<>(chunks);
+        return chunks;
     }
 
     @Override
@@ -349,7 +353,7 @@ public class SIsland implements Island{
 
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
 
-        for (Chunk chunk : getAllChunks())
+        for (Chunk chunk : getAllChunks(true))
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
 
         blocksCalculations.clear();

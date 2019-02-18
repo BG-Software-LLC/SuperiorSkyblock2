@@ -62,7 +62,7 @@ public interface Island extends Comparable<Island> {
 
     void disbandIsland();
 
-    List<Chunk> getAllChunks();
+    List<Chunk> getAllChunks(boolean onlyProtected);
 
     double getMoneyInBank();
 

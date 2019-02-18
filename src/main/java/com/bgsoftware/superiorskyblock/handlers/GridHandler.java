@@ -95,7 +95,7 @@ public final class GridHandler implements GridManager {
             islands.add(superiorPlayer.getUniqueId(), island);
             lastIsland = SBlockPosition.of(islandLocation);
 
-            for (Chunk chunk : island.getAllChunks()) {
+            for (Chunk chunk : island.getAllChunks(true)) {
                 chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
                 plugin.getNMSAdapter().refreshChunk(chunk);
             }
