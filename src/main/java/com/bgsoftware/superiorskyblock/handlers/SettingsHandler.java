@@ -30,6 +30,7 @@ public final class SettingsHandler {
     public final long saveInterval;
     public final long calcInterval;
     public final List<String> guestPermissions, memberPermissions, modPermissions, adminPermission, leaderPermissions;
+    public final String signWarpLine;
     public final List<String> signWarp;
     public final int bankWorthRate;
     public final String islandWorld;
@@ -72,6 +73,7 @@ public final class SettingsHandler {
         modPermissions = cfg.getStringList("default-permissions.mod");
         adminPermission = cfg.getStringList("default-permissions.admin");
         leaderPermissions = cfg.getStringList("default-permissions.leader");
+        signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = colorize(cfg.getStringList("sign-warp"));
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorld = cfg.getString("island-world", "SuperiorWorld");

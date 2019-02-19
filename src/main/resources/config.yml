@@ -123,6 +123,9 @@ default-permissions:
   leader:
   - ALL
 
+# Set the line to create the warp sign.
+sign-warp-line: '[IslandWarp]'
+
 # Set the lines of the island warp.
 sign-warp:
 - '&a[Island Warp]'

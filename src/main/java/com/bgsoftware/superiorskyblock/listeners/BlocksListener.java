@@ -252,7 +252,7 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
-        if(e.getLine(0).equalsIgnoreCase("[IslandWarp]")){
+        if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().signWarpLine)){
             String warpName = e.getLine(1);
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){

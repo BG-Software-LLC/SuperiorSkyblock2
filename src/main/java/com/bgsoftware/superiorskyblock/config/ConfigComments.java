@@ -120,6 +120,10 @@ public final class ConfigComments {
     public static String DEFAULT_PERMISSIONS_LEADER = "default-permissions.leader";
 
     @Comment("")
+    @Comment("Set the line to create the warp sign.")
+    public static String SIGN_WARP_LINE = "sign-warp-line";
+
+    @Comment("")
     @Comment("Set the lines of the island warp.")
     public static String SIGN_WARP = "sign-warp";
 
