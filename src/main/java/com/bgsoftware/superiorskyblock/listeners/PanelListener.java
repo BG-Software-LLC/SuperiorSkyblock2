@@ -29,7 +29,9 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -319,14 +321,19 @@ public final class PanelListener implements Listener {
             if(e.getCurrentItem() == null)
                 return;
 
-            if(e.getCurrentItem().hasItemMeta()) {
-                String warpName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-                Island island = plugin.getPanel().getIsland(superiorPlayer);
-                Location location = island.getWarpLocation(warpName);
+            Island island = plugin.getPanel().getIsland(superiorPlayer);
 
-                if(location != null) {
-                    island.warpPlayer(superiorPlayer, warpName);
-                }
+            //noinspection unchecked
+            List<Integer> slots = plugin.getPanel().warpsPage.get("slots", List.class);
+
+            List<String> warps = new ArrayList<>(island.getAllWarps());
+            warps.sort(String::compareTo);
+
+            String warpName = warps.get(slots.indexOf(e.getRawSlot()));
+            Location location = island.getWarpLocation(warpName);
+
+            if(location != null) {
+                island.warpPlayer(superiorPlayer, warpName);
             }
         }
     }
