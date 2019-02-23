@@ -77,7 +77,7 @@ public class SIsland implements Island{
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
     private final Map<String, Location> warps = new HashMap<>();
-    private double islandBank = 0;
+    private BigDecimal islandBank = new BigDecimal(0);
     private BigDecimal islandWorth = new BigDecimal(0);
     private String discord = "None", paypal = "None";
 
@@ -116,7 +116,7 @@ public class SIsland implements Island{
         for(String warp : warps.keySet())
             this.warps.put(warp, FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()));
 
-        this.islandBank = ((DoubleTag) compoundValues.get("islandBank")).getValue();
+        this.islandBank = new BigDecimal(((DoubleTag) compoundValues.get("islandBank")).getValue());
 
         this.hoppersLimit = ((IntTag) compoundValues.get("hoppersLimit")).getValue();
         this.teamLimit = ((IntTag) compoundValues.get("teamLimit")).getValue();
@@ -323,18 +323,24 @@ public class SIsland implements Island{
 
     @Override
     public double getMoneyInBank(){
-        if(islandBank < 0) islandBank = 0;
-        return islandBank;
+        if(islandBank.doubleValue() < 0) islandBank = new BigDecimal(0);
+        return islandBank.doubleValue();
+    }
+
+    @Override
+    public String getMoneyAsString() {
+        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
+        return numberFormatter.format(getMoneyInBank());
     }
 
     @Override
     public void depositMoney(double amount){
-        islandBank += amount;
+        islandBank = islandBank.add(new BigDecimal(amount));
     }
 
     @Override
     public void withdrawMoney(double amount){
-        islandBank -= amount;
+        islandBank = islandBank.subtract(new BigDecimal(amount));
     }
 
     @Override
@@ -501,7 +507,8 @@ public class SIsland implements Island{
     @Override
     public double getWorth(){
         int bankWorthRate = plugin.getSettings().bankWorthRate;
-        return bankWorthRate <= 0 ? islandWorth.doubleValue() : islandWorth.add(new BigDecimal(islandBank / bankWorthRate)).doubleValue();
+        //noinspection BigDecimalMethodWithoutRoundingCalled
+        return bankWorthRate <= 0 ? islandWorth.doubleValue() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate))).doubleValue();
     }
 
     @Override
@@ -515,13 +522,13 @@ public class SIsland implements Island{
     }
 
     @Override
-    public int getIslandLevel(){
+    public long getIslandLevel(){
         double worth = getWorth();
         try {
-            return (int) ((double) engine.eval(plugin.getSettings().islandLevelFormula.
-                    replace("{}", String.valueOf(worth))));
+            return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.
+                    replace("{}", String.valueOf(worth))).toString()).longValue();
         }catch(Exception ex){
-            return (int) worth;
+            return (long) worth;
         }
     }
 
@@ -743,7 +750,7 @@ public class SIsland implements Island{
                 .forEach(warp -> warps.put(warp, new StringTag(FileUtil.fromLocation(this.warps.get(warp)))));
         compoundValues.put("warps", new CompoundTag(warps));
 
-        compoundValues.put("islandBank", new DoubleTag(this.islandBank));
+        compoundValues.put("islandBank", new DoubleTag(this.islandBank.doubleValue()));
 
         compoundValues.put("hoppersLimit", new IntTag(this.hoppersLimit));
         compoundValues.put("teamLimit", new IntTag(this.teamLimit));
