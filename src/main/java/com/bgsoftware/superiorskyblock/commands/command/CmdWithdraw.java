@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -85,7 +86,7 @@ public final class CmdWithdraw implements ICommand {
         }
 
         if(island.getMoneyInBank() < amount){
-            Locale.WITHDRAW_ALL_MONEY.send(superiorPlayer, island.getMoneyInBank());
+            Locale.WITHDRAW_ALL_MONEY.send(superiorPlayer, island.getMoneyAsString());
             amount = island.getMoneyInBank();
         }
 
@@ -94,7 +95,7 @@ public final class CmdWithdraw implements ICommand {
 
         for(UUID uuid : island.getAllMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.WITHDRAW_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName(), amount);
+                Locale.WITHDRAW_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName(), StringUtil.format(amount));
             }
         }
     }

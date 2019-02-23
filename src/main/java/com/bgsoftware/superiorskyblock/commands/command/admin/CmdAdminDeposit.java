@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -78,7 +79,7 @@ public final class CmdAdminDeposit implements ICommand {
         }
 
         island.depositMoney(amount);
-        Locale.ADMIN_DEPOSIT_MONEY.send(sender, amount, targetPlayer.getName());
+        Locale.ADMIN_DEPOSIT_MONEY.send(sender, StringUtil.format(amount), targetPlayer.getName());
     }
 
     @Override

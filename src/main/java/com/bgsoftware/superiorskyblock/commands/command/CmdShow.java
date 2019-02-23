@@ -85,7 +85,7 @@ public final class CmdShow implements ICommand {
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
         if(!Locale.ISLAND_INFO_BANK.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyInBank())).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyAsString())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(island.getWorthAsString())).append("\n");
         if(!Locale.ISLAND_INFO_DISCORD.isEmpty() && island.hasPermission(sender, IslandPermission.DISCORD_SHOW))

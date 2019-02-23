@@ -66,6 +66,8 @@ public interface Island extends Comparable<Island> {
 
     double getMoneyInBank();
 
+    String getMoneyAsString();
+
     void depositMoney(double amount);
 
     void withdrawMoney(double amount);
@@ -94,7 +96,7 @@ public interface Island extends Comparable<Island> {
 
     String getWorthAsString();
 
-    int getIslandLevel();
+    long getIslandLevel();
 
     String getLevelAsString();
 

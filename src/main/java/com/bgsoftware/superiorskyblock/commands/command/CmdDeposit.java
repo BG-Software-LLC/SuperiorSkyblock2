@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -89,7 +90,7 @@ public final class CmdDeposit implements ICommand {
 
         for(UUID uuid : island.getAllMembers()){
             if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.DEPOSIT_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName(), amount);
+                Locale.DEPOSIT_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName(), StringUtil.format(amount));
             }
         }
     }

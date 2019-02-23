@@ -19,7 +19,7 @@ ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 TOGGLED_BYPASS_ON: '&aToggling bypass mode ON.'
 TOGGLED_BYPASS_OFF: '&aToggling bypass mode OFF.'
 # Called when running the /is admin deposit command.
-ADMIN_DEPOSIT_MONEY: '&aYou deposited ${0}} into {1}''s island bank.'
+ADMIN_DEPOSIT_MONEY: '&aYou deposited ${0} into {1}''s island bank.'
 # Called when running the /is admin msg command.
 PLAYER_NOT_ONLINE: '&cThis player is not online!'
 MESSAGE_SENT: '&aSuccessfully sent {0} the message!'
@@ -82,7 +82,7 @@ GOT_DEMOTED: '&aYou were demoted to a {0} in your island.'
 # Called when running the /is deposit or /is admin deposit commands.
 NO_DEPOSIT_PERMISSION: '&cYou must be at least {0} in order to deposit money to island bank.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&cYou don''t have enough money to deposit {0} dollars into your island''s bank.'
-DEPOSIT_ANNOUNCEMENT: '&a{0} deposited ${1}} into the island bank!'
+DEPOSIT_ANNOUNCEMENT: '&a{0} deposited ${1} into the island bank!'
 # Called when running the /is disband or /is admin disband commands.
 NO_DISBAND_PERMISSION: '&cYou must be at least {0} in order to disband your island.'
 DISBAND_ANNOUNCEMENT: '&aYour island was disbanded by {0}.'
@@ -203,7 +203,7 @@ NO_WITHDRAW_PERMISSION: '&cYou must be at least {0} in order to withdraw money f
 ISLAND_BANK_EMPTY: '&cIsland bank is empty and you can''t even buy a candy at this moment.'
 WITHDRAW_ALL_MONEY: '&cIsland bank has only {0} dollars inside it. Withdrawing all money...'
 WITHDRAW_ANNOUNCEMENT: '&a{0} withdrawn ${1} from the island bank!'
-WITHDRAWN_MONEY: '&aYou withdrawn ${0}} from {1}''s island bank!'
+WITHDRAWN_MONEY: '&aYou withdrawn ${0} from {1}''s island bank!'
 # Called when running the /is help command.
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'

@@ -58,6 +58,7 @@ public class SIsland implements Island{
     private static boolean calcProcess = false;
     private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
     private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
 
     /*
      * SIsland identifiers
@@ -329,7 +330,6 @@ public class SIsland implements Island{
 
     @Override
     public String getMoneyAsString() {
-        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
         return numberFormatter.format(getMoneyInBank());
     }
 
@@ -517,7 +517,6 @@ public class SIsland implements Island{
     }
 
     public String getWorthAsString(){
-        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
         return numberFormatter.format(getWorth());
     }
 
@@ -534,7 +533,6 @@ public class SIsland implements Island{
 
     @Override
     public String getLevelAsString() {
-        NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0");
         return numberFormatter.format(getIslandLevel());
     }
 

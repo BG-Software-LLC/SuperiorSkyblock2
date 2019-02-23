@@ -92,7 +92,7 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 case "raw_worth":
                     return String.valueOf(island.getRawWorth());
                 case "bank":
-                    return String.valueOf(island.getMoneyInBank());
+                    return island.getMoneyAsString();
                 case "hoppers_limit":
                     return String.valueOf(island.getHoppersLimit());
                 case "crops_multiplier":
