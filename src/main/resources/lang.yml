@@ -174,9 +174,9 @@ ISLAND_INFO_FOOTER: ''
 # Called when running the /is team command.
 ISLAND_TEAM_STATUS_HEADER: '&e&l(!) &7Members of {0}''s Island &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_LEADER: '&e * [Leader] {0} {1}'
-ISLAND_TEAM_STATUS_ADMINS: '&e * [Leader] {0} {1}'
-ISLAND_TEAM_STATUS_MODS: '&e * [Leader] {0} {1}'
-ISLAND_TEAM_STATUS_MEMBERS: '&e * [Leader] {0} {1}'
+ISLAND_TEAM_STATUS_ADMINS: '&e * [Admin] {0} {1}'
+ISLAND_TEAM_STATUS_MODS: '&e * [Moderator] {0} {1}'
+ISLAND_TEAM_STATUS_MEMBERS: '&e * [Member] {0} {1}'
 ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
 # Called when running the /is teamchat command.

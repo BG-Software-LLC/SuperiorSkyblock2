@@ -79,8 +79,9 @@ public final class CmdTeam implements ICommand {
         }
 
         new Thread(() -> {
-            StringBuilder infoMessage = new StringBuilder(), adminsMessage = new StringBuilder(),
-                    modsMessage = new StringBuilder(), membersMessage = new StringBuilder();
+            StringBuilder infoMessage = new StringBuilder(), leadersMessage = new StringBuilder(),
+                    adminsMessage = new StringBuilder(), modsMessage = new StringBuilder(),
+                    membersMessage = new StringBuilder();
 
             if(!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty())
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(island.getOwner().getName(),
@@ -98,28 +99,28 @@ public final class CmdTeam implements ICommand {
                 switch (wrappedMember.getIslandRole()){
                     case LEADER:
                         if(!Locale.ISLAND_TEAM_STATUS_LEADER.isEmpty())
-                            infoMessage.append(Locale.ISLAND_TEAM_STATUS_LEADER.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus));
+                            leadersMessage.append(Locale.ISLAND_TEAM_STATUS_LEADER.getMessage(wrappedMember.getName(),
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
                         break;
                     case ADMIN:
                         if(!Locale.ISLAND_TEAM_STATUS_ADMINS.isEmpty())
-                            infoMessage.append(Locale.ISLAND_TEAM_STATUS_ADMINS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus));
+                            adminsMessage.append(Locale.ISLAND_TEAM_STATUS_ADMINS.getMessage(wrappedMember.getName(),
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
                         break;
                     case MODERATOR:
                         if(!Locale.ISLAND_TEAM_STATUS_MODS.isEmpty())
-                            infoMessage.append(Locale.ISLAND_TEAM_STATUS_MODS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus));
+                            modsMessage.append(Locale.ISLAND_TEAM_STATUS_MODS.getMessage(wrappedMember.getName(),
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
                         break;
                     case MEMBER:
                         if(!Locale.ISLAND_TEAM_STATUS_MEMBERS.isEmpty())
-                            infoMessage.append(Locale.ISLAND_TEAM_STATUS_MEMBERS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus));
+                            membersMessage.append(Locale.ISLAND_TEAM_STATUS_MEMBERS.getMessage(wrappedMember.getName(),
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
                         break;
                 }
             }
 
-            infoMessage.append(adminsMessage).append(modsMessage).append(membersMessage);
+            infoMessage.append(leadersMessage).append(adminsMessage).append(modsMessage).append(membersMessage);
 
             Locale.sendMessage(sender, infoMessage.toString());
         }).start();
