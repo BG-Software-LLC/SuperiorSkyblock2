@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -114,18 +116,31 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent e){
         Location from = e.getFrom(), to = e.getTo();
 
-        if(from.getBlockX() == to.getBlockX() || from.getBlockZ() == to.getBlockZ())
+        if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);
 
-        if(fromIsland != null && fromIsland.equals(toIsland))
+        if(fromIsland != null && fromIsland.equals(toIsland)){
+            if(fromIsland.isInsideRange(e.getFrom()) && !fromIsland.isInsideRange(e.getTo())){
+                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+                Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
+                if(islandLeaveProtectedEvent.isCancelled())
+                    e.setCancelled(true);
+            }
+            else if(!fromIsland.isInsideRange(e.getFrom()) && fromIsland.isInsideRange(e.getTo())){
+                IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+                Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
+                if(islandEnterProtectedEvent.isCancelled())
+                    e.setCancelled(true);
+            }
             return;
+        }
 
         if (fromIsland != null && !(fromIsland instanceof SpawnIsland)) {
             IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
