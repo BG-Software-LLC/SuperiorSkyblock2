@@ -218,19 +218,19 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public static SuperiorPlayer of(CommandSender sender){
-        return of((Player) sender);
+        return sender == null ? null : of((Player) sender);
     }
 
     public static SuperiorPlayer of(Player player){
-        return of(player.getUniqueId());
+        return player == null ? null : of(player.getUniqueId());
     }
 
-    public static SuperiorPlayer of(UUID player){
-        return plugin.getPlayers().getSuperiorPlayer(player);
+    public static SuperiorPlayer of(UUID uuid){
+        return uuid == null ? null : plugin.getPlayers().getSuperiorPlayer(uuid);
     }
 
     public static SuperiorPlayer of(String name){
-        return plugin.getPlayers().getSuperiorPlayer(name);
+        return name == null ? null : plugin.getPlayers().getSuperiorPlayer(name);
     }
 
 }
