@@ -2,16 +2,18 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("unused")
-public final class IslandEnterEvent extends Event {
+public final class IslandEnterEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
     private final Island island;
+    private boolean cancelled = false;
 
     public IslandEnterEvent(SuperiorPlayer superiorPlayer, Island island){
         this.superiorPlayer = superiorPlayer;
@@ -24,6 +26,16 @@ public final class IslandEnterEvent extends Event {
 
     public Island getIsland() {
         return island;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     @Override
