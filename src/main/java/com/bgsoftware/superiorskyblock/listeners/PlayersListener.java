@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -76,19 +78,37 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onIslandJoin(IslandEnterEvent e){
+    public void onIslandEnter(IslandEnterEvent e){
         if(e.getIsland().isBanned(e.getPlayer())) {
             e.setCancelled(true);
             Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
+            return;
         }
 
+        IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland());
+        Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
+        if(islandEnterProtectedEvent.isCancelled())
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onIslandEnterProtected(IslandEnterProtectedEvent e){
         Bukkit.getScheduler().runTaskLater(plugin, () ->
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation())), 5L);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onIslandLeave(IslandLeaveEvent e){
-        plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), null);
+        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland());
+        Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
+        if(islandLeaveProtectedEvent.isCancelled())
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
+        Bukkit.getScheduler().runTaskLater(plugin, () ->
+                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation())), 5L);
     }
 
     @EventHandler
