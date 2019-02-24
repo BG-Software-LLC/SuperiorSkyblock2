@@ -105,10 +105,10 @@ public final class CmdShow implements ICommand {
                         adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                     case MODERATOR:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
+                        modsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                     case MEMBER:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
+                        membersString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
                         break;
                 }
             }
