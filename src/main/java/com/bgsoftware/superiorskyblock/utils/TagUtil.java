@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -39,7 +40,7 @@ public final class TagUtil {
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
-        new Thread(() -> {
+        new SuperiorThread(() -> {
             List<SchematicBlock> schematicBlocks = new ArrayList<>();
             for(Tag tag : blocks){
                 Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();

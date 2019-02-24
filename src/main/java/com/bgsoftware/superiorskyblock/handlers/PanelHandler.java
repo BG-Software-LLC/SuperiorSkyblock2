@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -114,7 +115,7 @@ public final class PanelHandler {
 
     public void openMembersPanel(SuperiorPlayer superiorPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openMembersPanel(superiorPlayer, page)).start();
+            new SuperiorThread(() -> openMembersPanel(superiorPlayer, page)).start();
             return;
         }
 
@@ -158,7 +159,7 @@ public final class PanelHandler {
 
     public void openVisitorsPanel(SuperiorPlayer superiorPlayer, int page){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openVisitorsPanel(superiorPlayer, page)).start();
+            new SuperiorThread(() -> openVisitorsPanel(superiorPlayer, page)).start();
             return;
         }
 
@@ -218,7 +219,7 @@ public final class PanelHandler {
 
     public void openIslandCreationPanel(SuperiorPlayer superiorPlayer){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openIslandCreationPanel(superiorPlayer)).start();
+            new SuperiorThread(() -> openIslandCreationPanel(superiorPlayer)).start();
             return;
         }
 
@@ -242,7 +243,7 @@ public final class PanelHandler {
 
     public void openBiomesPanel(SuperiorPlayer superiorPlayer){
         if(Bukkit.isPrimaryThread()){
-            new Thread(() -> openBiomesPanel(superiorPlayer)).start();
+            new SuperiorThread(() -> openBiomesPanel(superiorPlayer)).start();
             return;
         }
 
@@ -275,7 +276,8 @@ public final class PanelHandler {
 
     public void openWarpsPanel(SuperiorPlayer superiorPlayer, Island island, int page) {
         if (Bukkit.isPrimaryThread()) {
-            new Thread(() -> openWarpsPanel(superiorPlayer, island, page)).start();
+            new SuperiorThread(
+                    () -> openWarpsPanel(superiorPlayer, island, page)).start();
             return;
         }
 
@@ -322,7 +324,7 @@ public final class PanelHandler {
                         .replace("{1}", island.getWorthAsString()));
         inventory.setContents(valuesPageInventory.getContents());
 
-        new Thread(() -> {
+        new SuperiorThread(() -> {
             //noinspection unchecked
             KeyMap<Integer> countedBlocks = (KeyMap<Integer>) valuesPage.get("countedBlocks", KeyMap.class);
 

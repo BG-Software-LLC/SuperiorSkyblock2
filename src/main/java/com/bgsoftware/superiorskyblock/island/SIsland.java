@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -367,7 +368,7 @@ public class SIsland implements Island{
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
-        new Thread(() -> {
+        new SuperiorThread(() -> {
             Map<Location, Integer> spawnersToCheck = new HashMap<>();
             Set<Thread> threads = new HashSet<>();
 
