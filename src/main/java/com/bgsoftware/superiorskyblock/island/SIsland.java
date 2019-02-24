@@ -692,12 +692,9 @@ public class SIsland implements Island{
             return;
         }
 
-        superiorPlayer.asPlayer().teleport(location.add(0.5, 0, 0.5));
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if(superiorPlayer.getLocation().distanceSquared(location) < 25)
-                Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
-        }, 2L);
+        if(superiorPlayer.asPlayer().teleport(location.add(0.5, 0, 0.5))){
+            Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
+        }
     }
 
     @Override

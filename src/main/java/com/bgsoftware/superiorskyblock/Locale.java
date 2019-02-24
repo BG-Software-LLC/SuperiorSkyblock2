@@ -193,7 +193,8 @@ public enum Locale {
     PERMISSION_SPACER,
     TOGGLED_BYPASS_ON,
     TOGGLED_BYPASS_OFF,
-    NO_RANKUP_PERMISSION;
+    NO_RANKUP_PERMISSION,
+    BANNED_FROM_ISLAND;
 
     private String message;
 

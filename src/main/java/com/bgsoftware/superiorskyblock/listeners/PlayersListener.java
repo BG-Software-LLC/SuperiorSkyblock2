@@ -75,13 +75,19 @@ public final class PlayersListener implements Listener {
             island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onIslandJoin(IslandEnterEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), e.getIsland()), 5L);
+        if(e.getIsland().isBanned(e.getPlayer())) {
+            e.setCancelled(true);
+            Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
+        }
+
+        Bukkit.getScheduler().runTaskLater(plugin, () ->
+                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation())), 5L);
     }
 
     @EventHandler
-    public void onIslandJoin(IslandLeaveEvent e){
+    public void onIslandLeave(IslandLeaveEvent e){
         plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), null);
     }
 
