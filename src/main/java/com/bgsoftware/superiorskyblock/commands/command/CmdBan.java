@@ -69,7 +69,8 @@ public final class CmdBan implements ICommand {
             return;
         }
 
-        if(!targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole())) {
+        if(superiorPlayer.getIsland().isMember(targetPlayer) &&
+                !targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole())) {
             Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
