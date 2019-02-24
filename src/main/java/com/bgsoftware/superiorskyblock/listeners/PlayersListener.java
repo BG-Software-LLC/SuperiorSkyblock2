@@ -107,8 +107,10 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation())), 5L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if(e.getPlayer().asOfflinePlayer().isOnline())
+                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
+        }, 5L);
     }
 
     @EventHandler

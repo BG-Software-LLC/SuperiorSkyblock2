@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
@@ -86,6 +87,12 @@ public final class CustomEventsListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e){
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+            if(island != null && island.isBanned(superiorPlayer)){
+                superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
+                return;
+            }
 
             if(island != null && !island.isSpawn()){
                 IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), island);
