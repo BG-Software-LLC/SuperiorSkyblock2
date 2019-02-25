@@ -147,7 +147,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIslandAt(Location location){
-        if(!location.getWorld().getName().equals(plugin.getSettings().islandWorld))
+        if(location == null || !location.getWorld().getName().equals(plugin.getSettings().islandWorld))
             return null;
 
         if(spawnIsland.isInside(location))
