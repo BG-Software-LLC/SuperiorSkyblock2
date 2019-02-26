@@ -82,6 +82,7 @@ public class SIsland implements Island{
     private BigDecimal islandBank = new BigDecimal(0);
     private BigDecimal islandWorth = new BigDecimal(0);
     private String discord = "None", paypal = "None";
+    private int islandSize = plugin.getSettings().defaultIslandSize;
 
     /*
      * SIsland multipliers & limits
@@ -119,6 +120,7 @@ public class SIsland implements Island{
             this.warps.put(warp, FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()));
 
         this.islandBank = new BigDecimal(((DoubleTag) compoundValues.get("islandBank")).getValue());
+        this.islandSize = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(plugin.getSettings().defaultIslandSize))).getValue();
 
         this.hoppersLimit = ((IntTag) compoundValues.get("hoppersLimit")).getValue();
         this.teamLimit = ((IntTag) compoundValues.get("teamLimit")).getValue();
@@ -565,7 +567,10 @@ public class SIsland implements Island{
 
     @Override
     public int getIslandSize() {
-        return getOwner().getIslandSize();
+        int ownerIslandSize = ((SSuperiorPlayer) getOwner()).getIslandSize();
+        if(ownerIslandSize > islandSize)
+            setIslandSize(ownerIslandSize);
+        return islandSize;
     }
 
     @Override
@@ -595,7 +600,7 @@ public class SIsland implements Island{
 
     @Override
     public void setIslandSize(int islandSize) {
-        getOwner().setIslandSize(islandSize);
+        this.islandSize = islandSize;
     }
 
     @Override

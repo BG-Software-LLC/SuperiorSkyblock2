@@ -37,10 +37,6 @@ public interface SuperiorPlayer {
 
     void setIslandRole(IslandRole islandRole);
 
-    int getIslandSize();
-
-    void setIslandSize(int islandSize);
-
     boolean hasWorldBorderEnabled();
 
     void toggleWorldBorder();

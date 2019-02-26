@@ -33,7 +33,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private String name, textureValue = "";
     private IslandRole islandRole;
 
-    private int islandSize = plugin.getSettings().defaultIslandSize;
+    private int oldIslandSize = 0;
     private boolean worldBorderEnabled = true;
     private boolean blocksStackerEnabled = true;
     private boolean schematicModeEnabled = false;
@@ -48,7 +48,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         teamLeader = UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue());
         name = ((StringTag) compoundValues.get("name")).getValue();
         islandRole = IslandRole.valueOf(((StringTag) compoundValues.get("islandRole")).getValue());
-        islandSize  = ((IntTag) compoundValues.get("islandSize")).getValue();
+        oldIslandSize  = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(0))).getValue();
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
 
         if(plugin.getGrid().getIsland(SSuperiorPlayer.of(teamLeader)) == null)
@@ -112,11 +112,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public int getIslandSize() {
-        return islandSize;
-    }
-
-    public void setIslandSize(int islandSize) {
-        this.islandSize = islandSize;
+        return oldIslandSize;
     }
 
     public boolean hasWorldBorderEnabled() {
@@ -203,7 +199,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         compoundValues.put("teamLeader", new StringTag(teamLeader.toString()));
         compoundValues.put("name", new StringTag(this.name));
         compoundValues.put("islandRole", new StringTag(islandRole.name()));
-        compoundValues.put("islandSize", new IntTag(islandSize));
         compoundValues.put("textureValue", new StringTag(textureValue));
 
         return new CompoundTag(compoundValues);
