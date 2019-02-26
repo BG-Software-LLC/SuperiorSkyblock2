@@ -216,6 +216,10 @@ public final class GridHandler implements GridManager {
         return blockValues.getBlockValue(key);
     }
 
+    public Key getBlockValueKey(Key key){
+        return blockValues.blockValues.getKey(key);
+    }
+
     @Override
     public int getBlockAmount(Block block){
         return getBlockAmount(block.getLocation());

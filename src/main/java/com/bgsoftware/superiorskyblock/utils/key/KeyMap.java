@@ -50,6 +50,15 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         return map.put(key.toString(), value);
     }
 
+    public Key getKey(Key key){
+        String keyStr = key.toString();
+        if(keyStr.contains(":") && map.containsKey(keyStr.split(":")[0]))
+            keyStr = keyStr.split(":")[0];
+        else if(keyStr.contains(";") && map.containsKey(keyStr.split(";")[0]))
+            keyStr = keyStr.split(";")[0];
+        return SKey.of(keyStr);
+    }
+
     @Override
     public V remove(Object key) {
         if(key instanceof SKey) {

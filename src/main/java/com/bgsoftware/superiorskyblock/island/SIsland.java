@@ -466,7 +466,7 @@ public class SIsland implements Island{
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER:0").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
-            blocksCalculations.put(key, currentAmount + amount);
+            blocksCalculations.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
         }
     }
