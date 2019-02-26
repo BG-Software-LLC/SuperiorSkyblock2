@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.ItemUtil;
@@ -56,6 +57,17 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockBreak(e.getBlock());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDragonEggChangeMonitor(DragonEggChangeEvent e){
+        if(plugin != null && plugin.getGrid() != null) {
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+            if (island != null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getBlock(), 1), 1L);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
