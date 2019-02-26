@@ -25,7 +25,7 @@ public final class CmdPanel implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island panel";
+        return "island panel [members/visitors]";
     }
 
     @Override
@@ -35,7 +35,7 @@ public final class CmdPanel implements ICommand {
 
     @Override
     public int getMaxArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -50,6 +50,16 @@ public final class CmdPanel implements ICommand {
         if(superiorPlayer.getIsland() == null){
             Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
+        }
+
+        if(args.length > 1){
+            if(args[1].equalsIgnoreCase("members")){
+                plugin.getPanel().openMembersPanel(superiorPlayer, 1);
+                return;
+            }else if(args[1].equalsIgnoreCase("visitors")){
+                plugin.getPanel().openVisitorsPanel(superiorPlayer, 1);
+                return;
+            }
         }
 
         plugin.getPanel().openPanel(superiorPlayer);
