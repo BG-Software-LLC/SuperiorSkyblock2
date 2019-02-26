@@ -39,6 +39,11 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder asSkullOf(String textureValue){
+        this.textureValue = textureValue;
+        return this;
+    }
+
     public ItemBuilder withName(String name){
         itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
         return this;
