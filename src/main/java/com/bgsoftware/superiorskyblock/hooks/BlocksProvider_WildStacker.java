@@ -4,19 +4,19 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.wildstacker.WildStackerPlugin;
+import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
+import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
+import com.bgsoftware.wildstacker.api.objects.StackedObject;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import xyz.wildseries.wildstacker.WildStackerPlugin;
-import xyz.wildseries.wildstacker.api.events.BarrelPlaceEvent;
-import xyz.wildseries.wildstacker.api.events.BarrelStackEvent;
-import xyz.wildseries.wildstacker.api.events.BarrelUnstackEvent;
-import xyz.wildseries.wildstacker.api.events.SpawnerPlaceEvent;
-import xyz.wildseries.wildstacker.api.events.SpawnerStackEvent;
-import xyz.wildseries.wildstacker.api.events.SpawnerUnstackEvent;
-import xyz.wildseries.wildstacker.api.objects.StackedBarrel;
-import xyz.wildseries.wildstacker.api.objects.StackedObject;
 
 @SuppressWarnings("unused")
 public final class BlocksProvider_WildStacker implements BlocksProvider, Listener {
