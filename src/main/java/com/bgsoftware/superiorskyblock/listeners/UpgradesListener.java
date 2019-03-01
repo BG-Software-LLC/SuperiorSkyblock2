@@ -180,7 +180,7 @@ public final class UpgradesListener implements Listener {
         noRightClickTwice.add(e.getPlayer().getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
-        island.handleBlockPlace(SKey.of("HOPPER:0"), 1);
+        island.handleBlockPlace(SKey.of("HOPPER"), 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -193,10 +193,10 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(SKey.of("HOPPER:0"), 1);
+        island.handleBlockBreak(SKey.of("HOPPER"), 1);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHopperPlace(BlockPlaceEvent e){
         if(e.getBlockPlaced().getType() != Material.HOPPER && e.getBlockPlaced().getType() != Material.HOPPER_MINECART)
             return;
@@ -214,7 +214,7 @@ public final class UpgradesListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHopperCartPlace(PlayerInteractEvent e) {
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || noRightClickTwice.contains(e.getPlayer().getUniqueId()) ||
                 !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null ||

@@ -477,7 +477,7 @@ public class SIsland implements Island{
     @Override
     public synchronized void handleBlockPlace(Key key, int amount){
         int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER:0").equals(key)){
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
             blocksCalculations.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
@@ -497,8 +497,10 @@ public class SIsland implements Island{
     @Override
     public void handleBlockBreak(Key key, int amount){
         int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER:0").equals(key)){
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
             int currentAmount = blocksCalculations.getOrDefault(key, 0);
+
+            key = plugin.getGrid().getBlockValueKey(key);
 
             if(currentAmount <= amount)
                 blocksCalculations.remove(key);
