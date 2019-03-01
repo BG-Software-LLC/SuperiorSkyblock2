@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Lists;
@@ -102,11 +103,12 @@ public final class GridHandler implements GridManager {
 
             Schematic schematic = plugin.getSchematics().getSchematic(schemName);
             schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
                 if (superiorPlayer.asOfflinePlayer().isOnline()) {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     superiorPlayer.asPlayer().teleport(islandLocation);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
-                    new Thread(() -> island.calcIslandWorth(null)).start();
+                    new SuperiorThread(() -> island.calcIslandWorth(null)).start();
                 }
             });
 
