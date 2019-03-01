@@ -141,7 +141,7 @@ public final class UpgradesListener implements Listener {
      *   MOB DROPS
      */
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityDeath(EntityDeathEvent e) {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
