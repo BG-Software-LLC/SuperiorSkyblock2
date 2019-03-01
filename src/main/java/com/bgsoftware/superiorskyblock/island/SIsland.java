@@ -562,9 +562,10 @@ public class SIsland implements Island{
     public BigDecimal getIslandLevelAsBigDecimal() {
         BigDecimalFormatted worth = (BigDecimalFormatted) getWorthAsBigDecimal();
         try {
-            return BigDecimalFormatted.of(engine.eval(plugin.getSettings().islandLevelFormula.
-                    replace("{}", worth.getAsString())).toString());
+            BigDecimal level = new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", worth.getAsString())).toString());
+            return BigDecimalFormatted.of(level.toBigInteger());
         }catch(Exception ex){
+            ex.printStackTrace();
             return worth;
         }
     }

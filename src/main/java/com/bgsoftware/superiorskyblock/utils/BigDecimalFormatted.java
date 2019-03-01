@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public final class BigDecimalFormatted extends BigDecimal {
 
@@ -37,8 +38,7 @@ public final class BigDecimalFormatted extends BigDecimal {
     public String toString() {
         return StringUtil.format(this);
     }
-
-    @SuppressWarnings("WeakerAccess")
+    
     public String getAsString(){
         return super.toString();
     }
@@ -57,6 +57,10 @@ public final class BigDecimalFormatted extends BigDecimal {
 
     public static BigDecimalFormatted of(BigDecimal bigDecimal){
         return new BigDecimalFormatted(bigDecimal.toString());
+    }
+
+    public static BigDecimalFormatted of(BigInteger bigInteger){
+        return new BigDecimalFormatted(bigInteger.toString());
     }
 
     public static BigDecimalFormatted of(Tag tag){
