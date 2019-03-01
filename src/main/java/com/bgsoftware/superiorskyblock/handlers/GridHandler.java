@@ -262,6 +262,14 @@ public final class GridHandler implements GridManager {
             int stackAmount = ((IntTag) _compoundValues.get("stackAmount")).getValue();
             stackedBlocks.put(SBlockPosition.of(location), stackAmount);
         }
+
+        int maxIslandSize = ((IntTag) compoundValues.getOrDefault("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize))).getValue();
+        if(plugin.getSettings().maxIslandSize != maxIslandSize){
+            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting data.");
+            SuperiorSkyblockPlugin.log("Restoring it to the old value...");
+            plugin.getSettings().updateValue("max-island-size", maxIslandSize);
+        }
+
     }
 
     public CompoundTag getAsTag(){
@@ -278,6 +286,7 @@ public final class GridHandler implements GridManager {
         }
 
         compoundValues.put("stackedBlocks", new ListTag(CompoundTag.class, stackedBlocks));
+        compoundValues.put("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize));
 
         return new CompoundTag(compoundValues);
     }

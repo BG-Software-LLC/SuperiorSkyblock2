@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +84,31 @@ public final class SettingsHandler {
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
+    }
+
+    public void updateValue(String path, Object value){
+        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+        File file = new File(plugin.getDataFolder(), "config.yml");
+
+        if(!file.exists())
+            plugin.saveResource("config.yml", false);
+
+        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class);
+        cfg.load(file);
+
+        cfg.resetYamlFile(plugin, "config.yml");
+
+        cfg.set(path, value);
+
+        cfg.save(file);
+
+        try{
+            Field field = SuperiorSkyblockPlugin.class.getDeclaredField("settingsHandler");
+            field.setAccessible(true);
+            field.set(plugin, new SettingsHandler(plugin));
+        }catch(NoSuchFieldException | IllegalAccessException ex){
+            ex.printStackTrace();
+        }
     }
 
     private List<String> colorize(List<String> list){
