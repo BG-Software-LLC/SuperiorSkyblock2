@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -80,14 +81,14 @@ public final class CmdWithdraw implements ICommand {
             return;
         }
 
-        if(island.getMoneyInBank() <= 0){
-            Locale.ISLAND_BANK_EMPTY.send(superiorPlayer);
+        if(island.getMoneyInBankAsBigDecimal().compareTo(BigDecimal.ZERO) > 0){
+            Locale.ISLAND_BANK_EMPTY.send(sender);
             return;
         }
 
-        if(island.getMoneyInBank() < amount){
-            Locale.WITHDRAW_ALL_MONEY.send(superiorPlayer, island.getMoneyAsString());
-            amount = island.getMoneyInBank();
+        if(island.getMoneyInBankAsBigDecimal().compareTo(new BigDecimal(amount)) > 0){
+            Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBankAsBigDecimal().toString());
+            amount = island.getMoneyInBankAsBigDecimal().doubleValue();
         }
 
         island.withdrawMoney(amount);

@@ -224,8 +224,8 @@ public final class PlayersListener implements Listener {
 
         else {
             e.setFormat(e.getFormat()
-                    .replace("{island-level}", String.valueOf(island == null ? 0 : island.getLevelAsString()))
-                    .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsString())));
+                    .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
+                    .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal())));
         }
     }
 

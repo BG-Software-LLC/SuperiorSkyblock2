@@ -321,7 +321,7 @@ public final class PanelHandler {
         Inventory valuesPageInventory = valuesPage.clonedInventory();
         Inventory inventory = Bukkit.createInventory(null, valuesPageInventory.getSize(),
                 valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
-                        .replace("{1}", island.getWorthAsString()));
+                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
         inventory.setContents(valuesPageInventory.getContents());
 
         new SuperiorThread(() -> {

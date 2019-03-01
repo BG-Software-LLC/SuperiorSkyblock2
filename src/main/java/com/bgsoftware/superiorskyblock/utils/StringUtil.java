@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 public final class StringUtil {
 
-    private static NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
+    private static DecimalFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
 
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();
@@ -18,6 +19,12 @@ public final class StringUtil {
 
     public static String format(double d){
         String s = numberFormatter.format(d);
+        return s.endsWith(".00") ? s.replace(".00", "") : s;
+    }
+
+    public static String format(BigDecimal bigDecimal){
+        String s = numberFormatter.format(Double.parseDouble(bigDecimal instanceof BigDecimalFormatted ?
+                ((BigDecimalFormatted) bigDecimal).getAsString() : bigDecimal.toString()));
         return s.endsWith(".00") ? s.replace(".00", "") : s;
     }
 

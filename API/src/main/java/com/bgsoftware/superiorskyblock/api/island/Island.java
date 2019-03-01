@@ -8,10 +8,11 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+@SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public interface Island extends Comparable<Island> {
 
     SuperiorPlayer getOwner();
@@ -62,10 +63,16 @@ public interface Island extends Comparable<Island> {
 
     void disbandIsland();
 
+    List<Chunk> getAllChunks();
+
     List<Chunk> getAllChunks(boolean onlyProtected);
 
+    @Deprecated
     double getMoneyInBank();
 
+    BigDecimal getMoneyInBankAsBigDecimal();
+
+    @Deprecated
     String getMoneyAsString();
 
     void depositMoney(double amount);
@@ -90,14 +97,25 @@ public interface Island extends Comparable<Island> {
 
     int getBlockCount(Key key);
 
+    @Deprecated
     double getWorth();
 
+    @Deprecated
     double getRawWorth();
 
+    BigDecimal getWorthAsBigDecimal();
+
+    BigDecimal getRawWorthAsBigDecimal();
+
+    @Deprecated
     String getWorthAsString();
 
-    long getIslandLevel();
+    @Deprecated
+    int getIslandLevel();
 
+    BigDecimal getIslandLevelAsBigDecimal();
+
+    @Deprecated
     String getLevelAsString();
 
     boolean isInside(Location location);

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
+import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
@@ -79,8 +80,8 @@ public class SIsland implements Island{
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
     private final Map<String, Location> warps = new HashMap<>();
-    private BigDecimal islandBank = new BigDecimal(0);
-    private BigDecimal islandWorth = new BigDecimal(0);
+    private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
+    private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
 
@@ -119,7 +120,7 @@ public class SIsland implements Island{
         for(String warp : warps.keySet())
             this.warps.put(warp, FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()));
 
-        this.islandBank = new BigDecimal(((DoubleTag) compoundValues.get("islandBank")).getValue());
+        this.islandBank = BigDecimalFormatted.of(compoundValues.get("islandBank"));
         this.islandSize = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(plugin.getSettings().defaultIslandSize))).getValue();
 
         this.hoppersLimit = ((IntTag) compoundValues.get("hoppersLimit")).getValue();
@@ -308,6 +309,11 @@ public class SIsland implements Island{
     }
 
     @Override
+    public List<Chunk> getAllChunks() {
+        return getAllChunks(false);
+    }
+
+    @Override
     public List<Chunk> getAllChunks(boolean onlyProtected){
         int islandSize = getIslandSize();
         Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
@@ -326,19 +332,26 @@ public class SIsland implements Island{
     }
 
     @Override
+    @Deprecated
     public double getMoneyInBank(){
-        if(islandBank.doubleValue() < 0) islandBank = new BigDecimal(0);
-        return islandBank.doubleValue();
+        return getMoneyInBankAsBigDecimal().doubleValue();
     }
 
     @Override
+    public BigDecimal getMoneyInBankAsBigDecimal() {
+        if(islandBank.doubleValue() < 0) islandBank = BigDecimalFormatted.ZERO;
+        return islandBank;
+    }
+
+    @Override
+    @Deprecated
     public String getMoneyAsString() {
-        return numberFormatter.format(getMoneyInBank());
+        return getMoneyInBankAsBigDecimal().toString();
     }
 
     @Override
     public void depositMoney(double amount){
-        islandBank = islandBank.add(new BigDecimal(amount));
+        islandBank = islandBank.add(BigDecimalFormatted.of(amount));
     }
 
     @Override
@@ -366,7 +379,7 @@ public class SIsland implements Island{
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
 
         blocksCalculations.clear();
-        islandWorth = new BigDecimal(0);
+        islandWorth = BigDecimalFormatted.ZERO;
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
@@ -440,7 +453,7 @@ public class SIsland implements Island{
                     }
                 }
                 if(asker != null)
-                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsString(), getLevelAsString());
+                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsBigDecimal(), getIslandLevelAsBigDecimal());
             });
 
             if(islandCalcsQueue.size() != 0){
@@ -493,7 +506,7 @@ public class SIsland implements Island{
                 blocksCalculations.put(key, currentAmount - amount);
 
             if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue).multiply(new BigDecimal(amount)))).doubleValue() < 0)
-                islandWorth = new BigDecimal(0);
+                islandWorth = BigDecimalFormatted.ZERO;
         }
     }
 
@@ -508,35 +521,56 @@ public class SIsland implements Island{
     }
 
     @Override
+    @Deprecated
     public double getWorth(){
+        return getWorthAsBigDecimal().doubleValue();
+    }
+
+    @Override
+    public BigDecimal getWorthAsBigDecimal() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
         //noinspection BigDecimalMethodWithoutRoundingCalled
-        return bankWorthRate <= 0 ? islandWorth.doubleValue() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate))).doubleValue();
+        return bankWorthRate <= 0 ? getRawWorthAsBigDecimal() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
     }
 
     @Override
+    @Deprecated
     public double getRawWorth(){
-        return islandWorth.doubleValue();
-    }
-
-    public String getWorthAsString(){
-        return numberFormatter.format(getWorth());
+        return getRawWorthAsBigDecimal().doubleValue();
     }
 
     @Override
-    public long getIslandLevel(){
-        double worth = getWorth();
+    public BigDecimal getRawWorthAsBigDecimal() {
+        return islandWorth;
+    }
+
+    @Override
+    @Deprecated
+    public String getWorthAsString(){
+        return getWorthAsBigDecimal().toString();
+    }
+
+    @Override
+    @Deprecated
+    public int getIslandLevel(){
+        return getIslandLevelAsBigDecimal().intValue();
+    }
+
+    @Override
+    public BigDecimal getIslandLevelAsBigDecimal() {
+        BigDecimal worth = getWorthAsBigDecimal();
         try {
             return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.
-                    replace("{}", String.valueOf(worth))).toString()).longValue();
+                    replace("{}", String.valueOf(worth))).toString());
         }catch(Exception ex){
-            return (long) worth;
+            return worth;
         }
     }
 
     @Override
+    @Deprecated
     public String getLevelAsString() {
-        return numberFormatter.format(getIslandLevel());
+        return getIslandLevelAsBigDecimal().toString();
     }
 
     @Override
@@ -774,17 +808,14 @@ public class SIsland implements Island{
     public int compareTo(Island other) {
         if(other == null)
             return -1;
+
         if(plugin.getSettings().islandTopOrder.equals("WORTH")){
-            if (getWorth() > other.getWorth())
-                return 1;
-            else if (getWorth() < other.getWorth())
-                return -1;
+            int compare = getWorthAsBigDecimal().compareTo(other.getWorthAsBigDecimal());
+            if(compare != 0) return compare;
         }
         else {
-            if (getIslandLevel() > other.getIslandLevel())
-                return 1;
-            else if (getIslandLevel() < other.getIslandLevel())
-                return -1;
+            int compare = getIslandLevelAsBigDecimal().compareTo(other.getIslandLevelAsBigDecimal());
+            if(compare != 0) return compare;
         }
 
         return getOwner().getName().compareTo(other.getOwner().getName());
