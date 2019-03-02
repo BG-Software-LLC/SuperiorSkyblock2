@@ -293,6 +293,10 @@ public final class GridHandler implements GridManager {
         return new CompoundTag(compoundValues);
     }
 
+    public void reloadBlockValues(){
+        blockValues = new BlockValuesHandler();
+    }
+
     private BlockFace getIslandFace(){
         //Possibilities: North / East
         if(lastIsland.getX() >= lastIsland.getZ()) {

@@ -155,6 +155,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler = new GridHandler(this);
             playersHandler = new PlayersHandler();
             dataHandler = new DataHandler(this);
+        }else {
+            gridHandler.reloadBlockValues();
         }
         schematicsHandler = new SchematicsHandler(this);
 
