@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -133,15 +132,13 @@ public final class DataHandler {
                 try {
                     try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
                         tag = stream.readTag();
-                    }catch(Exception ex){
-                        ex.printStackTrace();
-                        File copyFile = new File(plugin.getDataFolder(), "data/islands-backup/" + file.getName());
-                        file.renameTo(copyFile);
-                        continue;
+                        plugin.getGrid().createIsland((CompoundTag) tag);
                     }
-                    plugin.getGrid().createIsland((CompoundTag) tag);
                 }catch(Exception ex){
                     ex.printStackTrace();
+                    File copyFile = new File(plugin.getDataFolder(), "data/islands-backup/" + file.getName());
+                    copyFile.getParentFile().mkdirs();
+                    file.renameTo(copyFile);
                 }
             }
         }
@@ -155,15 +152,13 @@ public final class DataHandler {
                 try {
                     try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
                         tag = stream.readTag();
-                    }catch(Exception ex){
-                        ex.printStackTrace();
-                        File copyFile = new File(plugin.getDataFolder(), "data/players-backup/" + file.getName());
-                        file.renameTo(copyFile);
-                        continue;
+                        plugin.getPlayers().loadPlayer((CompoundTag) tag);
                     }
-                    plugin.getPlayers().loadPlayer((CompoundTag) tag);
                 }catch(Exception ex){
                     ex.printStackTrace();
+                    File copyFile = new File(plugin.getDataFolder(), "data/players-backup/" + file.getName());
+                    copyFile.getParentFile().mkdirs();
+                    file.renameTo(copyFile);
                 }
             }
         }
@@ -174,15 +169,13 @@ public final class DataHandler {
             try{
                 try(NBTInputStream stream = new NBTInputStream(new FileInputStream(gridFile))){
                     tag = stream.readTag();
-                }catch(Exception ex){
-                    ex.printStackTrace();
-                    File copyFile = new File(plugin.getDataFolder(), "data/grid-backup");
-                    gridFile.renameTo(copyFile);
-                    return;
+                    plugin.getGrid().loadGrid((CompoundTag) tag);
                 }
-                plugin.getGrid().loadGrid((CompoundTag) tag);
             }catch(Exception ex){
                 ex.printStackTrace();
+                File copyFile = new File(plugin.getDataFolder(), "data/grid-backup");
+                copyFile.getParentFile().mkdirs();
+                gridFile.renameTo(copyFile);
             }
         }
 
