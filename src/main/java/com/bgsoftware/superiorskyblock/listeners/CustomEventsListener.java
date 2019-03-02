@@ -132,6 +132,8 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent e){
+        if(plugin.getGrid() == null) return;
+
         Location from = e.getFrom(), to = e.getTo();
 
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
