@@ -37,7 +37,6 @@ public final class DataHandler {
         List<Island> islands = new ArrayList<>();
         plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
         List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
-        NBTOutputStream outputStream;
         File file;
 
         /*
@@ -66,10 +65,12 @@ public final class DataHandler {
                     file.getParentFile().mkdirs();
                     file.createNewFile();
                 }
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
 
-                outputStream = new NBTOutputStream(new FileOutputStream(file));
-                outputStream.writeTag(((SIsland) island).getAsTag());
-                outputStream.close();
+            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+                stream.writeTag(((SIsland) island).getAsTag());
             }catch(Exception ex){
                 ex.printStackTrace();
             }
@@ -87,10 +88,12 @@ public final class DataHandler {
                     file.getParentFile().mkdirs();
                     file.createNewFile();
                 }
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
 
-                outputStream = new NBTOutputStream(new FileOutputStream(file));
-                outputStream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
-                outputStream.close();
+            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+                stream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
             }catch(Exception ex){
                 ex.printStackTrace();
             }
@@ -107,34 +110,36 @@ public final class DataHandler {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
-
-            outputStream = new NBTOutputStream(new FileOutputStream(file));
-            outputStream.writeTag(plugin.getGrid().getAsTag());
-            outputStream.close();
         }catch(Exception ex){
             ex.printStackTrace();
         }
 
-
+        try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+            stream.writeTag(plugin.getGrid().getAsTag());
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
     public void loadDatabase(){
-        NBTInputStream inputStream;
-
         File dataDir = new File(plugin.getDataFolder(), "data/islands");
+        Tag tag;
 
         if(!dataDir.exists()){
             dataDir.mkdirs();
         }else{
             for(File file : dataDir.listFiles()){
                 try {
-                    inputStream = new NBTInputStream(new FileInputStream(file));
-                    Tag tag = inputStream.readTag();
+                    try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
+                        tag = stream.readTag();
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                        File copyFile = new File(plugin.getDataFolder(), "data/islands-backup/" + file.getName());
+                        file.renameTo(copyFile);
+                        continue;
+                    }
                     plugin.getGrid().createIsland((CompoundTag) tag);
-                    inputStream.close();
-                }catch(EOFException ex){
-                    SuperiorSkyblockPlugin.log("Couldn't load the island of " + file.getName() + ".");
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }
@@ -148,12 +153,15 @@ public final class DataHandler {
         }else{
             for(File file : dataDir.listFiles()){
                 try {
-                    inputStream = new NBTInputStream(new FileInputStream(file));
-                    Tag tag = inputStream.readTag();
+                    try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
+                        tag = stream.readTag();
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                        File copyFile = new File(plugin.getDataFolder(), "data/players-backup/" + file.getName());
+                        file.renameTo(copyFile);
+                        continue;
+                    }
                     plugin.getPlayers().loadPlayer((CompoundTag) tag);
-                    inputStream.close();
-                }catch(EOFException ex){
-                    SuperiorSkyblockPlugin.log("Couldn't load the player data of " + file.getName() + ".");
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }
@@ -164,12 +172,15 @@ public final class DataHandler {
 
         if(gridFile.exists()){
             try{
-                inputStream = new NBTInputStream(new FileInputStream(gridFile));
-                Tag tag = inputStream.readTag();
+                try(NBTInputStream stream = new NBTInputStream(new FileInputStream(gridFile))){
+                    tag = stream.readTag();
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                    File copyFile = new File(plugin.getDataFolder(), "data/grid-backup");
+                    gridFile.renameTo(copyFile);
+                    return;
+                }
                 plugin.getGrid().loadGrid((CompoundTag) tag);
-                inputStream.close();
-            }catch(EOFException ex){
-                SuperiorSkyblockPlugin.log("Couldn't load the grid data.");
             }catch(Exception ex){
                 ex.printStackTrace();
             }
