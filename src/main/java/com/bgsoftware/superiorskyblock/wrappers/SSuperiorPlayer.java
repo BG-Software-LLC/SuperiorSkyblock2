@@ -221,7 +221,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public static SuperiorPlayer of(UUID uuid){
-        return uuid == null ? null : plugin.getPlayers().getSuperiorPlayer(uuid);
+        return uuid == null || plugin.getPlayers() == null ? null : plugin.getPlayers().getSuperiorPlayer(uuid);
     }
 
     public static SuperiorPlayer of(String name){
