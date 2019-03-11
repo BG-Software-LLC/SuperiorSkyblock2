@@ -81,12 +81,12 @@ public final class CmdWithdraw implements ICommand {
             return;
         }
 
-        if(island.getMoneyInBankAsBigDecimal().compareTo(BigDecimal.ZERO) > 0){
+        if(island.getMoneyInBankAsBigDecimal().compareTo(BigDecimal.ZERO) == 0){
             Locale.ISLAND_BANK_EMPTY.send(sender);
             return;
         }
 
-        if(island.getMoneyInBankAsBigDecimal().compareTo(new BigDecimal(amount)) > 0){
+        if(island.getMoneyInBankAsBigDecimal().compareTo(new BigDecimal(amount)) < 0){
             Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBankAsBigDecimal().toString());
             amount = island.getMoneyInBankAsBigDecimal().doubleValue();
         }
