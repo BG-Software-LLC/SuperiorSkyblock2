@@ -172,7 +172,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public Player asPlayer(){
-        return asOfflinePlayer().getPlayer();
+        return Bukkit.getPlayer(player);
     }
 
     public OfflinePlayer asOfflinePlayer(){
