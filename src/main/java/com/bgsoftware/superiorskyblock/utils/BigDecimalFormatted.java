@@ -69,7 +69,7 @@ public final class BigDecimalFormatted extends BigDecimal {
         else if(tag instanceof DoubleTag)
             return of(((DoubleTag) tag).getValue());
         else if(tag instanceof StringTag)
-            return of(((StringTag) tag).getValue());
+            return of(((StringTag) tag).getValue().replace(",", ""));
 
         throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " into BigDecimalFormatted");
     }

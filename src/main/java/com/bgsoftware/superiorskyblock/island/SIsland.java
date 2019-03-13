@@ -788,7 +788,7 @@ public class SIsland implements Island{
                 .forEach(warp -> warps.put(warp, new StringTag(FileUtil.fromLocation(this.warps.get(warp)))));
         compoundValues.put("warps", new CompoundTag(warps));
 
-        compoundValues.put("islandBank", new StringTag(this.islandBank.toString()));
+        compoundValues.put("islandBank", new StringTag(this.islandBank.getAsString()));
         compoundValues.put("islandSize", new IntTag(this.islandSize));
 
         compoundValues.put("hoppersLimit", new IntTag(this.hoppersLimit));
