@@ -23,6 +23,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -59,8 +60,16 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemFrameBreak(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof ItemFrame && e.getDamager() instanceof Player) {
-            ItemFrameBreakEvent itemFrameBreakEvent = new ItemFrameBreakEvent((Player) e.getDamager(), (ItemFrame) e.getEntity());
+        if (e.getEntity() instanceof ItemFrame) {
+            Player shooter;
+
+            if(e.getDamager() instanceof Player)
+                shooter = (Player) e.getDamager();
+            else if(e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof Player)
+                shooter = (Player) ((Projectile) e.getDamager()).getShooter();
+            else return;
+
+            ItemFrameBreakEvent itemFrameBreakEvent = new ItemFrameBreakEvent(shooter, (ItemFrame) e.getEntity());
             Bukkit.getPluginManager().callEvent(itemFrameBreakEvent);
             if(itemFrameBreakEvent.isCancelled())
                 e.setCancelled(true);
