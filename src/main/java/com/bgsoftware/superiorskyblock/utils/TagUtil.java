@@ -83,7 +83,8 @@ public final class TagUtil {
             banner.update();
         }
         else if(block.getState() instanceof InventoryHolder) {
-            ((InventoryHolder) block.getState()).getInventory().setContents(compoundToInventory((CompoundTag) compoundValue.get("contents")));
+            if(compoundValue.containsKey("contents"))
+                ((InventoryHolder) block.getState()).getInventory().setContents(compoundToInventory((CompoundTag) compoundValue.get("contents")));
         }
         else if(block.getType() == Material.FLOWER_POT){
             String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
