@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
@@ -143,6 +144,11 @@ public final class PlayersListener implements Listener {
             return;
 
         e.setCancelled(true);
+
+        //Disable flame
+        if(e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
+            targetPlayer.asPlayer().setFireTicks(0);
+
         Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
     }
 
