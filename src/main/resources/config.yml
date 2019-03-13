@@ -86,10 +86,12 @@ default-permissions:
   - DEPOSIT_MONEY
   - DROP_ITEMS
   - EXPEL_BYPASS
+  - FARM_TRAMPING
   - INTERACT
   - ITEM_FRAME
   - PAINTING
   - PICKUP_DROPS
+  - SIGN_INTERACT
   - USE
 
   # A list of default permissions for moderators.
@@ -113,6 +115,7 @@ default-permissions:
   - PROMOTE_MEMBERS
   - SET_BIOME
   - SET_DISCORD
+  - SET_HOME
   - SET_PAYPAL
   - SET_PERMISSION
   - SET_ROLE

@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.commands.command.CmdSetDiscord;
 import com.bgsoftware.superiorskyblock.commands.command.CmdSetPaypal;
 import com.bgsoftware.superiorskyblock.commands.command.CmdSetPermission;
 import com.bgsoftware.superiorskyblock.commands.command.CmdSetRole;
+import com.bgsoftware.superiorskyblock.commands.command.CmdSetTeleport;
 import com.bgsoftware.superiorskyblock.commands.command.CmdSetWarp;
 import com.bgsoftware.superiorskyblock.commands.command.CmdShow;
 import com.bgsoftware.superiorskyblock.commands.command.CmdTeam;
@@ -77,6 +78,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdSetPaypal());
         subCommands.add(new CmdSetPermission());
         subCommands.add(new CmdSetRole());
+        subCommands.add(new CmdSetTeleport());
         subCommands.add(new CmdSetWarp());
         subCommands.add(new CmdShow());
         subCommands.add(new CmdTeam());

@@ -63,6 +63,8 @@ permissions:
             description: Change permission for a role in your island.
           superior.island.setrole:
             description: Change the role of a player in your island.
+          superior.island.setteleport:
+            description: Change the teleport location of your island.
           superior.island.setwarp:
             description: Create a new island warp.
           superior.island.show:

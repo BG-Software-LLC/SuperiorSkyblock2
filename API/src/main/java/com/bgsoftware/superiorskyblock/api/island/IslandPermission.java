@@ -32,6 +32,7 @@ public enum IslandPermission {
     RANKUP,
     SET_BIOME,
     SET_DISCORD,
+    SET_HOME,
     SET_PAYPAL,
     SET_PERMISSION,
     SET_ROLE,

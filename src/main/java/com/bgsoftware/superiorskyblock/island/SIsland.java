@@ -84,6 +84,7 @@ public class SIsland implements Island{
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
+    private Location teleportLocation;
 
     /*
      * SIsland multipliers & limits
@@ -99,6 +100,9 @@ public class SIsland implements Island{
         Map<String, Tag> compoundValues = tag.getValue();
         this.owner = UUID.fromString(((StringTag) compoundValues.get("owner")).getValue());
         this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
+
+        this.teleportLocation = compoundValues.containsKey("teleportLocation") ?
+                getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter();
 
         List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
         for(Tag _tag : members)
@@ -253,6 +257,16 @@ public class SIsland implements Island{
     @Override
     public Location getCenter(){
         return center.parse().add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public Location getTeleportLocation() {
+        return teleportLocation.clone();
+    }
+
+    @Override
+    public void setTeleportLocation(Location teleportLocation) {
+        this.teleportLocation = teleportLocation.clone();
     }
 
     @Override
@@ -765,6 +779,8 @@ public class SIsland implements Island{
         compoundValues.put("owner", new StringTag(owner.toString()));
         compoundValues.put("center", new StringTag(center.toString()));
 
+        compoundValues.put("teleportLocation", new StringTag(getLocation(teleportLocation)));
+
         List<Tag> members = new ArrayList<>();
         this.members.forEach(uuid -> members.add(new StringTag(uuid.toString())));
         compoundValues.put("members", new ListTag(StringTag.class, members));
@@ -846,6 +862,16 @@ public class SIsland implements Island{
             this.asker = asker;
         }
 
+    }
+
+    private Location getLocation(String location){
+        String[] sections = location.split(",");
+        return new Location(Bukkit.getWorld(sections[0]), Double.parseDouble(sections[1]), Double.parseDouble(sections[2]),
+                Double.parseDouble(sections[3]), Float.parseFloat(sections[4]), Float.parseFloat(sections[5]));
+    }
+
+    private String getLocation(Location location){
+        return location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw() + "," + location.getPitch();
     }
 
 

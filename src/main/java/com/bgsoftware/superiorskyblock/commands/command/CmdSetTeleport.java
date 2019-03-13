@@ -1,32 +1,32 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdTeleport implements ICommand {
+public final class CmdSetTeleport implements ICommand {
 
     @Override
     public List<String> getAliases(){
-        return Arrays.asList("tp", "teleport", "go", "home");
+        return Arrays.asList("settp", "setteleport", "setgo", "sethome");
     }
 
     @Override
     public String getPermission() {
-        return "superior.island.teleport";
+        return "superior.island.setteleport";
     }
 
     @Override
     public String getUsage() {
-        return "island teleport";
+        return "island setteleport";
     }
 
     @Override
@@ -54,12 +54,17 @@ public final class CmdTeleport implements ICommand {
             return;
         }
 
-        superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
-        Locale.TELEPORTED_SUCCESS.send(superiorPlayer);
+        if(!superiorPlayer.hasPermission(IslandPermission.SET_HOME)){
+            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_HOME));
+            return;
+        }
+
+        island.setTeleportLocation(superiorPlayer.getLocation());
+        Locale.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return null;
     }
 }
