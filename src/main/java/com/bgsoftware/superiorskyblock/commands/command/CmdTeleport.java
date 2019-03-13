@@ -16,7 +16,7 @@ public final class CmdTeleport implements ICommand {
 
     @Override
     public List<String> getAliases(){
-        return Arrays.asList("tp", "teleport", "go");
+        return Arrays.asList("tp", "teleport", "go", "home");
     }
 
     @Override
