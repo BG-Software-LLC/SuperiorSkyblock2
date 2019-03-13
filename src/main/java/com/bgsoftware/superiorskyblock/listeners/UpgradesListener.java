@@ -44,6 +44,8 @@ public final class UpgradesListener implements Listener {
         this.plugin = plugin;
         maxGrowthData.put("BEETROOT_BLOCK", (byte) 3);
         maxGrowthData.put("NETHER_WARTS", (byte) 3);
+        maxGrowthData.put("CHORUS_FLOWER", (byte) 5);
+
     }
 
     /*
