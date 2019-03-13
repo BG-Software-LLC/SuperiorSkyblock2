@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -89,7 +90,9 @@ public final class GUIInventory {
     private void playOpenSound(SuperiorPlayer superiorPlayer){
         if(contains("openSound")) {
             Sound openSound = get("openSound", Sound.class);
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
+            Player player = superiorPlayer.asPlayer();
+            if(player != null)
+                player.playSound(player.getLocation(), openSound, 1, 1);
         }
     }
 
