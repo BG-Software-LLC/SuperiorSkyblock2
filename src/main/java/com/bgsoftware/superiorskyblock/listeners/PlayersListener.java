@@ -301,7 +301,7 @@ public final class PlayersListener implements Listener {
             island = plugin.getGrid().getSpawnIsland();
 
         noFallDamage.add(e.getPlayer().getUniqueId());
-        e.getPlayer().teleport(island.getCenter().add(0, 1, 0));
+        e.getPlayer().teleport(island.getTeleportLocation().add(0, 1, 0));
         Bukkit.getScheduler().runTaskLater(plugin, () -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
     }
 
