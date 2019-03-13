@@ -35,10 +35,10 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
         Matcher matcher;
 
         if((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()){
-            if(island == null)
-                return "";
+            String subPlaceholder = matcher.group(1).toLowerCase();
 
-            String subPlaceholder = matcher.group(1);
+            if(island == null)
+                return subPlaceholder.equals("exists") ? "No" : "";
 
             if(subPlaceholder.startsWith("location_")){
                 island = plugin.getGrid().getIslandAt(player.getLocation());
@@ -64,7 +64,7 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 return String.valueOf(island.getUpgradeLevel(upgradeName));
             }
 
-            switch (subPlaceholder.toLowerCase()){
+            switch (subPlaceholder){
                 case "center":
                     return SBlockPosition.of(island.getCenter()).toString();
                 case "x":
@@ -82,6 +82,9 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 case "leader":
                     return island.getOwner().getName();
                 case "size":
+                    int size = island.getIslandSize() * 2;
+                    return size + "x" + size;
+                case "radius":
                     return String.valueOf(island.getIslandSize());
                 case "biome":
                     return StringUtil.format(island.getCenter().getBlock().getBiome().name());
@@ -109,6 +112,8 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                     return island.getDiscord();
                 case "paypal_all":
                     return island.getPaypal();
+                case "exists":
+                    return "Yes";
             }
 
         }
