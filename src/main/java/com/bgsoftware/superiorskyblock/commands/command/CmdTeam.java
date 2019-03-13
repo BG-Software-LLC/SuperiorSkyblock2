@@ -122,6 +122,9 @@ public final class CmdTeam implements ICommand {
 
             infoMessage.append(leadersMessage).append(adminsMessage).append(modsMessage).append(membersMessage);
 
+            if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty())
+                infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage());
+
             Locale.sendMessage(sender, infoMessage.toString());
         }).start();
     }

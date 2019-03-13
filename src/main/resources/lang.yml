@@ -180,6 +180,7 @@ ISLAND_TEAM_STATUS_MODS: '&e * [Moderator] {0} {1}'
 ISLAND_TEAM_STATUS_MEMBERS: '&e * [Member] {0} {1}'
 ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
+ISLAND_TEAM_STATUS_FOOTER: ''
 # Called when running the /is teamchat command.
 TOGGLED_TEAM_CHAT_ON: '&aToggling team chat ON.'
 TOGGLED_TEAM_CHAT_OFF: '&aToggling team chat OFF.'
