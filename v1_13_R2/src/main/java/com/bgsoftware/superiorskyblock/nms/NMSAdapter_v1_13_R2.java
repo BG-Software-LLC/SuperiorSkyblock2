@@ -74,7 +74,7 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
         BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
         Block flower;
         try{
-            Field flowerField = blockFlowerPot.getClass().getField("c");
+            Field flowerField = blockFlowerPot.getClass().getDeclaredField("c");
             flowerField.setAccessible(true);
             flower = (Block) flowerField.get(blockFlowerPot);
             flowerField.setAccessible(false);
