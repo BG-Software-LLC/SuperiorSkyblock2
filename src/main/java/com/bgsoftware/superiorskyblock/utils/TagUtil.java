@@ -78,8 +78,10 @@ public final class TagUtil {
         Block block = blockLocation.getBlock();
         if(block.getState() instanceof Banner){
             Banner banner = (Banner) block.getState();
-            banner.setBaseColor(DyeColor.valueOf(((StringTag) compoundValue.get("baseColor")).getValue()));
-            banner.setPatterns(getPatternsFromTag((CompoundTag) compoundValue.get("patterns")));
+            if(compoundValue.containsKey("baseColor"))
+                banner.setBaseColor(DyeColor.valueOf(((StringTag) compoundValue.get("baseColor")).getValue()));
+            if(compoundValue.containsKey("patterns"))
+                banner.setPatterns(getPatternsFromTag((CompoundTag) compoundValue.get("patterns")));
             banner.update();
         }
         else if(block.getState() instanceof InventoryHolder) {
@@ -87,22 +89,27 @@ public final class TagUtil {
                 ((InventoryHolder) block.getState()).getInventory().setContents(compoundToInventory((CompoundTag) compoundValue.get("contents")));
         }
         else if(block.getType() == Material.FLOWER_POT){
-            String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
-            plugin.getNMSAdapter().setFlowerPot(blockLocation, new ItemStack(Material.valueOf(sections[0]), 1, Short.valueOf(sections[1])));
+            if(compoundValue.containsKey("flower")) {
+                String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
+                plugin.getNMSAdapter().setFlowerPot(blockLocation, new ItemStack(Material.valueOf(sections[0]), 1, Short.valueOf(sections[1])));
+            }
         }
         else if(block.getState() instanceof Skull){
             Skull skull = (Skull) block.getState();
-            try {
-                skull.setSkullType(SkullType.valueOf(((StringTag) compoundValue.get("skullType")).getValue()));
-            }catch(UnsupportedOperationException ignored){}
-            skull.setRotation(BlockFace.valueOf(((StringTag) compoundValue.get("rotation")).getValue()));
+            if(compoundValue.containsKey("skullType"))
+                try {
+                    skull.setSkullType(SkullType.valueOf(((StringTag) compoundValue.get("skullType")).getValue()));
+                }catch(UnsupportedOperationException ignored){}
+            if(compoundValue.containsKey("rotation"))
+                skull.setRotation(BlockFace.valueOf(((StringTag) compoundValue.get("rotation")).getValue()));
             if(compoundValue.containsKey("owner"))
                 skull.setOwner(((StringTag) compoundValue.get("owner")).getValue());
             skull.update();
         }else if(block.getState() instanceof Sign){
             Sign sign = (Sign) block.getState();
             for(int i = 0; i < 4; i++)
-                sign.setLine(i, ((StringTag) compoundValue.get("signLine" + i)).getValue());
+                if(compoundValue.containsKey("signLine" + i))
+                    sign.setLine(i, ((StringTag) compoundValue.get("signLine" + i)).getValue());
             sign.update();
         }
     }
