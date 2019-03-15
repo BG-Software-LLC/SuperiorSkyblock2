@@ -261,6 +261,8 @@ public class SIsland implements Island{
 
     @Override
     public Location getTeleportLocation() {
+        if(teleportLocation == null)
+            teleportLocation = getCenter();
         return teleportLocation.clone();
     }
 
