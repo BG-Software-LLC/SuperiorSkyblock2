@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
-import com.bgsoftware.superiorskyblock.schematics.SchematicBlock;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
@@ -40,36 +39,31 @@ public final class TagUtil {
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
-        new SuperiorThread(() -> {
-            List<SchematicBlock> schematicBlocks = new ArrayList<>();
-            for(Tag tag : blocks){
-                Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
-                Location blockLocation = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
-                schematicBlocks.add(new SchematicBlock(((IntTag) compoundValue.get("combinedId")).getValue(), blockLocation));
-            }
-            setBlocks(schematicBlocks, () ->
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    for(Tag tag : blocks){
-                        assignIntoBlock((CompoundTag) tag, offset);
-                    }
-                    callback.run();
-                }, 1L));
-        }).start();
-    }
+        Runnable _callback = () ->
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                for(Tag tag : blocks){
+                    assignIntoBlock((CompoundTag) tag, offset);
+                }
+                callback.run();
+            }, 1L);
 
-    private static void setBlocks(List<SchematicBlock> blocks, Runnable callback){
-        if(FAWEHook.isEnabled()){
-            FAWEHook.setBlocks(blocks, callback);
-        }
-        else {
-            for (SchematicBlock schematicBlock : blocks) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    plugin.getNMSAdapter().setBlock(schematicBlock.getLocation(), schematicBlock.getCombinedId());
-                    if (blocks.indexOf(schematicBlock) == blocks.size() - 1)
-                        callback.run();
-                });
+        new SuperiorThread(() -> {
+            if(FAWEHook.isEnabled()){
+                FAWEHook.setBlocks(blocks, offset, _callback);
             }
-        }
+            else {
+                for (Tag tag : blocks) {
+                    Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
+                    Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+                    int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        plugin.getNMSAdapter().setBlock(block, combinedId);
+                        if (blocks.indexOf(tag) == blocks.size() - 1)
+                            _callback.run();
+                    });
+                }
+            }
+        }).start();
     }
 
     public static void assignIntoBlock(CompoundTag compoundTag, Location offset){
