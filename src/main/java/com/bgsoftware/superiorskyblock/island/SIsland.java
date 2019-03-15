@@ -424,7 +424,12 @@ public class SIsland implements Island{
                         for (int z = 0; z < 16; z++) {
                             highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
                             for (int y = 0; y <= highestBlock; y++) {
-                                Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                Key blockKey = SKey.of("AIR");
+
+                                try{
+                                    blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                }catch(ArrayIndexOutOfBoundsException ignored){ }
+
                                 if(blockKey.toString().contains("AIR"))
                                     continue;
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
