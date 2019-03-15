@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.TagUtil;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Sign;
@@ -80,6 +79,13 @@ public final class TagBuilder {
     }
 
     public CompoundTag build(){
+        Map<String, Tag> compoundValue = new HashMap<>();
+
+        for(String key : this.compoundValue.keySet()){
+            if(this.compoundValue.get(key) != null)
+                compoundValue.put(key, this.compoundValue.get(key));
+        }
+
         return new CompoundTag(compoundValue);
     }
 
