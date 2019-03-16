@@ -786,7 +786,7 @@ public class SIsland implements Island{
         compoundValues.put("owner", new StringTag(owner.toString()));
         compoundValues.put("center", new StringTag(center.toString()));
 
-        compoundValues.put("teleportLocation", new StringTag(getLocation(teleportLocation)));
+        compoundValues.put("teleportLocation", new StringTag(getLocation(getTeleportLocation())));
 
         List<Tag> members = new ArrayList<>();
         this.members.forEach(uuid -> members.add(new StringTag(uuid.toString())));
