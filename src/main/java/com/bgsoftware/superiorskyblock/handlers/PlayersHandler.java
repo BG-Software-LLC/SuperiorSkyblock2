@@ -1,11 +1,15 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler implements PlayersManager {
 
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
 
     @Override
@@ -29,10 +34,18 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
-        if(!players.containsKey(uuid))
+        if(!players.containsKey(uuid)) {
             players.put(uuid, new SSuperiorPlayer(uuid));
+            Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
+        }
         return players.get(uuid);
     }
+
+    public void loadPlayer(ResultSet resultSet) throws SQLException {
+        UUID player = UUID.fromString(resultSet.getString("player"));
+        players.put(player, new SSuperiorPlayer(resultSet));
+    }
+
 
     public void loadPlayer(CompoundTag tag){
         UUID player = UUID.fromString(((StringTag) tag.getValue().get("player")).getValue());

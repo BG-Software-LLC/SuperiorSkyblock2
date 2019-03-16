@@ -4,31 +4,144 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
-import com.bgsoftware.superiorskyblock.utils.jnbt.NBTOutputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
+@SuppressWarnings({"ResultOfMethodCallIgnored",  "WeakerAccess"})
 public final class DataHandler {
 
     public SuperiorSkyblockPlugin plugin;
+    private String sqlURL = "";
 
     public DataHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+
+        File databaseFile = new File(plugin.getDataFolder(), "database.db");
+
+        if(!databaseFile.exists()){
+            try {
+                databaseFile.getParentFile().mkdirs();
+                databaseFile.createNewFile();
+            }catch(Exception ex){
+                ex.printStackTrace();
+                return;
+            }
+        }
+
+        sqlURL = "jdbc:sqlite:" + databaseFile.getAbsolutePath().replace("\\", "/");
+
+        loadOldDatabase();
         loadDatabase();
     }
 
-    public void saveDatabase(boolean async){
-        if(async && Bukkit.isPrimaryThread()){
+//    public void saveDatabase(boolean async){
+//        if(async && Bukkit.isPrimaryThread()){
+//            new Thread(() -> saveDatabase(false)).start();
+//            return;
+//        }
+//
+//        List<Island> islands = new ArrayList<>();
+//        plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
+//        List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
+//        File file;
+//
+//        /*
+//         * Delete all old island files
+//         */
+//
+//        file = new File(plugin.getDataFolder(), "data/islands");
+//
+//        if(file.exists()){
+//            //noinspection ConstantConditions
+//            for(File _file : file.listFiles()) {
+//                System.out.println(); //Idk why, but without it files are not getting deleted
+//                _file.delete();
+//            }
+//        }
+//
+//        /*
+//         * Save all islands from cache
+//         */
+//
+//        for(Island island : islands){
+//            file = new File(plugin.getDataFolder(), "data/islands/" + island.getOwner().getUniqueId());
+//
+//            try {
+//                if(!file.exists()){
+//                    file.getParentFile().mkdirs();
+//                    file.createNewFile();
+//                }
+//            }catch(Exception ex){
+//                ex.printStackTrace();
+//            }
+//
+//            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+//                stream.writeTag(((SIsland) island).getAsTag());
+//            }catch(Exception ex){
+//                ex.printStackTrace();
+//            }
+//        }
+//
+//        /*
+//         * Save all players from cache
+//         */
+//
+//        for(SuperiorPlayer superiorPlayer : players){
+//            file = new File(plugin.getDataFolder(), "data/players/" + superiorPlayer.getUniqueId());
+//
+//            try {
+//                if(!file.exists()){
+//                    file.getParentFile().mkdirs();
+//                    file.createNewFile();
+//                }
+//            }catch(Exception ex){
+//                ex.printStackTrace();
+//            }
+//
+//            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+//                stream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
+//            }catch(Exception ex){
+//                ex.printStackTrace();
+//            }
+//        }
+//
+//        /*
+//         * Save grid settings
+//         */
+//
+//        file = new File(plugin.getDataFolder(), "data/grid");
+//
+//        try{
+//            if(!file.exists()){
+//                file.getParentFile().mkdirs();
+//                file.createNewFile();
+//            }
+//        }catch(Exception ex){
+//            ex.printStackTrace();
+//        }
+//
+//        try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
+//            stream.writeTag(plugin.getGrid().getAsTag());
+//        }catch(Exception ex){
+//            ex.printStackTrace();
+//        }
+//    }
+
+    public void saveDatabase(boolean async) {
+        if (async && Bukkit.isPrimaryThread()) {
             new Thread(() -> saveDatabase(false)).start();
             return;
         }
@@ -36,98 +149,94 @@ public final class DataHandler {
         List<Island> islands = new ArrayList<>();
         plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
         List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
-        File file;
 
-        /*
-         * Delete all old island files
-         */
-
-        file = new File(plugin.getDataFolder(), "data/islands");
-
-        if(file.exists()){
-            //noinspection ConstantConditions
-            for(File _file : file.listFiles()) {
-                System.out.println(); //Idk why, but without it files are not getting deleted
-                _file.delete();
+        try (Connection conn = DriverManager.getConnection(sqlURL)) {
+            //Saving islands
+            for(Island island : islands){
+                conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
             }
-        }
-
-        /*
-         * Save all islands from cache
-         */
-
-        for(Island island : islands){
-            file = new File(plugin.getDataFolder(), "data/islands/" + island.getOwner().getUniqueId());
-
-            try {
-                if(!file.exists()){
-                    file.getParentFile().mkdirs();
-                    file.createNewFile();
-                }
-            }catch(Exception ex){
-                ex.printStackTrace();
+            //Saving players
+            for(SuperiorPlayer player : players){
+                conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
             }
-
-            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-                stream.writeTag(((SIsland) island).getAsTag());
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
-
-        /*
-         * Save all players from cache
-         */
-
-        for(SuperiorPlayer superiorPlayer : players){
-            file = new File(plugin.getDataFolder(), "data/players/" + superiorPlayer.getUniqueId());
-
-            try {
-                if(!file.exists()){
-                    file.getParentFile().mkdirs();
-                    file.createNewFile();
-                }
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-
-            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-                stream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
-        }
-
-        /*
-         * Save grid settings
-         */
-
-        file = new File(plugin.getDataFolder(), "data/grid");
-
-        try{
-            if(!file.exists()){
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-
-        try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-            stream.writeTag(plugin.getGrid().getAsTag());
+            //Saving grid
+            conn.prepareStatement(plugin.getGrid().getSaveStatement()).executeUpdate();
         }catch(Exception ex){
             ex.printStackTrace();
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+    @SuppressWarnings("WeakerAccess")
     public void loadDatabase(){
+        try (Connection conn = DriverManager.getConnection(sqlURL)){
+            //Creating default tables
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
+                    "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
+                    "islandSize INTEGER, blockLimits VARCHAR, teamLimit INTEGER, cropGrowth DECIMAL, spawnerRates DECIMAL," +
+                    "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR);").executeUpdate();
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
+                    "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER);").executeUpdate();
+
+            ResultSet resultSet = conn.prepareStatement("SELECT * FROM players;").executeQuery();
+            while (resultSet.next()){
+                plugin.getPlayers().loadPlayer(resultSet);
+            }
+
+            resultSet = conn.prepareStatement("SELECT * FROM islands;").executeQuery();
+            while (resultSet.next()){
+                plugin.getGrid().createIsland(resultSet);
+            }
+
+            resultSet = conn.prepareStatement("SELECT * FROM grid;").executeQuery();
+            if (resultSet.next()){
+                plugin.getGrid().loadGrid(resultSet);
+                conn.prepareStatement("DELETE FROM grid;").executeUpdate();
+            }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public void insertIsland(Island island){
+        new SuperiorThread(() -> {
+            try (Connection conn = DriverManager.getConnection(sqlURL)){
+                conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','');",
+                        island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
+                conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void deleteIsland(Island island){
+        new SuperiorThread(() -> {
+            try (Connection conn = DriverManager.getConnection(sqlURL)){
+                conn.prepareStatement("DELETE FROM islands WHERE owner='" + island.getOwner().getUniqueId() + "';").executeUpdate();
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }).start();
+    }
+
+    public void insertPlayer(SuperiorPlayer player){
+        new SuperiorThread(() -> {
+            try (Connection conn = DriverManager.getConnection(sqlURL)){
+                conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');", player.getUniqueId())).executeUpdate();
+                conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }).start();
+    }
+
+    @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+    public void loadOldDatabase(){
         File dataDir = new File(plugin.getDataFolder(), "data/islands");
         Tag tag;
 
-        if(!dataDir.exists()){
-            dataDir.mkdirs();
-        }else{
+        if(dataDir.exists()){
             for(File file : dataDir.listFiles()){
                 try {
                     try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
@@ -141,13 +250,12 @@ public final class DataHandler {
                     file.renameTo(copyFile);
                 }
             }
+            dataDir.delete();
         }
 
         dataDir = new File(plugin.getDataFolder(), "data/players");
 
-        if(!dataDir.exists()){
-            dataDir.mkdirs();
-        }else{
+        if(dataDir.exists()){
             for(File file : dataDir.listFiles()){
                 try {
                     try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
@@ -161,6 +269,7 @@ public final class DataHandler {
                     file.renameTo(copyFile);
                 }
             }
+            dataDir.delete();
         }
 
         File gridFile = new File(plugin.getDataFolder(), "data/grid");
@@ -177,6 +286,7 @@ public final class DataHandler {
                 copyFile.getParentFile().mkdirs();
                 gridFile.renameTo(copyFile);
             }
+            gridFile.delete();
         }
 
     }
