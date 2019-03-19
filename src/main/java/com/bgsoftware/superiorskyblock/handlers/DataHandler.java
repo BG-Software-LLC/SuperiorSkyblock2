@@ -249,6 +249,7 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
+                file.delete();
             }
             dataDir.delete();
         }
@@ -268,6 +269,7 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
+                file.delete();
             }
             dataDir.delete();
         }
