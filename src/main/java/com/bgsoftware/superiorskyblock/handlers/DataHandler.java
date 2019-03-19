@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,99 +47,6 @@ public final class DataHandler {
         loadOldDatabase();
         loadDatabase();
     }
-
-//    public void saveDatabase(boolean async){
-//        if(async && Bukkit.isPrimaryThread()){
-//            new Thread(() -> saveDatabase(false)).start();
-//            return;
-//        }
-//
-//        List<Island> islands = new ArrayList<>();
-//        plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
-//        List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
-//        File file;
-//
-//        /*
-//         * Delete all old island files
-//         */
-//
-//        file = new File(plugin.getDataFolder(), "data/islands");
-//
-//        if(file.exists()){
-//            //noinspection ConstantConditions
-//            for(File _file : file.listFiles()) {
-//                System.out.println(); //Idk why, but without it files are not getting deleted
-//                _file.delete();
-//            }
-//        }
-//
-//        /*
-//         * Save all islands from cache
-//         */
-//
-//        for(Island island : islands){
-//            file = new File(plugin.getDataFolder(), "data/islands/" + island.getOwner().getUniqueId());
-//
-//            try {
-//                if(!file.exists()){
-//                    file.getParentFile().mkdirs();
-//                    file.createNewFile();
-//                }
-//            }catch(Exception ex){
-//                ex.printStackTrace();
-//            }
-//
-//            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-//                stream.writeTag(((SIsland) island).getAsTag());
-//            }catch(Exception ex){
-//                ex.printStackTrace();
-//            }
-//        }
-//
-//        /*
-//         * Save all players from cache
-//         */
-//
-//        for(SuperiorPlayer superiorPlayer : players){
-//            file = new File(plugin.getDataFolder(), "data/players/" + superiorPlayer.getUniqueId());
-//
-//            try {
-//                if(!file.exists()){
-//                    file.getParentFile().mkdirs();
-//                    file.createNewFile();
-//                }
-//            }catch(Exception ex){
-//                ex.printStackTrace();
-//            }
-//
-//            try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-//                stream.writeTag(((SSuperiorPlayer) superiorPlayer).getAsTag());
-//            }catch(Exception ex){
-//                ex.printStackTrace();
-//            }
-//        }
-//
-//        /*
-//         * Save grid settings
-//         */
-//
-//        file = new File(plugin.getDataFolder(), "data/grid");
-//
-//        try{
-//            if(!file.exists()){
-//                file.getParentFile().mkdirs();
-//                file.createNewFile();
-//            }
-//        }catch(Exception ex){
-//            ex.printStackTrace();
-//        }
-//
-//        try(NBTOutputStream stream = new NBTOutputStream(new FileOutputStream(file))){
-//            stream.writeTag(plugin.getGrid().getAsTag());
-//        }catch(Exception ex){
-//            ex.printStackTrace();
-//        }
-//    }
 
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
@@ -291,6 +199,15 @@ public final class DataHandler {
             gridFile.delete();
         }
 
+    }
+
+    private void addColumnIfNotExists(Connection conn, String column, String table, String def) throws SQLException {
+        ResultSet resultSet = conn.prepareStatement("SELECT * FROM " + table + " LIMIT 1;").executeQuery();
+        try{
+            resultSet.findColumn(column);
+        }catch(SQLException ex){
+            conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " VARCHAR DEFAULT '" + def + "';").executeUpdate();
+        }
     }
 
 }
