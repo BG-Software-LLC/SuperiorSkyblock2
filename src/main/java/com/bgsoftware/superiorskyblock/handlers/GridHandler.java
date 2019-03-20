@@ -80,7 +80,9 @@ public final class GridHandler implements GridManager {
 
     public void createIsland(CompoundTag tag){
         UUID owner = UUID.fromString(((StringTag) tag.getValue().get("owner")).getValue());
-        islands.add(owner, new SIsland(tag));
+        Island island = new SIsland(tag);
+        islands.add(owner, island);
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertIsland(island));
     }
 
     @Override

@@ -157,7 +157,9 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
-                file.delete();
+                File copyFile = new File(plugin.getDataFolder(), "data-backup/islands/" + file.getName());
+                copyFile.getParentFile().mkdirs();
+                file.renameTo(copyFile);
             }
             dataDir.delete();
         }
@@ -177,7 +179,9 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
-                file.delete();
+                File copyFile = new File(plugin.getDataFolder(), "data-backup/players/" + file.getName());
+                copyFile.getParentFile().mkdirs();
+                file.renameTo(copyFile);
             }
             dataDir.delete();
         }
@@ -196,7 +200,9 @@ public final class DataHandler {
                 copyFile.getParentFile().mkdirs();
                 gridFile.renameTo(copyFile);
             }
-            gridFile.delete();
+            File copyFile = new File(plugin.getDataFolder(), "data-backup/grid");
+            copyFile.getParentFile().mkdirs();
+            gridFile.renameTo(copyFile);
         }
 
     }
