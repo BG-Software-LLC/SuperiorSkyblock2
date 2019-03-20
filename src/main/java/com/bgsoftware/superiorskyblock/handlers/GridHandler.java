@@ -268,7 +268,7 @@ public final class GridHandler implements GridManager {
     public void loadGrid(ResultSet resultSet) throws SQLException{
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
 
-        for(String entry : resultSet.getString("stackedBlocks").split(",")){
+        for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
                 stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.valueOf(sections[1]));
@@ -317,7 +317,7 @@ public final class GridHandler implements GridManager {
 
         StringBuilder stackedBlocks = new StringBuilder();
         this.stackedBlocks.entrySet().forEach(entry ->
-            stackedBlocks.append(",").append(entry.getKey().toString()).append("=").append(entry.getValue()));
+            stackedBlocks.append(";").append(entry.getKey().toString()).append("=").append(entry.getValue()));
 
         int maxIslandSize = plugin.getSettings().maxIslandSize;
         String world = plugin.getSettings().islandWorld;
