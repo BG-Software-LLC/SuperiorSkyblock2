@@ -37,6 +37,7 @@ import java.util.Map;
 public final class TagUtil {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static String version = Bukkit.getBukkitVersion();
 
     public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
         Runnable _callback = () ->
@@ -48,7 +49,7 @@ public final class TagUtil {
             }, 1L);
 
         new SuperiorThread(() -> {
-            if(FAWEHook.isEnabled()){
+            if(FAWEHook.isEnabled() && !version.contains("1.13")){
                 FAWEHook.setBlocks(blocks, offset, _callback);
             }
             else {

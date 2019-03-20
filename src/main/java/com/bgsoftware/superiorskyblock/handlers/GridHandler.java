@@ -9,6 +9,11 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -21,13 +26,8 @@ import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -41,6 +41,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -71,9 +73,16 @@ public final class GridHandler implements GridManager {
         spawnIsland = new SpawnIsland(SBlockPosition.of(plugin.getSettings().spawnLocation));
     }
 
+    public void createIsland(ResultSet resultSet) throws SQLException {
+        UUID owner = UUID.fromString(resultSet.getString("owner"));
+        islands.add(owner, new SIsland(resultSet));
+    }
+
     public void createIsland(CompoundTag tag){
         UUID owner = UUID.fromString(((StringTag) tag.getValue().get("owner")).getValue());
-        islands.add(owner, new SIsland(tag));
+        Island island = new SIsland(tag);
+        islands.add(owner, island);
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertIsland(island));
     }
 
     @Override
@@ -112,6 +121,8 @@ public final class GridHandler implements GridManager {
                 }
             });
 
+            plugin.getDataHandler().insertIsland(island);
+
             creationProgress = false;
         }
 
@@ -130,6 +141,7 @@ public final class GridHandler implements GridManager {
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(targetPlayer);
         }
         islands.remove(island.getOwner().getUniqueId());
+        plugin.getDataHandler().deleteIsland(island);
     }
 
     @Override
@@ -253,6 +265,32 @@ public final class GridHandler implements GridManager {
             island.calcIslandWorth(null);
     }
 
+    public void loadGrid(ResultSet resultSet) throws SQLException{
+        lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
+
+        for(String entry : resultSet.getString("stackedBlocks").split(";")){
+            if(!entry.isEmpty()) {
+                String[] sections = entry.split("=");
+                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.valueOf(sections[1]));
+            }
+        }
+
+        int maxIslandSize = resultSet.getInt("maxIslandSize");
+        String world = resultSet.getString("world");
+
+        if(plugin.getSettings().maxIslandSize != maxIslandSize){
+            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting data.");
+            SuperiorSkyblockPlugin.log("Restoring it to the old value...");
+            plugin.getSettings().updateValue("max-island-size", maxIslandSize);
+        }
+
+        if(!plugin.getSettings().islandWorld.equals(world)){
+            SuperiorSkyblockPlugin.log("You have changed the island-world value without deleting data.");
+            SuperiorSkyblockPlugin.log("Restoring it to the old value...");
+            plugin.getSettings().updateValue("island-world", world);
+        }
+    }
+
     public void loadGrid(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue(), _compoundValues;
 
@@ -274,24 +312,38 @@ public final class GridHandler implements GridManager {
 
     }
 
-    public CompoundTag getAsTag(){
-        Map<String, Tag> compoundValues = Maps.newHashMap(), _compoundValues;
-        List<Tag> stackedBlocks = Lists.newArrayList();
+    public String getSaveStatement(){
+        String lastIsland = this.lastIsland.toString();
 
-        compoundValues.put("lastIsland", new StringTag(lastIsland.toString()));
+        StringBuilder stackedBlocks = new StringBuilder();
+        this.stackedBlocks.entrySet().forEach(entry ->
+            stackedBlocks.append(";").append(entry.getKey().toString()).append("=").append(entry.getValue()));
 
-        for(Map.Entry<SBlockPosition, Integer> entry : this.stackedBlocks.entrySet()){
-            _compoundValues = Maps.newHashMap();
-            _compoundValues.put("location", new StringTag(entry.getKey().toString()));
-            _compoundValues.put("stackAmount", new IntTag(entry.getValue()));
-            stackedBlocks.add(new CompoundTag(_compoundValues));
-        }
+        int maxIslandSize = plugin.getSettings().maxIslandSize;
+        String world = plugin.getSettings().islandWorld;
 
-        compoundValues.put("stackedBlocks", new ListTag(CompoundTag.class, stackedBlocks));
-        compoundValues.put("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize));
-
-        return new CompoundTag(compoundValues);
+        return String.format("INSERT INTO grid VALUES('%s','%s',%s, '%s')",
+                lastIsland, stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1), maxIslandSize, world);
     }
+
+//    public CompoundTag getAsTag(){
+//        Map<String, Tag> compoundValues = Maps.newHashMap(), _compoundValues;
+//        List<Tag> stackedBlocks = Lists.newArrayList();
+//
+//        compoundValues.put("lastIsland", new StringTag(lastIsland.toString()));
+//
+//        for(Map.Entry<SBlockPosition, Integer> entry : this.stackedBlocks.entrySet()){
+//            _compoundValues = Maps.newHashMap();
+//            _compoundValues.put("location", new StringTag(entry.getKey().toString()));
+//            _compoundValues.put("stackAmount", new IntTag(entry.getValue()));
+//            stackedBlocks.add(new CompoundTag(_compoundValues));
+//        }
+//
+//        compoundValues.put("stackedBlocks", new ListTag(CompoundTag.class, stackedBlocks));
+//        compoundValues.put("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize));
+//
+//        return new CompoundTag(compoundValues);
+//    }
 
     public void reloadBlockValues(){
         blockValues = new BlockValuesHandler();

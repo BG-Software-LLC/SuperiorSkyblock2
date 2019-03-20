@@ -6,11 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -19,7 +18,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -33,13 +33,20 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private String name, textureValue = "";
     private IslandRole islandRole;
 
-    private int oldIslandSize = 0;
     private boolean worldBorderEnabled = true;
     private boolean blocksStackerEnabled = true;
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
+
+    public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
+        player = UUID.fromString(resultSet.getString("player"));
+        teamLeader = UUID.fromString(resultSet.getString("teamLeader"));
+        name = resultSet.getString("name");
+        textureValue = resultSet.getString("textureValue");
+        islandRole = IslandRole.valueOf(resultSet.getString("islandRole"));
+    }
 
     public SSuperiorPlayer(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
@@ -48,7 +55,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         teamLeader = UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue());
         name = ((StringTag) compoundValues.get("name")).getValue();
         islandRole = IslandRole.valueOf(((StringTag) compoundValues.get("islandRole")).getValue());
-        oldIslandSize  = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(0))).getValue();
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
 
         if(plugin.getGrid().getIsland(SSuperiorPlayer.of(teamLeader)) == null)
@@ -109,10 +115,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     public void setIslandRole(IslandRole islandRole) {
         this.islandRole = islandRole;
-    }
-
-    public int getIslandSize() {
-        return oldIslandSize;
     }
 
     public boolean hasWorldBorderEnabled() {
@@ -192,17 +194,22 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         return island != null && island.hasPermission(this, permission);
     }
 
-    public CompoundTag getAsTag(){
-        Map<String, Tag> compoundValues = new HashMap<>();
-
-        compoundValues.put("player", new StringTag(player.toString()));
-        compoundValues.put("teamLeader", new StringTag(teamLeader.toString()));
-        compoundValues.put("name", new StringTag(this.name));
-        compoundValues.put("islandRole", new StringTag(islandRole.name()));
-        compoundValues.put("textureValue", new StringTag(textureValue));
-
-        return new CompoundTag(compoundValues);
+    public String getSaveStatement(){
+        return String.format("UPDATE players SET teamLeader='%s',name='%s',islandRole='%s',textureValue='%s' WHERE player='%s'",
+                teamLeader, name, islandRole.name(), textureValue, player);
     }
+
+//    public CompoundTag getAsTag(){
+//        Map<String, Tag> compoundValues = new HashMap<>();
+//
+//        compoundValues.put("player", new StringTag(player.toString()));
+//        compoundValues.put("teamLeader", new StringTag(teamLeader.toString()));
+//        compoundValues.put("name", new StringTag(this.name));
+//        compoundValues.put("islandRole", new StringTag(islandRole.name()));
+//        compoundValues.put("textureValue", new StringTag(textureValue));
+//
+//        return new CompoundTag(compoundValues);
+//    }
 
     @Override
     public String toString() {

@@ -79,8 +79,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().setWhitelist(true);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            loadWorld();
-
             if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
                 PlaceholderHook_PAPI.register();
             if(Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
@@ -91,6 +89,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 registerBlocksProvider(new BlocksProvider_WildStacker());
 
             reloadPlugin(true);
+
+            loadWorld();
+
             getServer().setWhitelist(isWhitelisted);
 
             if(Updater.isOutdated()) {

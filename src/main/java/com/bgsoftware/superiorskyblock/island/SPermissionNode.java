@@ -23,7 +23,17 @@ public final class SPermissionNode implements PermissionNode {
 
         for(Tag _tag : list)
             nodes.add(IslandPermission.valueOf(((StringTag) _tag).getValue()));
+    }
 
+    public SPermissionNode(String permissions){
+        if(!permissions.isEmpty()) {
+            for (String permission : permissions.split(";")) {
+                try {
+                    nodes.add(IslandPermission.valueOf(permission));
+                } catch (Exception ignored) {
+                }
+            }
+        }
     }
 
     public SPermissionNode(SPermissionNode other, List<String> permissions){
@@ -78,12 +88,10 @@ public final class SPermissionNode implements PermissionNode {
         }
     }
 
-    public Tag getAsTag(){
-        List<Tag> enabledPermissions = new ArrayList<>();
-
-        nodes.forEach(islandPermission -> enabledPermissions.add(new StringTag(islandPermission.name())));
-
-        return new ListTag(StringTag.class, enabledPermissions);
+    public String getAsStatementString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        nodes.forEach(islandPermission -> stringBuilder.append(";").append(islandPermission.name()));
+        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
 

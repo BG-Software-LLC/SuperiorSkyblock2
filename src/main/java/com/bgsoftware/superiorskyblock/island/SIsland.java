@@ -11,19 +11,19 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.queue.Queue;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-
+import com.bgsoftware.superiorskyblock.utils.queue.Queue;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -41,6 +41,8 @@ import org.bukkit.entity.Player;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -95,6 +97,64 @@ public class SIsland implements Island{
     private double cropGrowth = plugin.getSettings().defaultCropGrowth;
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
+
+    public SIsland(ResultSet resultSet) throws SQLException {
+        this.owner = UUID.fromString(resultSet.getString("owner"));
+        this.center = SBlockPosition.of(getLocation(resultSet.getString("center")));
+
+        this.teleportLocation = getLocation(resultSet.getString("teleportLocation"));
+
+        for(String uuid : resultSet.getString("members").split(",")) {
+            try {
+                this.members.add(UUID.fromString(uuid));
+            }catch(Exception ignored){}
+        }
+
+        for(String uuid : resultSet.getString("banned").split(",")) {
+            try {
+                this.banned.add(UUID.fromString(uuid));
+            }catch(Exception ignored){}
+        }
+
+        for(String entry : resultSet.getString("permissionNodes").split(",")) {
+            try {
+                String[] sections = entry.split("=");
+                this.permissionNodes.put(IslandRole.valueOf(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+            }catch(Exception ignored){}
+        }
+
+        for(String entry : resultSet.getString("upgrades").split(",")) {
+            try {
+                String[] sections = entry.split("=");
+                this.upgrades.put(sections[0], Integer.valueOf(sections[1]));
+            }catch(Exception ignored){}
+        }
+
+        for(String entry : resultSet.getString("warps").split(",")) {
+            try {
+                String[] sections = entry.split("=");
+                this.warps.put(sections[0], FileUtil.toLocation(sections[1]));
+            }catch(Exception ignored){}
+        }
+
+        this.islandBank = BigDecimalFormatted.of(resultSet.getBigDecimal("islandBank"));
+        this.islandSize = resultSet.getInt("islandSize");
+
+        for(String limit : resultSet.getString("blockLimits").split(",")){
+            try {
+                this.hoppersLimit = Integer.valueOf(limit.split("=")[1]);
+            }catch(Exception ignored){}
+        }
+
+        this.teamLimit = resultSet.getInt("teamLimit");
+        this.cropGrowth = resultSet.getDouble("cropGrowth");
+        this.spawnerRates = resultSet.getDouble("spawnerRates");
+        this.mobDrops = resultSet.getDouble("mobDrops");
+        this.discord = resultSet.getString("discord");
+        this.paypal = resultSet.getString("paypal");
+
+        calcIslandWorth(null);
+    }
 
     public SIsland(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
@@ -424,7 +484,12 @@ public class SIsland implements Island{
                         for (int z = 0; z < 16; z++) {
                             highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
                             for (int y = 0; y <= highestBlock; y++) {
-                                Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                Key blockKey = SKey.of("AIR");
+
+                                try{
+                                    blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                }catch(ArrayIndexOutOfBoundsException ignored){ }
+
                                 if(blockKey.toString().contains("AIR"))
                                     continue;
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
@@ -620,9 +685,6 @@ public class SIsland implements Island{
 
     @Override
     public int getIslandSize() {
-        int ownerIslandSize = ((SSuperiorPlayer) getOwner()).getIslandSize();
-        if(ownerIslandSize > islandSize)
-            setIslandSize(ownerIslandSize);
         return islandSize;
     }
 
@@ -775,50 +837,79 @@ public class SIsland implements Island{
         return new ArrayList<>(warps.keySet());
     }
 
-    public CompoundTag getAsTag(){
-        Map<String, Tag> compoundValues = new HashMap<>();
+    public String getSaveStatement(){
+        String teleportLocation = getLocation(getTeleportLocation());
 
-        compoundValues.put("owner", new StringTag(owner.toString()));
-        compoundValues.put("center", new StringTag(center.toString()));
+        StringBuilder members = new StringBuilder();
+        this.members.forEach(uuid -> members.append(",").append(uuid.toString()));
 
-        compoundValues.put("teleportLocation", new StringTag(getLocation(getTeleportLocation())));
+        StringBuilder banned = new StringBuilder();
+        this.banned.forEach(uuid -> banned.append(",").append(uuid.toString()));
 
-        List<Tag> members = new ArrayList<>();
-        this.members.forEach(uuid -> members.add(new StringTag(uuid.toString())));
-        compoundValues.put("members", new ListTag(StringTag.class, members));
+        StringBuilder permissionNodes = new StringBuilder();
+        this.permissionNodes.keySet().forEach(islandRole ->
+                permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
 
-        List<Tag> banned = new ArrayList<>();
-        this.banned.forEach(uuid -> banned.add(new StringTag(uuid.toString())));
-        compoundValues.put("banned", new ListTag(StringTag.class, banned));
+        StringBuilder upgrades = new StringBuilder();
+        this.upgrades.keySet().forEach(upgrade ->
+                upgrades.append(",").append(upgrade).append("=").append(this.upgrades.get(upgrade)));
 
-        Map<String, Tag> permissionNodes = new HashMap<>();
-        this.permissionNodes.keySet()
-                .forEach(islandRole -> permissionNodes.put(islandRole.name(), this.permissionNodes.get(islandRole).getAsTag()));
-        compoundValues.put("permissionNodes", new CompoundTag(permissionNodes));
+        StringBuilder warps = new StringBuilder();
+        this.warps.keySet().forEach(warp ->
+                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
-        Map<String, Tag> upgrades = new HashMap<>();
-        this.upgrades.keySet()
-                .forEach(upgrade -> upgrades.put(upgrade, new IntTag(this.upgrades.get(upgrade))));
-        compoundValues.put("upgrades", new CompoundTag(upgrades));
-
-        Map<String, Tag> warps = new HashMap<>();
-        this.warps.keySet()
-                .forEach(warp -> warps.put(warp, new StringTag(FileUtil.fromLocation(this.warps.get(warp)))));
-        compoundValues.put("warps", new CompoundTag(warps));
-
-        compoundValues.put("islandBank", new StringTag(this.islandBank.getAsString()));
-        compoundValues.put("islandSize", new IntTag(this.islandSize));
-
-        compoundValues.put("hoppersLimit", new IntTag(this.hoppersLimit));
-        compoundValues.put("teamLimit", new IntTag(this.teamLimit));
-        compoundValues.put("cropGrowth", new DoubleTag(this.cropGrowth));
-        compoundValues.put("spawnerRates", new DoubleTag(this.spawnerRates));
-        compoundValues.put("mobDrops", new DoubleTag(this.mobDrops));
-        compoundValues.put("discord", new StringTag(this.discord));
-        compoundValues.put("paypal", new StringTag(this.paypal));
-
-        return new CompoundTag(compoundValues);
+        return String.format("UPDATE islands SET teleportLocation='%s',members='%s',banned='%s',permissionNodes='%s',upgrades='%s',warps='%s',islandBank='%s'," +
+                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s' WHERE owner='%s'",
+                teleportLocation, members.length() == 0 ? "" : members.substring(1), banned.length() == 0 ? "" : banned.substring(1),
+                permissionNodes.length() == 0 ? "" : permissionNodes.substring(1), upgrades.length() == 0 ? "" : upgrades.substring(1),
+                warps.length() == 0 ? "" : warps.substring(1), this.islandBank.getAsString(), this.islandSize, "HOPPER=" + this.hoppersLimit,
+                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.owner);
     }
+
+//    public CompoundTag getAsTag(){
+//        Map<String, Tag> compoundValues = new HashMap<>();
+//
+//        compoundValues.put("owner", new StringTag(owner.toString()));
+//        compoundValues.put("center", new StringTag(center.toString()));
+//
+//        compoundValues.put("teleportLocation", new StringTag(getLocation(getTeleportLocation())));
+//
+//        List<Tag> members = new ArrayList<>();
+//        this.members.forEach(uuid -> members.add(new StringTag(uuid.toString())));
+//        compoundValues.put("members", new ListTag(StringTag.class, members));
+//
+//        List<Tag> banned = new ArrayList<>();
+//        this.banned.forEach(uuid -> banned.add(new StringTag(uuid.toString())));
+//        compoundValues.put("banned", new ListTag(StringTag.class, banned));
+//
+//        Map<String, Tag> permissionNodes = new HashMap<>();
+//        this.permissionNodes.keySet()
+//                .forEach(islandRole -> permissionNodes.put(islandRole.name(), this.permissionNodes.get(islandRole).getAsTag()));
+//        compoundValues.put("permissionNodes", new CompoundTag(permissionNodes));
+//
+//        Map<String, Tag> upgrades = new HashMap<>();
+//        this.upgrades.keySet()
+//                .forEach(upgrade -> upgrades.put(upgrade, new IntTag(this.upgrades.get(upgrade))));
+//        compoundValues.put("upgrades", new CompoundTag(upgrades));
+//
+//        Map<String, Tag> warps = new HashMap<>();
+//        this.warps.keySet()
+//                .forEach(warp -> warps.put(warp, new StringTag(FileUtil.fromLocation(this.warps.get(warp)))));
+//        compoundValues.put("warps", new CompoundTag(warps));
+//
+//        compoundValues.put("islandBank", new StringTag(this.islandBank.getAsString()));
+//        compoundValues.put("islandSize", new IntTag(this.islandSize));
+//
+//        compoundValues.put("hoppersLimit", new IntTag(this.hoppersLimit));
+//        compoundValues.put("teamLimit", new IntTag(this.teamLimit));
+//        compoundValues.put("cropGrowth", new DoubleTag(this.cropGrowth));
+//        compoundValues.put("spawnerRates", new DoubleTag(this.spawnerRates));
+//        compoundValues.put("mobDrops", new DoubleTag(this.mobDrops));
+//        compoundValues.put("discord", new StringTag(this.discord));
+//        compoundValues.put("paypal", new StringTag(this.paypal));
+//
+//        return new CompoundTag(compoundValues);
+//    }
 
     @Override
     public boolean equals(Object obj) {
