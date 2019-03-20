@@ -84,7 +84,7 @@ public final class DataHandler {
                     "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
                     "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
-            conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER);").executeUpdate();
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);").executeUpdate();
 
             ResultSet resultSet = conn.prepareStatement("SELECT * FROM players;").executeQuery();
             while (resultSet.next()){

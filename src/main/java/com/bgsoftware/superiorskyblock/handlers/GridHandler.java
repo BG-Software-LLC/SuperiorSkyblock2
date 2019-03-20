@@ -274,10 +274,18 @@ public final class GridHandler implements GridManager {
         }
 
         int maxIslandSize = resultSet.getInt("maxIslandSize");
+        String world = resultSet.getString("world");
+
         if(plugin.getSettings().maxIslandSize != maxIslandSize){
             SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting data.");
             SuperiorSkyblockPlugin.log("Restoring it to the old value...");
             plugin.getSettings().updateValue("max-island-size", maxIslandSize);
+        }
+
+        if(!plugin.getSettings().islandWorld.equals(world)){
+            SuperiorSkyblockPlugin.log("You have changed the island-world value without deleting data.");
+            SuperiorSkyblockPlugin.log("Restoring it to the old value...");
+            plugin.getSettings().updateValue("island-world", world);
         }
     }
 
@@ -310,9 +318,10 @@ public final class GridHandler implements GridManager {
             stackedBlocks.append(",").append(entry.getKey().toString()).append("=").append(entry.getValue()));
 
         int maxIslandSize = plugin.getSettings().maxIslandSize;
+        String world = plugin.getSettings().islandWorld;
 
-        return String.format("INSERT INTO grid VALUES('%s','%s','%s')",
-                lastIsland, stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1), maxIslandSize);
+        return String.format("INSERT INTO grid VALUES('%s','%s',%s, '%s')",
+                lastIsland, stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1), maxIslandSize, world);
     }
 
 //    public CompoundTag getAsTag(){
