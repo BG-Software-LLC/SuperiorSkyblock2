@@ -113,6 +113,7 @@ public final class DataHandler {
                         island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
                 conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
             }catch(Exception ex){
+                SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getUniqueId() + ".");
                 ex.printStackTrace();
             }
         }).start();
@@ -123,6 +124,7 @@ public final class DataHandler {
             try (Connection conn = DriverManager.getConnection(sqlURL)){
                 conn.prepareStatement("DELETE FROM islands WHERE owner='" + island.getOwner().getUniqueId() + "';").executeUpdate();
             }catch(Exception ex){
+                SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getUniqueId() + ".");
                 ex.printStackTrace();
             }
         }).start();
@@ -134,6 +136,7 @@ public final class DataHandler {
                 conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');", player.getUniqueId())).executeUpdate();
                 conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
             }catch(Exception ex){
+                SuperiorSkyblockPlugin.log("Couldn't insert the player " + player.getUniqueId() + ".");
                 ex.printStackTrace();
             }
         }).start();
