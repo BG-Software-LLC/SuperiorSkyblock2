@@ -137,7 +137,7 @@ public class SIsland implements Island{
             }catch(Exception ignored){}
         }
 
-        this.islandBank = BigDecimalFormatted.of(resultSet.getBigDecimal("islandBank"));
+        this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.islandSize = resultSet.getInt("islandSize");
 
         for(String limit : resultSet.getString("blockLimits").split(",")){
