@@ -79,26 +79,31 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().setWhitelist(true);
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-                PlaceholderHook_PAPI.register();
-            if(Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
-                FAWEHook.register();
+            try {
+                if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+                    PlaceholderHook_PAPI.register();
+                if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
+                    FAWEHook.register();
 
-            registerBlocksProvider(new BlocksProvider_Default());
-            if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-                registerBlocksProvider(new BlocksProvider_WildStacker());
+                registerBlocksProvider(new BlocksProvider_Default());
+                if (Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+                    registerBlocksProvider(new BlocksProvider_WildStacker());
 
-            reloadPlugin(true);
+                reloadPlugin(true);
 
-            loadWorld();
+                loadWorld();
 
-            getServer().setWhitelist(isWhitelisted);
+                getServer().setWhitelist(isWhitelisted);
 
-            if(Updater.isOutdated()) {
-                log("");
-                log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-                log("Version's description: \"" + Updater.getVersionDescription() + "\"");
-                log("");
+                if (Updater.isOutdated()) {
+                    log("");
+                    log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+                    log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+                    log("");
+                }
+            }catch(Exception ex){
+                ex.printStackTrace();
+                Bukkit.getPluginManager().disablePlugin(this);
             }
         });
 
