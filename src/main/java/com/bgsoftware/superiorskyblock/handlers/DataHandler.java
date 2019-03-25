@@ -109,14 +109,27 @@ public final class DataHandler {
     public void insertIsland(Island island){
         new SuperiorThread(() -> {
             try (Connection conn = DriverManager.getConnection(sqlURL)){
-                conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','');",
-                        island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
+                if(!containsIsland(island)){
+                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','');",
+                            island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
+                }
                 conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
             }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getUniqueId() + ".");
+                SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
             }
         }).start();
+    }
+
+    private boolean containsIsland(Island island){
+        try (Connection conn = DriverManager.getConnection(sqlURL)){
+            return conn.prepareStatement(
+                    String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId())).executeQuery().next();
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Couldn't check if island " + island.getOwner().getName() + " exists.");
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     public void deleteIsland(Island island){
@@ -124,7 +137,7 @@ public final class DataHandler {
             try (Connection conn = DriverManager.getConnection(sqlURL)){
                 conn.prepareStatement("DELETE FROM islands WHERE owner='" + island.getOwner().getUniqueId() + "';").executeUpdate();
             }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getUniqueId() + ".");
+                SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
             }
         }).start();
@@ -133,13 +146,27 @@ public final class DataHandler {
     public void insertPlayer(SuperiorPlayer player){
         new SuperiorThread(() -> {
             try (Connection conn = DriverManager.getConnection(sqlURL)){
-                conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');", player.getUniqueId())).executeUpdate();
+                if(!containsPlayer(player)) {
+                    conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');",
+                            player.getUniqueId())).executeUpdate();
+                }
                 conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't insert the player " + player.getUniqueId() + ".");
                 ex.printStackTrace();
             }
         }).start();
+    }
+
+    private boolean containsPlayer(SuperiorPlayer player){
+        try (Connection conn = DriverManager.getConnection(sqlURL)){
+            return conn.prepareStatement(
+                    String.format("SELECT * FROM islands players player = '%s';", player.getUniqueId())).executeQuery().next();
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Couldn't check if player " + player.getName() + " exists.");
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
