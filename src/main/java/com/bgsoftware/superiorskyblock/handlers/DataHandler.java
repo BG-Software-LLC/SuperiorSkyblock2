@@ -135,7 +135,7 @@ public final class DataHandler {
     public void deleteIsland(Island island){
         new SuperiorThread(() -> {
             try (Connection conn = DriverManager.getConnection(sqlURL)){
-                conn.prepareStatement("DELETE FROM islands WHERE owner='" + island.getOwner().getUniqueId() + "';").executeUpdate();
+                conn.prepareStatement("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';").executeUpdate();
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
@@ -161,7 +161,7 @@ public final class DataHandler {
     private boolean containsPlayer(SuperiorPlayer player){
         try (Connection conn = DriverManager.getConnection(sqlURL)){
             return conn.prepareStatement(
-                    String.format("SELECT * FROM islands players player = '%s';", player.getUniqueId())).executeQuery().next();
+                    String.format("SELECT * FROM players WHERE player = '%s';", player.getUniqueId())).executeQuery().next();
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Couldn't check if player " + player.getName() + " exists.");
             ex.printStackTrace();
