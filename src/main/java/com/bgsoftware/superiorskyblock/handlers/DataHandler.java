@@ -25,7 +25,6 @@ import java.util.List;
 public final class DataHandler {
 
     public SuperiorSkyblockPlugin plugin;
-    private String sqlURL = "";
     private Connection conn;
 
     public DataHandler(SuperiorSkyblockPlugin plugin){
@@ -43,9 +42,8 @@ public final class DataHandler {
             }
         }
 
-        sqlURL = "jdbc:sqlite:" + databaseFile.getAbsolutePath().replace("\\", "/");
-
         try{
+            String sqlURL = "jdbc:sqlite:" + databaseFile.getAbsolutePath().replace("\\", "/");
             conn = DriverManager.getConnection(sqlURL);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -246,6 +244,7 @@ public final class DataHandler {
 
     }
 
+    @SuppressWarnings("unused")
     private void addColumnIfNotExists(Connection conn, String column, String table, String def) throws SQLException {
         ResultSet resultSet = conn.prepareStatement("SELECT * FROM " + table + " LIMIT 1;").executeQuery();
         try{
