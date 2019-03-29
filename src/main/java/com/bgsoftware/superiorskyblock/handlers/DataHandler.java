@@ -26,6 +26,7 @@ public final class DataHandler {
 
     public SuperiorSkyblockPlugin plugin;
     private String sqlURL = "";
+    private Connection conn;
 
     public DataHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -44,6 +45,14 @@ public final class DataHandler {
 
         sqlURL = "jdbc:sqlite:" + databaseFile.getAbsolutePath().replace("\\", "/");
 
+        try{
+            conn = DriverManager.getConnection(sqlURL);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().disablePlugin(plugin));
+            return;
+        }
+
         loadOldDatabase();
         loadDatabase();
     }
@@ -58,7 +67,7 @@ public final class DataHandler {
         plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
         List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
 
-        try (Connection conn = DriverManager.getConnection(sqlURL)) {
+        try{
             //Saving islands
             for(Island island : islands){
                 conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
@@ -76,7 +85,7 @@ public final class DataHandler {
 
     @SuppressWarnings("WeakerAccess")
     public void loadDatabase(){
-        try (Connection conn = DriverManager.getConnection(sqlURL)){
+        try{
             //Creating default tables
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
                     "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
@@ -108,7 +117,7 @@ public final class DataHandler {
 
     public void insertIsland(Island island){
         new SuperiorThread(() -> {
-            try (Connection conn = DriverManager.getConnection(sqlURL)){
+            try{
                 if(!containsIsland(island)){
                     conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','');",
                             island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
@@ -122,7 +131,7 @@ public final class DataHandler {
     }
 
     private boolean containsIsland(Island island){
-        try (Connection conn = DriverManager.getConnection(sqlURL)){
+        try{
             return conn.prepareStatement(
                     String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId())).executeQuery().next();
         }catch(Exception ex){
@@ -134,7 +143,7 @@ public final class DataHandler {
 
     public void deleteIsland(Island island){
         new SuperiorThread(() -> {
-            try (Connection conn = DriverManager.getConnection(sqlURL)){
+            try{
                 conn.prepareStatement("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';").executeUpdate();
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getName() + ".");
@@ -145,7 +154,7 @@ public final class DataHandler {
 
     public void insertPlayer(SuperiorPlayer player){
         new SuperiorThread(() -> {
-            try (Connection conn = DriverManager.getConnection(sqlURL)){
+            try{
                 if(!containsPlayer(player)) {
                     conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');",
                             player.getUniqueId())).executeUpdate();
@@ -159,7 +168,7 @@ public final class DataHandler {
     }
 
     private boolean containsPlayer(SuperiorPlayer player){
-        try (Connection conn = DriverManager.getConnection(sqlURL)){
+        try{
             return conn.prepareStatement(
                     String.format("SELECT * FROM players WHERE player = '%s';", player.getUniqueId())).executeQuery().next();
         }catch(Exception ex){
