@@ -530,7 +530,6 @@ public class SIsland implements Island{
                         Key key = SKey.of(creatureSpawner.getType() + ":" + creatureSpawner.getSpawnedType());
                         int blockCount = spawnersToCheck.get(location);
                         handleBlockPlace(key, blockCount);
-                        islandWorth = islandWorth.add(new BigDecimal(plugin.getGrid().getBlockValue(key) * blockCount));
                     }
                 }
                 if(asker != null)
