@@ -57,8 +57,10 @@ public final class PanelListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+        if(e.getCurrentItem() != null) {
+            latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
