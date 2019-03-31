@@ -161,7 +161,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if(loadGrid) {
             gridHandler = new GridHandler(this);
             playersHandler = new PlayersHandler();
-            dataHandler = new DataHandler(this);
+            Bukkit.getScheduler().runTask(plugin, () -> dataHandler = new DataHandler(this));
         }else {
             gridHandler.reloadBlockValues();
         }
