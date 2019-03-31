@@ -61,7 +61,7 @@ public final class PanelListener implements Listener {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
-    }
+    } 
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryCloseMonitor(InventoryCloseEvent e){
