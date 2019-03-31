@@ -113,6 +113,14 @@ public final class DataHandler {
         }
     }
 
+    public void closeConnection(){
+        try{
+            conn.close();
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        }
+    }
+
     public void insertIsland(Island island){
         new SuperiorThread(() -> {
             try{

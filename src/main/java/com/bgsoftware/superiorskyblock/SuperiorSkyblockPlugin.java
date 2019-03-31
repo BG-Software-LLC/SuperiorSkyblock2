@@ -116,6 +116,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             player.closeInventory();
             nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), null);
         }
+        dataHandler.closeConnection();
         SaveTask.cancelTask();
         CalcTask.cancelTask();
     }
