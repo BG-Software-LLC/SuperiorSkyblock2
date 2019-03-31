@@ -80,7 +80,7 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                 case "team_limit":
                     return String.valueOf(island.getTeamLimit());
                 case "leader":
-                    return island.getOwner().getName();
+                    return island.getOwner() == null ? "" : island.getOwner().getName();
                 case "size":
                     int size = island.getIslandSize() * 2;
                     return size + "x" + size;
