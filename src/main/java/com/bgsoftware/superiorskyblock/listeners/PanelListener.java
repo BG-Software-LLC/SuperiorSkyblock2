@@ -24,14 +24,18 @@ import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,6 +46,29 @@ public final class PanelListener implements Listener {
 
     public PanelListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+    }
+
+    private Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
+
+    /**
+     * The following two events are here for patching a dupe glitch caused
+     * by shift clicking and closing the inventory in the same time.
+     */
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryClickMonitor(InventoryClickEvent e){
+        if(e.isCancelled()){
+            latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryCloseMonitor(InventoryCloseEvent e){
+        if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
+            ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
+            e.getPlayer().getInventory().removeItem(clickedItem);
+        }
     }
 
     private Set<UUID> movingBetweenPages = new HashSet<>();
