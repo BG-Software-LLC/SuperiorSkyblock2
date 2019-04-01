@@ -114,6 +114,8 @@ public interface Island extends Comparable<Island> {
     @Deprecated
     String getWorthAsString();
 
+    void setBonusWorth(BigDecimal bonusWorth);
+
     @Deprecated
     int getIslandLevel();
 

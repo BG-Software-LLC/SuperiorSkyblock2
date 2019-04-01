@@ -531,6 +531,7 @@ public final class PanelHandler {
 
         for(String schematic : section.getKeys(false)){
             islandCreationPage.put(schematic + "-permission", section.getString(schematic + ".required-permission"));
+            islandCreationPage.put(schematic + "-bonus", section.getLong(schematic + ".bonus-worth", 0));
             islandCreationPage.put(schematic + "-slot", section.getInt(schematic + ".slot"));
             islandCreationPage.put(schematic + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));

@@ -31,6 +31,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -302,9 +303,10 @@ public final class PanelListener implements Listener {
                 String permission = guiInventory.get(schematic + "-permission", String.class);
 
                 if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
+                    BigDecimal bonusWorth = new BigDecimal(guiInventory.get(schematic + "-bonus", Long.class));
                     superiorPlayer.asPlayer().closeInventory();
                     Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic);
+                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth);
                     break;
                 }
             }

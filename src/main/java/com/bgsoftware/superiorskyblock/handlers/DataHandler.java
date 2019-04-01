@@ -127,7 +127,7 @@ public final class DataHandler {
         new SuperiorThread(() -> {
             try{
                 if(!containsIsland(island)){
-                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','');",
+                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0');",
                             island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
                 }
                 conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();

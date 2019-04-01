@@ -14,6 +14,7 @@ creation-gui:
   schematics:
     default:
       required-permission: ''
+      bonus-worth: -365
       slot: 0
       has-access-item:
         type: GRASS_BLOCK

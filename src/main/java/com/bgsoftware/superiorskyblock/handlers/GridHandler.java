@@ -41,6 +41,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -86,9 +87,9 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName){
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus){
         if(creationProgress) {
-            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName));
+            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName, bonus));
             return;
         }
 
@@ -100,7 +101,7 @@ public final class GridHandler implements GridManager {
             creationProgress = true;
 
             Location islandLocation = getNextLocation();
-            SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
+            Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
 
             islands.add(superiorPlayer.getUniqueId(), island);
             lastIsland = SBlockPosition.of(islandLocation);
@@ -113,6 +114,7 @@ public final class GridHandler implements GridManager {
             Schematic schematic = plugin.getSchematics().getSchematic(schemName);
             schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                 island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
+                island.setBonusWorth(bonus);
                 if (superiorPlayer.asOfflinePlayer().isOnline()) {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     superiorPlayer.asPlayer().teleport(islandLocation);
@@ -128,8 +130,13 @@ public final class GridHandler implements GridManager {
 
         if(islandCreationsQueue.size() != 0){
             CreateIslandData data = islandCreationsQueue.pop();
-            createIsland(SSuperiorPlayer.of(data.player), data.schemName);
+            createIsland(SSuperiorPlayer.of(data.player), data.schemName, data.bonus);
         }
+    }
+
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName){
+        createIsland(superiorPlayer, schemName, BigDecimal.ZERO);
     }
 
     @Override
@@ -364,10 +371,12 @@ public final class GridHandler implements GridManager {
 
         public UUID player;
         public String schemName;
+        public BigDecimal bonus;
 
-        public CreateIslandData(UUID player, String schemName){
+        public CreateIslandData(UUID player, String schemName, BigDecimal bonus){
             this.player = player;
             this.schemName = schemName;
+            this.bonus = bonus;
         }
 
     }

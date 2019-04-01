@@ -865,11 +865,11 @@ public class SIsland implements Island{
                 warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
         return String.format("UPDATE islands SET teleportLocation='%s',members='%s',banned='%s',permissionNodes='%s',upgrades='%s',warps='%s',islandBank='%s'," +
-                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s' WHERE owner='%s'",
+                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s',bonusWorth='%s' WHERE owner='%s'",
                 teleportLocation, members.length() == 0 ? "" : members.substring(1), banned.length() == 0 ? "" : banned.substring(1),
                 permissionNodes.length() == 0 ? "" : permissionNodes.substring(1), upgrades.length() == 0 ? "" : upgrades.substring(1),
                 warps.length() == 0 ? "" : warps.substring(1), this.islandBank.getAsString(), this.islandSize, "HOPPER=" + this.hoppersLimit,
-                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.owner);
+                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), this.owner);
     }
 
 //    public CompoundTag getAsTag(){
