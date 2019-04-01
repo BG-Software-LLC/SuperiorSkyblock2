@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminBonus;
 import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminBypass;
 import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminDemote;
 import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminDeposit;
@@ -37,6 +38,7 @@ public final class CmdAdmin implements ICommand {
     private List<ICommand> subCommands = new ArrayList<>();
 
     public CmdAdmin(){
+        subCommands.add(new CmdAdminBonus());
         subCommands.add(new CmdAdminBypass());
         subCommands.add(new CmdAdminDemote());
         subCommands.add(new CmdAdminDeposit());

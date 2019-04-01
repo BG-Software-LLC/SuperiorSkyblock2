@@ -84,6 +84,7 @@ public class SIsland implements Island{
     private final Map<String, Location> warps = new HashMap<>();
     private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
+    private BigDecimalFormatted bonusWorth = BigDecimalFormatted.ZERO;
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
     private Location teleportLocation;
@@ -138,6 +139,7 @@ public class SIsland implements Island{
         }
 
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
+        this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
         this.islandSize = resultSet.getInt("islandSize");
 
         for(String limit : resultSet.getString("blockLimits").split(",")){
@@ -612,7 +614,8 @@ public class SIsland implements Island{
     public BigDecimal getWorthAsBigDecimal() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
         //noinspection BigDecimalMethodWithoutRoundingCalled
-        return bankWorthRate <= 0 ? getRawWorthAsBigDecimal() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
+        BigDecimal islandWorth = bankWorthRate <= 0 ? getRawWorthAsBigDecimal() : this.islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
+        return islandWorth.add(bonusWorth);
     }
 
     @Override
@@ -630,6 +633,10 @@ public class SIsland implements Island{
     @Deprecated
     public String getWorthAsString(){
         return getWorthAsBigDecimal().toString();
+    }
+
+    public void setBonusWorth(BigDecimal bonusWorth){
+        this.bonusWorth = BigDecimalFormatted.of(bonusWorth);
     }
 
     @Override

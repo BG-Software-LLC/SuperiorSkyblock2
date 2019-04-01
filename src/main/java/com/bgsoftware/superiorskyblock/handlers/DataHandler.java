@@ -93,6 +93,8 @@ public final class DataHandler {
                     "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);").executeUpdate();
 
+            addColumnIfNotExists("bonusWorth", "islands", "0");
+
             ResultSet resultSet = conn.prepareStatement("SELECT * FROM players;").executeQuery();
             while (resultSet.next()){
                 plugin.getPlayers().loadPlayer(resultSet);
@@ -252,8 +254,8 @@ public final class DataHandler {
 
     }
 
-    @SuppressWarnings("unused")
-    private void addColumnIfNotExists(Connection conn, String column, String table, String def) throws SQLException {
+    @SuppressWarnings("SameParameterValue")
+    private void addColumnIfNotExists(String column, String table, String def) throws SQLException {
         ResultSet resultSet = conn.prepareStatement("SELECT * FROM " + table + " LIMIT 1;").executeQuery();
         try{
             resultSet.findColumn(column);
