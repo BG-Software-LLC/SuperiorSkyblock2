@@ -81,7 +81,7 @@ public final class PlaceholderHook_PAPI extends EZPlaceholderHook {
                         return island.getOwner().getName();
                     case "size":
                         int size = island.getIslandSize() * 2;
-                        return size + "x" + size;
+                        return size + " x " + size;
                     case "radius":
                         return String.valueOf(island.getIslandSize());
                     case "biome":
