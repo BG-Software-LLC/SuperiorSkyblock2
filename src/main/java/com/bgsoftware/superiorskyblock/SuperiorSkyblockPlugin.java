@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
+import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook_PAPI;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -84,6 +85,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     PlaceholderHook_PAPI.register();
                 if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
                     FAWEHook.register();
+                if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
+                    LeaderHeadsHook.register();
 
                 registerBlocksProvider(new BlocksProvider_Default());
                 if (Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
