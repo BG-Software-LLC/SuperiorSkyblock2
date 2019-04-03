@@ -255,12 +255,12 @@ public final class DataHandler {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private void addColumnIfNotExists(String column, String table, String def) throws SQLException {
-        ResultSet resultSet = conn.prepareStatement("SELECT * FROM " + table + " LIMIT 1;").executeQuery();
+    private void addColumnIfNotExists(String column, String table, String def) {
         try{
-            resultSet.findColumn(column);
-        }catch(SQLException ex){
             conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " VARCHAR DEFAULT '" + def + "';").executeUpdate();
+        }catch(SQLException ex){
+            if(!ex.getMessage().contains("duplicate"))
+                ex.printStackTrace();
         }
     }
 
