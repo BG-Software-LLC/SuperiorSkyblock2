@@ -43,6 +43,7 @@ public final class DataHandler {
         }
 
         try{
+            Class.forName("org.sqlite.JDBC");
             String sqlURL = "jdbc:sqlite:" + databaseFile.getAbsolutePath().replace("\\", "/");
             conn = DriverManager.getConnection(sqlURL);
         }catch(Exception ex){
