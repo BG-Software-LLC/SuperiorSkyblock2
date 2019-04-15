@@ -76,6 +76,7 @@ public final class DataHandler {
                 conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
             }
             //Saving grid
+            conn.prepareStatement("DELETE FROM grid;").executeUpdate();
             conn.prepareStatement(plugin.getGrid().getSaveStatement()).executeUpdate();
         }catch(Exception ex){
             ex.printStackTrace();
@@ -109,7 +110,6 @@ public final class DataHandler {
             resultSet = conn.prepareStatement("SELECT * FROM grid;").executeQuery();
             if (resultSet.next()){
                 plugin.getGrid().loadGrid(resultSet);
-                conn.prepareStatement("DELETE FROM grid;").executeUpdate();
             }
         }catch(Exception ex){
             ex.printStackTrace();
