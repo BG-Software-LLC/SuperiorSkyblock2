@@ -298,6 +298,16 @@ public final class GridHandler implements GridManager {
         }
     }
 
+    public void loadStackedBlocks(ResultSet set) throws SQLException {
+        String world = set.getString(0);
+        int x = set.getInt(1);
+        int y = set.getInt(2);
+        int z = set.getInt(3);
+        int amount = set.getInt(4);
+
+        stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount);
+    }
+
     public void loadGrid(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue(), _compoundValues;
 

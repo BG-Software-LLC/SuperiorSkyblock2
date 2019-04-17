@@ -94,6 +94,13 @@ public final class DataHandler {
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
                     "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);").executeUpdate();
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS \"stackedBlocks\" (\n" +
+                    "\t\"world\"\tTEXT NOT NULL,\n" +
+                    "\t\"x\"\tINTEGER NOT NULL,\n" +
+                    "\t\"y\"\tINTEGER NOT NULL,\n" +
+                    "\t\"z\"\tINTEGER NOT NULL,\n" +
+                    "\t\"amount\"\tINTEGER NOT NULL\n" +
+                    ");").executeUpdate();
 
             addColumnIfNotExists("bonusWorth", "islands", "0");
 
@@ -110,6 +117,11 @@ public final class DataHandler {
             resultSet = conn.prepareStatement("SELECT * FROM grid;").executeQuery();
             if (resultSet.next()){
                 plugin.getGrid().loadGrid(resultSet);
+            }
+
+            resultSet = conn.prepareStatement("SELECT * FROM stackedBlocks").executeQuery();
+            while (resultSet.next()) {
+
             }
         }catch(Exception ex){
             ex.printStackTrace();
