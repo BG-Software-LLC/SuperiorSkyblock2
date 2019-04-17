@@ -75,6 +75,11 @@ public final class DataHandler {
             for(SuperiorPlayer player : players){
                 conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
             }
+
+            // Saving stacked blocks
+            conn.prepareStatement("DELETE FROM stackedBlocks;").executeUpdate();
+            plugin.getGrid().saveStackedBlocksStatement(conn);
+
             //Saving grid
             conn.prepareStatement("DELETE FROM grid;").executeUpdate();
             conn.prepareStatement(plugin.getGrid().getSaveStatement()).executeUpdate();
@@ -119,10 +124,11 @@ public final class DataHandler {
                 plugin.getGrid().loadGrid(resultSet);
             }
 
-            resultSet = conn.prepareStatement("SELECT * FROM stackedBlocks").executeQuery();
+            resultSet = conn.prepareStatement("SELECT * FROM stackedBlocks;").executeQuery();
             while (resultSet.next()) {
-
+                plugin.getGrid().loadStackedBlocks(resultSet);
             }
+
         }catch(Exception ex){
             ex.printStackTrace();
         }

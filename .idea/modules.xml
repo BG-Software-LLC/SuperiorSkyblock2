@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/superiorskyblock.iml" filepath="$PROJECT_DIR$/superiorskyblock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SuperiorSkyBlock.iml" filepath="$PROJECT_DIR$/.idea/SuperiorSkyBlock.iml" />
       <module fileurl="file://$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" filepath="$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" />
       <module fileurl="file://$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" filepath="$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" />
       <module fileurl="file://$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" filepath="$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" />

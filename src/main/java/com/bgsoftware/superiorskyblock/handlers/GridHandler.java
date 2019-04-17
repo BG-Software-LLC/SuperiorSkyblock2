@@ -42,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -299,13 +300,22 @@ public final class GridHandler implements GridManager {
     }
 
     public void loadStackedBlocks(ResultSet set) throws SQLException {
-        String world = set.getString(0);
-        int x = set.getInt(1);
-        int y = set.getInt(2);
-        int z = set.getInt(3);
-        int amount = set.getInt(4);
+        String world = set.getString("world");
+        int x = set.getInt("x");
+        int y = set.getInt("y");
+        int z = set.getInt("z");
+        int amount = set.getInt("amount");
 
         stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount);
+    }
+
+    public void saveStackedBlocksStatement(Connection conn) throws SQLException {
+        for (SBlockPosition position : stackedBlocks.stackedBlocks.keySet()) {
+            String statement = String.format("INSERT INTO stackedBlocks (world, x, y, z, amount) VALUES (\"%s\", %d, %d, %d, %d);",
+                    position.getWorld().getName(), position.getX(), position.getY(), position.getZ(), stackedBlocks.stackedBlocks.get(position));
+            System.out.println(statement);
+            conn.prepareStatement(statement).executeUpdate();
+        }
     }
 
     public void loadGrid(CompoundTag tag){
@@ -340,7 +350,7 @@ public final class GridHandler implements GridManager {
         String world = plugin.getSettings().islandWorld;
 
         return String.format("INSERT INTO grid VALUES('%s','%s',%s, '%s')",
-                lastIsland, stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1), maxIslandSize, world);
+                lastIsland, ""/*stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1) */, maxIslandSize, world);
     }
 
 //    public CompoundTag getAsTag(){
