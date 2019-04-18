@@ -41,6 +41,7 @@ public final class SettingsHandler {
     public final boolean voidTeleport;
     public final List<String> interactables;
     public final boolean visitorsDamage;
+    public final int disbandCount;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -84,6 +85,7 @@ public final class SettingsHandler {
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
+        disbandCount = cfg.getInt("disband-counts", 5);
     }
 
     public void updateValue(String path, Object value){

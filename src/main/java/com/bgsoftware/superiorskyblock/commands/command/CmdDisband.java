@@ -63,6 +63,11 @@ public final class CmdDisband implements ICommand {
             return;
         }
 
+        if (!superiorPlayer.hasDisbands()) {
+            Locale.NO_MORE_DISBANDS.send(superiorPlayer);
+            return;
+        }
+
         IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
         Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
@@ -77,6 +82,7 @@ public final class CmdDisband implements ICommand {
 
         Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
+        superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
         island.disbandIsland();
     }
 

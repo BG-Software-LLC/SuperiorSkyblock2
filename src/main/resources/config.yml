@@ -326,3 +326,6 @@ interactables:
 
 # When disabled, visitors won't get damaged in other islands.
 visitors-damage: false
+
+# The amount of times a player can disband an island
+disband-count: 5

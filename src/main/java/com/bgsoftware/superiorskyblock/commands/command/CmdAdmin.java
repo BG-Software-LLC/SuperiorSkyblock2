@@ -1,25 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminBonus;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminBypass;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminDemote;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminDeposit;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminDisband;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminJoin;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminMsg;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminMsgAll;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminPromote;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminReload;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSave;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSchematic;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetCropGrowth;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetHoppersLimit;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetMobDrops;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetSize;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetSpawnerRates;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetTeamLimit;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminSetUpgrade;
-import com.bgsoftware.superiorskyblock.commands.command.admin.CmdAdminWithdraw;
+import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -58,6 +39,8 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetTeamLimit());
         subCommands.add(new CmdAdminSetUpgrade());
         subCommands.add(new CmdAdminWithdraw());
+        subCommands.add(new CmdAdminSetDisbands());
+        subCommands.add(new CmdAdminGiveDisbands());
     }
 
     @Override

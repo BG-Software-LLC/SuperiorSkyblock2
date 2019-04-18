@@ -40,12 +40,15 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private boolean teamChatEnabled = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
 
+    private int disbands;
+
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
         teamLeader = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");
         textureValue = resultSet.getString("textureValue");
         islandRole = IslandRole.valueOf(resultSet.getString("islandRole"));
+        disbands = resultSet.getInt("disbands");
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -56,6 +59,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         name = ((StringTag) compoundValues.get("name")).getValue();
         islandRole = IslandRole.valueOf(((StringTag) compoundValues.get("islandRole")).getValue());
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
+        disbands = compoundValues.containsKey("disbands") ?
+                (int) compoundValues.get("disbands").getValue() :
+                SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
 
         if(plugin.getGrid().getIsland(SSuperiorPlayer.of(teamLeader)) == null)
             teamLeader = player;
@@ -67,6 +73,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
         this.teamLeader = player;
         this.islandRole = IslandRole.GUEST;
+        this.disbands = SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
     }
 
     public UUID getUniqueId(){
@@ -157,6 +164,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         teamChatEnabled = !teamChatEnabled;
     }
 
+    public boolean hasDisbands() {
+        return disbands > 0;
+    }
+
+    public int getDisbands() {
+        return disbands;
+    }
+
+    public void setDisbands(int disbands) {
+        this.disbands = disbands < 0 ? 0 : disbands;
+    }
+
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
@@ -195,8 +214,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     public String getSaveStatement(){
-        return String.format("UPDATE players SET teamLeader='%s',name='%s',islandRole='%s',textureValue='%s' WHERE player='%s'",
-                teamLeader, name, islandRole.name(), textureValue, player);
+        return String.format("UPDATE players SET teamLeader='%s',name='%s',islandRole='%s',textureValue='%s',disbands='%d' WHERE player='%s'",
+                teamLeader, name, islandRole.name(), textureValue, disbands, player);
     }
 
 //    public CompoundTag getAsTag(){

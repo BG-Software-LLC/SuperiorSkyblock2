@@ -75,6 +75,10 @@ public interface SuperiorPlayer {
 
     boolean hasPermission(IslandPermission permission);
 
+    int getDisbands();
 
+    boolean hasDisbands();
+
+    void setDisbands(int disbands);
 
 }

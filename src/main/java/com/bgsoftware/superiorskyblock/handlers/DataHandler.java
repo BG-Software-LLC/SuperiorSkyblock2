@@ -107,7 +107,8 @@ public final class DataHandler {
                     "\t\"amount\"\tINTEGER NOT NULL\n" +
                     ");").executeUpdate();
 
-            addColumnIfNotExists("bonusWorth", "islands", "0");
+            addColumnIfNotExists("bonusWorth", "islands", "0", "VARCHAR");
+            addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
 
             ResultSet resultSet = conn.prepareStatement("SELECT * FROM players;").executeQuery();
             while (resultSet.next()){
@@ -274,9 +275,9 @@ public final class DataHandler {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private void addColumnIfNotExists(String column, String table, String def) {
+    private void addColumnIfNotExists(String column, String table, String def, String type) {
         try{
-            conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " VARCHAR DEFAULT '" + def + "';").executeUpdate();
+            conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT '" + def + "';").executeUpdate();
         }catch(SQLException ex){
             if(!ex.getMessage().contains("duplicate"))
                 ex.printStackTrace();
