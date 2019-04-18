@@ -150,6 +150,7 @@ CANNOT_SET_ROLE: '&cYou cannot set the player''s role to {0}.'
 PLAYER_ALREADY_IN_ROLE: '&c{0} is already a {1}.'
 # Called when running the /is setteleport command.
 NO_SET_HOME_PERMISSION: '&cYou must be at least {0} in order to set the teleport location of the island.'
+TELEPORT_LOCAITON_OUTSIDE_ISLAND: '&cYou are not inside your island.'
 CHANGED_TELEPORT_LOCATION: '&aSuccessfully updated teleport location.'
 # Called when running the /is setwarp command.
 NO_SET_WARP_PERMISSION: '&cYou must be at least {0} in order to set island warps.'
