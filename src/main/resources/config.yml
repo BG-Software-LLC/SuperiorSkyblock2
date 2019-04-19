@@ -27,6 +27,10 @@ default-island-size: 20
 # This limit can be expanded by using the /is admin sethopperslimit command.
 default-hoppers-limit: 8
 
+# The amount of warps an island can have
+# This limit can be expanded by using the /is admin setwarpslimit command.
+default-warps-limit: 3
+
 # Set the default team limit of islands.
 # This limit can be expanded by using the /is admin setteamlimit command.
 default-team-limit: 4

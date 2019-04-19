@@ -17,6 +17,7 @@ public final class SettingsHandler {
     public final int maxIslandSize;
     public final int defaultIslandSize;
     public final int defaultHoppersLimit;
+    public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCropGrowth;
     public final int defaultSpawnerRates;
@@ -60,6 +61,7 @@ public final class SettingsHandler {
         defaultIslandSize = cfg.getInt("default-island-size", 20);
         defaultHoppersLimit = cfg.getInt("default-hoppers-limit", 8);
         defaultTeamLimit = cfg.getInt("default-team-limit", 4);
+        defaultWarpsLimit = cfg.getInt("default-warps-limit", 3);
         defaultCropGrowth = cfg.getInt("default-crop-growth", 1);
         defaultSpawnerRates = cfg.getInt("default-spawner-rates", 1);
         defaultMobDrops = cfg.getInt("default-mob-drops", 1);

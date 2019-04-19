@@ -179,4 +179,10 @@ public interface Island extends Comparable<Island> {
     void deleteWarp(String name);
 
     List<String> getAllWarps();
+
+    boolean hasMoreWarpSlots();
+
+    void setWarpsLimit(int warpsLimit);
+
+    int getWarpsLimit();
 }

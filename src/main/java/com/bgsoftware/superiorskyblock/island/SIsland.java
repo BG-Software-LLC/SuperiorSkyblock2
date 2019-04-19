@@ -93,6 +93,8 @@ public class SIsland implements Island{
      * SIsland multipliers & limits
      */
 
+
+    private int warpsLimit = plugin.getSettings().defaultWarpsLimit;
     private int hoppersLimit = plugin.getSettings().defaultHoppersLimit;
     private int teamLimit = plugin.getSettings().defaultTeamLimit;
     private double cropGrowth = plugin.getSettings().defaultCropGrowth;
@@ -149,6 +151,7 @@ public class SIsland implements Island{
         }
 
         this.teamLimit = resultSet.getInt("teamLimit");
+        this.warpsLimit =  resultSet.getInt("warpsLimit");
         this.cropGrowth = resultSet.getDouble("cropGrowth");
         this.spawnerRates = resultSet.getDouble("spawnerRates");
         this.mobDrops = resultSet.getDouble("mobDrops");
@@ -191,6 +194,7 @@ public class SIsland implements Island{
 
         this.hoppersLimit = ((IntTag) compoundValues.get("hoppersLimit")).getValue();
         this.teamLimit = ((IntTag) compoundValues.get("teamLimit")).getValue();
+        this.warpsLimit = compoundValues.containsKey("warpsLimit") ? ((IntTag) compoundValues.get("warpsLimit")).getValue() : plugin.getSettings().defaultWarpsLimit;
         this.cropGrowth = ((DoubleTag) compoundValues.get("cropGrowth")).getValue();
         this.spawnerRates = ((DoubleTag) compoundValues.get("spawnerRates")).getValue();
         this.mobDrops = ((DoubleTag) compoundValues.get("mobDrops")).getValue();
@@ -865,11 +869,11 @@ public class SIsland implements Island{
                 warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
         return String.format("UPDATE islands SET teleportLocation='%s',members='%s',banned='%s',permissionNodes='%s',upgrades='%s',warps='%s',islandBank='%s'," +
-                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s',bonusWorth='%s' WHERE owner='%s'",
+                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s',bonusWorth='%s',warpsLimit=%d WHERE owner='%s'",
                 teleportLocation, members.length() == 0 ? "" : members.substring(1), banned.length() == 0 ? "" : banned.substring(1),
                 permissionNodes.length() == 0 ? "" : permissionNodes.substring(1), upgrades.length() == 0 ? "" : upgrades.substring(1),
                 warps.length() == 0 ? "" : warps.substring(1), this.islandBank.getAsString(), this.islandSize, "HOPPER=" + this.hoppersLimit,
-                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), this.owner);
+                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), warpsLimit, this.owner);
     }
 
 //    public CompoundTag getAsTag(){
@@ -973,5 +977,15 @@ public class SIsland implements Island{
         return location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw() + "," + location.getPitch();
     }
 
+    public boolean hasMoreWarpSlots() {
+        return warps.size() < warpsLimit;
+    }
 
+    public void setWarpsLimit(int warpsLimit) {
+        this.warpsLimit = warpsLimit;
+    }
+
+    public int getWarpsLimit() {
+        return warpsLimit;
+    }
 }

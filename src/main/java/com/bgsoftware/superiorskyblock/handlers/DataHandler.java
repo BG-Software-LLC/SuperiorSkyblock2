@@ -95,7 +95,7 @@ public final class DataHandler {
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
                     "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
                     "islandSize INTEGER, blockLimits VARCHAR, teamLimit INTEGER, cropGrowth DECIMAL, spawnerRates DECIMAL," +
-                    "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR);").executeUpdate();
+                    "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR, warpsLimit INTEGER);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
                     "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);").executeUpdate();
@@ -108,6 +108,7 @@ public final class DataHandler {
                     ");").executeUpdate();
 
             addColumnIfNotExists("bonusWorth", "islands", "0", "VARCHAR");
+            addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
             addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
 
             ResultSet resultSet = conn.prepareStatement("SELECT * FROM players;").executeQuery();
@@ -147,8 +148,8 @@ public final class DataHandler {
         new SuperiorThread(() -> {
             try{
                 if(!containsIsland(island)){
-                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0');",
-                            island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()))).executeUpdate();
+                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
+                            island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()), plugin.getSettings().defaultWarpsLimit)).executeUpdate();
                 }
                 conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
             }catch(Exception ex){

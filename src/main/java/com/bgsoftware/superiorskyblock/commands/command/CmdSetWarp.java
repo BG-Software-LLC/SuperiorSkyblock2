@@ -60,6 +60,11 @@ public final class CmdSetWarp implements ICommand {
             return;
         }
 
+        if (!island.hasMoreWarpSlots()) {
+            Locale.NO_MORE_WARPS.send(superiorPlayer);
+            return;
+        }
+
         if(island.getWarpLocation(args[1]) != null){
             Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
             return;

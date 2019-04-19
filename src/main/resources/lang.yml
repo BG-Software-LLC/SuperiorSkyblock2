@@ -210,6 +210,9 @@ BLOCK_VALUE: 'The block {0} worth {1}.'
 UNSAFE_WARP: '&cLooks like this warp is unsafe. Please try another warp.'
 TELEPORTED_TO_WARP: '&aSuccessfully teleported to this island warp!'
 DELETE_WARP: '&aYou deleted the warp {0}.'
+# Called when running the /is admin setwarps
+WARP_COUNT_SET_OTHER: '&aYou set {0}''s island''s warps limit to {1}.'
+WARP_COUNT_SET: '&aYour island''s warps limit is set to {0}'
 # Called when running the /is withdraw command.
 NO_WITHDRAW_PERMISSION: '&cYou must be at least {0} in order to withdraw money from island bank.'
 ISLAND_BANK_EMPTY: '&cIsland bank is empty and you can''t even buy a candy at this moment.'
@@ -262,6 +265,7 @@ INVALID_UPGRADE: |
   &cUpgrades: {1}
 INVALID_LEVEL: '&cInvalid level {0}.'
 INVALID_WARP: '&cInvalid warp {0}.'
+NO_MORE_WARPS: '&cYour island can''t have any more warps.'
 # Replacements for role names in messages, but not in command arguments!
 ROLE_GUEST: 'Guest'
 ROLE_MEMBER: 'Member'

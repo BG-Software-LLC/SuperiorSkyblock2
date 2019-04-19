@@ -41,6 +41,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminWithdraw());
         subCommands.add(new CmdAdminSetDisbands());
         subCommands.add(new CmdAdminGiveDisbands());
+        subCommands.add(new CmdAdminSetWarpsLimit());
     }
 
     @Override
