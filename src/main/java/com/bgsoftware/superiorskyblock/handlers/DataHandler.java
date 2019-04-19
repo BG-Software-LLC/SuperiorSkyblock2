@@ -185,7 +185,7 @@ public final class DataHandler {
         new SuperiorThread(() -> {
             try{
                 if(!containsPlayer(player)) {
-                    conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','');",
+                    conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','','');",
                             player.getUniqueId())).executeUpdate();
                 }
                 conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
