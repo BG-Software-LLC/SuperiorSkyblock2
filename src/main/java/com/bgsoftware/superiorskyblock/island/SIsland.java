@@ -41,18 +41,12 @@ import org.bukkit.entity.Player;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
+import java.security.acl.Owner;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SIsland implements Island{
@@ -67,8 +61,7 @@ public class SIsland implements Island{
     /*
      * SIsland identifiers
      */
-
-    private final UUID owner;
+    private UUID owner;
     private final BlockPosition center;
 
     /*
@@ -100,6 +93,9 @@ public class SIsland implements Island{
     private double cropGrowth = plugin.getSettings().defaultCropGrowth;
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
+
+    private boolean transferred = false;
+    private UUID prevOwner;
 
     public SIsland(ResultSet resultSet) throws SQLException {
         this.owner = UUID.fromString(resultSet.getString("owner"));
@@ -443,6 +439,7 @@ public class SIsland implements Island{
 
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
+
         if(!Bukkit.isPrimaryThread()){
             Bukkit.getScheduler().runTask(plugin, () -> calcIslandWorth(asker));
             return;
@@ -847,7 +844,9 @@ public class SIsland implements Island{
         return new ArrayList<>(warps.keySet());
     }
 
+    @SuppressWarnings("all")
     public String getSaveStatement(){
+
         String teleportLocation = getLocation(getTeleportLocation());
 
         StringBuilder members = new StringBuilder();
@@ -873,7 +872,37 @@ public class SIsland implements Island{
                 teleportLocation, members.length() == 0 ? "" : members.substring(1), banned.length() == 0 ? "" : banned.substring(1),
                 permissionNodes.length() == 0 ? "" : permissionNodes.substring(1), upgrades.length() == 0 ? "" : upgrades.substring(1),
                 warps.length() == 0 ? "" : warps.substring(1), this.islandBank.getAsString(), this.islandSize, "HOPPER=" + this.hoppersLimit,
-                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), warpsLimit, this.owner);
+                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), warpsLimit, this.owner.toString());
+    }
+
+    public String getDeleteStatement() {
+        return String.format("DELETE FROM islands WHERE owner='%s';", prevOwner.toString());
+    }
+
+    @SuppressWarnings("all")
+    public String getInsertStatement() {
+        String teleportLocation = getLocation(getTeleportLocation());
+
+        StringBuilder members = new StringBuilder();
+        this.members.forEach(uuid -> members.append(",").append(uuid.toString()));
+
+        StringBuilder banned = new StringBuilder();
+        this.banned.forEach(uuid -> banned.append(",").append(uuid.toString()));
+
+        StringBuilder permissionNodes = new StringBuilder();
+        this.permissionNodes.keySet().forEach(islandRole ->
+                permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
+
+        StringBuilder upgrades = new StringBuilder();
+        this.upgrades.keySet().forEach(upgrade ->
+                upgrades.append(",").append(upgrade).append("=").append(this.upgrades.get(upgrade)));
+
+        StringBuilder warps = new StringBuilder();
+        this.warps.keySet().forEach(warp ->
+                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+
+        return String.format("INSERT INTO islands VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', %d, %s, %s, %s, '%s', '%s', '%s', %d);",
+                owner.toString(), getLocation(center.getBlock().getLocation()), teleportLocation, members, banned, permissionNodes, upgrades, warps, islandBank.getAsString(), islandSize, "HOPPER=" + this.hoppersLimit, teamLimit, cropGrowth, spawnerRates, mobDrops, discord, paypal, bonusWorth, warpsLimit);
     }
 
 //    public CompoundTag getAsTag(){
@@ -987,5 +1016,34 @@ public class SIsland implements Island{
 
     public int getWarpsLimit() {
         return warpsLimit;
+    }
+
+    public boolean isTransferred() {
+        return transferred;
+    }
+
+    @Override
+    public void transfer(SuperiorPlayer player) {
+        if (prevOwner == null)
+            prevOwner = owner;
+        transferred = true;
+
+        SuperiorPlayer previous = getOwner();
+
+        members.remove(player.getUniqueId());
+        members.add(previous.getUniqueId());
+
+        owner = player.getUniqueId();
+
+        for (UUID member : getAllMembers())
+            Objects.requireNonNull(SSuperiorPlayer.of(member)).setTeamLeader(owner);
+
+        previous.setTeamLeader(owner);
+        player.setTeamLeader(owner);
+
+        player.setIslandRole(IslandRole.LEADER);
+        previous.setIslandRole(IslandRole.ADMIN);
+
+        plugin.getGrid().getIslands().transfer(previous.getUniqueId(), owner);
     }
 }

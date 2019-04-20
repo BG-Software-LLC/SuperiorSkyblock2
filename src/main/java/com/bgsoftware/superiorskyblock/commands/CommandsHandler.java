@@ -1,40 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.commands.command.CmdAccept;
-import com.bgsoftware.superiorskyblock.commands.command.CmdAdmin;
-import com.bgsoftware.superiorskyblock.commands.command.CmdBan;
-import com.bgsoftware.superiorskyblock.commands.command.CmdBiome;
-import com.bgsoftware.superiorskyblock.commands.command.CmdCreate;
-import com.bgsoftware.superiorskyblock.commands.command.CmdDelWarp;
-import com.bgsoftware.superiorskyblock.commands.command.CmdDemote;
-import com.bgsoftware.superiorskyblock.commands.command.CmdDeposit;
-import com.bgsoftware.superiorskyblock.commands.command.CmdDisband;
-import com.bgsoftware.superiorskyblock.commands.command.CmdExpel;
-import com.bgsoftware.superiorskyblock.commands.command.CmdInvite;
-import com.bgsoftware.superiorskyblock.commands.command.CmdKick;
-import com.bgsoftware.superiorskyblock.commands.command.CmdLeave;
-import com.bgsoftware.superiorskyblock.commands.command.CmdPanel;
-import com.bgsoftware.superiorskyblock.commands.command.CmdPardon;
-import com.bgsoftware.superiorskyblock.commands.command.CmdPermissions;
-import com.bgsoftware.superiorskyblock.commands.command.CmdPromote;
-import com.bgsoftware.superiorskyblock.commands.command.CmdRankup;
-import com.bgsoftware.superiorskyblock.commands.command.CmdRecalc;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetDiscord;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetPaypal;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetPermission;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetRole;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetTeleport;
-import com.bgsoftware.superiorskyblock.commands.command.CmdSetWarp;
-import com.bgsoftware.superiorskyblock.commands.command.CmdShow;
-import com.bgsoftware.superiorskyblock.commands.command.CmdTeam;
-import com.bgsoftware.superiorskyblock.commands.command.CmdTeamChat;
-import com.bgsoftware.superiorskyblock.commands.command.CmdTeleport;
-import com.bgsoftware.superiorskyblock.commands.command.CmdToggle;
-import com.bgsoftware.superiorskyblock.commands.command.CmdTop;
-import com.bgsoftware.superiorskyblock.commands.command.CmdUpgrade;
-import com.bgsoftware.superiorskyblock.commands.command.CmdValue;
-import com.bgsoftware.superiorskyblock.commands.command.CmdWarp;
-import com.bgsoftware.superiorskyblock.commands.command.CmdWithdraw;
+import com.bgsoftware.superiorskyblock.commands.command.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
@@ -90,6 +56,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdValue());
         subCommands.add(new CmdWarp());
         subCommands.add(new CmdWithdraw());
+        subCommands.add(new CmdTransfer());
     }
 
     @Override

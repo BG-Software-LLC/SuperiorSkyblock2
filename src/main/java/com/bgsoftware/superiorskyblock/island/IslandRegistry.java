@@ -54,4 +54,14 @@ public final class IslandRegistry implements Iterable<Island> {
         ownershipList.sort(Comparator.comparing(o -> islands.get(o)).reversed());
     }
 
+    public void transfer(UUID old, UUID now) {
+        Island island = islands.get(old);
+
+        islands.remove(old);
+        ownershipList.remove(old);
+
+        islands.put(now, island);
+        ownershipList.add(now);
+    }
+
 }

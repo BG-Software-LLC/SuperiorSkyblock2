@@ -185,4 +185,6 @@ public interface Island extends Comparable<Island> {
     void setWarpsLimit(int warpsLimit);
 
     int getWarpsLimit();
+
+    void transfer(SuperiorPlayer player);
 }

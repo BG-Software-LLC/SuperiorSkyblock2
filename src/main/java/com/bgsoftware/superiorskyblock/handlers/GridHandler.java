@@ -603,4 +603,7 @@ public final class GridHandler implements GridManager {
         }
     }
 
+    public IslandRegistry getIslands() {
+        return islands;
+    }
 }

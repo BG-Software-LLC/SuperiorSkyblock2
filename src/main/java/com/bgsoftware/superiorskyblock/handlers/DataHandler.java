@@ -14,10 +14,7 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +66,14 @@ public final class DataHandler {
         try{
             //Saving islands
             for(Island island : islands){
-                conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
+                SIsland sIsland = (SIsland) island;
+                if (sIsland == null)
+                    continue;
+                if (sIsland.isTransferred()) {
+                    conn.prepareStatement(sIsland.getDeleteStatement()).executeUpdate();
+                    conn.prepareStatement(sIsland.getInsertStatement()).executeUpdate();
+                } else
+                    conn.prepareStatement(sIsland.getSaveStatement()).executeUpdate();
             }
             //Saving players
             for(SuperiorPlayer player : players){
