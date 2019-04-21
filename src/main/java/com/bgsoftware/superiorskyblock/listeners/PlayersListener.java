@@ -224,15 +224,19 @@ public final class PlayersListener implements Listener {
         Island island = superiorPlayer.getIsland();
 
         if(superiorPlayer.hasTeamChatEnabled()){
-            e.setCancelled(true);
-            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage()));
+            if (superiorPlayer.getIsland() == null)
+                superiorPlayer.toggleTeamChat();
+            else {
+                e.setCancelled(true);
+                island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage()));
+                return;
+            }
         }
 
-        else {
-            e.setFormat(e.getFormat()
-                    .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
-                    .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal())));
-        }
+        e.setFormat(e.getFormat()
+                .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
+                .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal())));
+
     }
 
     @EventHandler
