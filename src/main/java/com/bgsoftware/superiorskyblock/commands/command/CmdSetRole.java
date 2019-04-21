@@ -91,7 +91,7 @@ public final class CmdSetRole implements ICommand {
                 return;
             }
 
-            if(!islandRole.isLessThan(superiorPlayer.getIslandRole()) || islandRole == IslandRole.GUEST){
+            if(targetPlayer.getIslandRole().isHigherThan(superiorPlayer.getIslandRole()) || !islandRole.isLessThan(superiorPlayer.getIslandRole()) || islandRole == IslandRole.GUEST){
                 Locale.CANNOT_SET_ROLE.send(sender, islandRole);
                 return;
             }
