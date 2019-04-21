@@ -42,8 +42,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
 import java.security.acl.Owner;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -845,16 +844,7 @@ public class SIsland implements Island{
     }
 
     @SuppressWarnings("all")
-    public String getSaveStatement(){
-
-        String teleportLocation = getLocation(getTeleportLocation());
-
-        StringBuilder members = new StringBuilder();
-        this.members.forEach(uuid -> members.append(",").append(uuid.toString()));
-
-        StringBuilder banned = new StringBuilder();
-        this.banned.forEach(uuid -> banned.append(",").append(uuid.toString()));
-
+    public void executeUpdateStatement(Connection connection) throws SQLException {
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
                 permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
@@ -867,28 +857,37 @@ public class SIsland implements Island{
         this.warps.keySet().forEach(warp ->
                 warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
-        return String.format("UPDATE islands SET teleportLocation='%s',members='%s',banned='%s',permissionNodes='%s',upgrades='%s',warps='%s',islandBank='%s'," +
-                "islandSize=%s,blockLimits='%s',teamLimit=%s,cropGrowth=%s,spawnerRates=%s,mobDrops=%s,discord='%s',paypal='%s',bonusWorth='%s',warpsLimit=%d WHERE owner='%s'",
-                teleportLocation, members.length() == 0 ? "" : members.substring(1), banned.length() == 0 ? "" : banned.substring(1),
-                permissionNodes.length() == 0 ? "" : permissionNodes.substring(1), upgrades.length() == 0 ? "" : upgrades.substring(1),
-                warps.length() == 0 ? "" : warps.substring(1), this.islandBank.getAsString(), this.islandSize, "HOPPER=" + this.hoppersLimit,
-                this.teamLimit, this.cropGrowth, this.spawnerRates, this.mobDrops, this.discord, this.paypal, this.bonusWorth.getAsString(), warpsLimit, this.owner.toString());
-    }
-
-    public String getDeleteStatement() {
-        return String.format("DELETE FROM islands WHERE owner='%s';", prevOwner.toString());
+        PreparedStatement statement = connection.prepareStatement("UPDATE  islands SET teleportLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,bonusWorth=?,warpsLimit=? WHERE owner=?;");
+        statement.setString(1, getLocation(getTeleportLocation()));
+        statement.setString(2, members.isEmpty() ? "" : getUuidCollectionString(members));
+        statement.setString(3, banned.isEmpty() ? "" : getUuidCollectionString(banned));
+        statement.setString(4, permissionNodes.length() == 0 ? "" : permissionNodes.toString());
+        statement.setString(5, upgrades.length() == 0 ? "" : upgrades.toString());
+        statement.setString(6, warps.length() == 0 ? "" : warps.toString());
+        statement.setString(7, islandBank.getAsString());
+        statement.setInt(8, islandSize);
+        statement.setString(9, "HOPPER" + this.hoppersLimit);
+        statement.setInt(10, teamLimit);
+        statement.setFloat(11, (float) cropGrowth);
+        statement.setFloat(12, (float) spawnerRates);
+        statement.setFloat(13, (float) mobDrops);
+        statement.setString(14, discord);
+        statement.setString(15, paypal);
+        statement.setBigDecimal(16, bonusWorth);
+        statement.setInt(17, warpsLimit);
+        statement.setString(18, owner.toString());
+        statement.executeUpdate();
     }
 
     @SuppressWarnings("all")
-    public String getInsertStatement() {
-        String teleportLocation = getLocation(getTeleportLocation());
+    public void executeDeleteStatement(Connection connection) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM islands WHERE owner=?;");
+        statement.setString(1, prevOwner.toString());
+        statement.executeUpdate();
+    }
 
-        StringBuilder members = new StringBuilder();
-        this.members.forEach(uuid -> members.append(",").append(uuid.toString()));
-
-        StringBuilder banned = new StringBuilder();
-        this.banned.forEach(uuid -> banned.append(",").append(uuid.toString()));
-
+    @SuppressWarnings("all")
+    public void executeInsertStatement(Connection connection) throws SQLException {
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
                 permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
@@ -901,8 +900,33 @@ public class SIsland implements Island{
         this.warps.keySet().forEach(warp ->
                 warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
-        return String.format("INSERT INTO islands VALUES('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, '%s', %d, %s, %s, %s, '%s', '%s', '%s', %d);",
-                owner.toString(), getLocation(center.getBlock().getLocation()), teleportLocation, members, banned, permissionNodes, upgrades, warps, islandBank.getAsString(), islandSize, "HOPPER=" + this.hoppersLimit, teamLimit, cropGrowth, spawnerRates, mobDrops, discord, paypal, bonusWorth, warpsLimit);
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        statement.setString(1, owner.toString());
+        statement.setString(2, getLocation(center.getBlock().getLocation()));
+        statement.setString(3, getLocation(getTeleportLocation()));
+        statement.setString(4, members.isEmpty() ? "" : getUuidCollectionString(members));
+        statement.setString(5, banned.isEmpty() ? "" : getUuidCollectionString(banned));
+        statement.setString(6, permissionNodes.length() == 0 ? "" : permissionNodes.toString());
+        statement.setString(7, upgrades.length() == 0 ? "" : upgrades.toString());
+        statement.setString(8, warps.length() == 0 ? "" : warps.toString());
+        statement.setString(9, islandBank.getAsString());
+        statement.setInt(10, islandSize);
+        statement.setString(11, "HOPPER" + this.hoppersLimit);
+        statement.setInt(12, teamLimit);
+        statement.setFloat(13, (float) cropGrowth);
+        statement.setFloat(14, (float) spawnerRates);
+        statement.setFloat(15, (float) mobDrops);
+        statement.setString(16, discord);
+        statement.setString(17, paypal);
+        statement.setBigDecimal(18, bonusWorth);
+        statement.setInt(19, warpsLimit);
+        statement.executeUpdate();
+    }
+
+    private static String getUuidCollectionString(Collection<UUID> collection) {
+        StringBuilder builder = new StringBuilder();
+        collection.forEach(uuid -> builder.append(",").append(uuid.toString()));
+        return builder.toString();
     }
 
 //    public CompoundTag getAsTag(){
@@ -1024,6 +1048,9 @@ public class SIsland implements Island{
 
     @Override
     public void transfer(SuperiorPlayer player) {
+        if (player.getUniqueId().equals(owner))
+            return;
+
         if (prevOwner == null)
             prevOwner = owner;
         transferred = true;

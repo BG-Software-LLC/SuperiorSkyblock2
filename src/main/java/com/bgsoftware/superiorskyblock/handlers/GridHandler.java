@@ -42,9 +42,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -309,12 +307,16 @@ public final class GridHandler implements GridManager {
         stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount);
     }
 
-    public void saveStackedBlocksStatement(Connection conn) throws SQLException {
+    @SuppressWarnings("all")
+    public void executeStackedBlocksInsertStatement(Connection connection) throws SQLException {
         for (SBlockPosition position : stackedBlocks.stackedBlocks.keySet()) {
-            String statement = String.format("INSERT INTO stackedBlocks (world, x, y, z, amount) VALUES (\"%s\", %d, %d, %d, %d);",
-                    position.getWorld().getName(), position.getX(), position.getY(), position.getZ(), stackedBlocks.stackedBlocks.get(position));
-            System.out.println(statement);
-            conn.prepareStatement(statement).executeUpdate();
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO stackedBlocks (world, x, y, z, amount) VALUES (?, ?, ?, ?, ?);");
+            statement.setString(1, position.getWorld().getName());
+            statement.setInt(2, position.getX());
+            statement.setInt(3, position.getY());
+            statement.setInt(4, position.getZ());
+            statement.setInt(5, stackedBlocks.stackedBlocks.get(position));
+            statement.executeUpdate();
         }
     }
 
@@ -339,18 +341,23 @@ public final class GridHandler implements GridManager {
 
     }
 
-    public String getSaveStatement(){
+    @SuppressWarnings("all")
+    public void executeGridInsertStatement(Connection connection) throws SQLException {
         String lastIsland = this.lastIsland.toString();
 
         StringBuilder stackedBlocks = new StringBuilder();
         this.stackedBlocks.entrySet().forEach(entry ->
-            stackedBlocks.append(";").append(entry.getKey().toString()).append("=").append(entry.getValue()));
+                stackedBlocks.append(";").append(entry.getKey().toString()).append("=").append(entry.getValue()));
 
         int maxIslandSize = plugin.getSettings().maxIslandSize;
         String world = plugin.getSettings().islandWorld;
 
-        return String.format("INSERT INTO grid VALUES('%s','%s',%s, '%s')",
-                lastIsland, ""/*stackedBlocks.length() == 0 ? "" : stackedBlocks.substring(1) */, maxIslandSize, world);
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO grid VALUES(?,?,?,?);");
+        statement.setString(1, lastIsland);
+        statement.setString(2, "");
+        statement.setInt(3, maxIslandSize);
+        statement.setString(4, world);
+        statement.executeUpdate();
     }
 
 //    public CompoundTag getAsTag(){

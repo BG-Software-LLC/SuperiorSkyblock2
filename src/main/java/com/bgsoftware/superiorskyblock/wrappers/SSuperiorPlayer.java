@@ -18,6 +18,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
@@ -216,6 +218,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public String getSaveStatement(){
         return String.format("UPDATE players SET teamLeader='%s',name='%s',islandRole='%s',textureValue='%s',disbands='%d' WHERE player='%s'",
                 teamLeader, name, islandRole.name(), textureValue, disbands, player);
+    }
+
+    @SuppressWarnings("all")
+    public void executeUpdateStatement(Connection connection) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=? WHERE player=?;");
+        statement.setString(1, teamLeader.toString());
+        statement.setString(2, name);
+        statement.setString(3, islandRole.name());
+        statement.setString(4, textureValue);
+        statement.setInt(5, disbands);
+        statement.setString(6, player.toString());
+        statement.executeUpdate();
     }
 
 //    public CompoundTag getAsTag(){

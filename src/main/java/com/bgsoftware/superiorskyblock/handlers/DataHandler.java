@@ -70,23 +70,24 @@ public final class DataHandler {
                 if (sIsland == null)
                     continue;
                 if (sIsland.isTransferred()) {
-                    conn.prepareStatement(sIsland.getDeleteStatement()).executeUpdate();
-                    conn.prepareStatement(sIsland.getInsertStatement()).executeUpdate();
+                    sIsland.executeDeleteStatement(conn);
+                    sIsland.executeInsertStatement(conn);
                 } else
-                    conn.prepareStatement(sIsland.getSaveStatement()).executeUpdate();
+                    sIsland.executeUpdateStatement(conn);
             }
+
             //Saving players
-            for(SuperiorPlayer player : players){
-                conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
-            }
+            for(SuperiorPlayer player : players)
+                ((SSuperiorPlayer) player).executeUpdateStatement(conn);
 
             // Saving stacked blocks
             conn.prepareStatement("DELETE FROM stackedBlocks;").executeUpdate();
-            plugin.getGrid().saveStackedBlocksStatement(conn);
+            plugin.getGrid().executeStackedBlocksInsertStatement(conn);
 
             //Saving grid
             conn.prepareStatement("DELETE FROM grid;").executeUpdate();
-            conn.prepareStatement(plugin.getGrid().getSaveStatement()).executeUpdate();
+            plugin.getGrid().executeGridInsertStatement(conn);
+
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -155,7 +156,7 @@ public final class DataHandler {
                     conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
                             island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()), plugin.getSettings().defaultWarpsLimit)).executeUpdate();
                 }
-                conn.prepareStatement(((SIsland) island).getSaveStatement()).executeUpdate();
+                ((SIsland) island).executeUpdateStatement(conn);
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
