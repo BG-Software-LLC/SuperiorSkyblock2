@@ -141,27 +141,29 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        if(!plugin.getSettings().worldBordersEnabled)
-            return;
+        try {
+            if (!plugin.getSettings().worldBordersEnabled)
+                return;
 
-        boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
+            boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
-        WorldBorder worldBorder = new WorldBorder();
+            WorldBorder worldBorder = new WorldBorder();
 
-        worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
-        double size = disabled || island == null ? Integer.MAX_VALUE : island.getIslandSize() + 1;
-        worldBorder.a(size, size, 0L);
+            worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+            double size = disabled || island == null ? Integer.MAX_VALUE : island.getIslandSize() + 1;
+            worldBorder.a(size, size, 0L);
 
-        Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
+            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
 
-        if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
-            worldBorder.c(center.getX() * 8, center.getZ() * 8);
-        } else {
-            worldBorder.c(center.getX(), center.getZ());
-        }
+            if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+                worldBorder.c(center.getX() * 8, center.getZ() * 8);
+            } else {
+                worldBorder.c(center.getX(), center.getZ());
+            }
 
-        PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, EnumWorldBorderAction.INITIALIZE);
-        ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
+            PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, EnumWorldBorderAction.INITIALIZE);
+            ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
+        } catch (NullPointerException ignored) {}
     }
 
     @Override
