@@ -52,11 +52,11 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdTeleport());
         subCommands.add(new CmdToggle());
         subCommands.add(new CmdTop());
+        subCommands.add(new CmdTransfer());
         subCommands.add(new CmdUpgrade());
         subCommands.add(new CmdValue());
         subCommands.add(new CmdWarp());
         subCommands.add(new CmdWithdraw());
-        subCommands.add(new CmdTransfer());
     }
 
     @Override

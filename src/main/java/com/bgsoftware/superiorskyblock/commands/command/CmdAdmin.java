@@ -34,14 +34,14 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetCropGrowth());
         subCommands.add(new CmdAdminSetHoppersLimit());
         subCommands.add(new CmdAdminSetMobDrops());
+        subCommands.add(new CmdAdminSetDisbands());
         subCommands.add(new CmdAdminSetSize());
         subCommands.add(new CmdAdminSetSpawnerRates());
         subCommands.add(new CmdAdminSetTeamLimit());
         subCommands.add(new CmdAdminSetUpgrade());
-        subCommands.add(new CmdAdminWithdraw());
-        subCommands.add(new CmdAdminSetDisbands());
-        subCommands.add(new CmdAdminGiveDisbands());
         subCommands.add(new CmdAdminSetWarpsLimit());
+        subCommands.add(new CmdAdminWithdraw());
+        subCommands.add(new CmdAdminGiveDisbands());
     }
 
     @Override

@@ -79,6 +79,8 @@ permissions:
             description: Toggle island borders and stacked blocks placements.
           superior.island.top:
             description: Open top islands panel.
+          superior.island.transfer:
+            description: Transfer your island's leadership
           superior.island.upgrade:
             description: Open upgrades panel.
           superior.island.value:
@@ -93,6 +95,8 @@ permissions:
         children:
           superior.admin:
             description: Use the admin commands.
+          superior.admin.bonus:
+            description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
           superior.admin.demote:
@@ -101,6 +105,8 @@ permissions:
             description: Deposit money into another player's island bank.
           superior.admin.disband:
             description: Disband another player's island permanently.
+          superior.admin.givedisbands:
+            description: Give disbands to a player.
           superior.admin.join:
             description: Join an island without an invitation.
           superior.admin.msg:
@@ -117,6 +123,8 @@ permissions:
             description: Create schematics for the plugin.
           superior.admin.setcropgrowth:
             description: Set the crop growth multiplier for another player's island.
+          superior.admin.setdisbands:
+            description: Set a player's amount of island disbands.
           superior.admin.sethopperslimit:
             description: Set hoppers limit for another player's island.
           superior.admin.setmobdrops:
@@ -129,5 +137,7 @@ permissions:
             description: Set members limit for another player's island.
           superior.admin.setupgrade:
             description: Set the level of an upgrade for another player's island.
+          superior.admin.setwarpslimit:
+            description: Set the warps limit of an island.
           superior.admin.withdraw:
             description: Withdraw money from another player's island bank.
