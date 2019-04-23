@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
+import com.bgsoftware.superiorskyblock.listeners.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
@@ -539,6 +540,9 @@ public class SIsland implements Island{
                         handleBlockPlace(key, blockCount);
                     }
                 }
+
+                Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, getIslandLevelAsBigDecimal(), asker));
+
                 if(asker != null)
                     Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsBigDecimal(), getIslandLevelAsBigDecimal());
             });
