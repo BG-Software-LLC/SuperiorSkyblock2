@@ -80,7 +80,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onIslandEnter(IslandEnterEvent e){
-        if(e.getIsland().isBanned(e.getPlayer())) {
+        if(!e.getPlayer().hasBypassModeEnabled() && e.getIsland().isBanned(e.getPlayer())) {
             e.setCancelled(true);
             Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
             return;
