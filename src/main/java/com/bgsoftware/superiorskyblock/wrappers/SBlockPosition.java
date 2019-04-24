@@ -11,7 +11,7 @@ public final class SBlockPosition implements BlockPosition {
     private final int x, y, z;
     private final String world;
 
-    private SBlockPosition(String world, int x, int y, int z){
+    public SBlockPosition(String world, int x, int y, int z){
         this.world = world;
         this.x = x;
         this.y = y;

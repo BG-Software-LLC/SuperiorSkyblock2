@@ -148,8 +148,10 @@ bank-worth-rate: 1000
 island-world: SuperiorWorld
 
 # Set the location of the spawn of the server.
-# Make sure you follow the format: <world>, <x>, <y>, <z>
-spawn-location: SuperiorWorld, 0, 100, 0
+# Make sure you follow one of these formats:
+# <world>, <x>, <y>, <z>
+# <world>, <x>, <y>, <z>, <yaw>, <pitch>
+spawn-location: SuperiorWorld, 0, 100, 0, 0, 0
 
 # When enabled, the islands protection will be on the spawn too.
 # If disabled, it's your responsibility to protect the spawn!

@@ -380,10 +380,6 @@ public class SIsland implements Island{
 
     @Override
     public void disbandIsland(){
-        Location spawn = SBlockPosition.of(plugin.getSettings().spawnLocation).getBlock().getLocation();
-        for (UUID uuid : new HashSet<>(allPlayersInside()))
-            Bukkit.getPlayer(uuid).teleport(spawn);
-
         members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
         for(Chunk chunk : getAllChunks(false))

@@ -4,7 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.ConfigComments;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -122,6 +125,23 @@ public final class SettingsHandler {
             newList.add(ChatColor.translateAlternateColorCodes('&', line));
 
         return newList;
+    }
+
+    public Location getSpawnAsBukkitLocation() {
+        String[] split = spawnLocation.split(", ");
+
+        World world = Bukkit.getWorld(split[0]);
+        double x = Double.valueOf(split[1]);
+        double y = Double.valueOf(split[2]);
+        double z = Double.valueOf(split[3]);
+        double yaw = 0;
+        double pitch = 0;
+        if (split.length == 6) {
+            yaw = Double.valueOf(split[4]);
+            pitch = Double.valueOf(split[5]);
+        }
+
+        return new Location(world, x, y, z, (float) yaw, (float) pitch);
     }
 
 }
