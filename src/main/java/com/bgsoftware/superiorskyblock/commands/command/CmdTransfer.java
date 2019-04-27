@@ -75,6 +75,11 @@ public class CmdTransfer implements ICommand {
             return;
         }
 
+        if (island.getOwner().getUniqueId().equals(target.getUniqueId())) {
+            Locale.TRANSFER_ALREADY_LEADER.send(player);
+            return;
+        }
+
         island.transfer(target);
         island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(target.getName()));
     }

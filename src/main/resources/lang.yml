@@ -166,6 +166,7 @@ SET_WARP: '&aSuccessfully created a new warp at {0}.'
 # Called when running the /is transfer command.
 NO_TRANSFER_PERMISSION: '&cYou must be the island''s leader to transfer the leadership.'
 TRANSFER_NOT_A_MEMBER: '&cThis player is not a member of your island.'
+TRANSFER_ALREADY_LEADER: '&cYou''re already the leader of this island.'
 TRANSFER_BROADCAST: '&aThe island''s leadership has been transferred to {0}.'
 # Called when running the /is show command.
 ISLAND_INFO_HEADER: ''

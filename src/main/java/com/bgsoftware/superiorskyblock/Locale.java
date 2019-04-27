@@ -209,6 +209,7 @@ public enum Locale {
     NO_SET_HOME_PERMISSION,
     NO_TRANSFER_PERMISSION,
     TRANSFER_NOT_A_MEMBER,
+    TRANSFER_ALREADY_LEADER,
     TRANSFER_BROADCAST;
 
     private String message;
