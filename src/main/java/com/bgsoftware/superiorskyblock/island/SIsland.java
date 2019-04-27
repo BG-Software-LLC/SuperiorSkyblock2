@@ -878,7 +878,7 @@ public class SIsland implements Island{
         statement.setFloat(13, (float) mobDrops);
         statement.setString(14, discord);
         statement.setString(15, paypal);
-        statement.setBigDecimal(16, bonusWorth);
+        statement.setString(16, bonusWorth.getAsString());
         statement.setInt(17, warpsLimit);
         statement.setString(18, owner.toString());
         statement.executeUpdate();
@@ -923,7 +923,7 @@ public class SIsland implements Island{
         statement.setFloat(15, (float) mobDrops);
         statement.setString(16, discord);
         statement.setString(17, paypal);
-        statement.setBigDecimal(18, bonusWorth);
+        statement.setString(18, bonusWorth.getAsString());
         statement.setInt(19, warpsLimit);
         statement.executeUpdate();
     }
