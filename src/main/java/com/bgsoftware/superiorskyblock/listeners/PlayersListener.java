@@ -96,7 +96,7 @@ public final class PlayersListener implements Listener {
     public void onIslandEnterProtected(IslandEnterProtectedEvent e){
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             try {
-                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()))
+                plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
             } catch (NullPointerException ignored) { }
         }, 5L);
     }
