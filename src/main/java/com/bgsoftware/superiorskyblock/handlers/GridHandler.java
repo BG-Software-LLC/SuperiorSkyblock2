@@ -274,6 +274,13 @@ public final class GridHandler implements GridManager {
     public void loadGrid(ResultSet resultSet) throws SQLException{
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
 
+        Location nextLocation;
+        do{
+            nextLocation = getNextLocation();
+            if(getIslandAt(nextLocation) != null)
+                lastIsland = SBlockPosition.of(nextLocation);
+        }while(getIslandAt(nextLocation) != null);
+
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
@@ -324,6 +331,13 @@ public final class GridHandler implements GridManager {
         Map<String, Tag> compoundValues = tag.getValue(), _compoundValues;
 
         lastIsland = SBlockPosition.of(((StringTag) compoundValues.get("lastIsland")).getValue());
+
+        Location nextLocation;
+        do{
+            nextLocation = getNextLocation();
+            if(getIslandAt(nextLocation) != null)
+                lastIsland = SBlockPosition.of(nextLocation);
+        }while(getIslandAt(nextLocation) != null);
 
         for(Tag _tag : ((ListTag) compoundValues.get("stackedBlocks")).getValue()){
             _compoundValues = ((CompoundTag) _tag).getValue();
