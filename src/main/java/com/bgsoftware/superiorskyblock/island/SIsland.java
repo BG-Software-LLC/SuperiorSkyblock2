@@ -378,8 +378,9 @@ public class SIsland implements Island{
     }
 
     @Override
+    @SuppressWarnings("all")
     public void disbandIsland(){
-        members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
+        new HashSet<>(members).forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
         for(Chunk chunk : getAllChunks(false))
             chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());

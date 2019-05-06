@@ -230,6 +230,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         statement.setInt(5, disbands);
         statement.setString(6, player.toString());
         statement.executeUpdate();
+
+
     }
 
 //    public CompoundTag getAsTag(){
