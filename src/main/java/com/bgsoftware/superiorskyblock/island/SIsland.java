@@ -86,7 +86,6 @@ public class SIsland implements Island{
      * SIsland multipliers & limits
      */
 
-
     private int warpsLimit = plugin.getSettings().defaultWarpsLimit;
     private int hoppersLimit = plugin.getSettings().defaultHoppersLimit;
     private int teamLimit = plugin.getSettings().defaultTeamLimit;
