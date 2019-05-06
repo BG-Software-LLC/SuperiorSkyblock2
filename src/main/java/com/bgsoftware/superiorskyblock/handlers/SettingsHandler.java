@@ -53,8 +53,7 @@ public final class SettingsHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class);
-        cfg.load(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
 
         cfg.resetYamlFile(plugin, "config.yml");
 
@@ -100,8 +99,7 @@ public final class SettingsHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class);
-        cfg.load(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
 
         cfg.resetYamlFile(plugin, "config.yml");
 

@@ -223,6 +223,11 @@ public final class GridHandler implements GridManager {
                 location.subtract(0, 0, islandRange);
         }
 
+        if(getIslandAt(location) != null){
+            lastIsland = SBlockPosition.of(location);
+            return getNextLocation();
+        }
+
         return location;
     }
 

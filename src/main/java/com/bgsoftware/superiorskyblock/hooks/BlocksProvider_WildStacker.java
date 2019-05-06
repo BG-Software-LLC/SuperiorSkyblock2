@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.wildstacker.WildStackerPlugin;
+import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
@@ -21,7 +21,6 @@ import org.bukkit.event.Listener;
 @SuppressWarnings("unused")
 public final class BlocksProvider_WildStacker implements BlocksProvider, Listener {
 
-    private static WildStackerPlugin stacker = WildStackerPlugin.getPlugin();
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public BlocksProvider_WildStacker(){
@@ -30,14 +29,14 @@ public final class BlocksProvider_WildStacker implements BlocksProvider, Listene
 
     @Override
     public int getBlockCount(Location location) {
-        StackedObject stackedObject = stacker.getDataHandler().CACHED_OBJECTS.get(location);
+        StackedObject stackedObject = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
         return stackedObject == null ? 1 : Math.max(stackedObject.getStackAmount(), 1);
     }
 
     @Override
     public Key getBlockKey(Location location, Key def) {
-        StackedObject stackedObject = stacker.getDataHandler().CACHED_OBJECTS.get(location);
-        return !(stackedObject instanceof StackedBarrel) ? def : SKey.of(((StackedBarrel) stackedObject).getBarrelItem(1));
+        StackedObject stackedObject = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
+        return SKey.of(((StackedBarrel) stackedObject).getBarrelItem(1));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

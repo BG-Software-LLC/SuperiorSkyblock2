@@ -133,8 +133,7 @@ public final class UpgradesHandler {
         if(!file.exists())
             plugin.saveResource("upgrades.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(null);
-        cfg.load(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
 
         ConfigurationSection upgrades = cfg.getConfigurationSection("upgrades");
 
@@ -155,8 +154,7 @@ public final class UpgradesHandler {
         if(!file.exists())
             FileUtil.saveResource("guis/upgrades-gui.yml");
 
-        CommentedConfiguration cfg = new CommentedConfiguration(null);
-        cfg.load(file);
+        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
 
         ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
 
