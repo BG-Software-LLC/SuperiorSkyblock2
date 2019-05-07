@@ -86,7 +86,6 @@ public class SIsland implements Island{
      * SIsland multipliers & limits
      */
 
-
     private int warpsLimit = plugin.getSettings().defaultWarpsLimit;
     private int hoppersLimit = plugin.getSettings().defaultHoppersLimit;
     private int teamLimit = plugin.getSettings().defaultTeamLimit;
@@ -379,8 +378,9 @@ public class SIsland implements Island{
     }
 
     @Override
+    @SuppressWarnings("all")
     public void disbandIsland(){
-        members.forEach(member -> kickMember(SSuperiorPlayer.of(member)));
+        new HashSet<>(members).forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
         for(Chunk chunk : getAllChunks(false))
             chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
@@ -1027,8 +1027,15 @@ public class SIsland implements Island{
 
     private Location getLocation(String location){
         String[] sections = location.split(",");
-        return new Location(Bukkit.getWorld(sections[0]), Double.parseDouble(sections[1]), Double.parseDouble(sections[2]),
-                Double.parseDouble(sections[3]), Float.parseFloat(sections[4]), Float.parseFloat(sections[5]));
+
+        World world = Bukkit.getWorld(sections[0]);
+        double x = Double.parseDouble(sections[1]);
+        double y = Double.parseDouble(sections[2]);
+        double z = Double.parseDouble(sections[3]);
+        float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
+        float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
+
+        return new Location(world, x, y, z, yaw, pitch);
     }
 
     private String getLocation(Location location){

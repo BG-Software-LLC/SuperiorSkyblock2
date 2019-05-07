@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="superiorskyblock:jar">
-    <output-path>$USER_HOME$/Server/1.13.2/plugins</output-path>
+    <output-path>D:/Minecraft Servers/Paper 1.8.8/plugins</output-path>
     <root id="archive" name="superiorskyblock.jar">
       <element id="module-output" name="SuperiorSkyBlock" />
       <element id="module-output" name="superiorskyblock-api" />

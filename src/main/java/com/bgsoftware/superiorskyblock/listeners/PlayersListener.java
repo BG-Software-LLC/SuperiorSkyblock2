@@ -297,6 +297,9 @@ public final class PlayersListener implements Listener {
         if(!plugin.getSettings().voidTeleport)
             return;
 
+        if (!e.getPlayer().getWorld().equals(plugin.getGrid().getIslandsWorld()))
+            return;
+
         Location from = e.getFrom(), to = e.getTo();
 
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() >= 0)
