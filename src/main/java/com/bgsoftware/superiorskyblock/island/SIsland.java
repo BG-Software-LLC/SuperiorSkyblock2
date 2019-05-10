@@ -871,7 +871,7 @@ public class SIsland implements Island{
         statement.setString(6, warps.length() == 0 ? "" : warps.toString());
         statement.setString(7, islandBank.getAsString());
         statement.setInt(8, islandSize);
-        statement.setString(9, "HOPPER" + this.hoppersLimit);
+        statement.setString(9, "HOPPER=" + this.hoppersLimit);
         statement.setInt(10, teamLimit);
         statement.setFloat(11, (float) cropGrowth);
         statement.setFloat(12, (float) spawnerRates);
@@ -916,7 +916,7 @@ public class SIsland implements Island{
         statement.setString(8, warps.length() == 0 ? "" : warps.toString());
         statement.setString(9, islandBank.getAsString());
         statement.setInt(10, islandSize);
-        statement.setString(11, "HOPPER" + this.hoppersLimit);
+        statement.setString(11, "HOPPER=" + this.hoppersLimit);
         statement.setInt(12, teamLimit);
         statement.setFloat(13, (float) cropGrowth);
         statement.setFloat(14, (float) spawnerRates);
