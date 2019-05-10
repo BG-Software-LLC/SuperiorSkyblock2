@@ -118,7 +118,8 @@ public final class GridHandler implements GridManager {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     if (islandCreateEvent.getTeleport()) {
                         superiorPlayer.asPlayer().teleport(islandLocation);
-                        Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+                        if (island.isInside(superiorPlayer.getLocation()))
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
                     }
                     new SuperiorThread(() -> island.calcIslandWorth(null)).start();
                 }
