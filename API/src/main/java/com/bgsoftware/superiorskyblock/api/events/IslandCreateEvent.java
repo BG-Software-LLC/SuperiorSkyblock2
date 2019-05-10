@@ -11,6 +11,7 @@ public final class IslandCreateEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
+    private boolean teleport = true;
     private boolean cancelled = false;
 
     public IslandCreateEvent(SuperiorPlayer superiorPlayer){
@@ -29,6 +30,14 @@ public final class IslandCreateEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+    public void setTeleport(boolean teleport) {
+        this.teleport = teleport;
+    }
+
+    public boolean getTeleport() {
+        return teleport;
     }
 
     @Override
