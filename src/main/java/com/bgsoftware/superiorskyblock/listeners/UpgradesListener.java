@@ -85,6 +85,9 @@ public final class UpgradesListener implements Listener {
     @Deprecated
     @SuppressWarnings({"JavaReflectionMemberAccess", "JavaReflectionInvocation"})
     public void onGrow(BlockGrowEvent e) {
+        if (e.getBlock().getType() == Material.PISTON_EXTENSION)
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island == null)
