@@ -71,11 +71,7 @@ public final class CmdLeave implements ICommand {
 
         island.kickMember(superiorPlayer);
 
-        for(UUID uuid : island.getMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.LEAVE_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
-            }
-        }
+        island.sendMessage(Locale.LEAVE_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
         Locale.LEFT_ISLAND.send(superiorPlayer);
     }
