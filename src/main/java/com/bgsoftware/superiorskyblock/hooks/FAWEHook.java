@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -36,9 +38,13 @@ public final class FAWEHook {
             Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
             Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
             int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
-            editSession.setBlock(block.getBlockX(), block.getBlockY(), block.getBlockZ(), new BaseBlock(combinedId & 4095, combinedId >> 12 & 15));
+            try {
+                editSession.setBlock(new Vector(block.getBlockX(), block.getBlockY(), block.getBlockZ()), new BaseBlock(combinedId & 4095, combinedId >> 12 & 15));
+            } catch (MaxChangedBlocksException e) {
+                e.printStackTrace();
+            }
         }
-        editSession.addNotifyTask(callback);
+//        editSession.addNotifyTask(callback);
         editSession.flushQueue();
     }
 

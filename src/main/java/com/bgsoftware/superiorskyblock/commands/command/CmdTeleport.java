@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
