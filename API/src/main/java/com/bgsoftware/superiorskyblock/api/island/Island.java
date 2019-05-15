@@ -132,6 +132,8 @@ public interface Island extends Comparable<Island> {
 
     void setUpgradeLevel(String upgradeName, int level);
 
+    void updateBorder();
+
     int getIslandSize();
 
     int getHoppersLimit();

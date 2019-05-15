@@ -730,6 +730,11 @@ public class SIsland implements Island{
     }
 
     @Override
+    public void updateBorder() {
+        allPlayersInside().forEach(uuid -> plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), this));
+    }
+
+    @Override
     public void setHoppersLimit(int hoppersLimit){
         this.hoppersLimit = hoppersLimit;
     }

@@ -72,9 +72,11 @@ public final class CmdAdminSetSize implements ICommand {
         island.setIslandSize(size);
         Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
 
-        for(UUID uuid : island.allPlayersInside()){
-            plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), island);
-        }
+//        for(UUID uuid : island.allPlayersInside()){
+//            plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), island);
+//        }
+
+        island.updateBorder();
 
     }
 
