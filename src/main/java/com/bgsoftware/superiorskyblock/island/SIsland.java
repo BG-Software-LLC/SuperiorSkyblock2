@@ -49,7 +49,7 @@ import java.text.NumberFormat;
 import java.util.*;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class SIsland implements Island{
+public class SIsland implements Island {
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 

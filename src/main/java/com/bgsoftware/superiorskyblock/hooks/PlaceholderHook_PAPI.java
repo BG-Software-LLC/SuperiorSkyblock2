@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -39,6 +40,8 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                 case "permission":
                     IslandPermission islandPermission = IslandPermission.valueOf(split[1].toUpperCase());
                     return String.valueOf(island.hasPermission(sPlayer, islandPermission));
+                case "count":
+                    return String.valueOf(island.getBlockCount(SKey.of(split[1])));
             }
 
             switch (placeholder) {
