@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.LangComments;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -210,7 +211,11 @@ public enum Locale {
     NO_TRANSFER_PERMISSION,
     TRANSFER_NOT_A_MEMBER,
     TRANSFER_ALREADY_LEADER,
-    TRANSFER_BROADCAST;
+    TRANSFER_BROADCAST,
+    TRANSFER_ADMIN_NOT_LEADER,
+    TRANSFER_ADMIN_DIFFERENT_ISLAND,
+    TRANSFER_ADMIN_ALREADY_LEADER,
+    TRANSFER_ADMIN;
 
     private String message;
 

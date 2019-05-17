@@ -127,6 +127,8 @@ permissions:
             description: Set a player's amount of island disbands.
           superior.admin.sethopperslimit:
             description: Set hoppers limit for another player's island.
+          superior.admin.setleader:
+            description: Transfer an island to someone else.
           superior.admin.setmobdrops:
             description: Set the mob drops multiplier for another player's island.
           superior.admin.setsize:
