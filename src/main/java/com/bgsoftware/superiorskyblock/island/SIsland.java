@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
+import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
 import com.bgsoftware.superiorskyblock.listeners.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -29,20 +30,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
-import java.security.acl.Owner;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -440,7 +440,6 @@ public class SIsland implements Island {
 
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
-
         if(!Bukkit.isPrimaryThread()){
             Bukkit.getScheduler().runTask(plugin, () -> calcIslandWorth(asker));
             return;
@@ -454,9 +453,17 @@ public class SIsland implements Island {
         calcProcess = true;
 
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
+        Map<Location, Map.Entry<Integer, EntityType>> spawners = new HashMap<>();
+        Map<Location, Map.Entry<Integer, Material>> blocks = new HashMap<>();
 
-        for (Chunk chunk : getAllChunks(true))
+        for (Chunk chunk : getAllChunks(true)) {
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
+            spawners.putAll(WildStackerHook.getAllSpawners(chunk));
+            blocks.putAll(WildStackerHook.getAllBarrels(chunk));
+        }
+
+//        Bukkit.broadcastMessage(spawners + "");
+//        Bukkit.broadcastMessage(blocks + "");
 
         blocksCalculations.clear();
         islandWorth = BigDecimalFormatted.ZERO;
@@ -496,17 +503,19 @@ public class SIsland implements Island {
 
                                 if(blockKey.toString().contains("AIR"))
                                     continue;
+
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                                 int blockCount = 1;
 
-                                for(BlocksProvider blocksProvider : plugin.getBlocksProviders()) {
-                                    blockCount = Math.max(blockCount, blocksProvider.getBlockCount(location));
-                                    blockKey = blocksProvider.getBlockKey(location, blockKey);
+                                if(spawners.containsKey(location)){
+                                    Map.Entry<Integer, EntityType> entry = spawners.get(location);
+                                    blockCount = entry.getKey();
+                                    blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
                                 }
 
-                                if(blockKey.toString().contains("SPAWNER")){
-                                    spawnersToCheck.put(location, blockCount);
-                                    continue;
+                                else if(blocks.containsKey(location)){
+                                    Map.Entry<Integer, EntityType> entry = spawners.get(location);
+                                    blockCount = entry.getKey();
                                 }
 
                                 handleBlockPlace(blockKey, blockCount);
@@ -526,16 +535,17 @@ public class SIsland implements Island {
             }
 
             calcProcess = false;
+
             Bukkit.getScheduler().runTask(plugin, () -> {
-                for(Location location : spawnersToCheck.keySet()){
-                    BlockState blockState = location.getBlock().getState();
-                    if(blockState instanceof CreatureSpawner){
-                        CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-                        Key key = SKey.of(creatureSpawner.getType() + ":" + creatureSpawner.getSpawnedType());
-                        int blockCount = spawnersToCheck.get(location);
-                        handleBlockPlace(key, blockCount);
-                    }
-                }
+//                for(Location location : spawnersToCheck.keySet()){
+//                    BlockState blockState = location.getBlock().getState();
+//                    if(blockState instanceof CreatureSpawner){
+//                        CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
+//                        Key key = SKey.of(creatureSpawner.getType() + ":" + creatureSpawner.getSpawnedType());
+//                        int blockCount = spawnersToCheck.get(location);
+//                        handleBlockPlace(key, blockCount);
+//                    }
+//                }
 
                 Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, getIslandLevelAsBigDecimal(), asker));
 
