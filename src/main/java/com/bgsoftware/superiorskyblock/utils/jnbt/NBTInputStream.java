@@ -61,12 +61,12 @@ import java.util.zip.GZIPInputStream;
 public final class NBTInputStream implements Closeable {
 
 	/**
-	 * The data input stream.
+	 * The database input stream.
 	 */
 	private final DataInputStream is;
 
 	/**
-	 * Creates a new <code>NBTInputStream</code>, which will source its data
+	 * Creates a new <code>NBTInputStream</code>, which will source its database
 	 * from the specified input stream.
 	 *
 	 * @param is

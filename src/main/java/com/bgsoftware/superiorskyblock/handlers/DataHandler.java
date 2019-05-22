@@ -53,6 +53,10 @@ public final class DataHandler {
         loadDatabase();
     }
 
+    public Connection getConnection() {
+        return conn;
+    }
+
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
             new Thread(() -> saveDatabase(false)).start();
@@ -230,7 +234,7 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
-                File copyFile = new File(plugin.getDataFolder(), "data-backup/islands/" + file.getName());
+                File copyFile = new File(plugin.getDataFolder(), "database-backup/islands/" + file.getName());
                 copyFile.getParentFile().mkdirs();
                 file.renameTo(copyFile);
             }
@@ -252,7 +256,7 @@ public final class DataHandler {
                     copyFile.getParentFile().mkdirs();
                     file.renameTo(copyFile);
                 }
-                File copyFile = new File(plugin.getDataFolder(), "data-backup/players/" + file.getName());
+                File copyFile = new File(plugin.getDataFolder(), "database-backup/players/" + file.getName());
                 copyFile.getParentFile().mkdirs();
                 file.renameTo(copyFile);
             }
@@ -273,7 +277,7 @@ public final class DataHandler {
                 copyFile.getParentFile().mkdirs();
                 gridFile.renameTo(copyFile);
             }
-            File copyFile = new File(plugin.getDataFolder(), "data-backup/grid");
+            File copyFile = new File(plugin.getDataFolder(), "database-backup/grid");
             copyFile.getParentFile().mkdirs();
             gridFile.renameTo(copyFile);
         }

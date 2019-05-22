@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * bStats collects some data for plugin authors.
+ * bStats collects some database for plugin authors.
  * <p>
  * Check out https://bStats.org/ to learn more about bStats!
  */
@@ -57,7 +57,7 @@ public class Metrics {
     // The version of this bStats class
     public static final int B_STATS_VERSION = 1;
 
-    // The url to which the data is sent
+    // The url to which the database is sent
     private static final String URL = "https://bStats.org/submitData/bukkit";
 
     // Is bStats enabled on this server?
@@ -66,7 +66,7 @@ public class Metrics {
     // Should failed requests be logged?
     private static boolean logFailedRequests;
 
-    // Should the sent data be logged?
+    // Should the sent database be logged?
     private static boolean logSentData;
 
     // Should the response text be logged?
@@ -106,14 +106,14 @@ public class Metrics {
             config.addDefault("serverUuid", UUID.randomUUID().toString());
             // Should failed request be logged?
             config.addDefault("logFailedRequests", false);
-            // Should the sent data be logged?
+            // Should the sent database be logged?
             config.addDefault("logSentData", false);
             // Should the response text be logged?
             config.addDefault("logResponseStatusText", false);
 
             // Inform the server owners about bStats
             config.options().header(
-                    "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
+                    "bStats collects some database for plugin authors like how many servers are using their plugins.\n" +
                             "To honor their work, you should not disable it.\n" +
                             "This has nearly no effect on the server performance!\n" +
                             "Check out https://bStats.org/ to learn more :)"
@@ -123,7 +123,7 @@ public class Metrics {
             } catch (IOException ignored) { }
         }
 
-        // Load the data
+        // Load the database
         enabled = config.getBoolean("enabled", true);
         serverUUID = config.getString("serverUuid");
         logFailedRequests = config.getBoolean("logFailedRequests", false);
@@ -171,7 +171,7 @@ public class Metrics {
     }
 
     /**
-     * Starts the Scheduler which submits our data every 30 minutes.
+     * Starts the Scheduler which submits our database every 30 minutes.
      */
     private void startSubmitting() {
         final Timer timer = new Timer(true); // We use a timer cause the Bukkit scheduler is affected by server lags
@@ -187,16 +187,16 @@ public class Metrics {
                 Bukkit.getScheduler().runTask(plugin, () -> submitData());
             }
         }, 1000 * 60 * 5, 1000 * 60 * 30);
-        // Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough time to start
+        // Submit the database every 30 minutes, first time after 5 minutes to give other plugins enough time to start
         // WARNING: Changing the frequency has no effect but your plugin WILL be blocked/deleted!
         // WARNING: Just don't do it!
     }
 
     /**
-     * Gets the plugin specific data.
+     * Gets the plugin specific database.
      * This method is called using Reflection.
      *
-     * @return The plugin specific data.
+     * @return The plugin specific database.
      */
     public JSONObject getPluginData() {
         JSONObject data = new JSONObject();
@@ -208,7 +208,7 @@ public class Metrics {
         data.put("pluginVersion", pluginVersion); // Append the version of the plugin
         JSONArray customCharts = new JSONArray();
         for (CustomChart customChart : charts) {
-            // Add the data of the custom charts
+            // Add the database of the custom charts
             JSONObject chart = customChart.getRequestJsonObject();
             if (chart == null) { // If the chart is null, we skip it
                 continue;
@@ -221,12 +221,12 @@ public class Metrics {
     }
 
     /**
-     * Gets the server specific data.
+     * Gets the server specific database.
      *
-     * @return The server specific data.
+     * @return The server specific database.
      */
     private JSONObject getServerData() {
-        // Minecraft specific data
+        // Minecraft specific database
         int playerAmount;
         try {
             // Around MC 1.8 the return type was changed to a collection from an array,
@@ -241,7 +241,7 @@ public class Metrics {
         int onlineMode = Bukkit.getOnlineMode() ? 1 : 0;
         String bukkitVersion = Bukkit.getVersion();
 
-        // OS/Java specific data
+        // OS/Java specific database
         String javaVersion = System.getProperty("java.version");
         String osName = System.getProperty("os.name");
         String osArch = System.getProperty("os.arch");
@@ -266,13 +266,13 @@ public class Metrics {
     }
 
     /**
-     * Collects the data and sends it afterwards.
+     * Collects the database and sends it afterwards.
      */
     private void submitData() {
         final JSONObject data = getServerData();
 
         JSONArray pluginData = new JSONArray();
-        // Search for all other bStats Metrics classes to get their plugin data
+        // Search for all other bStats Metrics classes to get their plugin database
         for (Class<?> service : Bukkit.getServicesManager().getKnownServices()) {
             try {
                 service.getField("B_STATS_VERSION"); // Our identifier :)
@@ -292,7 +292,7 @@ public class Metrics {
             @Override
             public void run() {
                 try {
-                    // Send the data
+                    // Send the database
                     sendData(plugin, data);
                 } catch (Exception e) {
                     // Something went wrong! :(
@@ -305,10 +305,10 @@ public class Metrics {
     }
 
     /**
-     * Sends the data to the bStats server.
+     * Sends the database to the bStats server.
      *
      * @param plugin Any plugin. It's just used to get a logger instance.
-     * @param data The data to send.
+     * @param data The database to send.
      * @throws Exception If the request failed.
      */
     private static void sendData(Plugin plugin, JSONObject data) throws Exception {
@@ -319,11 +319,11 @@ public class Metrics {
             throw new IllegalAccessException("This method must not be called from the main thread!");
         }
         if (logSentData) {
-            plugin.getLogger().info("Sending data to bStats: " + data.toString());
+            plugin.getLogger().info("Sending database to bStats: " + data.toString());
         }
         HttpsURLConnection connection = (HttpsURLConnection) new URL(URL).openConnection();
 
-        // Compress the data to save bandwidth
+        // Compress the database to save bandwidth
         byte[] compressedData = compress(data.toString());
 
         // Add headers
@@ -332,10 +332,10 @@ public class Metrics {
         connection.addRequestProperty("Connection", "close");
         connection.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
         connection.addRequestProperty("Content-Length", String.valueOf(compressedData.length));
-        connection.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON format
+        connection.setRequestProperty("Content-Type", "application/json"); // We send our database in JSON format
         connection.setRequestProperty("User-Agent", "MC-Server/" + B_STATS_VERSION);
 
-        // Send data
+        // Send database
         connection.setDoOutput(true);
         DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
         outputStream.write(compressedData);
@@ -352,7 +352,7 @@ public class Metrics {
         }
         bufferedReader.close();
         if (logResponseStatusText) {
-            plugin.getLogger().info("Sent data to bStats and received response: " + builder.toString());
+            plugin.getLogger().info("Sent database to bStats and received response: " + builder.toString());
         }
     }
 
@@ -400,13 +400,13 @@ public class Metrics {
             try {
                 JSONObject data = getChartData();
                 if (data == null) {
-                    // If the data is null we don't send the chart.
+                    // If the database is null we don't send the chart.
                     return null;
                 }
                 chart.put("data", data);
             } catch (Throwable t) {
                 if (logFailedRequests) {
-                    Bukkit.getLogger().log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
+                    Bukkit.getLogger().log(Level.WARNING, "Failed to get database for custom chart with id " + chartId, t);
                 }
                 return null;
             }
@@ -428,7 +428,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public SimplePie(String chartId, Callable<String> callable) {
             super(chartId);
@@ -459,7 +459,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
             super(chartId);
@@ -503,7 +503,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public DrilldownPie(String chartId, Callable<Map<String, Map<String, Integer>>> callable) {
             super(chartId);
@@ -552,7 +552,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public SingleLineChart(String chartId, Callable<Integer> callable) {
             super(chartId);
@@ -584,7 +584,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {
             super(chartId);
@@ -629,7 +629,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public SimpleBarChart(String chartId, Callable<Map<String, Integer>> callable) {
             super(chartId);
@@ -667,7 +667,7 @@ public class Metrics {
          * Class constructor.
          *
          * @param chartId The id of the chart.
-         * @param callable The callable which is used to request the chart data.
+         * @param callable The callable which is used to request the chart database.
          */
         public AdvancedBarChart(String chartId, Callable<Map<String, int[]>> callable) {
             super(chartId);

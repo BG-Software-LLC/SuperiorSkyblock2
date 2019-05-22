@@ -293,13 +293,13 @@ public final class GridHandler implements GridManager {
         String world = resultSet.getString("world");
 
         if(plugin.getSettings().maxIslandSize != maxIslandSize){
-            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting data.");
+            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting database.");
             SuperiorSkyblockPlugin.log("Restoring it to the old value...");
             plugin.getSettings().updateValue("max-island-size", maxIslandSize);
         }
 
         if(!plugin.getSettings().islandWorld.equals(world)){
-            SuperiorSkyblockPlugin.log("You have changed the island-world value without deleting data.");
+            SuperiorSkyblockPlugin.log("You have changed the island-world value without deleting database.");
             SuperiorSkyblockPlugin.log("Restoring it to the old value...");
             plugin.getSettings().updateValue("island-world", world);
         }
@@ -342,7 +342,7 @@ public final class GridHandler implements GridManager {
 
         int maxIslandSize = ((IntTag) compoundValues.getOrDefault("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize))).getValue();
         if(plugin.getSettings().maxIslandSize != maxIslandSize){
-            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting data.");
+            SuperiorSkyblockPlugin.log("You have changed the max-island-size value without deleting database.");
             SuperiorSkyblockPlugin.log("Restoring it to the old value...");
             plugin.getSettings().updateValue("max-island-size", maxIslandSize);
         }

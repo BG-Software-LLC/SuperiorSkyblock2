@@ -1,8 +1,12 @@
-package com.bgsoftware.superiorskyblock.enums;
+package com.bgsoftware.superiorskyblock.database;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public enum Query {
 
-    ISLAND_SET_CENTER("UPDATE islands SET center=? WHERE owner=?;"),
+    ISLAND_SET_CENTER("UPDATE islands SET center=? WHERE owner=?;"), //
     ISLAND_SET_TELEPORT_LOCATION("UPDATE islands SET teleportLocation=? WHERE owner=?;"),
     ISLAND_SET_BANK("UPDATE islands SET islandBank=? WHERE owner=?;"),
     ISLAND_SET_SIZE("UPDATE islands SET islandSize=? WHERE owner=?;"),
@@ -14,6 +18,12 @@ public enum Query {
     ISLAND_SET_PAYPAL("UPDATE islands SET paypal=? WHERE owner=?;"),
     ISLAND_SET_WARPS_LIMIT("UPDATE islands SET warpsLimit=? WHERE owner=?;"),
     ISLAND_SET_BONUS_WORTH("UPDATE islands SET bonusWorth=? WHERE owner=?;"),
+    ISLAND_SET_MEMBERS("UPDATE islands SET members=? WHERE owner=?;"),
+    ISLAND_SET_BANNED("UPDATE islands SET banned=? WHERE owner=?;"),
+    ISLAND_SET_PERMISSION_NODES("UPDATE islands SET permissionNodes=? WHERE owner=?;"),
+    ISLAND_SET_UPGRADES("UPDATE islands SET upgrades=? WHERE owner=?;"),
+    ISLAND_SET_WARPS("UPDATE islands SET warps=? WHERE owner=?;"),
+    ISLAND_SET_BLOCK_LIMITS("UPDATE islands SET blockLimits=? WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),
     PLAYER_SET_NAME("UPDATE players SET name=? WHERE player=?;"),
@@ -29,5 +39,13 @@ public enum Query {
 
     public String getQuery() {
         return query;
+    }
+
+    public PreparedStatement getStatement(Connection connection) throws SQLException {
+        return connection.prepareStatement(query);
+    }
+
+    public StatementHolder getStatementHolder() throws SQLException {
+        return new StatementHolder(this);
     }
 }

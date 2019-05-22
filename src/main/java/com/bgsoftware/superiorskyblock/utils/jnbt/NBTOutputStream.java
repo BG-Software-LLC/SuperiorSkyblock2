@@ -63,7 +63,7 @@ public final class NBTOutputStream implements Closeable {
 	private final DataOutputStream os;
 
 	/**
-	 * Creates a new <code>NBTOutputStream</code>, which will write data to the
+	 * Creates a new <code>NBTOutputStream</code>, which will write database to the
 	 * specified underlying output stream.
 	 *
 	 * @param os

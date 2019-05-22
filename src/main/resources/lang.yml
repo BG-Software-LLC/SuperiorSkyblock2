@@ -285,7 +285,7 @@ ROLE_LEADER: 'Leader'
 # Called when the calculate task finishes.
 ISLAND_CALC_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands have been re-calculated!'
 # Called when the save task finishes.
-ISLAND_SAVE_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands and player data have been saved!'
+ISLAND_SAVE_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands and player database have been saved!'
 # Called when a player joins/leave the server (for island-members only)
 PLAYER_JOIN_ANNOUNCEMENT: '&a{0} joined the server.'
 PLAYER_QUIT_ANNOUNCEMENT: '&a{0} left the server.'

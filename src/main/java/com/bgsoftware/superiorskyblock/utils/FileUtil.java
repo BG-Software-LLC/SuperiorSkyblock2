@@ -33,7 +33,7 @@ public final class FileUtil {
             type = Material.valueOf(section.getString("type"));
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
-            SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+            SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
             return null;
         }
 
