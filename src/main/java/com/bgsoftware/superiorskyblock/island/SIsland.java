@@ -8,9 +8,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.database.DataType;
-import com.bgsoftware.superiorskyblock.database.Query;
-import com.bgsoftware.superiorskyblock.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.listeners.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
@@ -41,7 +38,6 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.omg.PortableInterceptor.HOLDING;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -69,7 +65,7 @@ public class SIsland implements Island {
     private final BlockPosition center;
 
     /*
-     * SIsland database
+     * SIsland data
      */
 
     private final Set<UUID> members = new HashSet<>();
@@ -256,31 +252,23 @@ public class SIsland implements Island {
         members.add(superiorPlayer.getUniqueId());
         superiorPlayer.setTeamLeader(owner);
         superiorPlayer.setIslandRole(islandRole);
-
-        updateMembers();
     }
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
         members.remove(superiorPlayer.getUniqueId());
         superiorPlayer.setTeamLeader(superiorPlayer.getUniqueId());
-
-        updateMembers();
     }
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
         if(isMember(superiorPlayer)) kickMember(superiorPlayer);
         banned.add(superiorPlayer.getUniqueId());
-
-        updateBanned();
     }
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
         banned.remove(superiorPlayer.getUniqueId());
-
-        updateBanned();
     }
 
     @Override
@@ -340,27 +328,8 @@ public class SIsland implements Island {
     }
 
     @Override
-    public void setTeleportLocation(Location teleportLocation, boolean save) {
-        this.teleportLocation = teleportLocation.clone();
-
-        if (!save)
-            return;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, getLocation(this.teleportLocation));
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void setTeleportLocation(Location teleportLocation) {
-        setTeleportLocation(teleportLocation, false);
+        this.teleportLocation = teleportLocation.clone();
     }
 
     @Override
@@ -389,8 +358,6 @@ public class SIsland implements Island {
     @Override
     public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value){
         permissionNodes.get(islandRole).setPermission(islandPermission, value);
-
-        updatePermissionNodes();
     }
 
     @Override
@@ -463,27 +430,12 @@ public class SIsland implements Island {
 
     @Override
     public void depositMoney(double amount){
-        setIslandBank(islandBank.add(BigDecimalFormatted.of(amount)));
+        islandBank = islandBank.add(BigDecimalFormatted.of(amount));
     }
 
     @Override
     public void withdrawMoney(double amount){
-        setIslandBank(islandBank.subtract(new BigDecimal(amount)));
-    }
-
-    private void setIslandBank(BigDecimalFormatted bank) {
-        islandBank = bank;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_BANK.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, islandBank.getAsString());
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        islandBank = islandBank.subtract(new BigDecimal(amount));
     }
 
     @Override
@@ -690,17 +642,6 @@ public class SIsland implements Island {
 
     public void setBonusWorth(BigDecimal bonusWorth){
         this.bonusWorth = BigDecimalFormatted.of(bonusWorth);
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_BONUS_WORTH.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, this.bonusWorth.getAsString());
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -751,8 +692,6 @@ public class SIsland implements Island {
     @Override
     public void setUpgradeLevel(String upgradeName, int level){
         upgrades.put(upgradeName, Math.min(plugin.getUpgrades().getMaxUpgradeLevel(upgradeName), level));
-
-        updateUpgrades();
     }
 
     @Override
@@ -787,26 +726,7 @@ public class SIsland implements Island {
 
     @Override
     public void setIslandSize(int islandSize) {
-        setIslandSize(islandSize, true);
-    }
-
-    @Override
-    public void setIslandSize(int islandSize, boolean save) {
         this.islandSize = islandSize;
-
-        if (!save)
-            return;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_SIZE.getStatementHolder();
-
-            holder.set(DataType.INT, 1, this.islandSize);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -817,72 +737,26 @@ public class SIsland implements Island {
     @Override
     public void setHoppersLimit(int hoppersLimit){
         this.hoppersLimit = hoppersLimit;
-
-        updateBlockLimits();
     }
 
     @Override
     public void setTeamLimit(int teamLimit) {
         this.teamLimit = teamLimit;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder();
-
-            holder.set(DataType.INT, 1, teamLimit);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
         this.cropGrowth = cropGrowth;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_CROP_GROWTH.getStatementHolder();
-
-            holder.set(DataType.DOUBLE, 1, this.cropGrowth);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void setSpawnerRatesMultiplier(double spawnerRates) {
         this.spawnerRates = spawnerRates;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_SPAWNER_RATES.getStatementHolder();
-
-            holder.set(DataType.DOUBLE, 1, this.spawnerRates);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
     public void setMobDropsMultiplier(double mobDrops) {
         this.mobDrops = mobDrops;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_MOB_DROPS.getStatementHolder();
-
-            holder.set(DataType.DOUBLE, 1, this.mobDrops);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -893,17 +767,6 @@ public class SIsland implements Island {
     @Override
     public void setDiscord(String discord) {
         this.discord = discord;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_DISCORD.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, this.discord);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -914,17 +777,6 @@ public class SIsland implements Island {
     @Override
     public void setPaypal(String paypal) {
         this.paypal = paypal;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_PAYPAL.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, this.paypal);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -957,8 +809,6 @@ public class SIsland implements Island {
     @Override
     public void setWarpLocation(String name, Location location){
         warps.put(name.toLowerCase(), location.clone());
-
-        updateWarps();
     }
 
     @Override
@@ -991,15 +841,11 @@ public class SIsland implements Island {
                 Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
         }
-
-        updateWarps();
     }
 
     @Override
     public void deleteWarp(String name){
         warps.remove(name);
-
-        updateWarps();
     }
 
     @Override
@@ -1085,99 +931,6 @@ public class SIsland implements Island {
         statement.setString(18, bonusWorth.getAsString());
         statement.setInt(19, warpsLimit);
         statement.executeUpdate();
-    }
-
-    private void updateBlockLimits() {
-        try {
-            StatementHolder holder = Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, "HOPPER=" + this.hoppersLimit);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateWarps() {
-        StringBuilder warps = new StringBuilder();
-        this.warps.keySet().forEach(warp ->
-                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
-
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_WARPS.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, warps.length() == 0 ? "" : warps.toString());
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateUpgrades() {
-        StringBuilder upgrades = new StringBuilder();
-        this.upgrades.keySet().forEach(upgrade ->
-                upgrades.append(",").append(upgrade).append("=").append(this.upgrades.get(upgrade)));
-
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_UPGRADES.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, upgrades.length() == 0 ? "" : upgrades.toString());
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updatePermissionNodes() {
-        StringBuilder permissionNodes = new StringBuilder();
-        this.permissionNodes.keySet().forEach(islandRole ->
-                permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
-
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, permissionNodes.length() == 0 ? "" : permissionNodes.toString());
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateMembers() {
-        try {
-            StatementHolder holder = Query.ISLAND_SET_MEMBERS.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, members.isEmpty() ? "" : getUuidCollectionString(members));
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateBanned() {
-        try {
-            StatementHolder holder = Query.ISLAND_SET_BANNED.getStatementHolder();
-
-            holder.set(DataType.STRING, 1, banned.isEmpty() ? "" : getUuidCollectionString(banned));
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private static String getUuidCollectionString(Collection<UUID> collection) {
@@ -1300,17 +1053,6 @@ public class SIsland implements Island {
 
     public void setWarpsLimit(int warpsLimit) {
         this.warpsLimit = warpsLimit;
-
-        try {
-            StatementHolder holder = Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder();
-
-            holder.set(DataType.INT, 1, this.warpsLimit);
-            holder.set(DataType.STRING, 2, owner.toString());
-
-            holder.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public int getWarpsLimit() {

@@ -11,12 +11,10 @@ import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook_PAPI;
+import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.PanelListener;
@@ -38,8 +36,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -52,8 +48,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private DataHandler dataHandler;
     private PanelHandler panelHandler;
     private UpgradesHandler upgradesHandler;
-
-    private List<BlocksProvider> blocksProviders = new ArrayList<>();
 
     private NMSAdapter nmsAdapter;
 
@@ -87,10 +81,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     FAWEHook.register();
                 if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                     LeaderHeadsHook.register();
-
-                registerBlocksProvider(new BlocksProvider_Default());
-                if (Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-                    registerBlocksProvider(new BlocksProvider_WildStacker());
+                WildStackerHook.register(this);
 
                 reloadPlugin(true);
 
@@ -214,15 +205,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
-    }
-
-    public List<BlocksProvider> getBlocksProviders() {
-        return blocksProviders;
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public void registerBlocksProvider(BlocksProvider blocksProvider){
-        blocksProviders.add(blocksProvider);
     }
 
     public static void log(String message){
