@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
@@ -260,8 +261,40 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void setBlockAmount(Block block, int amount){
+        boolean insert = false;
+
+        if(!stackedBlocks.stackedBlocks.containsKey(SBlockPosition.of(block.getLocation())))
+            insert = true;
+
         stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount);
         stackedBlocks.updateName(block);
+
+        if(amount > 1) {
+            if (insert) {
+                Query.STACKED_BLOCKS_INSERT.getStatementHolder()
+                        .setString(block.getWorld().getName())
+                        .setInt(block.getX())
+                        .setInt(block.getY())
+                        .setInt(block.getZ())
+                        .setInt(amount)
+                        .execute();
+            } else {
+                Query.STACKED_BLOCKS_UPDATE.getStatementHolder()
+                        .setInt(amount)
+                        .setString(block.getWorld().getName())
+                        .setInt(block.getX())
+                        .setInt(block.getY())
+                        .setInt(block.getZ())
+                        .execute();
+            }
+        }else{
+            Query.STACKED_BLOCKS_DELETE.getStatementHolder()
+                    .setString(block.getWorld().getName())
+                    .setInt(block.getX())
+                    .setInt(block.getY())
+                    .setInt(block.getZ())
+                    .execute();
+        }
     }
 
     public GUIInventory getTopIslands(){
@@ -367,25 +400,6 @@ public final class GridHandler implements GridManager {
         statement.setString(4, world);
         statement.executeUpdate();
     }
-
-//    public CompoundTag getAsTag(){
-//        Map<String, Tag> compoundValues = Maps.newHashMap(), _compoundValues;
-//        List<Tag> stackedBlocks = Lists.newArrayList();
-//
-//        compoundValues.put("lastIsland", new StringTag(lastIsland.toString()));
-//
-//        for(Map.Entry<SBlockPosition, Integer> entry : this.stackedBlocks.entrySet()){
-//            _compoundValues = Maps.newHashMap();
-//            _compoundValues.put("location", new StringTag(entry.getKey().toString()));
-//            _compoundValues.put("stackAmount", new IntTag(entry.getValue()));
-//            stackedBlocks.add(new CompoundTag(_compoundValues));
-//        }
-//
-//        compoundValues.put("stackedBlocks", new ListTag(CompoundTag.class, stackedBlocks));
-//        compoundValues.put("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize));
-//
-//        return new CompoundTag(compoundValues);
-//    }
 
     public void reloadBlockValues(){
         blockValues = new BlockValuesHandler();

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 public enum Query {
 
-    ISLAND_SET_CENTER("UPDATE islands SET center=? WHERE owner=?;"), //
     ISLAND_SET_TELEPORT_LOCATION("UPDATE islands SET teleportLocation=? WHERE owner=?;"),
     ISLAND_SET_BANK("UPDATE islands SET islandBank=? WHERE owner=?;"),
     ISLAND_SET_SIZE("UPDATE islands SET islandSize=? WHERE owner=?;"),
@@ -24,12 +23,21 @@ public enum Query {
     ISLAND_SET_UPGRADES("UPDATE islands SET upgrades=? WHERE owner=?;"),
     ISLAND_SET_WARPS("UPDATE islands SET warps=? WHERE owner=?;"),
     ISLAND_SET_BLOCK_LIMITS("UPDATE islands SET blockLimits=? WHERE owner=?;"),
+    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,bonusWorth=?,warpsLimit=? WHERE owner=?;"),
+    ISLAND_INSERT("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),
     PLAYER_SET_NAME("UPDATE players SET name=? WHERE player=?;"),
     PLAYER_SET_ROLE("UPDATE players SET islandRole=? WHERE player=?;"),
     PLAYER_SET_TEXTURE("UPDATE players SET textureValue=? WHERE player=?;"),
-    PLAYER_SET_DISBANDS("UPDATE players SET disbands=? WHERE player=?;");
+    PLAYER_SET_DISBANDS("UPDATE players SET disbands=? WHERE player=?;"),
+    PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=? WHERE player=?;"),
+    PLAYER_INSERT("INSERT INTO players VALUES(?,?,?,?,?,?);"),
+
+    STACKED_BLOCKS_UPDATE("UPDATE stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
+    STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks VALUES(?,?,?,?,?);"),
+    STACKED_BLOCKS_DELETE("DELETE FROM stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;");
 
     private String query;
 
@@ -37,15 +45,11 @@ public enum Query {
         this.query = query;
     }
 
-    public String getQuery() {
-        return query;
-    }
-
     public PreparedStatement getStatement(Connection connection) throws SQLException {
         return connection.prepareStatement(query);
     }
 
-    public StatementHolder getStatementHolder() throws SQLException {
+    public StatementHolder getStatementHolder(){
         return new StatementHolder(this);
     }
 }

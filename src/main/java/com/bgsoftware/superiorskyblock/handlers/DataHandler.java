@@ -71,18 +71,13 @@ public final class DataHandler {
             //Saving islands
             for(Island island : islands){
                 SIsland sIsland = (SIsland) island;
-                if (sIsland == null)
-                    continue;
-                if (sIsland.isTransferred()) {
-                    sIsland.executeDeleteStatement(conn);
-                    sIsland.executeInsertStatement(conn);
-                } else
-                    sIsland.executeUpdateStatement(conn);
+                if (sIsland != null)
+                    sIsland.executeUpdateStatement();
             }
 
             //Saving players
             for(SuperiorPlayer player : players)
-                ((SSuperiorPlayer) player).executeUpdateStatement(conn);
+                ((SSuperiorPlayer) player).executeUpdateStatement();
 
             // Saving stacked blocks
             conn.prepareStatement("DELETE FROM stackedBlocks;").executeUpdate();
@@ -108,13 +103,7 @@ public final class DataHandler {
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
                     "islandRole VARCHAR, textureValue VARCHAR);").executeUpdate();
             conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);").executeUpdate();
-            conn.prepareStatement("CREATE TABLE IF NOT EXISTS \"stackedBlocks\" (\n" +
-                    "\t\"world\"\tTEXT NOT NULL,\n" +
-                    "\t\"x\"\tINTEGER NOT NULL,\n" +
-                    "\t\"y\"\tINTEGER NOT NULL,\n" +
-                    "\t\"z\"\tINTEGER NOT NULL,\n" +
-                    "\t\"amount\"\tINTEGER NOT NULL\n" +
-                    ");").executeUpdate();
+            conn.prepareStatement("CREATE TABLE IF NOT EXISTS stackedBlocks (world VARCHAR, x INTEGER, y INTEGER, z INTEGER, amount INTEGER);").executeUpdate();
 
             addColumnIfNotExists("bonusWorth", "islands", "0", "VARCHAR");
             addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
@@ -160,7 +149,7 @@ public final class DataHandler {
                     conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
                             island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()), plugin.getSettings().defaultWarpsLimit)).executeUpdate();
                 }
-                ((SIsland) island).executeUpdateStatement(conn);
+                ((SIsland) island).executeUpdateStatement();
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
@@ -191,18 +180,11 @@ public final class DataHandler {
     }
 
     public void insertPlayer(SuperiorPlayer player){
-        new SuperiorThread(() -> {
-            try{
-                if(!containsPlayer(player)) {
-                    conn.prepareStatement(String.format("INSERT INTO players VALUES('%s','','','','','');",
-                            player.getUniqueId())).executeUpdate();
-                }
-                conn.prepareStatement(((SSuperiorPlayer) player).getSaveStatement()).executeUpdate();
-            }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("Couldn't insert the player " + player.getUniqueId() + ".");
-                ex.printStackTrace();
-            }
-        }).start();
+        if(!containsPlayer(player)) {
+            ((SSuperiorPlayer) player).executeInsertStatement();
+        }else{
+            ((SSuperiorPlayer) player).executeUpdateStatement();
+        }
     }
 
     private boolean containsPlayer(SuperiorPlayer player){

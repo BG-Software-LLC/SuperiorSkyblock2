@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import com.bgsoftware.superiorskyblock.database.DatabaseObject;
+import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
@@ -18,14 +20,12 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-public final class SSuperiorPlayer implements SuperiorPlayer {
+public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -92,10 +92,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     public void setTextureValue(String textureValue) {
         this.textureValue = textureValue;
+        Query.PLAYER_SET_TEXTURE.getStatementHolder()
+                .setString(textureValue)
+                .setString(player.toString())
+                .execute();
     }
 
     public void updateName(){
         this.name = Bukkit.getPlayer(player).getName();
+        Query.PLAYER_SET_NAME.getStatementHolder()
+                .setString(name)
+                .setString(player.toString())
+                .execute();
     }
 
     public World getWorld(){
@@ -112,6 +120,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     public void setTeamLeader(UUID teamLeader) {
         this.teamLeader = teamLeader;
+        Query.PLAYER_SET_LEADER.getStatementHolder()
+                .setString(teamLeader.toString())
+                .setString(player.toString())
+                .execute();
     }
 
     public Island getIsland(){
@@ -124,6 +136,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     public void setIslandRole(IslandRole islandRole) {
         this.islandRole = islandRole;
+        Query.PLAYER_SET_ROLE.getStatementHolder()
+                .setString(islandRole.name())
+                .setString(player.toString())
+                .execute();
     }
 
     public boolean hasWorldBorderEnabled() {
@@ -176,6 +192,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     public void setDisbands(int disbands) {
         this.disbands = disbands < 0 ? 0 : disbands;
+        Query.PLAYER_SET_DISBANDS.getStatementHolder()
+                .setInt(disbands)
+                .setString(player.toString())
+                .execute();
     }
 
     public BlockPosition getSchematicPos1() {
@@ -215,36 +235,34 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         return island != null && island.hasPermission(this, permission);
     }
 
-    public String getSaveStatement(){
-        return String.format("UPDATE players SET teamLeader='%s',name='%s',islandRole='%s',textureValue='%s',disbands='%d' WHERE player='%s'",
-                teamLeader, name, islandRole.name(), textureValue, disbands, player);
+    @Override
+    public void executeUpdateStatement() {
+        Query.PLAYER_UPDATE.getStatementHolder()
+                .setString(teamLeader.toString())
+                .setString(name)
+                .setString(islandRole.name())
+                .setString(textureValue)
+                .setInt(disbands)
+                .setString(player.toString())
+                .execute();
     }
 
-    @SuppressWarnings("all")
-    public void executeUpdateStatement(Connection connection) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=? WHERE player=?;");
-        statement.setString(1, teamLeader.toString());
-        statement.setString(2, name);
-        statement.setString(3, islandRole.name());
-        statement.setString(4, textureValue);
-        statement.setInt(5, disbands);
-        statement.setString(6, player.toString());
-        statement.executeUpdate();
-
-
+    @Override
+    public void executeInsertStatement() {
+        Query.PLAYER_INSERT.getStatementHolder()
+                .setString(player.toString())
+                .setString("")
+                .setString("")
+                .setString("")
+                .setString("")
+                .setInt(plugin.getSettings().disbandCount)
+                .execute();
     }
 
-//    public CompoundTag getAsTag(){
-//        Map<String, Tag> compoundValues = new HashMap<>();
-//
-//        compoundValues.put("player", new StringTag(player.toString()));
-//        compoundValues.put("teamLeader", new StringTag(teamLeader.toString()));
-//        compoundValues.put("name", new StringTag(this.name));
-//        compoundValues.put("islandRole", new StringTag(islandRole.name()));
-//        compoundValues.put("textureValue", new StringTag(textureValue));
-//
-//        return new CompoundTag(compoundValues);
-//    }
+    @Override
+    public void executeDeleteStatement() {
+        throw new UnsupportedOperationException("You cannot use delete statement on superior players.");
+    }
 
     @Override
     public String toString() {

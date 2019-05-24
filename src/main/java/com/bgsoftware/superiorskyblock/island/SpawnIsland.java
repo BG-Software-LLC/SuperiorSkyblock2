@@ -28,6 +28,11 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void setTeleportLocation(Location teleportLocation) {
+        this.teleportLocation = teleportLocation;
+    }
+
+    @Override
     public boolean isMember(SuperiorPlayer superiorPlayer) {
         return false;
     }

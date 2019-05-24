@@ -51,8 +51,6 @@ public interface Island extends Comparable<Island> {
 
     void setTeleportLocation(Location teleportLocation);
 
-    void setTeleportLocation(Location teleportLocation, boolean save);
-
     Location getMinimum();
 
     Location getMaximum();
@@ -149,8 +147,6 @@ public interface Island extends Comparable<Island> {
     double getMobDropsMultiplier();
 
     void setIslandSize(int islandSize);
-
-    void setIslandSize(int islandSize, boolean save);
 
     void setHoppersLimit(int hoppersLimit);
 

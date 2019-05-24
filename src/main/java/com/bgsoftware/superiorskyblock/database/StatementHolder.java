@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.database;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
-import org.bukkit.Bukkit;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -10,28 +9,104 @@ import java.sql.SQLException;
 public class StatementHolder {
 
     private PreparedStatement statement;
+    private int currentIndex = 1;
 
-    public StatementHolder(Query query) throws SQLException {
-        statement = query.getStatement(SuperiorSkyblockPlugin.getPlugin().getDataHandler().getConnection());
+    StatementHolder(Query query){
+        try {
+            statement = query.getStatement(SuperiorSkyblockPlugin.getPlugin().getDataHandler().getConnection());
+        }catch(SQLException ex){
+            ex.printStackTrace();
+            statement = null;
+        }
     }
 
-    public void set(DataType type, int index, Object object) throws SQLException {
-        type.set(statement, index, object);
+    public StatementHolder setString(String value){
+        if(statement != null) {
+            try {
+                statement.setString(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setInt(int value){
+        if(statement != null) {
+            try {
+                statement.setInt(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setShort(short value){
+        if(statement != null) {
+            try {
+                statement.setInt(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setLong(long value){
+        if(statement != null) {
+            try {
+                statement.setLong(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setFloat(float value){
+        if(statement != null) {
+            try {
+                statement.setFloat(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setDouble(double value){
+        if(statement != null) {
+            try {
+                statement.setDouble(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
+    }
+
+    public StatementHolder setBoolean(boolean value){
+        if(statement != null) {
+            try {
+                statement.setBoolean(currentIndex++, value);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return this;
     }
 
     public void execute() {
-        if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(SuperiorSkyblockPlugin.getPlugin(), this::execute);
-            return;
+        if(statement != null) {
+            new SuperiorThread(() -> {
+                try {
+                    statement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         }
-
-        new SuperiorThread(() -> {
-            try {
-                statement.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }).start();
     }
 
 }
