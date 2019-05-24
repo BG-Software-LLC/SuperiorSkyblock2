@@ -46,6 +46,7 @@ public final class SettingsHandler {
     public final List<String> interactables;
     public final boolean visitorsDamage;
     public final int disbandCount;
+    public final boolean islandTopIncludeLeader;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -54,7 +55,6 @@ public final class SettingsHandler {
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
-
         cfg.resetYamlFile(plugin, "config.yml");
 
         saveInterval = cfg.getLong("save-interval", 6000);
@@ -90,6 +90,7 @@ public final class SettingsHandler {
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
         disbandCount = cfg.getInt("disband-counts", 5);
+        islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
     }
 
     public void updateValue(String path, Object value){

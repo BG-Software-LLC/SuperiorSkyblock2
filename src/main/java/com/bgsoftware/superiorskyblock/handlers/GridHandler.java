@@ -587,7 +587,7 @@ public final class GridHandler implements GridManager {
                                 lore.add(memberFormat.replace("{}", "None"));
                             }
                             else {
-                                for (UUID memberUUID : island.getMembers()) {
+                                for (UUID memberUUID : plugin.getSettings().islandTopIncludeLeader ? island.getAllMembers() : island.getMembers()) {
                                     lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberUUID).getName()));
                                 }
                             }

@@ -165,6 +165,14 @@ public final class ConfigComments {
     @Comment("When disabled, visitors won't get damaged in other islands.")
     public static String VISITORS_DAMAGE = "visitors-damage";
 
+    @Comment("")
+    @Comment("The amount of times a player can disband an island.")
+    public static String DISBAND_COUNT = "disband-count";
+
+    @Comment("")
+    @Comment("Should the list of members in island top also include the island leader?")
+    public static String ISLAND_TOP_INCLUDE_LEADER = "island-top-include-leader";
+
 
 
 }
