@@ -221,7 +221,7 @@ public final class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = superiorPlayer.getIsland();
@@ -239,7 +239,6 @@ public final class PlayersListener implements Listener {
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal())));
-
     }
 
     @EventHandler
