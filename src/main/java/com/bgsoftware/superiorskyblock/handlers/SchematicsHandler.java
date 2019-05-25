@@ -143,7 +143,6 @@ public final class SchematicsHandler implements SchematicManager {
             }
         }
 
-        //noinspection IntegerDivisionInFloatingPointContext
         Location center = new Location(world, xSize / 2, ySize / 2, zSize / 2).add(min);
         for(LivingEntity livingEntity : getEntities(min, max)){
             entities.add(new TagBuilder().applyEntity(livingEntity, center).build());
@@ -182,15 +181,11 @@ public final class SchematicsHandler implements SchematicManager {
                 file.createNewFile();
             }
 
-            NBTInputStream reader = new NBTInputStream(new FileInputStream(file));
-
             CompoundTag tag = null;
 
-            try{
+            try(NBTInputStream reader = new NBTInputStream(new FileInputStream(file))){
                 tag = (CompoundTag) reader.readTag();
-            }catch(ClassCastException ignored){ }
-
-            reader.close();
+            }catch(Exception ignored){}
 
             return tag == null ? null : new SSchematic(tag);
         }catch(IOException ex){
