@@ -1,0 +1,1618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="SuperiorSkyblock" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b2f6b34b-d605-444e-95cd-d8952d2fa24b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/SuperiorSkyblock2.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_boydti_fawe_api_latest.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_code_gson_gson_2_3_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_guava_guava_17_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_googlecode_json_simple_json_simple_1_1_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_6.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_persistence_persistence_api_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_10.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__me_clip_placeholderapi_2_10_2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_md_5_bungeecord_chat_1_8_SNAPSHOT.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_milkbowl_vault_VaultAPI_1_7.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_avaje_ebean_2_8_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_bukkit_bukkit_1_8_R0_1_SNAPSHOT.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_spigotmc_spigot_api_1_8_R0_1_SNAPSHOT.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_yaml_snakeyaml_1_14.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/superiorskyblock.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_13_R1/superiorskyblock-1_13_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_13_R2/superiorskyblock-1_13_R2.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_8_R1/superiorskyblock-1_8_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_8_R3/superiorskyblock-1_8_R3.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_9_R1/superiorskyblock-1_9_R1.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/v1_9_R2/superiorskyblock-1_9_R2.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/superiorskyblock-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/API/superiorskyblock-api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/out/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <ignored path="$PROJECT_DIR$/v1_8_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_8_R2/target/" />
+    <ignored path="$PROJECT_DIR$/v1_8_R3/target/" />
+    <ignored path="$PROJECT_DIR$/v1_9_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_9_R2/target/" />
+    <ignored path="$PROJECT_DIR$/v1_11_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_10_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_12_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_13_R1/target/" />
+    <ignored path="$PROJECT_DIR$/v1_13_R2/target/" />
+    <ignored path="$PROJECT_DIR$/API/target/" />
+    <ignored path=".idea/" />
+    <ignored mask="*.iml" />
+    <ignored mask="*.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="DefaultGradleProjectSettings">
+    <option name="isMigrated" value="true" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1439580957">
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="java" value="516" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JAVA" value="516" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="class" value="4" />
+          <entry key="java" value="24" />
+          <entry key="xml" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="CLASS" value="4" />
+          <entry key="JAVA" value="24" />
+          <entry key="XML" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="5" />
+          <entry key="project.open.time.4" value="5" />
+          <entry key="project.opened" value="5" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="476">
+              <caret line="109" column="147" lean-forward="true" selection-start-line="109" selection-start-column="147" selection-end-line="109" selection-end-column="147" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#3290#3323#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PlayersHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="425">
+              <caret line="48" column="68" selection-start-line="48" selection-start-column="58" selection-end-line="48" selection-end-column="68" />
+              <folding>
+                <element signature="e#4695#4696#0" expanded="true" />
+                <element signature="e#4750#4751#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/GridHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="290">
+              <caret line="314" column="16" selection-start-line="314" selection-start-column="16" selection-end-line="314" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-254">
+              <caret line="101" column="63" selection-start-line="101" selection-start-column="58" selection-end-line="101" selection-end-column="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>IslandRegistry</find>
+      <find>lastIsland =</find>
+      <find>boolean save</find>
+      <find>setCenter</find>
+      <find>setTEleport</find>
+      <find>setTeleport</find>
+      <find>Bank</find>
+      <find>bank</find>
+      <find>setIslandSize</find>
+      <find>SET</find>
+      <find>setTeam</find>
+      <find>setCropGrowth</find>
+      <find>setWARPS</find>
+      <find>setBonus</find>
+      <find>setMember</find>
+      <find>addMember</find>
+      <find>setPerm</find>
+      <find>setUpg</find>
+      <find>exec</find>
+      <find>setWarp</find>
+      <find>(0,</find>
+      <find>(1,</find>
+      <find>this.texture</find>
+      <find>setBlock</find>
+      <find>setBlockAm</find>
+      <find>disband-count</find>
+      <find>br</find>
+      <find>readNamedTagName</find>
+      <find>createIsland</find>
+      <find>players</find>
+    </findStrings>
+    <replaceStrings>
+      <replace />
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/ProtectionListener.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/UpgradesListener.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/CmdTeam.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/island/IslandPermission.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/lang.yml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/CmdTeleport.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/CommandsHandler.java" />
+        <option value="$PROJECT_DIR$/v1_13_R2/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_13_R2.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/TagBuilder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/TagUtil.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SPermissionNode.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PlayersHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/legacy/Materials.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/tasks/SaveTask.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/admin/CmdAdminSave.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/CmdAdmin.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/admin/CmdAdminBonus.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/BigDecimalFormatted.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/handlers/GridManager.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/guis/creation-gui.yml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PanelHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/guis/creation-gui1_13.yml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/LeaderHeadsHook.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PanelListener.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/config/CommentedConfiguration.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/Locale.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/UpgradesHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/BlocksProvider_WildStacker.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WildStackerHook.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java" />
+        <option value="$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/island/Island.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/DataType.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/CmdSetTeleport.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/DatabaseObject.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/Query.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SettingsHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/resources/config.yml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/config/ConfigComments.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/GridHandler.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WorldEditHook.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/grid/WorldGenerator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1047" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
+              <item name="database" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
+              <item name="hooks" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="superiorskyblock_recoded" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558801665640" />
+    <property name="last_opened_file_path" value="D:/Spigot Jars/plugins/FastAsyncWorldEdit-bukkit-1.13.17.jar!/" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.34747708" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\config" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\commands\command\admin" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\utils\key" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\org\jnbt" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.bgsoftware.superiorskyblock.commands.command.admin" />
+      <recent name="com.bgsoftware.superiorskyblock.api.events" />
+      <recent name="com.bgsoftware.superiorskyblock.metrics" />
+      <recent name="com.ome_r.superiorskyblock.grid" />
+      <recent name="com.ome_r.superiorskyblock.tasks" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\guis" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\schematics" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\Omer\AppData\Roaming\Subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b2f6b34b-d605-444e-95cd-d8952d2fa24b" name="Default Changelist" comment="" />
+      <created>1543001596233</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1543001596233</updated>
+      <workItem from="1543001597497" duration="15909000" />
+      <workItem from="1543049188164" duration="615000" />
+      <workItem from="1543411946072" duration="8349000" />
+      <workItem from="1543421146552" duration="5597000" />
+      <workItem from="1543440382362" duration="631000" />
+      <workItem from="1543443813854" duration="121000" />
+      <workItem from="1543492982840" duration="5585000" />
+      <workItem from="1543498862247" duration="659000" />
+      <workItem from="1543518451598" duration="601000" />
+      <workItem from="1543698213521" duration="5502000" />
+      <workItem from="1543785416830" duration="599000" />
+      <workItem from="1543841345002" duration="1198000" />
+      <workItem from="1543875959529" duration="25000" />
+      <workItem from="1543960889398" duration="3804000" />
+      <workItem from="1544003262495" duration="259000" />
+      <workItem from="1544093329871" duration="930000" />
+      <workItem from="1544124381693" duration="7200000" />
+      <workItem from="1544132402003" duration="8657000" />
+      <workItem from="1544179740523" duration="630000" />
+      <workItem from="1544212554548" duration="472000" />
+      <workItem from="1544213062980" duration="1382000" />
+      <workItem from="1544267054462" duration="20000" />
+      <workItem from="1544268838005" duration="6987000" />
+      <workItem from="1544379608230" duration="88000" />
+      <workItem from="1544382476012" duration="5846000" />
+      <workItem from="1544388380273" duration="109000" />
+      <workItem from="1544468336792" duration="10624000" />
+      <workItem from="1544529379849" duration="821000" />
+      <workItem from="1544559420607" duration="8038000" />
+      <workItem from="1544629286794" duration="629000" />
+      <workItem from="1544639079896" duration="15273000" />
+      <workItem from="1544708815486" duration="978000" />
+      <workItem from="1544732973527" duration="7276000" />
+      <workItem from="1544778320771" duration="168000" />
+      <workItem from="1544825601044" duration="1622000" />
+      <workItem from="1544827784091" duration="3563000" />
+      <workItem from="1544873505023" duration="72000" />
+      <workItem from="1544993954300" duration="4316000" />
+      <workItem from="1545076977622" duration="2414000" />
+      <workItem from="1545122953627" duration="9000" />
+      <workItem from="1545329250799" duration="13701000" />
+      <workItem from="1545388230529" duration="114000" />
+      <workItem from="1545410389060" duration="1892000" />
+      <workItem from="1545421883277" duration="7235000" />
+      <workItem from="1545429169512" duration="151000" />
+      <workItem from="1545431373393" duration="3404000" />
+      <workItem from="1545435971793" duration="48000" />
+      <workItem from="1545476362243" duration="90000" />
+      <workItem from="1545656781221" duration="367000" />
+      <workItem from="1545759822462" duration="7743000" />
+      <workItem from="1545768376156" duration="2212000" />
+      <workItem from="1545770682521" duration="1918000" />
+      <workItem from="1545854413564" duration="8757000" />
+      <workItem from="1545919200510" duration="638000" />
+      <workItem from="1545923625679" duration="2318000" />
+      <workItem from="1545998840001" duration="29063000" />
+      <workItem from="1546103898287" duration="5494000" />
+      <workItem from="1546110256027" duration="604000" />
+      <workItem from="1546258196103" duration="9707000" />
+      <workItem from="1546377141248" duration="5624000" />
+      <workItem from="1546438596284" duration="28672000" />
+      <workItem from="1546520814139" duration="16694000" />
+      <workItem from="1546595036899" duration="11067000" />
+      <workItem from="1546631982212" duration="10970000" />
+      <workItem from="1546644310744" duration="2238000" />
+      <workItem from="1546685729288" duration="6999000" />
+      <workItem from="1546693258268" duration="7663000" />
+      <workItem from="1546700971472" duration="12049000" />
+      <workItem from="1546724313803" duration="85000" />
+      <workItem from="1546987488904" duration="3000" />
+      <workItem from="1547145865946" duration="906000" />
+      <workItem from="1547325164062" duration="248000" />
+      <workItem from="1547326066728" duration="606000" />
+      <workItem from="1547327481022" duration="11000" />
+      <workItem from="1547407215982" duration="3503000" />
+      <workItem from="1547585206560" duration="4741000" />
+      <workItem from="1548097092287" duration="1761000" />
+      <workItem from="1548191446011" duration="2773000" />
+      <workItem from="1548250641404" duration="6218000" />
+      <workItem from="1548267929278" duration="12484000" />
+      <workItem from="1548280687935" duration="102000" />
+      <workItem from="1548329639667" duration="599000" />
+      <workItem from="1548351806213" duration="393000" />
+      <workItem from="1548353331621" duration="36000" />
+      <workItem from="1548356266668" duration="52000" />
+      <workItem from="1548364315303" duration="24000" />
+      <workItem from="1548368919096" duration="521000" />
+      <workItem from="1548421054084" duration="127000" />
+      <workItem from="1548513976828" duration="14669000" />
+      <workItem from="1548605876278" duration="5390000" />
+      <workItem from="1548614959243" duration="5832000" />
+      <workItem from="1548622023403" duration="680000" />
+      <workItem from="1548623662376" duration="931000" />
+      <workItem from="1548628170609" duration="1130000" />
+      <workItem from="1548690746748" duration="603000" />
+      <workItem from="1548852153687" duration="1439000" />
+      <workItem from="1548861828111" duration="10613000" />
+      <workItem from="1548872613614" duration="2619000" />
+      <workItem from="1548876753006" duration="1921000" />
+      <workItem from="1548880583545" duration="685000" />
+      <workItem from="1548881497232" duration="71000" />
+      <workItem from="1548885558566" duration="62000" />
+      <workItem from="1548885652575" duration="75000" />
+      <workItem from="1548885761860" duration="259000" />
+      <workItem from="1548886296043" duration="20000" />
+      <workItem from="1548966219452" duration="658000" />
+      <workItem from="1549016961736" duration="1685000" />
+      <workItem from="1549026620576" duration="2986000" />
+      <workItem from="1549032058250" duration="15183000" />
+      <workItem from="1549093063584" duration="1520000" />
+      <workItem from="1549098942988" duration="26774000" />
+      <workItem from="1549180981606" duration="52000" />
+      <workItem from="1549189053691" duration="676000" />
+      <workItem from="1549227346776" duration="3240000" />
+      <workItem from="1549285198048" duration="99000" />
+      <workItem from="1549287691254" duration="3447000" />
+      <workItem from="1549307758890" duration="409000" />
+      <workItem from="1549309372747" duration="664000" />
+      <workItem from="1549372222936" duration="1387000" />
+      <workItem from="1549384729434" duration="467000" />
+      <workItem from="1549385900475" duration="1954000" />
+      <workItem from="1549388200802" duration="9000" />
+      <workItem from="1549546267377" duration="629000" />
+      <workItem from="1549573860953" duration="3047000" />
+      <workItem from="1549623085617" duration="10386000" />
+      <workItem from="1549644173802" duration="1251000" />
+      <workItem from="1549648602316" duration="6217000" />
+      <workItem from="1549657554816" duration="4067000" />
+      <workItem from="1549726683926" duration="29000" />
+      <workItem from="1549727124131" duration="20000" />
+      <workItem from="1549735583560" duration="187000" />
+      <workItem from="1549736010093" duration="399000" />
+      <workItem from="1549808891277" duration="276000" />
+      <workItem from="1549824856616" duration="118000" />
+      <workItem from="1549834715866" duration="7000" />
+      <workItem from="1549889491521" duration="5870000" />
+      <workItem from="1549896441366" duration="37000" />
+      <workItem from="1549979539610" duration="883000" />
+      <workItem from="1549992671030" duration="36000" />
+      <workItem from="1550164397022" duration="7042000" />
+      <workItem from="1550175243023" duration="855000" />
+      <workItem from="1550176992808" duration="599000" />
+      <workItem from="1550225683577" duration="13378000" />
+      <workItem from="1550247736869" duration="564000" />
+      <workItem from="1550306051460" duration="3501000" />
+      <workItem from="1550342628825" duration="2848000" />
+      <workItem from="1550352747280" duration="316000" />
+      <workItem from="1550416642447" duration="1875000" />
+      <workItem from="1550429756910" duration="60000" />
+      <workItem from="1550511454596" duration="3869000" />
+      <workItem from="1550577586412" duration="153000" />
+      <workItem from="1550579836292" duration="1387000" />
+      <workItem from="1550601950900" duration="773000" />
+      <workItem from="1550838628795" duration="68000" />
+      <workItem from="1550839628960" duration="558000" />
+      <workItem from="1550850277532" duration="961000" />
+      <workItem from="1550915312708" duration="281000" />
+      <workItem from="1550915802262" duration="2439000" />
+      <workItem from="1550926411703" duration="51000" />
+      <workItem from="1550930764148" duration="6000" />
+      <workItem from="1550942443668" duration="26000" />
+      <workItem from="1550944664141" duration="1067000" />
+      <workItem from="1551014825790" duration="110000" />
+      <workItem from="1551015320180" duration="1808000" />
+      <workItem from="1551033926870" duration="8850000" />
+      <workItem from="1551131336176" duration="1317000" />
+      <workItem from="1551182718252" duration="1295000" />
+      <workItem from="1551212052397" duration="2223000" />
+      <workItem from="1551216126195" duration="285000" />
+      <workItem from="1551219067377" duration="555000" />
+      <workItem from="1551272120473" duration="40000" />
+      <workItem from="1551292195157" duration="4022000" />
+      <workItem from="1551361218274" duration="1197000" />
+      <workItem from="1551442104422" duration="34000" />
+      <workItem from="1551442858969" duration="6405000" />
+      <workItem from="1551454292366" duration="2388000" />
+      <workItem from="1551457200930" duration="3407000" />
+      <workItem from="1551463128409" duration="44000" />
+      <workItem from="1551464964695" duration="840000" />
+      <workItem from="1551466246874" duration="607000" />
+      <workItem from="1551480784811" duration="2604000" />
+      <workItem from="1551526597043" duration="2230000" />
+      <workItem from="1551530167259" duration="3429000" />
+      <workItem from="1551555104193" duration="1182000" />
+      <workItem from="1551617357645" duration="402000" />
+      <workItem from="1552306980647" duration="2735000" />
+      <workItem from="1552331061549" duration="4000" />
+      <workItem from="1552427689983" duration="2905000" />
+      <workItem from="1552475696909" duration="8182000" />
+      <workItem from="1552489495196" duration="646000" />
+      <workItem from="1552490233917" duration="6671000" />
+      <workItem from="1552581984679" duration="4284000" />
+      <workItem from="1552630490358" duration="1098000" />
+      <workItem from="1552667891420" duration="623000" />
+      <workItem from="1552670314721" duration="5047000" />
+      <workItem from="1552725865330" duration="14831000" />
+      <workItem from="1552753612291" duration="56000" />
+      <workItem from="1552938430242" duration="2792000" />
+      <workItem from="1553025240673" duration="841000" />
+      <workItem from="1553027561794" duration="2741000" />
+      <workItem from="1553072127331" duration="2880000" />
+      <workItem from="1553087223510" duration="632000" />
+      <workItem from="1553098970382" duration="251000" />
+      <workItem from="1553116855218" duration="288000" />
+      <workItem from="1553117572078" duration="480000" />
+      <workItem from="1553199558811" duration="540000" />
+      <workItem from="1553202364749" duration="697000" />
+      <workItem from="1553276913093" duration="1887000" />
+      <workItem from="1553335342752" duration="94000" />
+      <workItem from="1553336103064" duration="864000" />
+      <workItem from="1553337593232" duration="617000" />
+      <workItem from="1553459330214" duration="805000" />
+      <workItem from="1553521965039" duration="627000" />
+      <workItem from="1553523367266" duration="634000" />
+      <workItem from="1553889272674" duration="789000" />
+      <workItem from="1553978124150" duration="616000" />
+      <workItem from="1554020626981" duration="2027000" />
+      <workItem from="1554031005089" duration="206000" />
+      <workItem from="1554031491493" duration="97000" />
+      <workItem from="1554031886463" duration="1047000" />
+      <workItem from="1554121676386" duration="625000" />
+      <workItem from="1554130048124" duration="602000" />
+      <workItem from="1554141659015" duration="5226000" />
+      <workItem from="1554150926239" duration="511000" />
+      <workItem from="1554204933549" duration="3000" />
+      <workItem from="1554205437932" duration="16000" />
+      <workItem from="1554232132753" duration="125000" />
+      <workItem from="1554318568931" duration="1715000" />
+      <workItem from="1554323699521" duration="800000" />
+      <workItem from="1554381023018" duration="667000" />
+      <workItem from="1554407030237" duration="266000" />
+      <workItem from="1554463512234" duration="563000" />
+      <workItem from="1554469602802" duration="1548000" />
+      <workItem from="1554471989176" duration="622000" />
+      <workItem from="1554484890353" duration="27000" />
+      <workItem from="1554487882424" duration="599000" />
+      <workItem from="1554494931483" duration="457000" />
+      <workItem from="1554816299047" duration="421000" />
+      <workItem from="1554817282063" duration="88000" />
+      <workItem from="1554818332486" duration="108000" />
+      <workItem from="1554818807155" duration="105000" />
+      <workItem from="1554819499136" duration="957000" />
+      <workItem from="1554919738516" duration="125000" />
+      <workItem from="1554920702534" duration="189000" />
+      <workItem from="1554921470871" duration="767000" />
+      <workItem from="1555346982374" duration="1128000" />
+      <workItem from="1555352737129" duration="597000" />
+      <workItem from="1555402962638" duration="160000" />
+      <workItem from="1555524356750" duration="1149000" />
+      <workItem from="1555665415844" duration="315000" />
+      <workItem from="1555666862627" duration="127000" />
+      <workItem from="1555666991382" duration="2079000" />
+      <workItem from="1555780117336" duration="872000" />
+      <workItem from="1556393703581" duration="12000" />
+      <workItem from="1556396896348" duration="2509000" />
+      <workItem from="1556539980129" duration="596000" />
+      <workItem from="1556544073743" duration="19000" />
+      <workItem from="1556714628064" duration="17000" />
+      <workItem from="1557074683713" duration="2688000" />
+      <workItem from="1557078879609" duration="793000" />
+      <workItem from="1557252456486" duration="1163000" />
+      <workItem from="1557255586393" duration="74000" />
+      <workItem from="1557256809413" duration="802000" />
+      <workItem from="1558120541999" duration="832000" />
+      <workItem from="1558430452353" duration="4247000" />
+      <workItem from="1558694860727" duration="4303000" />
+      <workItem from="1558699944400" duration="5909000" />
+      <workItem from="1558705913407" duration="1099000" />
+      <workItem from="1558707107272" duration="1749000" />
+      <workItem from="1558715263039" duration="149000" />
+      <workItem from="1558716211252" duration="1594000" />
+      <workItem from="1558724593352" duration="602000" />
+      <workItem from="1558734375673" duration="22000" />
+      <workItem from="1558786394863" duration="28000" />
+      <workItem from="1558786516893" duration="8108000" />
+      <workItem from="1558802094385" duration="201000" />
+      <workItem from="1558802316551" duration="116000" />
+      <workItem from="1558802443866" duration="338000" />
+      <workItem from="1558802797415" duration="842000" />
+      <workItem from="1558803651319" duration="3334000" />
+    </task>
+    <task id="LOCAL-00213" summary="Fixed stacked blocks issue">
+      <created>1553074105970</created>
+      <option name="number" value="00213" />
+      <option name="presentableId" value="LOCAL-00213" />
+      <option name="project" value="LOCAL" />
+      <updated>1553074105970</updated>
+    </task>
+    <task id="LOCAL-00214" summary="Updated event priority of chat">
+      <created>1553199592131</created>
+      <option name="number" value="00214" />
+      <option name="presentableId" value="LOCAL-00214" />
+      <option name="project" value="LOCAL" />
+      <updated>1553199592132</updated>
+    </task>
+    <task id="LOCAL-00215" summary="Added debug messages">
+      <created>1553204216245</created>
+      <option name="number" value="00215" />
+      <option name="presentableId" value="LOCAL-00215" />
+      <option name="project" value="LOCAL" />
+      <updated>1553204216245</updated>
+    </task>
+    <task id="LOCAL-00216" summary="Fixed not supported command">
+      <created>1553281185750</created>
+      <option name="number" value="00216" />
+      <option name="presentableId" value="LOCAL-00216" />
+      <option name="project" value="LOCAL" />
+      <updated>1553281185751</updated>
+    </task>
+    <task id="LOCAL-00217" summary="Added a try-catch to main and force plugin to disable when something happens">
+      <created>1553463432817</created>
+      <option name="number" value="00217" />
+      <option name="presentableId" value="LOCAL-00217" />
+      <option name="project" value="LOCAL" />
+      <updated>1553463432817</updated>
+    </task>
+    <task id="LOCAL-00218" summary="Added a check so no 2 values will be inserted (exception)">
+      <created>1553522567269</created>
+      <option name="number" value="00218" />
+      <option name="presentableId" value="LOCAL-00218" />
+      <option name="project" value="LOCAL" />
+      <updated>1553522567269</updated>
+    </task>
+    <task id="LOCAL-00219" summary="Fixed typo in sql statement">
+      <created>1553523996020</created>
+      <option name="number" value="00219" />
+      <option name="presentableId" value="LOCAL-00219" />
+      <option name="project" value="LOCAL" />
+      <updated>1553523996021</updated>
+    </task>
+    <task id="LOCAL-00220" summary="Fixed spawners being calculated twice">
+      <created>1553889636761</created>
+      <option name="number" value="00220" />
+      <option name="presentableId" value="LOCAL-00220" />
+      <option name="project" value="LOCAL" />
+      <updated>1553889636762</updated>
+    </task>
+    <task id="LOCAL-00221" summary="Fixed sql busy exception">
+      <created>1553889898614</created>
+      <option name="number" value="00221" />
+      <option name="presentableId" value="LOCAL-00221" />
+      <option name="project" value="LOCAL" />
+      <updated>1553889898614</updated>
+    </task>
+    <task id="LOCAL-00222" summary="Cleaned code">
+      <created>1553889985813</created>
+      <option name="number" value="00222" />
+      <option name="presentableId" value="LOCAL-00222" />
+      <option name="project" value="LOCAL" />
+      <updated>1553889985813</updated>
+    </task>
+    <task id="LOCAL-00223" summary="Patched a dupe glitch related to guis">
+      <created>1554021130201</created>
+      <option name="number" value="00223" />
+      <option name="presentableId" value="LOCAL-00223" />
+      <option name="project" value="LOCAL" />
+      <updated>1554021130201</updated>
+    </task>
+    <task id="LOCAL-00224" summary="Fixed the busy exception">
+      <created>1554021442547</created>
+      <option name="number" value="00224" />
+      <option name="presentableId" value="LOCAL-00224" />
+      <option name="project" value="LOCAL" />
+      <updated>1554021442547</updated>
+    </task>
+    <task id="LOCAL-00225" summary="Added an update after removing the item">
+      <created>1554022041753</created>
+      <option name="number" value="00225" />
+      <option name="presentableId" value="LOCAL-00225" />
+      <option name="project" value="LOCAL" />
+      <updated>1554022041753</updated>
+    </task>
+    <task id="LOCAL-00226" summary="Fixed a NPE with FeatherBoard">
+      <created>1554022223211</created>
+      <option name="number" value="00226" />
+      <option name="presentableId" value="LOCAL-00226" />
+      <option name="project" value="LOCAL" />
+      <updated>1554022223211</updated>
+    </task>
+    <task id="LOCAL-00227" summary="Fixed NPE related to PAPI">
+      <created>1554022369420</created>
+      <option name="number" value="00227" />
+      <option name="presentableId" value="LOCAL-00227" />
+      <option name="project" value="LOCAL" />
+      <updated>1554022369420</updated>
+    </task>
+    <task id="LOCAL-00228" summary="Fixed NPE">
+      <created>1554031020883</created>
+      <option name="number" value="00228" />
+      <option name="presentableId" value="LOCAL-00228" />
+      <option name="project" value="LOCAL" />
+      <updated>1554031020884</updated>
+    </task>
+    <task id="LOCAL-00229" summary="Fixed NPE">
+      <created>1554031109113</created>
+      <option name="number" value="00229" />
+      <option name="presentableId" value="LOCAL-00229" />
+      <option name="project" value="LOCAL" />
+      <updated>1554031109113</updated>
+    </task>
+    <task id="LOCAL-00230" summary="Added an delay for loading database">
+      <created>1554032889595</created>
+      <option name="number" value="00230" />
+      <option name="presentableId" value="LOCAL-00230" />
+      <option name="project" value="LOCAL" />
+      <updated>1554032889595</updated>
+    </task>
+    <task id="LOCAL-00231" summary="Cleaned code">
+      <created>1554032903858</created>
+      <option name="number" value="00231" />
+      <option name="presentableId" value="LOCAL-00231" />
+      <option name="project" value="LOCAL" />
+      <updated>1554032903858</updated>
+    </task>
+    <task id="LOCAL-00232" summary="Formatted a placeholder">
+      <created>1554142997004</created>
+      <option name="number" value="00232" />
+      <option name="presentableId" value="LOCAL-00232" />
+      <option name="project" value="LOCAL" />
+      <updated>1554142997005</updated>
+    </task>
+    <task id="LOCAL-00233" summary="Fixed support for negative values">
+      <created>1554149542105</created>
+      <option name="number" value="00233" />
+      <option name="presentableId" value="LOCAL-00233" />
+      <option name="project" value="LOCAL" />
+      <updated>1554149542105</updated>
+    </task>
+    <task id="LOCAL-00234" summary="Added worth bonus for islands">
+      <created>1554149636295</created>
+      <option name="number" value="00234" />
+      <option name="presentableId" value="LOCAL-00234" />
+      <option name="project" value="LOCAL" />
+      <updated>1554149636295</updated>
+    </task>
+    <task id="LOCAL-00235" summary="Added worth bonus for schematics">
+      <created>1554151423849</created>
+      <option name="number" value="00235" />
+      <option name="presentableId" value="LOCAL-00235" />
+      <option name="project" value="LOCAL" />
+      <updated>1554151423850</updated>
+    </task>
+    <task id="LOCAL-00236" summary="Added support for LeaderHeads">
+      <created>1554320213365</created>
+      <option name="number" value="00236" />
+      <option name="presentableId" value="LOCAL-00236" />
+      <option name="project" value="LOCAL" />
+      <updated>1554320213365</updated>
+    </task>
+    <task id="LOCAL-00237" summary="Fixed add column method">
+      <created>1554324527853</created>
+      <option name="number" value="00237" />
+      <option name="presentableId" value="LOCAL-00237" />
+      <option name="project" value="LOCAL" />
+      <updated>1554324527853</updated>
+    </task>
+    <task id="LOCAL-00238" summary="Fixed an issue caused items to get disappeared">
+      <created>1554463939310</created>
+      <option name="number" value="00238" />
+      <option name="presentableId" value="LOCAL-00238" />
+      <option name="project" value="LOCAL" />
+      <updated>1554463939310</updated>
+    </task>
+    <task id="LOCAL-00239" summary="Version Beta-Pre2">
+      <created>1554469629961</created>
+      <option name="number" value="00239" />
+      <option name="presentableId" value="LOCAL-00239" />
+      <option name="project" value="LOCAL" />
+      <updated>1554469629961</updated>
+    </task>
+    <task id="LOCAL-00240" summary="Fixed not suitable driver error">
+      <created>1554817297117</created>
+      <option name="number" value="00240" />
+      <option name="presentableId" value="LOCAL-00240" />
+      <option name="project" value="LOCAL" />
+      <updated>1554817297117</updated>
+    </task>
+    <task id="LOCAL-00241" summary="Moved the delete grid to the save method">
+      <created>1555348015477</created>
+      <option name="number" value="00241" />
+      <option name="presentableId" value="LOCAL-00241" />
+      <option name="project" value="LOCAL" />
+      <updated>1555348015477</updated>
+    </task>
+    <task id="LOCAL-00242" summary="Fixed NPE with Citizens">
+      <created>1556397063326</created>
+      <option name="number" value="00242" />
+      <option name="presentableId" value="LOCAL-00242" />
+      <option name="project" value="LOCAL" />
+      <updated>1556397063327</updated>
+    </task>
+    <task id="LOCAL-00243" summary="Fixed an error with SQLite Driver">
+      <created>1556397208899</created>
+      <option name="number" value="00243" />
+      <option name="presentableId" value="LOCAL-00243" />
+      <option name="project" value="LOCAL" />
+      <updated>1556397208899</updated>
+    </task>
+    <task id="LOCAL-00244" summary="Updated CommentedConfiguration">
+      <created>1556397351759</created>
+      <option name="number" value="00244" />
+      <option name="presentableId" value="LOCAL-00244" />
+      <option name="project" value="LOCAL" />
+      <updated>1556397351759</updated>
+    </task>
+    <task id="LOCAL-00245" summary="Fixed a missing ;">
+      <created>1556397474022</created>
+      <option name="number" value="00245" />
+      <option name="presentableId" value="LOCAL-00245" />
+      <option name="project" value="LOCAL" />
+      <updated>1556397474022</updated>
+    </task>
+    <task id="LOCAL-00246" summary="Added islands check for the getNextLocation calculation">
+      <created>1557077038094</created>
+      <option name="number" value="00246" />
+      <option name="presentableId" value="LOCAL-00246" />
+      <option name="project" value="LOCAL" />
+      <updated>1557077038094</updated>
+    </task>
+    <task id="LOCAL-00247" summary="Changed WildStacker support to be based on API">
+      <created>1557077066954</created>
+      <option name="number" value="00247" />
+      <option name="presentableId" value="LOCAL-00247" />
+      <option name="project" value="LOCAL" />
+      <updated>1557077066955</updated>
+    </task>
+    <task id="LOCAL-00248" summary="Added islands check for next island calculations">
+      <created>1557077465970</created>
+      <option name="number" value="00248" />
+      <option name="presentableId" value="LOCAL-00248" />
+      <option name="project" value="LOCAL" />
+      <updated>1557077465970</updated>
+    </task>
+    <task id="LOCAL-00249" summary="Fixed wildstacker issues">
+      <created>1557252495380</created>
+      <option name="number" value="00249" />
+      <option name="presentableId" value="LOCAL-00249" />
+      <option name="project" value="LOCAL" />
+      <updated>1557252495380</updated>
+    </task>
+    <task id="LOCAL-00250" summary="Fixed integration with WildStacker">
+      <created>1558438890370</created>
+      <option name="number" value="00250" />
+      <option name="presentableId" value="LOCAL-00250" />
+      <option name="project" value="LOCAL" />
+      <updated>1558438890370</updated>
+    </task>
+    <task id="LOCAL-00251" summary="Added instant-save to database support">
+      <created>1558704036024</created>
+      <option name="number" value="00251" />
+      <option name="presentableId" value="LOCAL-00251" />
+      <option name="project" value="LOCAL" />
+      <updated>1558704036025</updated>
+    </task>
+    <task id="LOCAL-00252" summary="Fixed chat integration">
+      <created>1558704889906</created>
+      <option name="number" value="00252" />
+      <option name="presentableId" value="LOCAL-00252" />
+      <option name="project" value="LOCAL" />
+      <updated>1558704889906</updated>
+    </task>
+    <task id="LOCAL-00253" summary="Added include owner in island top feature">
+      <created>1558705233775</created>
+      <option name="number" value="00253" />
+      <option name="presentableId" value="LOCAL-00253" />
+      <option name="project" value="LOCAL" />
+      <updated>1558705233775</updated>
+    </task>
+    <task id="LOCAL-00254" summary="Version Pre4">
+      <created>1558705353812</created>
+      <option name="number" value="00254" />
+      <option name="presentableId" value="LOCAL-00254" />
+      <option name="project" value="LOCAL" />
+      <updated>1558705353812</updated>
+    </task>
+    <task id="LOCAL-00255" summary="Fixed version to Pre3">
+      <created>1558707005089</created>
+      <option name="number" value="00255" />
+      <option name="presentableId" value="LOCAL-00255" />
+      <option name="project" value="LOCAL" />
+      <updated>1558707005090</updated>
+    </task>
+    <task id="LOCAL-00256" summary="Removed iml file">
+      <created>1558708058117</created>
+      <option name="number" value="00256" />
+      <option name="presentableId" value="LOCAL-00256" />
+      <option name="project" value="LOCAL" />
+      <updated>1558708058118</updated>
+    </task>
+    <task id="LOCAL-00257" summary="Fixed void teleport to teleport players in y 0">
+      <created>1558708087493</created>
+      <option name="number" value="00257" />
+      <option name="presentableId" value="LOCAL-00257" />
+      <option name="project" value="LOCAL" />
+      <updated>1558708087493</updated>
+    </task>
+    <task id="LOCAL-00258" summary="Fixed papi hook">
+      <created>1558717375184</created>
+      <option name="number" value="00258" />
+      <option name="presentableId" value="LOCAL-00258" />
+      <option name="project" value="LOCAL" />
+      <updated>1558717375185</updated>
+    </task>
+    <task id="LOCAL-00259" summary="Added support for FAWE schematics">
+      <created>1558793565447</created>
+      <option name="number" value="00259" />
+      <option name="presentableId" value="LOCAL-00259" />
+      <option name="project" value="LOCAL" />
+      <updated>1558793565447</updated>
+    </task>
+    <task id="LOCAL-00260" summary="Cleaned code">
+      <created>1558793951007</created>
+      <option name="number" value="00260" />
+      <option name="presentableId" value="LOCAL-00260" />
+      <option name="project" value="LOCAL" />
+      <updated>1558793951007</updated>
+    </task>
+    <task id="LOCAL-00261" summary="Fixed null schematics being added to schematics list">
+      <created>1558793973500</created>
+      <option name="number" value="00261" />
+      <option name="presentableId" value="LOCAL-00261" />
+      <option name="project" value="LOCAL" />
+      <updated>1558793973500</updated>
+    </task>
+    <option name="localTasksCounter" value="262" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="735200000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Designer" order="0" />
+      <window_info id="UI Designer" order="1" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info id="Image Layers" order="4" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.2739872" />
+      <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Docker" order="0" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="1" sideWeight="0.4989339" weight="0.32936078" />
+      <window_info anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" weight="0.32936078" />
+      <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.5010661" side_tool="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="Database Changes" order="4" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Message" order="5" />
+      <window_info anchor="bottom" id="Find" order="6" sideWeight="0.4978678" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="7" />
+      <window_info anchor="bottom" id="Debug" order="8" weight="0.4" />
+      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.2857143" weight="0.32719395" />
+      <window_info anchor="bottom" id="Cvs" order="10" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="11" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="12" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run with VisualVM" order="13" />
+      <window_info anchor="bottom" id="JProfiler" order="14" />
+      <window_info anchor="bottom" id="Debug with VisualVM" order="15" />
+      <window_info anchor="bottom" id="Statistic" order="16" />
+      <window_info anchor="bottom" id="Floobits" order="17" />
+      <window_info anchor="right" id="Maven" order="0" weight="0.32995737" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" id="Capture Analysis" order="2" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
+      <window_info anchor="right" id="Palette&#9;" order="4" />
+      <window_info anchor="right" id="Maven Projects" order="5" visible="true" weight="0.17217484" />
+      <window_info anchor="right" id="Palette" order="6" />
+      <window_info anchor="right" id="Commander" order="7" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="8" weight="0.25" />
+      <window_info anchor="right" id="Database" order="9" weight="0.32995737" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="true" />
+    <MESSAGE value="Fixed add column method" />
+    <MESSAGE value="Fixed an issue caused items to get disappeared" />
+    <MESSAGE value="Version Beta-Pre2" />
+    <MESSAGE value="Fixed not suitable driver error" />
+    <MESSAGE value="Moved the delete grid to the save method" />
+    <MESSAGE value="Fixed NPE with Citizens" />
+    <MESSAGE value="Fixed an error with SQLite Driver" />
+    <MESSAGE value="Updated CommentedConfiguration" />
+    <MESSAGE value="Fixed a missing ;" />
+    <MESSAGE value="Added islands check for the getNextLocation calculation" />
+    <MESSAGE value="Changed WildStacker support to be based on API" />
+    <MESSAGE value="Added islands check for next island calculations" />
+    <MESSAGE value="Fixed wildstacker issues" />
+    <MESSAGE value="Fixed integration with WildStacker" />
+    <MESSAGE value="Added instant-save to database support" />
+    <MESSAGE value="Fixed chat integration" />
+    <MESSAGE value="Added include owner in island top feature" />
+    <MESSAGE value="Version Pre4" />
+    <MESSAGE value="Fixed version to Pre3" />
+    <MESSAGE value="Removed iml file" />
+    <MESSAGE value="Fixed void teleport to teleport players in y 0" />
+    <MESSAGE value="Fixed papi hook" />
+    <MESSAGE value="Added support for FAWE schematics" />
+    <MESSAGE value="Cleaned code" />
+    <MESSAGE value="Fixed null schematics being added to schematics list" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed null schematics being added to schematics list" />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/resources/config.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="471">
+          <caret line="339" selection-start-line="339" selection-end-line="339" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/plugin.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="212">
+          <caret line="320" column="5" lean-forward="true" selection-start-line="320" selection-start-column="5" selection-end-line="320" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/me/clip/placeholderapi/2.10.2/placeholderapi-2.10.2.jar!/me/clip/placeholderapi/expansion/PlaceholderExpansion.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="50" column="31" lean-forward="true" selection-start-line="50" selection-start-column="31" selection-end-line="50" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="39" column="79" selection-start-line="39" selection-start-column="79" selection-end-line="39" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/Updater.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Spigot Jars/v1_8_R3.jar!/org/bukkit/Bukkit.class" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/jnbt/NBTInputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="138">
+          <caret line="116" column="16" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/lang/Byte.java" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/jnbt/ListTag.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="299">
+          <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/TagBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Spigot Jars/v1_10_R1.jar!/net/minecraft/server/v1_10_R1/Block.class" />
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/DataInput.java" />
+    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/jnbt/NamedTag.class" />
+    <entry file="jar://$MAVEN_REPOSITORY$/com/boydti/fawe-api/latest/fawe-api-latest.jar!/com/sk89q/jnbt/NBTInputStream.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="22" column="11" selection-start-line="22" selection-start-column="11" selection-end-line="22" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/worldedit/extent/clipboard/Clipboard.class" />
+    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/worldedit/extent/clipboard/io/MCEditSchematicReader.class" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WorldEditHook.java" />
+    <entry file="file://$PROJECT_DIR$/v1_10_R1/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_10_R1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="56" column="23" selection-start-line="56" selection-start-column="23" selection-end-line="56" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/TagUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="41" column="33" selection-start-line="41" selection-start-column="33" selection-end-line="41" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/SSchematic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="86" column="112" selection-start-line="86" selection-start-column="112" selection-end-line="86" selection-end-column="112" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_8_R3/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_13_R2/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/SuperiorSkyblock.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/spigotmc/spigot-api/1.8-R0.1-SNAPSHOT/spigot-api-1.8-R0.1-SNAPSHOT.jar!/org/bukkit/generator/ChunkGenerator.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/grid/WorldGenerator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1037">
+          <caret line="65" selection-start-line="65" selection-end-line="65" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_9_R2/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_9_R2.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="36" selection-start-line="4" selection-start-column="36" selection-end-line="4" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_9_R1/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WildStackerHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="44" selection-start-line="11" selection-start-column="44" selection-end-line="11" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/Spigot Jars/v1_7_R3.jar!/org/bukkit/generator/ChunkGenerator.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="16" column="22" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/plugins/SuperiorSkyblockAPI.jar!/com/bgsoftware/superiorskyblock/api/island/Island.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="18" column="17" selection-start-line="18" selection-start-column="17" selection-end-line="18" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/plugins/SuperiorSkyblockAPI.jar!/com/bgsoftware/superiorskyblock/api/handlers/GridManager.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="16" column="17" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_9_R1/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_9_R1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="69" column="40" selection-start-line="69" selection-start-column="40" selection-end-line="69" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/UpgradesListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="97" column="37" selection-start-line="97" selection-start-column="37" selection-end-line="97" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/key/SKey.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="10" column="19" selection-start-line="10" selection-start-column="19" selection-end-line="10" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/v1_13_R2/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_13_R2.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="88">
+          <caret line="127" column="13" selection-start-line="127" selection-start-column="13" selection-end-line="127" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/worldedit/math/BlockVector3.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2575">
+          <caret line="45" column="12" selection-start-line="45" selection-start-column="12" selection-end-line="45" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="93" column="21" selection-start-line="93" selection-start-column="21" selection-end-line="93" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="39" column="16" selection-start-line="39" selection-start-column="16" selection-end-line="39" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#934#935#0" expanded="true" />
+            <element signature="e#964#965#0" expanded="true" />
+            <element signature="e#1001#1002#0" expanded="true" />
+            <element signature="e#1031#1032#0" expanded="true" />
+            <element signature="e#1038#1070#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/threads/SuperiorThread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="13" column="11" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="11" />
+          <folding>
+            <element signature="e#465#466#0" expanded="true" />
+            <element signature="e#505#506#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="583">
+          <caret line="101" column="25" lean-forward="true" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/Query.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="575">
+          <caret line="39" column="91" selection-start-line="39" selection-start-column="91" selection-end-line="39" selection-end-column="91" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/DatabaseObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="22" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="48" column="68" selection-start-line="48" selection-start-column="58" selection-end-line="48" selection-end-column="68" />
+          <folding>
+            <element signature="e#4695#4696#0" expanded="true" />
+            <element signature="e#4750#4751#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PlayersHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-254">
+          <caret line="101" column="63" selection-start-line="101" selection-start-column="58" selection-end-line="101" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/GridHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="314" column="16" selection-start-line="314" selection-start-column="16" selection-end-line="314" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="109" column="147" lean-forward="true" selection-start-line="109" selection-start-column="147" selection-end-line="109" selection-end-column="147" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#3290#3323#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>SuperiorSkyblock</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.34747708" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Minecraft (SuperiorSkyblock2)|Minecraft</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.34747708" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>highcharts</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>SuperiorSkyblock2</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.34747708" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Plugin Dependeries</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.34747708" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

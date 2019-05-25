@@ -22,19 +22,19 @@ public final class FAWEHook {
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static boolean enabled = false;
 
-    public static boolean isEnabled(){
+    public static boolean isEnabled() {
         return enabled;
     }
 
-    public static void register(){
+    public static void register() {
         enabled = true;
     }
 
     @SuppressWarnings("deprecation")
-    public static void setBlocks(List<Tag> blocks, Location offset, Runnable callback){
+    public static void setBlocks(List<Tag> blocks, Location offset, Runnable callback) {
         World world = plugin.getGrid().getIslandsWorld();
         EditSession editSession = new EditSessionBuilder(world.getName()).fastmode(true).autoQueue(false).build();
-        for(Tag tag : blocks){
+        for (Tag tag : blocks) {
             Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
             Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
             int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();

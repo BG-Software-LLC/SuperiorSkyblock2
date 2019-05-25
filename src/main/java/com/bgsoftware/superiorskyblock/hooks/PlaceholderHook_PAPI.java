@@ -1,29 +1,29 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import me.clip.placeholderapi.external.EZPlaceholderHook;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-//@SuppressWarnings("deprecation")
 public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
 
     private SuperiorSkyblockPlugin plugin;
 
-    public PlaceholderHook_PAPI(SuperiorSkyblockPlugin plugin){
+    public PlaceholderHook_PAPI(SuperiorSkyblockPlugin plugin) {
 //        super(plugin, "superior");
         this.plugin = plugin;
+    }
+
+    public static void myRegister() {
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+            new PlaceholderHook_PAPI(SuperiorSkyblockPlugin.getPlugin());
     }
 
     @Override
@@ -96,7 +96,8 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                     return island == null ? "No" : "Yes";
             }
 
-        } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {}
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {
+        }
 
         return "unrecognized placeholder";
     }
@@ -114,11 +115,6 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
     @Override
     public String getVersion() {
         return "1.0.0";
-    }
-
-    public static void myRegister(){
-        if(Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-            new PlaceholderHook_PAPI(SuperiorSkyblockPlugin.getPlugin());
     }
 
 }

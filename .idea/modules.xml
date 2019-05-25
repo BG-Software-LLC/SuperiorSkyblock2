@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/SuperiorSkyblock2.iml" filepath="$PROJECT_DIR$/.idea/SuperiorSkyblock2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" filepath="$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" filepath="$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" filepath="$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_13_R1/superiorskyblock-1_13_R1.iml" filepath="$PROJECT_DIR$/v1_13_R1/superiorskyblock-1_13_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_13_R2/superiorskyblock-1_13_R2.iml" filepath="$PROJECT_DIR$/v1_13_R2/superiorskyblock-1_13_R2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_8_R1/superiorskyblock-1_8_R1.iml" filepath="$PROJECT_DIR$/v1_8_R1/superiorskyblock-1_8_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_8_R3/superiorskyblock-1_8_R3.iml" filepath="$PROJECT_DIR$/v1_8_R3/superiorskyblock-1_8_R3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_9_R1/superiorskyblock-1_9_R1.iml" filepath="$PROJECT_DIR$/v1_9_R1/superiorskyblock-1_9_R1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/v1_9_R2/superiorskyblock-1_9_R2.iml" filepath="$PROJECT_DIR$/v1_9_R2/superiorskyblock-1_9_R2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/API/superiorskyblock-api.iml" filepath="$PROJECT_DIR$/API/superiorskyblock-api.iml" />
+    </modules>
+  </component>
+</project>
