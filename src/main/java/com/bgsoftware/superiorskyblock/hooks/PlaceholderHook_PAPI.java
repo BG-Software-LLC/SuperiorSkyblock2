@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -9,21 +8,12 @@ import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
 
-    private SuperiorSkyblockPlugin plugin;
-
-    public PlaceholderHook_PAPI(SuperiorSkyblockPlugin plugin) {
-//        super(plugin, "superior");
-        this.plugin = plugin;
-    }
-
-    public static void myRegister() {
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-            new PlaceholderHook_PAPI(SuperiorSkyblockPlugin.getPlugin());
+    public static void registerPlaceholderAPI() {
+        new PlaceholderHook_PAPI().register();
     }
 
     @Override

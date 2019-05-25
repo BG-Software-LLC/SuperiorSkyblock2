@@ -76,7 +76,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
                 if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-                    new PlaceholderHook_PAPI(this).register();
+                    PlaceholderHook_PAPI.registerPlaceholderAPI();
                 if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
                     FAWEHook.register();
                 if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))

@@ -7,40 +7,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b2f6b34b-d605-444e-95cd-d8952d2fa24b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/SuperiorSkyblock2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_boydti_fawe_api_latest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_code_gson_gson_2_3_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_guava_guava_17_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_googlecode_json_simple_json_simple_1_1_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_6.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_persistence_persistence_api_1_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_10.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__me_clip_placeholderapi_2_10_2.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_md_5_bungeecord_chat_1_8_SNAPSHOT.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_milkbowl_vault_VaultAPI_1_7.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_avaje_ebean_2_8_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_bukkit_bukkit_1_8_R0_1_SNAPSHOT.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_1.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_spigotmc_spigot_api_1_8_R0_1_SNAPSHOT.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_yaml_snakeyaml_1_14.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/superiorskyblock.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_10_R1/superiorskyblock-1_10_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_11_R1/superiorskyblock-1_11_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_12_R1/superiorskyblock-1_12_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_13_R1/superiorskyblock-1_13_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_13_R2/superiorskyblock-1_13_R2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_8_R1/superiorskyblock-1_8_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_8_R3/superiorskyblock-1_8_R3.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_9_R1/superiorskyblock-1_9_R1.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/v1_9_R2/superiorskyblock-1_9_R2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/API/superiorskyblock-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/API/superiorskyblock-api.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_10_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_11_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_12_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_13_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_13_R2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_7_R3.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_7_R4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R3.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_9_R1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_9_R2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/AAC.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Arconix.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/CMI8.5.1.4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Clearlag.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/CoreProtect_API5.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/CoreProtect_API6.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Crazy Enchantments[v1.7.9.3.8].jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/CustomDrops-3.0.4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/DropEdit2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/EditDrops.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/EpicSpawners.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Factions.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/FactionsUUID.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/FastAsyncWorldEdit-bukkit-18.01.15-bcb9320-971-18.2.2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Holograms-2.5.0-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/HolographicDisplays.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/LeaderHeadsAPI.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/MythicMobs-4.4.1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/NoCheatPlus.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/NovucsFactionsTop.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/PlaceholderAPI-2.9.2.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/ShopGUIPlus-1.18.3-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/SpartanAPI.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/StackSpawners-v1.7.10.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/SuperiorSkyblockAPI.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/Vault.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/WildStackerAPI.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/WildToolsAPI.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/mcMMO.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/worldedit-bukkit-7.0.0-beta-05.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/plugins/worldguard-legacy-7.0.0-beta-03.jar" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -96,6 +105,7 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="class" value="4" />
+          <entry key="gitignore" value="1" />
           <entry key="java" value="24" />
           <entry key="xml" value="2" />
         </counts>
@@ -104,6 +114,7 @@
         <counts>
           <entry key="CLASS" value="4" />
           <entry key="JAVA" value="24" />
+          <entry key="PLAIN_TEXT" value="1" />
           <entry key="XML" value="2" />
         </counts>
       </usages-collector>
@@ -131,7 +142,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="192">
@@ -141,6 +152,11 @@
               </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -728,7 +744,7 @@
       <workItem from="1558802316551" duration="116000" />
       <workItem from="1558802443866" duration="338000" />
       <workItem from="1558802797415" duration="842000" />
-      <workItem from="1558803651319" duration="3334000" />
+      <workItem from="1558803651319" duration="3562000" />
     </task>
     <task id="LOCAL-00213" summary="Fixed stacked blocks issue">
       <created>1553074105970</created>
@@ -1077,7 +1093,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="735200000" />
+    <option name="totallyTimeSpent" value="735428000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1090,18 +1106,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.2739872" />
+      <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.2739872" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="1" sideWeight="0.4989339" weight="0.32936078" />
-      <window_info anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.5010661" side_tool="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Database Changes" order="4" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="5" />
@@ -1195,13 +1210,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/config.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="339" selection-start-line="339" selection-end-line="339" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/resources/plugin.yml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -1523,6 +1531,9 @@
           </folding>
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
   <component name="masterDetails">
