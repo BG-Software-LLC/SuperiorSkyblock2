@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import org.bukkit.Location;
@@ -40,11 +39,12 @@ public final class FAWEHook {
             int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
             try {
                 editSession.setBlock(new Vector(block.getBlockX(), block.getBlockY(), block.getBlockZ()), new BaseBlock(combinedId & 4095, combinedId >> 12 & 15));
-            } catch (MaxChangedBlocksException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-//        editSession.addNotifyTask(callback);
+
+        editSession.addNotifyTask(callback);
         editSession.flushQueue();
     }
 

@@ -7,49 +7,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b2f6b34b-d605-444e-95cd-d8952d2fa24b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_10_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_11_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_12_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_13_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_13_R2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_7_R3.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_7_R4.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_8_R3.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_9_R1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Spigot Jars/v1_9_R2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/AAC.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Arconix.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CMI8.5.1.4.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Clearlag.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CoreProtect_API5.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CoreProtect_API6.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Crazy Enchantments[v1.7.9.3.8].jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/CustomDrops-3.0.4.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/DropEdit2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/EditDrops.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/EpicSpawners.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Factions.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/FactionsUUID.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/FastAsyncWorldEdit-bukkit-18.01.15-bcb9320-971-18.2.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Holograms-2.5.0-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/HolographicDisplays.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/LeaderHeadsAPI.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/MythicMobs-4.4.1.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/NoCheatPlus.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/NovucsFactionsTop.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/PlaceholderAPI-2.9.2.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/ShopGUIPlus-1.18.3-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/SpartanAPI.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/StackSpawners-v1.7.10.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/SuperiorSkyblockAPI.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/Vault.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/WildStackerAPI.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/WildToolsAPI.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/mcMMO.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/worldedit-bukkit-7.0.0-beta-05.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plugins/worldguard-legacy-7.0.0-beta-03.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/API/superiorskyblock-api.iml" beforeDir="false" afterPath="$PROJECT_DIR$/API/superiorskyblock-api.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/handlers/DataHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/handlers/DataHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -94,26 +61,26 @@
     <session id="-1439580957">
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="516" />
+          <entry key="java" value="845" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="516" />
+          <entry key="JAVA" value="845" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="class" value="4" />
           <entry key="gitignore" value="1" />
-          <entry key="java" value="24" />
+          <entry key="java" value="56" />
           <entry key="xml" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="CLASS" value="4" />
-          <entry key="JAVA" value="24" />
+          <entry key="JAVA" value="56" />
           <entry key="PLAIN_TEXT" value="1" />
           <entry key="XML" value="2" />
         </counts>
@@ -130,13 +97,68 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="109" column="147" lean-forward="true" selection-start-line="109" selection-start-column="147" selection-end-line="109" selection-end-column="147" />
+            <state relative-caret-position="290">
+              <caret line="992" column="16" selection-start-line="992" selection-start-column="16" selection-end-line="992" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="316">
+              <caret line="42" column="36" lean-forward="true" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3290#3323#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="668">
+              <caret line="106" column="17" lean-forward="true" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SPermissionNode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="7" lean-forward="true" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1989">
+              <caret line="61" column="39" lean-forward="true" selection-start-line="61" selection-start-column="39" selection-end-line="61" selection-end-column="39" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="138">
+              <caret line="131" column="17" lean-forward="true" selection-start-line="131" selection-start-column="17" selection-end-line="131" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1988#1989#0" expanded="true" />
+                <element signature="e#2015#2016#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -145,8 +167,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
+            <state relative-caret-position="238">
+              <caret line="15" column="85" selection-start-line="15" selection-start-column="85" selection-end-line="15" selection-end-column="85" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -154,25 +176,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PlayersHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="527">
-              <caret line="45" column="40" selection-start-line="45" selection-start-column="40" selection-end-line="45" selection-end-column="40" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="48" column="68" selection-start-line="48" selection-start-column="58" selection-end-line="48" selection-end-column="68" />
+            <state relative-caret-position="282">
+              <caret line="100" column="26" selection-start-line="100" selection-start-column="16" selection-end-line="100" selection-end-column="26" />
               <folding>
                 <element signature="e#4695#4696#0" expanded="true" />
                 <element signature="e#4750#4751#0" expanded="true" />
@@ -182,19 +190,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/GridHandler.java">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/wrappers/SuperiorPlayer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="314" column="16" selection-start-line="314" selection-start-column="16" selection-end-line="314" selection-end-column="16" />
+            <state relative-caret-position="238">
+              <caret line="23" column="9" selection-start-line="23" selection-start-column="9" selection-end-line="23" selection-end-column="9" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
+        <entry file="file://$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/island/PermissionNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-254">
-              <caret line="101" column="63" selection-start-line="101" selection-start-column="58" selection-end-line="101" selection-end-column="63" />
+            <state relative-caret-position="34">
+              <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -212,7 +220,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>IslandRegistry</find>
       <find>lastIsland =</find>
       <find>boolean save</find>
       <find>setCenter</find>
@@ -242,6 +249,7 @@
       <find>readNamedTagName</find>
       <find>createIsland</find>
       <find>players</find>
+      <find>updateName</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -287,12 +295,10 @@
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/UpgradesHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/BlocksProvider_WildStacker.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WildStackerHook.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java" />
         <option value="$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/island/Island.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/DataType.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/commands/command/CmdSetTeleport.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/DatabaseObject.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/Query.java" />
@@ -306,9 +312,11 @@
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WorldEditHook.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/grid/WorldGenerator.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java" />
       </list>
     </option>
   </component>
@@ -355,6 +363,41 @@
             <path>
               <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
               <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="API" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -377,15 +420,6 @@
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
-              <item name="database" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
@@ -395,6 +429,15 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
               <item name="hooks" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="SuperiorSkyblock2" type="b2602c69:ProjectViewProjectNode" />
+              <item name="SuperiorSkyblock2" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="superiorskyblock" type="462c0819:PsiDirectoryNode" />
+              <item name="wrappers" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -410,7 +453,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558801665640" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558816303523" />
     <property name="last_opened_file_path" value="D:/Spigot Jars/plugins/FastAsyncWorldEdit-bukkit-1.13.17.jar!/" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -421,12 +464,12 @@
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Ignored.Files" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\guis" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\schematics" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources" />
       <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\config" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\commands\command\admin" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\utils\key" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\org\jnbt" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.bgsoftware.superiorskyblock.commands.command.admin" />
@@ -435,12 +478,12 @@
       <recent name="com.ome_r.superiorskyblock.grid" />
       <recent name="com.ome_r.superiorskyblock.tasks" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\guis" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources\schematics" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\resources" />
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="U:\Development\SuperiorSkyblock2" />
       <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock" />
-      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\config" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\commands\command\admin" />
+      <recent name="D:\workspace\SuperiorSkyblock Recoded\src\main\java\com\ome_r\superiorskyblock\utils\key" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -744,7 +787,7 @@
       <workItem from="1558802316551" duration="116000" />
       <workItem from="1558802443866" duration="338000" />
       <workItem from="1558802797415" duration="842000" />
-      <workItem from="1558803651319" duration="3562000" />
+      <workItem from="1558803651319" duration="5898000" />
     </task>
     <task id="LOCAL-00213" summary="Fixed stacked blocks issue">
       <created>1553074105970</created>
@@ -1093,7 +1136,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="735428000" />
+    <option name="totallyTimeSpent" value="737764000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1106,17 +1149,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.2739872" />
+      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.2739872" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="1" sideWeight="0.4989339" weight="0.32936078" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" visible="true" weight="0.32936078" />
+      <window_info anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.5010661" side_tool="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Database Changes" order="4" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="5" />
@@ -1210,87 +1254,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/plugin.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="33" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
-          <caret line="320" column="5" lean-forward="true" selection-start-line="320" selection-start-column="5" selection-end-line="320" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/me/clip/placeholderapi/2.10.2/placeholderapi-2.10.2.jar!/me/clip/placeholderapi/expansion/PlaceholderExpansion.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="50" column="31" lean-forward="true" selection-start-line="50" selection-start-column="31" selection-end-line="50" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="39" column="79" selection-start-line="39" selection-start-column="79" selection-end-line="39" selection-end-column="79" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/Updater.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Spigot Jars/v1_8_R3.jar!/org/bukkit/Bukkit.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/jnbt/NBTInputStream.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="138">
-          <caret line="116" column="16" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/lang/Byte.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/jnbt/ListTag.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="58" column="11" selection-start-line="58" selection-start-column="11" selection-end-line="58" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/TagBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Spigot Jars/v1_10_R1.jar!/net/minecraft/server/v1_10_R1/Block.class" />
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/src.zip!/java/io/DataInput.java" />
-    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/jnbt/NamedTag.class" />
-    <entry file="jar://$MAVEN_REPOSITORY$/com/boydti/fawe-api/latest/fawe-api-latest.jar!/com/sk89q/jnbt/NBTInputStream.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="22" column="11" selection-start-line="22" selection-start-column="11" selection-end-line="22" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/worldedit/extent/clipboard/Clipboard.class" />
-    <entry file="jar://D:/Spigot Jars/plugins/worldedit-bukkit-7.0.0-beta-05.jar!/com/sk89q/worldedit/extent/clipboard/io/MCEditSchematicReader.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WorldEditHook.java" />
-    <entry file="file://$PROJECT_DIR$/v1_10_R1/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter_v1_10_R1.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="56" column="23" selection-start-line="56" selection-start-column="23" selection-end-line="56" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/nms/NMSAdapter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -1302,20 +1265,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
           <caret line="41" column="33" selection-start-line="41" selection-start-column="33" selection-end-line="41" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/SSchematic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="86" column="112" selection-start-line="86" selection-start-column="112" selection-end-line="86" selection-end-column="112" />
         </state>
       </provider>
     </entry>
@@ -1358,13 +1307,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/v1_9_R1/pom.xml">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WildStackerHook.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="44" selection-start-line="11" selection-start-column="44" selection-end-line="11" selection-end-column="44" />
-        </state>
-      </provider>
     </entry>
     <entry file="jar://$PROJECT_DIR$/Spigot Jars/v1_7_R3.jar!/org/bukkit/generator/ChunkGenerator.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -1429,21 +1371,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="569">
-          <caret line="39" column="16" selection-start-line="39" selection-start-column="16" selection-end-line="39" selection-end-column="16" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#934#935#0" expanded="true" />
-            <element signature="e#964#965#0" expanded="true" />
-            <element signature="e#1001#1002#0" expanded="true" />
-            <element signature="e#1031#1032#0" expanded="true" />
-            <element signature="e#1038#1070#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/utils/threads/SuperiorThread.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -1451,16 +1378,6 @@
           <folding>
             <element signature="e#465#466#0" expanded="true" />
             <element signature="e#505#506#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="583">
-          <caret line="101" column="25" lean-forward="true" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1479,17 +1396,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="48" column="68" selection-start-line="48" selection-start-column="58" selection-end-line="48" selection-end-column="68" />
-          <folding>
-            <element signature="e#4695#4696#0" expanded="true" />
-            <element signature="e#4750#4751#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PlayersHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="527">
@@ -1497,43 +1403,228 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
+    <entry file="file://$PROJECT_DIR$/../SuperiorSkyblock2.old/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-254">
-          <caret line="101" column="63" selection-start-line="101" selection-start-column="58" selection-end-line="101" selection-end-column="63" />
+        <state relative-caret-position="102">
+          <caret line="18" column="4" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/SuperiorSkyblockPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="83" column="38" selection-start-line="83" selection-start-column="38" selection-end-line="83" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/Locale.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2278">
+          <caret line="16" column="12" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/BlockPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="5" column="19" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SBlockPosition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="8" column="19" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/SSchematic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/schematics/TagBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/GridHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
+        <state relative-caret-position="4080">
           <caret line="314" column="16" selection-start-line="314" selection-start-column="16" selection-end-line="314" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/PanelHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-9036">
+          <caret line="39" column="19" selection-start-line="39" selection-start-column="19" selection-end-line="39" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SchematicsHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2168">
+          <caret line="66" column="13" lean-forward="true" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/SettingsHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1423">
+          <caret line="17" column="19" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/UpgradesHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2426">
+          <caret line="22" column="19" selection-start-line="22" selection-start-column="19" selection-end-line="22" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/EconomyHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="8" column="19" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/LeaderHeadsHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="27" column="70" selection-start-line="27" selection-start-column="70" selection-end-line="27" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/WildStackerHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="73">
+          <caret line="43" column="23" selection-start-line="43" selection-start-column="23" selection-end-line="43" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/IslandRegistry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SpawnIsland.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="10" column="19" selection-start-line="10" selection-start-column="19" selection-end-line="10" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/island/PermissionNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="17" selection-start-line="2" selection-start-column="17" selection-end-line="2" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SPermissionNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="7" lean-forward="true" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/API/src/main/java/com/bgsoftware/superiorskyblock/api/wrappers/SuperiorPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="23" column="9" selection-start-line="23" selection-start-column="9" selection-end-line="23" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/wrappers/SSuperiorPlayer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="282">
+          <caret line="100" column="26" selection-start-line="100" selection-start-column="16" selection-end-line="100" selection-end-column="26" />
+          <folding>
+            <element signature="e#4695#4696#0" expanded="true" />
+            <element signature="e#4750#4751#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/listeners/PlayersListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1989">
+          <caret line="61" column="39" lean-forward="true" selection-start-line="61" selection-start-column="39" selection-end-line="61" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/database/StatementHolder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="668">
+          <caret line="106" column="17" lean-forward="true" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/JDK/src.zip!/java/sql/Statement.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="604">
+          <caret line="89" column="8" selection-start-line="89" selection-start-column="8" selection-end-line="89" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/island/SIsland.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="992" column="16" selection-start-line="992" selection-start-column="16" selection-end-line="992" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/handlers/DataHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="109" column="147" lean-forward="true" selection-start-line="109" selection-start-column="147" selection-end-line="109" selection-end-column="147" />
+        <state relative-caret-position="138">
+          <caret line="131" column="17" lean-forward="true" selection-start-line="131" selection-start-column="17" selection-end-line="131" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3290#3323#0" expanded="true" />
+            <element signature="e#1988#1989#0" expanded="true" />
+            <element signature="e#2015#2016#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/PlaceholderHook_PAPI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="80" column="40" selection-start-line="80" selection-start-column="40" selection-end-line="80" selection-end-column="40" />
+        <state relative-caret-position="238">
+          <caret line="15" column="85" selection-start-line="15" selection-start-column="85" selection-end-line="15" selection-end-column="85" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/bgsoftware/superiorskyblock/hooks/FAWEHook.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="316">
+          <caret line="42" column="36" lean-forward="true" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
     </entry>
   </component>
   <component name="masterDetails">

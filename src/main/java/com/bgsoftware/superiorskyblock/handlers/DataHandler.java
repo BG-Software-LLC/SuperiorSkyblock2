@@ -95,46 +95,59 @@ public final class DataHandler {
     @SuppressWarnings("WeakerAccess")
     public void loadDatabase() {
         //Creating default tables and loading data...
-        try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
-                "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
-                "islandSize INTEGER, blockLimits VARCHAR, teamLimit INTEGER, cropGrowth DECIMAL, spawnerRates DECIMAL," +
-                "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR, warpsLimit INTEGER);")) {
-            ps.executeUpdate();
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
+                    "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
+                    "islandSize INTEGER, blockLimits VARCHAR, teamLimit INTEGER, cropGrowth DECIMAL, spawnerRates DECIMAL," +
+                    "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR, warpsLimit INTEGER);")) {
+                ps.executeUpdate();
+            }
 
-            ps.executeUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
-                    "islandRole VARCHAR, textureValue VARCHAR);");
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
+                    "islandRole VARCHAR, textureValue VARCHAR);")) {
+                ps.executeUpdate();
+            }
 
-            ps.executeUpdate("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
-                    "islandRole VARCHAR, textureValue VARCHAR);");
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
+                    "islandRole VARCHAR, textureValue VARCHAR, disbans INTEGER);")) {
+                ps.executeUpdate();
+            }
 
-            ps.executeUpdate("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);");
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);")) {
+                ps.executeUpdate();
+            }
 
-            ps.executeUpdate("CREATE TABLE IF NOT EXISTS stackedBlocks (world VARCHAR, x INTEGER, y INTEGER, z INTEGER, amount INTEGER);");
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS stackedBlocks (world VARCHAR, x INTEGER, y INTEGER, z INTEGER, amount INTEGER);")) {
+                ps.executeUpdate();
+            }
 
             addColumnIfNotExists("bonusWorth", "islands", "0", "VARCHAR");
             addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
             addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
 
-
-            try (ResultSet rs = ps.executeQuery("SELECT player,teamLeader,name,textureValue,islandRole,disbans FROM players;")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT player,teamLeader,name,textureValue,islandRole,disbands FROM players;");
+                 ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     plugin.getPlayers().loadPlayer(rs);
                 }
             }
 
-            try (ResultSet rs = ps.executeQuery("SELECT * FROM islands;")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM islands;");
+                 ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     plugin.getGrid().createIsland(rs);
                 }
             }
 
-            try (ResultSet rs = ps.executeQuery("SELECT  * FROM grid;")) {
-                if (rs.next()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM grid;");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     plugin.getGrid().loadGrid(rs);
                 }
             }
 
-            try (ResultSet rs = ps.executeQuery("SELECT * FROM stackedBlocks;")) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM stackedBlocks;");
+                 ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     plugin.getGrid().loadStackedBlocks(rs);
                 }
@@ -154,15 +167,15 @@ public final class DataHandler {
 
     public void insertIsland(Island island) {
         new SuperiorThread(() -> {
-            try {
-                if (!containsIsland(island)) {
-                    conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
-                            island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()), plugin.getSettings().defaultWarpsLimit)).executeUpdate();
+            if (!containsIsland(island)) {
+                try (PreparedStatement ps = conn.prepareStatement(String.format("INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
+                        island.getOwner().getUniqueId(), FileUtil.fromLocation(island.getCenter()), plugin.getSettings().defaultWarpsLimit))) {
+                    ps.executeUpdate();
+                    ((SIsland) island).executeUpdateStatement();
+                } catch (SQLException ex) {
+                    SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getName() + ".");
+                    ex.printStackTrace();
                 }
-                ((SIsland) island).executeUpdateStatement();
-            } catch (Exception ex) {
-                SuperiorSkyblockPlugin.log("Couldn't insert island of " + island.getOwner().getName() + ".");
-                ex.printStackTrace();
             }
         }).start();
     }
@@ -276,14 +289,12 @@ public final class DataHandler {
 
     }
 
-    @SuppressWarnings("SameParameterValue")
     private void addColumnIfNotExists(String column, String table, String def, String type) {
-        try {
-            conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT '" + def + "';").executeUpdate();
+        try (PreparedStatement ps = conn.prepareStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT '" + def + "';")) {
+            ps.executeUpdate();
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("duplicate"))
                 ex.printStackTrace();
         }
     }
-
 }

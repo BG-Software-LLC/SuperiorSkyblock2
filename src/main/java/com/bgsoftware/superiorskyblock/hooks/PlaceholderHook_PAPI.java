@@ -1,19 +1,37 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 
 public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
 
+    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     public static void registerPlaceholderAPI() {
         new PlaceholderHook_PAPI().register();
+    }
+
+    @Override
+    public String getIdentifier() {
+        return "superior";
+    }
+
+    @Override
+    public String getAuthor() {
+        return "Ome_R";
+    }
+
+    @Override
+    public String getVersion() {
+        return plugin.getDescription().getVersion();
     }
 
     @Override
@@ -91,20 +109,4 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
 
         return "unrecognized placeholder";
     }
-
-    @Override
-    public String getIdentifier() {
-        return "island";
-    }
-
-    @Override
-    public String getAuthor() {
-        return "Ome_R";
-    }
-
-    @Override
-    public String getVersion() {
-        return "1.0.0";
-    }
-
 }

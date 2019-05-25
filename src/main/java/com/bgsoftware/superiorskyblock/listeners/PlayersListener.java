@@ -301,7 +301,7 @@ public final class PlayersListener implements Listener {
 
         Location from = e.getFrom(), to = e.getTo();
 
-        if(from.getBlockY() == to.getBlockY() || to.getBlockY() >= 0)
+        if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());

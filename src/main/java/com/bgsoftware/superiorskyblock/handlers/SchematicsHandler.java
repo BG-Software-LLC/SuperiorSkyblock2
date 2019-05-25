@@ -69,7 +69,9 @@ public final class SchematicsHandler implements SchematicManager {
 
         //noinspection ConstantConditions
         for(File schemFile : schematicsFolder.listFiles()){
-            schematics.put(schemFile.getName().replace(".schematic", ""), loadFromFile(schemFile));
+            SSchematic schematic = loadFromFile(schemFile);
+            if(schematic != null)
+                schematics.put(schemFile.getName().replace(".schematic", ""), schematic);
         }
     }
 
@@ -143,7 +145,6 @@ public final class SchematicsHandler implements SchematicManager {
             }
         }
 
-        //noinspection IntegerDivisionInFloatingPointContext
         Location center = new Location(world, xSize / 2, ySize / 2, zSize / 2).add(min);
         for(LivingEntity livingEntity : getEntities(min, max)){
             entities.add(new TagBuilder().applyEntity(livingEntity, center).build());
@@ -182,17 +183,14 @@ public final class SchematicsHandler implements SchematicManager {
                 file.createNewFile();
             }
 
-            NBTInputStream reader = new NBTInputStream(new FileInputStream(file));
+            try(NBTInputStream reader = new NBTInputStream(new FileInputStream(file))){
+                CompoundTag compoundTag = (CompoundTag) reader.readTag();
+                return new SSchematic(compoundTag);
+            }catch(Exception ex){
+                SuperiorSkyblockPlugin.log("Schematic " + file.getName() + " is invalid. Make sure you use the built in system.");
+                return null;
+            }
 
-            CompoundTag tag = null;
-
-            try{
-                tag = (CompoundTag) reader.readTag();
-            }catch(ClassCastException ignored){ }
-
-            reader.close();
-
-            return tag == null ? null : new SSchematic(tag);
         }catch(IOException ex){
             ex.printStackTrace();
         }
