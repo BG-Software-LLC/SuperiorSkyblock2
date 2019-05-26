@@ -86,7 +86,7 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                     case "team_limit":
                         return String.valueOf(island == null ? 0 : island.getTeamLimit());
                     case "leader":
-                        return island == null ? "M/A" : island.getOwner().getName();
+                        return island == null ? "N/A" : island.getOwner().getName();
                     case "size":
                         int size = island.getIslandSize() * 2;
                         return size + " x " + size;
