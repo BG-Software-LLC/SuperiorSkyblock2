@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,44 +81,41 @@ public final class DataHandler {
                 ((SSuperiorPlayer) player).executeUpdateStatement();
 
             // Saving stacked blocks
-            conn.prepareStatement("DELETE FROM stackedBlocks;").executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM stackedBlocks;")) {
+                ps.executeUpdate();
+            }
             plugin.getGrid().executeStackedBlocksInsertStatement(conn);
 
             //Saving grid
-            conn.prepareStatement("DELETE FROM grid;").executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM grid;")) {
+                ps.executeUpdate();
+            }
             plugin.getGrid().executeGridInsertStatement(conn);
-
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     public void loadDatabase() {
         //Creating default tables and loading data...
         try {
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS islands (owner VARCHAR(36) PRIMARY KEY, center VARCHAR, teleportLocation VARCHAR, " +
                     "members VARCHAR, banned VARCHAR, permissionNodes VARCHAR, upgrades VARCHAR, warps VARCHAR, islandBank VARCHAR, " +
                     "islandSize INTEGER, blockLimits VARCHAR, teamLimit INTEGER, cropGrowth DECIMAL, spawnerRates DECIMAL," +
                     "mobDrops DECIMAL, discord VARCHAR, paypal VARCHAR, warpsLimit INTEGER);")) {
                 ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
-                    "islandRole VARCHAR, textureValue VARCHAR);")) {
-                ps.executeUpdate();
-            }
-
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR PRIMARY KEY, teamLeader VARCHAR, name VARCHAR, " +
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36) PRIMARY KEY, teamLeader VARCHAR(36), name VARCHAR(16), " +
                     "islandRole VARCHAR, textureValue VARCHAR, disbans INTEGER);")) {
                 ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR);")) {
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world(36) VARCHAR);")) {
                 ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS stackedBlocks (world VARCHAR, x INTEGER, y INTEGER, z INTEGER, amount INTEGER);")) {
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS stackedBlocks (world VARCHAR(36), x INTEGER, y INTEGER, z INTEGER, amount INTEGER);")) {
                 ps.executeUpdate();
             }
 
@@ -139,14 +137,14 @@ public final class DataHandler {
                 }
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM grid;");
+            try (PreparedStatement ps = conn.prepareStatement("SELECT lastIsland,stackedBlocks,maxIslandSize,world FROM grid;");
                  ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     plugin.getGrid().loadGrid(rs);
                 }
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM stackedBlocks;");
+            try (PreparedStatement ps = conn.prepareStatement("SELECT world,x,y,z,amount FROM stackedBlocks;");
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     plugin.getGrid().loadStackedBlocks(rs);
@@ -181,9 +179,10 @@ public final class DataHandler {
     }
 
     private boolean containsIsland(Island island) {
-        try {
-            return conn.prepareStatement(
-                    String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId())).executeQuery().next();
+        try (PreparedStatement ps = conn.prepareStatement(
+                String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next();
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Couldn't check if island " + island.getOwner().getName() + " exists.");
             ex.printStackTrace();
@@ -193,8 +192,9 @@ public final class DataHandler {
 
     public void deleteIsland(Island island) {
         new SuperiorThread(() -> {
-            try {
-                conn.prepareStatement("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';").executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM islands WHERE owner=?;")) {
+                ps.setString(1, island.getOwner().getUniqueId().toString());
+                ps.executeUpdate();
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("Couldn't delete island of " + island.getOwner().getName() + ".");
                 ex.printStackTrace();
@@ -211,9 +211,10 @@ public final class DataHandler {
     }
 
     private boolean containsPlayer(SuperiorPlayer player) {
-        try {
-            return conn.prepareStatement(
-                    String.format("SELECT * FROM players WHERE player = '%s';", player.getUniqueId())).executeQuery().next();
+        try (PreparedStatement ps = conn.prepareStatement(
+                String.format("SELECT 1 FROM players WHERE player = '%s';", player.getUniqueId()));
+             ResultSet rs = ps.executeQuery()) {
+            return rs.next();
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Couldn't check if player " + player.getName() + " exists.");
             ex.printStackTrace();
@@ -221,19 +222,17 @@ public final class DataHandler {
         }
     }
 
-    @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
+    @SuppressWarnings("ConstantConditions")
     public void loadOldDatabase() {
         File dataDir = new File(plugin.getDataFolder(), "data/islands");
         Tag tag;
 
         if (dataDir.exists()) {
             for (File file : dataDir.listFiles()) {
-                try {
-                    try (NBTInputStream stream = new NBTInputStream(new FileInputStream(file))) {
-                        tag = stream.readTag();
-                        plugin.getGrid().createIsland((CompoundTag) tag);
-                    }
-                } catch (Exception ex) {
+                try (NBTInputStream stream = new NBTInputStream(new FileInputStream(file))) {
+                    tag = stream.readTag();
+                    plugin.getGrid().createIsland((CompoundTag) tag);
+                } catch (IOException ex) {
                     ex.printStackTrace();
                     File copyFile = new File(plugin.getDataFolder(), "data/islands-backup/" + file.getName());
                     copyFile.getParentFile().mkdirs();
@@ -250,12 +249,10 @@ public final class DataHandler {
 
         if (dataDir.exists()) {
             for (File file : dataDir.listFiles()) {
-                try {
-                    try (NBTInputStream stream = new NBTInputStream(new FileInputStream(file))) {
-                        tag = stream.readTag();
-                        plugin.getPlayers().loadPlayer((CompoundTag) tag);
-                    }
-                } catch (Exception ex) {
+                try (NBTInputStream stream = new NBTInputStream(new FileInputStream(file))) {
+                    tag = stream.readTag();
+                    plugin.getPlayers().loadPlayer((CompoundTag) tag);
+                } catch (IOException ex) {
                     ex.printStackTrace();
                     File copyFile = new File(plugin.getDataFolder(), "data/players-backup/" + file.getName());
                     copyFile.getParentFile().mkdirs();
@@ -271,12 +268,10 @@ public final class DataHandler {
         File gridFile = new File(plugin.getDataFolder(), "data/grid");
 
         if (gridFile.exists()) {
-            try {
-                try (NBTInputStream stream = new NBTInputStream(new FileInputStream(gridFile))) {
-                    tag = stream.readTag();
-                    plugin.getGrid().loadGrid((CompoundTag) tag);
-                }
-            } catch (Exception ex) {
+            try (NBTInputStream stream = new NBTInputStream(new FileInputStream(gridFile))) {
+                tag = stream.readTag();
+                plugin.getGrid().loadGrid((CompoundTag) tag);
+            } catch (IOException ex) {
                 ex.printStackTrace();
                 File copyFile = new File(plugin.getDataFolder(), "data/grid-backup");
                 copyFile.getParentFile().mkdirs();

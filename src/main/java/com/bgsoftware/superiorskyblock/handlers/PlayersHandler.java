@@ -10,11 +10,7 @@ import org.bukkit.Bukkit;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler implements PlayersManager {
@@ -23,9 +19,9 @@ public final class PlayersHandler implements PlayersManager {
     private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
 
     @Override
-    public SuperiorPlayer getSuperiorPlayer(String name){
-        for(SuperiorPlayer superiorPlayer : players.values()){
-            if(superiorPlayer.getName().equalsIgnoreCase(name))
+    public SuperiorPlayer getSuperiorPlayer(String name) {
+        for (SuperiorPlayer superiorPlayer : players.values()) {
+            if (superiorPlayer.getName().equalsIgnoreCase(name))
                 return superiorPlayer;
         }
 
@@ -33,8 +29,8 @@ public final class PlayersHandler implements PlayersManager {
     }
 
     @Override
-    public SuperiorPlayer getSuperiorPlayer(UUID uuid){
-        if(!players.containsKey(uuid)) {
+    public SuperiorPlayer getSuperiorPlayer(UUID uuid) {
+        if (!players.containsKey(uuid)) {
             players.put(uuid, new SSuperiorPlayer(uuid));
             Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
         }
@@ -47,12 +43,12 @@ public final class PlayersHandler implements PlayersManager {
     }
 
 
-    public void loadPlayer(CompoundTag tag){
+    public void loadPlayer(CompoundTag tag) {
         UUID player = UUID.fromString(((StringTag) tag.getValue().get("player")).getValue());
         players.put(player, new SSuperiorPlayer(tag));
     }
 
-    public List<SuperiorPlayer> getAllPlayers(){
+    public List<SuperiorPlayer> getAllPlayers() {
         return new ArrayList<>(players.values());
     }
 

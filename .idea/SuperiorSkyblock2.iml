@@ -28,7 +28,6 @@
     <orderEntry type="library" name="v1_11_R1" level="project" />
     <orderEntry type="library" name="v1_12_R1" level="project" />
     <orderEntry type="library" name="v1_13_R1" level="project" />
-    <orderEntry type="library" name="Maven: com.boydti:fawe-api:latest" level="project" />
     <orderEntry type="library" name="Plugin Dependeries" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.spigotmc:spigot-api:1.8-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-lang:commons-lang:2.6" level="project" />
@@ -45,5 +44,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.milkbowl.vault:VaultAPI:1.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: me.clip:placeholderapi:2.10.2" level="project" />
     <orderEntry type="module" module-name="superiorskyblock-api" />
+    <orderEntry type="library" name="Maven: com.boydti:fawe-api:latest" level="project" />
   </component>
 </module>

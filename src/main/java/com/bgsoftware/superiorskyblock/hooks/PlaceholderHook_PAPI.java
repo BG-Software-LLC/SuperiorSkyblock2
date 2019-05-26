@@ -44,12 +44,12 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
 
             switch (split[0].toLowerCase()) {
                 case "upgrade":
-                    return String.valueOf(island.getUpgradeLevel(split[1]));
+                    return String.valueOf(island == null ? 0 : island.getUpgradeLevel(split[1]));
                 case "permission":
                     IslandPermission islandPermission = IslandPermission.valueOf(split[1].toUpperCase());
-                    return String.valueOf(island.hasPermission(sPlayer, islandPermission));
+                    return String.valueOf(island != null && island.hasPermission(sPlayer, islandPermission));
                 case "count":
-                    return String.valueOf(island.getBlockCount(SKey.of(split[1])));
+                    return String.valueOf(island == null ? 0 : island.getBlockCount(SKey.of(split[1])));
             }
 
             switch (placeholder) {
@@ -64,16 +64,16 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                 case "world":
                     return String.valueOf(island.getCenter().getWorld().getName());
                 case "team_size":
-                    return String.valueOf(island.getAllMembers().size());
+                    return String.valueOf(island == null ? 0 : island.getAllMembers().size());
                 case "team_limit":
-                    return String.valueOf(island.getTeamLimit());
+                    return String.valueOf(island == null ? 0 : island.getTeamLimit());
                 case "leader":
-                    return island.getOwner().getName();
+                    return island == null ? "N/A" : island.getOwner().getName();
                 case "size":
                     int size = island.getIslandSize() * 2;
                     return size + " x " + size;
                 case "radius":
-                    return String.valueOf(island.getIslandSize());
+                    return String.valueOf(island == null ? 0 : island.getIslandSize());
                 case "biome":
                     return StringUtil.format(island.getCenter().getBlock().getBiome().name());
                 case "level":
@@ -85,13 +85,13 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                 case "bank":
                     return island.getMoneyInBankAsBigDecimal().toString();
                 case "hoppers_limit":
-                    return String.valueOf(island.getHoppersLimit());
+                    return String.valueOf(island == null ? 0 : island.getHoppersLimit());
                 case "crops_multiplier":
-                    return String.valueOf(island.getCropGrowthMultiplier());
+                    return String.valueOf(island == null ? 0 : island.getCropGrowthMultiplier());
                 case "spawners_multiplier":
-                    return String.valueOf(island.getSpawnerRatesMultiplier());
+                    return String.valueOf(island == null ? 0 : island.getSpawnerRatesMultiplier());
                 case "drops_multiplier":
-                    return String.valueOf(island.getMobDropsMultiplier());
+                    return String.valueOf(island == null ? 0 : island.getMobDropsMultiplier());
                 case "discord":
                     return island.hasPermission(sPlayer, IslandPermission.DISCORD_SHOW) ? island.getDiscord() : "None";
                 case "paypal":
@@ -107,6 +107,6 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
         } catch (NullPointerException | ArrayIndexOutOfBoundsException ignored) {
         }
 
-        return "unrecognized placeholder";
+        return "No island";
     }
 }
