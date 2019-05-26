@@ -412,7 +412,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void disbandIsland(){
         new HashSet<>(members).forEach(member -> kickMember(SSuperiorPlayer.of(member)));
         plugin.getGrid().deleteIsland(this);
-        for(Chunk chunk : getAllChunks(false))
+        for(Chunk chunk : getAllChunks(true))
             chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
 
