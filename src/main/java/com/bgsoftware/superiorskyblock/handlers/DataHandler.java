@@ -111,7 +111,7 @@ public final class DataHandler {
                 ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world(36) VARCHAR);")) {
+            try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS grid (lastIsland VARCHAR, stackedBlocks VARCHAR, maxIslandSize INTEGER, world VARCHAR(36));")) {
                 ps.executeUpdate();
             }
 
