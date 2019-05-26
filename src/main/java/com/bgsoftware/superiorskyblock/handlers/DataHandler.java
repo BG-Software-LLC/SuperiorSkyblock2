@@ -107,7 +107,7 @@ public final class DataHandler {
             }
 
             try (PreparedStatement ps = conn.prepareStatement("CREATE TABLE IF NOT EXISTS players (player VARCHAR(36) PRIMARY KEY, teamLeader VARCHAR(36), name VARCHAR(16), " +
-                    "islandRole VARCHAR, textureValue VARCHAR, disbans INTEGER);")) {
+                    "islandRole VARCHAR, textureValue VARCHAR, disbands INTEGER);")) {
                 ps.executeUpdate();
             }
 
@@ -180,7 +180,7 @@ public final class DataHandler {
 
     private boolean containsIsland(Island island) {
         try (PreparedStatement ps = conn.prepareStatement(
-                String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
+                String.format("SELECT 1 FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
              ResultSet rs = ps.executeQuery()) {
             return rs.next();
         } catch (Exception ex) {
