@@ -847,7 +847,7 @@
       <workItem from="1558802443866" duration="338000" />
       <workItem from="1558802797415" duration="842000" />
       <workItem from="1558803651319" duration="11323000" />
-      <workItem from="1558858590173" duration="2768000" />
+      <workItem from="1558858590173" duration="2824000" />
     </task>
     <task id="LOCAL-00213" summary="Fixed stacked blocks issue">
       <created>1553074105970</created>
@@ -1196,7 +1196,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="745957000" />
+    <option name="totallyTimeSpent" value="746013000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1215,11 +1215,11 @@
       <window_info id="Capture Tool" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
-      <window_info active="true" content_ui="combo" id="Project" order="5" visible="true" weight="0.2771855" />
+      <window_info content_ui="combo" id="Project" order="5" visible="true" weight="0.2771855" />
       <window_info id="Structure" order="6" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="1" sideWeight="0.4989339" weight="0.32936078" />
-      <window_info anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" weight="0.32936078" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="2" sideWeight="0.49946696" visible="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.5010661" side_tool="true" weight="0.32936078" />
       <window_info anchor="bottom" id="Database Changes" order="4" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="5" />
