@@ -95,7 +95,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_SET_TEXTURE.getStatementHolder()
                 .setString(textureValue)
                 .setString(player.toString())
-                .execute();
+                .execute(true);
     }
 
     public void updateName(){
@@ -103,7 +103,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_SET_NAME.getStatementHolder()
                 .setString(name)
                 .setString(player.toString())
-                .execute();
+                .execute(true);
     }
 
     public World getWorld(){
@@ -123,7 +123,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_SET_LEADER.getStatementHolder()
                 .setString(teamLeader.toString())
                 .setString(player.toString())
-                .execute();
+                .execute(true);
     }
 
     public Island getIsland(){
@@ -139,7 +139,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_SET_ROLE.getStatementHolder()
                 .setString(islandRole.name())
                 .setString(player.toString())
-                .execute();
+                .execute(true);
     }
 
     public boolean hasWorldBorderEnabled() {
@@ -195,7 +195,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_SET_DISBANDS.getStatementHolder()
                 .setInt(disbands)
                 .setString(player.toString())
-                .execute();
+                .execute(true);
     }
 
     public BlockPosition getSchematicPos1() {
@@ -236,7 +236,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     @Override
-    public void executeUpdateStatement() {
+    public void executeUpdateStatement(boolean async) {
         Query.PLAYER_UPDATE.getStatementHolder()
                 .setString(teamLeader.toString())
                 .setString(name)
@@ -244,23 +244,23 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(textureValue)
                 .setInt(disbands)
                 .setString(player.toString())
-                .execute();
+                .execute(async);
     }
 
     @Override
-    public void executeInsertStatement() {
+    public void executeInsertStatement(boolean async) {
         Query.PLAYER_INSERT.getStatementHolder()
                 .setString(player.toString())
-                .setString("")
-                .setString("")
-                .setString("")
-                .setString("")
+                .setString(teamLeader.toString())
+                .setString(name)
+                .setString(islandRole.name())
+                .setString(textureValue)
                 .setInt(plugin.getSettings().disbandCount)
-                .execute();
+                .execute(async);
     }
 
     @Override
-    public void executeDeleteStatement() {
+    public void executeDeleteStatement(boolean async) {
         throw new UnsupportedOperationException("You cannot use delete statement on superior players.");
     }
 

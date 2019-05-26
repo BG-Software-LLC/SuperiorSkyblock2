@@ -37,7 +37,10 @@ public enum Query {
 
     STACKED_BLOCKS_UPDATE("UPDATE stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
     STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks VALUES(?,?,?,?,?);"),
-    STACKED_BLOCKS_DELETE("DELETE FROM stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;");
+    STACKED_BLOCKS_DELETE("DELETE FROM stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
+
+    GRID_UPDATE("UPDATE grid SET lastIsland=?;"),
+    GRID_INSERT("INSERT INTO grid VALUES(?,?,?,?);");
 
     private String query;
 
@@ -45,8 +48,8 @@ public enum Query {
         this.query = query;
     }
 
-    public PreparedStatement getStatement(Connection connection) throws SQLException {
-        return connection.prepareStatement(query);
+    public String getStatement(){
+        return query;
     }
 
     public StatementHolder getStatementHolder(){

@@ -5,107 +5,71 @@ import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StatementHolder {
 
-    private PreparedStatement statement;
+    private final String query;
+    private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
     StatementHolder(Query query){
-        try {
-            statement = query.getStatement(SuperiorSkyblockPlugin.getPlugin().getDataHandler().getConnection());
-        }catch(SQLException ex){
-            ex.printStackTrace();
-            statement = null;
-        }
+        this.query = query.getStatement();
     }
 
     public StatementHolder setString(String value){
-        if(statement != null) {
-            try {
-                statement.setString(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setInt(int value){
-        if(statement != null) {
-            try {
-                statement.setInt(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setShort(short value){
-        if(statement != null) {
-            try {
-                statement.setInt(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setLong(long value){
-        if(statement != null) {
-            try {
-                statement.setLong(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setFloat(float value){
-        if(statement != null) {
-            try {
-                statement.setFloat(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setDouble(double value){
-        if(statement != null) {
-            try {
-                statement.setDouble(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setBoolean(boolean value){
-        if(statement != null) {
-            try {
-                statement.setBoolean(currentIndex++, value);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        values.put(currentIndex++, value);
         return this;
     }
 
-    public void execute() {
-        if(statement != null) {
-            new SuperiorThread(() -> {
-                try {
-                    statement.executeUpdate();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+    public void execute(boolean async) {
+        if(async){
+            new SuperiorThread(() -> execute(false)).start();
+            return;
+        }
+
+        String errorQuery = query;
+        try(PreparedStatement preparedStatement = SQLHelper.buildStatement(query)){
+            for(Map.Entry<Integer, Object> entry : values.entrySet()) {
+                preparedStatement.setObject(entry.getKey(), entry.getValue());
+                errorQuery = errorQuery.replaceFirst("\\?", entry.getValue() + "");
+            }
+
+            preparedStatement.executeUpdate();
+        }catch(SQLException ex){
+            SuperiorSkyblockPlugin.log("Failed to execute query " + errorQuery);
+            ex.printStackTrace();
         }
     }
 

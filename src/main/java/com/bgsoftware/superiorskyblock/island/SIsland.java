@@ -257,7 +257,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -267,7 +267,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -277,7 +277,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -286,7 +286,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -351,7 +351,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
                 .setString(getLocation(getTeleportLocation()))
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -388,7 +388,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -464,7 +464,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_BANK.getStatementHolder()
                 .setString(islandBank.getAsString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -473,7 +473,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_BANK.getStatementHolder()
                 .setString(islandBank.getAsString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -672,12 +672,13 @@ public class SIsland extends DatabaseObject implements Island {
         return getWorthAsBigDecimal().toString();
     }
 
+    @Override
     public void setBonusWorth(BigDecimal bonusWorth){
         this.bonusWorth = BigDecimalFormatted.of(bonusWorth);
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
                 .setString(this.bonusWorth.getAsString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -736,7 +737,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_UPGRADES.getStatementHolder()
                 .setString(upgrades.length() == 0 ? "" : upgrades.toString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -775,7 +776,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_SIZE.getStatementHolder()
                 .setInt(islandSize)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -789,7 +790,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
                 .setString("HOPPER=" + this.hoppersLimit)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -798,7 +799,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
                 .setInt(teamLimit)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -807,7 +808,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_CROP_GROWTH.getStatementHolder()
                 .setDouble(cropGrowth)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -816,7 +817,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_SPAWNER_RATES.getStatementHolder()
                 .setDouble(spawnerRates)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -825,7 +826,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_MOB_DROPS.getStatementHolder()
                 .setDouble(mobDrops)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -839,7 +840,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_DISCORD.getStatementHolder()
                 .setString(discord)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -853,7 +854,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_PAYPAL.getStatementHolder()
                 .setString(paypal)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -894,7 +895,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(warps.length() == 0 ? "" : warps.toString())
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -950,7 +951,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder()
                 .setInt(warpsLimit)
                 .setString(owner.toString())
-                .execute();
+                .execute(true);
     }
 
     @Override
@@ -985,12 +986,12 @@ public class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().getIslands().transfer(previous.getUniqueId(), owner);
 
-        executeDeleteStatement();
-        executeInsertStatement();
+        executeDeleteStatement(true);
+        executeInsertStatement(true);
     }
 
     @Override
-    public void executeUpdateStatement(){
+    public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
                 permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
@@ -1022,18 +1023,18 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(bonusWorth.getAsString())
                 .setInt(warpsLimit)
                 .setString(owner.toString())
-                .execute();
+                .execute(async);
     }
 
     @Override
-    public void executeDeleteStatement(){
+    public void executeDeleteStatement(boolean async){
         Query.ISLAND_DELETE.getStatementHolder()
                 .setString(prevOwner.toString())
-                .execute();
+                .execute(async);
     }
 
     @Override
-    public void executeInsertStatement(){
+    public void executeInsertStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
                 permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
@@ -1066,7 +1067,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(paypal)
                 .setString(bonusWorth.getAsString())
                 .setInt(warpsLimit)
-                .execute();
+                .execute(async);
     }
 
     private static String getUuidCollectionString(Collection<UUID> collection) {

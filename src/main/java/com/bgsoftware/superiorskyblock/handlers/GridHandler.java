@@ -104,7 +104,7 @@ public final class GridHandler implements GridManager {
             Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
 
             islands.add(superiorPlayer.getUniqueId(), island);
-            lastIsland = SBlockPosition.of(islandLocation);
+            setLastIsland(SBlockPosition.of(islandLocation));
 
             for (Chunk chunk : island.getAllChunks(true)) {
                 chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
@@ -277,7 +277,7 @@ public final class GridHandler implements GridManager {
                         .setInt(block.getY())
                         .setInt(block.getZ())
                         .setInt(amount)
-                        .execute();
+                        .execute(true);
             } else {
                 Query.STACKED_BLOCKS_UPDATE.getStatementHolder()
                         .setInt(amount)
@@ -285,7 +285,7 @@ public final class GridHandler implements GridManager {
                         .setInt(block.getX())
                         .setInt(block.getY())
                         .setInt(block.getZ())
-                        .execute();
+                        .execute(true);
             }
         }else{
             Query.STACKED_BLOCKS_DELETE.getStatementHolder()
@@ -293,7 +293,7 @@ public final class GridHandler implements GridManager {
                     .setInt(block.getX())
                     .setInt(block.getY())
                     .setInt(block.getZ())
-                    .execute();
+                    .execute(true);
         }
     }
 
@@ -348,16 +348,15 @@ public final class GridHandler implements GridManager {
         stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount);
     }
 
-    @SuppressWarnings("all")
-    public void executeStackedBlocksInsertStatement(Connection connection) throws SQLException {
+    public void executeStackedBlocksInsertStatement(boolean async){
         for (SBlockPosition position : stackedBlocks.stackedBlocks.keySet()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO stackedBlocks (world, x, y, z, amount) VALUES (?, ?, ?, ?, ?);");
-            statement.setString(1, position.getWorld().getName());
-            statement.setInt(2, position.getX());
-            statement.setInt(3, position.getY());
-            statement.setInt(4, position.getZ());
-            statement.setInt(5, stackedBlocks.stackedBlocks.get(position));
-            statement.executeUpdate();
+            Query.STACKED_BLOCKS_INSERT.getStatementHolder()
+                    .setString(position.getWorld().getName())
+                    .setInt(position.getX())
+                    .setInt(position.getY())
+                    .setInt(position.getZ())
+                    .setInt(stackedBlocks.stackedBlocks.get(position))
+                    .execute(async);
         }
     }
 
@@ -382,23 +381,13 @@ public final class GridHandler implements GridManager {
 
     }
 
-    @SuppressWarnings("all")
-    public void executeGridInsertStatement(Connection connection) throws SQLException {
-        String lastIsland = this.lastIsland.toString();
-
-        StringBuilder stackedBlocks = new StringBuilder();
-        this.stackedBlocks.entrySet().forEach(entry ->
-                stackedBlocks.append(";").append(entry.getKey().toString()).append("=").append(entry.getValue()));
-
-        int maxIslandSize = plugin.getSettings().maxIslandSize;
-        String world = plugin.getSettings().islandWorld;
-
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO grid VALUES(?,?,?,?);");
-        statement.setString(1, lastIsland);
-        statement.setString(2, "");
-        statement.setInt(3, maxIslandSize);
-        statement.setString(4, world);
-        statement.executeUpdate();
+    public void executeGridInsertStatement(boolean async) {
+        Query.GRID_INSERT.getStatementHolder()
+                .setString(this.lastIsland.toString())
+                .setString("")
+                .setInt(plugin.getSettings().maxIslandSize)
+                .setString(plugin.getSettings().islandWorld)
+                .execute(async);
     }
 
     public void reloadBlockValues(){
@@ -414,6 +403,13 @@ public final class GridHandler implements GridManager {
         else{
             return -lastIsland.getX() > lastIsland.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
         }
+    }
+
+    private void setLastIsland(SBlockPosition blockPosition){
+        this.lastIsland = blockPosition;
+        Query.GRID_UPDATE.getStatementHolder()
+                .setString(blockPosition.toString())
+                .execute(true);
     }
 
     private class CreateIslandData {
