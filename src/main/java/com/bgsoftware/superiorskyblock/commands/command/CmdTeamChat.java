@@ -16,7 +16,7 @@ public final class CmdTeamChat implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("teamchat", "chat");
+        return Arrays.asList("teamchat", "chat", "tc");
     }
 
     @Override
