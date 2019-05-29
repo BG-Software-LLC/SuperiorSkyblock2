@@ -338,3 +338,10 @@ disband-count: 5
 
 # Should the list of members in island top also include the island leader?
 island-top-include-leader: true
+
+# Set default placeholders that will be returned if the island is null.
+# Please use the <placeholder>:<default> format.
+default-placeholders:
+- 'superior_island_leader:N/A'
+- 'superior_island_level:0'
+- 'superior_island_worth:0'

@@ -47,12 +47,14 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
                 if (island == null)
-                    return subPlaceholder.equals("exists") ? "No" : "";
+                    return subPlaceholder.equals("exists") ? "No" : plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
 
                 if (subPlaceholder.startsWith("location_")) {
                     island = plugin.getGrid().getIslandAt(player.getLocation());
+
                     if (island == null)
-                        return "";
+                        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
+
                     subPlaceholder = subPlaceholder.replace("location_", "");
                 }
 
@@ -128,7 +130,7 @@ public final class PlaceholderHook_PAPI extends PlaceholderExpansion {
             }
         }catch(NullPointerException ignored){}
 
-        return "";
+        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
     }
 
 }

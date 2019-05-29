@@ -13,6 +13,8 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class SettingsHandler {
@@ -47,6 +49,7 @@ public final class SettingsHandler {
     public final boolean visitorsDamage;
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
+    public final Map<String, String> defaultPlaceholders;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -91,6 +94,10 @@ public final class SettingsHandler {
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
         disbandCount = cfg.getInt("disband-counts", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
+        defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
+                line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
+                line -> line.split(":")[1]
+        ));
     }
 
     public void updateValue(String path, Object value){

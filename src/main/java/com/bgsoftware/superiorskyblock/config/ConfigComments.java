@@ -173,6 +173,9 @@ public final class ConfigComments {
     @Comment("Should the list of members in island top also include the island leader?")
     public static String ISLAND_TOP_INCLUDE_LEADER = "island-top-include-leader";
 
-
+    @Comment("")
+    @Comment("Set default placeholders that will be returned if the island is null.")
+    @Comment("Please use the <placeholder>:<default> format.")
+    public static String DEFAULT_PLACEHOLDERS = "default-placeholders";
 
 }
