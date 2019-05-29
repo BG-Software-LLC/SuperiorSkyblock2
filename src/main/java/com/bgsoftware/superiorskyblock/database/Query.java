@@ -1,9 +1,5 @@
 package com.bgsoftware.superiorskyblock.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 public enum Query {
 
     ISLAND_SET_TELEPORT_LOCATION("UPDATE islands SET teleportLocation=? WHERE owner=?;"),
