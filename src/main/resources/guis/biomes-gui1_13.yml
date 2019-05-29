@@ -6,7 +6,7 @@
 ######################################################
 
 biomes-gui:
-  title: '&lSelect a biome'
+  title: 'Select a biome'
   size: 1
   open-sound: 'CHEST_OPEN'
   close-sound: 'CHEST_CLOSE'
@@ -16,12 +16,107 @@ biomes-gui:
       required-permission: ''
       slot: 0
       has-access-item:
-        type: GRASS
+        type: GRASS_BLOCK
         name: '&ePlains Biome &a(Available)'
         lore:
           - '&7Change your island biome to plains.'
       no-access-item:
-        type: GRASS
+        type: GRASS_BLOCK
         name: '&ePlains Biome &c(Unavailable)'
         lore:
           - '&7Change your island biome to plains.'
+    jungle:
+      required-permission: ''
+      slot: 1
+      has-access-item:
+        type: JUNGLE_SAPLING
+        name: '&eJungle Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to jungle.'
+      no-access-item:
+        type: JUNGLE_SAPLING
+        name: '&eJungle Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to jungle.'
+    taiga:
+      required-permission: ''
+      slot: 2
+      has-access-item:
+        type: SNOWBALL
+        name: '&eTaiga Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to taiga.'
+      no-access-item:
+        type: SNOWBALL
+        name: '&eTaiga Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to taiga.'
+    desert:
+      required-permission: ''
+      slot: 3
+      has-access-item:
+        type: SAND
+        name: '&eDesert Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to desert.'
+          - '&cWarning ice and snow must go!'
+      no-access-item:
+        type: SAND
+        name: '&eDesert Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to desert.'
+          - '&cWarning ice and snow must go!'
+    nether:
+      required-permission: ''
+      slot: 4
+      has-access-item:
+        type: NETHERRACK
+        name: '&eNether Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to nether.'
+          - '&cWarning ice, snow and water must go!'
+      no-access-item:
+        type: NETHERRACK
+        name: '&eNether Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to nether.'
+          - '&cWarning ice snow, and water must go!'
+    swamp:
+      required-permission: ''
+      slot: 5
+      has-access-item:
+        type: LILY_PAD
+        name: '&eSwamp Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to swamp.'
+      no-access-item:
+        type: LILY_PAD
+        name: '&eSwamp Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to swamp.'
+    wooded_hills:
+      required-permission: ''
+      slot: 6
+      has-access-item:
+        type: TERRACOTTA
+        name: '&eMesa Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to Mesa.'
+      no-access-item:
+        type: TERRACOTTA
+        name: '&eMesa Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to Mesa.'
+    mountains:
+      required-permission: ''
+      slot: 7
+      has-access-item:
+        type: STONE
+        name: '&eExtreme Hills Biome &a(Available)'
+        lore:
+          - '&7Change your island biome to extreme hills.'
+      no-access-item:
+        type: STONE
+        name: '&eExtreme Hills Biome &c(Unavailable)'
+        lore:
+          - '&7Change your island biome to extreme hills.'
