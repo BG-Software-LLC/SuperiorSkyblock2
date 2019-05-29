@@ -95,7 +95,7 @@ public final class CmdInvite implements ICommand {
                 return;
             }
 
-            IslandInviteEvent islandInviteEvent = new IslandInviteEvent(superiorPlayer, island);
+            IslandInviteEvent islandInviteEvent = new IslandInviteEvent(superiorPlayer, targetPlayer, island);
             Bukkit.getPluginManager().callEvent(islandInviteEvent);
 
             if(islandInviteEvent.isCancelled())

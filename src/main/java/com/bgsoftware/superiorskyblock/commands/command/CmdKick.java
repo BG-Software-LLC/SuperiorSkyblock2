@@ -75,7 +75,7 @@ public final class CmdKick implements ICommand {
             return;
         }
 
-        IslandKickEvent islandKickEvent = new IslandKickEvent(superiorPlayer, island);
+        IslandKickEvent islandKickEvent = new IslandKickEvent(superiorPlayer, targetPlayer, island);
         Bukkit.getPluginManager().callEvent(islandKickEvent);
 
         island.kickMember(targetPlayer);

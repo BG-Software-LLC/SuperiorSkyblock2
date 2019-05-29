@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
+import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -93,40 +94,45 @@ public final class GridHandler implements GridManager {
             return;
         }
 
-        IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer);
-        Bukkit.getPluginManager().callEvent(islandCreateEvent);
+        PreIslandCreateEvent preIslandCreateEvent = new PreIslandCreateEvent(superiorPlayer);
+        Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
 
-        if(!islandCreateEvent.isCancelled()) {
+        if(!preIslandCreateEvent.isCancelled()) {
             long startTime = System.currentTimeMillis();
             creationProgress = true;
 
             Location islandLocation = getNextLocation();
             Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
 
-            islands.add(superiorPlayer.getUniqueId(), island);
-            setLastIsland(SBlockPosition.of(islandLocation));
+            IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island);
+            Bukkit.getPluginManager().callEvent(islandCreateEvent);
 
-            for (Chunk chunk : island.getAllChunks(true)) {
-                chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-                plugin.getNMSAdapter().refreshChunk(chunk);
-            }
+            if(!islandCreateEvent.isCancelled()) {
+                islands.add(superiorPlayer.getUniqueId(), island);
+                setLastIsland(SBlockPosition.of(islandLocation));
 
-            Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-            schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
-                island.setBonusWorth(bonus);
-                if (superiorPlayer.asOfflinePlayer().isOnline()) {
-                    Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
-                    if (islandCreateEvent.getTeleport()) {
-                        superiorPlayer.asPlayer().teleport(islandLocation);
-                        if (island.isInside(superiorPlayer.getLocation()))
-                            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
-                    }
-                    new SuperiorThread(() -> island.calcIslandWorth(null)).start();
+                for (Chunk chunk : island.getAllChunks(true)) {
+                    chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
+                    plugin.getNMSAdapter().refreshChunk(chunk);
                 }
-            });
 
-            plugin.getDataHandler().insertIsland(island);
+                Schematic schematic = plugin.getSchematics().getSchematic(schemName);
+                schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                    island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
+                    island.setBonusWorth(bonus);
+                    if (superiorPlayer.asOfflinePlayer().isOnline()) {
+                        Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
+                        if (islandCreateEvent.canTeleport()) {
+                            superiorPlayer.asPlayer().teleport(islandLocation);
+                            if (island.isInside(superiorPlayer.getLocation()))
+                                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+                        }
+                        new SuperiorThread(() -> island.calcIslandWorth(null)).start();
+                    }
+                });
+
+                plugin.getDataHandler().insertIsland(island);
+            }
 
             creationProgress = false;
         }

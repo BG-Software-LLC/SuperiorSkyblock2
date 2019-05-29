@@ -10,16 +10,21 @@ public final class IslandKickEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private final SuperiorPlayer superiorPlayer;
+    private final SuperiorPlayer superiorPlayer, targetPlayer;
     private final Island island;
 
-    public IslandKickEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
         this.superiorPlayer = superiorPlayer;
+        this.targetPlayer = targetPlayer;
         this.island = island;
     }
 
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
+    }
+
+    public SuperiorPlayer getTarget() {
+        return targetPlayer;
     }
 
     public Island getIsland() {

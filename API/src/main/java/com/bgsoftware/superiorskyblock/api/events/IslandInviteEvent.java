@@ -11,17 +11,22 @@ public final class IslandInviteEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private final SuperiorPlayer superiorPlayer;
+    private final SuperiorPlayer superiorPlayer, targetPlayer;
     private final Island island;
     private boolean cancelled = false;
 
-    public IslandInviteEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
         this.superiorPlayer = superiorPlayer;
+        this.targetPlayer = targetPlayer;
         this.island = island;
     }
 
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
+    }
+
+    public SuperiorPlayer getTarget() {
+        return targetPlayer;
     }
 
     public Island getIsland() {
