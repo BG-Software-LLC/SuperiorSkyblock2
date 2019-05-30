@@ -528,7 +528,7 @@ public class SIsland extends DatabaseObject implements Island {
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
                             highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
-                            for (int y = 0; y <= highestBlock; y++) {
+                            for (int y = 0; y < highestBlock; y++) {
                                 Key blockKey = SKey.of("AIR");
 
                                 try{
