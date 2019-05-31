@@ -536,7 +536,7 @@ public class SIsland extends DatabaseObject implements Island {
                                     continue;
 
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
-                                int blockCount = 1;
+                                int blockCount = plugin.getGrid().getBlockAmount(location);
 
                                 if(spawners.containsKey(location)){
                                     Map.Entry<Integer, EntityType> entry = spawners.get(location);
