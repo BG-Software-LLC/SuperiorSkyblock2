@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
-import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook_PAPI;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -75,8 +75,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
-                if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-                    new PlaceholderHook_PAPI(this).register();
                 if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
                     FAWEHook.register();
                 if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
@@ -84,6 +82,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 WildStackerHook.register(this);
 
                 reloadPlugin(true);
+
+                PlaceholderHook.register(this);
 
                 loadWorld();
 
