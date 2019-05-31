@@ -523,12 +523,9 @@ public class SIsland extends DatabaseObject implements Island {
                     if(emptyChunk)
                         return;
 
-                    int highestBlock;
-
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
-                            highestBlock = chunkSnapshot.getHighestBlockYAt(x, z);
-                            for (int y = 0; y < highestBlock; y++) {
+                            for (int y = 0; y < 256; y++) {
                                 Key blockKey = SKey.of("AIR");
 
                                 try{
@@ -537,6 +534,7 @@ public class SIsland extends DatabaseObject implements Island {
 
                                 if(blockKey.toString().contains("AIR"))
                                     continue;
+
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                                 int blockCount = 1;
 
