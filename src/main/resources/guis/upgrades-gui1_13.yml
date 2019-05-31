@@ -317,7 +317,7 @@ upgrades-gui:
             - '&7increased spawn speed.'
             - '&7'
             - '&bBoost: &fx3 Speed'
-            - '&bPrice: &f$51,000,000'
+            - '&bPrice: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
@@ -351,7 +351,7 @@ upgrades-gui:
             - '&7increased spawn speed.'
             - '&7'
             - '&bBoost: &fx4 Speed'
-            - '&bPrice: &f$51,500,000'
+            - '&bPrice: &f$2,500,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
@@ -367,7 +367,7 @@ upgrades-gui:
             - '&7increased spawn speed.'
             - '&7'
             - '&bBoost: &fx4 Speed'
-            - '&bPrice: &f$1,500,000'
+            - '&bPrice: &f$2,500,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '4':
@@ -402,7 +402,7 @@ upgrades-gui:
             - '&7increased loot drops.'
             - '&7'
             - '&4Amount: &fx2 Drops'
-            - '&4Price: &f$100,000'
+            - '&4Price: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
@@ -418,7 +418,7 @@ upgrades-gui:
             - '&7increased loot drops.'
             - '&7'
             - '&4Amount: &fx2 Drops'
-            - '&4Price: &f$100,000'
+            - '&4Price: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '2':

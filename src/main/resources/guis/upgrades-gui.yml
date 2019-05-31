@@ -319,7 +319,7 @@ upgrades-gui:
             - '&7increased spawn speed.'
             - '&7'
             - '&bBoost: &fx3 Speed'
-            - '&bPrice: &f$51,000,000'
+            - '&bPrice: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
@@ -342,34 +342,34 @@ upgrades-gui:
         slot: 15
         has-next-level:
           sound: 'LEVEL_UP'
-          type: DIAMOND_HOE
-          name: '&e&lCrop Growth &a(Available)'
+          type: MOB_SPAWNER
+          name: '&b&lSpawner Boost &a(Available)'
           lore:
             - '&7'
-            - '&eNext Level: 4'
+            - '&bNext Level: &e4'
             - '&7'
-            - '&7Purchasing the growth upgrade'
-            - '&7gives all crops within your island'
-            - '&7increased growth speed.'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
             - '&7'
-            - '&eGrowth: &fx4 Speed'
-            - '&ePrice: &f$1,500,000'
+            - '&bBoost: &fx4 Speed'
+            - '&bPrice: &f$2,500,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
           sound: 'ANVIL_LAND'
           type: DIAMOND_HOE
-          name: '&e&lCrop Growth &c(Unavailable)'
+          name: '&b&lSpawner Boost &c(Unavailable)'
           lore:
             - '&7'
-            - '&eNext Level: 4'
+            - '&bNext Level: &e4'
             - '&7'
-            - '&7Purchasing the growth upgrade'
-            - '&7gives all crops within your island'
-            - '&7increased growth speed.'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
             - '&7'
-            - '&eGrowth: &fx4 Speed'
-            - '&ePrice: &f$1,500,000'
+            - '&bBoost: &fx4 Speed'
+            - '&bPrice: &f$2,500,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '4':
@@ -404,7 +404,7 @@ upgrades-gui:
             - '&7increased loot drops.'
             - '&7'
             - '&4Amount: &fx2 Drops'
-            - '&4Price: &f$100,000'
+            - '&4Price: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
@@ -420,7 +420,7 @@ upgrades-gui:
             - '&7increased loot drops.'
             - '&7'
             - '&4Amount: &fx2 Drops'
-            - '&4Price: &f$100,000'
+            - '&4Price: &f$1,000,000'
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '2':

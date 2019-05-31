@@ -98,7 +98,7 @@ upgrades:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for spawner-rates.'
   mob-drops:
     '1':
-      price: 100000.0
+      price: 1000000.0
       commands:
         - 'island admin setupgrade %player% mob-drops 2'
         - 'island admin setmobdrops %player% 2'
