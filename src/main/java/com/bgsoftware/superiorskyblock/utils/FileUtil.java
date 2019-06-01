@@ -108,7 +108,7 @@ public final class FileUtil {
     public static Location toLocation(String location){
         String[] sections = location.split(",");
         return new Location(Bukkit.getWorld(sections[0]), Double.valueOf(sections[1]), Double.valueOf(sections[2]),
-                Double.valueOf(sections[3]), Float.valueOf(sections[1]), Float.valueOf(sections[1]));
+                Double.valueOf(sections[3]), Float.valueOf(sections[4]), Float.valueOf(sections[5]));
     }
 
     public static void saveResource(String resourcePath){
