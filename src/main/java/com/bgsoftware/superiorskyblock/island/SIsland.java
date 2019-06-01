@@ -129,7 +129,7 @@ public class SIsland extends DatabaseObject implements Island {
             }catch(Exception ignored){}
         }
 
-        for(String entry : resultSet.getString("warps").split(",")) {
+        for(String entry : resultSet.getString("warps").split(";")) {
             try {
                 String[] sections = entry.split("=");
                 this.warps.put(sections[0], FileUtil.toLocation(sections[1]));
@@ -887,10 +887,10 @@ public class SIsland extends DatabaseObject implements Island {
 
         StringBuilder warps = new StringBuilder();
         this.warps.keySet().forEach(warp ->
-                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
-                .setString(warps.length() == 0 ? "" : warps.toString())
+                .setString(warps.length() == 0 ? "" : warps.toString().substring(1))
                 .setString(owner.toString())
                 .execute(true);
     }
@@ -998,7 +998,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         StringBuilder warps = new StringBuilder();
         this.warps.keySet().forEach(warp ->
-                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(getLocation(getTeleportLocation()))
@@ -1006,7 +1006,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
                 .setString(upgrades.length() == 0 ? "" : upgrades.toString())
-                .setString(warps.length() == 0 ? "" : warps.toString())
+                .setString(warps.length() == 0 ? "" : warps.toString().substring(1))
                 .setString(islandBank.getAsString())
                 .setInt(islandSize)
                 .setString("HOPPER=" + this.hoppersLimit)
@@ -1041,7 +1041,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         StringBuilder warps = new StringBuilder();
         this.warps.keySet().forEach(warp ->
-                warps.append(",").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.toString())
@@ -1051,7 +1051,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
                 .setString(upgrades.length() == 0 ? "" : upgrades.toString())
-                .setString(warps.length() == 0 ? "" : warps.toString())
+                .setString(warps.length() == 0 ? "" : warps.toString().substring(1))
                 .setString(islandBank.getAsString())
                 .setInt(islandSize)
                 .setString("HOPPER=" + this.hoppersLimit)
