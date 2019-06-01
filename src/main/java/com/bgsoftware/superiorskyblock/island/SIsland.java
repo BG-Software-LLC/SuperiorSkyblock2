@@ -95,7 +95,6 @@ public class SIsland extends DatabaseObject implements Island {
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
 
-    private boolean transferred = false;
     private UUID prevOwner;
 
     public SIsland(ResultSet resultSet) throws SQLException {
@@ -964,7 +963,6 @@ public class SIsland extends DatabaseObject implements Island {
 
         if (prevOwner == null)
             prevOwner = owner;
-        transferred = true;
 
         SuperiorPlayer previous = getOwner();
 
