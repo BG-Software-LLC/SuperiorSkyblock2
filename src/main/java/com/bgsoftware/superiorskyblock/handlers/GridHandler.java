@@ -35,6 +35,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -88,9 +89,9 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus){
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome){
         if(creationProgress) {
-            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName, bonus));
+            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName, bonus, biome));
             return;
         }
 
@@ -120,6 +121,7 @@ public final class GridHandler implements GridManager {
                 schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                     island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
+                    island.setBiome(biome);
                     if (superiorPlayer.asOfflinePlayer().isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                         if (islandCreateEvent.canTeleport()) {
@@ -139,8 +141,13 @@ public final class GridHandler implements GridManager {
 
         if(islandCreationsQueue.size() != 0){
             CreateIslandData data = islandCreationsQueue.pop();
-            createIsland(SSuperiorPlayer.of(data.player), data.schemName, data.bonus);
+            createIsland(SSuperiorPlayer.of(data.player), data.schemName, data.bonus, data.biome);
         }
+    }
+
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus) {
+        createIsland(superiorPlayer, schemName, bonus, Biome.PLAINS);
     }
 
     @Override
@@ -423,11 +430,13 @@ public final class GridHandler implements GridManager {
         public UUID player;
         public String schemName;
         public BigDecimal bonus;
+        public Biome biome;
 
-        public CreateIslandData(UUID player, String schemName, BigDecimal bonus){
+        public CreateIslandData(UUID player, String schemName, BigDecimal bonus, Biome biome){
             this.player = player;
             this.schemName = schemName;
             this.bonus = bonus;
+            this.biome = biome;
         }
 
     }

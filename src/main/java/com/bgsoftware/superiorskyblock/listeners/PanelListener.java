@@ -304,9 +304,10 @@ public final class PanelListener implements Listener {
 
                 if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
                     BigDecimal bonusWorth = new BigDecimal(guiInventory.get(schematic + "-bonus", Long.class));
+                    Biome biome = Biome.valueOf(guiInventory.get(schematic + "-biome", String.class));
                     superiorPlayer.asPlayer().closeInventory();
                     Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth);
+                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome);
                     break;
                 }
             }

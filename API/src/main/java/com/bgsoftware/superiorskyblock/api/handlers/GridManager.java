@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
 import java.math.BigDecimal;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GridManager {
+
+    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome);
 
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus);
 
