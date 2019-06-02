@@ -83,6 +83,8 @@ public final class PlayersListener implements Listener {
         if(!e.getPlayer().hasBypassModeEnabled() && e.getIsland().isBanned(e.getPlayer())) {
             e.setCancelled(true);
             Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
+            if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
+                e.setCancelTeleport(plugin.getSettings().getSpawnAsBukkitLocation());
             return;
         }
 
