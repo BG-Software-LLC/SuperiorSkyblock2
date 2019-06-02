@@ -8,7 +8,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +32,7 @@ public final class CmdSetPermission implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setpermission <island-role> <island-permission> <true/false>";
+        return "island setpermission <island-role/player-name> <island-permission> <true/false>";
     }
 
     @Override
@@ -63,15 +65,27 @@ public final class CmdSetPermission implements ICommand {
             return;
         }
 
+        Object permssionHolder;
+        String permissionHolderName;
         IslandRole islandRole;
         IslandPermission islandPermission;
         boolean value;
 
         try{
             islandRole = IslandRole.valueOf(args[1].toUpperCase());
+            permssionHolder = islandRole;
+            permissionHolderName = islandRole.name();
         }catch(IllegalArgumentException ex){
-            Locale.INVALID_ROLE.send(superiorPlayer, args[1], IslandRole.getValuesString());
-            return;
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+
+            if(targetPlayer == null){
+                Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
+                return;
+            }
+
+            islandRole = island.isMember(targetPlayer) ? targetPlayer.getIslandRole() : IslandRole.GUEST;
+            permssionHolder = targetPlayer;
+            permissionHolderName = targetPlayer.getName();
         }
 
         if(!islandRole.isLessThan(superiorPlayer.getIslandRole())){
@@ -91,8 +105,6 @@ public final class CmdSetPermission implements ICommand {
             return;
         }
 
-
-
         try{
             value = Boolean.parseBoolean(args[3]);
         }catch(IllegalArgumentException ex){
@@ -100,8 +112,12 @@ public final class CmdSetPermission implements ICommand {
             return;
         }
 
-        island.setPermission(islandRole, islandPermission, value);
-        Locale.UPDATED_PERMISSION.send(superiorPlayer, islandRole);
+        if(permssionHolder instanceof IslandRole)
+            island.setPermission((IslandRole) permssionHolder, islandPermission, value);
+        else
+            island.setPermission((SuperiorPlayer) permssionHolder, islandPermission, value);
+
+        Locale.UPDATED_PERMISSION.send(superiorPlayer, permissionHolderName);
     }
 
     @Override
@@ -116,6 +132,11 @@ public final class CmdSetPermission implements ICommand {
                 for(IslandRole islandRole : IslandRole.values()) {
                     if(islandRole.name().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(islandRole.name().toLowerCase());
+                }
+
+                for(Player player : Bukkit.getOnlinePlayers()){
+                    if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(player.getName().toLowerCase());
                 }
             }
             else if (args.length == 3) {

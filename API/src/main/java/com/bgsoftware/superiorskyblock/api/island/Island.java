@@ -61,7 +61,11 @@ public interface Island extends Comparable<Island> {
 
     void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value);
 
+    void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value);
+
     PermissionNode getPermisisonNode(IslandRole islandRole);
+
+    PermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer);
 
     IslandRole getRequiredRole(IslandPermission islandPermission);
 

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -72,7 +73,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     private final Set<UUID> members = new HashSet<>();
     private final Set<UUID> banned = new HashSet<>();
-    private final Map<IslandRole, SPermissionNode> permissionNodes = new HashMap<>();
+    private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
@@ -119,8 +120,12 @@ public class SIsland extends DatabaseObject implements Island {
         for(String entry : resultSet.getString("permissionNodes").split(",")) {
             try {
                 String[] sections = entry.split("=");
-                this.permissionNodes.put(IslandRole.valueOf(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
-            }catch(Exception ignored){}
+                try {
+                    this.permissionNodes.put(IslandRole.valueOf(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+                }catch(Exception ex){
+                    this.permissionNodes.put(UUID.fromString(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+                }
+            }catch(Exception ignored){ }
         }
 
         for(String entry : resultSet.getString("upgrades").split(",")) {
@@ -374,8 +379,14 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
+        boolean playerPermission = false;
+
+        if(permissionNodes.containsKey(superiorPlayer.getUniqueId())){
+            playerPermission = permissionNodes.get(superiorPlayer.getUniqueId()).hasPermission(islandPermission);
+        }
+
         IslandRole islandRole = isMember(superiorPlayer) ? superiorPlayer.getIslandRole() : IslandRole.GUEST;
-        return superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
+        return playerPermission || superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
     }
 
     @Override
@@ -384,7 +395,25 @@ public class SIsland extends DatabaseObject implements Island {
 
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(_islandRole ->
-                permissionNodes.append(",").append(_islandRole.name()).append("=").append(this.permissionNodes.get(_islandRole).getAsStatementString()));
+                permissionNodes.append(",").append(_islandRole.toString()).append("=").append(this.permissionNodes.get(_islandRole).getAsStatementString()));
+
+        Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
+                .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+        SPermissionNode permissionNode = permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), new SPermissionNode(""));
+
+        permissionNode.setPermission(islandPermission, value);
+
+        permissionNodes.put(superiorPlayer.getUniqueId(), permissionNode);
+
+        StringBuilder permissionNodes = new StringBuilder();
+        this.permissionNodes.keySet().forEach(_islandRole ->
+                permissionNodes.append(",").append(_islandRole.toString()).append("=").append(this.permissionNodes.get(_islandRole).getAsStatementString()));
 
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
@@ -395,6 +424,12 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public SPermissionNode getPermisisonNode(IslandRole islandRole){
         return permissionNodes.get(islandRole).clone();
+    }
+
+    @Override
+    public PermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer) {
+        IslandRole islandRole = isMember(superiorPlayer) ? superiorPlayer.getIslandRole() : IslandRole.GUEST;
+        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermisisonNode(islandRole));
     }
 
     @Override
@@ -1017,7 +1052,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
-                permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
+                permissionNodes.append(",").append(islandRole.toString()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
 
         StringBuilder upgrades = new StringBuilder();
         this.upgrades.keySet().forEach(upgrade ->
@@ -1061,7 +1096,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void executeInsertStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
-                permissionNodes.append(",").append(islandRole.name()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
+                permissionNodes.append(",").append(islandRole.toString()).append("=").append(this.permissionNodes.get(islandRole).getAsStatementString()));
 
         StringBuilder upgrades = new StringBuilder();
         this.upgrades.keySet().forEach(upgrade ->
@@ -1107,6 +1142,7 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @SuppressWarnings("all")
     public int compareTo(Island other) {
         if(other == null)
             return -1;

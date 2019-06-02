@@ -9,7 +9,9 @@ import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,7 @@ public final class CmdPermissions implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island permissions <island-role>";
+        return "island permissions <island-role/player-name>";
     }
 
     @Override
@@ -62,18 +64,27 @@ public final class CmdPermissions implements ICommand {
             return;
         }
 
-        IslandRole islandRole;
+        PermissionNode permissionNode;
+        String permissionHolderName;
 
+        //Checks if entered an island role.
         try{
-            islandRole = IslandRole.valueOf(args[1].toUpperCase());
+            IslandRole islandRole = IslandRole.valueOf(args[1].toUpperCase());
+            permissionNode = island.getPermisisonNode(islandRole);
+            permissionHolderName = islandRole.name();
         }catch(IllegalArgumentException ex){
-            Locale.INVALID_ROLE.send(superiorPlayer, args[1], IslandRole.getValuesString());
-            return;
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+
+            if(targetPlayer == null){
+                Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
+                return;
+            }
+
+            permissionNode = island.getPermisisonNode(targetPlayer);
+            permissionHolderName = targetPlayer.getName();
         }
 
-        PermissionNode permissionNode = island.getPermisisonNode(islandRole);
-
-        Locale.PERMISSION_CHECK.send(superiorPlayer, islandRole, permissionNode.getColoredPermissions());
+        Locale.PERMISSION_CHECK.send(superiorPlayer, permissionHolderName, permissionNode.getColoredPermissions());
     }
 
     @Override
@@ -87,6 +98,11 @@ public final class CmdPermissions implements ICommand {
             for(IslandRole islandRole : IslandRole.values()) {
                 if(islandRole.name().toLowerCase().startsWith(args[1].toLowerCase()))
                     list.add(islandRole.name().toLowerCase());
+            }
+
+            for(Player player : Bukkit.getOnlinePlayers()){
+                if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(player.getName().toLowerCase());
             }
 
             return list;
