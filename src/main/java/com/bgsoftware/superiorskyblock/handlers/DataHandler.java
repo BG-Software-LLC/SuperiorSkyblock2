@@ -164,14 +164,10 @@ public final class DataHandler {
     public void insertIsland(Island island){
         new SuperiorThread(() -> {
             if(!containsIsland(island)){
-                SQLHelper.executeUpdate(String.format(
-                        "INSERT INTO islands VALUES('%s','%s','','','','','','','',0,'',0,0.0,0.0,0.0,'','','0',%d);",
-                        island.getOwner().getUniqueId(),
-                        FileUtil.fromLocation(island.getCenter()),
-                        plugin.getSettings().defaultWarpsLimit)
-                );
+                ((SIsland) island).executeInsertStatement(true);
+            }else {
+                ((SIsland) island).executeUpdateStatement(true);
             }
-            ((SIsland) island).executeUpdateStatement(true);
         }).start();
     }
 
