@@ -16,11 +16,14 @@ import java.util.List;
 
 public final class CommandsHandler implements CommandExecutor, TabCompleter {
 
+    private static CommandsHandler instance;
+
     private SuperiorSkyblockPlugin plugin;
     private List<ICommand> subCommands = new ArrayList<>();
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+        instance = this;
         subCommands.add(new CmdAccept());
         subCommands.add(new CmdAdmin());
         subCommands.add(new CmdBan());
@@ -32,6 +35,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdDeposit());
         subCommands.add(new CmdDisband());
         subCommands.add(new CmdExpel());
+        subCommands.add(new CmdHelp());
         subCommands.add(new CmdInvite());
         subCommands.add(new CmdKick());
         subCommands.add(new CmdLeave());
@@ -88,23 +92,10 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
             }
         }
 
-        for(ICommand subCommand : subCommands){
-            if(subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())){
-                Locale.ISLAND_HELP_HEADER.send(sender);
-
-                for(ICommand _subCommand : subCommands) {
-                    if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                        Locale.ISLAND_HELP_LINE.send(sender, _subCommand.getUsage(), getPermissionDescription(_subCommand.getPermission()));
-                    }
-                }
-
-                Locale.ISLAND_HELP_FOOTER.send(sender);
-
-                return false;
-            }
-        }
-
-        Locale.NO_COMMAND_PERMISSION.send(sender);
+        if(sender.hasPermission("superior.island.help"))
+            Locale.UNKNOWN_COMMAND.send(sender);
+        else
+            Locale.NO_COMMAND_PERMISSION.send(sender);
 
         return false;
     }
@@ -138,15 +129,9 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         return list;
     }
 
-    private String getPermissionDescription(String permission){
-        List<Permission> permissions = plugin.getDescription().getPermissions();
-
-        for(Permission _permission : permissions) {
-            if (_permission.getName().equals(permission))
-                return _permission.getDescription();
-        }
-
-        return "";
+    public static List<ICommand> getSubCommands(){
+        return instance.subCommands;
     }
+
 
 }

@@ -37,6 +37,8 @@ permissions:
             description: Disband your island permanently.
           superior.island.expel:
             description: Kick a visitor from your island.
+          superior.island.help:
+            description: List of all commands.
           superior.island.invite:
             description: Invite a player to your island.
           superior.island.kick:

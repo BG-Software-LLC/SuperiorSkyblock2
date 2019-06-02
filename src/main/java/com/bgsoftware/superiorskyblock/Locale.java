@@ -221,7 +221,8 @@ public enum Locale {
     NO_CLOSE_BYPASS,
     ISLAND_WAS_CLOSED,
     NO_OPEN_PERMISSION,
-    ISLAND_OPENED;
+    ISLAND_OPENED,
+    UNKNOWN_COMMAND;
 
     private String message;
 

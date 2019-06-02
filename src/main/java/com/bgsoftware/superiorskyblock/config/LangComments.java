@@ -137,6 +137,9 @@ public final class LangComments {
     @Comment("Called when running a command without the required permission.")
     public static String NO_COMMAND_PERMISSION = "NO_COMMAND_PERMISSION";
 
+    @Comment("Called when running an unknown command.")
+    public static String UNKNOWN_COMMAND = "UNKNOWN_COMMAND";
+
     @Comment("Called when running a command not in the required usage format.")
     public static String COMMAND_USAGE = "COMMAND_USAGE";
 

@@ -243,6 +243,8 @@ ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 # Called when running a command without the required permission.
 NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
+# Called when running an unknown command.
+UNKNOWN_COMMAND: '&cUnknown command. Type "/island help" for help.'
 # Called when running a command not in the required usage format.
 COMMAND_USAGE: '&cUsage: /{0}'
 # Called when using the upgrades menu.
