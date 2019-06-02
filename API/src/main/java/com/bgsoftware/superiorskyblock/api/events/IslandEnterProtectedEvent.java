@@ -7,25 +7,19 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("unused")
-public final class IslandEnterProtectedEvent extends Event implements Cancellable {
+public class IslandEnterProtectedEvent extends IslandEnterEvent {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private final SuperiorPlayer superiorPlayer;
-    private final Island island;
     private boolean cancelled = false;
 
+    @Deprecated
     public IslandEnterProtectedEvent(SuperiorPlayer superiorPlayer, Island island){
-        this.superiorPlayer = superiorPlayer;
-        this.island = island;
+        super(superiorPlayer, island, EnterCause.INVALID);
     }
 
-    public SuperiorPlayer getPlayer() {
-        return superiorPlayer;
-    }
-
-    public Island getIsland() {
-        return island;
+    public IslandEnterProtectedEvent(SuperiorPlayer superiorPlayer, Island island, EnterCause enterCause){
+        super(superiorPlayer, island, enterCause);
     }
 
     @Override

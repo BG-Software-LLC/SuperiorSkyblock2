@@ -6,7 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("unused")
-public final class IslandKickEvent extends Event {
+public class IslandKickEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();
 

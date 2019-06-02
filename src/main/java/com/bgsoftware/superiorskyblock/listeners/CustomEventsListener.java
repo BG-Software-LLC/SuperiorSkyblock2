@@ -168,10 +168,13 @@ public final class CustomEventsListener implements Listener {
                     e.setCancelled(true);
             }
             else if(!fromIsland.isInsideRange(e.getFrom()) && fromIsland.isInsideRange(e.getTo())){
-                IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+                IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland, IslandEnterEvent.EnterCause.PLAYER_MOVE);
                 Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
-                if(islandEnterProtectedEvent.isCancelled())
+                if(islandEnterProtectedEvent.isCancelled()) {
                     e.setCancelled(true);
+                    if(islandEnterProtectedEvent.getCancelTeleport() != null)
+                        e.getPlayer().teleport(islandEnterProtectedEvent.getCancelTeleport());
+                }
             }
             return;
         }

@@ -94,10 +94,12 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland());
+        IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
         Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
         if(islandEnterProtectedEvent.isCancelled()) {
             e.setCancelled(true);
+            if(islandEnterProtectedEvent.getCancelTeleport() != null)
+                e.setCancelTeleport(islandEnterProtectedEvent.getCancelTeleport());
         }
     }
 
