@@ -21,12 +21,14 @@ public final class CmdAdmin implements ICommand {
     public CmdAdmin(){
         subCommands.add(new CmdAdminBonus());
         subCommands.add(new CmdAdminBypass());
+        subCommands.add(new CmdAdminClose());
         subCommands.add(new CmdAdminDemote());
         subCommands.add(new CmdAdminDeposit());
         subCommands.add(new CmdAdminDisband());
         subCommands.add(new CmdAdminJoin());
         subCommands.add(new CmdAdminMsg());
         subCommands.add(new CmdAdminMsgAll());
+        subCommands.add(new CmdAdminOpen());
         subCommands.add(new CmdAdminPromote());
         subCommands.add(new CmdAdminReload());
         subCommands.add(new CmdAdminSave());

@@ -83,6 +83,7 @@ public class SIsland extends DatabaseObject implements Island {
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
     protected Location teleportLocation;
+    private boolean locked;
 
     /*
      * SIsland multipliers & limits
@@ -153,6 +154,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.mobDrops = resultSet.getDouble("mobDrops");
         this.discord = resultSet.getString("discord");
         this.paypal = resultSet.getString("paypal");
+        this.locked = resultSet.getBoolean("locked");
 
         calcIslandWorth(null);
     }
@@ -987,6 +989,31 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public boolean isLocked() {
+        return locked;
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+
+        if(locked){
+            for(UUID uuid : allPlayersInside()){
+                SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
+                if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
+                    victimPlayer.asPlayer().teleport(plugin.getSettings().getSpawnAsBukkitLocation());
+                    Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
+                }
+            }
+        }
+
+        Query.ISLAND_SET_LOCKED.getStatementHolder()
+                .setBoolean(locked)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
@@ -1016,8 +1043,9 @@ public class SIsland extends DatabaseObject implements Island {
                 .setFloat((float) mobDrops)
                 .setString(discord)
                 .setString(paypal)
-                .setString(bonusWorth.getAsString())
                 .setInt(warpsLimit)
+                .setString(bonusWorth.getAsString())
+                .setBoolean(false)
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1061,8 +1089,9 @@ public class SIsland extends DatabaseObject implements Island {
                 .setFloat((float) mobDrops)
                 .setString(discord)
                 .setString(paypal)
-                .setString(bonusWorth.getAsString())
                 .setInt(warpsLimit)
+                .setString(bonusWorth.getAsString())
+                .setBoolean(false)
                 .execute(async);
     }
 

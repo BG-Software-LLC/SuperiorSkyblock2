@@ -62,6 +62,9 @@ public final class LangComments {
     @Comment("Called when running the /is biome command or changing biome from gui.")
     public static String NO_SET_BIOME_PERMISSION = "NO_SET_BIOME_PERMISSION";
 
+    @Comment("Called when running the /is close command.")
+    public static String NO_CLOSE_PERMISSION = "NO_CLOSE_PERMISSION";
+
     @Comment("Called when running the /is create command or creating a new island using gui.")
     public static String ISLAND_CREATE_PROCCESS_REQUEST = "ISLAND_CREATE_PROCCESS_REQUEST";
 
@@ -85,6 +88,9 @@ public final class LangComments {
 
     @Comment("Called when running the /is leave command.")
     public static String LEAVE_ISLAND_AS_LEADER = "LEAVE_ISLAND_AS_LEADER";
+
+    @Comment("Called when running the /is open command.")
+    public static String NO_OPEN_PERMISSION = "NO_OPEN_PERMISSION";
 
     @Comment("Called when running the /is permissions command.")
     public static String NO_PERMISSION_CHECK_PERMISSION = "NO_PERMISSION_CHECK_PERMISSION";

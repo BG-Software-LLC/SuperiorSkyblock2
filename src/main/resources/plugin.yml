@@ -23,6 +23,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.biome:
             description: Change the biome of the island.
+          superior.island.close:
+            description: Close the island to the public.
           superior.island.create:
             description: Create a new island.
           superior.island.delwarp:
@@ -40,7 +42,9 @@ permissions:
           superior.island.kick:
             description: Kick a player from your island.
           superior.island.leave:
-            description: Leave your island.
+            description: Leave your island
+          superior.island.open:
+            description: Open the island to the public.
           superior.island.panel:
             description: Open island panel.
           superior.island.pardon:
@@ -99,6 +103,8 @@ permissions:
             description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
+          superior.admin.close:
+            description: Close an island to the public.
           superior.admin.demote:
             description: Demote a member in another player's island.
           superior.admin.deposit:
@@ -113,6 +119,8 @@ permissions:
             description: Send a player a message without any prefixes.
           superior.admin.msgall:
             description: Send to all island members a message without any prefixes.
+          superior.admin.open:
+            description: Open an island to the public.
           superior.admin.promote:
             description: Promote a member in another player's island.
           superior.admin.reload:

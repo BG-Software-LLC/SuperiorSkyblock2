@@ -25,6 +25,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdAdmin());
         subCommands.add(new CmdBan());
         subCommands.add(new CmdBiome());
+        subCommands.add(new CmdClose());
         subCommands.add(new CmdCreate());
         subCommands.add(new CmdDelWarp());
         subCommands.add(new CmdDemote());
@@ -34,6 +35,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdInvite());
         subCommands.add(new CmdKick());
         subCommands.add(new CmdLeave());
+        subCommands.add(new CmdOpen());
         subCommands.add(new CmdPanel());
         subCommands.add(new CmdPardon());
         subCommands.add(new CmdPermissions());

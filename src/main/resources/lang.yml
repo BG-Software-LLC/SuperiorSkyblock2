@@ -68,6 +68,11 @@ BANNED_FROM_ISLAND: '&cYou are banned from this island.'
 # Called when running the /is biome command or changing biome from gui.
 NO_SET_BIOME_PERMISSION: '&cYou must be at least {0} in order to change island biome.'
 CHANGED_BIOME: '&aSuccessfully changed biome to {0}. You might need to reconnect to the server to see changes.'
+# Called when running the /is close command.
+NO_CLOSE_PERMISSION: '&cYou must be at least {0} in order to close the island to the public.'
+ISLAND_CLOSED: '&aSuccessfully closed the island to the public.'
+NO_CLOSE_BYPASS: '&cThis island is not opened to the public.'
+ISLAND_WAS_CLOSED: '&cThe island you were in was closed and you were teleported back to spawn.'
 # Called when running the /is create command or creating a new island using gui.
 ISLAND_CREATE_PROCCESS_REQUEST: '&aProcessing your request...'
 CREATE_ISLAND: |
@@ -118,6 +123,9 @@ GOT_KICKED: '&aYou were kicked from your island by {0}.'
 LEAVE_ISLAND_AS_LEADER: '&cYou cannot leave your island when you own it.'
 LEAVE_ANNOUNCEMENT: '&a{0} left the island.'
 LEFT_ISLAND: '&aYou left your island.'
+# Called when running the /is open command.
+NO_OPEN_PERMISSION: '&cYou must be at least {0} in order to open the island to the public.'
+ISLAND_OPENED: '&aSuccessfully opened the island to the public.'
 # Called when running the /is pardon command.
 PLAYER_NOT_BANNED: '&cThis player is not banned.'
 UNBAN_ANNOUNCEMENT: '&a{0} was UNBANNED from the island by {1}.'

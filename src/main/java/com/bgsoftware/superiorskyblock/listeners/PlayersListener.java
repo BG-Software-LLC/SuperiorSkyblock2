@@ -86,10 +86,19 @@ public final class PlayersListener implements Listener {
             return;
         }
 
+        if(e.getIsland().isLocked() && !e.getIsland().hasPermission(e.getPlayer(), IslandPermission.CLOSE_BYPASS)){
+            e.setCancelled(true);
+            Locale.NO_CLOSE_BYPASS.send(e.getPlayer());
+            if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
+                e.setCancelTeleport(plugin.getSettings().getSpawnAsBukkitLocation());
+            return;
+        }
+
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland());
         Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
-        if(islandEnterProtectedEvent.isCancelled())
+        if(islandEnterProtectedEvent.isCancelled()) {
             e.setCancelled(true);
+        }
     }
 
     @EventHandler

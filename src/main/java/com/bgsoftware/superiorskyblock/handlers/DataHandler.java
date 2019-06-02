@@ -93,7 +93,8 @@ public final class DataHandler {
                 "discord VARCHAR, " +
                 "paypal VARCHAR, " +
                 "warpsLimit INTEGER, " +
-                "bonusWorth INTEGER" +
+                "bonusWorth VARCHAR," +
+                "locked BOOLEAN" +
                 ");");
 
         //Creating default players table
@@ -126,9 +127,10 @@ public final class DataHandler {
                 "amount INTEGER" +
                 ");");
 
-        addColumnIfNotExists("bonusWorth", "islands", "0", "VARCHAR");
+        addColumnIfNotExists("bonusWorth", "islands", "'0'", "VARCHAR");
         addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
         addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
+        addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {
@@ -266,7 +268,7 @@ public final class DataHandler {
     }
 
     private void addColumnIfNotExists(String column, String table, String def, String type) {
-        try(PreparedStatement statement = SQLHelper.buildStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT '" + def + "';")){
+        try(PreparedStatement statement = SQLHelper.buildStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT " + def + ";")){
             statement.executeUpdate();
         }catch(SQLException ex){
             if(!ex.getMessage().contains("duplicate"))

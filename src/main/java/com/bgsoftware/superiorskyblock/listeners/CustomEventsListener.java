@@ -92,10 +92,13 @@ public final class CustomEventsListener implements Listener {
         }
 
         if (toIsland != null && !toIsland.isSpawn()) {
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland, IslandEnterEvent.EnterCause.PLAYER_TELEPORT);
             Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled())
+            if(islandEnterEvent.isCancelled()) {
                 e.setCancelled(true);
+                if(islandEnterEvent.getCancelTeleport() != null)
+                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
+            }
         }
     }
 
@@ -111,8 +114,11 @@ public final class CustomEventsListener implements Listener {
             }
 
             if(island != null && !island.isSpawn()){
-                IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), island);
+                IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), island, IslandEnterEvent.EnterCause.PLAYER_JOIN);
                 Bukkit.getPluginManager().callEvent(islandEnterEvent);
+                if(islandEnterEvent.isCancelled() && islandEnterEvent.getCancelTeleport() != null) {
+                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
+                }
             }
         }, 1L);
     }
@@ -132,10 +138,13 @@ public final class CustomEventsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getTo());
 
         if(island != null && !(island instanceof SpawnIsland)){
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), island);
+            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), island, IslandEnterEvent.EnterCause.PORTAL);
             Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled())
+            if(islandEnterEvent.isCancelled()) {
                 e.setCancelled(true);
+                if(islandEnterEvent.getCancelTeleport() != null)
+                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
+            }
         }
     }
 
@@ -175,10 +184,13 @@ public final class CustomEventsListener implements Listener {
         }
 
         if (toIsland != null && !(toIsland instanceof SpawnIsland)) {
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland, IslandEnterEvent.EnterCause.PLAYER_MOVE);
             Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled())
+            if(islandEnterEvent.isCancelled()) {
                 e.setCancelled(true);
+                if(islandEnterEvent.getCancelTeleport() != null)
+                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
+            }
         }
 
     }
