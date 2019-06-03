@@ -20,7 +20,7 @@ public enum Query {
     ISLAND_SET_WARPS("UPDATE islands SET warps=? WHERE owner=?;"),
     ISLAND_SET_BLOCK_LIMITS("UPDATE islands SET blockLimits=? WHERE owner=?;"),
     ISLAND_SET_LOCKED("UPDATE islands SET locked=? WHERE owner=?;"),
-    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,bonusWorth=?,warpsLimit=? WHERE owner=?;"),
+    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=? WHERE owner=?;"),
     ISLAND_INSERT("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
