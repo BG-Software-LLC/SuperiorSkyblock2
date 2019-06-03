@@ -583,6 +583,7 @@ public class SIsland extends DatabaseObject implements Island {
                                 else if(blocks.containsKey(location)){
                                     Map.Entry<Integer, Material> entry = blocks.get(location);
                                     blockCount = entry.getKey();
+                                    blockKey = SKey.of(entry.getValue().name());
                                 }
 
                                 handleBlockPlace(blockKey, blockCount);
