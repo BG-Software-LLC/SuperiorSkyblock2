@@ -16,7 +16,7 @@ public final class LeaderHeadsHook extends DataCollector {
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private LeaderHeadsHook(){
-        super("top-islands", "SuperiorSkyblock2", BoardType.DEFAULT, "&lTop Islands", "islandstop", Arrays.asList(null, null, "&e{amount} worth", null), true, String.class);
+        super("top-islands", "SuperiorSkyblock2", BoardType.DEFAULT, "&lTop Islands", "islandstop", Arrays.asList("", "", "&e{amount} worth", ""), true, String.class);
     }
 
     @Override
