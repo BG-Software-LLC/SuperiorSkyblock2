@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.gui.menus;
 
 import com.bgsoftware.superiorskyblock.gui.buttons.Button;
+import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public class YamlMenu extends Menu {
         if (!file.contains("items"))
             return;
 
-        file.getConfigurationSection("items").getKeys(false).forEach(key -> items.put(key, file.getItemStack("items." + key)));
+        file.getConfigurationSection("items").getKeys(false).forEach(key -> items.put(key, ItemSerializer.getItem(file.getConfigurationSection("items." + key))));
     }
 
     protected void loadButtons() {
