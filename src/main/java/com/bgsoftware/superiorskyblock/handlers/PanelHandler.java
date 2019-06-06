@@ -51,10 +51,10 @@ public final class PanelHandler {
     }
 
     private void loadMenus(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
+        File file = new File(plugin.getDataFolder(), "guis/panel-gui-old.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/panel-gui.yml");
+            FileUtil.saveResource("guis/panel-gui-old.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
