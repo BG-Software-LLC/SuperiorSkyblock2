@@ -60,4 +60,24 @@ public class ItemSerializer {
         return getItem(map.getString("material"), map);
     }
 
+    public static ItemStack replace(ItemStack item, String... placeholders) {
+        ItemMeta meta = item.getItemMeta();
+
+        for (int i = 0; i < placeholders.length; i++) {
+            if (meta.hasDisplayName())
+                meta.setDisplayName(meta.getDisplayName().replace("{" + i + "}", placeholders[i]));
+
+            if (meta.hasLore()) {
+                List<String> lore = new ArrayList<>();
+                for (String line : meta.getLore()) {
+                    lore.add(line.replace("{" + i + "}", placeholders[i]));
+                }
+                meta.setLore(lore);
+            }
+        }
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
 }

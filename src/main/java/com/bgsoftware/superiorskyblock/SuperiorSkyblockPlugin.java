@@ -46,6 +46,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         plugin = this;
         new Metrics(this);
 
+
         getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);

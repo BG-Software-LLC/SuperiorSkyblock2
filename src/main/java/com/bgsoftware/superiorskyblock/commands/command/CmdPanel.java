@@ -63,9 +63,9 @@ public final class CmdPanel implements ICommand {
             }
         }
 
-        plugin.getPanel().openPanel(superiorPlayer);
+//        plugin.getPanel().openPanel(superiorPlayer);
 
-//        new PanelMenu(superiorPlayer.asPlayer());
+        new PanelMenu(superiorPlayer.asPlayer());
     }
 
     @Override

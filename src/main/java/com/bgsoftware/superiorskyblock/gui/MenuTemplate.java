@@ -8,7 +8,8 @@ import java.io.File;
 
 public enum MenuTemplate {
 
-    PANEL("guis/panel-gui.yml");
+    PANEL("guis/panel-gui.yml"),
+    MEMBERS("guis/members-gui.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
