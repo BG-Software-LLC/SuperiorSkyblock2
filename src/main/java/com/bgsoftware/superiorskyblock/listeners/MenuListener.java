@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 @SuppressWarnings("unused")
-public class MenuListener implements Listener {
+public final class MenuListener implements Listener {
 
     private SuperiorSkyblockPlugin plugin;
 

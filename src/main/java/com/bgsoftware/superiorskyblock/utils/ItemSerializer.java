@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -50,6 +51,10 @@ public class ItemSerializer {
             List<String> lore = new ArrayList<>();
             map.getStringList("lore").forEach(line -> lore.add(ChatColor.translateAlternateColorCodes('&', line)));
             meta.setLore(lore);
+        }
+
+        if(map.contains("glow")){
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
         }
 
         item.setItemMeta(meta);
