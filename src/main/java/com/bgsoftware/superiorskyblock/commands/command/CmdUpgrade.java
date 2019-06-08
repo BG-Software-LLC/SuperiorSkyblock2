@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.menus.types.islands.IslandUpgradeMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -53,7 +54,8 @@ public final class CmdUpgrade implements ICommand {
             return;
         }
 
-        plugin.getUpgrades().openUpgradesMenu(superiorPlayer);
+//        plugin.getUpgrades().openUpgradesMenu(superiorPlayer);
+        new IslandUpgradeMenu(superiorPlayer.asPlayer());
     }
 
     @Override

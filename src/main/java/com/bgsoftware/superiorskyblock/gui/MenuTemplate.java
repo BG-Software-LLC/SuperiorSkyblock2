@@ -19,6 +19,7 @@ public enum MenuTemplate {
 
     ISLAND_CREATE("guis/island/island-create.yml"),
     ISLAND_BIOME("guis/island/island-biome.yml"),
+    ISLAND_UPGRADES("guis/island/island-upgrades.yml"),
 
     ISLAND_WARPS("guis/warps/island-warps.yml");
 
