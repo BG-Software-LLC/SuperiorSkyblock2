@@ -126,6 +126,9 @@ LEFT_ISLAND: '&aYou left your island.'
 # Called when running the /is open command.
 NO_OPEN_PERMISSION: '&cYou must be at least {0} in order to open the island to the public.'
 ISLAND_OPENED: '&aSuccessfully opened the island to the public.'
+# Called when running the /is panel toggle command.
+PANEL_TOGGLE_ON: '&aToggled island panel ON. Running /is will open the panel for you!'
+PANEL_TOGGLE_OFF: '&aToggled island panel OFF. Running /is will teleport you to the island!'
 # Called when running the /is pardon command.
 PLAYER_NOT_BANNED: '&cThis player is not banned.'
 UNBAN_ANNOUNCEMENT: '&a{0} was UNBANNED from the island by {1}.'

@@ -81,4 +81,8 @@ public interface SuperiorPlayer {
 
     void setDisbands(int disbands);
 
+    void setToggledPanel(boolean toggledPanel);
+
+    boolean hasToggledPanel();
+
 }
