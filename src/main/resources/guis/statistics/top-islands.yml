@@ -1,0 +1,88 @@
+title: "&8&lTop Islands"
+rows: 3
+scroll_width: 1
+
+island_item:
+  name: "&e&l[!] Island: &6&n{0}&7 (#{1})"
+  lore:
+    - ""
+    - "&6&l* &e&lIsland Level &7{2}"
+    - ""
+    - "&6&l* &e&lPlace &7#{1}"
+    - "&6&l* &e&lWorth &7${3}"
+    - ""
+    - "&6&l* &e&lMembers:"
+    - "&f - " # TODO
+    - ""
+    - "&7&o(( &f&oLeft-Click &7&oto view their items. ))"
+    - "&7&o(( &f&oRight-Click &7&oto teleport to island warp. ))"
+
+invalid_item:
+  name: "&cInvalid Island"
+  lore: []
+
+items:
+  blue:
+    material: STAINED_GLASS_PANE:11
+    name: " "
+    lore: []
+  cyan:
+    material: STAINED_GLASS_PANE:9
+    name: " "
+    lore: []
+  aqua:
+    material: STAINED_GLASS_PANE:3
+    name: " "
+    lore: []
+
+buttons:
+  - item: blue
+    position: 0, 0
+  - item: blue
+    position: 1, 0
+  - item: blue
+    position: 0, 1
+
+  - item: blue
+    position: 8, 0
+  - item: blue
+    position: 7, 0
+  - item: blue
+    position: 8, 1
+
+  - item: cyan
+    position: 2, 0
+  - item: cyan
+    position: 1, 1
+  - item: cyan
+    position: 0, 2
+
+  - item: cyan
+    position: 6, 0
+  - item: cyan
+    position: 7, 1
+  - item: cyan
+    position: 8, 2
+
+  - item: aqua
+    position: 2, 1
+  - item: aqua
+    position: 3, 0
+  - item: aqua
+    position: 4, 1
+  - item: aqua
+    position: 5, 0
+  - item: aqua
+    position: 6, 1
+
+list_positions:
+  - 4, 0
+  - 3, 1
+  - 5, 1
+  - 1, 2
+  - 2, 2
+  - 3, 2
+  - 4, 2
+  - 5, 2
+  - 6, 2
+  - 7, 2

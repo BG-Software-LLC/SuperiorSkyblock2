@@ -12,7 +12,10 @@ public enum MenuTemplate {
     MEMBERS("guis/panel/members-gui.yml"),
     VISITORS("guis/panel/visitors-gui.yml"),
     MEMBER("guis/panel/member-gui.yml"),
-    MEMBER_ROLE("guis/panel/member-role-gui.yml");
+    MEMBER_ROLE("guis/panel/member-role-gui.yml"),
+
+    TOP_ISLANDS("guis/statistics/top-islands.yml"),
+    ISLAND_VALUE("guis/statistics/island-value.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 

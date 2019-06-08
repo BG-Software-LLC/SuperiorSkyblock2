@@ -10,8 +10,8 @@ import java.util.List;
 
 public class YamlScroll extends YamlMenu {
 
-    private int page;
-    private int scrollWidth;
+    protected int page;
+    protected int scrollWidth;
 
     private List<Button> list;
     private List<Integer> slots;
