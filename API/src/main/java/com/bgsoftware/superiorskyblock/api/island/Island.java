@@ -93,13 +93,21 @@ public interface Island extends Comparable<Island> {
 
     void handleBlockPlace(Block block, int amount);
 
+    void handleBlockPlace(Block block, int amount, boolean save);
+
     void handleBlockPlace(Key key, int amount);
+
+    void handleBlockPlace(Key key, int amount, boolean save);
 
     void handleBlockBreak(Block block);
 
     void handleBlockBreak(Block block, int amount);
 
+    void handleBlockBreak(Block block, int amount, boolean save);
+
     void handleBlockBreak(Key key, int amount);
+
+    void handleBlockBreak(Key key, int amount, boolean save);
 
     int getHoppersAmount();
 
