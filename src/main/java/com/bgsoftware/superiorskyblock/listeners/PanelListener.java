@@ -362,7 +362,12 @@ public final class PanelListener implements Listener {
             List<String> warps = new ArrayList<>(island.getAllWarps());
             warps.sort(String::compareTo);
 
-            String warpName = warps.get(slots.indexOf(e.getRawSlot()));
+            int indexOf = slots.indexOf(e.getRawSlot());
+
+            if(indexOf >= warps.size())
+                return;
+
+            String warpName = warps.get(indexOf);
             Location location = island.getWarpLocation(warpName);
 
             if(location != null) {
