@@ -7,11 +7,11 @@ import org.bukkit.inventory.Inventory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MenuHandler {
+public final class MenuHandler {
 
     private SuperiorSkyblockPlugin plugin;
 
-    public Map<Inventory, Menu> menus;
+    private Map<Inventory, Menu> menus;
 
     public MenuHandler(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
