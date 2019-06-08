@@ -8,10 +8,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -59,7 +60,7 @@ public final class CommentedConfiguration extends YamlConfiguration{
     @Override
     public void load(File file){
         try {
-            super.load(file);
+            super.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -293,7 +294,7 @@ public final class CommentedConfiguration extends YamlConfiguration{
 
             //OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
 
-            BufferedWriter out = new BufferedWriter(new FileWriter(file));
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
 
             out.write(source);
             out.close();
