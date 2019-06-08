@@ -17,6 +17,9 @@ public enum MenuTemplate {
     TOP_ISLANDS("guis/statistics/top-islands.yml"),
     ISLAND_VALUES("guis/statistics/island-values.yml"),
 
+    ISLAND_CREATE("guis/island/island-create.yml"),
+    ISLAND_BIOME("guis/island/island-biome.yml"),
+
     ISLAND_WARPS("guis/warps/island-warps.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

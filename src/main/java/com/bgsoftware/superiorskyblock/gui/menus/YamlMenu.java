@@ -16,8 +16,8 @@ public class YamlMenu extends Menu {
 
     protected YamlConfiguration file;
 
-    private Map<String, ItemStack> items;
-    private Map<String, BiConsumer<? super Player, ? super ClickType>> actions;
+    protected Map<String, ItemStack> items;
+    protected Map<String, BiConsumer<? super Player, ? super ClickType>> actions;
 
     public YamlMenu(Player player, YamlConfiguration file) {
         super(player, ChatColor.translateAlternateColorCodes('&', file.getString("title")), file.getInt("rows"));
