@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.gui.menus;
 
 import com.bgsoftware.superiorskyblock.gui.buttons.Button;
+import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -79,6 +80,13 @@ public class YamlScroll extends YamlMenu {
     public void setPage(int page) {
         this.page = page;
         updatePage();
+
+        load();
+        update();
+
+        for (Button button : buttons.values()) {
+            button.setItem(ItemSerializer.replace(button.getItem(), this.page + ""));
+        }
     }
 
     public void nextPage() {

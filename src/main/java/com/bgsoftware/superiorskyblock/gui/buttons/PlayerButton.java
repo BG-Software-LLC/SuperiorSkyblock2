@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.gui.buttons;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +21,9 @@ public class PlayerButton extends Button {
     }
 
     private static ItemStack getItem(ItemStack template, SuperiorPlayer player) {
-        ItemStack item = ItemSerializer.replace(template.clone(), player.getName());
+        ItemStack item = ItemSerializer.replace(template.clone(),
+                player.getName(),
+                player.getTeamLeader() != null ? SSuperiorPlayer.of(player.getTeamLeader()).getName() : "None");
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         meta.setOwner(player.getName());
         item.setItemMeta(meta);

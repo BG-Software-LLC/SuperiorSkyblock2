@@ -15,7 +15,7 @@ public class PanelMenu extends YamlMenu {
 
         addAction("members", (a, b) -> new MembersMenu(player, island));
         addAction("settings", (a, b) -> {});
-        addAction("visitors", (a, b) -> {});
+        addAction("visitors", (a, b) -> new VisitorsMenu(player, island));
 
         load();
         open();
