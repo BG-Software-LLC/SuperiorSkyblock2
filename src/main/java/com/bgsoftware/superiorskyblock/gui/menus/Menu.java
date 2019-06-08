@@ -18,11 +18,19 @@ public class Menu {
 
     protected Map<Integer, Button> buttons;
 
+    protected String title;
+    protected int rows;
+
     public Menu(Player player, String title, int rows) {
         this.player = player;
-        inventory = Bukkit.createInventory(null, rows * 9, title);
         buttons = new HashMap<>();
 
+        this.title = title;
+        this.rows = rows;
+    }
+
+    protected void create(String title, int rows) {
+        inventory = Bukkit.createInventory(null, rows * 9, title);
         SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(inventory, this);
     }
 

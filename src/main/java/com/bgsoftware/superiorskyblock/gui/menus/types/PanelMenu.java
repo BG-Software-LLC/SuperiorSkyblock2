@@ -10,6 +10,7 @@ public class PanelMenu extends YamlMenu {
 
     public PanelMenu(Player player) {
         super(player, MenuTemplate.PANEL.getFile());
+        create(title, rows);
 
         Island island = SSuperiorPlayer.of(player).getIsland();
 

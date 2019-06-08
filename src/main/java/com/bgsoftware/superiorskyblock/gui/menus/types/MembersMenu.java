@@ -22,6 +22,7 @@ public class MembersMenu extends YamlScroll {
 
     public MembersMenu(Player player, Island island) {
         super(player, MenuTemplate.MEMBERS.getFile());
+        create(title, rows);
 
         this.island = island;
         template = ItemSerializer.getItem("SKULL_ITEM:3", file.getConfigurationSection("member-item"));
@@ -37,7 +38,9 @@ public class MembersMenu extends YamlScroll {
 
         for (UUID uuid : island.getAllMembers()) {
             SuperiorPlayer member = SSuperiorPlayer.of(uuid);
-            buttons.add(new PlayerButton(template, member, (clicker, type) -> {}));
+            buttons.add(new PlayerButton(template, member, (clicker, type) -> {
+                new MemberMenu(player, member);
+            }));
         }
 
         return buttons;

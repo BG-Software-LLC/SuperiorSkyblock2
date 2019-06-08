@@ -24,6 +24,7 @@ public class VisitorsMenu extends YamlScroll {
 
     public VisitorsMenu(Player player, Island island) {
         super(player, MenuTemplate.VISITORS.getFile());
+        create(title, rows);
 
         this.island = island;
         template = ItemSerializer.getItem("SKULL_ITEM:3", file.getConfigurationSection("visitor-item"));
