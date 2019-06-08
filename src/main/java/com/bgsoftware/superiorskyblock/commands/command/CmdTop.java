@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.gui.menus.types.TopIslandsMenu;
+import com.bgsoftware.superiorskyblock.gui.menus.types.statistics.TopIslandsMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;

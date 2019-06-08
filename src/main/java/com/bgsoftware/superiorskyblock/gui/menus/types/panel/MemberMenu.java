@@ -1,21 +1,10 @@
-package com.bgsoftware.superiorskyblock.gui.menus.types;
+package com.bgsoftware.superiorskyblock.gui.menus.types.panel;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.MenuTemplate;
-import com.bgsoftware.superiorskyblock.gui.buttons.Button;
-import com.bgsoftware.superiorskyblock.gui.buttons.PlayerButton;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlMenu;
-import com.bgsoftware.superiorskyblock.gui.menus.YamlScroll;
-import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public class MemberMenu extends YamlMenu {
 
