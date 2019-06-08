@@ -36,7 +36,7 @@ public class MemberMenu extends YamlMenu {
     }
 
     private void role(Player clicker, ClickType type) {
-
+        new MemberRoleMenu(player, member);
     }
 
     private void kick(Player clicker, ClickType type) {

@@ -1,0 +1,92 @@
+title: "&8&l{0}"
+rows: 5
+
+items:
+  barrier:
+    material: STAINED_GLASS_PANE:15
+    name: " "
+    lore: []
+
+  member:
+    material: LEATHER_CHESTPLATE:0
+    name: "&eMember"
+    lore:
+      - "&7Click to set the player's role to member."
+  moderator:
+    material: IRON_CHESTPLATE:0
+    name: "&eModerator"
+    lore:
+      - "&7Click to set the player's role to moderator."
+  admin:
+    material: GOLD_CHESTPLATE:0
+    name: "&eAdmin"
+    lore:
+      - "&7Click to set the player's role to admin."
+  leader:
+    material: DIAMOND_CHESTPLATE:0
+    name: "&eLeader"
+    lore:
+      - "&7Click to transfer leadership to player."
+
+buttons:
+  - item: member
+    position: 1, 2
+    action: member
+  - item: moderator
+    position: 3, 2
+    action: moderator
+  - item: admin
+    position: 5, 2
+    action: admin
+  - item: leader
+    position: 7, 2
+    action: leader
+
+  - item: barrier
+    position: 0, 0
+  - item: barrier
+    position: 1, 0
+  - item: barrier
+    position: 2, 0
+  - item: barrier
+    position: 3, 0
+  - item: barrier
+    position: 4, 0
+  - item: barrier
+    position: 5, 0
+  - item: barrier
+    position: 6, 0
+  - item: barrier
+    position: 7, 0
+  - item: barrier
+    position: 8, 0
+  - item: barrier
+    position: 0, 4
+  - item: barrier
+    position: 1, 4
+  - item: barrier
+    position: 2, 4
+  - item: barrier
+    position: 3, 4
+  - item: barrier
+    position: 4, 4
+  - item: barrier
+    position: 5, 4
+  - item: barrier
+    position: 6, 4
+  - item: barrier
+    position: 7, 4
+  - item: barrier
+    position: 8, 4
+  - item: barrier
+    position: 0, 1
+  - item: barrier
+    position: 0, 2
+  - item: barrier
+    position: 0, 3
+  - item: barrier
+    position: 8, 1
+  - item: barrier
+    position: 8, 2
+  - item: barrier
+    position: 8, 3

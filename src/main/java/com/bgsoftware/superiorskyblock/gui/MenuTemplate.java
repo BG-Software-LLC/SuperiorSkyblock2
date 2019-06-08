@@ -11,7 +11,8 @@ public enum MenuTemplate {
     PANEL("guis/panel-gui.yml"),
     MEMBERS("guis/members-gui.yml"),
     VISITORS("guis/visitors-gui.yml"),
-    MEMBER("guis/member-gui.yml");
+    MEMBER("guis/member-gui.yml"),
+    MEMBER_ROLE("guis/member-role-gui.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
