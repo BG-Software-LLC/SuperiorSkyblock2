@@ -67,13 +67,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
+                reloadPlugin(true);
+
                 if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
                     FAWEHook.register();
                 if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                     LeaderHeadsHook.register();
                 WildStackerHook.register(this);
-
-                reloadPlugin(true);
 
                 PlaceholderHook.register(this);
 
