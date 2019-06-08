@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.gui.menus.types;
+package com.bgsoftware.superiorskyblock.gui.menus.types.statistics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -40,7 +40,15 @@ public class TopIslandsMenu extends YamlScroll {
 
         int rank = 1;
         for (Island island : SuperiorSkyblockPlugin.getPlugin().getGrid().getIslands()) {
-            buttons.add(new IslandButton(island, rank, islandItem, (clicker, type) -> {}));
+            buttons.add(new IslandButton(island, rank, islandItem, (clicker, type) -> {
+                switch (type) {
+                    case LEFT:
+                        new IslandValuesMenu(player, island);
+                        break;
+                    case RIGHT:
+                        break;
+                }
+            }));
             rank++;
         }
 

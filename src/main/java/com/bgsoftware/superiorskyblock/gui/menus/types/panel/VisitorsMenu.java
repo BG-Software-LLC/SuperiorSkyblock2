@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.gui.menus.types;
+package com.bgsoftware.superiorskyblock.gui.menus.types.panel;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;

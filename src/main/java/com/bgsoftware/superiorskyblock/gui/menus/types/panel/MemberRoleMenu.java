@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.gui.menus.types;
+package com.bgsoftware.superiorskyblock.gui.menus.types.panel;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.MenuTemplate;

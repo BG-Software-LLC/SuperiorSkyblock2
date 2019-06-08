@@ -1,0 +1,130 @@
+title: "&8{0} - &8&n${1}"
+rows: 5
+scroll_width: 1
+
+list:
+  - "MOB_SPAWNER:IRON_GOLEM"
+  - "MOB_SPAWNER:BLAZE"
+  - "MOB_SPAWNER:SPIDER"
+  - "MOB_SPAWNER:COW"
+  - "MOB_SPAWNER:ZOMBIE"
+  - "MOB_SPAWNER:SKELETON"
+  - "MOB_SPAWNER:CREEPER"
+  - "MOB_SPAWNER:PIG_ZOMBIE"
+  - "MOB_SPAWNER:GHAST"
+  - "MOB_SPAWNER:SLIME"
+  - "MOB_SPAWNER:GUARDIAN"
+  - "MOB_SPAWNER:SQUID"
+  - "HOPPER"
+  - "BEACON"
+  - "IRON_BLOCK"
+  - "GOLD_BLOCK"
+  - "DIAMOND_BLOCK"
+  - "EMERALD_BLOCK"
+  - "BEDROCK"
+  - "ENDER_CHEST"
+  - "DRAGON_EGG"
+  - "CHEST"
+  - "TRAPPED_CHEST"
+  - "ENCHANTMENT_TABLE"
+
+template:
+  name: "&e&l[!] &7{0}"
+  lore:
+    - "&6&l* &e&lQuantity &fx{1}"
+
+items:
+  blue:
+    material: STAINED_GLASS_PANE:11
+    name: " "
+    lore: []
+  cyan:
+    material: STAINED_GLASS_PANE:9
+    name: " "
+    lore: []
+  aqua:
+    material: STAINED_GLASS_PANE:3
+    name: " "
+    lore: []
+
+  spawners:
+    material: "MOB_SPAWNER:0"
+    name: "&e&lSPAWNERS ->"
+    lore: []
+  items:
+    material: "BOOK_AND_QUILL:0"
+    name: "&e&lITEMS ->"
+    lore: []
+
+buttons:
+  - item: blue
+    position: 0, 0
+  - item: blue
+    position: 8, 0
+  - item: blue
+    position: 0, 4
+  - item: blue
+    position: 1, 4
+  - item: blue
+    position: 8, 4
+
+  - item: cyan
+    position: 0, 1
+  - item: cyan
+    position: 1, 1
+  - item: cyan
+    position: 8, 1
+  - item: cyan
+    position: 0, 3
+  - item: cyan
+    position: 8, 3
+
+  - item: aqua
+    position: 0, 2
+  - item: aqua
+    position: 1, 2
+  - item: aqua
+    position: 2, 2
+  - item: aqua
+    position: 3, 2
+  - item: aqua
+    position: 4, 2
+  - item: aqua
+    position: 5, 2
+  - item: aqua
+    position: 6, 2
+  - item: aqua
+    position: 7, 2
+  - item: aqua
+    position: 8, 2
+
+  - item: spawners
+    position: 1, 0
+  - item: items
+    position: 1, 3
+
+list_positions:
+  - 2, 0
+  - 3, 0
+  - 4, 0
+  - 5, 0
+  - 6, 0
+  - 7, 0
+  - 2, 1
+  - 3, 1
+  - 4, 1
+  - 5, 1
+  - 6, 1
+  - 7, 1
+  - 2, 3
+  - 3, 3
+  - 4, 3
+  - 5, 3
+  - 6, 3
+  - 7, 3
+  - 2, 4
+  - 3, 4
+  - 4, 4
+  - 5, 4
+  - 6, 4
+  - 7, 4

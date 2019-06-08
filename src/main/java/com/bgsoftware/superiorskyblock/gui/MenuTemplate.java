@@ -15,7 +15,7 @@ public enum MenuTemplate {
     MEMBER_ROLE("guis/panel/member-role-gui.yml"),
 
     TOP_ISLANDS("guis/statistics/top-islands.yml"),
-    ISLAND_VALUE("guis/statistics/island-value.yml");
+    ISLAND_VALUES("guis/statistics/island-values.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
