@@ -94,7 +94,8 @@ public final class DataHandler {
                 "paypal VARCHAR, " +
                 "warpsLimit INTEGER, " +
                 "bonusWorth VARCHAR," +
-                "locked BOOLEAN" +
+                "locked BOOLEAN," +
+                "blockCounts VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -131,6 +132,7 @@ public final class DataHandler {
         addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
         addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
         addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {
