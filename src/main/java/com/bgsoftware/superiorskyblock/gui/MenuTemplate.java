@@ -8,11 +8,11 @@ import java.io.File;
 
 public enum MenuTemplate {
 
-    PANEL("guis/panel-gui.yml"),
-    MEMBERS("guis/members-gui.yml"),
-    VISITORS("guis/visitors-gui.yml"),
-    MEMBER("guis/member-gui.yml"),
-    MEMBER_ROLE("guis/member-role-gui.yml");
+    PANEL("guis/panel/panel-gui.yml"),
+    MEMBERS("guis/panel/members-gui.yml"),
+    VISITORS("guis/panel/visitors-gui.yml"),
+    MEMBER("guis/panel/member-gui.yml"),
+    MEMBER_ROLE("guis/panel/member-role-gui.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
