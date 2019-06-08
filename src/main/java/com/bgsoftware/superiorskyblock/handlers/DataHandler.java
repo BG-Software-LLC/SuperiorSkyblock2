@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
@@ -105,7 +104,8 @@ public final class DataHandler {
                 "name VARCHAR, " +
                 "islandRole VARCHAR, " +
                 "textureValue VARCHAR, " +
-                "disbands INTEGER" +
+                "disbands INTEGER," +
+                "toggledPanel BOOLEAN" +
                 ");");
 
         //Creating default grid table
@@ -133,6 +133,7 @@ public final class DataHandler {
         addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
         addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
         addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {

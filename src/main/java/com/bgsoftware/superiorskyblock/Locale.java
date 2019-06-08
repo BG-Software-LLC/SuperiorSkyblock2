@@ -222,7 +222,9 @@ public enum Locale {
     ISLAND_WAS_CLOSED,
     NO_OPEN_PERMISSION,
     ISLAND_OPENED,
-    UNKNOWN_COMMAND;
+    UNKNOWN_COMMAND,
+    PANEL_TOGGLE_ON,
+    PANEL_TOGGLE_OFF;
 
     private String message;
 
