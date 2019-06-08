@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.gui.MenuTemplate;
 import com.bgsoftware.superiorskyblock.gui.buttons.Button;
 import com.bgsoftware.superiorskyblock.gui.buttons.IslandButton;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlScroll;
+import com.bgsoftware.superiorskyblock.gui.menus.types.warps.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +47,7 @@ public class TopIslandsMenu extends YamlScroll {
                         new IslandValuesMenu(player, island);
                         break;
                     case RIGHT:
+                        new IslandWarpsMenu(player, island);
                         break;
                 }
             }));
