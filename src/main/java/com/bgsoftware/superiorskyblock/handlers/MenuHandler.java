@@ -9,10 +9,11 @@ import org.bukkit.inventory.Inventory;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.UUID;
 
 public final class MenuHandler {
 
-    private Map<Inventory, Menu> menus;
+    private Map<UUID, Menu> menus;
 
     public MenuHandler(SuperiorSkyblockPlugin plugin) {
         menus = new HashMap<>();
@@ -22,14 +23,15 @@ public final class MenuHandler {
 
     public void save() {
         // TODO close menus
-        for (Inventory inventory : new HashSet<>(menus.keySet())) {
-            for (HumanEntity viewer : new HashSet<>(inventory.getViewers())) {
+
+        for (Menu menu : new HashSet<>(menus.values())) {
+            for (HumanEntity viewer : menu.getInventory().getViewers()) {
                 viewer.closeInventory();
             }
         }
     }
 
-    public Map<Inventory, Menu> getMenus() {
+    public Map<UUID, Menu> getMenus() {
         return menus;
     }
 }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.gui.menus.Menu;
+import com.bgsoftware.superiorskyblock.gui.menus.types.statistics.TopIslandsMenu;
 import com.bgsoftware.superiorskyblock.handlers.MenuHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public final class MenuListener implements Listener {
         if (handler == null)
             return;
 
-        Menu menu = handler.getMenus().get(event.getInventory());
+        Menu menu = handler.getMenus().get(event.getWhoClicked().getUniqueId());
         if (menu == null)
             return;
 
@@ -47,11 +48,14 @@ public final class MenuListener implements Listener {
         if (handler == null)
             return;
 
-        Menu menu = handler.getMenus().get(event.getInventory());
+        Menu menu = handler.getMenus().get(event.getPlayer().getUniqueId());
         if (menu == null)
             return;
 
-        handler.getMenus().remove(event.getInventory());
+        if (!event.getInventory().equals(menu.getInventory()))
+            return;
+
+        handler.getMenus().remove(event.getPlayer().getUniqueId());
 
         UUID uuid = event.getPlayer().getUniqueId();
         new BukkitRunnable() {

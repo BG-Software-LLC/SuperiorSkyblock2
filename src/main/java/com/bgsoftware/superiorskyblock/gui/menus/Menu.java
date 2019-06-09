@@ -35,7 +35,7 @@ public class Menu {
 
     protected void create(String title, int rows) {
         inventory = Bukkit.createInventory(null, rows * 9, title);
-        SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(inventory, this);
+        SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(player.getUniqueId(), this);
     }
 
     public void open() {
@@ -97,5 +97,9 @@ public class Menu {
 
     public void onClose() {
 
+    }
+
+    public Inventory getInventory() {
+        return inventory;
     }
 }

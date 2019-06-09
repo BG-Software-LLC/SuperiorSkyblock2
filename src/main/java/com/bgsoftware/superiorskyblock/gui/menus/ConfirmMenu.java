@@ -28,7 +28,7 @@ public class ConfirmMenu extends Menu {
 
     protected void create(String title) {
         inventory = Bukkit.createInventory(null, InventoryType.HOPPER, title);
-        SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(inventory, this);
+        SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(player.getUniqueId(), this);
     }
 
     private static ItemStack getConfirmItem() {
