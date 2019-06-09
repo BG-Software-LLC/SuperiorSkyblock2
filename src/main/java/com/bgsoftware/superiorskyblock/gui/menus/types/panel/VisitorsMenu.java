@@ -32,6 +32,8 @@ public class VisitorsMenu extends YamlScroll {
 
         setList(getButtonsList());
 
+        canExit = false;
+
         setPage(0);
         open();
     }
@@ -52,4 +54,9 @@ public class VisitorsMenu extends YamlScroll {
         return buttons;
     }
 
+    @Override
+    public void onClose() {
+        if (!canExit)
+            new PanelMenu(player);
+    }
 }

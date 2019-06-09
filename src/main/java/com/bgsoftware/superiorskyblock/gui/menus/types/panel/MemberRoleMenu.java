@@ -21,6 +21,8 @@ public class MemberRoleMenu extends YamlMenu {
         addAction("admin", this::admin);
         addAction("leader", this::leader);
 
+        canExit = false;
+
         load();
         open();
     }
@@ -39,5 +41,11 @@ public class MemberRoleMenu extends YamlMenu {
 
     private void leader(Player clicker, ClickType type) {
         clicker.performCommand("is transfer " + member.getName());
+    }
+
+    @Override
+    public void onClose() {
+        if (!canExit)
+            new MemberMenu(player, member);
     }
 }

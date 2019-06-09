@@ -21,12 +21,16 @@ public class Menu {
     protected String title;
     protected int rows;
 
+    protected boolean canExit;
+
     public Menu(Player player, String title, int rows) {
         this.player = player;
         buttons = new HashMap<>();
 
         this.title = title;
         this.rows = rows;
+
+        canExit = true;
     }
 
     protected void create(String title, int rows) {
@@ -91,4 +95,7 @@ public class Menu {
         removeButton(coordsToSlot(x, y));
     }
 
+    public void onClose() {
+
+    }
 }

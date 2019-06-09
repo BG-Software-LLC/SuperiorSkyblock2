@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.gui.menus.types.panel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.MenuTemplate;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlMenu;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -20,11 +21,14 @@ public class MemberMenu extends YamlMenu {
         addAction("kick", this::kick);
         addAction("ban", this::ban);
 
+        canExit = false;
+
         load();
         open();
     }
 
     private void role(Player clicker, ClickType type) {
+        canExit = true;
         new MemberRoleMenu(player, member);
     }
 
@@ -36,4 +40,9 @@ public class MemberMenu extends YamlMenu {
         clicker.performCommand("is ban " + member.getName());
     }
 
+    @Override
+    public void onClose() {
+        if (!canExit)
+            new MembersMenu(player, SSuperiorPlayer.of(player).getIsland());
+    }
 }

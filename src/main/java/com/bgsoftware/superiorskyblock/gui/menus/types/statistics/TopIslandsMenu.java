@@ -48,7 +48,7 @@ public class TopIslandsMenu extends YamlScroll {
                         new IslandValuesMenu(player, island);
                         break;
                     case RIGHT:
-                        new IslandWarpsMenu(player, island);
+                        new IslandWarpsMenu(player, island, IslandWarpsMenu.PreviousMenu.TOP);
                         break;
                 }
             }));

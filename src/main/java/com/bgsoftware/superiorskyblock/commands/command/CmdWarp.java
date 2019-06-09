@@ -74,7 +74,7 @@ public final class CmdWarp implements ICommand {
         }
 
 //        plugin.getPanel().openWarpsPanel(superiorPlayer, island, 1);
-        new IslandWarpsMenu(superiorPlayer.asPlayer(), island);
+        new IslandWarpsMenu(superiorPlayer.asPlayer(), island, IslandWarpsMenu.PreviousMenu.NONE);
     }
 
     @Override

@@ -32,6 +32,8 @@ public class IslandValuesMenu extends YamlScroll {
         materials = file.getStringList("list");
         template = ItemSerializer.getItem("STONE", file.getConfigurationSection("template"));
 
+        canExit = false;
+
         setList(createButtons());
 
         setPage(0);
@@ -95,4 +97,9 @@ public class IslandValuesMenu extends YamlScroll {
         return item;
     }
 
+    @Override
+    public void onClose() {
+        if (!canExit)
+            new TopIslandsMenu(player);
+    }
 }

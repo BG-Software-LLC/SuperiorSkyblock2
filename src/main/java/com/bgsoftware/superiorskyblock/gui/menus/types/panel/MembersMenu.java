@@ -30,6 +30,8 @@ public class MembersMenu extends YamlScroll {
 
         setList(getButtonsList());
 
+        canExit = false;
+
         setPage(0);
         open();
     }
@@ -40,6 +42,7 @@ public class MembersMenu extends YamlScroll {
         for (UUID uuid : island.getAllMembers()) {
             SuperiorPlayer member = SSuperiorPlayer.of(uuid);
             buttons.add(new PlayerButton(template, member, (clicker, type) -> {
+                canExit = true;
                 new MemberMenu(player, member);
             }));
         }
@@ -47,4 +50,9 @@ public class MembersMenu extends YamlScroll {
         return buttons;
     }
 
+    @Override
+    public void onClose() {
+        if (!canExit)
+            new PanelMenu(player);
+    }
 }

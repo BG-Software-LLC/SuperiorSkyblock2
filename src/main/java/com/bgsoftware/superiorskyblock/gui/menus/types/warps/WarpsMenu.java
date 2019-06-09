@@ -39,7 +39,7 @@ public class WarpsMenu extends YamlScroll {
             if (island.getAllWarps().isEmpty())
                 continue;
 
-            buttons.add(new PlayerButton(template, island.getOwner(), (clicker, type) -> new IslandWarpsMenu(player, island)));
+            buttons.add(new PlayerButton(template, island.getOwner(), (clicker, type) -> new IslandWarpsMenu(player, island, IslandWarpsMenu.PreviousMenu.WARPS)));
         }
 
         return buttons;

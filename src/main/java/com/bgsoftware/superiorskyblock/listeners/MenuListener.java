@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +42,25 @@ public final class MenuListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (plugin.getMenuHandler() == null)
+        MenuHandler handler = plugin.getMenuHandler();
+
+        if (handler == null)
             return;
 
-        plugin.getMenuHandler().getMenus().remove(event.getInventory());
+        Menu menu = handler.getMenus().get(event.getInventory());
+        if (menu == null)
+            return;
+
+        handler.getMenus().remove(event.getInventory());
+
+        UUID uuid = event.getPlayer().getUniqueId();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (Bukkit.getPlayer(uuid) != null)
+                    menu.onClose();
+            }
+        }.runTaskLater(SuperiorSkyblockPlugin.getPlugin(), 1);
     }
 
     /**
