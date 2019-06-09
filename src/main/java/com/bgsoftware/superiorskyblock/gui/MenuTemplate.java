@@ -44,7 +44,7 @@ public enum MenuTemplate {
     private void load() {
         String path = this.path + "";
         if (legacy)
-            path = path.replaceFirst("guis", "guis-legacy");
+            path = path.replace(".yml", "-legacy.yml");
 
         file = new File(plugin.getDataFolder(), path);
 
