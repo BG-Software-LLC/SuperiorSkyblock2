@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.legacy;
 
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,4 +41,5 @@ public enum Materials {
     public ItemStack toBukkitItem(int amount){
         return bukkitData == 0 ? new ItemStack(toBukkitType(), amount) : new ItemStack(toBukkitType(), amount, bukkitData);
     }
+
 }

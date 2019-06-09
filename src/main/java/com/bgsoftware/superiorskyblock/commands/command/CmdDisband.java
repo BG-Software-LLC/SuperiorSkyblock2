@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.menus.ConfirmMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -80,10 +82,12 @@ public final class CmdDisband implements ICommand {
             }
         }
 
-        Locale.DISBANDED_ISLAND.send(superiorPlayer);
+        new ConfirmMenu(superiorPlayer.asPlayer(), ChatColor.DARK_GRAY + "Are you sure?", (clicker, type) -> {
+            Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
-        superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
-        island.disbandIsland();
+            superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+            island.disbandIsland();
+        });
     }
 
     @Override
