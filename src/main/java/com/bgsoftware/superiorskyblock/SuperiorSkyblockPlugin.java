@@ -146,7 +146,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         settingsHandler = new SettingsHandler(this);
         panelHandler = new PanelHandler(this);
         upgradesHandler = new UpgradesHandler(this);
-        menuHandler = new MenuHandler(this);
 
         if(loadGrid) {
             gridHandler = new GridHandler(this);
@@ -155,6 +154,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.reloadBlockValues();
         }
         schematicsHandler = new SchematicsHandler(this);
+
+        menuHandler = new MenuHandler(this);
+        menuHandler.load();
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (loadGrid)

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.gui.menus.types.warps.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +39,14 @@ public class TopIslandsMenu extends YamlScroll {
         setList(createButtons());
 
         setPage(0);
-        open();
+        if (player == null)
+            update();
+        else
+            open();
+    }
+
+    public static void staticLoad() {
+        new TopIslandsMenu(null);
     }
 
     @Override
@@ -47,7 +55,9 @@ public class TopIslandsMenu extends YamlScroll {
             globalInv = Bukkit.createInventory(null, rows * 9, title);
 
         inventory = globalInv;
-        SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(player.getUniqueId(), this);
+
+        if (player != null)
+            SuperiorSkyblockPlugin.getPlugin().getMenuHandler().getMenus().put(player.getUniqueId(), this);
     }
 
     private List<Button> createButtons() {

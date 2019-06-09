@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.gui.MenuTemplate;
 import com.bgsoftware.superiorskyblock.gui.menus.Menu;
+import com.bgsoftware.superiorskyblock.gui.menus.types.statistics.TopIslandsMenu;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
@@ -17,15 +18,18 @@ public final class MenuHandler {
 
     public MenuHandler(SuperiorSkyblockPlugin plugin) {
         menus = new HashMap<>();
+    }
 
+    public void load() {
         MenuTemplate.loadAll();
+        TopIslandsMenu.staticLoad();
     }
 
     public void save() {
         // TODO close menus
 
         for (Menu menu : new HashSet<>(menus.values())) {
-            for (HumanEntity viewer : menu.getInventory().getViewers()) {
+            for (HumanEntity viewer : new HashSet<>(menu.getInventory().getViewers())) {
                 viewer.closeInventory();
             }
         }
