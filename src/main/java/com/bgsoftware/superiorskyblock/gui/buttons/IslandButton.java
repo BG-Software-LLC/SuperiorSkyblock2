@@ -40,11 +40,16 @@ public class IslandButton extends Button{
                 continue;
             }
 
+            int added = 0;
             for (UUID uuid : island.getAllMembers()) {
                 if (!SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopIncludeLeader && uuid.equals(island.getOwner().getUniqueId()))
                     continue;
                 newLore.add(line.replace("{MEMBER}", SSuperiorPlayer.of(uuid).getName()));
+                added++;
             }
+
+            if (added == 0)
+                newLore.add(line.replace("{MEMBER}", "None"));
         }
         meta.setLore(newLore);
 
