@@ -21,6 +21,7 @@ public enum MenuTemplate {
     ISLAND_BIOME("guis/island/island-biome.yml"),
     ISLAND_UPGRADES("guis/island/island-upgrades.yml"),
 
+    WARPS("guis/warps/warps.yml"),
     ISLAND_WARPS("guis/warps/island-warps.yml");
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

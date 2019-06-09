@@ -93,6 +93,8 @@ permissions:
             description: Get the worth value of a block.
           superior.island.warp:
             description: Warp to an island warp.
+          superior.island.warps:
+            description: List of island warps.
           superior.island.withdraw:
             description: Withdraw money from your island's bank into your personal account.
       superior.admin.*:
