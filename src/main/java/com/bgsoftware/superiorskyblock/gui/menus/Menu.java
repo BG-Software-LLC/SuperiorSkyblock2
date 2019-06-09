@@ -60,6 +60,8 @@ public class Menu {
         if (button.getAction() != null)
             button.getAction().accept((Player) event.getWhoClicked(), event.getClick());
 
+        button.sendCommands(player, player.getName());
+
         update();
     }
 

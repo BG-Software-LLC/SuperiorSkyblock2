@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -62,7 +63,14 @@ public class YamlMenu extends Menu {
         ItemStack item = items.get(map.get("item"));
         BiConsumer<? super Player, ? super ClickType> action = actions.get(map.get("action"));
 
-        setButton(x, y, new Button(item, action));
+        Button button = new Button(item, action);
+
+        if (map.containsKey("commands"))
+            button.setCommands((List<String>) map.get("commands"));
+        if (map.containsKey("console"))
+            button.setConsole((Boolean) map.get("console"));
+
+        setButton(x, y, button);
 
         return coordsToSlot(x, y);
     }
