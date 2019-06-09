@@ -16,11 +16,11 @@ import java.util.function.BiConsumer;
 
 public class IslandButton extends Button{
 
-    public IslandButton(Island island, int rank, ItemStack template, BiConsumer<? super Player, ? super ClickType> action) {
-        super(getIslandItem(island, rank, template), action);
+    public IslandButton(Island island, int rank, ItemStack template, boolean includeLeader, BiConsumer<? super Player, ? super ClickType> action) {
+        super(getIslandItem(island, rank, includeLeader, template), action);
     }
 
-    private static ItemStack getIslandItem(Island island, int rank, ItemStack template) {
+    private static ItemStack getIslandItem(Island island, int rank, boolean includeLeader, ItemStack template) {
         ItemStack item = ItemSerializer.replace(
                 template.clone(),
                 island.getOwner().getName(),
@@ -39,8 +39,11 @@ public class IslandButton extends Button{
                 continue;
             }
 
-            for (UUID uuid : island.getAllMembers())
+            for (UUID uuid : island.getAllMembers()) {
+                if (!includeLeader && uuid.equals(island.getOwner().getUniqueId()))
+                    continue;
                 newLore.add(line.replace("{MEMBER}", SSuperiorPlayer.of(uuid).getName()));
+            }
         }
         meta.setLore(newLore);
 

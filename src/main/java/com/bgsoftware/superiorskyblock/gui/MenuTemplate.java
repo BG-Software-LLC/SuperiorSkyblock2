@@ -31,14 +31,14 @@ public enum MenuTemplate {
 
     private String path;
 
-    private File file;
+    private YamlConfiguration file;
 
     MenuTemplate(String path) {
         this.path = path;
     }
 
     public YamlConfiguration getFile() {
-        return YamlConfiguration.loadConfiguration(file);
+        return file;
     }
 
     private void load() {
@@ -46,10 +46,12 @@ public enum MenuTemplate {
         if (legacy)
             path = path.replace(".yml", "-legacy.yml");
 
-        file = new File(plugin.getDataFolder(), path);
+        File file = new File(plugin.getDataFolder(), path);
 
         if (!file.exists())
             FileUtil.saveResource(path);
+
+        this.file = YamlConfiguration.loadConfiguration(file);
     }
 
     public static void loadAll() {
