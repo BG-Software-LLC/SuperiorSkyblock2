@@ -3,12 +3,12 @@ rows: 5
 
 items:
   barrier:
-    material: STAINED_GLASS_PANE:15
+    material: BLACK_STAINED_GLASS_PANE
     name: " "
     lore: []
 
   members:
-    material: SKULL_ITEM:3
+    material: PLAYER_HEAD
     name: "&eMembers"
     lore:
       - "&7Click to manage all island members."
@@ -18,7 +18,7 @@ items:
     lore:
       - "&7Click to manage island settings."
   visitors:
-    material: SKULL_ITEM:0
+    material: SKELETON_SKULL
     name: "&eVisitors"
     lore:
       - "&7Click to manage all island visitors."

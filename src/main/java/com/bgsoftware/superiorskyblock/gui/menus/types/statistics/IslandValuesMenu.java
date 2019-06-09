@@ -30,7 +30,7 @@ public class IslandValuesMenu extends YamlScroll {
 
         this.island = island;
         materials = file.getStringList("list");
-        template = ItemSerializer.getItem("STONE:0", file.getConfigurationSection("template"));
+        template = ItemSerializer.getItem("STONE", file.getConfigurationSection("template"));
 
         setList(createButtons());
 
@@ -61,7 +61,7 @@ public class IslandValuesMenu extends YamlScroll {
         }
 
         int data = 0;
-        if (material != Material.MOB_SPAWNER)
+        if (!material.toString().contains("SPAWNER"))
             try {
                 data = Integer.valueOf(split[1]);
             } catch (Exception ignored) {}

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.gui;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -24,21 +25,37 @@ public enum MenuTemplate {
     WARPS("guis/warps/warps.yml"),
     ISLAND_WARPS("guis/warps/island-warps.yml");
 
+    private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
+
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private String path;
+
+    private File file;
 
     MenuTemplate(String path) {
         this.path = path;
     }
 
     public YamlConfiguration getFile() {
-        File file = new File(plugin.getDataFolder(), path);
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    private void load() {
+        String path = this.path + "";
+        if (legacy)
+            path = path.replaceFirst("guis", "guis-legacy");
+
+        file = new File(plugin.getDataFolder(), path);
 
         if (!file.exists())
             FileUtil.saveResource(path);
+    }
 
-        return YamlConfiguration.loadConfiguration(file);
+    public static void loadAll() {
+        for (MenuTemplate template : values()) {
+            template.load();
+        }
     }
 
 }

@@ -78,28 +78,6 @@ public final class FileUtil {
         return itemBuilder.build();
     }
 
-    public static GUIInventory getGUI(String identifier, ConfigurationSection section, int defaultSize, String defaultTitle){
-        String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
-        int size = section.getInt("size", defaultSize);
-
-        Sound openSound = getSound(section.getString("open-sound", ""));
-        Sound closeSound = getSound(section.getString("close-sound", ""));
-
-        Inventory inventory = Bukkit.createInventory(null, 9 * size, title);
-
-        if(section.contains("fill-items")){
-            ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
-            for(String _name : fillItems.getKeys(false)){
-                String[] slots = fillItems.getString(_name + ".slots").split(",");
-                ItemStack fillItem = getItemStack(fillItems.getConfigurationSection(_name));
-                for(String slot : slots)
-                    inventory.setItem(Integer.valueOf(slot), fillItem);
-            }
-        }
-
-        return GUIInventory.from(identifier, inventory).withSounds(openSound, closeSound);
-    }
-
     public static String fromLocation(Location location){
         return location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," +
                 location.getYaw() + "," + location.getPitch();
@@ -111,11 +89,11 @@ public final class FileUtil {
                 Double.valueOf(sections[3]), Float.valueOf(sections[4]), Float.valueOf(sections[5]));
     }
 
-    public static void saveResource(String resourcePath){
+    public static void saveResource(String resourcePath, boolean supportLegacy){
         try {
             String destination = resourcePath;
 
-            if(v1_13) resourcePath = resourcePath.replace(".yml", "1_13.yml");
+            if(supportLegacy && v1_13) resourcePath = resourcePath.replace(".yml", "1_13.yml");
 
             File file = new File(plugin.getDataFolder(), resourcePath);
             plugin.saveResource(resourcePath, true);
@@ -128,6 +106,10 @@ public final class FileUtil {
         }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    public static void saveResource(String resourcePath) {
+        saveResource(resourcePath, false);
     }
 
     private static Sound getSound(String sound){

@@ -3,18 +3,18 @@ rows: 5
 scroll_width: 1
 
 list:
-  - "SPAWNER:IRON_GOLEM"
-  - "SPAWNER:BLAZE"
-  - "SPAWNER:SPIDER"
-  - "SPAWNER:COW"
-  - "SPAWNER:ZOMBIE"
-  - "SPAWNER:SKELETON"
-  - "SPAWNER:CREEPER"
-  - "SPAWNER:PIG_ZOMBIE"
-  - "SPAWNER:GHAST"
-  - "SPAWNER:SLIME"
-  - "SPAWNER:GUARDIAN"
-  - "SPAWNER:SQUID"
+  - "MOB_SPAWNER:IRON_GOLEM"
+  - "MOB_SPAWNER:BLAZE"
+  - "MOB_SPAWNER:SPIDER"
+  - "MOB_SPAWNER:COW"
+  - "MOB_SPAWNER:ZOMBIE"
+  - "MOB_SPAWNER:SKELETON"
+  - "MOB_SPAWNER:CREEPER"
+  - "MOB_SPAWNER:PIG_ZOMBIE"
+  - "MOB_SPAWNER:GHAST"
+  - "MOB_SPAWNER:SLIME"
+  - "MOB_SPAWNER:GUARDIAN"
+  - "MOB_SPAWNER:SQUID"
   - "HOPPER"
   - "BEACON"
   - "IRON_BLOCK"
@@ -26,7 +26,7 @@ list:
   - "DRAGON_EGG"
   - "CHEST"
   - "TRAPPED_CHEST"
-  - "ENCHANTING_TABLE"
+  - "ENCHANTMENT_TABLE"
 
 template:
   name: "&e&l[!] &7{0}"
@@ -35,24 +35,24 @@ template:
 
 items:
   blue:
-    material: BLUE_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:11
     name: " "
     lore: []
   cyan:
-    material: CYAN_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:9
     name: " "
     lore: []
   aqua:
-    material: LIGHT_BLUE_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:3
     name: " "
     lore: []
 
   spawners:
-    material: "SPAWNER"
+    material: "MOB_SPAWNER:0"
     name: "&e&lSPAWNERS ->"
     lore: []
   items:
-    material: "WRITABLE_BOOK"
+    material: "BOOK_AND_QUILL:0"
     name: "&e&lITEMS ->"
     lore: []
 

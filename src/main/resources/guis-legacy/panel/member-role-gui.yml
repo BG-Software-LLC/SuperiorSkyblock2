@@ -3,27 +3,27 @@ rows: 5
 
 items:
   barrier:
-    material: BLACK_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:15
     name: " "
     lore: []
 
   member:
-    material: LEATHER_CHESTPLATE
+    material: LEATHER_CHESTPLATE:0
     name: "&eMember"
     lore:
       - "&7Click to set the player's role to member."
   moderator:
-    material: IRON_CHESTPLATE
+    material: IRON_CHESTPLATE:0
     name: "&eModerator"
     lore:
       - "&7Click to set the player's role to moderator."
   admin:
-    material: GOLDEN_CHESTPLATE
+    material: GOLD_CHESTPLATE:0
     name: "&eAdmin"
     lore:
       - "&7Click to set the player's role to admin."
   leader:
-    material: DIAMOND_CHESTPLATE
+    material: DIAMOND_CHESTPLATE:0
     name: "&eLeader"
     lore:
       - "&7Click to transfer leadership to player."

@@ -1,46 +1,38 @@
-title: "&8&l{0}"
+title: "&8&lIsland Panel"
 rows: 5
 
 items:
   barrier:
-    material: BLACK_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:15
     name: " "
     lore: []
 
-  member:
-    material: LEATHER_CHESTPLATE
-    name: "&eMember"
+  members:
+    material: SKULL_ITEM:3
+    name: "&eMembers"
     lore:
-      - "&7Click to set the player's role to member."
-  moderator:
-    material: IRON_CHESTPLATE
-    name: "&eModerator"
+      - "&7Click to manage all island members."
+  settings:
+    material: BOOK
+    name: "&eSettings"
     lore:
-      - "&7Click to set the player's role to moderator."
-  admin:
-    material: GOLDEN_CHESTPLATE
-    name: "&eAdmin"
+      - "&7Click to manage island settings."
+  visitors:
+    material: SKULL_ITEM:0
+    name: "&eVisitors"
     lore:
-      - "&7Click to set the player's role to admin."
-  leader:
-    material: DIAMOND_CHESTPLATE
-    name: "&eLeader"
-    lore:
-      - "&7Click to transfer leadership to player."
+      - "&7Click to manage all island visitors."
 
 buttons:
-  - item: member
-    position: 1, 2
-    action: member
-  - item: moderator
-    position: 3, 2
-    action: moderator
-  - item: admin
-    position: 5, 2
-    action: admin
-  - item: leader
-    position: 7, 2
-    action: leader
+  - item: members
+    position: 2, 2
+    action: members
+  - item: settings
+    position: 4, 2
+    action: settings
+  - item: visitors
+    position: 6, 2
+    action: visitors
 
   - item: barrier
     position: 0, 0

@@ -23,15 +23,15 @@ invalid_item:
 
 items:
   blue:
-    material: BLUE_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:11
     name: " "
     lore: []
   cyan:
-    material: CYAN_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:9
     name: " "
     lore: []
   aqua:
-    material: LIGHT_BLUE_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:3
     name: " "
     lore: []
 

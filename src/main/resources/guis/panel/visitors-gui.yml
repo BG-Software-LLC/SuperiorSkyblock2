@@ -9,20 +9,20 @@ visitor-item:
 
 items:
   barrier:
-    material: STAINED_GLASS_PANE:15
+    material: BLACK_STAINED_GLASS_PANE
     name: " "
     lore: []
 
   previous-page:
-    material: PAPER:0
+    material: PAPER
     name: "&cPrevious Page"
     lore: []
   next-page:
-    material: PAPER:0
+    material: PAPER
     name: "&cNext Page"
     lore: []
   current-page:
-    material: DOUBLE_PLANT:0
+    material: SUNFLOWER
     name: "&aCurrent Page:"
     lore:
       - "&7Page {0}"

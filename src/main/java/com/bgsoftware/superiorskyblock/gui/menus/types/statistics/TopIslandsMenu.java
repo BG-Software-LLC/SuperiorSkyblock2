@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.gui.buttons.Button;
 import com.bgsoftware.superiorskyblock.gui.buttons.IslandButton;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlScroll;
 import com.bgsoftware.superiorskyblock.gui.menus.types.warps.IslandWarpsMenu;
+import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -24,8 +25,8 @@ public class TopIslandsMenu extends YamlScroll {
         super(player, MenuTemplate.TOP_ISLANDS.getFile());
         create(title, rows);
 
-        islandItem = ItemSerializer.getItem("SKULL_ITEM:3", file.getConfigurationSection("island_item"));
-        invalidItem = ItemSerializer.getItem("SKULL_ITEM:3", file.getConfigurationSection("invalid_item"));
+        islandItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("island_item"));
+        invalidItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("invalid_item"));
         SkullMeta meta = (SkullMeta) invalidItem.getItemMeta();
         meta.setOwner("MHF_Question");
         invalidItem.setItemMeta(meta);

@@ -46,7 +46,5 @@ public interface GridManager {
 
     void setBlockAmount(Block block, int amount);
 
-    void openTopIslands(SuperiorPlayer superiorPlayer);
-
     void calcAllIslands();
 }

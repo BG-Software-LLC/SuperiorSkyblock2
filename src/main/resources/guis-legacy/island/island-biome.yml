@@ -3,44 +3,44 @@ rows: 1
 
 items:
   plains:
-    material: "GRASS_BLOCK"
+    material: "GRASS:0"
     name: "&ePlains Biome &r{0}"
     lore:
       - "&7Changes your island biome to plains."
   jungle:
-    material: "OAK_SAPLING"
+    material: "SAPLING:0"
     name: "&eJungle Biome &r{0}"
     lore:
       - "&7Changes your island biome to jungle."
   taiga:
-    material: "SNOWBALL"
+    material: "SNOW_BALL:0"
     name: "&eTaiga Biome &r{0}"
     lore:
       - "&7Changes your island biome to taiga."
   desert:
-    material: "SAND"
+    material: "SAND:0"
     name: "&eDesert Biome &r{0}"
     lore:
       - "&7Changes your island biome to desert."
       - "&cWarning ice and snow must go!"
   nether:
-    material: "NETHERRACK"
+    material: "NETHERRACK:0"
     name: "&eNether Biome &r{0}"
     lore:
       - "&7Changes your island biome to nether."
       - "&cWarning ice, snow and water must go!"
   swamp:
-    material: "LILY_PAD"
+    material: "WATER_LILY:0"
     name: "&eSwamp Biome &r{0}"
     lore:
       - "&7Changes your island biome to swamp."
   mesa:
-    material: "TERRACOTTA"
+    material: "HARD_CLAY:0"
     name: "&eMesa Biome &r{0}"
     lore:
       - "&7Changes your island biome to mesa."
   extreme_hills:
-    material: "STONE"
+    material: "STONE:0"
     name: "&eExtreme Hills Biome &r{0}"
     lore:
       - "&7Changes your island biome to extreme hills."

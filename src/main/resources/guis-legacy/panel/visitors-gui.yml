@@ -1,27 +1,28 @@
-title: "&8&lIsland Members"
+title: "&8&lIsland Visitors"
 rows: 6
 scroll_width: 36
 
-member-item:
+visitor-item:
   name: "&e{0}"
-  lore: []
+  lore:
+    - "&7Island Owner: {1}"
 
 items:
   barrier:
-    material: BLACK_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:15
     name: " "
     lore: []
 
   previous-page:
-    material: PAPER
+    material: PAPER:0
     name: "&cPrevious Page"
     lore: []
   next-page:
-    material: PAPER
+    material: PAPER:0
     name: "&cNext Page"
     lore: []
   current-page:
-    material: SUNFLOWER
+    material: DOUBLE_PLANT:0
     name: "&aCurrent Page:"
     lore:
       - "&7Page {0}"

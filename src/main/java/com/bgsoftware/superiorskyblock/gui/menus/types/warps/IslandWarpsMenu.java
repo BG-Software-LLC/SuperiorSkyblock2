@@ -27,7 +27,7 @@ public class IslandWarpsMenu extends YamlScroll {
         create(title, rows);
 
         this.island = island;
-        template = ItemSerializer.getItem("BOOK:0", file.getConfigurationSection("warp-item"));
+        template = ItemSerializer.getItem("BOOK", file.getConfigurationSection("warp-item"));
 
         setList(getButtonsList());
 

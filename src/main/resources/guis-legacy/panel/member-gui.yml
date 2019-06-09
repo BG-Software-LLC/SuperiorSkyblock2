@@ -3,45 +3,37 @@ rows: 5
 
 items:
   barrier:
-    material: BLACK_STAINED_GLASS_PANE
+    material: STAINED_GLASS_PANE:15
     name: " "
     lore: []
 
-  member:
-    material: LEATHER_CHESTPLATE
-    name: "&eMember"
+  role:
+    material: DIAMOND_CHESTPLATE:0
+    name: "&ePlayer Role"
     lore:
-      - "&7Click to set the player's role to member."
-  moderator:
-    material: IRON_CHESTPLATE
-    name: "&eModerator"
+      - "&7Click to edit player's role."
+  ban:
+    material: BARRIER:0
+    name: "&eBan Player"
     lore:
-      - "&7Click to set the player's role to moderator."
-  admin:
-    material: GOLDEN_CHESTPLATE
-    name: "&eAdmin"
+      - "&7Click to ban the player from the island."
+  kick:
+    material: SKULL_ITEM:0
+    name: "&eKick Player"
     lore:
-      - "&7Click to set the player's role to admin."
-  leader:
-    material: DIAMOND_CHESTPLATE
-    name: "&eLeader"
-    lore:
-      - "&7Click to transfer leadership to player."
+      - "&7Click to kick the player from the island."
 
 buttons:
-  - item: member
-    position: 1, 2
-    action: member
-  - item: moderator
-    position: 3, 2
-    action: moderator
-  - item: admin
-    position: 5, 2
-    action: admin
-  - item: leader
-    position: 7, 2
-    action: leader
-
+  - item: role
+    position: 2, 2
+    action: role
+  - item: ban
+    position: 4, 2
+    action: ban
+  - item: kick
+    position: 6, 2
+    action: kick
+  
   - item: barrier
     position: 0, 0
   - item: barrier

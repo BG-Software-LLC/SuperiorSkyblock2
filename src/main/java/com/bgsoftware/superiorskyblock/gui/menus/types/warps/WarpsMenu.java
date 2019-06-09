@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.gui.buttons.Button;
 import com.bgsoftware.superiorskyblock.gui.buttons.PlayerButton;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlMenu;
 import com.bgsoftware.superiorskyblock.gui.menus.YamlScroll;
+import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -23,7 +24,7 @@ public class WarpsMenu extends YamlScroll {
         super(player, MenuTemplate.WARPS.getFile());
         create(title, rows);
 
-        template = ItemSerializer.getItem("SKULL_ITEM:3", file.getConfigurationSection("island-item"));
+        template = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("island-item"));
 
         setList(getButtonsList());
 

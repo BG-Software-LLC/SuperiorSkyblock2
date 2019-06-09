@@ -51,7 +51,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
-        getServer().getPluginManager().registerEvents(new PanelListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
         getServer().getPluginManager().registerEvents(new MenuListener(this), this);
 
@@ -146,8 +145,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         settingsHandler = new SettingsHandler(this);
         panelHandler = new PanelHandler(this);
-        menuHandler = new MenuHandler(this);
         upgradesHandler = new UpgradesHandler(this);
+        menuHandler = new MenuHandler(this);
 
         if(loadGrid) {
             gridHandler = new GridHandler(this);

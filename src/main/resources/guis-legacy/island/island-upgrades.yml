@@ -16,7 +16,7 @@ items:
     lore: []
 
   hopper:
-    material: "HOPPER"
+    material: "HOPPER:0"
     name: "&d&lHopper Increase &r{0}"
     lore:
       - '&7'
@@ -31,7 +31,7 @@ items:
       - '&7'
       - '&aLeft-click to purchase upgrade.'
   crop:
-    material: "DIAMOND_HOE"
+    material: "DIAMOND_HOE:0"
     name: "&e&lCrop Growth &r{0}"
     lore:
       - '&7'
@@ -46,7 +46,7 @@ items:
       - '&7'
       - '&aLeft-click to purchase upgrade.'
   spawner:
-    material: "SPAWNER"
+    material: "MOB_SPAWNER:0"
     name: "&b&lSpawner Boost &r{0}"
     lore:
       - '&7'
@@ -76,7 +76,7 @@ items:
       - '&7'
       - '&aLeft-click to purchase upgrade.'
   members:
-    material: "PLAYER_HEAD"
+    material: "SKULL_ITEM:3"
     name: "&2&lMembers Size &r{0}"
     lore:
       - '&7'

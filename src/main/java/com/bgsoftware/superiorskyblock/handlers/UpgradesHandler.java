@@ -30,7 +30,6 @@ public final class UpgradesHandler {
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadUpgrades();
-        loadMenu();
     }
 
     public void openUpgradesMenu(SuperiorPlayer superiorPlayer){
@@ -145,39 +144,6 @@ public final class UpgradesHandler {
                 upgradeData.commands.put(level, upgrades.getStringList(upgradeName + "." + level + ".commands"));
             }
             this.upgrades.put(upgradeName, upgradeData);
-        }
-    }
-
-    private void loadMenu(){
-        File file = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/upgrades-gui.yml");
-
-        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
-
-        ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
-
-        upgradesMenu = FileUtil.getGUI(GUIInventory.UPGRADES_PAGE_IDENTIFIER, section, 4, "&lIsland Upgrades");
-
-        if(section.contains("upgrades")){
-            ConfigurationSection upgrades = section.getConfigurationSection("upgrades");
-            for(String _upgrade : upgrades.getKeys(false)){
-                if(!isUpgrade(_upgrade))
-                    continue;
-
-                UpgradeData upgradeData = this.upgrades.get(_upgrade);
-
-                for(String level : upgrades.getConfigurationSection(_upgrade).getKeys(false)) {
-                    int slot = upgrades.getInt(_upgrade + "." + level + ".slot");
-                    upgradeData.items.put(Integer.valueOf(level), new ItemData(
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
-                            slot,
-                            getSound(upgrades.getString(_upgrade + "." + level + ".has-next-level.sound", "")),
-                            getSound(upgrades.getString(_upgrade + "." + level + ".no-next-level.sound", ""))));
-                }
-            }
         }
     }
 
