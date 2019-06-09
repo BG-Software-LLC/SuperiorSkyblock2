@@ -23,18 +23,12 @@ public class TopIslandsMenu extends YamlScroll {
 
     private static Inventory globalInv;
 
-    private ItemStack islandItem;
-    private ItemStack invalidItem;
+    private static ItemStack islandItem;
+    private static ItemStack invalidItem;
 
     public TopIslandsMenu(Player player) {
         super(player, MenuTemplate.TOP_ISLANDS.getFile());
         create(title, rows);
-
-        islandItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("island_item"));
-        invalidItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("invalid_item"));
-        SkullMeta meta = (SkullMeta) invalidItem.getItemMeta();
-        meta.setOwner("MHF_Question");
-        invalidItem.setItemMeta(meta);
 
         setList(createButtons());
 
@@ -46,6 +40,15 @@ public class TopIslandsMenu extends YamlScroll {
     }
 
     public static void staticLoad() {
+        YamlConfiguration file = MenuTemplate.TOP_ISLANDS.getFile();
+
+        islandItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("island_item"));
+        invalidItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("invalid_item"));
+        SkullMeta meta = (SkullMeta) invalidItem.getItemMeta();
+        meta.setOwner("MHF_Question");
+        invalidItem.setItemMeta(meta);
+
+
         new TopIslandsMenu(null);
     }
 
