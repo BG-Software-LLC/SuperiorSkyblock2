@@ -28,7 +28,9 @@ public class WarpsMenu extends YamlScroll {
 
         setList(getButtonsList());
 
-        setPage(0);
+        if (buttons.isEmpty())
+            load();
+
         open();
     }
 

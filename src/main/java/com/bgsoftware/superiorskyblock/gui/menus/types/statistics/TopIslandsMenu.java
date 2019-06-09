@@ -12,16 +12,21 @@ import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TopIslandsMenu extends YamlScroll {
 
     private static Inventory globalInv;
+
+    private static Map<String, ItemStack> globalItems;
+    private static Map<Integer, Button> globalButtons;
 
     private static ItemStack islandItem;
     private static ItemStack invalidItem;
@@ -32,11 +37,43 @@ public class TopIslandsMenu extends YamlScroll {
 
         setList(createButtons());
 
-        setPage(0);
         if (player == null)
-            update();
+            load();
         else
             open();
+    }
+
+    @Override
+    public void load() {
+        super.load();
+    }
+
+    @Override
+    protected void update() {
+        if (globalButtons != null)
+            buttons = globalButtons;
+
+        super.update();
+    }
+
+    @Override
+    public void onClick(InventoryClickEvent event) {
+        event.setCancelled(true);
+
+        if (event.getClickedInventory() == null)
+            return;
+
+        if (!event.getClickedInventory().equals(inventory))
+            return;
+
+        Button button = buttons.get(event.getSlot());
+        if (button == null)
+            return;
+
+        if (button.getAction() != null)
+            button.getAction().accept((Player) event.getWhoClicked(), event.getClick());
+
+        button.sendCommands(player, player.getName());
     }
 
     public static void staticLoad() {
@@ -48,8 +85,9 @@ public class TopIslandsMenu extends YamlScroll {
         meta.setOwner("MHF_Question");
         invalidItem.setItemMeta(meta);
 
-
-        new TopIslandsMenu(null);
+        TopIslandsMenu menu = new TopIslandsMenu(null);
+        globalItems = menu.getItems();
+        globalButtons = menu.getButtons();
     }
 
     @Override

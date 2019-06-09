@@ -36,7 +36,9 @@ public class IslandValuesMenu extends YamlScroll {
 
         setList(createButtons());
 
-        setPage(0);
+        if (buttons.isEmpty())
+            load();
+
         open();
     }
 

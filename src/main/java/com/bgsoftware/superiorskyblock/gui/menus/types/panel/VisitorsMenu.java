@@ -34,7 +34,9 @@ public class VisitorsMenu extends YamlScroll {
 
         canExit = false;
 
-        setPage(0);
+        if (buttons.isEmpty())
+            load();
+
         open();
     }
 

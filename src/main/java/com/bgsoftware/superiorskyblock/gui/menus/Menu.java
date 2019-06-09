@@ -102,4 +102,8 @@ public class Menu {
     public Inventory getInventory() {
         return inventory;
     }
+
+    public Map<Integer, Button> getButtons() {
+        return buttons;
+    }
 }

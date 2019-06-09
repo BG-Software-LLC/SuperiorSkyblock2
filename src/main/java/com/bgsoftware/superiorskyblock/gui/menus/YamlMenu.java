@@ -83,4 +83,7 @@ public class YamlMenu extends Menu {
         player.closeInventory();
     }
 
+    public Map<String, ItemStack> getItems() {
+        return items;
+    }
 }

@@ -32,9 +32,13 @@ public class YamlScroll extends YamlMenu {
     }
 
     @Override
+    public void load() {
+        super.load();
+    }
+
+    @Override
     protected void update() {
-        updatePage();
-        updateScroll();
+        setPage(page);
 
         super.update();
     }
@@ -80,9 +84,7 @@ public class YamlScroll extends YamlMenu {
     public void setPage(int page) {
         this.page = page;
         updatePage();
-
-        load();
-        update();
+        updateScroll();
 
         for (Button button : buttons.values()) {
             button.setItem(ItemSerializer.replace(button.getItem(), this.page + ""));
