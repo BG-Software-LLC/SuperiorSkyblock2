@@ -2,8 +2,6 @@ title: "&8&lTop Islands"
 rows: 3
 scroll_width: 1
 
-include-leader: true
-
 island_item:
   name: "&e&l[!] Island: &6&n{0}&7 (#{1})"
   lore:

@@ -21,13 +21,10 @@ public class TopIslandsMenu extends YamlScroll {
     private ItemStack islandItem;
     private ItemStack invalidItem;
 
-    private boolean includeLeader;
-
     public TopIslandsMenu(Player player) {
         super(player, MenuTemplate.TOP_ISLANDS.getFile());
         create(title, rows);
 
-        includeLeader = file.getBoolean("include-leader", true);
         islandItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("island_item"));
         invalidItem = ItemSerializer.getItem(HeadUtil.getMaterial(), file.getConfigurationSection("invalid_item"));
         SkullMeta meta = (SkullMeta) invalidItem.getItemMeta();
@@ -45,7 +42,7 @@ public class TopIslandsMenu extends YamlScroll {
 
         int rank = 1;
         for (Island island : SuperiorSkyblockPlugin.getPlugin().getGrid().getIslands()) {
-            buttons.add(new IslandButton(island, rank, islandItem, includeLeader, (clicker, type) -> {
+            buttons.add(new IslandButton(island, rank, islandItem, (clicker, type) -> {
                 switch (type) {
                     case LEFT:
                         new IslandValuesMenu(player, island);

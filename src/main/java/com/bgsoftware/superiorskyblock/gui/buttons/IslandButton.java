@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.gui.buttons;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.ItemSerializer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -16,11 +17,11 @@ import java.util.function.BiConsumer;
 
 public class IslandButton extends Button{
 
-    public IslandButton(Island island, int rank, ItemStack template, boolean includeLeader, BiConsumer<? super Player, ? super ClickType> action) {
-        super(getIslandItem(island, rank, includeLeader, template), action);
+    public IslandButton(Island island, int rank, ItemStack template, BiConsumer<? super Player, ? super ClickType> action) {
+        super(getIslandItem(island, rank, template), action);
     }
 
-    private static ItemStack getIslandItem(Island island, int rank, boolean includeLeader, ItemStack template) {
+    private static ItemStack getIslandItem(Island island, int rank, ItemStack template) {
         ItemStack item = ItemSerializer.replace(
                 template.clone(),
                 island.getOwner().getName(),
@@ -40,7 +41,7 @@ public class IslandButton extends Button{
             }
 
             for (UUID uuid : island.getAllMembers()) {
-                if (!includeLeader && uuid.equals(island.getOwner().getUniqueId()))
+                if (!SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopIncludeLeader && uuid.equals(island.getOwner().getUniqueId()))
                     continue;
                 newLore.add(line.replace("{MEMBER}", SSuperiorPlayer.of(uuid).getName()));
             }
