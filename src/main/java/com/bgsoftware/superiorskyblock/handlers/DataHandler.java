@@ -105,7 +105,8 @@ public final class DataHandler {
                 "name VARCHAR, " +
                 "islandRole VARCHAR, " +
                 "textureValue VARCHAR, " +
-                "disbands INTEGER" +
+                "disbands INTEGER," +
+                "toggledPanel BOOLEAN" +
                 ");");
 
         //Creating default grid table
@@ -133,6 +134,7 @@ public final class DataHandler {
         addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
         addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
         addColumnIfNotExists("blockCounts", "islands", "", "VARCHAR");
+        addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {

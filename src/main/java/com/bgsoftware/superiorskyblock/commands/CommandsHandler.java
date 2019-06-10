@@ -1,9 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands;
 
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.command.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -92,10 +95,25 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
             }
         }
 
-        if(sender.hasPermission("superior.island.help"))
-            Locale.UNKNOWN_COMMAND.send(sender);
-        else
-            Locale.NO_COMMAND_PERMISSION.send(sender);
+        if(sender instanceof Player){
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+
+            if(superiorPlayer != null) {
+                if (superiorPlayer.getIsland() == null) {
+                    Bukkit.dispatchCommand(sender, "is create");
+                } else {
+                    if (superiorPlayer.hasToggledPanel()) {
+                        Bukkit.dispatchCommand(sender, "is panel");
+                    } else {
+                        Bukkit.dispatchCommand(sender, "is tp");
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        Locale.NO_COMMAND_PERMISSION.send(sender);
 
         return false;
     }

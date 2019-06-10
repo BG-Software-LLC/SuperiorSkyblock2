@@ -40,6 +40,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
+    private boolean toggledPanel = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
 
     private int disbands;
@@ -51,6 +52,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         textureValue = resultSet.getString("textureValue");
         islandRole = IslandRole.valueOf(resultSet.getString("islandRole"));
         disbands = resultSet.getInt("disbands");
+        toggledPanel = resultSet.getBoolean("toggledPanel");
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -198,6 +200,21 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .execute(true);
     }
 
+    @Override
+    public boolean hasToggledPanel() {
+        return toggledPanel;
+    }
+
+    @Override
+    public void setToggledPanel(boolean toggledPanel) {
+        this.toggledPanel = toggledPanel;
+
+        Query.PLAYER_SET_TOGGLED_PANEL.getStatementHolder()
+                .setBoolean(toggledPanel)
+                .setString(player.toString())
+                .execute(true);
+    }
+
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
@@ -243,6 +260,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(islandRole.name())
                 .setString(textureValue)
                 .setInt(disbands)
+                .setBoolean(toggledPanel)
                 .setString(player.toString())
                 .execute(async);
     }
@@ -256,6 +274,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(islandRole.name())
                 .setString(textureValue)
                 .setInt(plugin.getSettings().disbandCount)
+                .setBoolean(toggledPanel)
                 .execute(async);
     }
 

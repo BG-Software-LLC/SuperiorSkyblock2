@@ -60,6 +60,17 @@ public final class CmdPanel implements ICommand {
                 plugin.getPanel().openVisitorsPanel(superiorPlayer, 1);
                 return;
             }
+            else if(args[1].equalsIgnoreCase("toggle")){
+                if(superiorPlayer.hasToggledPanel()){
+                    superiorPlayer.setToggledPanel(false);
+                    Locale.TOGGLED_PANEL_OFF.send(sender);
+                }
+                else{
+                    superiorPlayer.setToggledPanel(true);
+                    Locale.TOGGLED_PANEL_ON.send(sender);
+                }
+                return;
+            }
         }
 
         plugin.getPanel().openPanel(superiorPlayer);
