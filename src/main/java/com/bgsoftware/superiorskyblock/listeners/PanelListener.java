@@ -365,7 +365,7 @@ public final class PanelListener implements Listener {
 
             int indexOf = slots.indexOf(e.getRawSlot());
 
-            if(indexOf >= warps.size())
+            if(indexOf >= warps.size() || indexOf == -1)
                 return;
 
             String warpName = warps.get(indexOf);
