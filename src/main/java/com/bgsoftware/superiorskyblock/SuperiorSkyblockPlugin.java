@@ -36,7 +36,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler;
     private DataHandler dataHandler;
     private PanelHandler panelHandler;
-    private MenuHandler menuHandler;
     private UpgradesHandler upgradesHandler;
 
     private NMSAdapter nmsAdapter;
@@ -53,7 +52,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new PanelListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
-        getServer().getPluginManager().registerEvents(new MenuListener(this), this);
 
         loadNMSAdapter();
         loadAPI();
@@ -141,12 +139,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
-        if (menuHandler != null)
-            menuHandler.save();
-
         settingsHandler = new SettingsHandler(this);
         panelHandler = new PanelHandler(this);
-        menuHandler = new MenuHandler(this);
         upgradesHandler = new UpgradesHandler(this);
 
         if(loadGrid) {
@@ -169,10 +163,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         Locale.reload();
         SaveTask.startTask();
         CalcTask.startTask();
-    }
-
-    public MenuHandler getMenuHandler() {
-        return menuHandler;
     }
 
     public UpgradesHandler getUpgrades() {
