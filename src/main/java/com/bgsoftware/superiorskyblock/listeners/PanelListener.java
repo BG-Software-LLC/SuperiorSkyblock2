@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
+import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
@@ -128,10 +129,6 @@ public final class PanelListener implements Listener {
                 break;
             }
             case VALUES_PAGE_IDENTIFIER: {
-                break;
-            }
-            case ISLAND_TOP_PAGE_IDENTIFIER: {
-                islandTopPage(e, guiInventory, superiorPlayer);
                 break;
             }
             case CONFIRM_PAGE_IDENTIFIER: {
@@ -383,32 +380,12 @@ public final class PanelListener implements Listener {
         }
     }
 
-    private void islandTopPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        Integer[] slots = plugin.getGrid().getTopIslands().get("slots", Integer[].class);
-
-        for(int i = 0; i < slots.length; i++){
-            if(slots[i] == e.getRawSlot()){
-                Island island = plugin.getGrid().getIsland(i);
-
-                if(island != null) {
-                    superiorPlayer.asPlayer().closeInventory();
-                    if(e.getAction() == InventoryAction.PICKUP_HALF){
-                        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
-                    } else {
-                        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                plugin.getPanel().openValuesPanel(superiorPlayer, island), 1L);
-                    }
-                    break;
-                }
-
-            }
-        }
-    }
-
     private void confirmPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
         ItemStack clickedItem = e.getCurrentItem();
         Island island = superiorPlayer.getIsland();
+
+        if(clickedItem == null)
+            return;
 
         if(clickedItem.getItemMeta().getDisplayName().contains("Confirm")){
             IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);

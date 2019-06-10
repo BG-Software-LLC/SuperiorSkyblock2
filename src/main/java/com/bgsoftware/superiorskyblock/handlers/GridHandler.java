@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
@@ -64,7 +65,6 @@ public final class GridHandler implements GridManager {
 
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
-    private IslandTopHandler topIslands = new IslandTopHandler();
     private BlockValuesHandler blockValues = new BlockValuesHandler();
 
     private SIsland spawnIsland;
@@ -74,6 +74,7 @@ public final class GridHandler implements GridManager {
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         spawnIsland = new SpawnIsland();
+        IslandsTopMenu.createInventory(); //Init
     }
 
     public void createIsland(ResultSet resultSet) throws SQLException {
@@ -310,13 +311,9 @@ public final class GridHandler implements GridManager {
         }
     }
 
-    public GUIInventory getTopIslands(){
-        return topIslands.topIslands;
-    }
-
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        topIslands.openTopIslands(superiorPlayer);
+        IslandsTopMenu.createInventory().openInventory(superiorPlayer, false);
     }
 
     @Override
@@ -505,117 +502,6 @@ public final class GridHandler implements GridManager {
             }
 
             return stringBuilder.toString().substring(1);
-        }
-
-    }
-
-    private class IslandTopHandler {
-
-        private GUIInventory topIslands;
-
-        public IslandTopHandler(){
-            SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-            File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
-
-            if(!file.exists())
-                FileUtil.saveResource("guis/top-islands.yml");
-
-            YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-            topIslands = FileUtil.getGUI(GUIInventory.ISLAND_TOP_PAGE_IDENTIFIER,
-                    cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
-
-            ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
-            ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
-
-            List<Integer> slots = new ArrayList<>();
-            Arrays.stream(cfg.getString("top-islands.slots").split(","))
-                    .forEach(slot -> slots.add(Integer.valueOf(slot)));
-
-            topIslands.put("islandItem", islandItem);
-            topIslands.put("noIslandItem", noIslandItem);
-            topIslands.put("slots", slots.toArray(new Integer[0]));
-
-            reloadGUI();
-        }
-
-        void openTopIslands(SuperiorPlayer superiorPlayer){
-            if(!Bukkit.isPrimaryThread()){
-                Bukkit.getScheduler().runTask(plugin, () -> openTopIslands(superiorPlayer));
-                return;
-            }
-
-            islands.sort();
-            topIslands.openInventory(superiorPlayer, false);
-
-            reloadGUI();
-        }
-
-        private void reloadGUI(){
-            if(Bukkit.isPrimaryThread()){
-                new Thread(this::reloadGUI).start();
-                return;
-            }
-
-            Integer[] slots = topIslands.get("slots", Integer[].class);
-
-            for(int i = 0; i < slots.length; i++){
-                Island island = i >= islands.size() ? null : islands.get(i);
-                ItemStack itemStack = getTopItem(island, i + 1);
-                topIslands.setItem(slots[i], itemStack);
-            }
-        }
-
-        private ItemStack getTopItem(Island island, int place){
-            SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
-
-            ItemStack itemStack;
-
-            if(islandOwner == null){
-                itemStack = topIslands.get("noIslandItem", ItemStack.class).clone();
-            }
-
-            else{
-                itemStack = topIslands.get("islandItem", ItemStack.class).clone();
-            }
-
-            ItemBuilder itemBuilder = new ItemBuilder(itemStack).asSkullOf(islandOwner);
-
-            if(island != null && islandOwner != null) {
-                itemBuilder.replaceName("{0}", islandOwner.getName())
-                        .replaceName("{1}", String.valueOf(place))
-                        .replaceName("{2}", island.getIslandLevelAsBigDecimal().toString())
-                        .replaceName("{3}", island.getWorthAsBigDecimal().toString());
-
-                if(itemStack.getItemMeta().hasLore()){
-                    List<String> lore = new ArrayList<>();
-
-                    for(String line : itemStack.getItemMeta().getLore()){
-                        if(line.contains("{4}")){
-                            String memberFormat = line.split("\\{4}:")[1];
-                            if(island.getMembers().size() == 0){
-                                lore.add(memberFormat.replace("{}", "None"));
-                            }
-                            else {
-                                for (UUID memberUUID : plugin.getSettings().islandTopIncludeLeader ? island.getAllMembers() : island.getMembers()) {
-                                    lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberUUID).getName()));
-                                }
-                            }
-                        }else{
-                            lore.add(line
-                                    .replace("{0}", island.getOwner().getName())
-                                    .replace("{1}", String.valueOf(place))
-                                    .replace("{2}", island.getIslandLevelAsBigDecimal().toString())
-                                    .replace("{3}", island.getWorthAsBigDecimal().toString()));
-                        }
-                    }
-
-                    itemBuilder.withLore(lore);
-                }
-            }
-
-            return itemBuilder.build();
         }
 
     }
