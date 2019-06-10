@@ -115,7 +115,7 @@ public final class FileUtil {
         try {
             String destination = resourcePath;
 
-            if(supportLegacy && v1_13) resourcePath = resourcePath.replace(".yml", "1_13.yml");
+            if(supportLegacy && v1_13) resourcePath = resourcePath.replace(".yml", "-legacy.yml");
 
             File file = new File(plugin.getDataFolder(), resourcePath);
             plugin.saveResource(resourcePath, true);

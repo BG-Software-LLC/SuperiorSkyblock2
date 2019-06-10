@@ -515,7 +515,7 @@ public final class GridHandler implements GridManager {
             File file = new File(plugin.getDataFolder(), "guis/statistics/top-islands.yml");
 
             if(!file.exists())
-                FileUtil.saveResource("guis/statistics/top-islands.yml");
+                saveResource("guis/statistics/top-islands.yml");
 
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -612,6 +612,28 @@ public final class GridHandler implements GridManager {
             }
 
             return itemBuilder.build();
+        }
+
+        private boolean v1_13 = Bukkit.getBukkitVersion().contains("1.13");
+
+        private void saveResource(String resourcePath){
+            try {
+                SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+                String destination = resourcePath;
+
+                if(!v1_13) resourcePath = resourcePath.replace(".yml", "-legacy.yml");
+
+                File file = new File(plugin.getDataFolder(), resourcePath);
+                plugin.saveResource(resourcePath, true);
+
+                if(!destination.equals(resourcePath)){
+                    File dest = new File(plugin.getDataFolder(), destination);
+                    //noinspection ResultOfMethodCallIgnored
+                    file.renameTo(dest);
+                }
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
         }
 
     }
