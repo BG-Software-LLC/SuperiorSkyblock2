@@ -76,7 +76,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
-    private final KeyMap<Integer> blocksCalculations = new KeyMap<>();
+    private final KeyMap<Integer> blockCounts = new KeyMap<>();
     private final Map<String, Location> warps = new HashMap<>();
     private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
@@ -142,6 +142,13 @@ public class SIsland extends DatabaseObject implements Island {
             }catch(Exception ignored){}
         }
 
+        for(String entry : resultSet.getString("blockCounts").split(";")) {
+            try {
+                String[] sections = entry.split("=");
+                handleBlockPlace(SKey.of(sections[0]), Integer.valueOf(sections[1]), false);
+            }catch(Exception ignored){}
+        }
+
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
         this.islandSize = resultSet.getInt("islandSize");
@@ -161,7 +168,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.paypal = resultSet.getString("paypal");
         this.locked = resultSet.getBoolean("locked");
 
-        calcIslandWorth(null);
+        //calcIslandWorth(null);
     }
 
     public SIsland(CompoundTag tag){
@@ -204,7 +211,6 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = ((StringTag) compoundValues.get("discord")).getValue();
         this.paypal = ((StringTag) compoundValues.get("paypal")).getValue();
 
-        calcIslandWorth(null);
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location){
@@ -536,7 +542,7 @@ public class SIsland extends DatabaseObject implements Island {
             blocks.putAll(WildStackerHook.getAllBarrels(chunk));
         }
 
-        blocksCalculations.clear();
+        blockCounts.clear();
         islandWorth = BigDecimalFormatted.ZERO;
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
@@ -586,7 +592,7 @@ public class SIsland extends DatabaseObject implements Island {
                                     blockKey = SKey.of(entry.getValue().name());
                                 }
 
-                                handleBlockPlace(blockKey, blockCount);
+                                handleBlockPlace(blockKey, blockCount, false);
                                 //islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
                             }
                         }
@@ -601,6 +607,8 @@ public class SIsland extends DatabaseObject implements Island {
                     th.join();
                 }catch(Exception ignored){}
             }
+
+            saveBlockCounts();
 
             calcProcess = false;
             Bukkit.getScheduler().runTask(plugin, () -> {
@@ -620,21 +628,33 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockPlace(Block block){
-        handleBlockPlace(SKey.of(block), 1);
+        handleBlockPlace(block, 1);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount){
-        handleBlockPlace(SKey.of(block), amount);
+        handleBlockPlace(block, amount, true);
     }
 
     @Override
-    public synchronized void handleBlockPlace(Key key, int amount){
+    public void handleBlockPlace(Block block, int amount, boolean save) {
+        handleBlockPlace(SKey.of(block), amount, save);
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, int amount){
+        handleBlockPlace(key, amount, true);
+    }
+
+    @Override
+    public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
-            int currentAmount = blocksCalculations.getOrDefault(key, 0);
-            blocksCalculations.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
+            int currentAmount = blockCounts.getOrDefault(key, 0);
+            blockCounts.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
+
+            if(save) saveBlockCounts();
         }
     }
 
@@ -645,25 +665,48 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockBreak(Block block, int amount){
-        handleBlockBreak(SKey.of(block), amount);
+        handleBlockBreak(block, amount, true);
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, int amount, boolean save) {
+        handleBlockBreak(SKey.of(block), amount, save);
     }
 
     @Override
     public void handleBlockBreak(Key key, int amount){
+        handleBlockBreak(key, amount, true);
+    }
+
+    @Override
+    public synchronized void handleBlockBreak(Key key, int amount, boolean save){
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
-            int currentAmount = blocksCalculations.getOrDefault(key, 0);
+            int currentAmount = blockCounts.getOrDefault(key, 0);
 
             key = plugin.getGrid().getBlockValueKey(key);
 
             if(currentAmount <= amount)
-                blocksCalculations.remove(key);
+                blockCounts.remove(key);
             else
-                blocksCalculations.put(key, currentAmount - amount);
+                blockCounts.put(key, currentAmount - amount);
 
             if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue).multiply(new BigDecimal(amount)))).doubleValue() < 0)
                 islandWorth = BigDecimalFormatted.ZERO;
+
+            if(save) saveBlockCounts();
         }
+    }
+
+    private void saveBlockCounts(){
+        StringBuilder blockCounts = new StringBuilder();
+        this.blockCounts.keySet().forEach(blockKey ->
+                blockCounts.append(";").append(blockKey).append("=").append(this.blockCounts.get(blockKey)));
+
+        Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+                .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
+                .setString(owner.toString())
+                .execute(true);
     }
 
     @Override
@@ -673,7 +716,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockCount(Key key){
-        return blocksCalculations.getOrDefault(key, 0);
+        return blockCounts.getOrDefault(key, 0);
     }
 
     @Override
@@ -1063,6 +1106,10 @@ public class SIsland extends DatabaseObject implements Island {
         this.warps.keySet().forEach(warp ->
                 warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
+        StringBuilder blockCounts = new StringBuilder();
+        this.blockCounts.keySet().forEach(blockKey ->
+                blockCounts.append(";").append(blockKey).append("=").append(this.blockCounts.get(blockKey)));
+
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(getLocation(getTeleportLocation()))
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
@@ -1082,6 +1129,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setInt(warpsLimit)
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
+                .setString(blockCounts.length() == 0 ? "" : blockCounts.substring(1))
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1107,6 +1155,10 @@ public class SIsland extends DatabaseObject implements Island {
         this.warps.keySet().forEach(warp ->
                 warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
 
+        StringBuilder blockCounts = new StringBuilder();
+        this.blockCounts.keySet().forEach(blockKey ->
+                blockCounts.append(";").append(blockKey).append("=").append(this.blockCounts.get(blockKey)));
+
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.toString())
                 .setString(getLocation(center.getBlock().getLocation()))
@@ -1115,7 +1167,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(permissionNodes.length() == 0 ? "" : permissionNodes.toString())
                 .setString(upgrades.length() == 0 ? "" : upgrades.toString())
-                .setString(warps.length() == 0 ? "" : warps.toString().substring(1))
+                .setString(warps.length() == 0 ? "" : warps.substring(1))
                 .setString(islandBank.getAsString())
                 .setInt(islandSize)
                 .setString("HOPPER=" + this.hoppersLimit)
@@ -1128,6 +1180,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setInt(warpsLimit)
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
+                .setString(blockCounts.length() == 0 ? "" : blockCounts.substring(1))
                 .execute(async);
     }
 
