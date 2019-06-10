@@ -22,7 +22,7 @@ public final class MenuHandler {
 
     public void load() {
         MenuTemplate.loadAll();
-        TopIslandsMenu.staticLoad();
+        //TopIslandsMenu.staticLoad();
     }
 
     public void save() {

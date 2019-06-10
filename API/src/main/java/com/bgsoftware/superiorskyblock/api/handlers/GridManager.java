@@ -38,6 +38,8 @@ public interface GridManager {
 
     List<UUID> getAllIslands();
 
+    void openTopIslands(SuperiorPlayer superiorPlayer);
+
     int getBlockValue(Key key);
 
     int getBlockAmount(Block block);
