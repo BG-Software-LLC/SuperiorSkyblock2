@@ -36,7 +36,7 @@ public final class GUIInventory {
     private Map<String, Object> data = Maps.newHashMap();
 
     private GUIInventory(String identifier, Inventory inventory){
-        this.inventory = Bukkit.createInventory(null, inventory.getSize(), inventory.getTitle());
+        this.inventory = Bukkit.createInventory(new GUIIdentifier(identifier), inventory.getSize(), inventory.getTitle());
         this.inventory.setContents(inventory.getContents());
         put("identifier", identifier);
         recentlyOpened.put(this, Sets.newHashSet());
@@ -120,7 +120,7 @@ public final class GUIInventory {
     }
 
     public Inventory clonedInventory(){
-        Inventory inventory = Bukkit.createInventory(null, this.inventory.getSize(), this.inventory.getTitle());
+        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(getIdentifier()), this.inventory.getSize(), this.inventory.getTitle());
         inventory.setContents(this.inventory.getContents());
         return inventory;
     }

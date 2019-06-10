@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.HeadUtil;
@@ -206,13 +207,13 @@ public final class PanelHandler {
     }
 
     public void openPlayerPanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
-        Inventory inventory = Bukkit.createInventory(null, playerPage.getSize(), ChatColor.BOLD + targetPlayer.getName());
+        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.PLAYER_PAGE_IDENTIFIER), playerPage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(playerPage.getContents());
         playerPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openRolePanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
-        Inventory inventory = Bukkit.createInventory(null, rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
+        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.ROLE_PAGE_IDENTIFIER), rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(rolePage.getContents());
         rolePage.openInventory(superiorPlayer, inventory);
     }
@@ -319,7 +320,7 @@ public final class PanelHandler {
 
     public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
         Inventory valuesPageInventory = valuesPage.clonedInventory();
-        Inventory inventory = Bukkit.createInventory(null, valuesPageInventory.getSize(),
+        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.VALUES_PAGE_IDENTIFIER), valuesPageInventory.getSize(),
                 valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
                         .replace("{1}", island.getWorthAsBigDecimal().toString()));
         inventory.setContents(valuesPageInventory.getContents());

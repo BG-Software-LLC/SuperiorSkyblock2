@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -58,7 +59,7 @@ public final class PanelListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled()) {
+        if(e.getCurrentItem() != null && e.isCancelled() && e.getInventory().getHolder() instanceof GUIIdentifier) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }

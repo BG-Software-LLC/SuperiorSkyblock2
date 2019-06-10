@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -85,7 +86,7 @@ public final class FileUtil {
         Sound openSound = getSound(section.getString("open-sound", ""));
         Sound closeSound = getSound(section.getString("close-sound", ""));
 
-        Inventory inventory = Bukkit.createInventory(null, 9 * size, title);
+        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(identifier), 9 * size, title);
 
         if(section.contains("fill-items")){
             ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
