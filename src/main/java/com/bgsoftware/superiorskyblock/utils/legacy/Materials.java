@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.legacy;
 
+import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,4 +42,12 @@ public enum Materials {
     public ItemStack toBukkitItem(int amount){
         return bukkitData == 0 ? new ItemStack(toBukkitType(), amount) : new ItemStack(toBukkitType(), amount, bukkitData);
     }
+
+    private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
+
+    public static ItemStack getGlass(DyeColor dyeColor){
+        return legacy ? new ItemStack(Material.matchMaterial("STAINED_GLASS_PANE"), 1, dyeColor.getWoolData()) :
+                new ItemStack(Material.matchMaterial(dyeColor.name() + "_STAINED_GLASS_PANE"));
+    }
+
 }

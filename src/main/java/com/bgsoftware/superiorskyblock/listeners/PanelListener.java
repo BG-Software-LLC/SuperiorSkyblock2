@@ -10,9 +10,11 @@ import static com.bgsoftware.superiorskyblock.gui.GUIInventory.WARPS_PAGE_IDENTI
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VALUES_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ISLAND_TOP_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
+import static com.bgsoftware.superiorskyblock.gui.GUIInventory.CONFIRM_PAGE_IDENTIFIER;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
@@ -130,6 +132,10 @@ public final class PanelListener implements Listener {
             }
             case ISLAND_TOP_PAGE_IDENTIFIER: {
                 islandTopPage(e, guiInventory, superiorPlayer);
+                break;
+            }
+            case CONFIRM_PAGE_IDENTIFIER: {
+                confirmPage(e, guiInventory, superiorPlayer);
                 break;
             }
         }
@@ -398,6 +404,33 @@ public final class PanelListener implements Listener {
 
             }
         }
+    }
+
+    private void confirmPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
+        ItemStack clickedItem = e.getCurrentItem();
+        Island island = superiorPlayer.getIsland();
+
+        if(clickedItem.getItemMeta().getDisplayName().contains("Confirm")){
+            IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
+            Bukkit.getPluginManager().callEvent(islandDisbandEvent);
+
+            if(!islandDisbandEvent.isCancelled()) {
+                for(UUID uuid : island.getMembers()){
+                    if(Bukkit.getOfflinePlayer(uuid).isOnline()){
+                        Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
+                    }
+                }
+
+                Locale.DISBANDED_ISLAND.send(superiorPlayer);
+
+                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+                island.disbandIsland();
+
+                return;
+            }
+        }
+
+        superiorPlayer.asPlayer().closeInventory();
     }
 
 }

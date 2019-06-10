@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,6 +28,7 @@ public final class GUIInventory {
     public static final String VALUES_PAGE_IDENTIFIER = "valuesPage";
     public static final String ISLAND_TOP_PAGE_IDENTIFIER = "islandTop";
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
+    public static final String CONFIRM_PAGE_IDENTIFIER = "confirmPage";
 
     private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -36,7 +38,10 @@ public final class GUIInventory {
     private Map<String, Object> data = Maps.newHashMap();
 
     private GUIInventory(String identifier, Inventory inventory){
-        this.inventory = Bukkit.createInventory(new GUIIdentifier(identifier), inventory.getSize(), inventory.getTitle());
+        if(inventory.getType() == InventoryType.CHEST)
+            this.inventory = Bukkit.createInventory(new GUIIdentifier(identifier), inventory.getSize(), inventory.getTitle());
+        else
+            this.inventory = Bukkit.createInventory(new GUIIdentifier(identifier), inventory.getType(), inventory.getTitle());
         this.inventory.setContents(inventory.getContents());
         put("identifier", identifier);
         recentlyOpened.put(this, Sets.newHashSet());
