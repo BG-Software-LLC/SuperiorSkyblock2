@@ -35,15 +35,6 @@ public final class BigDecimalFormatted extends BigDecimal {
     }
 
     @Override
-    public double doubleValue() {
-        try{
-            return super.doubleValue();
-        }catch(NumberFormatException ex){
-            return Double.parseDouble(getAsString());
-        }
-    }
-
-    @Override
     public String toString() {
         return StringUtil.format(this);
     }
