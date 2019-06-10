@@ -82,24 +82,6 @@ public final class PanelHandler {
         cfg = YamlConfiguration.loadConfiguration(file);
 
         initBiomesPage(cfg);
-
-        file = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/warps-gui.yml");
-
-        cfg = YamlConfiguration.loadConfiguration(file);
-
-        initWarpsPage(cfg);
-
-//        file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
-//
-//        if(!file.exists())
-//            FileUtil.saveResource("guis/values-gui.yml");
-//
-//        cfg = YamlConfiguration.loadConfiguration(file);
-//
-//        initValuesPage(cfg);
     }
 
     private Sound getSound(String name){
@@ -267,113 +249,8 @@ public final class PanelHandler {
         biomesPage.openInventory(superiorPlayer, inventory);
     }
 
-    public void openWarpsPanel(SuperiorPlayer superiorPlayer, int page) {
-        openWarpsPanel(superiorPlayer, getIsland(superiorPlayer), page);
-    }
-
     public Island getIsland(SuperiorPlayer superiorPlayer){
         return plugin.getGrid().getIsland(SSuperiorPlayer.of(islands.get(superiorPlayer.getUniqueId())));
-    }
-
-    public void openWarpsPanel(SuperiorPlayer superiorPlayer, Island island, int page) {
-        if (Bukkit.isPrimaryThread()) {
-            new SuperiorThread(
-                    () -> openWarpsPanel(superiorPlayer, island, page)).start();
-            return;
-        }
-
-        Inventory inventory = warpsPage.clonedInventory();
-        List<String> warps = new ArrayList<>(island.getAllWarps());
-
-        warps.sort(String::compareTo);
-
-        //noinspection unchecked
-        List<Integer> slots = warpsPage.get("slots", List.class);
-
-        ItemStack warpItem = warpsPage.get("warpItem", ItemStack.class);
-
-        for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < warps.size(); i++){
-            String warpName = warps.get(i + (slots.size() * (page - 1)));
-            inventory.setItem(slots.get(i), new ItemBuilder(warpItem)
-                    .replaceAll("{0}", warpName)
-                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString()).build());
-        }
-
-        int previousSlot = warpsPage.get("previousSlot", Integer.class);
-        ItemStack previousButton = warpsPage.get("previousButton", ItemStack.class);
-        inventory.setItem(previousSlot, new ItemBuilder(previousButton)
-                .replaceName("{0}", (page == 1 ? "&c" : "&a")).build());
-
-        int currentSlot = warpsPage.get("currentSlot", Integer.class);
-        ItemStack currentButton = warpsPage.get("currentButton", ItemStack.class);
-        inventory.setItem(currentSlot, new ItemBuilder(currentButton)
-                .replaceLore("{0}", page + "").build());
-
-        int nextSlot = warpsPage.get("nextSlot", Integer.class);
-        ItemStack nextButton = warpsPage.get("nextButton", ItemStack.class);
-        inventory.setItem(nextSlot, new ItemBuilder(nextButton)
-                .replaceName("{0}", (warps.size() > page * slots.size() ? "&a" : "&c")).build());
-
-        warpsPage.openInventory(superiorPlayer, inventory);
-        islands.put(superiorPlayer.getUniqueId(), island.getOwner().getUniqueId());
-    }
-
-//    public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
-//        Inventory valuesPageInventory = valuesPage.clonedInventory();
-//        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.VALUES_PAGE_IDENTIFIER), valuesPageInventory.getSize(),
-//                valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
-//                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
-//        inventory.setContents(valuesPageInventory.getContents());
-//
-//        new SuperiorThread(() -> {
-//            //noinspection unchecked
-//            KeyMap<Integer> countedBlocks = (KeyMap<Integer>) valuesPage.get("countedBlocks", KeyMap.class);
-//
-//            for(Key key : countedBlocks.keySet()){
-//                String[] sections = key.toString().split(":");
-//                ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
-//                int slot = countedBlocks.get(key);
-//
-//                String typeName = StringUtil.format(sections[0]);
-//                int amount = island.getBlockCount(SKey.of(itemStack));
-//
-//                if(sections.length == 2) {
-//                    if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
-//                        EntityType entityType = EntityType.valueOf(sections[1]);
-//                        amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
-//                        itemStack = HeadUtil.getEntityHead(entityType);
-//                        typeName = StringUtil.format(sections[1]) + " Spawner";
-//                    }
-//                    else {
-//                        itemStack.setDurability(Short.valueOf(sections[1]));
-//                        amount = island.getBlockCount(SKey.of(itemStack));
-//                    }
-//                }
-//
-//                String blockName = valuesPage.get("blockName", String.class);
-//                //noinspection unchecked
-//                List<String> blockLore = (List<String>) valuesPage.get("blockLore", List.class);
-//
-//                itemStack = new ItemBuilder(itemStack).withName(blockName).withLore(blockLore)
-//                        .replaceAll("{0}", typeName).replaceAll("{1}", String.valueOf(amount)).build();
-//
-//                if(amount == 0)
-//                    amount = 1;
-//                else if(amount > 64)
-//                    amount = 64;
-//
-//                itemStack.setAmount(amount);
-//
-//                inventory.setItem(slot, itemStack);
-//            }
-//
-//            valuesPage.openInventory(superiorPlayer, inventory);
-//        }).start();
-//    }
-
-    public void closeInventory(SuperiorPlayer superiorPlayer){
-        GUIInventory.from(superiorPlayer).closeInventory(superiorPlayer);
-        islands.remove(superiorPlayer.getUniqueId());
     }
 
     private void initMainPage(YamlConfiguration cfg){
@@ -557,63 +434,5 @@ public final class PanelHandler {
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".no-access-item")));
         }
     }
-
-    private void initWarpsPage(YamlConfiguration cfg){
-        warpsPage = FileUtil.getGUI(GUIInventory.WARPS_PAGE_IDENTIFIER, cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
-
-        ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.previous-page"));
-        ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.current-page"));
-        ItemStack nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.next-page"));
-        ItemStack warpItem = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.warp-item"));
-        int previousSlot = cfg.getInt("warps-gui.previous-page.slot");
-        int currentSlot = cfg.getInt("warps-gui.current-page.slot");
-        int nextSlot = cfg.getInt("warps-gui.next-page.slot");
-        Sound previousSound = getSound(cfg.getString("warps-gui.previous-page.sound", ""));
-        Sound currentSound = getSound(cfg.getString("warps-gui.current-page.sound", ""));
-        Sound nextSound = getSound(cfg.getString("warps-gui.next-page.sound", ""));
-        Sound warpSound = getSound(cfg.getString("warps-gui.warp-item.sound", ""));
-
-        List<Integer> slots = new ArrayList<>();
-        Arrays.stream(cfg.getString("warps-gui.warp-item.slots").split(","))
-                .forEach(slot -> slots.add(Integer.valueOf(slot)));
-        slots.sort(Integer::compareTo);
-
-        warpsPage.put("previousButton", previousButton);
-        warpsPage.put("currentButton", currentButton);
-        warpsPage.put("nextButton", nextButton);
-        warpsPage.put("warpItem", warpItem);
-        warpsPage.put("previousSound", previousSound);
-        warpsPage.put("currentSound", currentSound);
-        warpsPage.put("nextSound", nextSound);
-        warpsPage.put("previousSlot", previousSlot);
-        warpsPage.put("currentSlot", currentSlot);
-        warpsPage.put("nextSlot", nextSlot);
-        warpsPage.put("warpSound", warpSound);
-        warpsPage.put("slots", slots);
-    }
-
-//    private void initValuesPage(YamlConfiguration cfg){
-//        valuesPage = FileUtil.getGUI(GUIInventory.VALUES_PAGE_IDENTIFIER, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
-//
-//        Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
-//        String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
-//        List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");
-//
-//        KeyMap<Integer> countedBlocks = new KeyMap<>();
-//
-//        for(String materialName : cfg.getStringList("values-gui.materials")){
-//            String[] sections = materialName.split(":");
-//            if(sections.length == 2){
-//                countedBlocks.put(sections[0], Integer.valueOf(sections[1]));
-//            }else{
-//                countedBlocks.put(sections[0] + ":" + sections[1], Integer.valueOf(sections[2]));
-//            }
-//        }
-//
-//        valuesPage.put("blockSound", blockSound);
-//        valuesPage.put("blockName", blockName);
-//        valuesPage.put("blockLore", blockLore);
-//        valuesPage.put("countedBlocks", countedBlocks);
-//    }
 
 }

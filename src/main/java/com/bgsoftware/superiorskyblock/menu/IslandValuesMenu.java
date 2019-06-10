@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -26,7 +25,6 @@ import java.util.List;
 public final class IslandValuesMenu extends SuperiorMenu {
 
     private static Inventory valuesPage;
-    private static Sound blockSound;
     private static String blockName;
     private static List<String> blockLore;
     private static KeyMap<Integer> countedBlocks;
@@ -40,7 +38,6 @@ public final class IslandValuesMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
-        e.setCancelled(true);
     }
 
     @Override
@@ -110,7 +107,6 @@ public final class IslandValuesMenu extends SuperiorMenu {
 
         valuesPage = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
 
-        Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
         List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");
 
@@ -125,18 +121,9 @@ public final class IslandValuesMenu extends SuperiorMenu {
             }
         }
 
-        IslandValuesMenu.blockSound = blockSound;
         IslandValuesMenu.blockName = blockName;
         IslandValuesMenu.blockLore = blockLore;
         IslandValuesMenu.countedBlocks = countedBlocks;
-    }
-
-    private static Sound getSound(String name){
-        try{
-            return Sound.valueOf(name);
-        }catch(Exception ex){
-            return null;
-        }
     }
 
 }

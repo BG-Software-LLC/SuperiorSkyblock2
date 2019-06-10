@@ -73,4 +73,12 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public abstract void onClick(InventoryClickEvent e);
 
+    protected static Sound getSound(String name){
+        try{
+            return Sound.valueOf(name);
+        }catch(Exception ex){
+            return null;
+        }
+    }
+
 }

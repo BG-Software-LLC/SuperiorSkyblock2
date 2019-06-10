@@ -32,8 +32,6 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
-        e.setCancelled(true);
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         for(int i = 0; i < slots.length; i++){
@@ -43,8 +41,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
                 if(island != null) {
                     superiorPlayer.asPlayer().closeInventory();
                     if(e.getAction() == InventoryAction.PICKUP_HALF){
-                        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
+                        IslandWarpsMenu.createInventory(island).openInventory(superiorPlayer, this);
                     } else {
                         IslandValuesMenu.createInventory(island).openInventory(superiorPlayer, this);
                     }

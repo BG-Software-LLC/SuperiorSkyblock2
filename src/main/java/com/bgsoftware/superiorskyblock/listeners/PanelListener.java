@@ -124,10 +124,6 @@ public final class PanelListener implements Listener {
                 biomesPage(e, guiInventory, superiorPlayer);
                 break;
             }
-            case WARPS_PAGE_IDENTIFIER: {
-                warpsPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case CONFIRM_PAGE_IDENTIFIER: {
                 confirmPage(e, guiInventory, superiorPlayer);
                 break;
@@ -327,52 +323,6 @@ public final class PanelListener implements Listener {
                     Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
                     break;
                 }
-            }
-        }
-    }
-
-    private void warpsPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        if(e.getRawSlot() == guiInventory.get("previousSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("nextSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("currentSlot", Integer.class)){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
-            int currentSlot = guiInventory.get("currentSlot", Integer.class);
-
-            if(e.getRawSlot() == currentSlot)
-                return;
-
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
-            int nextPage = guiInventory.get("nextSlot", Integer.class);
-
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
-            plugin.getPanel().openWarpsPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
-        }
-
-        else{
-            if(e.getCurrentItem() == null)
-                return;
-
-            Island island = plugin.getPanel().getIsland(superiorPlayer);
-
-            //noinspection unchecked
-            List<Integer> slots = plugin.getPanel().warpsPage.get("slots", List.class);
-
-            List<String> warps = new ArrayList<>(island.getAllWarps());
-            warps.sort(String::compareTo);
-
-            int indexOf = slots.indexOf(e.getRawSlot());
-
-            if(indexOf >= warps.size() || indexOf == -1)
-                return;
-
-            String warpName = warps.get(indexOf);
-            Location location = island.getWarpLocation(warpName);
-
-            if(location != null) {
-                island.warpPlayer(superiorPlayer, warpName);
             }
         }
     }

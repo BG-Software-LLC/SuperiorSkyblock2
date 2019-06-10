@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
@@ -76,9 +77,11 @@ public final class GridHandler implements GridManager {
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         spawnIsland = new SpawnIsland();
 
+        //Init
         Bukkit.getScheduler().runTask(SuperiorSkyblockPlugin.getPlugin(), () -> {
-            IslandsTopMenu.init(); //Init
-            IslandValuesMenu.init(); //Init
+            IslandsTopMenu.init();
+            IslandValuesMenu.init();
+            IslandWarpsMenu.init();
         });
     }
 

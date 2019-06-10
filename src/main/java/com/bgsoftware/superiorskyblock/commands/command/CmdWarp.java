@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -72,7 +73,7 @@ public final class CmdWarp implements ICommand {
             }
         }
 
-        plugin.getPanel().openWarpsPanel(superiorPlayer, island, 1);
+        IslandWarpsMenu.createInventory(island).openInventory(superiorPlayer, null);
     }
 
     @Override

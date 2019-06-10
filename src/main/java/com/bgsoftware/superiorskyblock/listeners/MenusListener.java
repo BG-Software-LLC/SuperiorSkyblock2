@@ -18,6 +18,8 @@ public final class MenusListener implements Listener {
         if(!(inventoryHolder instanceof SuperiorMenu) || !(e.getWhoClicked() instanceof Player))
             return;
 
+        e.setCancelled(true);
+
         ((SuperiorMenu) inventoryHolder).onClick(e);
     }
 
