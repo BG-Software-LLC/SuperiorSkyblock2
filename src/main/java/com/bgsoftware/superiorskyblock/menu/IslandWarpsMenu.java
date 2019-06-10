@@ -91,12 +91,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(
-                this,
-                inventory.getSize(),
-                inventory.getTitle().replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString())
-        );
-
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
         inv.setContents(inventory.getContents());
 
         List<String> warps = new ArrayList<>(island.getAllWarps());
@@ -124,7 +119,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
         if(previousMenu != null)
             previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
-        
+
         Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
     }
 

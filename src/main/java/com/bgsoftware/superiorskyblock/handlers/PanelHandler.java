@@ -2,29 +2,19 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,8 +31,7 @@ import java.util.UUID;
 public final class PanelHandler {
 
     private SuperiorSkyblockPlugin plugin;
-    public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage,
-            islandCreationPage, biomesPage, warpsPage;
+    public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage, islandCreationPage;
 
     public Map<UUID, UUID> islands = new HashMap<>();
 
@@ -73,15 +62,6 @@ public final class PanelHandler {
         cfg = YamlConfiguration.loadConfiguration(file);
 
         initIslandCreationPage(cfg);
-
-        file = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/biomes-gui.yml");
-
-        cfg = YamlConfiguration.loadConfiguration(file);
-
-        initBiomesPage(cfg);
     }
 
     private Sound getSound(String name){
@@ -222,31 +202,6 @@ public final class PanelHandler {
         }
 
         islandCreationPage.openInventory(superiorPlayer, inventory);
-    }
-
-    public void openBiomesPanel(SuperiorPlayer superiorPlayer){
-        if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openBiomesPanel(superiorPlayer)).start();
-            return;
-        }
-
-        Inventory inventory = biomesPage.clonedInventory();
-
-        for(Biome biome : Biome.values()){
-            String biomeName = biome.name().toLowerCase();
-            if(biomesPage.contains(biomeName + "-has-access-item")) {
-                ItemStack biomeItem = biomesPage.get(biomeName + "-has-access-item", ItemStack.class);
-                String permission = biomesPage.get(biomeName + "-permission", String.class);
-                int slot = biomesPage.get(biomeName + "-slot", Integer.class);
-
-                if(!superiorPlayer.hasPermission(permission))
-                    biomeItem = biomesPage.get(biomeName + "-no-access-item", ItemStack.class);
-
-                inventory.setItem(slot, biomeItem);
-            }
-        }
-
-        biomesPage.openInventory(superiorPlayer, inventory);
     }
 
     public Island getIsland(SuperiorPlayer superiorPlayer){
@@ -416,22 +371,6 @@ public final class PanelHandler {
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
             islandCreationPage.put(schematic + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
-        }
-    }
-
-    private void initBiomesPage(YamlConfiguration cfg){
-        biomesPage = FileUtil.getGUI(GUIInventory.BIOMES_PAGE_IDENTIFIER, cfg.getConfigurationSection("biomes-gui"), 1, "&lSelect a biome");
-
-        ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes");
-
-        for(String biome : section.getKeys(false)){
-            biome = biome.toLowerCase();
-            biomesPage.put(biome + "-permission", section.getString(biome + ".required-permission"));
-            biomesPage.put(biome + "-slot", section.getInt(biome + ".slot"));
-            biomesPage.put(biome + "-has-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(biome + ".has-access-item")));
-            biomesPage.put(biome + "-no-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(biome + ".no-access-item")));
         }
     }
 

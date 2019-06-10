@@ -113,10 +113,6 @@ public final class PanelListener implements Listener {
                 islandCreationPage(e, guiInventory, superiorPlayer);
                 break;
             }
-            case BIOMES_PAGE_IDENTIFIER: {
-                biomesPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case CONFIRM_PAGE_IDENTIFIER: {
                 confirmPage(e, guiInventory, superiorPlayer);
                 break;
@@ -298,22 +294,6 @@ public final class PanelListener implements Listener {
                     superiorPlayer.asPlayer().closeInventory();
                     Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
                     plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void biomesPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        for(Biome biome : Biome.values()){
-            String biomeName = biome.name().toLowerCase();
-            if(guiInventory.contains(biomeName + "-slot")) {
-                int slot = guiInventory.get(biomeName + "-slot", Integer.class);
-                String permission = guiInventory.get(biomeName + "-permission", String.class);
-
-                if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                    superiorPlayer.getIsland().setBiome(biome);
-                    Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
                     break;
                 }
             }
