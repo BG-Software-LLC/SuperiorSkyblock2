@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
@@ -10,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,7 +22,8 @@ import java.util.List;
 
 public final class IslandValuesMenu extends SuperiorMenu {
 
-    private static Inventory valuesPage;
+    private static Inventory inventory = null;
+
     private static String blockName;
     private static List<String> blockLore;
     private static KeyMap<Integer> countedBlocks;
@@ -41,55 +40,50 @@ public final class IslandValuesMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        Inventory inventory = Bukkit.createInventory(this, valuesPage.getSize(),
-                valuesPage.getTitle().replace("{0}", island.getOwner().getName())
-                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
-        inventory.setContents(valuesPage.getContents());
+    public Inventory getInventory() {
+        Inventory inv = Bukkit.createInventory(
+                this,
+                inventory.getSize(),
+                inventory.getTitle().replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString())
+        );
 
-        new SuperiorThread(() -> {
-            for(Key key : countedBlocks.keySet()){
-                String[] sections = key.toString().split(":");
-                ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
-                int slot = countedBlocks.get(key);
+        inv.setContents(inventory.getContents());
 
-                String typeName = StringUtil.format(sections[0]);
-                int amount = island.getBlockCount(SKey.of(itemStack));
+        for(Key key : countedBlocks.keySet()){
+            String[] sections = key.toString().split(":");
+            ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
+            int slot = countedBlocks.get(key);
 
-                if(sections.length == 2) {
-                    if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
-                        EntityType entityType = EntityType.valueOf(sections[1]);
-                        amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
-                        itemStack = HeadUtil.getEntityHead(entityType);
-                        typeName = StringUtil.format(sections[1]) + " Spawner";
-                    }
-                    else {
-                        itemStack.setDurability(Short.valueOf(sections[1]));
-                        amount = island.getBlockCount(SKey.of(itemStack));
-                    }
+            String typeName = StringUtil.format(sections[0]);
+            int amount = island.getBlockCount(SKey.of(itemStack));
+
+            if(sections.length == 2) {
+                if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
+                    EntityType entityType = EntityType.valueOf(sections[1]);
+                    amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
+                    itemStack = HeadUtil.getEntityHead(entityType);
+                    typeName = StringUtil.format(sections[1]) + " Spawner";
                 }
-
-                itemStack = new ItemBuilder(itemStack).withName(blockName).withLore(blockLore)
-                        .replaceAll("{0}", typeName).replaceAll("{1}", String.valueOf(amount)).build();
-
-                if(amount == 0)
-                    amount = 1;
-                else if(amount > 64)
-                    amount = 64;
-
-                itemStack.setAmount(amount);
-
-                inventory.setItem(slot, itemStack);
+                else {
+                    itemStack.setDurability(Short.valueOf(sections[1]));
+                    amount = island.getBlockCount(SKey.of(itemStack));
+                }
             }
 
-            if(openSound != null)
-                superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
+            itemStack = new ItemBuilder(itemStack).withName(blockName).withLore(blockLore)
+                    .replaceAll("{0}", typeName).replaceAll("{1}", String.valueOf(amount)).build();
 
-            superiorPlayer.asPlayer().openInventory(inventory);
+            if(amount == 0)
+                amount = 1;
+            else if(amount > 64)
+                amount = 64;
 
-            if(previousMenu != null)
-                previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
-        }).start();
+            itemStack.setAmount(amount);
+
+            inv.setItem(slot, itemStack);
+        }
+
+        return inv;
     }
 
     public static IslandValuesMenu createInventory(Island island){
@@ -105,7 +99,7 @@ public final class IslandValuesMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        valuesPage = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
+        inventory = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
 
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
         List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");

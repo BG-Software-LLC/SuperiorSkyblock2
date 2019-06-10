@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +20,6 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private String identifier;
     protected Sound openSound = null, closeSound = null;
-    protected Inventory inventory;
 
     public SuperiorMenu(String identifier){
         this.identifier = identifier;
@@ -46,18 +46,21 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     @Override
-    public Inventory getInventory() {
-        return inventory;
-    }
+    public abstract Inventory getInventory();
+
+    public abstract void onClick(InventoryClickEvent e);
 
     public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         if(openSound != null)
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
-        superiorPlayer.asPlayer().openInventory(inventory);
-
         if(previousMenu != null)
             previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
+
+        new SuperiorThread(() -> {
+            Inventory inventory = getInventory();
+            Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inventory));
+        }).start();
     }
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
@@ -70,8 +73,6 @@ public abstract class SuperiorMenu implements InventoryHolder {
         if(previousMenu != null)
             Bukkit.getScheduler().runTask(plugin, () -> previousMenu.openInventory(superiorPlayer, null));
     }
-
-    public abstract void onClick(InventoryClickEvent e);
 
     protected static Sound getSound(String name){
         try{

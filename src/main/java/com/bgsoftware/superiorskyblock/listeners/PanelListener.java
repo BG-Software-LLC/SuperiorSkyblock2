@@ -6,9 +6,7 @@ import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VISITORS_PAGE_IDE
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.PLAYER_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ISLAND_CREATION_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.BIOMES_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.WARPS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VALUES_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ISLAND_TOP_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.CONFIRM_PAGE_IDENTIFIER;
 
@@ -19,27 +17,22 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
-import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;

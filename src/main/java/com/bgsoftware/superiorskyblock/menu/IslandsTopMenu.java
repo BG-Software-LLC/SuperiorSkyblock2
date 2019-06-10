@@ -5,11 +5,13 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -21,9 +23,10 @@ import java.util.UUID;
 public final class IslandsTopMenu extends SuperiorMenu {
 
     private static IslandsTopMenu instance = null;
+    private static Inventory inventory = null;
 
-    private Integer[] slots;
-    private ItemStack noIslandItem, islandItem;
+    private static Integer[] slots;
+    private static ItemStack noIslandItem, islandItem;
 
     private IslandsTopMenu(){
         super("islandTop");
@@ -52,9 +55,14 @@ public final class IslandsTopMenu extends SuperiorMenu {
         }
     }
 
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
+
     private void reloadGUI(){
         if(Bukkit.isPrimaryThread()){
-            new Thread(this::reloadGUI).start();
+            new SuperiorThread(this::reloadGUI).start();
             return;
         }
 
@@ -118,11 +126,6 @@ public final class IslandsTopMenu extends SuperiorMenu {
         return itemBuilder.build();
     }
 
-    public static IslandsTopMenu createInventory(){
-        instance.reloadGUI();
-        return instance;
-    }
-
     public static void init(){
         IslandsTopMenu islandsTopMenu = new IslandsTopMenu();
 
@@ -133,9 +136,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-
-        islandsTopMenu.inventory = FileUtil.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
-
+        inventory = FileUtil.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
 
         ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
         ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
@@ -144,11 +145,16 @@ public final class IslandsTopMenu extends SuperiorMenu {
         Arrays.stream(cfg.getString("top-islands.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
 
-        islandsTopMenu.islandItem = islandItem;
-        islandsTopMenu.noIslandItem = noIslandItem;
-        islandsTopMenu.slots = slots.toArray(new Integer[0]);
+        IslandsTopMenu.islandItem = islandItem;
+        IslandsTopMenu.noIslandItem = noIslandItem;
+        IslandsTopMenu.slots = slots.toArray(new Integer[0]);
 
         islandsTopMenu.reloadGUI();
+    }
+
+    public static IslandsTopMenu createInventory(){
+        instance.reloadGUI();
+        return instance;
     }
 
 }

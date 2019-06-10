@@ -24,9 +24,7 @@ public final class GUIInventory {
     public static final String ROLE_PAGE_IDENTIFIER = "rolePage";
     public static final String ISLAND_CREATION_PAGE_IDENTIFIER = "islandCreationPage";
     public static final String BIOMES_PAGE_IDENTIFIER = "biomesPage";
-    public static final String WARPS_PAGE_IDENTIFIER = "warpsPage";
     public static final String VALUES_PAGE_IDENTIFIER = "valuesPage";
-    public static final String ISLAND_TOP_PAGE_IDENTIFIER = "islandTop";
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
     public static final String CONFIRM_PAGE_IDENTIFIER = "confirmPage";
 

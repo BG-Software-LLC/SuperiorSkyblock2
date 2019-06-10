@@ -23,7 +23,8 @@ import java.util.List;
 
 public final class IslandWarpsMenu extends SuperiorMenu {
 
-    private static Inventory warpsPage;
+    private static Inventory inventory = null;
+
     private static ItemStack previousButton, currentButton, nextButton, warpItem;
     private static Sound previousSound, currentSound, nextSound, warpSound;
     private static int previousSlot, currentSlot, nextSlot;
@@ -79,16 +80,24 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         openInventory(superiorPlayer, 1, previousMenu);
     }
 
+    @Override
+    public Inventory getInventory() {
+        return inventory;
+    }
+
     private void openInventory(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
         if (Bukkit.isPrimaryThread()) {
-            new SuperiorThread(() -> openInventory(superiorPlayer, previousMenu)).start();
+            new SuperiorThread(() -> openInventory(superiorPlayer, page, previousMenu)).start();
             return;
         }
 
-        Inventory inventory = Bukkit.createInventory(this, warpsPage.getSize(),
-                warpsPage.getTitle().replace("{0}", island.getOwner().getName())
-                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
-        inventory.setContents(warpsPage.getContents());
+        Inventory inv = Bukkit.createInventory(
+                this,
+                inventory.getSize(),
+                inventory.getTitle().replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString())
+        );
+
+        inv.setContents(inventory.getContents());
 
         List<String> warps = new ArrayList<>(island.getAllWarps());
 
@@ -96,31 +105,27 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < warps.size(); i++){
             String warpName = warps.get(i + (slots.size() * (page - 1)));
-            inventory.setItem(slots.get(i), new ItemBuilder(warpItem)
+            inv.setItem(slots.get(i), new ItemBuilder(warpItem)
                     .replaceAll("{0}", warpName)
                     .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString()).build());
         }
 
-        inventory.setItem(previousSlot, new ItemBuilder(previousButton)
+        inv.setItem(previousSlot, new ItemBuilder(previousButton)
                 .replaceName("{0}", (page == 1 ? "&c" : "&a")).build());
 
-        inventory.setItem(currentSlot, new ItemBuilder(currentButton)
+        inv.setItem(currentSlot, new ItemBuilder(currentButton)
                 .replaceLore("{0}", page + "").build());
 
-        inventory.setItem(nextSlot, new ItemBuilder(nextButton)
+        inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (warps.size() > page * slots.size() ? "&a" : "&c")).build());
 
         if(openSound != null)
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
-        superiorPlayer.asPlayer().openInventory(inventory);
-
         if(previousMenu != null)
             previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
-    }
-
-    public static IslandWarpsMenu createInventory(Island island){
-        return new IslandWarpsMenu(island);
+        
+        Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
     }
 
     public static void init(){
@@ -132,7 +137,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        warpsPage = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
+        inventory = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
 
         ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.previous-page"));
         ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.current-page"));
@@ -163,6 +168,10 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         IslandWarpsMenu.nextSlot = nextSlot;
         IslandWarpsMenu.warpSound = warpSound;
         IslandWarpsMenu.slots = slots;
+    }
+
+    public static IslandWarpsMenu createInventory(Island island){
+        return new IslandWarpsMenu(island);
     }
 
 }
