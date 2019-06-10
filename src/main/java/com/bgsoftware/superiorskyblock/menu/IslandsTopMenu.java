@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.menu;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
@@ -21,16 +20,39 @@ import java.util.UUID;
 
 public final class IslandsTopMenu extends SuperiorMenu {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private static IslandsTopMenu instance = null;
 
     private Integer[] slots;
     private ItemStack noIslandItem, islandItem;
 
-    private IslandsTopMenu(String identifier){
-        super(identifier);
+    private IslandsTopMenu(){
+        super("islandTop");
         instance = this;
+    }
+
+    @Override
+    public void onClick(InventoryClickEvent e) {
+        e.setCancelled(true);
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+
+        for(int i = 0; i < slots.length; i++){
+            if(slots[i] == e.getRawSlot()){
+                Island island = plugin.getGrid().getIsland(i);
+
+                if(island != null) {
+                    superiorPlayer.asPlayer().closeInventory();
+                    if(e.getAction() == InventoryAction.PICKUP_HALF){
+                        Bukkit.getScheduler().runTaskLater(plugin, () ->
+                                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
+                    } else {
+                        IslandValuesMenu.createInventory(island).openInventory(superiorPlayer, this);
+                    }
+                    break;
+                }
+
+            }
+        }
     }
 
     private void reloadGUI(){
@@ -99,64 +121,37 @@ public final class IslandsTopMenu extends SuperiorMenu {
         return itemBuilder.build();
     }
 
-    @Override
-    public void onClick(InventoryClickEvent e) {
-        e.setCancelled(true);
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
-
-        for(int i = 0; i < slots.length; i++){
-            if(slots[i] == e.getRawSlot()){
-                Island island = plugin.getGrid().getIsland(i);
-
-                if(island != null) {
-                    superiorPlayer.asPlayer().closeInventory();
-                    if(e.getAction() == InventoryAction.PICKUP_HALF){
-                        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island warp " + island.getOwner().getName()), 1L);
-                    } else {
-                        Bukkit.getScheduler().runTaskLater(plugin, () ->
-                                plugin.getPanel().openValuesPanel(superiorPlayer, island), 1L);
-                    }
-                    break;
-                }
-
-            }
-        }
+    public static IslandsTopMenu createInventory(){
+        instance.reloadGUI();
+        return instance;
     }
 
-    public static IslandsTopMenu createInventory(){
-        if(instance == null){
-            IslandsTopMenu islandsTopMenu = new IslandsTopMenu("islandTop");
+    public static void init(){
+        IslandsTopMenu islandsTopMenu = new IslandsTopMenu();
 
-            File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
+        File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
-            if(!file.exists())
-                FileUtil.saveResource("guis/top-islands.yml");
+        if(!file.exists())
+            FileUtil.saveResource("guis/top-islands.yml");
 
-            YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-
-            islandsTopMenu.inventory = FileUtil.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
 
-            ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
-            ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
+        islandsTopMenu.inventory = FileUtil.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
 
-            List<Integer> slots = new ArrayList<>();
-            Arrays.stream(cfg.getString("top-islands.slots").split(","))
-                    .forEach(slot -> slots.add(Integer.valueOf(slot)));
 
-            islandsTopMenu.islandItem = islandItem;
-            islandsTopMenu.noIslandItem = noIslandItem;
-            islandsTopMenu.slots = slots.toArray(new Integer[0]);
+        ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
+        ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
 
-            islandsTopMenu.reloadGUI();
-        }
+        List<Integer> slots = new ArrayList<>();
+        Arrays.stream(cfg.getString("top-islands.slots").split(","))
+                .forEach(slot -> slots.add(Integer.valueOf(slot)));
 
-        instance.reloadGUI();
+        islandsTopMenu.islandItem = islandItem;
+        islandsTopMenu.noIslandItem = noIslandItem;
+        islandsTopMenu.slots = slots.toArray(new Integer[0]);
 
-        return instance;
+        islandsTopMenu.reloadGUI();
     }
 
 }

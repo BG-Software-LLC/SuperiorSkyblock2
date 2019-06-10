@@ -128,9 +128,6 @@ public final class PanelListener implements Listener {
                 warpsPage(e, guiInventory, superiorPlayer);
                 break;
             }
-            case VALUES_PAGE_IDENTIFIER: {
-                break;
-            }
             case CONFIRM_PAGE_IDENTIFIER: {
                 confirmPage(e, guiInventory, superiorPlayer);
                 break;

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
@@ -74,7 +75,11 @@ public final class GridHandler implements GridManager {
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         spawnIsland = new SpawnIsland();
-        IslandsTopMenu.createInventory(); //Init
+
+        Bukkit.getScheduler().runTask(SuperiorSkyblockPlugin.getPlugin(), () -> {
+            IslandsTopMenu.init(); //Init
+            IslandValuesMenu.init(); //Init
+        });
     }
 
     public void createIsland(ResultSet resultSet) throws SQLException {
@@ -313,7 +318,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        IslandsTopMenu.createInventory().openInventory(superiorPlayer, false);
+        IslandsTopMenu.createInventory().openInventory(superiorPlayer, null);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -12,10 +14,11 @@ import java.util.UUID;
 
 public abstract class SuperiorMenu implements InventoryHolder {
 
-    private static Map<UUID, SuperiorMenu> previousMenus = new HashMap<>();
+    protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    protected static Map<UUID, SuperiorMenu> previousMenus = new HashMap<>();
 
     private String identifier;
-    private Sound openSound = null, closeSound = null;
+    protected Sound openSound = null, closeSound = null;
     protected Inventory inventory;
 
     public SuperiorMenu(String identifier){
@@ -47,25 +50,25 @@ public abstract class SuperiorMenu implements InventoryHolder {
         return inventory;
     }
 
-    public void openInventory(SuperiorPlayer superiorPlayer, boolean savePrevious){
+    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         if(openSound != null)
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
         superiorPlayer.asPlayer().openInventory(inventory);
-        if(savePrevious)
-            previousMenus.put(superiorPlayer.getUniqueId(), this);
+
+        if(previousMenu != null)
+            previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
     }
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
         SuperiorMenu previousMenu = previousMenus.get(superiorPlayer.getUniqueId());
+        previousMenus.remove(superiorPlayer.getUniqueId());
 
         if(closeSound != null && (previousMenu == null || previousMenu.openSound == null))
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), closeSound, 1, 1);
 
         if(previousMenu != null)
-            previousMenu.openInventory(superiorPlayer, false);
-        else
-            superiorPlayer.asPlayer().closeInventory();
+            Bukkit.getScheduler().runTask(plugin, () -> previousMenu.openInventory(superiorPlayer, null));
     }
 
     public abstract void onClick(InventoryClickEvent e);

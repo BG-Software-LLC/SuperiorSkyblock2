@@ -42,7 +42,7 @@ public final class PanelHandler {
 
     private SuperiorSkyblockPlugin plugin;
     public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage,
-            islandCreationPage, biomesPage, warpsPage, valuesPage;
+            islandCreationPage, biomesPage, warpsPage;
 
     public Map<UUID, UUID> islands = new HashMap<>();
 
@@ -92,14 +92,14 @@ public final class PanelHandler {
 
         initWarpsPage(cfg);
 
-        file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/values-gui.yml");
-
-        cfg = YamlConfiguration.loadConfiguration(file);
-
-        initValuesPage(cfg);
+//        file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
+//
+//        if(!file.exists())
+//            FileUtil.saveResource("guis/values-gui.yml");
+//
+//        cfg = YamlConfiguration.loadConfiguration(file);
+//
+//        initValuesPage(cfg);
     }
 
     private Sound getSound(String name){
@@ -318,58 +318,58 @@ public final class PanelHandler {
         islands.put(superiorPlayer.getUniqueId(), island.getOwner().getUniqueId());
     }
 
-    public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
-        Inventory valuesPageInventory = valuesPage.clonedInventory();
-        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.VALUES_PAGE_IDENTIFIER), valuesPageInventory.getSize(),
-                valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
-                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
-        inventory.setContents(valuesPageInventory.getContents());
-
-        new SuperiorThread(() -> {
-            //noinspection unchecked
-            KeyMap<Integer> countedBlocks = (KeyMap<Integer>) valuesPage.get("countedBlocks", KeyMap.class);
-
-            for(Key key : countedBlocks.keySet()){
-                String[] sections = key.toString().split(":");
-                ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
-                int slot = countedBlocks.get(key);
-
-                String typeName = StringUtil.format(sections[0]);
-                int amount = island.getBlockCount(SKey.of(itemStack));
-
-                if(sections.length == 2) {
-                    if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
-                        EntityType entityType = EntityType.valueOf(sections[1]);
-                        amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
-                        itemStack = HeadUtil.getEntityHead(entityType);
-                        typeName = StringUtil.format(sections[1]) + " Spawner";
-                    }
-                    else {
-                        itemStack.setDurability(Short.valueOf(sections[1]));
-                        amount = island.getBlockCount(SKey.of(itemStack));
-                    }
-                }
-
-                String blockName = valuesPage.get("blockName", String.class);
-                //noinspection unchecked
-                List<String> blockLore = (List<String>) valuesPage.get("blockLore", List.class);
-
-                itemStack = new ItemBuilder(itemStack).withName(blockName).withLore(blockLore)
-                        .replaceAll("{0}", typeName).replaceAll("{1}", String.valueOf(amount)).build();
-
-                if(amount == 0)
-                    amount = 1;
-                else if(amount > 64)
-                    amount = 64;
-
-                itemStack.setAmount(amount);
-
-                inventory.setItem(slot, itemStack);
-            }
-
-            valuesPage.openInventory(superiorPlayer, inventory);
-        }).start();
-    }
+//    public void openValuesPanel(SuperiorPlayer superiorPlayer, Island island){
+//        Inventory valuesPageInventory = valuesPage.clonedInventory();
+//        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.VALUES_PAGE_IDENTIFIER), valuesPageInventory.getSize(),
+//                valuesPageInventory.getTitle().replace("{0}", island.getOwner().getName())
+//                        .replace("{1}", island.getWorthAsBigDecimal().toString()));
+//        inventory.setContents(valuesPageInventory.getContents());
+//
+//        new SuperiorThread(() -> {
+//            //noinspection unchecked
+//            KeyMap<Integer> countedBlocks = (KeyMap<Integer>) valuesPage.get("countedBlocks", KeyMap.class);
+//
+//            for(Key key : countedBlocks.keySet()){
+//                String[] sections = key.toString().split(":");
+//                ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
+//                int slot = countedBlocks.get(key);
+//
+//                String typeName = StringUtil.format(sections[0]);
+//                int amount = island.getBlockCount(SKey.of(itemStack));
+//
+//                if(sections.length == 2) {
+//                    if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
+//                        EntityType entityType = EntityType.valueOf(sections[1]);
+//                        amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
+//                        itemStack = HeadUtil.getEntityHead(entityType);
+//                        typeName = StringUtil.format(sections[1]) + " Spawner";
+//                    }
+//                    else {
+//                        itemStack.setDurability(Short.valueOf(sections[1]));
+//                        amount = island.getBlockCount(SKey.of(itemStack));
+//                    }
+//                }
+//
+//                String blockName = valuesPage.get("blockName", String.class);
+//                //noinspection unchecked
+//                List<String> blockLore = (List<String>) valuesPage.get("blockLore", List.class);
+//
+//                itemStack = new ItemBuilder(itemStack).withName(blockName).withLore(blockLore)
+//                        .replaceAll("{0}", typeName).replaceAll("{1}", String.valueOf(amount)).build();
+//
+//                if(amount == 0)
+//                    amount = 1;
+//                else if(amount > 64)
+//                    amount = 64;
+//
+//                itemStack.setAmount(amount);
+//
+//                inventory.setItem(slot, itemStack);
+//            }
+//
+//            valuesPage.openInventory(superiorPlayer, inventory);
+//        }).start();
+//    }
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
         GUIInventory.from(superiorPlayer).closeInventory(superiorPlayer);
@@ -592,28 +592,28 @@ public final class PanelHandler {
         warpsPage.put("slots", slots);
     }
 
-    private void initValuesPage(YamlConfiguration cfg){
-        valuesPage = FileUtil.getGUI(GUIInventory.VALUES_PAGE_IDENTIFIER, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
-
-        Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
-        String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
-        List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");
-
-        KeyMap<Integer> countedBlocks = new KeyMap<>();
-
-        for(String materialName : cfg.getStringList("values-gui.materials")){
-            String[] sections = materialName.split(":");
-            if(sections.length == 2){
-                countedBlocks.put(sections[0], Integer.valueOf(sections[1]));
-            }else{
-                countedBlocks.put(sections[0] + ":" + sections[1], Integer.valueOf(sections[2]));
-            }
-        }
-
-        valuesPage.put("blockSound", blockSound);
-        valuesPage.put("blockName", blockName);
-        valuesPage.put("blockLore", blockLore);
-        valuesPage.put("countedBlocks", countedBlocks);
-    }
+//    private void initValuesPage(YamlConfiguration cfg){
+//        valuesPage = FileUtil.getGUI(GUIInventory.VALUES_PAGE_IDENTIFIER, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
+//
+//        Sound blockSound = getSound(cfg.getString("values-gui.block-item.sound", ""));
+//        String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
+//        List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");
+//
+//        KeyMap<Integer> countedBlocks = new KeyMap<>();
+//
+//        for(String materialName : cfg.getStringList("values-gui.materials")){
+//            String[] sections = materialName.split(":");
+//            if(sections.length == 2){
+//                countedBlocks.put(sections[0], Integer.valueOf(sections[1]));
+//            }else{
+//                countedBlocks.put(sections[0] + ":" + sections[1], Integer.valueOf(sections[2]));
+//            }
+//        }
+//
+//        valuesPage.put("blockSound", blockSound);
+//        valuesPage.put("blockName", blockName);
+//        valuesPage.put("blockLore", blockLore);
+//        valuesPage.put("countedBlocks", countedBlocks);
+//    }
 
 }
