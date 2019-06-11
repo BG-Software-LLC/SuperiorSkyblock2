@@ -47,7 +47,6 @@ public final class PanelHandler {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        initPlayerPage(cfg);
         initRolePage(cfg);
     }
 
@@ -59,45 +58,10 @@ public final class PanelHandler {
         }
     }
 
-    public void openPlayerPanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
-        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.PLAYER_PAGE_IDENTIFIER), playerPage.getSize(), ChatColor.BOLD + targetPlayer.getName());
-        inventory.setContents(playerPage.getContents());
-        playerPage.openInventory(superiorPlayer, inventory);
-    }
-
     public void openRolePanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.ROLE_PAGE_IDENTIFIER), rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(rolePage.getContents());
         rolePage.openInventory(superiorPlayer, inventory);
-    }
-
-    public Island getIsland(SuperiorPlayer superiorPlayer){
-        return plugin.getGrid().getIsland(SSuperiorPlayer.of(islands.get(superiorPlayer.getUniqueId())));
-    }
-
-    private void initPlayerPage(YamlConfiguration cfg){
-        playerPage = FileUtil.getGUI(GUIInventory.PLAYER_PAGE_IDENTIFIER, cfg.getConfigurationSection("players-panel"), 6, "");
-
-        ItemStack rolesButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.roles"));
-        ItemStack banButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.ban"));
-        ItemStack kickButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.kick"));
-        int rolesSlot = cfg.getInt("players-panel.roles.slot");
-        int banSlot = cfg.getInt("players-panel.ban.slot");
-        int kickSlot = cfg.getInt("players-panel.kick.slot");
-        Sound rolesSound = getSound(cfg.getString("players-panel.roles.sound", ""));
-        Sound banSound = getSound(cfg.getString("players-panel.ban.sound", ""));
-        Sound kickSound = getSound(cfg.getString("players-panel.kick.sound", ""));
-
-        playerPage.setItem(rolesSlot, rolesButton);
-        playerPage.setItem(banSlot, banButton);
-        playerPage.setItem(kickSlot, kickButton);
-
-        playerPage.put("rolesSound", rolesSound);
-        playerPage.put("banSound", banSound);
-        playerPage.put("kickSound", kickSound);
-        playerPage.put("rolesSlot", rolesSlot);
-        playerPage.put("banSlot", banSlot);
-        playerPage.put("kickSlot", kickSlot);
     }
 
     private void initRolePage(YamlConfiguration cfg){

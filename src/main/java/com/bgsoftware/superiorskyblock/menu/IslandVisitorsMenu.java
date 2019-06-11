@@ -60,7 +60,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
             if(nextPage == -1)
                 return;
 
-            openInventory(superiorPlayer, nextPage, previousMenus.get(superiorPlayer.getUniqueId()));
+            openInventory(superiorPlayer, nextPage, previousMenu);
         }
 
         else{
@@ -69,7 +69,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
 
             int indexOf = slots.indexOf(e.getRawSlot());
 
-            if(indexOf < 0)
+            if(indexOf < 0 || indexOf >= visitors.size())
                 return;
 
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(visitors.get(indexOf));
@@ -125,15 +125,12 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            superiorPlayer.asPlayer().openInventory(inv);
+        if(openSound != null)
+            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
-            if(openSound != null)
-                superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
+        this.previousMenu = previousMenu;
 
-            if(previousMenu != null)
-                previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
-        });
+        Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
     }
 
     public static void init(){

@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.menu.MemberManageMenu;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
@@ -94,6 +95,7 @@ public final class GridHandler implements GridManager {
             IslandPanelMenu.init();
             IslandMembersMenu.init();
             IslandVisitorsMenu.init();
+            MemberManageMenu.init();
         });
     }
 

@@ -60,7 +60,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
             if(nextPage == -1)
                 return;
 
-            openInventory(superiorPlayer, nextPage, previousMenus.get(superiorPlayer.getUniqueId()));
+            openInventory(superiorPlayer, nextPage, previousMenu);
         }
 
         else{
@@ -69,13 +69,14 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
             int indexOf = slots.indexOf(e.getRawSlot());
 
-            if(indexOf < 0)
+            if(indexOf < 0 || indexOf >= members.size())
                 return;
 
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(members.get(indexOf));
 
             if (targetPlayer != null) {
-                plugin.getPanel().openPlayerPanel(superiorPlayer, targetPlayer);
+                previousMove = false;
+                MemberManageMenu.createInventory(targetPlayer).openInventory(superiorPlayer, this);
             }
         }
     }
@@ -117,14 +118,14 @@ public final class IslandMembersMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
+
         Bukkit.getScheduler().runTask(plugin, () -> {
             superiorPlayer.asPlayer().openInventory(inv);
 
             if(openSound != null)
                 superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
-            if(previousMenu != null)
-                previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
+            this.previousMenu = previousMenu;
         });
     }
 

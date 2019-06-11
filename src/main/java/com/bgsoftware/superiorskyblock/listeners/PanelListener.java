@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.PLAYER_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -20,9 +19,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -75,32 +72,12 @@ public final class PanelListener implements Listener {
         e.setCancelled(true);
 
         switch (guiInventory.getIdentifier()){
-            case PLAYER_PAGE_IDENTIFIER: {
-                playerPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case ROLE_PAGE_IDENTIFIER: {
                 rolesPage(e, guiInventory, superiorPlayer);
                 break;
             }
         }
 
-    }
-
-    private void playerPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
-
-        if(e.getRawSlot() == guiInventory.get("rolesSlot", Integer.class)){
-            plugin.getPanel().openRolePanel(superiorPlayer, targetPlayer);
-        }
-
-        else if(e.getRawSlot() == guiInventory.get("banSlot", Integer.class)){
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island ban " + targetPlayer.getName());
-        }
-
-        else if(e.getRawSlot() == guiInventory.get("kickSlot", Integer.class)){
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island kick " + targetPlayer.getName());
-        }
     }
 
     private void rolesPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){

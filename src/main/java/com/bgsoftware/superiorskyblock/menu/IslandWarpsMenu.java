@@ -82,7 +82,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        return inventory;
+        return null;
     }
 
     private void openInventory(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
@@ -117,8 +117,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         if(openSound != null)
             superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
 
-        if(previousMenu != null)
-            previousMenus.put(superiorPlayer.getUniqueId(), previousMenu);
+        this.previousMenu = previousMenu;
 
         Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
     }
