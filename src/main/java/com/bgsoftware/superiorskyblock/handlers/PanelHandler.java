@@ -31,7 +31,7 @@ import java.util.UUID;
 public final class PanelHandler {
 
     private SuperiorSkyblockPlugin plugin;
-    public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage, islandCreationPage;
+    public GUIInventory mainPage, membersPage, visitorsPage, playerPage, rolePage;
 
     public Map<UUID, UUID> islands = new HashMap<>();
 

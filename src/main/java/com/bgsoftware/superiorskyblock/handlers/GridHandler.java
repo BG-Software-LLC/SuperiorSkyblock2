@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
@@ -86,6 +87,7 @@ public final class GridHandler implements GridManager {
             IslandWarpsMenu.init();
             IslandBiomesMenu.init();
             IslandCreationMenu.init();
+            ConfirmDisbandMenu.init();
         });
     }
 

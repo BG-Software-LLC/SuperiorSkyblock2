@@ -3,34 +3,18 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.gui.GUIInventory;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class CmdDisband implements ICommand {
-
-    private GUIInventory confirmPage;
-
-    public CmdDisband(){
-        Inventory confirmPage = Bukkit.createInventory(null, InventoryType.HOPPER, ChatColor.BOLD + "      Confirm Disband");
-        confirmPage.setItem(1, new ItemBuilder(Materials.getGlass(DyeColor.LIME)).withName("&aConfirm").withLore("&8Are you sure?").build());
-        confirmPage.setItem(3, new ItemBuilder(Materials.getGlass(DyeColor.RED)).withName("&4Cancel").build());
-        this.confirmPage = GUIInventory.from(GUIInventory.CONFIRM_PAGE_IDENTIFIER, confirmPage);
-    }
 
     @Override
     public List<String> getAliases() {
@@ -82,7 +66,7 @@ public final class CmdDisband implements ICommand {
             return;
         }
 
-        confirmPage.openInventory(superiorPlayer, false);
+        ConfirmDisbandMenu.createInventory().openInventory(superiorPlayer, null);
     }
 
     @Override

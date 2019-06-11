@@ -4,16 +4,10 @@ import static com.bgsoftware.superiorskyblock.gui.GUIInventory.MAIN_PAGE_IDENTIF
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.MEMBERS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VISITORS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.PLAYER_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ISLAND_CREATION_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.BIOMES_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VALUES_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.CONFIRM_PAGE_IDENTIFIER;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.gui.GUIInventory;
@@ -21,7 +15,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -107,10 +99,6 @@ public final class PanelListener implements Listener {
             }
             case ROLE_PAGE_IDENTIFIER: {
                 rolesPage(e, guiInventory, superiorPlayer);
-                break;
-            }
-            case CONFIRM_PAGE_IDENTIFIER: {
-                confirmPage(e, guiInventory, superiorPlayer);
                 break;
             }
         }
@@ -276,36 +264,6 @@ public final class PanelListener implements Listener {
         else if(e.getRawSlot() == guiInventory.get("leaderSlot", Integer.class)){
             Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island transfer " + targetPlayer.getName());
         }
-    }
-
-    private void confirmPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        ItemStack clickedItem = e.getCurrentItem();
-        Island island = superiorPlayer.getIsland();
-
-        if(clickedItem == null)
-            return;
-
-        if(clickedItem.getItemMeta().getDisplayName().contains("Confirm")){
-            IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
-            Bukkit.getPluginManager().callEvent(islandDisbandEvent);
-
-            if(!islandDisbandEvent.isCancelled()) {
-                for(UUID uuid : island.getMembers()){
-                    if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                        Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
-                    }
-                }
-
-                Locale.DISBANDED_ISLAND.send(superiorPlayer);
-
-                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
-                island.disbandIsland();
-
-                return;
-            }
-        }
-
-        superiorPlayer.asPlayer().closeInventory();
     }
 
 }
