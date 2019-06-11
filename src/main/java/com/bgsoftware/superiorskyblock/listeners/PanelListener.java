@@ -77,10 +77,6 @@ public final class PanelListener implements Listener {
         e.setCancelled(true);
 
         switch (guiInventory.getIdentifier()){
-            case MEMBERS_PAGE_IDENTIFIER: {
-                membersPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case VISITORS_PAGE_IDENTIFIER: {
                 visitorsPage(e, guiInventory, superiorPlayer);
                 break;
@@ -95,39 +91,6 @@ public final class PanelListener implements Listener {
             }
         }
 
-    }
-
-    private void membersPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        if(e.getRawSlot() == guiInventory.get("previousSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("nextSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("currentSlot", Integer.class)){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
-            int currentSlot = guiInventory.get("currentSlot", Integer.class);
-
-            if(e.getRawSlot() == currentSlot)
-                return;
-
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
-            int nextPage = guiInventory.get("nextSlot", Integer.class);
-
-            plugin.getPanel().openMembersPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
-        }
-
-        else{
-            if(e.getCurrentItem() == null)
-                return;
-
-            if(e.getCurrentItem().hasItemMeta()) {
-                SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
-
-                if (targetPlayer != null) {
-                    plugin.getPanel().openPlayerPanel(superiorPlayer, targetPlayer);
-                }
-            }
-        }
     }
 
     private void visitorsPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){

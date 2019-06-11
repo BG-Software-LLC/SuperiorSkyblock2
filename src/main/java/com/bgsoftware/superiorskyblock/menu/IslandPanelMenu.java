@@ -27,8 +27,9 @@ public final class IslandPanelMenu extends SuperiorMenu {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(membersButton.equals(e.getCurrentItem())){
-            //TODO: Members panel
-            plugin.getPanel().openMembersPanel(superiorPlayer, 1);
+            SuperiorMenu previousMenu = previousMenus.get(superiorPlayer.getUniqueId());
+            previousMenus.remove(superiorPlayer.getUniqueId());
+            IslandMembersMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, previousMenu);
         }
         else if (visitorsButton.equals(e.getCurrentItem())) {
             //TODO: Visitors panel

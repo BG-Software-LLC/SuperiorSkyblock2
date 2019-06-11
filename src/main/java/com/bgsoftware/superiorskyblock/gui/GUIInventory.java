@@ -21,7 +21,6 @@ public final class GUIInventory {
     public static final String VISITORS_PAGE_IDENTIFIER = "visitorsPage";
     public static final String PLAYER_PAGE_IDENTIFIER = "playerPage";
     public static final String ROLE_PAGE_IDENTIFIER = "rolePage";
-    public static final String VALUES_PAGE_IDENTIFIER = "valuesPage";
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
 
     private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
