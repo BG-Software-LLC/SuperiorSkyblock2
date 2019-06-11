@@ -30,7 +30,7 @@ import java.util.UUID;
 public final class PanelHandler {
 
     private SuperiorSkyblockPlugin plugin;
-    public GUIInventory visitorsPage, playerPage, rolePage;
+    public GUIInventory playerPage, rolePage;
 
     public Map<UUID, UUID> islands = new HashMap<>();
 
@@ -47,7 +47,6 @@ public final class PanelHandler {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        initVisitorsPage(cfg);
         initPlayerPage(cfg);
         initRolePage(cfg);
     }
@@ -58,54 +57,6 @@ public final class PanelHandler {
         }catch(Exception ex){
             return null;
         }
-    }
-
-    public void openVisitorsPanel(SuperiorPlayer superiorPlayer, int page){
-        if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openVisitorsPanel(superiorPlayer, page)).start();
-            return;
-        }
-
-        Inventory inventory = visitorsPage.clonedInventory();
-        List<UUID> visitors = new ArrayList<>();
-
-        if(superiorPlayer.getIsland() != null)
-            visitors.addAll(superiorPlayer.getIsland().getVisitors());
-
-        visitors.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
-
-        //noinspection unchecked
-        List<Integer> slots = visitorsPage.get("slots", List.class);
-
-        ItemStack visitorItem = visitorsPage.get("visitorItem", ItemStack.class);
-
-        for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < visitors.size(); i++){
-            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(visitors.get(i + (slots.size() * (page - 1))));
-            String islandOwner = "None";
-            if(_superiorPlayer.getIsland() != null)
-                islandOwner = _superiorPlayer.getIsland().getOwner().getName();
-            inventory.setItem(slots.get(i), new ItemBuilder(visitorItem)
-                    .replaceAll("{0}", _superiorPlayer.getName())
-                    .replaceAll("{1}", islandOwner)
-                    .asSkullOf(_superiorPlayer).build());
-        }
-
-        int previousSlot = visitorsPage.get("previousSlot", Integer.class);
-        ItemStack previousButton = visitorsPage.get("previousButton", ItemStack.class);
-        inventory.setItem(previousSlot, new ItemBuilder(previousButton)
-                .replaceName("{0}", (page == 1 ? "&c" : "&a")).build());
-
-        int currentSlot = visitorsPage.get("currentSlot", Integer.class);
-        ItemStack currentButton = visitorsPage.get("currentButton", ItemStack.class);
-        inventory.setItem(currentSlot, new ItemBuilder(currentButton)
-                .replaceLore("{0}", page + "").build());
-
-        int nextSlot = visitorsPage.get("nextSlot", Integer.class);
-        ItemStack nextButton = visitorsPage.get("nextButton", ItemStack.class);
-        inventory.setItem(nextSlot, new ItemBuilder(nextButton)
-                .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
-
-        visitorsPage.openInventory(superiorPlayer, inventory);
     }
 
     public void openPlayerPanel(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
@@ -122,40 +73,6 @@ public final class PanelHandler {
 
     public Island getIsland(SuperiorPlayer superiorPlayer){
         return plugin.getGrid().getIsland(SSuperiorPlayer.of(islands.get(superiorPlayer.getUniqueId())));
-    }
-
-    private void initVisitorsPage(YamlConfiguration cfg){
-        visitorsPage = FileUtil.getGUI(GUIInventory.VISITORS_PAGE_IDENTIFIER, cfg.getConfigurationSection("visitors-panel"), 6, "&lIsland Visitors");
-
-        ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.previous-page"));
-        ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.current-page"));
-        ItemStack nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.next-page"));
-        ItemStack visitorItem = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.visitor-item"));
-        int previousSlot = cfg.getInt("visitors-panel.previous-page.slot");
-        int currentSlot = cfg.getInt("visitors-panel.current-page.slot");
-        int nextSlot = cfg.getInt("visitors-panel.next-page.slot");
-        Sound previousSound = getSound(cfg.getString("visitors-panel.previous-page.sound", ""));
-        Sound currentSound = getSound(cfg.getString("visitors-panel.current-page.sound", ""));
-        Sound nextSound = getSound(cfg.getString("visitors-panel.next-page.sound", ""));
-        Sound visitorSound = getSound(cfg.getString("visitors-panel.visitor-item.sound", ""));
-
-        List<Integer> slots = new ArrayList<>();
-        Arrays.stream(cfg.getString("visitors-panel.visitor-item.slots").split(","))
-                .forEach(slot -> slots.add(Integer.valueOf(slot)));
-        slots.sort(Integer::compareTo);
-
-        visitorsPage.put("previousButton", previousButton);
-        visitorsPage.put("currentButton", currentButton);
-        visitorsPage.put("nextButton", nextButton);
-        visitorsPage.put("visitorItem", visitorItem);
-        visitorsPage.put("previousSound", previousSound);
-        visitorsPage.put("currentSound", currentSound);
-        visitorsPage.put("nextSound", nextSound);
-        visitorsPage.put("previousSlot", previousSlot);
-        visitorsPage.put("currentSlot", currentSlot);
-        visitorsPage.put("nextSlot", nextSlot);
-        visitorsPage.put("visitorSound", visitorSound);
-        visitorsPage.put("slots", slots);
     }
 
     private void initPlayerPage(YamlConfiguration cfg){

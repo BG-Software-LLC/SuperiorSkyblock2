@@ -20,24 +20,24 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public final class IslandMembersMenu extends SuperiorMenu {
+public final class IslandVisitorsMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
-    private static ItemStack previousButton, currentButton, nextButton, memberItem;
+    private static ItemStack previousButton, currentButton, nextButton, visitorItem;
     private static int previousSlot, currentSlot, nextSlot;
-    private static Sound previousSound, currentSound, nextSound, memberSound;
+    private static Sound previousSound, currentSound, nextSound, visitorSound;
     private static List<Integer> slots = new ArrayList<>();
 
     private Island island;
-    private List<UUID> members;
+    private List<UUID> visitors;
     private int page;
 
-    private IslandMembersMenu(Island island){
-        super("membersPage");
+    private IslandVisitorsMenu(Island island){
+        super("visitorsPage");
         if(island != null) {
             this.island = island;
-            this.members = island.getAllMembers();
-            members.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
+            this.visitors = island.getVisitors();
+            visitors.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
         }
     }
 
@@ -53,7 +53,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
                 nextPage = page == 1 ? -1 : page - 1;
             }
             else if(clickedSlot == nextSlot){
-                nextPage = members.size() > page * slots.size() ? page + 1 : -1;
+                nextPage = visitors.size() > page * slots.size() ? page + 1 : -1;
             }
             else return;
 
@@ -72,10 +72,14 @@ public final class IslandMembersMenu extends SuperiorMenu {
             if(indexOf < 0)
                 return;
 
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(members.get(indexOf));
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(visitors.get(indexOf));
 
             if (targetPlayer != null) {
-                plugin.getPanel().openPlayerPanel(superiorPlayer, targetPlayer);
+                if (e.getClick().name().contains("RIGHT")) {
+                    Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
+                } else if (e.getClick().name().contains("LEFT")) {
+                    Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island expel " + targetPlayer.getName());
+                }
             }
         }
     }
@@ -101,10 +105,14 @@ public final class IslandMembersMenu extends SuperiorMenu {
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
         inv.setContents(inventory.getContents());
 
-        for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < members.size(); i++){
-            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(members.get(i + (slots.size() * (page - 1))));
-            inv.setItem(slots.get(i), new ItemBuilder(memberItem)
+        for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < visitors.size(); i++){
+            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(visitors.get(i + (slots.size() * (page - 1))));
+            String islandOwner = "None";
+            if(_superiorPlayer.getIsland() != null)
+                islandOwner = _superiorPlayer.getIsland().getOwner().getName();
+            inv.setItem(slots.get(i), new ItemBuilder(visitorItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
+                    .replaceAll("{1}", islandOwner)
                     .asSkullOf(_superiorPlayer).build());
         }
 
@@ -115,7 +123,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
                 .replaceLore("{0}", page + "").build());
 
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
-                .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
+                .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             superiorPlayer.asPlayer().openInventory(inv);
@@ -129,7 +137,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
     }
 
     public static void init(){
-        IslandMembersMenu islandMembersMenu = new IslandMembersMenu(null);
+        IslandVisitorsMenu islandVisitorsMenu = new IslandVisitorsMenu(null);
 
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
@@ -138,33 +146,27 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandMembersMenu, cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
+        inventory = FileUtil.loadGUI(islandVisitorsMenu, cfg.getConfigurationSection("visitors-panel"), 6, "&lIsland Visitors");
 
-        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.previous-page"));
-        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.current-page"));
-        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.next-page"));
-        memberItem = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.member-item"));
+        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.previous-page"));
+        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.current-page"));
+        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.next-page"));
+        visitorItem = FileUtil.getItemStack(cfg.getConfigurationSection("visitors-panel.visitor-item"));
+        previousSlot = cfg.getInt("visitors-panel.previous-page.slot");
+        currentSlot = cfg.getInt("visitors-panel.current-page.slot");
+        nextSlot = cfg.getInt("visitors-panel.next-page.slot");
+        previousSound = getSound(cfg.getString("visitors-panel.previous-page.sound", ""));
+        currentSound = getSound(cfg.getString("visitors-panel.current-page.sound", ""));
+        nextSound = getSound(cfg.getString("visitors-panel.next-page.sound", ""));
+        visitorSound = getSound(cfg.getString("visitors-panel.visitor-item.sound", ""));
 
-        previousSound = getSound(cfg.getString("members-panel.previous-page.sound", ""));
-        currentSound = getSound(cfg.getString("members-panel.current-page.sound", ""));
-        nextSound = getSound(cfg.getString("members-panel.next-page.sound", ""));
-        memberSound = getSound(cfg.getString("members-panel.member-item.sound", ""));
-
-        previousSlot = cfg.getInt("members-panel.previous-page.slot");
-        currentSlot = cfg.getInt("members-panel.current-page.slot");
-        nextSlot = cfg.getInt("members-panel.next-page.slot");
-
-        inventory.setItem(previousSlot, previousButton);
-        inventory.setItem(currentSlot, currentButton);
-        inventory.setItem(nextSlot, nextButton);
-
-        Arrays.stream(cfg.getString("members-panel.member-item.slots").split(","))
+        Arrays.stream(cfg.getString("visitors-panel.visitor-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
         slots.sort(Integer::compareTo);
     }
 
-    public static IslandMembersMenu createInventory(Island island){
-        return new IslandMembersMenu(island);
+    public static IslandVisitorsMenu createInventory(Island island){
+        return new IslandVisitorsMenu(island);
     }
 
 }

@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.MEMBERS_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VISITORS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.PLAYER_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
 
@@ -77,10 +75,6 @@ public final class PanelListener implements Listener {
         e.setCancelled(true);
 
         switch (guiInventory.getIdentifier()){
-            case VISITORS_PAGE_IDENTIFIER: {
-                visitorsPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case PLAYER_PAGE_IDENTIFIER: {
                 playerPage(e, guiInventory, superiorPlayer);
                 break;
@@ -91,43 +85,6 @@ public final class PanelListener implements Listener {
             }
         }
 
-    }
-
-    private void visitorsPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        if(e.getRawSlot() == guiInventory.get("previousSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("nextSlot", Integer.class) ||
-                e.getRawSlot() == guiInventory.get("currentSlot", Integer.class)){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
-            int currentSlot = guiInventory.get("currentSlot", Integer.class);
-
-            if(e.getRawSlot() == currentSlot)
-                return;
-
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
-            int nextPage = guiInventory.get("nextSlot", Integer.class);
-
-            plugin.getPanel().openVisitorsPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
-        }
-
-        else{
-            if(e.getCurrentItem() == null)
-                return;
-
-            if(e.getCurrentItem().hasItemMeta()) {
-                SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
-
-                if (targetPlayer != null) {
-                    if (e.getClick().name().contains("RIGHT")) {
-                        Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
-                    } else if (e.getClick().name().contains("LEFT")) {
-                        Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island expel " + targetPlayer.getName());
-                    }
-                }
-            }
-        }
     }
 
     private void playerPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){

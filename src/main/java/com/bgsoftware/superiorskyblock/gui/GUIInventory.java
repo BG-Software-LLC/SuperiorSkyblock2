@@ -17,8 +17,6 @@ import java.util.UUID;
 
 public final class GUIInventory {
 
-    public static final String MEMBERS_PAGE_IDENTIFIER = "membersPage";
-    public static final String VISITORS_PAGE_IDENTIFIER = "visitorsPage";
     public static final String PLAYER_PAGE_IDENTIFIER = "playerPage";
     public static final String ROLE_PAGE_IDENTIFIER = "rolePage";
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";

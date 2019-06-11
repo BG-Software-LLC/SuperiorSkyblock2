@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,13 +28,10 @@ public final class IslandPanelMenu extends SuperiorMenu {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(membersButton.equals(e.getCurrentItem())){
-            SuperiorMenu previousMenu = previousMenus.get(superiorPlayer.getUniqueId());
-            previousMenus.remove(superiorPlayer.getUniqueId());
-            IslandMembersMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, previousMenu);
+            IslandMembersMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, this);
         }
         else if (visitorsButton.equals(e.getCurrentItem())) {
-            //TODO: Visitors panel
-            plugin.getPanel().openVisitorsPanel(superiorPlayer, 1);
+            IslandVisitorsMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, this);
         }
     }
 
