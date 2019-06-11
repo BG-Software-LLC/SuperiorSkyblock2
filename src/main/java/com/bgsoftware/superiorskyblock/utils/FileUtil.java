@@ -1,8 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
-import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -78,28 +76,6 @@ public final class FileUtil {
         }
 
         return itemBuilder.build();
-    }
-
-    public static GUIInventory getGUI(String identifier, ConfigurationSection section, int defaultSize, String defaultTitle){
-        String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
-        int size = section.getInt("size", defaultSize);
-
-        Sound openSound = getSound(section.getString("open-sound", ""));
-        Sound closeSound = getSound(section.getString("close-sound", ""));
-
-        Inventory inventory = Bukkit.createInventory(new GUIIdentifier(identifier), 9 * size, title);
-
-        if(section.contains("fill-items")){
-            ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
-            for(String _name : fillItems.getKeys(false)){
-                String[] slots = fillItems.getString(_name + ".slots").split(",");
-                ItemStack fillItem = getItemStack(fillItems.getConfigurationSection(_name));
-                for(String slot : slots)
-                    inventory.setItem(Integer.valueOf(slot), fillItem);
-            }
-        }
-
-        return GUIInventory.from(identifier, inventory).withSounds(openSound, closeSound);
     }
 
     public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, int defaultSize, String defaultTitle){

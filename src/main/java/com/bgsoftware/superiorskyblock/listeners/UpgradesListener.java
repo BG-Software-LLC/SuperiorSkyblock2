@@ -3,10 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.gui.GUIInventory;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -22,7 +19,6 @@ import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
@@ -46,35 +42,6 @@ public final class UpgradesListener implements Listener {
         maxGrowthData.put("NETHER_WARTS", (byte) 3);
         maxGrowthData.put("CHORUS_FLOWER", (byte) 5);
 
-    }
-
-    /*
-     *   getUpgradeCommands
-     */
-
-    /*
-     *   MENU
-     */
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent e){
-        if(e.getClickedInventory() == null || !(e.getWhoClicked() instanceof Player))
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
-        GUIInventory guiInventory = GUIInventory.from(superiorPlayer);
-
-        if(guiInventory == null || !guiInventory.getIdentifier().equals(GUIInventory.UPGRADES_PAGE_IDENTIFIER))
-            return;
-
-        e.setCancelled(true);
-
-        String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
-
-        if(!upgradeName.isEmpty()){
-            Bukkit.dispatchCommand(e.getWhoClicked(), "is rankup " + upgradeName);
-            e.getWhoClicked().closeInventory();
-        }
     }
 
     /*

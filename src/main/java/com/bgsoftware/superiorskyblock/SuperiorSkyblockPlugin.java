@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
@@ -188,6 +189,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandVisitorsMenu.init();
         MemberManageMenu.init();
         MemberRoleMenu.init();
+        IslandUpgradesMenu.init();
     }
 
     public UpgradesHandler getUpgrades() {

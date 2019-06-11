@@ -1,17 +1,10 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.gui.GUIInventory;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -25,41 +18,9 @@ public final class UpgradesHandler {
     private SuperiorSkyblockPlugin plugin;
     private Map<String, UpgradeData> upgrades = new HashMap<>();
 
-    private GUIInventory upgradesMenu;
-
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadUpgrades();
-        loadMenu();
-    }
-
-    public void openUpgradesMenu(SuperiorPlayer superiorPlayer){
-        if(!Bukkit.isPrimaryThread()){
-            new Thread(() -> openUpgradesMenu(superiorPlayer));
-            return;
-        }
-
-        Inventory inventory = upgradesMenu.clonedInventory();
-
-        Island island;
-
-        for(String upgrade : upgrades.keySet()){
-            int level = (island = superiorPlayer.getIsland()) == null ? 1 : island.getUpgradeLevel(upgrade);
-            double nextLevelPrice = getUpgradePrice(upgrade, level);
-            UpgradeData upgradeData = upgrades.get(upgrade);
-            if(upgradeData.items.containsKey(level)) {
-                ItemData itemData = upgradeData.items.get(level);
-
-                inventory.setItem(itemData.slot, EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
-                                itemData.hasNextLevel : itemData.noNextLevel);
-            }
-        }
-
-        upgradesMenu.openInventory(superiorPlayer, inventory);
-    }
-
-    public String getTitle() {
-        return upgradesMenu.getTitle();
     }
 
     public double getUpgradePrice(String upgradeName, int level){
@@ -148,62 +109,27 @@ public final class UpgradesHandler {
         }
     }
 
-    private void loadMenu(){
-        File file = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/upgrades-gui.yml");
-
-        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
-
-        ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
-
-        upgradesMenu = FileUtil.getGUI(GUIInventory.UPGRADES_PAGE_IDENTIFIER, section, 4, "&lIsland Upgrades");
-
-        if(section.contains("upgrades")){
-            ConfigurationSection upgrades = section.getConfigurationSection("upgrades");
-            for(String _upgrade : upgrades.getKeys(false)){
-                if(!isUpgrade(_upgrade))
-                    continue;
-
-                UpgradeData upgradeData = this.upgrades.get(_upgrade);
-
-                for(String level : upgrades.getConfigurationSection(_upgrade).getKeys(false)) {
-                    int slot = upgrades.getInt(_upgrade + "." + level + ".slot");
-                    upgradeData.items.put(Integer.valueOf(level), new ItemData(
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
-                            slot,
-                            getSound(upgrades.getString(_upgrade + "." + level + ".has-next-level.sound", "")),
-                            getSound(upgrades.getString(_upgrade + "." + level + ".no-next-level.sound", ""))));
-                }
-            }
-        }
+    public Map<String, UpgradeData> getUpgrades() {
+        return upgrades;
     }
 
-    private Sound getSound(String name){
-        try{
-            return Sound.valueOf(name);
-        }catch(Exception ex){
-            return null;
-        }
-    }
+    @SuppressWarnings("WeakerAccess")
+    public class UpgradeData{
 
-    private class UpgradeData{
-
-        private Map<Integer, Double> prices = new HashMap<>();
-        private Map<Integer, List<String>> commands = new HashMap<>();
-        private Map<Integer, ItemData> items = new HashMap<>();
+        public Map<Integer, Double> prices = new HashMap<>();
+        public Map<Integer, List<String>> commands = new HashMap<>();
+        public Map<Integer, ItemData> items = new HashMap<>();
 
     }
 
-    private class ItemData{
+    @SuppressWarnings("WeakerAccess")
+    public static class ItemData{
 
-        private ItemStack hasNextLevel, noNextLevel;
-        private int slot;
-        private Sound hasNextLevelSound, noNextLevelSound;
+        public ItemStack hasNextLevel, noNextLevel;
+        public int slot;
+        public Sound hasNextLevelSound, noNextLevelSound;
 
-        private ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, Sound hasNextLevelSound, Sound noNextLevelSound){
+        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, Sound hasNextLevelSound, Sound noNextLevelSound){
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.slot = slot;

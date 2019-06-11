@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.gui.GUIIdentifier;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -36,7 +35,7 @@ public final class MenusListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled() && e.getInventory().getHolder() instanceof GUIIdentifier) {
+        if(e.getCurrentItem() != null && e.isCancelled() && e.getInventory().getHolder() instanceof SuperiorMenu) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
