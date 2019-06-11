@@ -83,20 +83,6 @@ public final class GridHandler implements GridManager {
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         spawnIsland = new SpawnIsland();
-
-        //Init all panels
-        Bukkit.getScheduler().runTask(SuperiorSkyblockPlugin.getPlugin(), () -> {
-            IslandsTopMenu.init();
-            IslandValuesMenu.init();
-            IslandWarpsMenu.init();
-            IslandBiomesMenu.init();
-            IslandCreationMenu.init();
-            ConfirmDisbandMenu.init();
-            IslandPanelMenu.init();
-            IslandMembersMenu.init();
-            IslandVisitorsMenu.init();
-            MemberManageMenu.init();
-        });
     }
 
     public void createIsland(ResultSet resultSet) throws SQLException {

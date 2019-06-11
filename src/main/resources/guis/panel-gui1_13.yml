@@ -120,7 +120,7 @@ visitors-panel:
       - '&7Island Owner: {1}'
 
 players-panel:
-  title: ''
+  title: '&8&l{}'
   size: 5
   open-sound: 'CHEST_OPEN'
   close-sound: 'CHEST_CLOSE'
@@ -158,7 +158,7 @@ players-panel:
       - '&7Click to kick the player from the island.'
 
 roles-panel:
-  title: ''
+  title: '&8&l{}'
   size: 5
   open-sound: 'CHEST_OPEN'
   close-sound: 'CHEST_CLOSE'

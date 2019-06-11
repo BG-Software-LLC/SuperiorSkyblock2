@@ -28,7 +28,8 @@ public final class MemberManageMenu extends SuperiorMenu {
     @Override
     public void onClick(InventoryClickEvent e) {
         if(e.getRawSlot() == rolesSlot){
-            plugin.getPanel().openRolePanel(SSuperiorPlayer.of(e.getWhoClicked()), targetPlayer);
+            previousMove = false;
+            MemberRoleMenu.createInventory(targetPlayer).openInventory(SSuperiorPlayer.of(e.getWhoClicked()), this);
         }
 
         else if(e.getRawSlot() == banSlot){
