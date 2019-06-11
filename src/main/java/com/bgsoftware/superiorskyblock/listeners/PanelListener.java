@@ -109,10 +109,6 @@ public final class PanelListener implements Listener {
                 rolesPage(e, guiInventory, superiorPlayer);
                 break;
             }
-            case ISLAND_CREATION_PAGE_IDENTIFIER: {
-                islandCreationPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case CONFIRM_PAGE_IDENTIFIER: {
                 confirmPage(e, guiInventory, superiorPlayer);
                 break;
@@ -279,24 +275,6 @@ public final class PanelListener implements Listener {
 
         else if(e.getRawSlot() == guiInventory.get("leaderSlot", Integer.class)){
             Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island transfer " + targetPlayer.getName());
-        }
-    }
-
-    private void islandCreationPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        for(String schematic : plugin.getSchematics().getSchematics()){
-            if(guiInventory.contains(schematic + "-slot")) {
-                int slot = guiInventory.get(schematic + "-slot", Integer.class);
-                String permission = guiInventory.get(schematic + "-permission", String.class);
-
-                if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                    BigDecimal bonusWorth = new BigDecimal(guiInventory.get(schematic + "-bonus", Long.class));
-                    Biome biome = Biome.valueOf(guiInventory.get(schematic + "-biome", String.class));
-                    superiorPlayer.asPlayer().closeInventory();
-                    Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome);
-                    break;
-                }
-            }
         }
     }
 

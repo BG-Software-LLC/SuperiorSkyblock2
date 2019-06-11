@@ -46,8 +46,8 @@ public final class IslandBiomesMenu extends SuperiorMenu {
 
     @Override
     public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        super.openInventory(superiorPlayer, previousMenu);
         this.superiorPlayer = superiorPlayer;
+        super.openInventory(superiorPlayer, previousMenu);
     }
 
     @Override

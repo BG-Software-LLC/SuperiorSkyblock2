@@ -53,15 +53,6 @@ public final class PanelHandler {
         initVisitorsPage(cfg);
         initPlayerPage(cfg);
         initRolePage(cfg);
-
-        file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
-
-        if(!file.exists())
-            FileUtil.saveResource("guis/creation-gui.yml");
-
-        cfg = YamlConfiguration.loadConfiguration(file);
-
-        initIslandCreationPage(cfg);
     }
 
     private Sound getSound(String name){
@@ -178,30 +169,6 @@ public final class PanelHandler {
         Inventory inventory = Bukkit.createInventory(new GUIIdentifier(GUIInventory.ROLE_PAGE_IDENTIFIER), rolePage.getSize(), ChatColor.BOLD + targetPlayer.getName());
         inventory.setContents(rolePage.getContents());
         rolePage.openInventory(superiorPlayer, inventory);
-    }
-
-    public void openIslandCreationPanel(SuperiorPlayer superiorPlayer){
-        if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openIslandCreationPanel(superiorPlayer)).start();
-            return;
-        }
-
-        Inventory inventory = islandCreationPage.clonedInventory();
-
-        for(String schematic : plugin.getSchematics().getSchematics()){
-            if(islandCreationPage.contains(schematic + "-has-access-item")) {
-                ItemStack schematicItem = islandCreationPage.get(schematic + "-has-access-item", ItemStack.class);
-                String permission = islandCreationPage.get(schematic + "-permission", String.class);
-                int slot = islandCreationPage.get(schematic + "-slot", Integer.class);
-
-                if(!superiorPlayer.hasPermission(permission))
-                    schematicItem = islandCreationPage.get(schematic + "-no-access-item", ItemStack.class);
-
-                inventory.setItem(slot, schematicItem);
-            }
-        }
-
-        islandCreationPage.openInventory(superiorPlayer, inventory);
     }
 
     public Island getIsland(SuperiorPlayer superiorPlayer){
@@ -355,23 +322,6 @@ public final class PanelHandler {
         rolePage.put("modSlot", modSlot);
         rolePage.put("adminSlot", adminSlot);
         rolePage.put("leaderSlot", leaderSlot);
-    }
-
-    private void initIslandCreationPage(YamlConfiguration cfg){
-        islandCreationPage = FileUtil.getGUI(GUIInventory.ISLAND_CREATION_PAGE_IDENTIFIER, cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
-
-        ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics");
-
-        for(String schematic : section.getKeys(false)){
-            islandCreationPage.put(schematic + "-permission", section.getString(schematic + ".required-permission"));
-            islandCreationPage.put(schematic + "-bonus", section.getLong(schematic + ".bonus-worth", 0));
-            islandCreationPage.put(schematic + "-biome", section.getString(schematic + ".biome", "PLAINS"));
-            islandCreationPage.put(schematic + "-slot", section.getInt(schematic + ".slot"));
-            islandCreationPage.put(schematic + "-has-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
-            islandCreationPage.put(schematic + "-no-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
-        }
     }
 
 }
