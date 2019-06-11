@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.MAIN_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.MEMBERS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VISITORS_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.PLAYER_PAGE_IDENTIFIER;
-import static com.bgsoftware.superiorskyblock.gui.GUIInventory.VALUES_PAGE_IDENTIFIER;
 import static com.bgsoftware.superiorskyblock.gui.GUIInventory.ROLE_PAGE_IDENTIFIER;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -64,8 +62,6 @@ public final class PanelListener implements Listener {
         }
     }
 
-    private Set<UUID> movingBetweenPages = new HashSet<>();
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e){
         if(!(e.getWhoClicked() instanceof Player) || e.getClickedInventory() == null)
@@ -81,10 +77,6 @@ public final class PanelListener implements Listener {
         e.setCancelled(true);
 
         switch (guiInventory.getIdentifier()){
-            case MAIN_PAGE_IDENTIFIER: {
-                mainPage(e, guiInventory, superiorPlayer);
-                break;
-            }
             case MEMBERS_PAGE_IDENTIFIER: {
                 membersPage(e, guiInventory, superiorPlayer);
                 break;
@@ -105,57 +97,6 @@ public final class PanelListener implements Listener {
 
     }
 
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e){
-        if(!(e.getPlayer() instanceof Player))
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        GUIInventory guiInventory = GUIInventory.from(superiorPlayer);
-        String title = e.getInventory().getName();
-
-        if(movingBetweenPages.contains(superiorPlayer.getUniqueId())){
-            movingBetweenPages.remove(superiorPlayer.getUniqueId());
-            return;
-        }
-
-        if(guiInventory == null)
-            return;
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            switch (guiInventory.getIdentifier()){
-                case MEMBERS_PAGE_IDENTIFIER:
-                case VISITORS_PAGE_IDENTIFIER:
-                    plugin.getPanel().openPanel(superiorPlayer);
-                    break;
-                case PLAYER_PAGE_IDENTIFIER:
-                    plugin.getPanel().openMembersPanel(superiorPlayer, 1);
-                    break;
-                case ROLE_PAGE_IDENTIFIER:
-                    plugin.getPanel().openPlayerPanel(superiorPlayer, SSuperiorPlayer.of(ChatColor.stripColor(title)));
-                    break;
-                case VALUES_PAGE_IDENTIFIER:
-                    plugin.getGrid().openTopIslands(superiorPlayer);
-                    break;
-                default:
-                    guiInventory.closeInventory(superiorPlayer);
-                    break;
-            }
-        }, 1L);
-    }
-
-    private void mainPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
-        if(e.getRawSlot() == guiInventory.get("membersSlot", Integer.class)){
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
-            plugin.getPanel().openMembersPanel(superiorPlayer, 1);
-        }
-
-        else if(e.getRawSlot() == guiInventory.get("visitorsSlot", Integer.class)){
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
-            plugin.getPanel().openVisitorsPanel(superiorPlayer, 1);
-        }
-    }
-
     private void membersPage(InventoryClickEvent e, GUIInventory guiInventory, SuperiorPlayer superiorPlayer){
         if(e.getRawSlot() == guiInventory.get("previousSlot", Integer.class) ||
                 e.getRawSlot() == guiInventory.get("nextSlot", Integer.class) ||
@@ -172,7 +113,6 @@ public final class PanelListener implements Listener {
                     .getItemMeta().getLore().get(0)).split(" ")[1]);
             int nextPage = guiInventory.get("nextSlot", Integer.class);
 
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
             plugin.getPanel().openMembersPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
         }
 
@@ -184,7 +124,6 @@ public final class PanelListener implements Listener {
                 SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
 
                 if (targetPlayer != null) {
-                    movingBetweenPages.add(superiorPlayer.getUniqueId());
                     plugin.getPanel().openPlayerPanel(superiorPlayer, targetPlayer);
                 }
             }
@@ -207,7 +146,6 @@ public final class PanelListener implements Listener {
                     .getItemMeta().getLore().get(0)).split(" ")[1]);
             int nextPage = guiInventory.get("nextSlot", Integer.class);
 
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
             plugin.getPanel().openVisitorsPanel(superiorPlayer, e.getRawSlot() == nextPage ? currentPage + 1 : currentPage - 1);
         }
 
@@ -233,7 +171,6 @@ public final class PanelListener implements Listener {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(ChatColor.stripColor(e.getClickedInventory().getName()));
 
         if(e.getRawSlot() == guiInventory.get("rolesSlot", Integer.class)){
-            movingBetweenPages.add(superiorPlayer.getUniqueId());
             plugin.getPanel().openRolePanel(superiorPlayer, targetPlayer);
         }
 

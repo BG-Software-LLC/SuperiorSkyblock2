@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -41,14 +40,13 @@ public final class PanelHandler {
     }
 
     private void loadMenus(SuperiorSkyblockPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), "guis/panel-gui-old.yml");
+        File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/panel-gui-old.yml");
+            FileUtil.saveResource("guis/panel-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        initMainPage(cfg);
         initMembersPage(cfg);
         initVisitorsPage(cfg);
         initPlayerPage(cfg);
@@ -61,10 +59,6 @@ public final class PanelHandler {
         }catch(Exception ex){
             return null;
         }
-    }
-
-    public void openPanel(SuperiorPlayer superiorPlayer){
-        mainPage.openInventory(superiorPlayer, true);
     }
 
     public void openMembersPanel(SuperiorPlayer superiorPlayer, int page){
@@ -173,31 +167,6 @@ public final class PanelHandler {
 
     public Island getIsland(SuperiorPlayer superiorPlayer){
         return plugin.getGrid().getIsland(SSuperiorPlayer.of(islands.get(superiorPlayer.getUniqueId())));
-    }
-
-    private void initMainPage(YamlConfiguration cfg){
-        mainPage = FileUtil.getGUI(GUIInventory.MAIN_PAGE_IDENTIFIER, cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
-
-        ItemStack membersButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.members"));
-        ItemStack settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
-        ItemStack visitorsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
-        int membersSlot = cfg.getInt("main-panel.members.slot");
-        int settingsSlot = cfg.getInt("main-panel.settings.slot");
-        int visitorsSlot = cfg.getInt("main-panel.visitors.slot");
-        Sound membersSound = getSound(cfg.getString("main-panel.members.sound", ""));
-        Sound settingsSound = getSound(cfg.getString("main-panel.settings.sound", ""));
-        Sound visitorsSound = getSound(cfg.getString("main-panel.visitors.sound", ""));
-
-        mainPage.setItem(membersSlot, membersButton);
-        mainPage.setItem(settingsSlot, settingsButton);
-        mainPage.setItem(visitorsSlot, visitorsButton);
-
-        mainPage.put("membersSound", membersSound);
-        mainPage.put("settingsSound", settingsSound);
-        mainPage.put("visitorsSound", visitorsSound);
-        mainPage.put("membersSlot", membersSlot);
-        mainPage.put("settingsSlot", settingsSlot);
-        mainPage.put("visitorsSlot", visitorsSlot);
     }
 
     private void initMembersPage(YamlConfiguration cfg){

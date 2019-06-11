@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
@@ -88,6 +89,7 @@ public final class GridHandler implements GridManager {
             IslandBiomesMenu.init();
             IslandCreationMenu.init();
             ConfirmDisbandMenu.init();
+            IslandPanelMenu.init();
         });
     }
 

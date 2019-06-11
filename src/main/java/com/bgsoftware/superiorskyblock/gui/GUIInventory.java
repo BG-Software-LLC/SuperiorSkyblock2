@@ -17,16 +17,12 @@ import java.util.UUID;
 
 public final class GUIInventory {
 
-    public static final String MAIN_PAGE_IDENTIFIER = "mainPage";
     public static final String MEMBERS_PAGE_IDENTIFIER = "membersPage";
     public static final String VISITORS_PAGE_IDENTIFIER = "visitorsPage";
     public static final String PLAYER_PAGE_IDENTIFIER = "playerPage";
     public static final String ROLE_PAGE_IDENTIFIER = "rolePage";
-    public static final String ISLAND_CREATION_PAGE_IDENTIFIER = "islandCreationPage";
-    public static final String BIOMES_PAGE_IDENTIFIER = "biomesPage";
     public static final String VALUES_PAGE_IDENTIFIER = "valuesPage";
     public static final String UPGRADES_PAGE_IDENTIFIER = "upgradesPage";
-    public static final String CONFIRM_PAGE_IDENTIFIER = "confirmPage";
 
     private static Map<UUID, GUIInventory> openedInventories = Maps.newHashMap();
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

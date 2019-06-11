@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -73,7 +74,7 @@ public final class CmdPanel implements ICommand {
             }
         }
 
-        plugin.getPanel().openPanel(superiorPlayer);
+        IslandPanelMenu.createInventory().openInventory(superiorPlayer, null);
     }
 
     @Override
