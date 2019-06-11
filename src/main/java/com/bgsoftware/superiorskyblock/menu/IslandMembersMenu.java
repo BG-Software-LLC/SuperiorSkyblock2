@@ -28,14 +28,12 @@ public final class IslandMembersMenu extends SuperiorMenu {
     private static Sound previousSound, currentSound, nextSound, memberSound;
     private static List<Integer> slots = new ArrayList<>();
 
-    private Island island;
     private List<UUID> members;
     private int page;
 
     private IslandMembersMenu(Island island){
         super("membersPage");
         if(island != null) {
-            this.island = island;
             this.members = island.getAllMembers();
             members.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
         }
@@ -60,7 +58,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
             if(nextPage == -1)
                 return;
 
-            openInventory(superiorPlayer, nextPage, previousMenu);
+            open(superiorPlayer, nextPage, previousMenu);
         }
 
         else{
@@ -76,7 +74,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
             if (targetPlayer != null) {
                 previousMove = false;
-                MemberManageMenu.createInventory(targetPlayer).openInventory(superiorPlayer, this);
+                MemberManageMenu.createInventory(targetPlayer).open(superiorPlayer, this);
             }
         }
     }
@@ -87,13 +85,13 @@ public final class IslandMembersMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, 1, previousMenu);
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+        open(superiorPlayer, 1, previousMenu);
     }
 
-    private void openInventory(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu){
+    private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openInventory(superiorPlayer, page, previousMenu)).start();
+            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
             return;
         }
 
@@ -164,8 +162,8 @@ public final class IslandMembersMenu extends SuperiorMenu {
         slots.sort(Integer::compareTo);
     }
 
-    public static IslandMembersMenu createInventory(Island island){
-        return new IslandMembersMenu(island);
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        new IslandMembersMenu(island).open(superiorPlayer, previousMenu);
     }
 
 }

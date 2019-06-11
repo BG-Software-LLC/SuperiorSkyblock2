@@ -37,9 +37,9 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
         this.superiorPlayer = superiorPlayer;
-        super.openInventory(superiorPlayer, previousMenu);
+        super.open(superiorPlayer, previousMenu);
     }
 
     @Override
@@ -62,10 +62,6 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
         }
 
         return inv;
-    }
-
-    public static IslandUpgradesMenu createInventory(Island island){
-        return new IslandUpgradesMenu(island);
     }
 
     public static void init(){
@@ -100,6 +96,10 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
                 }
             }
         }
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        new IslandUpgradesMenu(island).open(superiorPlayer, previousMenu);
     }
 
 }

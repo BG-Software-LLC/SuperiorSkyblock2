@@ -54,7 +54,7 @@ public final class CmdCreate implements ICommand {
             return;
         }
 
-        IslandCreationMenu.createInventory().openInventory(superiorPlayer, null);
+        IslandCreationMenu.openInventory(superiorPlayer, null);
     }
 
     @Override

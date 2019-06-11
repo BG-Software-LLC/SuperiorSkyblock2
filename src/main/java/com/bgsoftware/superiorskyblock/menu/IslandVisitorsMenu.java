@@ -28,14 +28,12 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
     private static Sound previousSound, currentSound, nextSound, visitorSound;
     private static List<Integer> slots = new ArrayList<>();
 
-    private Island island;
     private List<UUID> visitors;
     private int page;
 
     private IslandVisitorsMenu(Island island){
         super("visitorsPage");
         if(island != null) {
-            this.island = island;
             this.visitors = island.getVisitors();
             visitors.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
         }
@@ -60,7 +58,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
             if(nextPage == -1)
                 return;
 
-            openInventory(superiorPlayer, nextPage, previousMenu);
+            open(superiorPlayer, nextPage, previousMenu);
         }
 
         else{
@@ -90,13 +88,13 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, 1, previousMenu);
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+        open(superiorPlayer, 1, previousMenu);
     }
 
-    private void openInventory(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu){
+    private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openInventory(superiorPlayer, page, previousMenu)).start();
+            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
             return;
         }
 
@@ -162,8 +160,8 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         slots.sort(Integer::compareTo);
     }
 
-    public static IslandVisitorsMenu createInventory(Island island){
-        return new IslandVisitorsMenu(island);
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        new IslandVisitorsMenu(island).open(superiorPlayer, previousMenu);
     }
 
 }

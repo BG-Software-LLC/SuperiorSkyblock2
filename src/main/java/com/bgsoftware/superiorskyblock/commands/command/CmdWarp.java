@@ -73,7 +73,7 @@ public final class CmdWarp implements ICommand {
             }
         }
 
-        IslandWarpsMenu.createInventory(island).openInventory(superiorPlayer, null);
+        IslandWarpsMenu.openInventory(superiorPlayer, null, island);
     }
 
     @Override

@@ -62,7 +62,7 @@ public final class CmdBiome implements ICommand {
             return;
         }
 
-        IslandBiomesMenu.createInventory().openInventory(superiorPlayer, null);
+        IslandBiomesMenu.openInventory(superiorPlayer, null);
     }
 
     @Override

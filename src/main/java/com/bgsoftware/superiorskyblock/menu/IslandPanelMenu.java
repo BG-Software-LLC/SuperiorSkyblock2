@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,8 +14,7 @@ import java.io.File;
 public final class IslandPanelMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
-
-    private static ItemStack membersButton, settingsButton, visitorsButton;
+    private static int membersSlot, settingsSlot, visitorsSlot;
     private static Sound membersSound, settingsSound, visitorsSound;
 
     private IslandPanelMenu(){
@@ -27,11 +25,11 @@ public final class IslandPanelMenu extends SuperiorMenu {
     public void onClick(InventoryClickEvent e) {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
-        if(membersButton.equals(e.getCurrentItem())){
-            IslandMembersMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, this);
+        if(membersSlot == e.getRawSlot()){
+            IslandMembersMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
         }
-        else if (visitorsButton.equals(e.getCurrentItem())) {
-            IslandVisitorsMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, this);
+        else if (visitorsSlot == e.getRawSlot()) {
+            IslandVisitorsMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
         }
     }
 
@@ -52,25 +50,25 @@ public final class IslandPanelMenu extends SuperiorMenu {
 
         inventory = FileUtil.loadGUI(islandPanelMenu, cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
 
-        membersButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.members"));
-        settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
-        visitorsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
+        ItemStack membersButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.members"));
+        ItemStack settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
+        ItemStack visitorsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
 
         membersSound = getSound(cfg.getString("main-panel.members.sound", ""));
         settingsSound = getSound(cfg.getString("main-panel.settings.sound", ""));
         visitorsSound = getSound(cfg.getString("main-panel.visitors.sound", ""));
 
-        int membersSlot = cfg.getInt("main-panel.members.slot");
-        int settingsSlot = cfg.getInt("main-panel.settings.slot");
-        int visitorsSlot = cfg.getInt("main-panel.visitors.slot");
+        membersSlot = cfg.getInt("main-panel.members.slot");
+        settingsSlot = cfg.getInt("main-panel.settings.slot");
+        visitorsSlot = cfg.getInt("main-panel.visitors.slot");
 
         inventory.setItem(membersSlot, membersButton);
         inventory.setItem(settingsSlot, settingsButton);
         inventory.setItem(visitorsSlot, visitorsButton);
     }
 
-    public static IslandPanelMenu createInventory(){
-        return new IslandPanelMenu();
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+        new IslandPanelMenu().open(superiorPlayer, previousMenu);
     }
 
 }

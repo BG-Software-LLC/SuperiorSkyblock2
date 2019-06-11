@@ -66,7 +66,7 @@ public final class CmdDisband implements ICommand {
             return;
         }
 
-        ConfirmDisbandMenu.createInventory().openInventory(superiorPlayer, null);
+        ConfirmDisbandMenu.openInventory(superiorPlayer, null);
     }
 
     @Override

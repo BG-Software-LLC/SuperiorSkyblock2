@@ -51,7 +51,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
             int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
                     .getItemMeta().getLore().get(0)).split(" ")[1]);
 
-            createInventory(island).openInventory(superiorPlayer, e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1, null);
+            open(superiorPlayer, e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1, null);
         }
 
         else{
@@ -76,8 +76,8 @@ public final class IslandWarpsMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, 1, previousMenu);
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+        open(superiorPlayer, 1, previousMenu);
     }
 
     @Override
@@ -85,9 +85,9 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         return null;
     }
 
-    private void openInventory(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
+    private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
         if (Bukkit.isPrimaryThread()) {
-            new SuperiorThread(() -> openInventory(superiorPlayer, page, previousMenu)).start();
+            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
             return;
         }
 
@@ -164,8 +164,8 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         IslandWarpsMenu.slots = slots;
     }
 
-    public static IslandWarpsMenu createInventory(Island island){
-        return new IslandWarpsMenu(island);
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        new IslandWarpsMenu(island).open(superiorPlayer, previousMenu);
     }
 
 }

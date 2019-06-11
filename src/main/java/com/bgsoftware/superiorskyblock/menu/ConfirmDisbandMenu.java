@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -21,8 +20,7 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
     private static ConfirmDisbandMenu instance;
     private static Inventory inventory = null;
-
-    private static ItemStack confirmItem, cancelItem;
+    private static int confirmSlot, cancelSlot;
 
     private SuperiorPlayer superiorPlayer;
 
@@ -33,10 +31,9 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
-        ItemStack clickedItem = e.getCurrentItem();
         Island island = superiorPlayer.getIsland();
 
-        if(confirmItem.equals(clickedItem)){
+        if(confirmSlot == e.getRawSlot()){
             IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
             Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
@@ -53,7 +50,7 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
                 island.disbandIsland();
             }
         }
-        else if(!cancelItem.equals(clickedItem))
+        else if(e.getRawSlot() != cancelSlot)
             return;
 
         superiorPlayer.asPlayer().closeInventory();
@@ -65,9 +62,9 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
     }
 
     @Override
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
         this.superiorPlayer = superiorPlayer;
-        super.openInventory(superiorPlayer, previousMenu);
+        super.open(superiorPlayer, previousMenu);
     }
 
     public static void init(){
@@ -86,17 +83,17 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
         inventory = Bukkit.createInventory(confirmDisbandMenu, InventoryType.HOPPER, ChatColor.translateAlternateColorCodes('&', title));
 
-        confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
-        int confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);
+        ItemStack confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
+        confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);
         inventory.setItem(confirmSlot, confirmItem);
 
-        cancelItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
-        int cancelSlot = cfg.getInt("disband-gui.cancel.slot", 3);
+        ItemStack cancelItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
+        cancelSlot = cfg.getInt("disband-gui.cancel.slot", 3);
         inventory.setItem(cancelSlot, cancelItem);
     }
 
-    public static ConfirmDisbandMenu createInventory(){
-        return instance;
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+        instance.open(superiorPlayer, previousMenu);
     }
 
 }

@@ -44,9 +44,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                 if(island != null) {
                     superiorPlayer.asPlayer().closeInventory();
                     if(e.getAction() == InventoryAction.PICKUP_HALF){
-                        IslandWarpsMenu.createInventory(island).openInventory(superiorPlayer, this);
+                        IslandWarpsMenu.openInventory(superiorPlayer, this, island);
                     } else {
-                        IslandValuesMenu.createInventory(island).openInventory(superiorPlayer, this);
+                        IslandValuesMenu.openInventory(superiorPlayer, this, island);
                     }
                     break;
                 }
@@ -152,9 +152,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
         islandsTopMenu.reloadGUI();
     }
 
-    public static IslandsTopMenu createInventory(){
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         instance.reloadGUI();
-        return instance;
+        instance.open(superiorPlayer, previousMenu);
     }
 
 }

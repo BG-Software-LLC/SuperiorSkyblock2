@@ -47,9 +47,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public abstract void onClick(InventoryClickEvent e);
 
-    public void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> openInventory(superiorPlayer, previousMenu)).start();
+            new SuperiorThread(() -> open(superiorPlayer, previousMenu)).start();
             return;
         }
 
@@ -72,7 +72,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         if(previousMenu != null) {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(previousMove)
-                    previousMenu.openInventory(superiorPlayer, previousMenu.previousMenu);
+                    previousMenu.open(superiorPlayer, previousMenu.previousMenu);
                 else
                     previousMove = true;
             });

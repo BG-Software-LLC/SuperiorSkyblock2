@@ -54,7 +54,7 @@ public final class CmdUpgrade implements ICommand {
             return;
         }
 
-        IslandUpgradesMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, null);
+        IslandUpgradesMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
     }
 
     @Override

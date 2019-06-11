@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
@@ -86,10 +87,6 @@ public final class IslandValuesMenu extends SuperiorMenu {
         return inv;
     }
 
-    public static IslandValuesMenu createInventory(Island island){
-        return new IslandValuesMenu(island);
-    }
-
     public static void init(){
         IslandValuesMenu islandValuesMenu = new IslandValuesMenu(null);
         File file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
@@ -118,6 +115,10 @@ public final class IslandValuesMenu extends SuperiorMenu {
         IslandValuesMenu.blockName = blockName;
         IslandValuesMenu.blockLore = blockLore;
         IslandValuesMenu.countedBlocks = countedBlocks;
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        new IslandValuesMenu(island).open(superiorPlayer, previousMenu);
     }
 
 }

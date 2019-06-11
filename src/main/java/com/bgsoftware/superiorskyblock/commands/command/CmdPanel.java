@@ -57,10 +57,10 @@ public final class CmdPanel implements ICommand {
 
         if(args.length > 1){
             if(args[1].equalsIgnoreCase("members")){
-                IslandMembersMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, null);
+                IslandMembersMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
                 return;
             }else if(args[1].equalsIgnoreCase("visitors")){
-                IslandVisitorsMenu.createInventory(superiorPlayer.getIsland()).openInventory(superiorPlayer, null);
+                IslandVisitorsMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
                 return;
             }
             else if(args[1].equalsIgnoreCase("toggle")){
@@ -76,7 +76,7 @@ public final class CmdPanel implements ICommand {
             }
         }
 
-        IslandPanelMenu.createInventory().openInventory(superiorPlayer, null);
+        IslandPanelMenu.openInventory(superiorPlayer, null);
     }
 
     @Override

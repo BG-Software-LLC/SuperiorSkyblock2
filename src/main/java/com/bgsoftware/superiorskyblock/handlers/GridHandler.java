@@ -309,7 +309,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        IslandsTopMenu.createInventory().openInventory(superiorPlayer, null);
+        IslandsTopMenu.openInventory(superiorPlayer, null);
     }
 
     @Override
