@@ -65,7 +65,6 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdUpgrade());
         subCommands.add(new CmdValue());
         subCommands.add(new CmdWarp());
-        subCommands.add(new CmdWarps());
         subCommands.add(new CmdWithdraw());
     }
 

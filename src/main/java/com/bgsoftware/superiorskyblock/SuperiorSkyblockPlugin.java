@@ -10,6 +10,18 @@ import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
 import com.bgsoftware.superiorskyblock.listeners.*;
+import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.menu.MemberManageMenu;
+import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -35,8 +47,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SchematicsHandler schematicsHandler;
     private SettingsHandler settingsHandler;
     private DataHandler dataHandler;
-    private PanelHandler panelHandler;
-    private MenuHandler menuHandler;
     private UpgradesHandler upgradesHandler;
 
     private NMSAdapter nmsAdapter;
@@ -52,7 +62,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
-        getServer().getPluginManager().registerEvents(new MenuListener(this), this);
+        getServer().getPluginManager().registerEvents(new MenusListener(this), this);
 
         loadNMSAdapter();
         loadAPI();
@@ -140,11 +150,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
-        if (menuHandler != null)
-            menuHandler.save();
-
         settingsHandler = new SettingsHandler(this);
-        panelHandler = new PanelHandler(this);
         upgradesHandler = new UpgradesHandler(this);
 
         if(loadGrid) {
@@ -155,8 +161,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
         schematicsHandler = new SchematicsHandler(this);
 
-        menuHandler = new MenuHandler(this);
-        menuHandler.load();
+        loadMenus();
 
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (loadGrid)
@@ -172,16 +177,23 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         CalcTask.startTask();
     }
 
-    public MenuHandler getMenuHandler() {
-        return menuHandler;
+    private void loadMenus(){
+        ConfirmDisbandMenu.init();
+        IslandBiomesMenu.init();
+        IslandCreationMenu.init();
+        IslandMembersMenu.init();
+        IslandPanelMenu.init();
+        IslandsTopMenu.init();
+        IslandUpgradesMenu.init();
+        IslandValuesMenu.init();
+        IslandVisitorsMenu.init();
+        IslandWarpsMenu.init();
+        MemberManageMenu.init();
+        MemberRoleMenu.init();
     }
 
     public UpgradesHandler getUpgrades() {
         return upgradesHandler;
-    }
-
-    public PanelHandler getPanel() {
-        return panelHandler;
     }
 
     public DataHandler getDataHandler() {

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.gui.menus.types.islands.IslandUpgradeMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -10,7 +10,6 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class CmdUpgrade implements ICommand {
@@ -54,8 +53,7 @@ public final class CmdUpgrade implements ICommand {
             return;
         }
 
-//        plugin.getUpgrades().openUpgradesMenu(superiorPlayer);
-        new IslandUpgradeMenu(superiorPlayer.asPlayer());
+        IslandUpgradesMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
     }
 
     @Override
