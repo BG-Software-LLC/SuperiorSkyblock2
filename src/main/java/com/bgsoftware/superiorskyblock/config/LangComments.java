@@ -92,6 +92,9 @@ public final class LangComments {
     @Comment("Called when running the /is open command.")
     public static String NO_OPEN_PERMISSION = "NO_OPEN_PERMISSION";
 
+    @Comment("Called when running the /is panel toggle command.")
+    public static String TOGGLED_PANEL_ON = "TOGGLED_PANEL_ON";
+
     @Comment("Called when running the /is permissions command.")
     public static String NO_PERMISSION_CHECK_PERMISSION = "NO_PERMISSION_CHECK_PERMISSION";
 

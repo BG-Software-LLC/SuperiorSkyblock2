@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.gui.GUIInventory;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -78,14 +78,14 @@ public final class FileUtil {
         return itemBuilder.build();
     }
 
-    public static GUIInventory getGUI(String identifier, ConfigurationSection section, int defaultSize, String defaultTitle){
+    public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, int defaultSize, String defaultTitle){
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
         int size = section.getInt("size", defaultSize);
 
         Sound openSound = getSound(section.getString("open-sound", ""));
         Sound closeSound = getSound(section.getString("close-sound", ""));
 
-        Inventory inventory = Bukkit.createInventory(null, 9 * size, title);
+        Inventory inventory = Bukkit.createInventory(menu, 9 * size, title);
 
         if(section.contains("fill-items")){
             ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
@@ -97,7 +97,10 @@ public final class FileUtil {
             }
         }
 
-        return GUIInventory.from(identifier, inventory).withSounds(openSound, closeSound);
+        menu.setOpenSound(openSound);
+        menu.setCloseSound(closeSound);
+
+        return inventory;
     }
 
     public static String fromLocation(Location location){

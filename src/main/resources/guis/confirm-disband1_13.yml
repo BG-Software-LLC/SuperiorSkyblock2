@@ -1,0 +1,23 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+disband-gui:
+  title: '&l      Confirm Disband'
+  open-sound: 'CHEST_OPEN'
+  close-sound: 'CHEST_CLOSE'
+
+  confirm:
+    slot: 1
+    type: LIME_STAINED_GLASS_PANE
+    name: '&aConfirm'
+    lore:
+    - '&8Are you sure?'
+
+  cancel:
+    slot: 3
+    type: RED_STAINED_GLASS_PANE
+    name: '&4Cancel'
