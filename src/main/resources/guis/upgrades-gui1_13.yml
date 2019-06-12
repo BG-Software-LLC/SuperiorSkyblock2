@@ -1,0 +1,626 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Make sure you put the correct upgrade name.
+
+upgrades-gui:
+  title: '&lIsland Upgrades'
+  size: 4
+  open-sound: 'CHEST_OPEN'
+  close-sound: 'CHEST_CLOSE'
+
+  fill-items:
+    '1':
+      type: CYAN_STAINED_GLASS_PANE
+      name: '&f'
+      slots: 0,1,7,8,9,17,18,19,25,26,27,28,29,33,34,35
+    '2':
+      type: BLUE_STAINED_GLASS_PANE
+      name: '&f'
+      slots: 2,3,5,6,10,16,20,24,30,32
+    '3':
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
+      data: 11
+      name: '&f'
+      slots: 4,12,14,22,31
+
+  upgrades:
+    hoppers-limit:
+      '1':
+        slot: 11
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: HOPPER
+          name: '&d&lHopper Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f16x Hoppers'
+            - '&dPrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: HOPPER
+          name: '&d&lHopper Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f16x Hoppers'
+            - '&dPrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 11
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: HOPPER
+          name: '&d&lHopper Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e3'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f32x Hoppers'
+            - '&dPrice: &f$3,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: HOPPER
+          name: '&d&lHopper Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e3'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f32x Hoppers'
+            - '&dPrice: &f$3,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 11
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: HOPPER
+          name: '&d&lHopper Increase &a(Available)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e4'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f64x Hoppers'
+            - '&dPrice: &f$9,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: HOPPER
+          name: '&d&lHopper Increase &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&dNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the hopper upgrade'
+            - '&7will increase your island''s'
+            - '&7max hoppers limit.'
+            - '&7'
+            - '&dAmount: &f64x Hoppers'
+            - '&dPrice: &f$9,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 11
+        has-next-level:
+          sound: 'ANVIL_LAND'
+          type: HOPPER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the hoppers limit!'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: HOPPER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the hoppers limit!'
+    crop-growth:
+      '1':
+        slot: 13
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &a(Available)'
+          lore:
+            - '&7'
+            - '&eNext Level: 2'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx2 Speed'
+            - '&ePrice: &f$100,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&eNext Level: 2'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx2 Speed'
+            - '&ePrice: &f$100,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 13
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &a(Available)'
+          lore:
+            - '&7'
+            - '&eNext Level: 3'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx3 Speed'
+            - '&ePrice: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&eNext Level: 3'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx3 Speed'
+            - '&ePrice: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 13
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &a(Available)'
+          lore:
+            - '&7'
+            - '&eNext Level: 4'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx4 Speed'
+            - '&ePrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: DIAMOND_HOE
+          name: '&e&lCrop Growth &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&eNext Level: 4'
+            - '&7'
+            - '&7Purchasing the growth upgrade'
+            - '&7gives all crops within your island'
+            - '&7increased growth speed.'
+            - '&7'
+            - '&eGrowth: &fx4 Speed'
+            - '&ePrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 13
+        has-next-level:
+          sound: 'ANVIL_LAND'
+          type: DIAMOND_HOE
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the crop growth!'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: DIAMOND_HOE
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the crop growth!'
+    spawner-rates:
+      '1':
+        slot: 15
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx2 Speed'
+            - '&bPrice: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e2'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx2 Speed'
+            - '&bPrice: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 15
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e3'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx3 Speed'
+            - '&bPrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e3'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx3 Speed'
+            - '&bPrice: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 15
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e4'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx4 Speed'
+            - '&bPrice: &f$2,500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: SPAWNER
+          name: '&b&lSpawner Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&bNext Level: &e4'
+            - '&7'
+            - '&7Purchasing the spawner upgrade'
+            - '&7gives all spawners within your island'
+            - '&7increased spawn speed.'
+            - '&7'
+            - '&bBoost: &fx4 Speed'
+            - '&bPrice: &f$2,500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 15
+        has-next-level:
+          sound: 'ANVIL_LAND'
+          type: SPAWNER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the spawner rates!'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: SPAWNER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the spawner rates!'
+    mob-drops:
+      '1':
+        slot: 21
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &a(Available)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx2 Drops'
+            - '&4Price: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx2 Drops'
+            - '&4Price: &f$1,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 21
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &a(Available)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx3 Drops'
+            - '&4Price: &f$2,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx3 Drops'
+            - '&4Price: &f$2,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 21
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &a(Available)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx5 Drops'
+            - '&4Price: &f$5,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: ROTTEN_FLESH
+          name: '&4&lPremium Drops &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&4Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the drops upgrade'
+            - '&7gives all mobs within your island'
+            - '&7increased loot drops.'
+            - '&7'
+            - '&4Amount: &fx5 Drops'
+            - '&4Price: &f$5,000,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 21
+        has-next-level:
+          sound: 'ANVIL_LAND'
+          type: ROTTEN_FLESH
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the mob drops!'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: ROTTEN_FLESH
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the mob drops!'
+    members-limit:
+      '1':
+        slot: 23
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &a(Available)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f8 Members'
+            - '&2Price: &f$100,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f8 Members'
+            - '&2Price: &f$100,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 23
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &a(Available)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f16 Members'
+            - '&2Price: &f$300,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f16 Members'
+            - '&2Price: &f$300,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 23
+        has-next-level:
+          sound: 'LEVEL_UP'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &a(Available)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f32 Members'
+            - '&2Price: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: PLAYER_HEAD
+          name: '&2&lMembers Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&2Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the members upgrade'
+            - '&7will increase the maximum allowed'
+            - '&7members in your island.'
+            - '&7'
+            - '&2Amount: &f32 Members'
+            - '&2Price: &f$500,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 23
+        has-next-level:
+          sound: 'ANVIL_LAND'
+          type: PLAYER_HEAD
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the members limit!'
+        no-next-level:
+          sound: 'ANVIL_LAND'
+          type: PLAYER_HEAD
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the members limit!'

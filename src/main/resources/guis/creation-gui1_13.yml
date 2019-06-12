@@ -1,0 +1,28 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+creation-gui:
+  title: '&lCreate a new island...'
+  size: 1
+  open-sound: 'CHEST_OPEN'
+  close-sound: 'CHEST_CLOSE'
+
+  schematics:
+    default:
+      required-permission: ''
+      bonus-worth: -365
+      slot: 0
+      has-access-item:
+        type: GRASS_BLOCK
+        name: '&eDefault Island &a(Available)'
+        lore:
+          - '&7The old and the original island.'
+      no-access-item:
+        type: GRASS_BLOCK
+        name: '&eDefault Island &c(Unavailable)'
+        lore:
+          - '&7The old and the original island.'
