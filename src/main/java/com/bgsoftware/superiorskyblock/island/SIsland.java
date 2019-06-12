@@ -168,7 +168,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.paypal = resultSet.getString("paypal");
         this.locked = resultSet.getBoolean("locked");
 
-        calcIslandWorth(null);
+        //calcIslandWorth(null);
     }
 
     public SIsland(CompoundTag tag){
@@ -211,7 +211,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = ((StringTag) compoundValues.get("discord")).getValue();
         this.paypal = ((StringTag) compoundValues.get("paypal")).getValue();
 
-        calcIslandWorth(null);
+        //calcIslandWorth(null);
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location){
