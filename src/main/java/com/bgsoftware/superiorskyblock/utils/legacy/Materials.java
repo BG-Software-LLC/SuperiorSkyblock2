@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils.legacy;
 
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

@@ -20,7 +20,7 @@ import java.util.List;
 public final class FileUtil {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static boolean v1_13 = Bukkit.getBukkitVersion().contains("1.13");
+    private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
 
     public static ItemStack getItemStack(ConfigurationSection section){
         if(section == null)
@@ -114,11 +114,12 @@ public final class FileUtil {
                 Double.valueOf(sections[3]), Float.valueOf(sections[4]), Float.valueOf(sections[5]));
     }
 
-    public static void saveResource(String resourcePath, boolean supportLegacy){
+    public static void saveResource(String resourcePath){
         try {
             String destination = resourcePath;
 
-            if(supportLegacy && v1_13) resourcePath = resourcePath.replace(".yml", "-legacy.yml");
+            if(!legacy) resourcePath = resourcePath.replace(".yml", "1_13.yml")
+                    .replace(".schematic", "1_13.schematic");
 
             File file = new File(plugin.getDataFolder(), resourcePath);
             plugin.saveResource(resourcePath, true);
@@ -131,10 +132,6 @@ public final class FileUtil {
         }catch(Exception ex){
             ex.printStackTrace();
         }
-    }
-
-    public static void saveResource(String resourcePath) {
-        saveResource(resourcePath, false);
     }
 
     private static Sound getSound(String sound){

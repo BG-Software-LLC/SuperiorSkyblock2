@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
@@ -14,6 +16,7 @@ import net.minecraft.server.v1_9_R2.EntityLiving;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
 import net.minecraft.server.v1_9_R2.IBlockData;
 import net.minecraft.server.v1_9_R2.ItemStack;
+import net.minecraft.server.v1_9_R2.NBTBase;
 import net.minecraft.server.v1_9_R2.NBTTagByte;
 import net.minecraft.server.v1_9_R2.NBTTagByteArray;
 import net.minecraft.server.v1_9_R2.NBTTagCompound;
@@ -224,6 +227,16 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
     @Override
     public String getNBTStringValue(Object object) {
         return ((NBTTagString) object).a_();
+    }
+
+    @Override
+    public Object parseList(ListTag listTag) {
+        NBTTagList nbtTagList = new NBTTagList();
+
+        for(Tag tag : listTag.getValue())
+            nbtTagList.add((NBTBase) tag.toNBT());
+
+        return nbtTagList;
     }
 
 }

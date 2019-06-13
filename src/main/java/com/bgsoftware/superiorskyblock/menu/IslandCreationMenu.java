@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,6 +20,7 @@ import java.util.Map;
 public final class IslandCreationMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
 
     private static Map<String, Object> schematicsData = new HashMap<>();
 
@@ -55,7 +57,7 @@ public final class IslandCreationMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
         for(String schematic : plugin.getSchematics().getSchematics()){
@@ -85,6 +87,7 @@ public final class IslandCreationMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(islandCreationMenu, cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("creation-gui.title"));
 
         ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics");
 

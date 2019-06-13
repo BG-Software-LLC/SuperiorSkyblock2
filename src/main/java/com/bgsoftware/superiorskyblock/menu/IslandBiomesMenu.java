@@ -18,6 +18,7 @@ import java.util.Map;
 public final class IslandBiomesMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
 
     private static Map<String, Object> biomesData = new HashMap<>();
 
@@ -52,7 +53,7 @@ public final class IslandBiomesMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
         for(Biome biome : Biome.values()){

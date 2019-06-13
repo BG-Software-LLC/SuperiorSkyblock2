@@ -24,6 +24,7 @@ import java.util.List;
 public final class IslandWarpsMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
 
     private static ItemStack previousButton, currentButton, nextButton, warpItem;
     private static Sound previousSound, currentSound, nextSound, warpSound;
@@ -91,7 +92,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
         List<String> warps = new ArrayList<>(island.getAllWarps());
@@ -132,6 +133,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("warps-gui"), 6, "&lIsland Warps");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("warps-gui.title"));
 
         ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.previous-page"));
         ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("warps-gui.current-page"));

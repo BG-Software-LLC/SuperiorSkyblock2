@@ -106,9 +106,11 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                for (Chunk chunk : island.getAllChunks(true)) {
-                    chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-                    plugin.getNMSAdapter().refreshChunk(chunk);
+                if(!Bukkit.getBukkitVersion().contains("1.14")) {
+                    for (Chunk chunk : island.getAllChunks(true)) {
+                        chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
+                        plugin.getNMSAdapter().refreshChunk(chunk);
+                    }
                 }
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);

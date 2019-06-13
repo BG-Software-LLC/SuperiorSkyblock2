@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,6 +16,7 @@ import java.io.File;
 public final class MemberManageMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
     private static int rolesSlot, banSlot, kickSlot;
     private static Sound rolesSound, banSound, kickSound;
 
@@ -43,7 +45,7 @@ public final class MemberManageMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle().replace("{}", targetPlayer.getName()));
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title.replace("{}", targetPlayer.getName()));
         inv.setContents(inventory.getContents());
         return inv;
     }
@@ -58,6 +60,7 @@ public final class MemberManageMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(memberManageMenu, cfg.getConfigurationSection("players-panel"), 6, "");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("players-panel.title"));
 
         rolesSlot = cfg.getInt("players-panel.roles.slot");
         banSlot = cfg.getInt("players-panel.ban.slot");

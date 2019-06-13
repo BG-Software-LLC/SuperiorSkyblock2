@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -62,4 +63,7 @@ public interface NMSAdapter {
     short getNBTShortValue(Object object);
 
     String getNBTStringValue(Object object);
+
+    Object parseList(ListTag listTag);
+
 }

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.jnbt;
 
 import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import net.minecraft.server.v1_14_R1.NBTTagList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,21 +93,7 @@ public final class ListTag extends Tag<List<Tag>> {
 
     @Override
     public Object toNBT() {
-        try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagList");
-            Class nbtTagBase = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTBase");
-            //noinspection unchecked, ConstantConditions
-            Object nbtTagList = nbtTagClass.getConstructor().newInstance();
-
-            for(Tag _tag : value)
-                //noinspection unchecked
-                nbtTagClass.getMethod("add", nbtTagBase).invoke(nbtTagList, _tag.toNBT());
-
-            return nbtTagList;
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
+        return plugin.getNMSAdapter().parseList(this);
     }
 
     public static ListTag fromNBT(Object tag){

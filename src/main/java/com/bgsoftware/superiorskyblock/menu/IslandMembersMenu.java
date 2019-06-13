@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public final class IslandMembersMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
     private static ItemStack previousButton, currentButton, nextButton, memberItem;
     private static int previousSlot, currentSlot, nextSlot;
     private static Sound previousSound, currentSound, nextSound, memberSound;
@@ -97,7 +99,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
         this.page = page;
 
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < members.size(); i++){
@@ -138,6 +140,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(islandMembersMenu, cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("members-panel.title"));
 
         previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.previous-page"));
         currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.current-page"));

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.google.common.collect.Lists;
 
@@ -57,14 +58,7 @@ public final class SchematicsHandler implements SchematicManager {
 
         if(!schematicsFolder.exists()) {
             schematicsFolder.mkdirs();
-            if(plugin.getServer().getBukkitVersion().contains("1.13")){
-                plugin.saveResource("schematics/default1_13.schematic", true);
-                File fileDefault = new File(plugin.getDataFolder(), "schematics/default.schematic");
-                File fileDefault1_13 = new File(plugin.getDataFolder(), "schematics/default1_13.schematic");
-                fileDefault1_13.renameTo(fileDefault);
-            }else{
-                plugin.saveResource("schematics/default.schematic", true);
-            }
+            FileUtil.saveResource("schematics/default.schematic");
         }
 
         //noinspection ConstantConditions

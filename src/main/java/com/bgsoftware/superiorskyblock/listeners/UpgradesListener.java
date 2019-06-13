@@ -64,7 +64,7 @@ public final class UpgradesListener implements Listener {
                 byte newData = (byte) (e.getBlock().getData() + cropGrowthMultiplier);
                 if(newData > maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7))
                     newData = maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7);
-                if(Bukkit.getBukkitVersion().contains("1.13")){
+                if(Bukkit.getBukkitVersion().contains("1.13") || Bukkit.getBukkitVersion().contains("1.14")){
                     try {
                         Object blockData = UnsafeValues.class.getMethod("fromLegacy", Material.class, byte.class)
                                 .invoke(Bukkit.getUnsafe(), e.getBlock().getType(), newData);

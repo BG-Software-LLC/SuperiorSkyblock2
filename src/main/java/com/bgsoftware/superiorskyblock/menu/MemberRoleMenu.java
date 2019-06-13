@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,6 +16,7 @@ import java.io.File;
 public final class MemberRoleMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
     private static int memberSlot, modSlot, adminSlot, leaderSlot;
     private static Sound memberSound, modSound, adminSound, leaderSound;
 
@@ -48,7 +50,7 @@ public final class MemberRoleMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle().replace("{}", targetPlayer.getName()));
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title.replace("{}", targetPlayer.getName()));
         inv.setContents(inventory.getContents());
         return inv;
     }
@@ -63,6 +65,7 @@ public final class MemberRoleMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(memberRoleMenu, cfg.getConfigurationSection("roles-panel"), 5, "");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("roles-panel.title"));
 
         ItemStack memberButton = FileUtil.getItemStack(cfg.getConfigurationSection("roles-panel.member-role"));
         ItemStack modButton = FileUtil.getItemStack(cfg.getConfigurationSection("roles-panel.mod-role"));

@@ -49,7 +49,7 @@ public final class TagUtil {
             }, 1L);
 
         new SuperiorThread(() -> {
-            if(FAWEHook.isEnabled() && !version.contains("1.13")){
+            if(FAWEHook.isEnabled() && !version.contains("1.13") && !version.contains("1.14")){
                 FAWEHook.setBlocks(blocks, offset, _callback);
             }
             else {

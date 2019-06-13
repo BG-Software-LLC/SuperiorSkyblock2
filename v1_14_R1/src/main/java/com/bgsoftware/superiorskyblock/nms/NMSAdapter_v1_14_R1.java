@@ -3,53 +3,55 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.Chunk;
-import net.minecraft.server.v1_10_R1.EntityHuman;
-import net.minecraft.server.v1_10_R1.EntityLiving;
-import net.minecraft.server.v1_10_R1.EntityPlayer;
-import net.minecraft.server.v1_10_R1.IBlockData;
-import net.minecraft.server.v1_10_R1.ItemStack;
-import net.minecraft.server.v1_10_R1.NBTBase;
-import net.minecraft.server.v1_10_R1.NBTTagByte;
-import net.minecraft.server.v1_10_R1.NBTTagByteArray;
-import net.minecraft.server.v1_10_R1.NBTTagCompound;
-import net.minecraft.server.v1_10_R1.NBTTagDouble;
-import net.minecraft.server.v1_10_R1.NBTTagFloat;
-import net.minecraft.server.v1_10_R1.NBTTagInt;
-import net.minecraft.server.v1_10_R1.NBTTagIntArray;
-import net.minecraft.server.v1_10_R1.NBTTagList;
-import net.minecraft.server.v1_10_R1.NBTTagLong;
-import net.minecraft.server.v1_10_R1.NBTTagShort;
-import net.minecraft.server.v1_10_R1.NBTTagString;
-import net.minecraft.server.v1_10_R1.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_10_R1.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_10_R1.TileEntityFlowerPot;
-import net.minecraft.server.v1_10_R1.TileEntityMobSpawner;
-import net.minecraft.server.v1_10_R1.World;
-import net.minecraft.server.v1_10_R1.WorldBorder;
+import com.mojang.authlib.properties.Property;
+import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.BlockFlowerPot;
+import net.minecraft.server.v1_14_R1.BlockPosition;
+import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.EntityHuman;
+import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.IBlockData;
+import net.minecraft.server.v1_14_R1.ItemStack;
+import net.minecraft.server.v1_14_R1.NBTBase;
+import net.minecraft.server.v1_14_R1.NBTTagByte;
+import net.minecraft.server.v1_14_R1.NBTTagByteArray;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.NBTTagDouble;
+import net.minecraft.server.v1_14_R1.NBTTagFloat;
+import net.minecraft.server.v1_14_R1.NBTTagInt;
+import net.minecraft.server.v1_14_R1.NBTTagIntArray;
+import net.minecraft.server.v1_14_R1.NBTTagList;
+import net.minecraft.server.v1_14_R1.NBTTagLong;
+import net.minecraft.server.v1_14_R1.NBTTagShort;
+import net.minecraft.server.v1_14_R1.NBTTagString;
+import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_14_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_14_R1.TileEntityMobSpawner;
+import net.minecraft.server.v1_14_R1.World;
+import net.minecraft.server.v1_14_R1.WorldBorder;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.craftbukkit.v1_10_R1.CraftChunk;
-import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
-public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
+public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -65,15 +67,25 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
+        chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
     }
 
     @Override
     public org.bukkit.inventory.ItemStack getFlowerPot(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
-        ItemStack itemStack = new ItemStack(tileEntityFlowerPot.getItem(), 1, tileEntityFlowerPot.getData());
+        BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
+        Block flower;
+        try{
+            Field flowerField = blockFlowerPot.getClass().getDeclaredField("c");
+            flowerField.setAccessible(true);
+            flower = (Block) flowerField.get(blockFlowerPot);
+            flowerField.setAccessible(false);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+        ItemStack itemStack = new ItemStack(flower.getItem(), 1);
         return CraftItemStack.asBukkitCopy(itemStack);
     }
 
@@ -81,10 +93,17 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     public void setFlowerPot(Location location, org.bukkit.inventory.ItemStack itemStack) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
+        BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
         ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
-        tileEntityFlowerPot.a(flower.getItem(), flower.getData());
-        tileEntityFlowerPot.update();
+        try{
+            Field flowerField = blockFlowerPot.getClass().getField("c");
+            flowerField.setAccessible(true);
+            flowerField.set(blockFlowerPot, Block.asBlock(flower.getItem()));
+            flowerField.setAccessible(false);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        world.update(blockPosition, blockFlowerPot);
     }
 
     @Override
@@ -118,18 +137,18 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     }
 
     @Override
-    @Deprecated
     public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
-        Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
-        short data = (short) chunkSnapshot.getBlockData(x, y, z);
+        IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
+        Material type = chunkSnapshot.getBlockType(x, y, z);
+        short data = (short) (Block.getCombinedId(blockData) >> 12 & 15);
         return SKey.of(type, data);
     }
 
     @Override
     public int getSpawnerDelay(CreatureSpawner creatureSpawner) {
         Location location = creatureSpawner.getLocation();
-        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld())
-                .getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld()).getHandle().getTileEntity(blockPosition);
         return mobSpawner.getSpawner().spawnDelay;
     }
 
@@ -137,13 +156,13 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(EntityHuman entityHuman : world.players)
+        for(EntityHuman entityHuman : world.getPlayers())
             ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
-        try{
+        try {
             if(!plugin.getSettings().worldBordersEnabled)
                 return;
 
@@ -176,57 +195,57 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
 
     @Override
     public byte[] getNBTByteArrayValue(Object object) {
-        return ((NBTTagByteArray) object).c();
+        return ((NBTTagByteArray) object).getBytes();
     }
 
     @Override
     public byte getNBTByteValue(Object object) {
-        return ((NBTTagByte) object).g();
+        return ((NBTTagByte) object).asByte();
     }
 
     @Override
     public Set<String> getNBTCompoundValue(Object object) {
-        return ((NBTTagCompound) object).c();
+        return ((NBTTagCompound) object).getKeys();
     }
 
     @Override
     public double getNBTDoubleValue(Object object) {
-        return ((NBTTagDouble) object).h();
+        return ((NBTTagDouble) object).asDouble();
     }
 
     @Override
     public float getNBTFloatValue(Object object) {
-        return ((NBTTagFloat) object).i();
+        return ((NBTTagFloat) object).asFloat();
     }
 
     @Override
     public int[] getNBTIntArrayValue(Object object) {
-        return ((NBTTagIntArray) object).d();
+        return ((NBTTagIntArray) object).getInts();
     }
 
     @Override
     public int getNBTIntValue(Object object) {
-        return ((NBTTagInt) object).e();
+        return ((NBTTagInt) object).asInt();
     }
 
     @Override
     public Object getNBTListIndexValue(Object object, int index) {
-        return ((NBTTagList) object).h(index);
+        return ((NBTTagList) object).get(index);
     }
 
     @Override
     public long getNBTLongValue(Object object) {
-        return ((NBTTagLong) object).d();
+        return ((NBTTagLong) object).asLong();
     }
 
     @Override
     public short getNBTShortValue(Object object) {
-        return ((NBTTagShort) object).f();
+        return ((NBTTagShort) object).asShort();
     }
 
     @Override
     public String getNBTStringValue(Object object) {
-        return ((NBTTagString) object).c_();
+        return ((NBTTagString) object).asString();
     }
 
     @Override

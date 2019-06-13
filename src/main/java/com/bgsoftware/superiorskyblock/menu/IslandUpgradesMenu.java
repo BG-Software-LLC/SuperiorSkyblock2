@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -17,6 +18,7 @@ import java.util.Map;
 public final class IslandUpgradesMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
 
     private Island island;
     private SuperiorPlayer superiorPlayer;
@@ -44,7 +46,7 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), inventory.getTitle());
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
         Map<String, UpgradesHandler.UpgradeData> upgrades = plugin.getUpgrades().getUpgrades();
@@ -76,6 +78,7 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
         ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
 
         inventory = FileUtil.loadGUI(islandUpgradesMenu, section, 4, "&lIsland Upgrades");
+        title = ChatColor.translateAlternateColorCodes('&', section.getString("title"));
 
         if(section.contains("upgrades")){
             ConfigurationSection upgrades = section.getConfigurationSection("upgrades");

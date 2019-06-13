@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -24,6 +25,7 @@ import java.util.List;
 public final class IslandValuesMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
+    private static String title = "";
 
     private static String blockName;
     private static List<String> blockLore;
@@ -45,7 +47,7 @@ public final class IslandValuesMenu extends SuperiorMenu {
         Inventory inv = Bukkit.createInventory(
                 this,
                 inventory.getSize(),
-                inventory.getTitle().replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString())
+                title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString())
         );
 
         inv.setContents(inventory.getContents());
@@ -97,6 +99,7 @@ public final class IslandValuesMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("values-gui.title"));
 
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");
         List<String> blockLore = cfg.getStringList("values-gui.block-item.lore");
