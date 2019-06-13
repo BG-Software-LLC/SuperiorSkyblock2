@@ -50,6 +50,7 @@ public final class SettingsHandler {
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
     public final Map<String, String> defaultPlaceholders;
+    public final boolean disbandConfirm;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -98,6 +99,7 @@ public final class SettingsHandler {
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
                 line -> line.split(":")[1]
         ));
+        disbandConfirm = cfg.getBoolean("disband-confirm");
     }
 
     public void updateValue(String path, Object value){

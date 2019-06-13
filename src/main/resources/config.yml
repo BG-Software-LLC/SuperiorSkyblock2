@@ -345,3 +345,6 @@ default-placeholders:
 - 'superior_island_leader:N/A'
 - 'superior_island_level:0'
 - 'superior_island_worth:0'
+
+# Should a confirm gui be displayed when /is disband is executed.
+disband-confirm: true

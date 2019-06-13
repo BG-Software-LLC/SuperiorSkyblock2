@@ -178,4 +178,8 @@ public final class ConfigComments {
     @Comment("Please use the <placeholder>:<default> format.")
     public static String DEFAULT_PLACEHOLDERS = "default-placeholders";
 
+    @Comment("")
+    @Comment("Should a confirm gui be displayed when /is disband is executed.")
+    public static String DISBAND_CONFIRM = "disband-confirm";
+
 }

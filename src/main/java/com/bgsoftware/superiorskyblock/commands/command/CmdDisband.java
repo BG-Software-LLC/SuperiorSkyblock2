@@ -69,19 +69,28 @@ public final class CmdDisband implements ICommand {
             return;
         }
 
-        IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
-        Bukkit.getPluginManager().callEvent(islandDisbandEvent);
+        if(plugin.getSettings().disbandConfirm) {
+            ConfirmDisbandMenu.openInventory(superiorPlayer, null);
+        }
 
-        if(islandDisbandEvent.isCancelled())
-            return;
+        else{
+            IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
+            Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
-        for(UUID uuid : island.getMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
+            if(!islandDisbandEvent.isCancelled()) {
+                for(UUID uuid : island.getMembers()){
+                    if(Bukkit.getOfflinePlayer(uuid).isOnline()){
+                        Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
+                    }
+                }
+
+                Locale.DISBANDED_ISLAND.send(superiorPlayer);
+
+                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+                island.disbandIsland();
             }
         }
 
-        ConfirmDisbandMenu.openInventory(superiorPlayer, null);
     }
 
     @Override
