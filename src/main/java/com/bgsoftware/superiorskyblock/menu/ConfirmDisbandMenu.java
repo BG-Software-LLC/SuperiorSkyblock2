@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -77,11 +76,7 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        String title = cfg.getString("disband-gui.title", "&l      Confirm Disband");
-        confirmDisbandMenu.openSound = getSound(cfg.getString("disband-gui.open-sound", ""));
-        confirmDisbandMenu.closeSound = getSound(cfg.getString("disband-gui.close-sound", ""));
-
-        inventory = Bukkit.createInventory(confirmDisbandMenu, InventoryType.HOPPER, ChatColor.translateAlternateColorCodes('&', title));
+        inventory = FileUtil.loadGUI(confirmDisbandMenu, cfg.getConfigurationSection("disband-gui"), InventoryType.HOPPER, "&l      Confirm Disband");
 
         ItemStack confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
         confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);

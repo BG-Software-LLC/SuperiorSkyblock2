@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -78,14 +79,22 @@ public final class FileUtil {
         return itemBuilder.build();
     }
 
+    public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, InventoryType inventoryType, String defaultTitle){
+        String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
+        Inventory inventory = Bukkit.createInventory(menu, inventoryType, title);
+        return loadGUI(menu, inventory, section);
+    }
+
     public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, int defaultSize, String defaultTitle){
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
         int size = section.getInt("size", defaultSize);
+        Inventory inventory = Bukkit.createInventory(menu, 9 * size, title);
+        return loadGUI(menu, inventory, section);
+    }
 
+    private static Inventory loadGUI(SuperiorMenu menu, Inventory inventory, ConfigurationSection section){
         Sound openSound = getSound(section.getString("open-sound", ""));
         Sound closeSound = getSound(section.getString("close-sound", ""));
-
-        Inventory inventory = Bukkit.createInventory(menu, 9 * size, title);
 
         if(section.contains("fill-items")){
             ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
