@@ -99,7 +99,7 @@ public final class GridHandler implements GridManager {
             Location islandLocation = getNextLocation();
             Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5));
 
-            IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island);
+            IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island, schemName);
             Bukkit.getPluginManager().callEvent(islandCreateEvent);
 
             if(!islandCreateEvent.isCancelled()) {

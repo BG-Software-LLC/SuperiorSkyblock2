@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -13,12 +14,19 @@ public class IslandCreateEvent extends Event implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private final Island island;
+    private final String schematic;
     private boolean teleport = true;
     private boolean cancelled = false;
 
+    @Deprecated
     public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island){
+        this(superiorPlayer, island, "");
+    }
+
+    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic){
         this.superiorPlayer = superiorPlayer;
         this.island = island;
+        this.schematic = schematic;
     }
 
     public SuperiorPlayer getPlayer() {
@@ -27,6 +35,10 @@ public class IslandCreateEvent extends Event implements Cancellable {
 
     public Island getIsland() {
         return island;
+    }
+
+    public String getSchematic() {
+        return schematic;
     }
 
     @Override
