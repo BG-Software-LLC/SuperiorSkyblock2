@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class CmdTransfer implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("transfer");
+        return Arrays.asList("transfer", "leader", "leadership");
     }
 
     @Override
