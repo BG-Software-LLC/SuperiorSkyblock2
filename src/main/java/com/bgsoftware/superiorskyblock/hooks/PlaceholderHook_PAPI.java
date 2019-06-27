@@ -31,6 +31,11 @@ public final class PlaceholderHook_PAPI extends PlaceholderHook {
         public String onPlaceholderRequest(Player player, String placeholder) {
             return parsePlaceholder(player, placeholder);
         }
+
+        @Override
+        public boolean persist() {
+            return true;
+        }
     }
 
 }
