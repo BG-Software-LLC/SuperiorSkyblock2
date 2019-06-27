@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,6 +83,18 @@ public final class FileUtil {
     public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, InventoryType inventoryType, String defaultTitle){
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
         Inventory inventory = Bukkit.createInventory(menu, inventoryType, title);
+
+        if(inventory.getHolder() == null){
+            try{
+                Class craftInventoryClass = ReflectionUtil.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
+                //noinspection all
+                Field field = craftInventoryClass.getDeclaredField("inventory");
+                field.setAccessible(true);
+                field.set(inventory, plugin.getNMSAdapter().getCustomHolder(menu, title));
+                field.setAccessible(false);
+            }catch(Exception ignored){}
+        }
+
         return loadGUI(menu, inventory, section);
     }
 

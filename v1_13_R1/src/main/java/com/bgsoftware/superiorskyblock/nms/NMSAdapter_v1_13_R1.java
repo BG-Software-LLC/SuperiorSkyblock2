@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.mojang.authlib.properties.Property;
@@ -11,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockFlowerPot;
 import net.minecraft.server.v1_13_R1.BlockPosition;
+import net.minecraft.server.v1_13_R1.ChatMessage;
 import net.minecraft.server.v1_13_R1.Chunk;
 import net.minecraft.server.v1_13_R1.EntityHuman;
 import net.minecraft.server.v1_13_R1.EntityLiving;
@@ -31,6 +33,7 @@ import net.minecraft.server.v1_13_R1.NBTTagShort;
 import net.minecraft.server.v1_13_R1.NBTTagString;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_13_R1.TileEntityHopper;
 import net.minecraft.server.v1_13_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R1.World;
 
@@ -46,6 +49,7 @@ import org.bukkit.craftbukkit.v1_13_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -257,6 +261,26 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
             nbtTagList.add((NBTBase) tag.toNBT());
 
         return nbtTagList;
+    }
+
+    @Override
+    public Object getCustomHolder(InventoryHolder defaultHolder, String title) {
+        return new CustomTileEntityHopper(defaultHolder, title);
+    }
+
+    private class CustomTileEntityHopper extends TileEntityHopper{
+
+        private InventoryHolder holder;
+
+        CustomTileEntityHopper(InventoryHolder holder, String title){
+            this.holder = holder;
+            this.setCustomName(new ChatMessage(title));
+        }
+
+        @Override
+        public InventoryHolder getOwner() {
+            return holder;
+        }
     }
 
 }

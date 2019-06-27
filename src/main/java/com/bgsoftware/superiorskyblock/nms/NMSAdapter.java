@@ -10,6 +10,7 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
@@ -65,5 +66,9 @@ public interface NMSAdapter {
     String getNBTStringValue(Object object);
 
     Object parseList(ListTag listTag);
+
+    default Object getCustomHolder(InventoryHolder defaultHolder, String title){
+        return defaultHolder;
+    }
 
 }

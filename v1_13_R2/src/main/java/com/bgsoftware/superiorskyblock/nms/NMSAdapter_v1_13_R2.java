@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockFlowerPot;
 import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityLiving;
@@ -31,6 +32,7 @@ import net.minecraft.server.v1_13_R2.NBTTagShort;
 import net.minecraft.server.v1_13_R2.NBTTagString;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_13_R2.TileEntityHopper;
 import net.minecraft.server.v1_13_R2.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R2.World;
 import net.minecraft.server.v1_13_R2.WorldBorder;
@@ -45,6 +47,7 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
@@ -256,6 +259,26 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
             nbtTagList.add((NBTBase) tag.toNBT());
 
         return nbtTagList;
+    }
+
+    @Override
+    public Object getCustomHolder(InventoryHolder defaultHolder, String title) {
+        return new CustomTileEntityHopper(defaultHolder, title);
+    }
+
+    private class CustomTileEntityHopper extends TileEntityHopper {
+
+        private InventoryHolder holder;
+
+        CustomTileEntityHopper(InventoryHolder holder, String title){
+            this.holder = holder;
+            this.setCustomName(new ChatMessage(title));
+        }
+
+        @Override
+        public InventoryHolder getOwner() {
+            return holder;
+        }
     }
 
 }
