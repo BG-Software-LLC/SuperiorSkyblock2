@@ -348,3 +348,7 @@ default-placeholders:
 
 # Should a confirm gui be displayed when /is disband is executed.
 disband-confirm: true
+
+# If you want a specific spawners provider to use, specify it here.
+# Providers: AUTO, MERGEDSPAWNER, STACKSPAWNERS, WILDSTACKER, SILKSPAWNERS
+spawners-provider: 'AUTO'

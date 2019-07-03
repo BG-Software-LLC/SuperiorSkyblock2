@@ -11,10 +11,11 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
-import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.listeners.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
@@ -38,6 +39,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
@@ -537,14 +539,12 @@ public class SIsland extends DatabaseObject implements Island {
 
         calcProcess = true;
 
+        List<Chunk> chunks = getAllChunks(true);
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
-        Map<Location, Map.Entry<Integer, EntityType>> spawners = new HashMap<>();
-        Map<Location, Map.Entry<Integer, Material>> blocks = new HashMap<>();
 
-        for (Chunk chunk : getAllChunks(true)) {
+        for (Chunk chunk : chunks) {
             chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
-            spawners.putAll(WildStackerHook.getAllSpawners(chunk));
-            blocks.putAll(WildStackerHook.getAllBarrels(chunk));
+            BlocksProvider_WildStacker.cacheChunk(chunk);
         }
 
         blockCounts.clear();
@@ -554,6 +554,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         new SuperiorThread(() -> {
             Set<Thread> threads = new HashSet<>();
+            Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 Thread thread = new Thread(() -> {
@@ -585,20 +586,26 @@ public class SIsland extends DatabaseObject implements Island {
                                 Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                                 int blockCount = plugin.getGrid().getBlockAmount(location);
 
-                                if(spawners.containsKey(location)){
-                                    Map.Entry<Integer, EntityType> entry = spawners.get(location);
+                                if(blockKey.toString().contains("SPAWNER")){
+                                    Pair<Integer, EntityType> entry = plugin.getProviders().getSpawner(location);
                                     blockCount = entry.getKey();
-                                    blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
+                                    if(entry.getValue() == null){
+                                        spawnersToCheck.add(new Pair<>(location, blockCount));
+                                        continue;
+                                    }
+                                    else{
+                                        blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
+                                    }
                                 }
 
-                                else if(blocks.containsKey(location)){
-                                    Map.Entry<Integer, Material> entry = blocks.get(location);
-                                    blockCount = entry.getKey();
-                                    blockKey = SKey.of(entry.getValue().name());
+                                Pair<Integer, Material> blockPair = plugin.getProviders().getBlock(location);
+
+                                if(blockPair != null){
+                                    blockCount = blockPair.getKey();
+                                    blockKey = SKey.of(blockPair.getValue().name());
                                 }
 
                                 handleBlockPlace(blockKey, blockCount, false);
-                                //islandWorth += plugin.getGrid().getBlockValue(blockKey) * blockCount;
                             }
                         }
                     }
@@ -613,10 +620,28 @@ public class SIsland extends DatabaseObject implements Island {
                 }catch(Exception ignored){}
             }
 
+            for(Chunk chunk : chunks)
+                BlocksProvider_WildStacker.uncacheChunk(chunk);
+
             saveBlockCounts();
 
             calcProcess = false;
             Bukkit.getScheduler().runTask(plugin, () -> {
+                Key blockKey;
+                int blockCount;
+
+                for(Pair<Location, Integer> pair : spawnersToCheck){
+                    try {
+                        CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
+                        blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType());
+                        blockCount = pair.getValue();
+                        if(blockCount <= 0)
+                            blockCount = plugin.getProviders().getSpawner(pair.getKey()).getKey();
+                        handleBlockPlace(blockKey, blockCount, false);
+                    }catch(Throwable ignored){}
+                }
+                spawnersToCheck.clear();
+
                 Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, getIslandLevelAsBigDecimal(), asker));
 
                 if(asker != null)

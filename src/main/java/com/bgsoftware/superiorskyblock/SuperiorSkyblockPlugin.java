@@ -4,12 +4,19 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
-import com.bgsoftware.superiorskyblock.handlers.*;
-import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
-import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
-import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.hooks.WildStackerHook;
-import com.bgsoftware.superiorskyblock.listeners.*;
+import com.bgsoftware.superiorskyblock.handlers.DataHandler;
+import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
+import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
+import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
+import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
+import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
+import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
+import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
+import com.bgsoftware.superiorskyblock.listeners.MenusListener;
+import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
+import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
+import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
@@ -48,6 +55,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler;
     private DataHandler dataHandler;
     private UpgradesHandler upgradesHandler;
+    private ProvidersHandler providersHandler;
 
     private NMSAdapter nmsAdapter;
 
@@ -77,14 +85,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
                 reloadPlugin(true);
-
-                if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
-                    FAWEHook.register();
-                if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
-                    LeaderHeadsHook.register();
-                WildStackerHook.register(this);
-
-                PlaceholderHook.register(this);
 
                 loadWorld();
 
@@ -160,6 +160,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.reloadBlockValues();
         }
         schematicsHandler = new SchematicsHandler(this);
+        providersHandler = new ProvidersHandler(this);
 
         loadMenus();
 
@@ -190,6 +191,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandWarpsMenu.init();
         MemberManageMenu.init();
         MemberRoleMenu.init();
+    }
+
+    public ProvidersHandler getProviders() {
+        return providersHandler;
     }
 
     public UpgradesHandler getUpgrades() {

@@ -51,6 +51,7 @@ public final class SettingsHandler {
     public final boolean islandTopIncludeLeader;
     public final Map<String, String> defaultPlaceholders;
     public final boolean disbandConfirm;
+    public final String spawnersProvider;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -100,6 +101,7 @@ public final class SettingsHandler {
                 line -> line.split(":")[1]
         ));
         disbandConfirm = cfg.getBoolean("disband-confirm");
+        spawnersProvider = cfg.getString("spawners-provider", "AUTO");
     }
 
     public void updateValue(String path, Object value){

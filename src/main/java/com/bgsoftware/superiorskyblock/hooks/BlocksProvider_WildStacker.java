@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -10,7 +11,9 @@ import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
+import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
+import com.bgsoftware.wildstacker.api.objects.StackedSpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -23,50 +26,46 @@ import org.bukkit.event.Listener;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class WildStackerHook {
+public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     private static final Map<Chunk, StackedSnapshot> chunkSnapshots = new HashMap<>();
 
-    public static Map<Location, Map.Entry<Integer, EntityType>> getAllSpawners(Chunk chunk){
-        if(isEnabled() && prepareSnapshot(chunk))
-            return chunkSnapshots.get(chunk).getAllSpawners();
-
-        return new HashMap<>();
+    public BlocksProvider_WildStacker(){
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
     }
 
-    public static Map<Location, Map.Entry<Integer, Material>> getAllBarrels(Chunk chunk){
-        if(isEnabled() && prepareSnapshot(chunk))
-            return chunkSnapshots.get(chunk).getAllBarrels();
-
-        return new HashMap<>();
+    public static void cacheChunk(Chunk chunk){
+        try {
+            chunkSnapshots.put(chunk, WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
+        }catch(Throwable ignored){}
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin){
-        if(isEnabled())
-            plugin.getServer().getPluginManager().registerEvents(new StackerListener(plugin), plugin);
+    public static void uncacheChunk(Chunk chunk){
+        chunkSnapshots.remove(chunk);
     }
 
-    private static boolean isEnabled(){
-        return Bukkit.getPluginManager().isPluginEnabled("WildStacker");
+    @Override
+    public Pair<Integer, EntityType> getSpawner(Location location) {
+        if(chunkSnapshots.containsKey(location.getChunk()))
+            return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedSpawner(location));
+
+        StackedSpawner stackedSpawner = WildStackerAPI.getWildStacker().getSystemManager().getStackedSpawner(location);
+        return new Pair<>(stackedSpawner.getStackAmount(), stackedSpawner.getSpawnedType());
     }
 
-    private static boolean prepareSnapshot(Chunk chunk){
-        if(!chunkSnapshots.containsKey(chunk)) {
-            chunkSnapshots.put(chunk, WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, true));
-            Bukkit.getScheduler().runTaskLater(SuperiorSkyblockPlugin.getPlugin(), () -> chunkSnapshots.remove(chunk), 40L);
-        }
+    @Override
+    public Pair<Integer, Material> getBlock(Location location) {
+        if(chunkSnapshots.containsKey(location.getChunk()))
+            return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedBarrel(location));
 
-        return true;
+        StackedBarrel stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
+        return new Pair<>(stackedBarrel.getStackAmount(), stackedBarrel.getType());
     }
 
     @SuppressWarnings("unused")
     private static class StackerListener implements Listener{
 
-        private final SuperiorSkyblockPlugin plugin;
-
-        private StackerListener(SuperiorSkyblockPlugin plugin){
-            this.plugin = plugin;
-        }
+        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelPlace(BarrelPlaceEvent e){

@@ -39,6 +39,11 @@ public final class ConfigComments {
     public static String DEFAULT_HOPPERS_LIMIT = "default-hoppers-limit";
 
     @Comment("")
+    @Comment("The amount of warps an island can have")
+    @Comment("This limit can be expanded by using the /is admin setwarpslimit command.")
+    public static String DEFAULT_WARPS_LIMIT = "default-warps-limit";
+
+    @Comment("")
     @Comment("Set the default team limit of islands.")
     @Comment("This limit can be expanded by using the /is admin setteamlimit command.")
     public static String DEFAULT_TEAM_LIMIT = "default-team-limit";
@@ -181,5 +186,10 @@ public final class ConfigComments {
     @Comment("")
     @Comment("Should a confirm gui be displayed when /is disband is executed.")
     public static String DISBAND_CONFIRM = "disband-confirm";
+
+    @Comment("")
+    @Comment("If you want a specific spawners provider to use, specify it here.")
+    @Comment("Providers: AUTO, MERGEDSPAWNER, STACKSPAWNERS, WILDSTACKER, SILKSPAWNERS")
+    public static String SPAWNERS_PROVIDER = "spawners-provider";
 
 }
