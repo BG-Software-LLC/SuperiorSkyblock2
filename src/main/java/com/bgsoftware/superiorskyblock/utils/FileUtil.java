@@ -23,6 +23,7 @@ public final class FileUtil {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
+    private static boolean v1_14 = Bukkit.getBukkitVersion().contains("1.14");
 
     public static ItemStack getItemStack(ConfigurationSection section){
         if(section == null)
@@ -140,7 +141,11 @@ public final class FileUtil {
         try {
             String destination = resourcePath;
 
-            if(!legacy) resourcePath = resourcePath.replace(".yml", "1_13.yml")
+            if(v1_14)
+                resourcePath = resourcePath.replace(".yml", "1_13.yml")
+                        .replace(".schematic", "1_14.schematic");
+            else if(!legacy)
+                resourcePath = resourcePath.replace(".yml", "1_13.yml")
                     .replace(".schematic", "1_13.schematic");
 
             File file = new File(plugin.getDataFolder(), resourcePath);
