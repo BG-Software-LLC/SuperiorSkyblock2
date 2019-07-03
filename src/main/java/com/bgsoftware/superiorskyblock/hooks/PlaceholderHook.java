@@ -70,6 +70,13 @@ public abstract class PlaceholderHook {
                     return String.valueOf(island.getBlockCount(SKey.of(keyName)));
                 }
 
+                if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {
+                    try{
+                        int index = Integer.valueOf(matcher.group(1));
+                        return String.valueOf(plugin.getGrid().getIsland(index).getOwner().getName());
+                    }catch(IllegalArgumentException ignored){}
+                }
+
                 switch (subPlaceholder) {
                     case "center":
                         return SBlockPosition.of(island.getCenter()).toString();
