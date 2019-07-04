@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -86,7 +87,8 @@ public final class IslandBiomesMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandBiomesMenu, cfg.getConfigurationSection("biomes-gui"), 1, "&lSelect a biome");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("biomes-gui.title", "Select a biome"));
+        inventory = FileUtil.loadGUI(islandBiomesMenu, cfg.getConfigurationSection("biomes-gui"), 1, "Select a biome");
 
         ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes");
 
