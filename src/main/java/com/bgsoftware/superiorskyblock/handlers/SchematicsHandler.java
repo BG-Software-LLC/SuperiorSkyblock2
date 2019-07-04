@@ -58,7 +58,9 @@ public final class SchematicsHandler implements SchematicManager {
 
         if(!schematicsFolder.exists()) {
             schematicsFolder.mkdirs();
-            FileUtil.saveResource("schematics/default.schematic");
+            FileUtil.saveResource("schematics/normal.schematic");
+            FileUtil.saveResource("schematics/mycel.schematic");
+            FileUtil.saveResource("schematics/desert.schematic");
         }
 
         //noinspection ConstantConditions
