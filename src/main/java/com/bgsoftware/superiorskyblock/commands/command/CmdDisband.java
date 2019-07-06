@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +22,7 @@ public final class CmdDisband implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("disband");
+        return Arrays.asList("disband", "reset");
     }
 
     @Override
