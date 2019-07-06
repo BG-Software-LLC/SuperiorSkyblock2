@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.ChatColor;
@@ -30,6 +29,11 @@ public final class CmdAdminBonus implements ICommand {
     @Override
     public String getUsage() {
         return "island admin bonus <player-name> <amount>";
+    }
+
+    @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_BONUS.getMessage();
     }
 
     @Override
@@ -72,7 +76,7 @@ public final class CmdAdminBonus implements ICommand {
             return;
         }
 
-        ((SIsland) island).setBonusWorth(bonusWorth);
+        island.setBonusWorth(bonusWorth);
 
         sender.sendMessage(ChatColor.GREEN + "Success!");
     }

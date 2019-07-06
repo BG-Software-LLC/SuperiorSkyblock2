@@ -32,6 +32,11 @@ public final class CmdPanel implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_PANEL.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

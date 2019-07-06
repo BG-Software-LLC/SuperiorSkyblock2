@@ -28,6 +28,11 @@ public class CmdAdminSetLeader implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_LEADER.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

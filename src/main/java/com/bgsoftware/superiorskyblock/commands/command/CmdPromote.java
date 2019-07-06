@@ -33,6 +33,11 @@ public final class CmdPromote implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_PROMOTE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

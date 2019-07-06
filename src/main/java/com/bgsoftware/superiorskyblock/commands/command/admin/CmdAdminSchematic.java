@@ -28,6 +28,11 @@ public final class CmdAdminSchematic implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SCHEMATIC.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

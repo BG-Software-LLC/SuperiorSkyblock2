@@ -13,6 +13,8 @@ public interface ICommand {
 
     String getUsage();
 
+    String getDescription();
+
     int getMinArgs();
 
     int getMaxArgs();

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -24,6 +25,11 @@ public final class CmdTop implements ICommand {
     @Override
     public String getUsage() {
         return "island top";
+    }
+
+    @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_TOP.getMessage();
     }
 
     @Override

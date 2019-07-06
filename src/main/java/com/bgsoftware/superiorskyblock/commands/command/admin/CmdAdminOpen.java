@@ -29,6 +29,11 @@ public final class CmdAdminOpen implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_OPEN.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 3;
     }

@@ -33,6 +33,11 @@ public final class CmdBan implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_BAN.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

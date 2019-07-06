@@ -32,6 +32,11 @@ public final class CmdPardon implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_PARDON.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

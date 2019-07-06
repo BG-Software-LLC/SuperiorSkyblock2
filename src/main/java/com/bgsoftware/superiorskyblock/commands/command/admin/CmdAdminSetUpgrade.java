@@ -32,6 +32,11 @@ public final class CmdAdminSetUpgrade implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 5;
     }

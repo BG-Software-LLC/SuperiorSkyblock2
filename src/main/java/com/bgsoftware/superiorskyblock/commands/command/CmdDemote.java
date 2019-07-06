@@ -33,6 +33,11 @@ public final class CmdDemote implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_DEMOTE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

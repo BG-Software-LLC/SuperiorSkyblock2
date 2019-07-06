@@ -33,6 +33,11 @@ public final class CmdTeam implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_TEAM.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

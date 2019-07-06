@@ -29,6 +29,11 @@ public final class CmdAdminSetSpawnerRates implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

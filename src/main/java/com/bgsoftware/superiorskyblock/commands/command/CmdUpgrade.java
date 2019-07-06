@@ -30,6 +30,11 @@ public final class CmdUpgrade implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_UPGRADE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

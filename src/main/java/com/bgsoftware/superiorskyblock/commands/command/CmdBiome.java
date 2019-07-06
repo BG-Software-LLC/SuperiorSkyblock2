@@ -33,6 +33,11 @@ public final class CmdBiome implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_BIOME.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

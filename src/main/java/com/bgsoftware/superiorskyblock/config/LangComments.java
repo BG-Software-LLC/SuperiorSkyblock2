@@ -9,6 +9,7 @@ public final class LangComments {
     @Comment("##                Developed by Ome_R                ##")
     @Comment("##                                                  ##")
     @Comment("######################################################")
+    @Comment(" ")
     public static String HEADER = "";
 
 }

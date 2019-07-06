@@ -32,6 +32,11 @@ public final class CmdAdminDeposit implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_DEPOSIT.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

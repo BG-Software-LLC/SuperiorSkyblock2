@@ -35,6 +35,11 @@ public final class CmdPermissions implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_PERMISSIONS.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

@@ -30,6 +30,11 @@ public final class CmdAdminPromote implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 3;
     }

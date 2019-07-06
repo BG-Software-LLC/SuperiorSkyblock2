@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class CmdHelp implements ICommand {
 
@@ -25,7 +25,12 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island help";
+        return "island help [page]";
+    }
+
+    @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_HELP.getMessage();
     }
 
     @Override
@@ -35,7 +40,7 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public int getMaxArgs() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -45,41 +50,58 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<ICommand> subCommands = CommandsHandler.getSubCommands();
+        int page = 1;
 
-        for(ICommand subCommand : subCommands){
-            if(subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())){
-                Locale.ISLAND_HELP_HEADER.send(sender);
-
-                for(ICommand _subCommand : subCommands) {
-                    if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                        Locale.ISLAND_HELP_LINE.send(sender, _subCommand.getUsage(), getPermissionDescription(plugin, _subCommand.getPermission()));
-                    }
-                }
-
-                Locale.ISLAND_HELP_FOOTER.send(sender);
-
+        if(args.length == 2){
+            try{
+                page = Integer.valueOf(args[1]);
+            }catch(IllegalArgumentException ex){
+                Locale.INVALID_AMOUNT.send(sender, args[1]);
                 return;
             }
         }
 
-        Locale.NO_COMMAND_PERMISSION.send(sender);
+        if(page <= 0){
+            Locale.INVALID_AMOUNT.send(sender, page);
+            return;
+        }
+
+        List<ICommand> subCommands = CommandsHandler.getSubCommands().stream()
+                .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
+                .collect(Collectors.toList());
+
+        if(subCommands.isEmpty()){
+            Locale.NO_COMMAND_PERMISSION.send(sender);
+            return;
+        }
+
+        int lastPage = subCommands.size() / 7;
+        if(lastPage % 7 != 0) lastPage++;
+
+        if(page > lastPage){
+            Locale.INVALID_AMOUNT.send(sender, page);
+            return;
+        }
+
+        subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
+
+        Locale.ISLAND_HELP_HEADER.send(sender, page, lastPage);
+
+        for(ICommand _subCommand : subCommands) {
+            if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
+                        Locale.ISLAND_HELP_LINE.send(sender, _subCommand.getUsage(), _subCommand.getDescription());
+            }
+        }
+
+        if(page != lastPage)
+            Locale.ISLAND_HELP_NEXT_PAGE.send(sender, page + 1);
+        else
+            Locale.ISLAND_HELP_FOOTER.send(sender);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
-    }
-
-    private String getPermissionDescription(SuperiorSkyblockPlugin plugin, String permission){
-        List<Permission> permissions = plugin.getDescription().getPermissions();
-
-        for(Permission _permission : permissions) {
-            if (_permission.getName().equals(permission))
-                return _permission.getDescription();
-        }
-
-        return "";
     }
 
 }

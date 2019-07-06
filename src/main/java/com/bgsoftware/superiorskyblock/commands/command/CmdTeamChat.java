@@ -30,6 +30,11 @@ public final class CmdTeamChat implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

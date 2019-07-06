@@ -32,6 +32,11 @@ public final class CmdValue implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_VALUE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

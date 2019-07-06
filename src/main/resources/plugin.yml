@@ -44,7 +44,7 @@ permissions:
           superior.island.kick:
             description: Kick a player from your island.
           superior.island.leave:
-            description: Leave your island
+            description: Leave your island.
           superior.island.open:
             description: Open the island to the public.
           superior.island.panel:
@@ -86,7 +86,7 @@ permissions:
           superior.island.top:
             description: Open top islands panel.
           superior.island.transfer:
-            description: Transfer your island's leadership
+            description: Transfer your island's leadership.
           superior.island.upgrade:
             description: Open upgrades panel.
           superior.island.value:

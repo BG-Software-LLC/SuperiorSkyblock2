@@ -30,6 +30,11 @@ public final class CmdDelWarp implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_DEL_WARP.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

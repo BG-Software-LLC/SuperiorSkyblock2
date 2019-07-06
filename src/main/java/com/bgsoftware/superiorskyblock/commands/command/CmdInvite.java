@@ -35,6 +35,11 @@ public final class CmdInvite implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_INVITE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

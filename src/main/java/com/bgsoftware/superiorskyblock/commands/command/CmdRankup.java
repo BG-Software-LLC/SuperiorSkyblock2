@@ -33,6 +33,11 @@ public class CmdRankup implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_RANKUP.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

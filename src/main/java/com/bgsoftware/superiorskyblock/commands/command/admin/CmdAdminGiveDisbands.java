@@ -28,6 +28,11 @@ public class CmdAdminGiveDisbands implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

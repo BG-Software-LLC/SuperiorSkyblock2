@@ -34,6 +34,11 @@ public final class CmdLeave implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_LEAVE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

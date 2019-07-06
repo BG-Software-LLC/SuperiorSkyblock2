@@ -26,6 +26,11 @@ public final class CmdAdminSave implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SAVE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

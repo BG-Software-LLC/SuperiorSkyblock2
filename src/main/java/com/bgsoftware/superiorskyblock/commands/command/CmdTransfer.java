@@ -11,7 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CmdTransfer implements ICommand {
@@ -29,6 +28,11 @@ public class CmdTransfer implements ICommand {
     @Override
     public String getUsage() {
         return "island transfer <player-name>";
+    }
+
+    @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_TRANSFER.getMessage();
     }
 
     @Override

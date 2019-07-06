@@ -30,6 +30,11 @@ public final class CmdSetTeleport implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_SET_TELEPORT.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

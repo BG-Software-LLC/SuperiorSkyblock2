@@ -30,6 +30,11 @@ public final class CmdAdminMsgAll implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_MSG_ALL.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

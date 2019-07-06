@@ -35,6 +35,11 @@ public final class CmdDisband implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_DISBAND.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 1;
     }

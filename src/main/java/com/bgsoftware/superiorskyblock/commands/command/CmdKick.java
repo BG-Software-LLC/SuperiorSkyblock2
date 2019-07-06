@@ -34,6 +34,11 @@ public final class CmdKick implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_KICK.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

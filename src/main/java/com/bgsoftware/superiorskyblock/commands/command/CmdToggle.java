@@ -31,6 +31,11 @@ public final class CmdToggle implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_TOGGLE.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

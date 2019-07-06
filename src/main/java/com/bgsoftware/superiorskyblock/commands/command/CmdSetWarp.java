@@ -31,6 +31,11 @@ public final class CmdSetWarp implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_SET_WARP.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 2;
     }

@@ -29,6 +29,11 @@ public class CmdAdminSetWarpsLimit implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }

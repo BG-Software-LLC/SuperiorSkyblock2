@@ -29,6 +29,11 @@ public final class CmdAdminSetCropGrowth implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH.getMessage();
+    }
+
+    @Override
     public int getMinArgs() {
         return 4;
     }
