@@ -1,304 +1,245 @@
 ######################################################
-######################################################
 ##                                                  ##
 ##                SuperiorSkyblock 2                ##
 ##                Developed by Ome_R                ##
 ##                                                  ##
 ######################################################
 
-# Called when running the /is accept command.
-JOIN_WHILE_IN_ISLAND: '&cYou cannot join other islands while you are already in one.'
-NO_ISLAND_INVITE: '&cThis island didn''t invite you.'
-JOIN_FULL_ISLAND: '&cYou cannot join this island, as it reached their members limit.'
-JOIN_ANNOUNCEMENT: '&a{0} has joined your island.'
-JOINED_ISLAND: '&aYou joined {0}''s island.'
-# Called when running the /is admin help command.
+ADMIN_DEPOSIT_MONEY: '&e&lBank | &7You deposited ${0} into {1}''s island bank.'
+ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Admin Commands List:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
-# Called when running the /is admin bypass command.
-TOGGLED_BYPASS_ON: '&aToggling bypass mode ON.'
-TOGGLED_BYPASS_OFF: '&aToggling bypass mode OFF.'
-# Called when running the /is admin deposit command.
-ADMIN_DEPOSIT_MONEY: '&aYou deposited ${0} into {1}''s island bank.'
-# Called when running the /is admin msg command.
-PLAYER_NOT_ONLINE: '&cThis player is not online!'
-MESSAGE_SENT: '&aSuccessfully sent {0} the message!'
-# Called when running the /is admin msgall command.
-GLOBAL_MESSAGE_SENT: '&aSuccessfully sent to {0}''s island members the message!'
-# Called when running the /is admin reload command.
-RELOAD_PROCCESS_REQUEST: '&e&lSuperiorSkyblock &7Starting to reload configurations...'
-RELOAD_COMPLETED: '&e&lSuperiorSkyblock &7Reload is finished!'
-# Called when running the /is save command.
-SAVE_PROCCESS_REQUEST: '&aProcessing your request...'
-SAVED_DATABASE: '&aSaved database finished!'
-# Called when running the /is admin schematic command or selection positions for schematics.
-TOGGLED_SCHEMATIC_ON: '&aToggling schematic mode ON. Select an area using a golden axe.'
-TOGGLED_SCHEMATIC_OFF: '&aToggling schematic mode OFF.'
-SCHEMATIC_RIGHT_SELECT: '&eSelected position #1 ({0})'
-SCHEMATIC_LEFT_SELECT: '&eSelected position #2 ({0})'
-SCHEMATIC_READY_TO_CREATE: |
-  &eYou have selected two positions. Run /is admin schematic <name> to create a new schematic.
-  &eMake sure you stand at the teleport location when executing the command.
-SCHEMATIC_NOT_READY: '&cYou haven''t selected two positions.'
-SCHEMATIC_PROCCESS_REQUEST: '&aProcessing your request...'
-SCHEMATIC_SAVED: '&aSuccessfully saved schematic!'
-# Called when running the /is admin setcropgrowth command.
-CHANGED_CROP_GROWTH: '&aSuccessfully updated the crop growth multiplier of {0}''s island.'
-# Called when running the /is admin sethopperslimit command.
-CHANGED_HOPPERS_LIMIT: '&aSuccessfully updated the hoppers limit of {0}''s island.'
-# Called when running the /is admin setmobdrops command.
-CHANGED_MOB_DROPS: '&aSuccessfully updated the mob drops multiplier of {0}''s island.'
-# Called when running the /is admin setsize command.
-CHANGED_ISLAND_SIZE: '&aSuccessfully updated the island size of {0}''s island.'
-# Called when running the /is admin setspawnerrates command.
-CHANGED_SPAWNER_RATES: '&aSuccessfully updated the spawner rates multiplier of {0}''s island.'
-# Called when running the /is admin setteamlimit command.
-CHANGED_TEAM_LIMIT: '&aSuccessfully updated the team limit of {0}''s island.'
-# Called when running the /is admin setupgrade command.
-MAXIMUM_LEVEL: '&cThe maximum level for this upgrade is {0}.'
-SET_UPGRADE_LEVEL: '&aSuccessfully updated the level of {0} for {1}''s island.'
-# Called when running the /is ban command.
-NO_BAN_PERMISSION: '&cYou must be at least {0} in order to ban players.'
-BAN_PLAYERS_WITH_LOWER_ROLE: '&cYou can only ban players with a lower island role than yours.'
-PLAYER_ALREADY_BANNED: '&cThis player is already banned.'
-BAN_ANNOUNCEMENT: '&a{0} was BANNED from the island by {1}.'
-GOT_BANNED: '&aYou were BANNED from {0}''s island.'
-BANNED_FROM_ISLAND: '&cYou are banned from this island.'
-# Called when running the /is biome command or changing biome from gui.
-NO_SET_BIOME_PERMISSION: '&cYou must be at least {0} in order to change island biome.'
-CHANGED_BIOME: '&aSuccessfully changed biome to {0}. You might need to reconnect to the server to see changes.'
-# Called when running the /is close command.
-NO_CLOSE_PERMISSION: '&cYou must be at least {0} in order to close the island to the public.'
-ISLAND_CLOSED: '&aSuccessfully closed the island to the public.'
-NO_CLOSE_BYPASS: '&cThis island is not opened to the public.'
-ISLAND_WAS_CLOSED: '&cThe island you were in was closed and you were teleported back to spawn.'
-# Called when running the /is create command or creating a new island using gui.
-ISLAND_CREATE_PROCCESS_REQUEST: '&aProcessing your request...'
-CREATE_ISLAND: |
-  &aCreated a new island at {0}.
-  &aTook {1}ms
-# Called when running the /is delwarp command.
-NO_DELETE_WARP_PERMISSION: '&cYou must be at least {0} in order to delete warps.'
-# Called when running the /is demote or /is admin demote commands.
-NO_DEMOTE_PERMISSION: '&cYou must be at least {0} in order to demote players.'
-DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&cYou can only demote players with a lower island role than yours.'
-LAST_ROLE_DEMOTE: '&cYou cannot demote this player anymore.'
-DEMOTED_MEMBER: '&aYou demoted {0} to a {1} in his island.'
-GOT_DEMOTED: '&aYou were demoted to a {0} in your island.'
-# Called when running the /is deposit or /is admin deposit commands.
-NO_DEPOSIT_PERMISSION: '&cYou must be at least {0} in order to deposit money to island bank.'
-NOT_ENOUGH_MONEY_TO_DEPOSIT: '&cYou don''t have enough money to deposit {0} dollars into your island''s bank.'
-DEPOSIT_ANNOUNCEMENT: '&a{0} deposited ${1} into the island bank!'
-# Called when running the /is admin setdisbands or /is admin givedisbands commands.
-DISBAND_GIVE_OTHER: '&aYou gave {0} disbands to {1}.'
-DISBAND_GIVE: '&aYou received {0} disbands.'
-DISBAND_SET_OTHER: '&aYou set {0}''s disband count to {1}.'
-DISBAND_SET: '&aYour disband count was set to {0}.'
-# Called when running the /is disband or /is admin disband commands.
-NO_DISBAND_PERMISSION: '&cYou must be at least {0} in order to disband your island.'
-NO_MORE_DISBANDS: '&cYou can''t disband any more islands.'
-DISBAND_ANNOUNCEMENT: '&aYour island was disbanded by {0}.'
-DISBANDED_ISLAND: '&aYou disbanded your island.'
-ISLAND_GOT_DELETED_WHILE_INSIDE: '&aYou were inside a island that got deleted, so you were teleported back to spawn.'
-# Called when running the /is expel command.
-NO_EXPEL_PERMISSION: '&cYou must be at least {0} in order to expel players from your island..'
-PLAYER_EXPEL_BYPASS: '&cThis user cannot be expelled from the island.'
-EXPELLED_PLAYER: '&a{0} was expelled from the island.'
-GOT_EXPELLED: '&aYou have been expelled from the island by {0}.'
-# Called when running the /is invite command.
-NO_INVITE_PERMISSION: '&cYou must be at least {0} in order to invite players.'
-INVITE_BANNED_PLAYER: '&cThis player is banned from the island and cannot get invited.'
-REVOKE_INVITE_ANNOUNCEMENT: '&a{0} has revoked invitation of {1} to the island.'
-GOT_REVOKED: '&a{0} has revoked your invitation to his island.'
-INVITE_TO_FULL_ISLAND: '&cYou cannot invite more members to your island.'
-INVITE_ANNOUNCEMENT: '&a{0} has invited {1} to the island.'
-GOT_INVITE: '&a{0} has invited you to his island.'
-# Called when running the /is kick command.
-NO_KICK_PERMISSION: '&cYou must be at least {0} in order to kick players.'
-KICK_PLAYERS_WITH_LOWER_ROLE: '&cYou can only kick players with a lower island role than yours.'
-KICK_ANNOUNCEMENT: '&a{0} was kicked from the island by {1}.'
-GOT_KICKED: '&aYou were kicked from your island by {0}.'
-# Called when running the /is leave command.
-LEAVE_ISLAND_AS_LEADER: '&cYou cannot leave your island when you own it.'
-LEAVE_ANNOUNCEMENT: '&a{0} left the island.'
-LEFT_ISLAND: '&aYou left your island.'
-# Called when running the /is open command.
-NO_OPEN_PERMISSION: '&cYou must be at least {0} in order to open the island to the public.'
-ISLAND_OPENED: '&aSuccessfully opened the island to the public.'
-# Called when running the /is panel toggle command.
-PANEL_TOGGLE_ON: '&aToggled island panel ON. Running /is will open the panel for you!'
-PANEL_TOGGLE_OFF: '&aToggled island panel OFF. Running /is will teleport you to the island!'
-# Called when running the /is pardon command.
-PLAYER_NOT_BANNED: '&cThis player is not banned.'
-UNBAN_ANNOUNCEMENT: '&a{0} was UNBANNED from the island by {1}.'
-GOT_UNBANNED: '&aYou were UNBANNED from {0}''s island.'
-# Called when running the /is permissions command.
-NO_PERMISSION_CHECK_PERMISSION: '&cYou must be at least {0} in order to get information about permissions.'
-PERMISSION_CHECK: |
-  &a{0}''s Permissions:
-  {1}
-PERMISSION_SPACER: '&7, '
-# Called when running the /is promote or /is admin promote commands.
-NO_PROMOTE_PERMISSION: '&cYou must be at least {0} in order to promote players.'
-PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&cYou can only promote players with a lower island role than yours.'
-LAST_ROLE_PROMOTE: '&cYou cannot promote this player anymore.'
-PROMOTED_MEMBER: '&aYou promoted {0} to a {1} in his island.'
-GOT_PROMOTED: '&aYou were promoted to a {0} in your island.'
-# Called when running the /is rankup command.
-NO_RANKUP_PERMISSION: '&cYou must be at least {0} in order to rankup upgrades.'
-# Called when running the /is recalc command.
-RECALC_PROCCESS_REQUEST: '&aProcessing your request...'
-ISLAND_WORTH_RESULT: '&aYour island worth is {0} [Level {1}]'
-# Called when running the /is setdiscord command.
-NO_SET_DISCORD_PERMISSION: '&cYou must be at least {0} in order to change island discord.'
-CHANGED_DISCORD: '&aSuccessfully changed island discord to {0}.'
-# Called when running the /is setpaypal command.
-NO_SET_PAYPAL_PERMISSION: '&cYou must be at least {0} in order to change island paypal email.'
-CHANGED_PAYPAL: '&aSuccessfully changed island paypal to {0}.'
-# Called when running the /is setpermission command.
-NO_PERMISSION_SET_PERMISSION: '&cYou must be at least {0} in order to set permissions for players.'
-CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&cYou can only change permissions to lower island role than yours.'
-LACK_CHANGE_PERMISSION: '&cYou must have this permission in order to change it to other roles.'
-UPDATED_PERMISSION: '&aUpdated permissions for {0}.'
-# Called when running the /is setrole command.
-SELF_ROLE_CHANGE: '&cYou cannot change the role of yourself.'
-NO_SET_ROLE_PERMISSION: '&cYou must be at least {0} in order to set roles for players.'
-CANNOT_SET_ROLE: '&cYou cannot set the player''s role to {0}.'
-PLAYER_ALREADY_IN_ROLE: '&c{0} is already a {1}.'
-# Called when running the /is setteleport command.
-NO_SET_HOME_PERMISSION: '&cYou must be at least {0} in order to set the teleport location of the island.'
-TELEPORT_LOCAITON_OUTSIDE_ISLAND: '&cYou are not inside your island.'
-CHANGED_TELEPORT_LOCATION: '&aSuccessfully updated teleport location.'
-# Called when running the /is setwarp command.
-NO_SET_WARP_PERMISSION: '&cYou must be at least {0} in order to set island warps.'
-WARP_ALREADY_EXIST: '&cThere is already a warp with this name.'
-SET_WARP_OUTSIDE: '&cYou cannot set warps outside your island.'
-SET_WARP: '&aSuccessfully created a new warp at {0}.'
-# Called when running the /is transfer and /is admin setleader commands.
-NO_TRANSFER_PERMISSION: '&cYou must be the island''s leader to transfer the leadership.'
-TRANSFER_NOT_A_MEMBER: '&cThis player is not a member of your island.'
-TRANSFER_ALREADY_LEADER: '&cYou''re already the leader of this island.'
-TRANSFER_BROADCAST: '&aThe island''s leadership has been transferred to {0}.'
-TRANSFER_ADMIN_NOT_LEADER: '&cThis player is not a leader of any islands.'
-TRANSFER_ADMIN_DIFFERENT_ISLAND: '&cThese players are not in the same islands.'
-TRANSFER_ADMIN_ALREADY_LEADER: '&c{0} is already the leader of his island.'
-TRANSFER_ADMIN: '&aYou transferred {0}''s leadership to {1}.'
-# Called when running the /is show command.
-ISLAND_INFO_HEADER: ''
-ISLAND_INFO_OWNER: '&aIsland Owner: {0}'
-ISLAND_INFO_LOCATION: '&aIsland Location: {0}'
-ISLAND_INFO_BANK: '&aIsland Bank: {0}'
-ISLAND_INFO_WORTH: '&aIsland Worth: {0}'
-ISLAND_INFO_DISCORD: '&aIsland Discord: {0}'
-ISLAND_INFO_PAYPAL: '&aIsland Paypal: {0}'
-ISLAND_INFO_ADMINS: |
-  &aAdmins:
-  {0}
-ISLAND_INFO_MODS: |
-  &aModerators:
-  {0}
-ISLAND_INFO_MEMBERS: |
-  &aMembers:
-  {0}
-ISLAND_INFO_PLAYER_LINE: '&a - {0}'
-ISLAND_INFO_FOOTER: ''
-# Called when running the /is team command.
-ISLAND_TEAM_STATUS_HEADER: '&e&l(!) &7Members of {0}''s Island &8[&e{1}&8/&e{2}&8]&7:'
-ISLAND_TEAM_STATUS_LEADER: '&e * [Leader] {0} {1}'
-ISLAND_TEAM_STATUS_ADMINS: '&e * [Admin] {0} {1}'
-ISLAND_TEAM_STATUS_MODS: '&e * [Moderator] {0} {1}'
-ISLAND_TEAM_STATUS_MEMBERS: '&e * [Member] {0} {1}'
-ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
-ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
-ISLAND_TEAM_STATUS_FOOTER: ''
-# Called when running the /is teamchat command.
-TOGGLED_TEAM_CHAT_ON: '&aToggling team chat ON.'
-TOGGLED_TEAM_CHAT_OFF: '&aToggling team chat OFF.'
-TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
-# Called when running the /is teleport command.
-TELEPORTED_SUCCESS: '&aYou were teleported to your island.'
-# Called when running the /is toggle command.
-TOGGLED_WORLD_BORDER_ON: '&aToggling world border ON.'
-TOGGLED_WORLD_BORDER_OFF: '&aToggling world border OFF.'
-TOGGLED_STACKED_BLCOKS_ON: '&aToggling blocks stacker ON.'
-TOGGLED_STACKED_BLCOKS_OFF: '&aToggling blocks stacker OFF.'
-INVALID_TOGGLE_MODE: '&cCouldn''t toggle {0}.'
-# Called when running the /is value command.
-BLOCK_VALUE_WORTHLESS: 'The block {0} is worthless.'
-BLOCK_VALUE: 'The block {0} worth {1}.'
-# Called when running the /is warp or using the warps gui.
-UNSAFE_WARP: '&cLooks like this warp is unsafe. Please try another warp.'
-TELEPORTED_TO_WARP: '&aSuccessfully teleported to this island warp!'
-DELETE_WARP: '&aYou deleted the warp {0}.'
-# Called when running the /is admin setwarps
-WARP_COUNT_SET_OTHER: '&aYou set {0}''s island''s warps limit to {1}.'
-WARP_COUNT_SET: '&aYour island''s warps limit is set to {0}'
-# Called when running the /is withdraw command.
-NO_WITHDRAW_PERMISSION: '&cYou must be at least {0} in order to withdraw money from island bank.'
-ISLAND_BANK_EMPTY: '&cIsland bank is empty and you can''t even buy a candy at this moment.'
-WITHDRAW_ALL_MONEY: '&cIsland bank has only {0} dollars inside it. Withdrawing all money...'
-WITHDRAW_ANNOUNCEMENT: '&a{0} withdrawn ${1} from the island bank!'
-WITHDRAWN_MONEY: '&aYou withdrawn ${0} from {1}''s island bank!'
-# Called when running the /is help command.
+ALREADY_IN_ISLAND: '&c&lError | &7You are already in an island.'
+ALREADY_IN_ISLAND_OTHER: '&c&lError | &7This player is already a member of your island.'
+BAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was BANNED from the island by {1}.'
+BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only ban players with a lower island role than yours.'
+BANNED_FROM_ISLAND: '&c&lError | &7You are banned from this island.'
+BLOCK_VALUE: '&e&lWorth | &7The block {0} worth {1}.'
+BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7The block {0} is worthless.'
+BUILD_OUTSIDE_ISLAND: '&c&lError | &7You cannot build outside of your protection range.'
+CANNOT_SET_ROLE: '&c&lError | &7You cannot set the player''s role to {0}.'
+CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lError | &7You can only change permissions to lower island role than yours.'
+CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0}. You might need to reconnect to the server to see changes.'
+CHANGED_CROP_GROWTH: '&e&lUpgrades | &7Successfully updated the crop growth multiplier of {0}''s island.'
+CHANGED_DISCORD: '&e&lIsland | &7Successfully changed island discord to {0}.'
+CHANGED_HOPPERS_LIMIT: '&e&lUpgrades | &7Successfully updated the hoppers limit of {0}''s island.'
+CHANGED_ISLAND_SIZE: '&e&lUpgrades | &7Successfully updated the island size of {0}''s island.'
+CHANGED_MOB_DROPS: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of {0}''s island.'
+CHANGED_PAYPAL: '&e&lIsland | &7Successfully changed island paypal to {0}.'
+CHANGED_SPAWNER_RATES: '&e&lUpgrades | &7Successfully updated the spawner rates multiplier of {0}''s island.'
+CHANGED_TEAM_LIMIT: '&e&lUpgrades | &7Successfully updated the team limit of {0}''s island.'
+CHANGED_TELEPORT_LOCATION: '&e&lIsland | &7Successfully updated teleport location.'
+COMMAND_USAGE: '&cUsage: /{0}'
+CREATE_ISLAND: '&e&lIsland | &7Created a new island at {0} in {1}ms.'
+DELETE_WARP: '&e&lIsland | &7You deleted the warp {0}.'
+DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only demote players with a lower island role than yours.'
+DEMOTED_MEMBER: '&e&lIsland | &7You demoted {0} to a {1} in his island.'
+DEPOSIT_ANNOUNCEMENT: '&e&lBank | &7{0} deposited ${1} into the island bank!'
+DESTROY_OUTSIDE_ISLAND: '&c&lError | &7You cannot destroy outside of your protection range.'
+DISBAND_ANNOUNCEMENT: '&e&lIsland | &7Your island was disbanded by {0}.'
+DISBAND_GIVE: '&e&lIsland | &7You received {0} disbands.'
+DISBAND_GIVE_OTHER: '&e&lIsland | &7You gave {0} disbands to {1}.'
+DISBAND_SET: '&e&lIsland | &7Your disband count was set to {0}.'
+DISBAND_SET_OTHER: '&e&lIsland | &7You set {0}''s disband count to {1}.'
+DISBANDED_ISLAND: '&e&lIsland | &7You disbanded your island.'
+EXPELLED_PLAYER: '&e&lIsland | &7{0} was expelled from the island.'
+GLOBAL_MESSAGE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the message!'
+GOT_BANNED: '&e&lIsland | &7You were BANNED from {0}''s island.'
+GOT_DEMOTED: '&e&lIsland | &7You were demoted to a {0} in your island.'
+GOT_EXPELLED: '&e&lIsland | &7&oYou have been expelled from the island by {0}...'
+GOT_INVITE: '&e&lIsland | &7{0} invited you to his island.'
+GOT_KICKED: '&e&lIsland | &7You were kicked from your island by {0}.'
+GOT_PROMOTED: '&e&lIsland | &7You were promoted to a {0} in your island.'
+GOT_REVOKED: '&e&lIsland | &7{0} revoked your invitation to his island.'
+GOT_UNBANNED: '&e&lIsland | &7You were UNBANNED from {0}''s island.'
+HIT_PLAYER_IN_ISLAND: '&c&lError | &7You cannot hit players inside islands.'
+INVALID_AMOUNT: '&c&lError | &7Invalid amount {0}.'
+INVALID_BIOME: |
+  &c&lError | &7Couldn't find the biome {0}.
+  &c&lError | &7Biomes: {1}
+INVALID_BOOLEAN: '&c&lError | &7Please specify true/false.'
+INVALID_ISLAND: '&c&lError | &7You don''t have an island.'
+INVALID_ISLAND_OTHER: '&c&lError | &7{0} doesn''t have an island.'
+INVALID_ISLAND_PERMISSION: |
+  &c&lError | &7Couldn't find the island permission {0}.
+  &c&lError | &7Island Permissions: {1}
+INVALID_LEVEL: '&c&lError | &7Invalid level {0}.'
+INVALID_LIMIT: '&c&lError | &7Invalid limit {0}.'
+INVALID_MULTIPLIER: '&c&lError | &7Invalid multiplier {0}.'
+INVALID_PLAYER: '&c&lError | &7Cannot find a player called {0}'
+INVALID_ROLE: |
+  &c&lError | &7Couldn''t find the island role {0}.
+  &c&lError | &7Island Roles: {1}
+INVALID_SIZE: '&c&lError | &7Invalid size {0}.'
+INVALID_TOGGLE_MODE: '&c&lError | &7Cannot toggle {0}.'
+INVALID_UPGRADE: |
+  &c&lError | &7Couldn't find an upgrade called {0}.
+  &c&lError | &7Upgrades: {1}
+INVALID_WARP: '&c&lError | &7Invalid warp {0}.'
+INVITE_ANNOUNCEMENT: '&e&lIsland | &7{0} invited {1} to the island.'
+INVITE_BANNED_PLAYER: '&c&lError | &7This player is banned from the island and cannot get invited.'
+INVITE_TO_FULL_ISLAND: '&c&lError | &7You cannot invite more members to your island.'
+ISLAND_BANK_EMPTY: '&e&lBank | &7Island bank is empty.'
+ISLAND_CALC_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands have been re-calculated!'
+ISLAND_CLOSED: '&e&lIsland | &7Successfully closed the island to the public.'
+ISLAND_CREATE_PROCCESS_REQUEST: '&e&lIsland | &7Processing your request...'
+ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lIsland | &7&oYou had been inside a island that been disbanded, so you were teleported back to spawn...'
+ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
-ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
-# Called when running a command without the required permission.
-NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
-# Called when running an unknown command.
-UNKNOWN_COMMAND: '&cUnknown command. Type "/island help" for help.'
-# Called when running a command not in the required usage format.
-COMMAND_USAGE: '&cUsage: /{0}'
-# Called when using the upgrades menu.
-NOT_ENOUGH_MONEY_TO_UPGRADE: '&cYou don''t have enough money.'
-# Called when reaching hoppers limit.
-REACHED_HOPPERS_LIMIT: '&cYou have reached the island''s hoppers limit.'
-# Called when building, destroying / interacting with unallowed blocks.
-ISLAND_PROTECTED: '&cThis island is protected.'
-BUILD_OUTSIDE_ISLAND: '&cYou cannot build outside of your protection range.'
-DESTROY_OUTSIDE_ISLAND: '&cYou cannot destroy outside of your protection range.'
-# Called when hitting a team-mate.
-HIT_PLAYER_IN_ISLAND: '&cYou cannot hit players inside islands.'
-# Called when an error is occurred because of a player already in an island.
-ALREADY_IN_ISLAND: '&cYou are already in an island.'
-ALREADY_IN_ISLAND_OTHER: '&cThis player is already a member of your island.'
-# Called when an error is occurred because of a player not in the island.
-PLAYER_NOT_INSIDE_ISLAND: '&cThis player is not inside your island.'
-# Called when an error is occurred because of a bad value.
-INVALID_SIZE: '&cInvalid size {0}.'
-INVALID_ISLAND: '&cYou don''t have an island.'
-INVALID_PLAYER: '&cCouldn''t find a player called {0}'
-INVALID_ISLAND_OTHER: '&c{0} doesn''t have an island.'
-INVALID_AMOUNT: '&cInvalid amount {0}.'
-INVALID_ROLE: |
-  &cCouldn''t find the island role {0}.
-  &cIsland Roles: {1}
-INVALID_BIOME: |
-  &cCouldn't find the biome {0}.
-  &cBiomes: {1}
-INVALID_ISLAND_PERMISSION: |
-  &cCouldn't find the island permission {0}.
-  &cIsland Permissions: {1}
-INVALID_BOOLEAN: '&cPlease specify true/false.'
-INVALID_MULTIPLIER: '&cInvalid multiplier {0}.'
-INVALID_LIMIT: '&cInvalid limit {0}.'
-INVALID_UPGRADE: |
-  &cCouldn't find an upgrade called {0}.
-  &cUpgrades: {1}
-INVALID_LEVEL: '&cInvalid level {0}.'
-INVALID_WARP: '&cInvalid warp {0}.'
-NO_MORE_WARPS: '&cYour island can''t have any more warps.'
-# Replacements for role names in messages, but not in command arguments!
-ROLE_GUEST: 'Guest'
-ROLE_MEMBER: 'Member'
-ROLE_MOD: 'Moderator'
-ROLE_ADMIN: 'Admin'
-ROLE_LEADER: 'Leader'
-# Called when the calculate task finishes.
-ISLAND_CALC_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands have been re-calculated!'
-# Called when the save task finishes.
+ISLAND_INFO_ADMINS: |
+  &e&lIsland | &7Admins:
+  {0}
+ISLAND_INFO_BANK: '&e&lIsland | &7Bank: {0}'
+ISLAND_INFO_DISCORD: '&e&lIsland | &7Discord: {0}'
+ISLAND_INFO_FOOTER: ''
+ISLAND_INFO_HEADER: ''
+ISLAND_INFO_LOCATION: '&e&lIsland | &7Home: {0}'
+ISLAND_INFO_MEMBERS: |
+  &e&lIsland | &7Members:
+  {0}
+ISLAND_INFO_MODS: |
+  &e&lIsland | &7Moderators:
+  {0}
+ISLAND_INFO_OWNER: '&e&lIsland | &7Leader: {0}'
+ISLAND_INFO_PAYPAL: '&e&lIsland | &7Paypal: {0}'
+ISLAND_INFO_PLAYER_LINE: '&e&lIsland | &7 - {0}'
+ISLAND_INFO_WORTH: '&e&lIsland | &7Worth: {0}'
+ISLAND_OPENED: '&e&lIsland | &7Successfully opened the island to the public.'
+ISLAND_PROTECTED: '&c&lError | &7This island is protected.'
 ISLAND_SAVE_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands and player database have been saved!'
-# Called when a player joins/leave the server (for island-members only)
-PLAYER_JOIN_ANNOUNCEMENT: '&a{0} joined the server.'
-PLAYER_QUIT_ANNOUNCEMENT: '&a{0} left the server.'
+ISLAND_TEAM_STATUS_ADMINS: '&e&lIsland | &7 * [Admin] {0} {1}'
+ISLAND_TEAM_STATUS_FOOTER: ''
+ISLAND_TEAM_STATUS_HEADER: '&e&lIsland | &7Members of {0}''s Island &8[&e{1}&8/&e{2}&8]&7:'
+ISLAND_TEAM_STATUS_LEADER: '&e&lIsland | &7 * [Leader] {0} {1}'
+ISLAND_TEAM_STATUS_MEMBERS: '&e&lIsland | &7 * [Member] {0} {1}'
+ISLAND_TEAM_STATUS_MODS: '&e&lIsland | &7 * [Moderator] {0} {1}'
+ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
+ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
+ISLAND_WAS_CLOSED: '&e&lIsland | &7&oThe island you were in was closed and you were teleported back to spawn...'
+ISLAND_WORTH_RESULT: '&e&lIsland | &7Your island worth is {0} [Level {1}]'
+JOIN_ANNOUNCEMENT: '&e&lIsland | &7{0} has joined your island.'
+JOIN_FULL_ISLAND: '&c&lError | &7This island reached the maximum amount of allowed members.'
+JOIN_WHILE_IN_ISLAND: '&c&lError | &7You are already inside an island.'
+JOINED_ISLAND: '&e&lIsland | &7You joined {0}''s island.'
+KICK_ANNOUNCEMENT: '&e&lIsland | &7{0} was kicked from the island by {1}.'
+KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only kick players with a lower island role than yours.'
+LACK_CHANGE_PERMISSION: '&c&lError | &7You must have this permission in order to change it to other roles.'
+LAST_ROLE_DEMOTE: '&c&lError | &7You cannot demote this player anymore.'
+LAST_ROLE_PROMOTE: '&c&lError | &7You cannot promote this player anymore.'
+LEAVE_ANNOUNCEMENT: '&e&lIsland | &7{0} left the island.'
+LEAVE_ISLAND_AS_LEADER: |-
+  &c&lError | &7You cannot leave your island when you own it.
+  &c&lError | &7You can transfer the ownership using /is transfer.
+LEFT_ISLAND: '&e&lIsland | &7You left your island.'
+MAXIMUM_LEVEL: '&c&lError | &7The maximum level for this upgrade is {0}.'
+MESSAGE_SENT: '&e&lIsland | &7Successfully sent {0} the message!'
+NO_BAN_PERMISSION: '&c&lError | &7You must be at least {0} in order to ban players.'
+NO_CLOSE_BYPASS: '&c&lError | &7This island is not opened to the public.'
+NO_CLOSE_PERMISSION: '&c&lError | &7You must be at least {0} in order to close the island to the public.'
+NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
+NO_DELETE_WARP_PERMISSION: '&c&lError | &7You must be at least {0} in order to delete warps.'
+NO_DEMOTE_PERMISSION: '&c&lError | &7You must be at least {0} in order to demote players.'
+NO_DEPOSIT_PERMISSION: '&c&lError | &7You must be at least {0} in order to deposit money to island bank.'
+NO_DISBAND_PERMISSION: '&c&lError | &7You must be at least {0} in order to disband your island.'
+NO_EXPEL_PERMISSION: '&c&lError | &7You must be at least {0} in order to expel players from your island.'
+NO_INVITE_PERMISSION: '&c&lError | &7You must be at least {0} in order to invite players.'
+NO_ISLAND_INVITE: '&c&lError | &7Could not find any invites from this island.'
+NO_KICK_PERMISSION: '&c&lError | &7You must be at least {0} in order to kick players.'
+NO_MORE_DISBANDS: '&c&lError | &7You can''t disband any more islands.'
+NO_MORE_WARPS: '&c&lError | &7Your island can''t have any more warps.'
+NO_OPEN_PERMISSION: '&c&lError | &7You must be at least {0} in order to open the island to the public.'
+NO_PERMISSION_CHECK_PERMISSION: '&c&lError | &7You must be at least {0} in order to get information about permissions.'
+NO_PERMISSION_SET_PERMISSION: '&c&lError | &7You must be at least {0} in order to set permissions for players.'
+NO_PROMOTE_PERMISSION: '&c&lError | &7You must be at least {0} in order to promote players.'
+NO_RANKUP_PERMISSION: '&c&lError | &7You must be at least {0} in order to rankup upgrades.'
+NO_SET_BIOME_PERMISSION: '&c&lError | &7You must be at least {0} in order to change island biome.'
+NO_SET_DISCORD_PERMISSION: '&c&lError | &7You must be at least {0} in order to change island discord.'
+NO_SET_HOME_PERMISSION: '&c&lError | &7You must be at least {0} in order to set the teleport location of the island.'
+NO_SET_PAYPAL_PERMISSION: '&c&lError | &7You must be at least {0} in order to change island paypal email.'
+NO_SET_ROLE_PERMISSION: '&c&lError | &7You must be at least {0} in order to set roles for players.'
+NO_SET_WARP_PERMISSION: '&c&lError | &7You must be at least {0} in order to set island warps.'
+NO_TRANSFER_PERMISSION: '&cYou must be the island''s leader to transfer the leadership.'
+NO_WITHDRAW_PERMISSION: '&c&lError | &7You must be at least {0} in order to withdraw money from island bank.'
+NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lError | &7You don''t have enough money to deposit {0} dollars into your island''s bank.'
+NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lError | &7You don''t have enough money.'
+PANEL_TOGGLE_OFF: |-
+  &e&lPanel | &7Toggled island panel &cOFF&7.
+  &e&lPanel | &7Running /is will teleport you to the island.'
+PANEL_TOGGLE_ON: |-
+  &e&lPanel | &7Toggled island panel &aON&7.
+  &e&lPanel | &7Running /is will open the panel for you.
+PERMISSION_CHECK: |
+  &e&lIsland | &7{0}'s Permissions:
+  &e&lIsland | &7{0}'s Permissions:
+  {1}
+PERMISSION_SPACER: '&7, '
+PLAYER_ALREADY_BANNED: '&c&lError | &7This player is already banned.'
+PLAYER_ALREADY_IN_ROLE: '&c&lError | &7{0} is already a {1}.'
+PLAYER_EXPEL_BYPASS: '&c&lError | &7This user cannot be expelled from the island.'
+PLAYER_JOIN_ANNOUNCEMENT: '&e&lIsland | &7{0} joined the server.'
+PLAYER_NOT_BANNED: '&c&lError | &7This player is not banned.'
+PLAYER_NOT_INSIDE_ISLAND: '&c&lError | &7This player is not inside your island.'
+PLAYER_NOT_ONLINE: '&c&lError | &7This player is not online!'
+PLAYER_QUIT_ANNOUNCEMENT: '&e&lIsland | &7{0} left the server.'
+PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only promote players with a lower island role than yours.'
+PROMOTED_MEMBER: '&e&lIsland | &7You promoted {0} to a {1} in his island.'
+REACHED_HOPPERS_LIMIT: '&e&lUpgrades | &7You have reached the island''s hoppers limit.'
+RECALC_PROCCESS_REQUEST: '&e&lIsland | &7Processing your request...'
+RELOAD_COMPLETED: '&e&lIsland | &7Reload is finished!'
+RELOAD_PROCCESS_REQUEST: '&e&lIsland | &7Starting to reload configurations...'
+REVOKE_INVITE_ANNOUNCEMENT: '&e&lIsland | &7{0} revoked the invitation of {1} to the island.'
+ROLE_ADMIN: Admin
+ROLE_GUEST: Guest
+ROLE_LEADER: Leader
+ROLE_MEMBER: Member
+ROLE_MOD: Moderator
+SAVE_PROCCESS_REQUEST: '&e&lData | &7Processing your request...'
+SAVED_DATABASE: '&e&lData | &7Saved database successfully!'
+SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Selected position #2 ({0})'
+SCHEMATIC_NOT_READY: '&c&lError | &7You haven''t selected two positions.'
+SCHEMATIC_PROCCESS_REQUEST: '&e&lSchematics | &7Processing your request...'
+SCHEMATIC_READY_TO_CREATE: |
+  &e&lSchematics | &7You have selected two positions. Run /is admin schematic <name> to create a new schematic.
+  &e&lSchematics | &7Make sure you stand at the teleportion location when executing the command.
+SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Selected position #1 ({0})'
+SCHEMATIC_SAVED: '&e&lSchematics | &7Successfully saved schematic!'
+SELF_ROLE_CHANGE: '&c&lError | &7You cannot change the role of yourself.'
+SET_UPGRADE_LEVEL: '&e&lUpgrades | &7Successfully updated the level of {0} for {1}''s island.'
+SET_WARP: '&e&lIsland | &7Successfully created a new warp at {0}.'
+SET_WARP_OUTSIDE: '&c&lError | &7You cannot set warps outside your island.'
+TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
+TELEPORT_LOCAITON_OUTSIDE_ISLAND: '&c&lError | &7You are not inside your island.'
+TELEPORTED_SUCCESS: '&e&lIsland | &7You were teleported to your island.'
+TELEPORTED_TO_WARP: '&e&lIsland | &7Successfully teleported to this island warp.'
+TOGGLED_BYPASS_OFF: '&e&lBypass | &7Toggled bypass mode &cOFF&7.'
+TOGGLED_BYPASS_ON: '&e&lBypass | &7Toggled bypass mode &aON&7.'
+TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Toggling schematic mode &cOFF&7.'
+TOGGLED_SCHEMATIC_ON: |-
+  &e&lSchematics | &7Toggling schematic mode &aON&7.
+  &e&lSchematics | &7Select an area using a golden axe.
+TOGGLED_STACKED_BLCOKS_OFF: '&e&lStacker | &7Toggling blocks stacker &cOFF&7.'
+TOGGLED_STACKED_BLCOKS_ON: '&e&lStacker | &7Toggling blocks stacker &aON&7.'
+TOGGLED_TEAM_CHAT_OFF: '&e&lChat | &7Toggling team chat &cOFF&7.'
+TOGGLED_TEAM_CHAT_ON: '&e&lChat | &7Toggling team chat &aON&7.'
+TOGGLED_WORLD_BORDER_OFF: '&e&lBorder | &7Toggling world border &cOFF&7.'
+TOGGLED_WORLD_BORDER_ON: '&e&lBorder | &7Toggling world border &aON&7.'
+TRANSFER_ADMIN: '&e&lIsland | &7You transferred {0}''s leadership to {1}.'
+TRANSFER_ADMIN_ALREADY_LEADER: '&c&lError | &7{0} is already the leader of his island.'
+TRANSFER_ADMIN_DIFFERENT_ISLAND: '&c&lError | &7These players are not in the same islands.'
+TRANSFER_ADMIN_NOT_LEADER: '&c&lError | &7This player is not a leader of any islands.'
+TRANSFER_ALREADY_LEADER: '&cYou''re already the leader of this island.'
+TRANSFER_BROADCAST: '&e&lIsland | &7The island''s leadership has been transferred to {0}.'
+TRANSFER_NOT_A_MEMBER: '&cThis player is not a member of your island.'
+UNBAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was UNBANNED from the island by {1}.'
+UNKNOWN_COMMAND: '&cUnknown command. Type "/island help" for help.'
+UNSAFE_WARP: '&e&lIsland | &7&oLooks like this warp is unsafe. Please try another warp.'
+UPDATED_PERMISSION: '&e&lIsland | &7Updated permissions for {0}.'
+WARP_ALREADY_EXIST: '&c&lError | &7There is already a warp with this name.'
+WARP_COUNT_SET: '&e&lIsland | &7Your island''s warps limit is set to {0}'
+WARP_COUNT_SET_OTHER: '&e&lIsland | &7You set {0}''s island''s warps limit to {1}.'
+WITHDRAW_ALL_MONEY: |-
+  &e&lBank | &7Island bank has only {0} dollars inside it.
+  &e&lBank | &7&oWithdrawing all money..."
+WITHDRAW_ANNOUNCEMENT: '&e&lBank | &7{0} withdrawn ${1} from the island bank!'
+WITHDRAWN_MONEY: '&e&lBank | &7You withdrawn ${0} from {1}''s island bank!'
