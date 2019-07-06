@@ -50,6 +50,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_discord_all");
         registerPlaceholder("superior_island_paypal_all");
         registerPlaceholder("superior_island_exists");
+        registerPlaceholder("superior_island_locked");
 
         registerPlaceholder("superior_island_location_center");
         registerPlaceholder("superior_island_location_x");
@@ -75,6 +76,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_discord_all");
         registerPlaceholder("superior_island_location_paypal_all");
         registerPlaceholder("superior_island_location_exists");
+        registerPlaceholder("superior_island_location_locked");
     }
 
     //Register placeholder without logging to console

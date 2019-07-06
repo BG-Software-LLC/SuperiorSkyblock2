@@ -127,6 +127,8 @@ public abstract class PlaceholderHook {
                         return island.getPaypal();
                     case "exists":
                         return "Yes";
+                    case "locked":
+                        return island.isLocked() ? "True" : "False";
                 }
 
             }
