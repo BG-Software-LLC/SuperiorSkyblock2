@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
+import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -47,6 +48,7 @@ import java.util.Map;
 @SuppressWarnings({"WeakerAccess", "ResultOfMethodCallIgnored"})
 public final class SchematicsHandler implements SchematicManager {
 
+    private static String version = Bukkit.getBukkitVersion().split("-")[0];
     private SuperiorSkyblockPlugin plugin;
 
     private Map<String, Schematic> schematics = new HashMap<>();
@@ -155,6 +157,7 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("offsetX", new IntTag(offsetX));
         compoundValue.put("offsetY", new IntTag(offsetY));
         compoundValue.put("offsetZ", new IntTag(offsetZ));
+        compoundValue.put("version", new StringTag(version));
 
         SSchematic schematic = new SSchematic(new CompoundTag(compoundValue));
         schematics.put(schematicName, schematic);
@@ -181,9 +184,11 @@ public final class SchematicsHandler implements SchematicManager {
 
             try(NBTInputStream reader = new NBTInputStream(new FileInputStream(file))){
                 CompoundTag compoundTag = (CompoundTag) reader.readTag();
+                if(compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(version))
+                    SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
                 return new SSchematic(compoundTag);
             }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("Schematic " + file.getName() + " is invalid. Make sure you use the built in system.");
+                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid. Make sure you use the built in system.");
                 return null;
             }
 

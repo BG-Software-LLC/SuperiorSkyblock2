@@ -68,7 +68,7 @@ public class StatementHolder {
 
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
-            SuperiorSkyblockPlugin.log("Failed to execute query " + errorQuery);
+            SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
             ex.printStackTrace();
         }
     }

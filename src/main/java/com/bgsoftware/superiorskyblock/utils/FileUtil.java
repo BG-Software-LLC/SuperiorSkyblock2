@@ -36,7 +36,7 @@ public final class FileUtil {
             type = Material.valueOf(section.getString("type"));
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
-            SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
+            SuperiorSkyblockPlugin.log("&cCouldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
             return null;
         }
 
@@ -61,7 +61,7 @@ public final class FileUtil {
                 try {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.log("Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
+                    SuperiorSkyblockPlugin.log("&cCouldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
                     continue;
                 }
 

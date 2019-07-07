@@ -36,6 +36,7 @@ import com.bgsoftware.superiorskyblock.tasks.SaveTask;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -226,7 +227,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public static void log(String message){
-        plugin.getLogger().info(message);
+        message = ChatColor.translateAlternateColorCodes('&', message);
+        if(message.contains(ChatColor.COLOR_CHAR + ""))
+            Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
+        else
+            plugin.getLogger().info(message);
     }
 
     public static SuperiorSkyblockPlugin getPlugin(){
