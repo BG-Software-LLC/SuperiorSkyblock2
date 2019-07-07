@@ -15,6 +15,7 @@ creation-gui:
     normal:
       required-permission: ''
       slot: 1
+      biome: PLAINS
       has-access-item:
         type: SKULL_ITEM
         data: 3
@@ -36,6 +37,7 @@ creation-gui:
     mycel:
       required-permission: ''
       slot: 4
+      biome: MUSHROOM_ISLAND
       has-access-item:
         type: SKULL_ITEM
         data: 3
@@ -57,6 +59,7 @@ creation-gui:
     desert:
       required-permission: ''
       slot: 7
+      biome: DESERT
       has-access-item:
         type: SKULL_ITEM
         data: 3

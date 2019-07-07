@@ -15,6 +15,7 @@ creation-gui:
     normal:
       required-permission: ''
       slot: 1
+      biome: PLAINS
       has-access-item:
         type: PLAYER_HEAD
         skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk1ZDM3OTkzZTU5NDA4MjY3ODQ3MmJmOWQ4NjgyMzQxM2MyNTBkNDMzMmEyYzdkOGM1MmRlNDk3NmIzNjIifX19'
@@ -34,6 +35,7 @@ creation-gui:
     mycel:
       required-permission: ''
       slot: 4
+      biome: MUSHROOM_FIELDS
       has-access-item:
         type: PLAYER_HEAD
         skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE0NWQxYjQxN2NiZGRjMjE3NjdiMDYwNDRlODk5YjI2NmJmNzhhNjZlMjE4NzZiZTNjMDUxNWFiNTVkNzEifX19'
@@ -53,6 +55,7 @@ creation-gui:
     desert:
       required-permission: ''
       slot: 7
+      biome: DESERT
       has-access-item:
         type: PLAYER_HEAD
         skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVkYjMxMjA2N2JlMWQ1YzRmMTQ3OGFmM2NhMmY2Y2Y4MTA0YWI0Y2NiZmY1NzkxN2M4NTc4ZGFhMTUwMDJjMiJ9fX0='
