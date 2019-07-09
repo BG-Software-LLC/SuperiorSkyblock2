@@ -5,18 +5,29 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 
 public final class SpawnIsland extends SIsland {
 
-    public SpawnIsland() {
-        super(null, SBlockPosition.of(SuperiorSkyblockPlugin.getPlugin().getSettings().spawnLocation));
+    private static SuperiorSkyblockPlugin plugin;
+
+    private Location center;
+
+    public SpawnIsland(SuperiorSkyblockPlugin plugin) {
+        super(null, SBlockPosition.of(plugin.getSettings().spawnLocation));
+        SpawnIsland.plugin = plugin;
+
+        String[] loc = plugin.getSettings().spawnLocation.split(", ");
+        center = loc.length == 4 ?
+            new Location(Bukkit.getWorld(loc[0]), Double.valueOf(loc[1]), Double.valueOf(loc[2]), Double.valueOf(loc[3])) :
+            new Location(Bukkit.getWorld(loc[0]), Double.valueOf(loc[1]), Double.valueOf(loc[2]), Double.valueOf(loc[3]), Float.valueOf(loc[4]), Float.valueOf(loc[5]));
     }
 
     @Override
     public Location getCenter() {
-        return SuperiorSkyblockPlugin.getPlugin().getSettings().getSpawnAsBukkitLocation();
+        return center.clone();
     }
 
     @Override

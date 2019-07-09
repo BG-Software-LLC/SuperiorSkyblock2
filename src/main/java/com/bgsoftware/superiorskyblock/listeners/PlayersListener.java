@@ -84,7 +84,7 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
             if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
-                e.setCancelTeleport(plugin.getSettings().getSpawnAsBukkitLocation());
+                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter());
             return;
         }
 
@@ -92,7 +92,7 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.NO_CLOSE_BYPASS.send(e.getPlayer());
             if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
-                e.setCancelTeleport(plugin.getSettings().getSpawnAsBukkitLocation());
+                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter());
             return;
         }
 

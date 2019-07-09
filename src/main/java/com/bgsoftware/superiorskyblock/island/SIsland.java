@@ -1110,7 +1110,7 @@ public class SIsland extends DatabaseObject implements Island {
             for(UUID uuid : allPlayersInside()){
                 SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
                 if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
-                    victimPlayer.asPlayer().teleport(plugin.getSettings().getSpawnAsBukkitLocation());
+                    victimPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
                     Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
                 }
             }

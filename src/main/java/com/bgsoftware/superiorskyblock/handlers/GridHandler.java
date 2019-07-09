@@ -67,7 +67,7 @@ public final class GridHandler implements GridManager {
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
-        spawnIsland = new SpawnIsland();
+        spawnIsland = new SpawnIsland(plugin);
     }
 
     public void createIsland(ResultSet resultSet) throws SQLException {
@@ -156,7 +156,7 @@ public final class GridHandler implements GridManager {
         SuperiorPlayer targetPlayer;
         for(UUID uuid : island.allPlayersInside()){
             targetPlayer = SSuperiorPlayer.of(uuid);
-            targetPlayer.asPlayer().teleport(plugin.getSettings().getSpawnAsBukkitLocation());
+            targetPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(targetPlayer);
         }
         islands.remove(island.getOwner().getUniqueId());
