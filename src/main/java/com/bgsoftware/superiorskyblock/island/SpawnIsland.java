@@ -10,26 +10,18 @@ import org.bukkit.Location;
 
 public final class SpawnIsland extends SIsland {
 
-    private Location preciseCenter;
-
-    public SpawnIsland(SBlockPosition wrappedLocation){
-        super(null, wrappedLocation);
-    }
-
     public SpawnIsland() {
         super(null, SBlockPosition.of(SuperiorSkyblockPlugin.getPlugin().getSettings().spawnLocation));
-        preciseCenter = SuperiorSkyblockPlugin.getPlugin().getSettings().getSpawnAsBukkitLocation();
-        setTeleportLocation(preciseCenter);
     }
 
     @Override
     public Location getCenter() {
-        return preciseCenter == null ? super.getCenter() : preciseCenter;
+        return SuperiorSkyblockPlugin.getPlugin().getSettings().getSpawnAsBukkitLocation();
     }
 
     @Override
-    public void setTeleportLocation(Location teleportLocation) {
-        this.teleportLocation = teleportLocation;
+    public Location getTeleportLocation() {
+        return getCenter();
     }
 
     @Override
