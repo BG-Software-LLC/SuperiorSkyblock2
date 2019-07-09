@@ -11,9 +11,7 @@ import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
-import com.bgsoftware.wildstacker.api.objects.StackedBarrel;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
-import com.bgsoftware.wildstacker.api.objects.StackedSpawner;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -49,17 +47,19 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         if(chunkSnapshots.containsKey(location.getChunk()))
             return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedSpawner(location));
 
-        StackedSpawner stackedSpawner = WildStackerAPI.getWildStacker().getSystemManager().getStackedSpawner(location);
-        return new Pair<>(stackedSpawner.getStackAmount(), stackedSpawner.getSpawnedType());
+        cacheChunk(location.getChunk());
+        return getSpawner(location);
     }
 
     @Override
     public Pair<Integer, Material> getBlock(Location location) {
-        if(chunkSnapshots.containsKey(location.getChunk()))
-            return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedBarrel(location));
+        if(chunkSnapshots.containsKey(location.getChunk())) {
+            Map.Entry<Integer, Material> entry = chunkSnapshots.get(location.getChunk()).getStackedBarrel(location);
+            return entry.getValue().name().contains("AIR") ? null : new Pair<>(entry);
+        }
 
-        StackedBarrel stackedBarrel = WildStackerAPI.getWildStacker().getSystemManager().getStackedBarrel(location);
-        return new Pair<>(stackedBarrel.getStackAmount(), stackedBarrel.getType());
+        cacheChunk(location.getChunk());
+        return getBlock(location);
     }
 
     @SuppressWarnings("unused")
