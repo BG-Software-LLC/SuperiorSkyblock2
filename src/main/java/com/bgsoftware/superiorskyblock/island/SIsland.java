@@ -289,7 +289,10 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
-        if(isMember(superiorPlayer)) kickMember(superiorPlayer);
+        if(isMember(superiorPlayer))
+            kickMember(superiorPlayer);
+        if(isInside(superiorPlayer.getLocation()))
+            superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
         banned.add(superiorPlayer.getUniqueId());
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
