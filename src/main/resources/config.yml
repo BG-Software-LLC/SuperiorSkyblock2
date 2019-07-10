@@ -350,5 +350,5 @@ default-placeholders:
 disband-confirm: true
 
 # If you want a specific spawners provider to use, specify it here.
-# Providers: AUTO, MERGEDSPAWNER, STACKSPAWNERS, WILDSTACKER, SILKSPAWNERS
+# Providers: Auto, MergedSpawner, StackSpawners, WildStacker, SilkSpawners, PvpingSpawners
 spawners-provider: 'AUTO'

@@ -189,7 +189,7 @@ public final class ConfigComments {
 
     @Comment("")
     @Comment("If you want a specific spawners provider to use, specify it here.")
-    @Comment("Providers: AUTO, MERGEDSPAWNER, STACKSPAWNERS, WILDSTACKER, SILKSPAWNERS")
+    @Comment("Providers: Auto, MergedSpawner, StackSpawners, WildStacker, SilkSpawners, PvpingSpawners")
     public static String SPAWNERS_PROVIDER = "spawners-provider";
 
 }

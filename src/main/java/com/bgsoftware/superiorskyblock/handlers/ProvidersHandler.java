@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
@@ -37,6 +38,9 @@ public final class ProvidersHandler {
                 Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                 (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
             this.spawnersProvider = new BlocksProvider_SilkSpawners();
+        else if(Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
+                (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
+            this.spawnersProvider = new BlocksProvider_PvpingSpawners();
         else this.spawnersProvider = new BlocksProvider_Default();
 
         PlaceholderHook.register(plugin);
