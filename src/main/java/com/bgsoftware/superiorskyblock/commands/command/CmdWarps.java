@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -29,7 +30,7 @@ public final class CmdWarps implements ICommand {
 
     @Override
     public String getDescription() {
-        return "";
+        return Locale.COMMAND_DESCRIPTION_WARPS.getMessage();
     }
 
     @Override
