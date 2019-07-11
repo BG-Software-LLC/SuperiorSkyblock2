@@ -4,18 +4,18 @@ import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class CmdAdmin implements ICommand {
 
-    private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private List<ICommand> subCommands = new ArrayList<>();
 
     public CmdAdmin(){
@@ -84,7 +84,7 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length > 1){
+        if(args.length > 1 && !NumberUtils.isNumber(args[1])){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[1].toLowerCase())){
                     if(!(sender instanceof Player) && !subCommand.canBeExecutedByConsole()){
@@ -109,23 +109,66 @@ public final class CmdAdmin implements ICommand {
             }
         }
 
-        for(ICommand subCommand : subCommands){
-            if(subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())){
-                Locale.ADMIN_HELP_HEADER.send(sender);
+        int page = 1;
 
-                for(ICommand _subCommand : subCommands) {
-                    if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                        Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), getPermissionDescription(_subCommand.getPermission()));
-                    }
-                }
+        if(args.length == 2){
+            page = Integer.valueOf(args[1]);
+        }
 
-                Locale.ADMIN_HELP_FOOTER.send(sender);
+        if(page <= 0){
+            Locale.INVALID_AMOUNT.send(sender, page);
+            return;
+        }
 
-                return;
+        List<ICommand> subCommands = this.subCommands.stream()
+                .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
+                .collect(Collectors.toList());
+
+        if(subCommands.isEmpty()){
+            Locale.NO_COMMAND_PERMISSION.send(sender);
+            return;
+        }
+
+        int lastPage = subCommands.size() / 7;
+        if(lastPage % 7 != 0) lastPage++;
+
+        if(page > lastPage){
+            Locale.INVALID_AMOUNT.send(sender, page);
+            return;
+        }
+
+        subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
+
+        Locale.ADMIN_HELP_HEADER.send(sender, page, lastPage);
+
+        for(ICommand _subCommand : subCommands) {
+            if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
+                Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), _subCommand.getDescription());
             }
         }
 
-        Locale.NO_COMMAND_PERMISSION.send(sender);
+        if(page != lastPage)
+            Locale.ADMIN_HELP_NEXT_PAGE.send(sender, page + 1);
+        else
+            Locale.ADMIN_HELP_FOOTER.send(sender);
+
+//        for(ICommand subCommand : subCommands){
+//            if(subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())){
+//                Locale.ADMIN_HELP_HEADER.send(sender);
+//
+//                for(ICommand _subCommand : subCommands) {
+//                    if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
+//                        Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), getPermissionDescription(_subCommand.getPermission()));
+//                    }
+//                }
+//
+//                Locale.ADMIN_HELP_FOOTER.send(sender);
+//
+//                return;
+//            }
+//        }
+//
+//        Locale.NO_COMMAND_PERMISSION.send(sender);
     }
 
     @Override
@@ -169,17 +212,6 @@ public final class CmdAdmin implements ICommand {
         }
 
         return list;
-    }
-
-    private String getPermissionDescription(String permission){
-        List<Permission> permissions = plugin.getDescription().getPermissions();
-
-        for(Permission _permission : permissions) {
-            if (_permission.getName().equals(permission))
-                return _permission.getDescription();
-        }
-
-        return "";
     }
 
 }
