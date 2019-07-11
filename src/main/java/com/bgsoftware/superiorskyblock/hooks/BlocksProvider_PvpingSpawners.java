@@ -1,11 +1,18 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import skyblock.hassan.plugin.Main;
+import skyblock.hassan.plugin.api.SpawnerStackEvent;
+import skyblock.hassan.plugin.api.UnstackEvent;
 import skyblock.hassan.plugin.spawners.StackedSpawner;
 
 public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
@@ -14,6 +21,7 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
 
     public BlocksProvider_PvpingSpawners(){
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
+        Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
     }
 
     @Override
@@ -24,6 +32,27 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
             blockCount = stackedSpawner.getSize();
         }
         return new Pair<>(blockCount, null);
+    }
+
+    @SuppressWarnings("unused")
+    private static class StackerListener implements Listener {
+
+        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerStack(SpawnerStackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getSpawnerAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerUnstack(UnstackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getSpawnerAmount());
+        }
+
     }
 
 }
