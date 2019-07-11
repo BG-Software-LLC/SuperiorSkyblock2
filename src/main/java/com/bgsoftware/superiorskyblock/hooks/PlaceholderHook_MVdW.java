@@ -38,9 +38,13 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_radius");
         registerPlaceholder("superior_island_biome");
         registerPlaceholder("superior_island_level");
+        registerPlaceholder("superior_island_level_format");
         registerPlaceholder("superior_island_worth");
+        registerPlaceholder("superior_island_worth_format");
         registerPlaceholder("superior_island_raw_worth");
+        registerPlaceholder("superior_island_raw_worth_format");
         registerPlaceholder("superior_island_bank");
+        registerPlaceholder("superior_island_bank_format");
         registerPlaceholder("superior_island_hoppers_limit");
         registerPlaceholder("superior_island_crops_multiplier");
         registerPlaceholder("superior_island_spawners_multiplier");
@@ -64,9 +68,13 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_radius");
         registerPlaceholder("superior_island_location_biome");
         registerPlaceholder("superior_island_location_level");
+        registerPlaceholder("superior_island_location_level_format");
         registerPlaceholder("superior_island_location_worth");
+        registerPlaceholder("superior_island_location_worth_format");
         registerPlaceholder("superior_island_location_raw_worth");
+        registerPlaceholder("superior_island_location_raw_worth_format");
         registerPlaceholder("superior_island_location_bank");
+        registerPlaceholder("superior_island_location_bank_format");
         registerPlaceholder("superior_island_location_hoppers_limit");
         registerPlaceholder("superior_island_location_crops_multiplier");
         registerPlaceholder("superior_island_location_spawners_multiplier");

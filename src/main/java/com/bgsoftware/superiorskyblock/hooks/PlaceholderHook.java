@@ -103,12 +103,20 @@ public abstract class PlaceholderHook {
                         return StringUtil.format(island.getCenter().getBlock().getBiome().name());
                     case "level":
                         return island.getIslandLevelAsBigDecimal().toString();
+                    case "level_format":
+                        return StringUtil.fancyFormat(island.getIslandLevelAsBigDecimal());
                     case "worth":
                         return island.getWorthAsBigDecimal().toString();
+                    case "worth_format":
+                        return StringUtil.fancyFormat(island.getWorthAsBigDecimal());
                     case "raw_worth":
                         return island.getRawWorthAsBigDecimal().toString();
+                    case "raw_worth_format":
+                        return StringUtil.fancyFormat(island.getRawWorthAsBigDecimal());
                     case "bank":
                         return island.getMoneyInBankAsBigDecimal().toString();
+                    case "bank_format":
+                        return StringUtil.fancyFormat(island.getMoneyInBankAsBigDecimal());
                     case "hoppers_limit":
                         return String.valueOf(island.getHoppersLimit());
                     case "crops_multiplier":

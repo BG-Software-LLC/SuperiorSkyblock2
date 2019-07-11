@@ -785,7 +785,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
-        this.bonusWorth = BigDecimalFormatted.of(bonusWorth);
+        this.bonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
                 .setString(this.bonusWorth.getAsString())
                 .setString(owner.toString())
