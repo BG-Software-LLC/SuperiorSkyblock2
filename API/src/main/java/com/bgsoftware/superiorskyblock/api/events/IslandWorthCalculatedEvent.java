@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.listeners.events;
+package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
