@@ -16,6 +16,7 @@ BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only ban players with a lowe
 BANNED_FROM_ISLAND: '&c&lError | &7You are banned from this island.'
 BLOCK_VALUE: '&e&lWorth | &7The block {0} worth {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7The block {0} is worthless.'
+BONUS_SET_SUCCESS: '&e&lIsland | &7Successfully updated the island bonus to {0}.'
 BUILD_OUTSIDE_ISLAND: '&c&lError | &7You cannot build outside of your protection range.'
 CANNOT_SET_ROLE: '&c&lError | &7You cannot set the player''s role to {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lError | &7You can only change permissions to lower island role than yours.'

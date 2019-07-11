@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -72,13 +71,13 @@ public final class CmdAdminBonus implements ICommand {
         try{
             bonusWorth = BigDecimalFormatted.of(args[3]);
         }catch(NumberFormatException ex){
-            sender.sendMessage(ChatColor.RED + "Invalud number.");
+            Locale.INVALID_AMOUNT.send(sender);
             return;
         }
 
         island.setBonusWorth(bonusWorth);
 
-        sender.sendMessage(ChatColor.GREEN + "Success!");
+        Locale.BONUS_SET_SUCCESS.send(sender, bonusWorth.toString());
     }
 
     @Override
