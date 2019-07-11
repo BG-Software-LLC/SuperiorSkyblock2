@@ -151,24 +151,6 @@ public final class CmdAdmin implements ICommand {
             Locale.ADMIN_HELP_NEXT_PAGE.send(sender, page + 1);
         else
             Locale.ADMIN_HELP_FOOTER.send(sender);
-
-//        for(ICommand subCommand : subCommands){
-//            if(subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())){
-//                Locale.ADMIN_HELP_HEADER.send(sender);
-//
-//                for(ICommand _subCommand : subCommands) {
-//                    if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-//                        Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), getPermissionDescription(_subCommand.getPermission()));
-//                    }
-//                }
-//
-//                Locale.ADMIN_HELP_FOOTER.send(sender);
-//
-//                return;
-//            }
-//        }
-//
-//        Locale.NO_COMMAND_PERMISSION.send(sender);
     }
 
     @Override
