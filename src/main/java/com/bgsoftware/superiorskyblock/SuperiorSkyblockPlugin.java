@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
+import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
@@ -181,6 +182,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void loadMenus(){
         ConfirmDisbandMenu.init();
+        GlobalWarpsMenu.init();
         IslandBiomesMenu.init();
         IslandCreationMenu.init();
         IslandMembersMenu.init();

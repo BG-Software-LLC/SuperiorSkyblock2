@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,12 +36,14 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder asSkullOf(SuperiorPlayer superiorPlayer){
-        textureValue = superiorPlayer == null ? HeadUtil.getNullPlayerTexture() :  superiorPlayer.getTextureValue();
+        if(itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
+            textureValue = superiorPlayer == null ? HeadUtil.getNullPlayerTexture() :  superiorPlayer.getTextureValue();
         return this;
     }
 
     public ItemBuilder asSkullOf(String textureValue){
-        this.textureValue = textureValue;
+        if(itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
+            this.textureValue = textureValue;
         return this;
     }
 

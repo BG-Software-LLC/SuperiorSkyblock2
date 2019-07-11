@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -43,6 +44,8 @@ import org.bukkit.entity.Entity;
 import java.io.File;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -527,4 +530,12 @@ public final class GridHandler implements GridManager {
     public IslandRegistry getIslands() {
         return islands;
     }
+
+    public List<Island> getListIslands(){
+        List<Island> islands = new ArrayList<>();
+        for (Island island : this.islands)
+            islands.add(island);
+        return islands;
+    }
+
 }

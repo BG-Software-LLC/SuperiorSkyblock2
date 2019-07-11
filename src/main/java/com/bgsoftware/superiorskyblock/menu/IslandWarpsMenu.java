@@ -71,6 +71,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
             Location location = island.getWarpLocation(warpName);
 
             if(location != null) {
+                this.previousMenu = null;
                 island.warpPlayer(superiorPlayer, warpName);
             }
         }
