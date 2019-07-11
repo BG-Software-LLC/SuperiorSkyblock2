@@ -12,7 +12,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import skyblock.hassan.plugin.Main;
 import skyblock.hassan.plugin.api.SpawnerStackEvent;
-import skyblock.hassan.plugin.api.UnstackEvent;
+import skyblock.hassan.plugin.api.SpawnerUnstackEvent;
 import skyblock.hassan.plugin.spawners.StackedSpawner;
 
 public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
@@ -47,7 +47,7 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerUnstack(UnstackEvent e){
+        public void onSpawnerUnstack(SpawnerUnstackEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
                 island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getSpawnerAmount());
