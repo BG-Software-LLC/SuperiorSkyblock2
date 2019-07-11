@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.jnbt;
 
 import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
-import net.minecraft.server.v1_14_R1.NBTTagList;
 
 import java.util.ArrayList;
 import java.util.Collections;
