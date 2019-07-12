@@ -42,6 +42,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean teamChatEnabled = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
     private boolean toggledPanel = false;
+    private boolean islandFly = false;
 
     private int disbands;
 
@@ -53,6 +54,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         islandRole = IslandRole.valueOf(resultSet.getString("islandRole"));
         disbands = resultSet.getInt("disbands");
         toggledPanel = resultSet.getBoolean("toggledPanel");
+        islandFly = resultSet.getBoolean("islandFly");
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -212,6 +214,23 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return toggledPanel;
     }
 
+    public boolean hasIslandFlyEnabled(){
+        return islandFly;
+    }
+
+    public void toggleIslandFly(){
+        islandFly = !islandFly;
+        Query.PLAYER_SET_ISLAND_FLY.getStatementHolder()
+                .setBoolean(islandFly)
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean isInsideIsland() {
+        return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
+    }
+
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
@@ -258,6 +277,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(textureValue)
                 .setInt(disbands)
                 .setBoolean(toggledPanel)
+                .setBoolean(islandFly)
                 .setString(player.toString())
                 .execute(async);
     }
@@ -272,6 +292,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(textureValue)
                 .setInt(plugin.getSettings().disbandCount)
                 .setBoolean(toggledPanel)
+                .setBoolean(islandFly)
                 .execute(async);
     }
 

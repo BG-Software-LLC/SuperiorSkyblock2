@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
@@ -98,6 +99,17 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     log("Version's description: \"" + Updater.getVersionDescription() + "\"");
                     log("");
                 }
+
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    for(Player player : Bukkit.getOnlinePlayers()){
+                        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                        if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
+                            player.setAllowFlight(true);
+                            player.setFlying(true);
+                        }
+                    }
+                }, 10L);
+
             }catch(Exception ex){
                 ex.printStackTrace();
                 Bukkit.getPluginManager().disablePlugin(this);
@@ -111,7 +123,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         dataHandler.saveDatabase(false);
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
-            nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), null);
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+            nmsAdapter.setWorldBorder(superiorPlayer, null);
+            if(superiorPlayer.hasIslandFlyEnabled()){
+                player.setAllowFlight(false);
+                player.setFlying(false);
+            }
         }
         dataHandler.closeConnection();
         SaveTask.cancelTask();

@@ -85,7 +85,7 @@ public final class CustomEventsListener implements Listener {
             return;
 
         if (fromIsland != null && !fromIsland.isSpawn()) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), fromIsland);
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
             if(islandLeaveEvent.isCancelled())
                 e.setCancelled(true);
@@ -180,7 +180,7 @@ public final class CustomEventsListener implements Listener {
         }
 
         if (fromIsland != null && !(fromIsland instanceof SpawnIsland)) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), toIsland);
+            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(SSuperiorPlayer.of(e.getPlayer()), fromIsland);
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
             if(islandLeaveEvent.isCancelled())
                 e.setCancelled(true);

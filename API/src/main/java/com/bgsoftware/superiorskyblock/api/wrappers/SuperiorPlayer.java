@@ -85,4 +85,10 @@ public interface SuperiorPlayer {
 
     boolean hasToggledPanel();
 
+    boolean hasIslandFlyEnabled();
+
+    void toggleIslandFly();
+
+    boolean isInsideIsland();
+
 }

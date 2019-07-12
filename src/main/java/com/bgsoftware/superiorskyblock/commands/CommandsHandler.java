@@ -38,6 +38,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdDeposit());
         subCommands.add(new CmdDisband());
         subCommands.add(new CmdExpel());
+        subCommands.add(new CmdFly());
         subCommands.add(new CmdHelp());
         subCommands.add(new CmdInvite());
         subCommands.add(new CmdKick());

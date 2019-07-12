@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -97,6 +98,13 @@ public final class PlayersListener implements Listener {
             return;
         }
 
+        if(e.getPlayer().getIsland().equals(e.getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+            Player player = e.getPlayer().asPlayer();
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            Locale.ISLAND_FLY_ENABLED.send(player);
+        }
+
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
         Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
         if(islandEnterProtectedEvent.isCancelled()) {
@@ -117,6 +125,15 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onIslandLeave(IslandLeaveEvent e){
+        if(e.getPlayer().getIsland().equals(e.getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+            Player player = e.getPlayer().asPlayer();
+            if(player.getGameMode() != GameMode.CREATIVE) {
+                player.setAllowFlight(false);
+                player.setFlying(false);
+            }
+            Locale.ISLAND_FLY_DISABLED.send(player);
+        }
+
         IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland());
         Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
         if(islandLeaveProtectedEvent.isCancelled())

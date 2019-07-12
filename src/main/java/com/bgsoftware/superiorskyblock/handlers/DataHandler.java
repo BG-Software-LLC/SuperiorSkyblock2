@@ -134,6 +134,7 @@ public final class DataHandler {
         addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
         addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
         addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {
