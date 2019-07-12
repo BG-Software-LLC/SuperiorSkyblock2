@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.utils.HeadUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -58,18 +57,18 @@ public final class IslandValuesMenu extends SuperiorMenu {
             int slot = countedBlocks.get(key);
 
             String typeName = StringUtil.format(sections[0]);
-            int amount = island.getBlockCount(SKey.of(itemStack));
+            int amount = island.getBlockCount(Key.of(itemStack));
 
             if(sections.length == 2) {
                 if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
                     EntityType entityType = EntityType.valueOf(sections[1]);
-                    amount = island.getBlockCount(SKey.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
+                    amount = island.getBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
                     itemStack = HeadUtil.getEntityHead(entityType);
                     typeName = StringUtil.format(sections[1]) + " Spawner";
                 }
                 else {
                     itemStack.setDurability(Short.valueOf(sections[1]));
-                    amount = island.getBlockCount(SKey.of(itemStack));
+                    amount = island.getBlockCount(Key.of(itemStack));
                 }
             }
 

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.mojang.authlib.properties.Property;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockFlowerPot;
@@ -140,11 +140,11 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
-    public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+    public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
         Material type = chunkSnapshot.getBlockType(x, y, z);
         short data = (short) (Block.getCombinedId(blockData) >> 12 & 15);
-        return SKey.of(type, data);
+        return Key.of(type, data);
     }
 
     @Override

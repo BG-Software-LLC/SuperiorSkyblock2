@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -147,7 +146,7 @@ public class SIsland extends DatabaseObject implements Island {
         for(String entry : resultSet.getString("blockCounts").split(";")){
             try{
                 String[] sections = entry.split("=");
-                handleBlockPlace(SKey.of(sections[0]), Integer.valueOf(sections[1]), false);
+                handleBlockPlace(Key.of(sections[0]), Integer.valueOf(sections[1]), false);
             }catch(Exception ignored){}
         }
 
@@ -577,7 +576,7 @@ public class SIsland extends DatabaseObject implements Island {
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {
                             for (int y = 0; y < 256; y++) {
-                                Key blockKey = SKey.of("AIR");
+                                Key blockKey = Key.of("AIR");
 
                                 try{
                                     blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
@@ -597,7 +596,7 @@ public class SIsland extends DatabaseObject implements Island {
                                         continue;
                                     }
                                     else{
-                                        blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
+                                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
                                     }
                                 }
 
@@ -605,7 +604,7 @@ public class SIsland extends DatabaseObject implements Island {
 
                                 if(blockPair != null){
                                     blockCount = blockPair.getKey();
-                                    blockKey = SKey.of(blockPair.getValue().name());
+                                    blockKey = Key.of(blockPair.getValue().name());
                                 }
 
                                 handleBlockPlace(blockKey, blockCount, false);
@@ -636,7 +635,7 @@ public class SIsland extends DatabaseObject implements Island {
                 for(Pair<Location, Integer> pair : spawnersToCheck){
                     try {
                         CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                        blockKey = SKey.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType());
+                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType());
                         blockCount = pair.getValue();
                         if(blockCount <= 0)
                             blockCount = plugin.getProviders().getSpawner(pair.getKey()).getKey();
@@ -661,17 +660,17 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockPlace(Block block){
-        handleBlockPlace(SKey.of(block), 1);
+        handleBlockPlace(Key.of(block), 1);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount){
-        handleBlockPlace(SKey.of(block), amount, true);
+        handleBlockPlace(Key.of(block), amount, true);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount, boolean save) {
-        handleBlockPlace(SKey.of(block), amount, save);
+        handleBlockPlace(Key.of(block), amount, save);
     }
 
     @Override
@@ -682,7 +681,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
         int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
             blockCounts.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
@@ -693,7 +692,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockBreak(Block block){
-        handleBlockBreak(SKey.of(block), 1);
+        handleBlockBreak(Key.of(block), 1);
     }
 
     @Override
@@ -703,7 +702,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockBreak(Block block, int amount, boolean save) {
-        handleBlockBreak(SKey.of(block), amount, save);
+        handleBlockBreak(Key.of(block), amount, save);
     }
 
     @Override
@@ -714,7 +713,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
         int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || SKey.of("HOPPER").equals(key)){
+        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
 
             key = plugin.getGrid().getBlockValueKey(key);
@@ -744,7 +743,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getHoppersAmount(){
-        return getBlockCount(SKey.of("HOPPER"));
+        return getBlockCount(Key.of("HOPPER"));
     }
 
     @Override

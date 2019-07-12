@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -55,7 +55,7 @@ public final class CmdValue implements ICommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
-        SKey toCheck;
+        Key toCheck;
 
         if(args.length == 1){
             ItemStack inHand = superiorPlayer.asPlayer().getItemInHand();
@@ -64,10 +64,10 @@ public final class CmdValue implements ICommand {
                 inHand = new ItemStack(Material.AIR);
             }
 
-            toCheck = SKey.of(inHand);
+            toCheck = Key.of(inHand);
         }
         else{
-            toCheck = SKey.of(args[1]);
+            toCheck = Key.of(args[1]);
         }
 
         int value = plugin.getGrid().getBlockValue(toCheck);

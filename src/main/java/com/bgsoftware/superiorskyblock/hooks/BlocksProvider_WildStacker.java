@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.Pair;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
@@ -71,21 +71,21 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         public void onBarrelPlace(BarrelPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
             if(island != null)
-                island.handleBlockPlace(SKey.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelStack(BarrelStackEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
             if(island != null)
-                island.handleBlockPlace(SKey.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelUnstack(BarrelUnstackEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
             if(island != null)
-                island.handleBlockBreak(SKey.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
+                island.handleBlockBreak(Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

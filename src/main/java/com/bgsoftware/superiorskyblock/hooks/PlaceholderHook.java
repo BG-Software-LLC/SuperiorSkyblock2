@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -67,7 +67,7 @@ public abstract class PlaceholderHook {
 
                 if ((matcher = Pattern.compile("island_count_(.+)").matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1).toUpperCase();
-                    return String.valueOf(island.getBlockCount(SKey.of(keyName)));
+                    return String.valueOf(island.getBlockCount(Key.of(keyName)));
                 }
 
                 if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {

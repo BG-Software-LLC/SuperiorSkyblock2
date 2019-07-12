@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -149,7 +149,7 @@ public final class UpgradesListener implements Listener {
         noRightClickTwice.add(e.getPlayer().getUniqueId());
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
-        island.handleBlockPlace(SKey.of("HOPPER"), 1);
+        island.handleBlockPlace(Key.of("HOPPER"), 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -162,7 +162,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(SKey.of("HOPPER"), 1);
+        island.handleBlockBreak(Key.of("HOPPER"), 1);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

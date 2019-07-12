@@ -16,23 +16,23 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -45,7 +45,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -320,6 +319,11 @@ public final class GridHandler implements GridManager {
             island.calcIslandWorth(null);
     }
 
+    @Override
+    public boolean isSpawner(Material material) {
+        return material == Materials.SPAWNER.toBukkitType();
+    }
+
     public void loadGrid(ResultSet resultSet) throws SQLException{
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
 
@@ -519,7 +523,7 @@ public final class GridHandler implements GridManager {
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
             for(String key : cfg.getConfigurationSection("block-values").getKeys(false))
-                blockValues.put(SKey.of(key), cfg.getInt("block-values." + key));
+                blockValues.put(Key.of(key), cfg.getInt("block-values." + key));
         }
 
         int getBlockValue(Key key) {

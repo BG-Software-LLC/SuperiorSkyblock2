@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.mojang.authlib.properties.Property;
-import com.bgsoftware.superiorskyblock.utils.key.SKey;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -119,10 +119,10 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
 
     @Override
     @Deprecated
-    public SKey getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+    public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
         short data = (short) chunkSnapshot.getBlockData(x, y, z);
-        return SKey.of(type, data);
+        return Key.of(type, data);
     }
 
     @Override

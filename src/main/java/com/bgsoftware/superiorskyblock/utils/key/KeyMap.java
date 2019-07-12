@@ -42,7 +42,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     public V put(String key, V value) {
-        return put(SKey.of(key), value);
+        return put(Key.of(key), value);
     }
 
     @Override
@@ -56,12 +56,12 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
             keyStr = keyStr.split(":")[0];
         else if(keyStr.contains(";") && map.containsKey(keyStr.split(";")[0]))
             keyStr = keyStr.split(";")[0];
-        return SKey.of(keyStr);
+        return Key.of(keyStr);
     }
 
     @Override
     public V remove(Object key) {
-        if(key instanceof SKey) {
+        if(key instanceof Key) {
             String keyStr = key.toString();
             map.remove(keyStr);
             map.remove(keyStr.split(":")[0]);
@@ -71,22 +71,22 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     public V get(ItemStack itemStack) {
-        return get(SKey.of(itemStack));
+        return get(Key.of(itemStack));
     }
 
     public V get(Material material, short data) {
-        return get(SKey.of(material, data));
+        return get(Key.of(material, data));
     }
 
     public V get(String key) {
-        return get(SKey.of(key));
+        return get(Key.of(key));
     }
 
     @Override
     public V get(Object o) {
         if(map.containsKey("all"))
             return map.get("all");
-        if(o instanceof SKey) {
+        if(o instanceof Key) {
             String key = o.toString();
             if(map.containsKey(key))
                 return map.get(key);
@@ -105,7 +105,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return key instanceof SKey ? containsKey(key) ? get(key) : defaultValue : super.getOrDefault(key, defaultValue);
+        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : super.getOrDefault(key, defaultValue);
     }
 
     @Override
@@ -115,7 +115,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     private Map<Key, V> asKeyMap(){
         Map<Key, V> map = new HashMap<>();
-        this.map.forEach((key, value) -> map.put(SKey.of(key), value));
+        this.map.forEach((key, value) -> map.put(Key.of(key), value));
         return map;
     }
 
