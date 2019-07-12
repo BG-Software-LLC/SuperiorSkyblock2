@@ -310,15 +310,26 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     public static SuperiorPlayer of(CommandSender sender){
-        return sender == null ? null : of((Player) sender);
+        if(sender == null)
+            throw new NullPointerException("CommandSender cannot be null.");
+
+        return of((Player) sender);
     }
 
     public static SuperiorPlayer of(Player player){
-        return player == null ? null : of(player.getUniqueId());
+        if(player == null)
+            throw new NullPointerException("Player cannot be null.");
+
+        return of(player.getUniqueId());
     }
 
     public static SuperiorPlayer of(UUID uuid){
-        return uuid == null || plugin.getPlayers() == null ? null : plugin.getPlayers().getSuperiorPlayer(uuid);
+        if(uuid == null)
+            throw new NullPointerException("UUID cannot be null.");
+        if(plugin.getPlayers() == null)
+            throw new NullPointerException("PlayersHandle is not ready yet.");
+
+        return plugin.getPlayers().getSuperiorPlayer(uuid);
     }
 
     public static SuperiorPlayer of(String name){
