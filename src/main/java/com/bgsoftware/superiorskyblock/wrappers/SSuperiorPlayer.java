@@ -65,9 +65,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         name = ((StringTag) compoundValues.get("name")).getValue();
         islandRole = IslandRole.valueOf(((StringTag) compoundValues.get("islandRole")).getValue());
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
-        disbands = compoundValues.containsKey("disbands") ?
-                (int) compoundValues.get("disbands").getValue() :
-                SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
+        disbands = compoundValues.containsKey("disbands") ? (int) compoundValues.get("disbands").getValue() : plugin.getSettings().disbandCount;
 
         if(plugin.getGrid().getIsland(SSuperiorPlayer.of(teamLeader)) == null)
             teamLeader = player;

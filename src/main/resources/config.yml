@@ -334,6 +334,7 @@ interactables:
 visitors-damage: false
 
 # The amount of times a player can disband an island.
+# If you want to disable this feature, set it to 0.
 disband-count: 5
 
 # Should the list of members in island top also include the island leader?

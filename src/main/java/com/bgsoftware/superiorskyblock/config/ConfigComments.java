@@ -172,6 +172,7 @@ public final class ConfigComments {
 
     @Comment("")
     @Comment("The amount of times a player can disband an island.")
+    @Comment("If you want to disable this feature, set it to 0.")
     public static String DISBAND_COUNT = "disband-count";
 
     @Comment("")

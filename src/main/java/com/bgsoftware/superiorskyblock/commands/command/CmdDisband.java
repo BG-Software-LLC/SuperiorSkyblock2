@@ -70,7 +70,7 @@ public final class CmdDisband implements ICommand {
             return;
         }
 
-        if (!superiorPlayer.hasDisbands()) {
+        if (!superiorPlayer.hasDisbands() && plugin.getSettings().disbandCount > 0) {
             Locale.NO_MORE_DISBANDS.send(superiorPlayer);
             return;
         }
