@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
@@ -47,7 +48,6 @@ import org.bukkit.entity.Player;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
-import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
@@ -100,10 +100,10 @@ public class SIsland extends DatabaseObject implements Island {
 
     private UUID prevOwner;
 
-    public SIsland(ResultSet resultSet) throws SQLException {
+    public SIsland(CachedResultSet resultSet){
         this.owner = UUID.fromString(resultSet.getString("owner"));
-        this.center = SBlockPosition.of(getLocation(resultSet.getString("center")));
 
+        this.center = SBlockPosition.of(getLocation(resultSet.getString("center")));
         this.teleportLocation = getLocation(resultSet.getString("teleportLocation"));
 
         for(String uuid : resultSet.getString("members").split(",")) {
@@ -136,7 +136,7 @@ public class SIsland extends DatabaseObject implements Island {
             }catch(Exception ignored){}
         }
 
-        for(String entry : resultSet.getString("warps").split(";")) {
+        for(String entry : resultSet.getString("warps").split(",")) {
             try {
                 String[] sections = entry.split("=");
                 this.warps.put(sections[0], FileUtil.toLocation(sections[1]));
@@ -150,16 +150,15 @@ public class SIsland extends DatabaseObject implements Island {
             }catch(Exception ignored){}
         }
 
-        this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
-        this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
-        this.islandSize = resultSet.getInt("islandSize");
-
         for(String limit : resultSet.getString("blockLimits").split(",")){
             try {
                 this.hoppersLimit = Integer.valueOf(limit.split("=")[1]);
             }catch(Exception ignored){}
         }
 
+        this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
+        this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
+        this.islandSize = resultSet.getInt("islandSize");
         this.teamLimit = resultSet.getInt("teamLimit");
         this.warpsLimit =  resultSet.getInt("warpsLimit");
         this.cropGrowth = resultSet.getDouble("cropGrowth");
@@ -168,7 +167,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = resultSet.getString("discord");
         this.paypal = resultSet.getString("paypal");
         this.locked = resultSet.getBoolean("locked");
-        
+
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
     }
@@ -679,7 +678,7 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
+    public void handleBlockPlace(Key key, int amount, boolean save) {
         int blockValue;
         if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);

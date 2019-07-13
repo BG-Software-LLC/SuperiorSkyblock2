@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public final class IslandRegistry implements Iterable<Island> {
 
-    private Map<UUID, Island> islands = Maps.newHashMap();
-    private List<UUID> ownershipList = Lists.newArrayList();
+    private Map<UUID, Island> islands = Maps.newConcurrentMap();
+    private List<UUID> ownershipList = Lists.newCopyOnWriteArrayList();
 
     public Island get(UUID uuid){
         return islands.get(uuid);
