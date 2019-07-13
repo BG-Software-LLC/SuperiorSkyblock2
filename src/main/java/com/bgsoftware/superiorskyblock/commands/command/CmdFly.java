@@ -31,7 +31,7 @@ public final class CmdFly implements ICommand {
 
     @Override
     public String getDescription() {
-        return "Toggle island fly.";
+        return Locale.COMMAND_DESCRIPTION_FLY.getMessage();
     }
 
     @Override
