@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public final class IslandRegistry implements Iterable<Island> {
 
-    private Map<UUID, Island> islands = Maps.newConcurrentMap();
-    private List<UUID> ownershipList = Lists.newCopyOnWriteArrayList();
+    private Map<UUID, Island> islands = Maps.newHashMap();
+    private List<UUID> ownershipList = Lists.newArrayList();
 
     public Island get(UUID uuid){
         return islands.get(uuid);
@@ -23,14 +23,14 @@ public final class IslandRegistry implements Iterable<Island> {
         return islands.get(ownershipList.get(index));
     }
 
-    public void add(UUID uuid, Island island){
+    public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
         ownershipList.remove(uuid);
         ownershipList.add(uuid);
         sort();
     }
 
-    public void remove(UUID uuid){
+    public synchronized void remove(UUID uuid){
         islands.remove(uuid);
         ownershipList.remove(uuid);
         sort();
@@ -49,7 +49,7 @@ public final class IslandRegistry implements Iterable<Island> {
         return ownershipList.iterator();
     }
 
-    public void sort(){
+    public synchronized void sort(){
         //noinspection SuspiciousMethodCalls
         ownershipList.sort(Comparator.comparing(o -> islands.get(o)).reversed());
     }
