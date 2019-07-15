@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -84,7 +83,7 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length > 1 && !NumberUtils.isNumber(args[1])){
+        if(args.length > 1 && !isNumber(args[1])){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[1].toLowerCase())){
                     if(!(sender instanceof Player) && !subCommand.canBeExecutedByConsole()){
@@ -194,6 +193,15 @@ public final class CmdAdmin implements ICommand {
         }
 
         return list;
+    }
+
+    private boolean isNumber(String str){
+        try{
+            Integer.valueOf(str);
+            return true;
+        }catch(NumberFormatException ex){
+            return false;
+        }
     }
 
 }
