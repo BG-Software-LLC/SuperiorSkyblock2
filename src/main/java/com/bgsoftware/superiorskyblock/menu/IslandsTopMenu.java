@@ -66,7 +66,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
             return;
         }
 
-        IslandRegistry islands = plugin.getGrid().getIslands();
+        IslandRegistry islands = plugin.getGrid().getIslandRegistry();
         islands.sort();
 
         for(int i = 0; i < slots.length; i++){

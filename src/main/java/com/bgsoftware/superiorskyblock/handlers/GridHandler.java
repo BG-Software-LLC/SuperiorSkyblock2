@@ -255,6 +255,11 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
+    public List<Island> getIslands(){
+        return Lists.newArrayList(islands.iterator());
+    }
+
+    @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
         IslandsTopMenu.openInventory(superiorPlayer, null);
     }
@@ -534,7 +539,7 @@ public final class GridHandler implements GridManager {
         }
     }
 
-    public IslandRegistry getIslands() {
+    public IslandRegistry getIslandRegistry() {
         return islands;
     }
 

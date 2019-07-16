@@ -1092,7 +1092,7 @@ public class SIsland extends DatabaseObject implements Island {
         player.setIslandRole(IslandRole.LEADER);
         previous.setIslandRole(IslandRole.ADMIN);
 
-        plugin.getGrid().getIslands().transfer(previous.getUniqueId(), owner);
+        plugin.getGrid().getIslandRegistry().transfer(previous.getUniqueId(), owner);
 
         executeDeleteStatement(true);
         executeInsertStatement(true);
