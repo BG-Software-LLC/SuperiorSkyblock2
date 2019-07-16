@@ -98,7 +98,7 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(e.getPlayer().getIsland().equals(e.getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getIsland().equals(e.getPlayer().getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             player.setAllowFlight(true);
             player.setFlying(true);
