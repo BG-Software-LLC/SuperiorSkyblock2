@@ -458,7 +458,12 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void disbandIsland(){
-        new HashSet<>(members).forEach(member -> kickMember(SSuperiorPlayer.of(member)));
+        getAllMembers().forEach(member -> {
+            if(members.contains(member))
+                kickMember(SSuperiorPlayer.of(member));
+            if(plugin.getSettings().disbandInventoryClear)
+                plugin.getNMSAdapter().clearInventory(Bukkit.getOfflinePlayer(member));
+        });
         plugin.getGrid().deleteIsland(this);
         if(!Bukkit.getBukkitVersion().contains("1.14")) {
             for (Chunk chunk : getAllChunks(true))

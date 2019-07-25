@@ -49,6 +49,7 @@ public final class SettingsHandler {
     public final Map<String, String> defaultPlaceholders;
     public final boolean disbandConfirm;
     public final String spawnersProvider;
+    public final boolean disbandInventoryClear;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -99,6 +100,7 @@ public final class SettingsHandler {
         ));
         disbandConfirm = cfg.getBoolean("disband-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
+        disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
     }
 
     public void updateValue(String path, Object value){

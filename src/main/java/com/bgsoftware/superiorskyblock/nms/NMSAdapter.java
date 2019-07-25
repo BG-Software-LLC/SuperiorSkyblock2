@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -70,5 +71,7 @@ public interface NMSAdapter {
     default Object getCustomHolder(InventoryHolder defaultHolder, String title){
         return defaultHolder;
     }
+
+    void clearInventory(OfflinePlayer offlinePlayer);
 
 }

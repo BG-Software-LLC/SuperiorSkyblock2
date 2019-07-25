@@ -193,4 +193,8 @@ public final class ConfigComments {
     @Comment("Providers: Auto, MergedSpawner, StackSpawners, WildStacker, SilkSpawners, PvpingSpawners")
     public static String SPAWNERS_PROVIDER = "spawners-provider";
 
+    @Comment("")
+    @Comment("Should inventories of island members get cleared after disbanding their island?")
+    public static String DISBAND_INVENTORY_CLEAR = "disband-inventory-clear";
+
 }
