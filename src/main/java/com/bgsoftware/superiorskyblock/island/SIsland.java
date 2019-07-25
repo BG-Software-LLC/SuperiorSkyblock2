@@ -136,7 +136,7 @@ public class SIsland extends DatabaseObject implements Island {
             }catch(Exception ignored){}
         }
 
-        for(String entry : resultSet.getString("warps").split(",")) {
+        for(String entry : resultSet.getString("warps").split(";")) {
             try {
                 String[] sections = entry.split("=");
                 this.warps.put(sections[0], FileUtil.toLocation(sections[1]));
