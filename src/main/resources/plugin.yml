@@ -155,5 +155,7 @@ permissions:
             description: Set the level of an upgrade for another player's island.
           superior.admin.setwarpslimit:
             description: Set the warps limit of an island.
+          superior.admin.spy:
+            description: Toggle chat spy mode.
           superior.admin.withdraw:
             description: Withdraw money from another player's island bank.

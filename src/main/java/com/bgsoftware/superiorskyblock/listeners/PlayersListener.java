@@ -263,6 +263,12 @@ public final class PlayersListener implements Listener {
             else {
                 e.setCancelled(true);
                 island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage()));
+                Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage());
+                for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
+                    SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
+                    if(onlinePlayer.hasAdminSpyEnabled())
+                        Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage());
+                }
                 return;
             }
         }
