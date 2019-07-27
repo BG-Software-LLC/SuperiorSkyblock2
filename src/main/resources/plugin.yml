@@ -47,6 +47,8 @@ permissions:
             description: Kick a player from your island.
           superior.island.leave:
             description: Leave your island.
+          superior.island.name:
+            description: Change the name of your island.
           superior.island.open:
             description: Open the island to the public.
           superior.island.panel:
@@ -125,6 +127,8 @@ permissions:
             description: Send a player a message without any prefixes.
           superior.admin.msgall:
             description: Send to all island members a message without any prefixes.
+          superior.admin.name:
+            description: Change the name of an island.
           superior.admin.open:
             description: Open an island to the public.
           superior.admin.promote:

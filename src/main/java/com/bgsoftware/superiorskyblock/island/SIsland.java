@@ -85,7 +85,8 @@ public class SIsland extends DatabaseObject implements Island {
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
     protected Location teleportLocation;
-    private boolean locked;
+    private boolean locked = false;
+    private String islandName = "";
 
     /*
      * SIsland multipliers & limits
@@ -167,6 +168,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = resultSet.getString("discord");
         this.paypal = resultSet.getString("paypal");
         this.locked = resultSet.getBoolean("locked");
+        this.islandName = resultSet.getString("name");
 
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
@@ -216,11 +218,11 @@ public class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, Location location){
-        this(superiorPlayer, SBlockPosition.of(location));
+    public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
+        this(superiorPlayer, SBlockPosition.of(location), islandName);
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation){
+    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getTeamLeader();
             superiorPlayer.setIslandRole(IslandRole.LEADER);
@@ -228,6 +230,7 @@ public class SIsland extends DatabaseObject implements Island {
             this.owner = null;
         }
         this.center = wrappedLocation;
+        this.islandName = islandName;
         assignPermissionNodes();
     }
 
@@ -1134,6 +1137,21 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public String getName() {
+        return islandName;
+    }
+
+    @Override
+    public void setName(String islandName) {
+        this.islandName = islandName;
+
+        Query.ISLAND_SET_NAME.getStatementHolder()
+                .setString(islandName)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
@@ -1171,6 +1189,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
                 .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
+                .setString(islandName)
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1222,6 +1241,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
                 .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
+                .setString(islandName)
                 .execute(async);
     }
 

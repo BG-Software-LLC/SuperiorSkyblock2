@@ -31,7 +31,7 @@ public final class CmdShow implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island show [player-name]";
+        return "island show [player-name/island-name]";
     }
 
     @Override
@@ -56,7 +56,8 @@ public final class CmdShow implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer;
+        SuperiorPlayer targetPlayer = null;
+        Island island;
 
         if(args.length == 1){
             if(!(sender instanceof Player)){
@@ -64,21 +65,20 @@ public final class CmdShow implements ICommand {
                 return;
             }
 
-            targetPlayer = SSuperiorPlayer.of(sender);
+            island = SSuperiorPlayer.of(sender).getIsland();
         }
         else{
             targetPlayer = SSuperiorPlayer.of(args[1]);
-
-            if(targetPlayer == null){
-                Locale.INVALID_PLAYER.send(sender, args[1]);
-                return;
-            }
+            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
         }
 
-        Island island = targetPlayer.getIsland();
-
         if(island == null){
-            Locale.INVALID_ISLAND.send(sender);
+            if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
@@ -88,6 +88,8 @@ public final class CmdShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_HEADER.getMessage()).append("\n");
         if(!Locale.ISLAND_INFO_OWNER.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_OWNER.getMessage(island.getOwner().getName())).append("\n");
+        if(!Locale.ISLAND_INFO_NAME.isEmpty() && !island.getName().isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
         if(!Locale.ISLAND_INFO_BANK.isEmpty())
@@ -136,13 +138,18 @@ public final class CmdShow implements ICommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? SSuperiorPlayer.of(sender) : null;
+        Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
         List<String> list = new ArrayList<>();
 
         if(args.length == 2){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()) && (superiorPlayer == null ||
-                        superiorPlayer.getIsland() == null || !superiorPlayer.getIsland().getOwner().getUniqueId().equals(player.getUniqueId()))){
-                    list.add(player.getName());
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                if (onlinePlayer.getIsland() != null && (superiorPlayer == null || island == null ||
+                        !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {
+                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(player.getName());
+                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(onlinePlayer.getIsland().getName());
                 }
             }
         }

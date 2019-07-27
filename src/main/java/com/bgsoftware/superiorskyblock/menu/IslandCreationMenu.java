@@ -25,9 +25,11 @@ public final class IslandCreationMenu extends SuperiorMenu {
     private static Map<String, Object> schematicsData = new HashMap<>();
 
     private SuperiorPlayer superiorPlayer;
+    private String islandName;
 
-    private IslandCreationMenu(){
+    private IslandCreationMenu(String islandName){
         super("islandCreationPage");
+        this.islandName = islandName;
     }
 
     @Override
@@ -42,7 +44,7 @@ public final class IslandCreationMenu extends SuperiorMenu {
                     Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
                     superiorPlayer.asPlayer().closeInventory();
                     Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome);
+                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
                     break;
                 }
             }
@@ -78,7 +80,7 @@ public final class IslandCreationMenu extends SuperiorMenu {
     }
 
     public static void init(){
-        IslandCreationMenu islandCreationMenu = new IslandCreationMenu();
+        IslandCreationMenu islandCreationMenu = new IslandCreationMenu("");
         File file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if(!file.exists())
@@ -103,8 +105,8 @@ public final class IslandCreationMenu extends SuperiorMenu {
         }
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
-        new IslandCreationMenu().open(superiorPlayer, previousMenu);
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
+        new IslandCreationMenu(islandName).open(superiorPlayer, previousMenu);
     }
 
 }

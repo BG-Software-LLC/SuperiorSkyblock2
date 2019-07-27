@@ -15,6 +15,8 @@ import java.util.List;
 
 public final class CmdCreate implements ICommand {
 
+    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("create");
@@ -27,7 +29,7 @@ public final class CmdCreate implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island create";
+        return plugin.getSettings().islandNamesRequiredForCreation ? "island create <name>" : "island create";
     }
 
     @Override
@@ -42,7 +44,7 @@ public final class CmdCreate implements ICommand {
 
     @Override
     public int getMaxArgs() {
-        return 1;
+        return plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1;
     }
 
     @Override
@@ -59,7 +61,22 @@ public final class CmdCreate implements ICommand {
             return;
         }
 
-        IslandCreationMenu.openInventory(superiorPlayer, null);
+        if(!plugin.getSettings().islandNamesRequiredForCreation && args.length == 2){
+            Locale.COMMAND_USAGE.send(sender, getUsage());
+            return;
+        }
+
+        String islandName = "";
+
+        if(args.length == 2){
+            islandName = args[1];
+            if(plugin.getGrid().getIsland(islandName) != null){
+                Locale.ISLAND_ALREADY_EXIST.send(superiorPlayer);
+                return;
+            }
+        }
+
+        IslandCreationMenu.openInventory(superiorPlayer, null, islandName);
     }
 
     @Override

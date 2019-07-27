@@ -50,6 +50,10 @@ public final class SettingsHandler {
     public final boolean disbandConfirm;
     public final String spawnersProvider;
     public final boolean disbandInventoryClear;
+    public final boolean islandNamesRequiredForCreation;
+    public final int islandNamesMaxLength;
+    public final int islandNamesMinLength;
+    public final List<String> filteredIslandNames;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -101,6 +105,10 @@ public final class SettingsHandler {
         disbandConfirm = cfg.getBoolean("disband-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
+        islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
+        islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
+        islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
+        filteredIslandNames = cfg.getStringList("island-names.filtered-names");
     }
 
     public void updateValue(String path, Object value){

@@ -6,25 +6,18 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored",  "WeakerAccess"})
 public final class DataHandler {
@@ -102,7 +95,8 @@ public final class DataHandler {
                 "warpsLimit INTEGER, " +
                 "bonusWorth VARCHAR," +
                 "locked BOOLEAN," +
-                "blockCounts VARCHAR" +
+                "blockCounts VARCHAR," +
+                "name VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -143,6 +137,7 @@ public final class DataHandler {
         addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
         addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
         addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("name", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -297,47 +292,6 @@ public final class DataHandler {
             if(!ex.getMessage().contains("duplicate"))
                 ex.printStackTrace();
         }
-    }
-
-    private Map<String, Object> copyResultSet(ResultSet resultSet) throws SQLException{
-        Map<String, Object> copiedResultSet = new HashMap<>();
-
-        copiedResultSet.put("owner", UUID.fromString(resultSet.getString("owner")));
-        copiedResultSet.put("center", SBlockPosition.of(getLocation(resultSet.getString("center"))));
-        copiedResultSet.put("teleportLocation", getLocation(resultSet.getString("teleportLocation")));
-        copiedResultSet.put("members", resultSet.getString("members"));
-        copiedResultSet.put("banned", resultSet.getString("banned"));
-        copiedResultSet.put("permissionNodes", resultSet.getString("permissionNodes"));
-        copiedResultSet.put("upgrades", resultSet.getString("upgrades"));
-        copiedResultSet.put("warps", resultSet.getString("warps"));
-        copiedResultSet.put("blockCounts", resultSet.getString("blockCounts"));
-        copiedResultSet.put("islandBank", BigDecimalFormatted.of(resultSet.getString("islandBank")));
-        copiedResultSet.put("bonusWorth", BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
-        copiedResultSet.put("islandSize", resultSet.getInt("islandSize"));
-        copiedResultSet.put("blockLimits", resultSet.getString("blockLimits"));
-        copiedResultSet.put("teamLimit", resultSet.getInt("teamLimit"));
-        copiedResultSet.put("warpsLimit", resultSet.getInt("warpsLimit"));
-        copiedResultSet.put("cropGrowth", resultSet.getDouble("cropGrowth"));
-        copiedResultSet.put("spawnerRates", resultSet.getDouble("spawnerRates"));
-        copiedResultSet.put("mobDrops", resultSet.getDouble("mobDrops"));
-        copiedResultSet.put("discord", resultSet.getString("discord"));
-        copiedResultSet.put("paypal", resultSet.getString("paypal"));
-        copiedResultSet.put("locked", resultSet.getBoolean("locked"));
-
-        return copiedResultSet;
-    }
-
-    private Location getLocation(String location){
-        String[] sections = location.split(",");
-
-        World world = Bukkit.getWorld(sections[0]);
-        double x = Double.parseDouble(sections[1]);
-        double y = Double.parseDouble(sections[2]);
-        double z = Double.parseDouble(sections[3]);
-        float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
-        float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
-
-        return new Location(world, x, y, z, yaw, pitch);
     }
 
 }

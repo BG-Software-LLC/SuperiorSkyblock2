@@ -28,6 +28,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminJoin());
         subCommands.add(new CmdAdminMsg());
         subCommands.add(new CmdAdminMsgAll());
+        subCommands.add(new CmdAdminName());
         subCommands.add(new CmdAdminOpen());
         subCommands.add(new CmdAdminPromote());
         subCommands.add(new CmdAdminReload());

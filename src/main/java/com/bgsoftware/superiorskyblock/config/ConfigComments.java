@@ -197,4 +197,23 @@ public final class ConfigComments {
     @Comment("Should inventories of island members get cleared after disbanding their island?")
     public static String DISBAND_INVENTORY_CLEAR = "disband-inventory-clear";
 
+    @Comment("")
+    @Comment("All settings related to island names.")
+    public static String ISLAND_NAMES = "island-names";
+
+    @Comment("Should creation of islands will ask for name (/is create <name>)?")
+    public static String ISLAND_NAMES_REQUIRED_FOR_CREATION = "island-names.required-for-creation";
+
+    @Comment("")
+    @Comment("The maximum length for names.")
+    public static String ISLAND_NAMES_MAX_LENGTH = "island-names.max-length";
+
+    @Comment("")
+    @Comment("The minimum length for names.")
+    public static String ISLAND_NAMES_MIN_LENGTH = "island-names.min-length";
+
+    @Comment("")
+    @Comment("A list of names that will be blacklisted.")
+    public static String ISLAND_NAMES_FILTERED_NAMES = "island-names.filtered-names";
+
 }

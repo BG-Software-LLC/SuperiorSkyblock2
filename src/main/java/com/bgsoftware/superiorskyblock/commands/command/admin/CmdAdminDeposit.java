@@ -31,7 +31,7 @@ public final class CmdAdminDeposit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin deposit <player-name> <amount>";
+        return "island admin deposit <player-name/island-name> <amount>";
     }
 
     @Override
@@ -62,16 +62,15 @@ public final class CmdAdminDeposit implements ICommand {
         }
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
-            return;
-        }
-
-        Island island = targetPlayer.getIsland();
+        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            if(args[2].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
@@ -87,7 +86,11 @@ public final class CmdAdminDeposit implements ICommand {
         }
 
         island.depositMoney(amount);
-        Locale.ADMIN_DEPOSIT_MONEY.send(sender, StringUtil.format(amount), targetPlayer.getName());
+
+        if(targetPlayer == null)
+            Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtil.format(amount), island.getName());
+        else
+            Locale.ADMIN_DEPOSIT_MONEY.send(sender, StringUtil.format(amount), targetPlayer.getName());
     }
 
     @Override
@@ -96,9 +99,12 @@ public final class CmdAdminDeposit implements ICommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(!player.equals(sender) && player.getName().toLowerCase().startsWith(args[2].toLowerCase()) &&
-                        SSuperiorPlayer.of(player).getIsland() != null){
-                    list.add(player.getName());
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                if (onlinePlayer.getIsland() != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(onlinePlayer.getIsland().getName());
                 }
             }
         }

@@ -10,6 +10,7 @@ public enum IslandPermission {
     BAN_MEMBER,
     BREAK,
     BUILD,
+    CHANGE_NAME,
     CHECK_PERMISSION,
     CHEST_ACCESS,
     CLOSE_BYPASS,

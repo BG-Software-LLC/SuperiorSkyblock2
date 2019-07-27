@@ -15,10 +15,15 @@ import java.util.UUID;
 
 public interface GridManager {
 
+    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName);
+
+    @Deprecated
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome);
 
+    @Deprecated
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus);
 
+    @Deprecated
     void createIsland(SuperiorPlayer superiorPlayer, String schemName);
 
     void deleteIsland(Island island);
@@ -28,6 +33,8 @@ public interface GridManager {
     Island getIsland(int index);
 
     Island getIsland(UUID uuid);
+
+    Island getIsland(String islandName);
 
     Island getIslandAt(Location location);
 

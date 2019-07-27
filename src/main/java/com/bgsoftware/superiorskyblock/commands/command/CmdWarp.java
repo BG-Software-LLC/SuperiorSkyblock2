@@ -29,7 +29,7 @@ public final class CmdWarp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island warp [player-name]";
+        return "island warp [player-name/island-name]";
     }
 
     @Override
@@ -55,30 +55,25 @@ public final class CmdWarp implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer targetPlayer = null;
         Island island;
 
         if(args.length == 1){
             island = superiorPlayer.getIsland();
-
-            if(island == null){
-                Locale.INVALID_ISLAND.send(superiorPlayer);
-                return;
-            }
         }
         else{
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+            targetPlayer = SSuperiorPlayer.of(args[1]);
+            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
+        }
 
-            if(targetPlayer == null){
-                Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
-                return;
-            }
-
-            island = targetPlayer.getIsland();
-
-            if(island == null){
-                Locale.INVALID_ISLAND_OTHER.send(superiorPlayer, targetPlayer.getName());
-                return;
-            }
+        if(island == null){
+            if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            return;
         }
 
         IslandWarpsMenu.openInventory(superiorPlayer, null, island);
@@ -87,13 +82,18 @@ public final class CmdWarp implements ICommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? SSuperiorPlayer.of(sender) : null;
+        Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
         List<String> list = new ArrayList<>();
 
         if(args.length == 2){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()) && (superiorPlayer == null ||
-                        superiorPlayer.getIsland() == null || !superiorPlayer.getIsland().getOwner().getUniqueId().equals(player.getUniqueId()))){
-                    list.add(player.getName());
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                if (onlinePlayer.getIsland() != null && (superiorPlayer == null || island == null ||
+                        !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {
+                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(player.getName());
+                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(onlinePlayer.getIsland().getName());
                 }
             }
         }

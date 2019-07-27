@@ -273,11 +273,15 @@ public final class PlayersListener implements Listener {
             }
         }
 
+        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(String.valueOf(island == null ? "" : island.getName()));
+
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
                 .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getIslandLevelAsBigDecimal())))
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getWorthAsBigDecimal()))));
+                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getWorthAsBigDecimal())))
+                .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
+        );
     }
 
     @EventHandler

@@ -137,6 +137,8 @@ public abstract class PlaceholderHook {
                         return "Yes";
                     case "locked":
                         return island.isLocked() ? "True" : "False";
+                    case "name":
+                        return island.getName();
                 }
 
             }

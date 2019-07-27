@@ -208,4 +208,8 @@ public interface Island extends Comparable<Island> {
 
     void setLocked(boolean locked);
 
+    String getName();
+
+    void setName(String islandName);
+
 }
