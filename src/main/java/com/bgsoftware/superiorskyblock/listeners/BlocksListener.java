@@ -90,6 +90,9 @@ public final class BlocksListener implements Listener {
         if(!plugin.getSettings().stackedBlocksEnabled)
             return;
 
+        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
+            plugin.getGrid().setBlockAmount(e.getBlock(), 1);
+
         if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(e.getBlock().getWorld().getName()))
             return;
 
