@@ -131,7 +131,7 @@ public final class CmdAdmin implements ICommand {
         }
 
         int lastPage = subCommands.size() / 7;
-        if(lastPage % 7 != 0) lastPage++;
+        if(subCommands.size() % 7 != 0) lastPage++;
 
         if(page > lastPage){
             Locale.INVALID_AMOUNT.send(sender, page);

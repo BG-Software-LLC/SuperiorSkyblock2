@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public final class CmdHelp implements ICommand {
         }
 
         int lastPage = subCommands.size() / 7;
-        if(lastPage % 7 != 0) lastPage++;
+        if(subCommands.size() % 7 != 0) lastPage++;
 
         if(page > lastPage){
             Locale.INVALID_AMOUNT.send(sender, page);
@@ -109,7 +110,7 @@ public final class CmdHelp implements ICommand {
                     .collect(Collectors.toList());
 
             int lastPage = subCommands.size() / 7;
-            if(lastPage % 7 != 0) lastPage++;
+            if(subCommands.size() % 7 != 0) lastPage++;
 
             for(int i = 1; i <= lastPage; i++)
                 list.add(i + "");
