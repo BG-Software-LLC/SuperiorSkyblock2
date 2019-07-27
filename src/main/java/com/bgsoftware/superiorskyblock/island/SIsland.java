@@ -313,6 +313,11 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public List<UUID> getAllBannedMembers() {
+        return new ArrayList<>(banned);
+    }
+
+    @Override
     public List<UUID> getAllMembers() {
         List<UUID> members = new ArrayList<>();
 

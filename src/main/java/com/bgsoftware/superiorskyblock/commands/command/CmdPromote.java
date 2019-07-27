@@ -100,7 +100,7 @@ public final class CmdPromote implements ICommand {
             List<String> list = new ArrayList<>();
             SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getAllMembers()){
+            for(UUID uuid : island.getMembers()){
                 targetPlayer = SSuperiorPlayer.of(uuid);
                 if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
                         !targetPlayer.getIslandRole().getNextRole().isHigherThan(superiorPlayer.getIslandRole()) &&

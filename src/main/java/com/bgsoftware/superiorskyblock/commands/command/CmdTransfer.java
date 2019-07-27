@@ -10,8 +10,10 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class CmdTransfer implements ICommand {
 
@@ -91,6 +93,24 @@ public class CmdTransfer implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
+
+        if(args.length == 2 && island != null && superiorPlayer.getIslandRole() != IslandRole.LEADER){
+            List<String> list = new ArrayList<>();
+            SuperiorPlayer targetPlayer;
+
+            for(UUID uuid : island.getMembers()){
+                targetPlayer = SSuperiorPlayer.of(uuid);
+                if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                    list.add(targetPlayer.getName());
+                }
+            }
+
+            return list;
+        }
+
+        return new ArrayList<>();
     }
+
 }

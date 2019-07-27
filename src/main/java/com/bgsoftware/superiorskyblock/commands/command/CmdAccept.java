@@ -103,8 +103,8 @@ public final class CmdAccept implements ICommand {
 
             for(UUID uuid : plugin.getGrid().getAllIslands()){
                 island = plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid));
-                if(island.isInvited(superiorPlayer) && superiorPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
-                    list.add(SSuperiorPlayer.of(uuid).getName());
+                if(island.isInvited(superiorPlayer) && island.getOwner().getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(island.getOwner().getName());
             }
 
             return list;

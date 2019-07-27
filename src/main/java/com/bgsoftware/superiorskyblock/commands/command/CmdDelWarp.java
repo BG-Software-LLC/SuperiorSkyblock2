@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,6 +76,20 @@ public final class CmdDelWarp implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
+
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.DELETE_WARP)){
+            List<String> list = new ArrayList<>();
+
+            for(String warpName : island.getAllWarps()){
+                if(warpName.toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(warpName);
+            }
+
+            return list;
+        }
+
+        return new ArrayList<>();
     }
 }

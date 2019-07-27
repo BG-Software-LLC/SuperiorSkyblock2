@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -101,7 +102,21 @@ public class CmdRankup implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
+
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.RANKUP)){
+            List<String> list = new ArrayList<>();
+
+            for(String upgrade : plugin.getUpgrades().getAllUpgrades()){
+                if(upgrade.toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(upgrade.toLowerCase());
+            }
+
+            return list;
+        }
+
+        return new ArrayList<>();
     }
 
     private String getUpgradesString(SuperiorSkyblockPlugin plugin){

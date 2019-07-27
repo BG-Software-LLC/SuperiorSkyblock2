@@ -7,8 +7,11 @@ import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -83,6 +86,18 @@ public final class CmdWarp implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        SuperiorPlayer superiorPlayer = sender instanceof Player ? SSuperiorPlayer.of(sender) : null;
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 2){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()) && (superiorPlayer == null ||
+                        superiorPlayer.getIsland() == null || !superiorPlayer.getIsland().getOwner().getUniqueId().equals(player.getUniqueId()))){
+                    list.add(player.getName());
+                }
+            }
+        }
+
+        return list;
     }
 }
