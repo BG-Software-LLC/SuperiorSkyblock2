@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
+@SuppressWarnings("unused")
 public interface Island extends Comparable<Island> {
 
     SuperiorPlayer getOwner();
@@ -36,6 +36,8 @@ public interface Island extends Comparable<Island> {
     void unbanMember(SuperiorPlayer superiorPlayer);
 
     boolean isBanned(SuperiorPlayer superiorPlayer);
+
+    List<UUID> getAllBannedMembers();
 
     List<UUID> getAllMembers();
 
