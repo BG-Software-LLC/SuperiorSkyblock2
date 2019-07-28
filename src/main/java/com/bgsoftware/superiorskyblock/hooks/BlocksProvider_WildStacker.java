@@ -26,7 +26,7 @@ import java.util.Map;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
-    private static final Map<Chunk, StackedSnapshot> chunkSnapshots = new HashMap<>();
+    private static final Map<ChunkWrapper, StackedSnapshot> chunkSnapshots = new HashMap<>();
 
     public BlocksProvider_WildStacker(){
         Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
@@ -34,18 +34,19 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     public static void cacheChunk(Chunk chunk){
         try {
-            chunkSnapshots.put(chunk, WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
+            chunkSnapshots.put(new ChunkWrapper(chunk), WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
         }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
-        chunkSnapshots.remove(chunk);
+        chunkSnapshots.remove(new ChunkWrapper(chunk));
     }
 
     @Override
     public Pair<Integer, EntityType> getSpawner(Location location) {
-        if(chunkSnapshots.containsKey(location.getChunk()))
-            return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedSpawner(location));
+        ChunkWrapper chunkWrapper = new ChunkWrapper(location);
+        if(chunkSnapshots.containsKey(chunkWrapper))
+            return new Pair<>(chunkSnapshots.get(chunkWrapper).getStackedSpawner(location));
 
         cacheChunk(location.getChunk());
         return getSpawner(location);
@@ -53,8 +54,9 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     @Override
     public Pair<Integer, Material> getBlock(Location location) {
-        if(chunkSnapshots.containsKey(location.getChunk())) {
-            Map.Entry<Integer, Material> entry = chunkSnapshots.get(location.getChunk()).getStackedBarrel(location);
+        ChunkWrapper chunkWrapper = new ChunkWrapper(location);
+        if(chunkSnapshots.containsKey(chunkWrapper)) {
+            Map.Entry<Integer, Material> entry = chunkSnapshots.get(chunkWrapper).getStackedBarrel(location);
             return entry.getValue().name().contains("AIR") ? null : new Pair<>(entry);
         }
 
@@ -109,6 +111,32 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                 island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount());
         }
 
+    }
+
+    private static class ChunkWrapper{
+
+        private int x, z;
+
+        ChunkWrapper(Chunk chunk){
+            this(chunk.getX(), chunk.getZ());
+        }
+
+        ChunkWrapper(Location location){
+            this(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        }
+
+        ChunkWrapper(int x, int z){
+            this.x = x;
+            this.z = z;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 19 * 3;
+            hash = 19 * hash + (int)(Double.doubleToLongBits(this.x) ^ Double.doubleToLongBits(this.x) >>> 32);
+            hash = 19 * hash + (int)(Double.doubleToLongBits(this.z) ^ Double.doubleToLongBits(this.z) >>> 32);
+            return hash;
+        }
     }
 
 }
