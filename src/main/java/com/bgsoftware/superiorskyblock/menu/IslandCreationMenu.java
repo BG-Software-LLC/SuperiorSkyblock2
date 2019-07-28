@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
@@ -39,13 +40,23 @@ public final class IslandCreationMenu extends SuperiorMenu {
                 int slot = get(schematic + "-slot", Integer.class);
                 String permission = get(schematic + "-permission", String.class);
 
-                if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                    BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
-                    Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
-                    superiorPlayer.asPlayer().closeInventory();
-                    Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
-                    break;
+                if(slot == e.getRawSlot()) {
+                    if (superiorPlayer.hasPermission(permission)) {
+                        BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
+                        Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
+                        superiorPlayer.asPlayer().closeInventory();
+                        SoundWrapper sound = get(schematic + "-has-access-item-sound", SoundWrapper.class);
+                        if(sound != null)
+                            sound.playSound(superiorPlayer.asPlayer());
+                        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
+                        plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
+                        break;
+                    }
+                    else{
+                        SoundWrapper sound = get(schematic + "-no-access-item-sound", SoundWrapper.class);
+                        if(sound != null)
+                            sound.playSound(superiorPlayer.asPlayer());
+                    }
                 }
             }
         }
@@ -100,8 +111,12 @@ public final class IslandCreationMenu extends SuperiorMenu {
             schematicsData.put(schematic + "-slot", section.getInt(schematic + ".slot"));
             schematicsData.put(schematic + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
+            schematicsData.put(schematic + "-has-access-item-sound",
+                    getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
             schematicsData.put(schematic + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
+            schematicsData.put(schematic + "-no-access-item-sound",
+                    getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
         }
     }
 

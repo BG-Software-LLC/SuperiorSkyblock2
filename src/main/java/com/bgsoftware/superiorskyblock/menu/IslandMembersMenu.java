@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -27,7 +27,6 @@ public final class IslandMembersMenu extends SuperiorMenu {
     private static String title = "";
     private static ItemStack previousButton, currentButton, nextButton, memberItem;
     private static int previousSlot, currentSlot, nextSlot;
-    private static Sound previousSound, currentSound, nextSound, memberSound;
     private static List<Integer> slots = new ArrayList<>();
 
     private List<UUID> members;
@@ -43,6 +42,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
         int clickedSlot = e.getRawSlot();
 
@@ -75,6 +75,9 @@ public final class IslandMembersMenu extends SuperiorMenu {
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(members.get(indexOf));
 
             if (targetPlayer != null) {
+                SoundWrapper sound = getSound(-1);
+                if(sound != null)
+                    sound.playSound(e.getWhoClicked());
                 previousMove = false;
                 MemberManageMenu.createInventory(targetPlayer).open(superiorPlayer, this);
             }
@@ -122,9 +125,6 @@ public final class IslandMembersMenu extends SuperiorMenu {
         Bukkit.getScheduler().runTask(plugin, () -> {
             superiorPlayer.asPlayer().openInventory(inv);
 
-            if(openSound != null)
-                superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
-
             this.previousMenu = previousMenu;
         });
     }
@@ -147,14 +147,14 @@ public final class IslandMembersMenu extends SuperiorMenu {
         nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.next-page"));
         memberItem = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.member-item"));
 
-        previousSound = getSound(cfg.getString("members-panel.previous-page.sound", ""));
-        currentSound = getSound(cfg.getString("members-panel.current-page.sound", ""));
-        nextSound = getSound(cfg.getString("members-panel.next-page.sound", ""));
-        memberSound = getSound(cfg.getString("members-panel.member-item.sound", ""));
-
         previousSlot = cfg.getInt("members-panel.previous-page.slot");
         currentSlot = cfg.getInt("members-panel.current-page.slot");
         nextSlot = cfg.getInt("members-panel.next-page.slot");
+
+        islandMembersMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("members-panel.previous-page.sound")));
+        islandMembersMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
+        islandMembersMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
+        islandMembersMenu.addSound(-1, getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
 
         inventory.setItem(previousSlot, previousButton);
         inventory.setItem(currentSlot, currentButton);

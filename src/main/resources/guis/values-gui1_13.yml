@@ -8,8 +8,6 @@
 values-gui:
   title: '{0} &n${1}'
   size: 5
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':

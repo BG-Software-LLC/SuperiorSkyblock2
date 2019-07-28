@@ -8,15 +8,15 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdRankup implements ICommand {
+public final class CmdRankup implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -75,6 +75,7 @@ public class CmdRankup implements ICommand {
             return;
         }
 
+
         int level = island.getUpgradeLevel(upgradeName);
         double nextUpgradePrice = plugin.getUpgrades().getUpgradePrice(upgradeName, level);
         boolean hasNextLevel;
@@ -95,9 +96,9 @@ public class CmdRankup implements ICommand {
             hasNextLevel = true;
         }
 
-        Sound sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
+        SoundWrapper sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
         if(sound != null)
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), sound, 1, 1);
+            sound.playSound(superiorPlayer.asPlayer());
     }
 
     @Override

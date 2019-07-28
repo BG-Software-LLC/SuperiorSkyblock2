@@ -8,8 +8,6 @@
 top-islands:
   title: '&lTop Islands'
   size: 3
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -29,6 +27,10 @@ top-islands:
       slots: 3,5,11,13,15
 
   island-item:
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: PLAYER_HEAD
     name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
     lore:
@@ -45,6 +47,10 @@ top-islands:
       - '&7&o(( &f&oRight-Click &7&oto teleport to island warp. ))'
 
   no-island-item:
+    sound:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
     type: PLAYER_HEAD
     name: '&cInvalid Island'
 

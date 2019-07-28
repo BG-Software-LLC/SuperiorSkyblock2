@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -27,7 +27,6 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
     private static String title;
     private static ItemStack previousButton, currentButton, nextButton, visitorItem;
     private static int previousSlot, currentSlot, nextSlot;
-    private static Sound previousSound, currentSound, nextSound, visitorSound;
     private static List<Integer> slots = new ArrayList<>();
 
     private List<UUID> visitors;
@@ -43,6 +42,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
         int clickedSlot = e.getRawSlot();
 
@@ -75,6 +75,9 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(visitors.get(indexOf));
 
             if (targetPlayer != null) {
+                SoundWrapper sound = getSound(-1);
+                if(sound != null)
+                    sound.playSound(e.getWhoClicked());
                 if (e.getClick().name().contains("RIGHT")) {
                     Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
                 } else if (e.getClick().name().contains("LEFT")) {
@@ -125,9 +128,6 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (visitors.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        if(openSound != null)
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
-
         this.previousMenu = previousMenu;
 
         Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
@@ -153,10 +153,11 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         previousSlot = cfg.getInt("visitors-panel.previous-page.slot");
         currentSlot = cfg.getInt("visitors-panel.current-page.slot");
         nextSlot = cfg.getInt("visitors-panel.next-page.slot");
-        previousSound = getSound(cfg.getString("visitors-panel.previous-page.sound", ""));
-        currentSound = getSound(cfg.getString("visitors-panel.current-page.sound", ""));
-        nextSound = getSound(cfg.getString("visitors-panel.next-page.sound", ""));
-        visitorSound = getSound(cfg.getString("visitors-panel.visitor-item.sound", ""));
+
+        islandVisitorsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("visitors-panel.previous-page.sound")));
+        islandVisitorsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("visitors-panel.current-page.sound")));
+        islandVisitorsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("visitors-panel.next-page.sound")));
+        islandVisitorsMenu.addSound(-1, getSound(cfg.getConfigurationSection("visitors-panel.visitor-item.sound")));
 
         Arrays.stream(cfg.getString("visitors-panel.visitor-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));

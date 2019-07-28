@@ -8,8 +8,6 @@
 main-panel:
   title: '&lIsland Panel'
   size: 5
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -19,7 +17,10 @@ main-panel:
 
   members:
     slot: 20
-    sound: ''
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
     type: PLAYER_HEAD
     name: '&eMembers'
     lore:
@@ -27,7 +28,10 @@ main-panel:
 
   settings:
     slot: 22
-    sound: ''
+    sound:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
     type: BOOK
     name: '&eSettings'
     lore:
@@ -35,7 +39,10 @@ main-panel:
 
   visitors:
     slot: 24
-    sound: ''
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
     type: SKELETON_SKULL
     name: '&eVisitors'
     lore:
@@ -44,8 +51,6 @@ main-panel:
 members-panel:
   title: '&lIsland Members'
   size: 6
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -55,13 +60,11 @@ members-panel:
 
   previous-page:
     slot: 47
-    sound: ''
     type: PAPER
     name: '{0}Previous Page'
 
   current-page:
     slot: 49
-    sound: ''
     type: SUNFLOWER
     name: '&aCurrent Page'
     lore:
@@ -69,21 +72,21 @@ members-panel:
 
   next-page:
     slot: 51
-    sound: ''
     type: PAPER
     name: '{0}Next Page'
 
   member-item:
     slots: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
-    sound: 'LEVEL_UP'
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
     type: PLAYER_HEAD
     name: '&e{0}' #name must be the {0} symbol and colors only!
 
 visitors-panel:
   title: '&lIsland Visitors'
   size: 6
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -93,13 +96,11 @@ visitors-panel:
 
   previous-page:
     slot: 47
-    sound: ''
     type: PAPER
     name: '{0}Previous Page'
 
   current-page:
     slot: 49
-    sound: ''
     type: SUNFLOWER
     name: '&aCurrent Page'
     lore:
@@ -107,13 +108,15 @@ visitors-panel:
 
   next-page:
     slot: 51
-    sound: ''
     type: PAPER
     name: '{0}Next Page'
 
   visitor-item:
     slots: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: PLAYER_HEAD
     name: '&e{0}' #name must be the {0} symbol and colors only!
     lore:
@@ -122,8 +125,6 @@ visitors-panel:
 players-panel:
   title: '&8&l{}'
   size: 5
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -133,7 +134,10 @@ players-panel:
 
   roles:
     slot: 20
-    sound: ''
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
     type: DIAMOND_CHESTPLATE
     name: '&ePlayer Role'
     lore:
@@ -143,7 +147,10 @@ players-panel:
 
   ban:
     slot: 22
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: BARRIER
     name: '&eBan Player'
     lore:
@@ -151,7 +158,10 @@ players-panel:
 
   kick:
     slot: 24
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: SKELETON_SKULL
     name: '&eKick Player'
     lore:
@@ -160,8 +170,6 @@ players-panel:
 roles-panel:
   title: '&8&l{}'
   size: 5
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -171,7 +179,10 @@ roles-panel:
 
   member-role:
     slot: 19
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: LEATHER_CHESTPLATE
     name: '&eMember'
     lore:
@@ -181,7 +192,10 @@ roles-panel:
 
   mod-role:
     slot: 21
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: GOLDEN_CHESTPLATE
     name: '&eModerator'
     lore:
@@ -191,7 +205,10 @@ roles-panel:
 
   admin-role:
     slot: 23
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: IRON_CHESTPLATE
     name: '&eAdmin'
     lore:
@@ -201,7 +218,10 @@ roles-panel:
 
   leader-role:
     slot: 25
-    sound: ''
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: DIAMOND_CHESTPLATE
     name: '&eLeader'
     lore:

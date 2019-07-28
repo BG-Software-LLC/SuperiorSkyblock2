@@ -10,8 +10,6 @@
 upgrades-gui:
   title: '&lIsland Upgrades'
   size: 4
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -33,7 +31,10 @@ upgrades-gui:
       '1':
         slot: 11
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &a(Available)'
           lore:
@@ -49,7 +50,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &c(Unavailable)'
           lore:
@@ -67,7 +71,10 @@ upgrades-gui:
       '2':
         slot: 11
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &a(Available)'
           lore:
@@ -83,7 +90,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &c(Unavailable)'
           lore:
@@ -101,7 +111,10 @@ upgrades-gui:
       '3':
         slot: 11
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &a(Available)'
           lore:
@@ -117,7 +130,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&d&lHopper Increase &c(Unavailable)'
           lore:
@@ -135,14 +151,20 @@ upgrades-gui:
       '4':
         slot: 11
         has-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&c&lMAX LEVEL'
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the hoppers limit!'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: HOPPER
           name: '&c&lMAX LEVEL'
           lore:
@@ -152,7 +174,10 @@ upgrades-gui:
       '1':
         slot: 13
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &a(Available)'
           lore:
@@ -168,7 +193,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &c(Unavailable)'
           lore:
@@ -186,7 +214,10 @@ upgrades-gui:
       '2':
         slot: 13
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &a(Available)'
           lore:
@@ -202,7 +233,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &c(Unavailable)'
           lore:
@@ -220,7 +254,10 @@ upgrades-gui:
       '3':
         slot: 13
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &a(Available)'
           lore:
@@ -236,7 +273,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&e&lCrop Growth &c(Unavailable)'
           lore:
@@ -254,14 +294,20 @@ upgrades-gui:
       '4':
         slot: 13
         has-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&c&lMAX LEVEL'
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the crop growth!'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: DIAMOND_HOE
           name: '&c&lMAX LEVEL'
           lore:
@@ -271,7 +317,10 @@ upgrades-gui:
       '1':
         slot: 15
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &a(Available)'
           lore:
@@ -287,7 +336,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &c(Unavailable)'
           lore:
@@ -305,7 +357,10 @@ upgrades-gui:
       '2':
         slot: 15
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &a(Available)'
           lore:
@@ -321,7 +376,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &c(Unavailable)'
           lore:
@@ -339,7 +397,10 @@ upgrades-gui:
       '3':
         slot: 15
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &a(Available)'
           lore:
@@ -355,7 +416,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&b&lSpawner Boost &c(Unavailable)'
           lore:
@@ -373,14 +437,20 @@ upgrades-gui:
       '4':
         slot: 15
         has-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&c&lMAX LEVEL'
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the spawner rates!'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: SPAWNER
           name: '&c&lMAX LEVEL'
           lore:
@@ -390,7 +460,10 @@ upgrades-gui:
       '1':
         slot: 21
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &a(Available)'
           lore:
@@ -406,7 +479,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &c(Unavailable)'
           lore:
@@ -424,7 +500,10 @@ upgrades-gui:
       '2':
         slot: 21
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &a(Available)'
           lore:
@@ -440,7 +519,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &c(Unavailable)'
           lore:
@@ -458,7 +540,10 @@ upgrades-gui:
       '3':
         slot: 21
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &a(Available)'
           lore:
@@ -474,7 +559,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&4&lPremium Drops &c(Unavailable)'
           lore:
@@ -492,14 +580,20 @@ upgrades-gui:
       '4':
         slot: 21
         has-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&c&lMAX LEVEL'
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the mob drops!'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: ROTTEN_FLESH
           name: '&c&lMAX LEVEL'
           lore:
@@ -509,7 +603,10 @@ upgrades-gui:
       '1':
         slot: 23
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &a(Available)'
           lore:
@@ -525,7 +622,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &c(Unavailable)'
           lore:
@@ -543,7 +643,10 @@ upgrades-gui:
       '2':
         slot: 23
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &a(Available)'
           lore:
@@ -559,7 +662,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &c(Unavailable)'
           lore:
@@ -577,7 +683,10 @@ upgrades-gui:
       '3':
         slot: 23
         has-next-level:
-          sound: 'LEVEL_UP'
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &a(Available)'
           lore:
@@ -593,7 +702,10 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&2&lMembers Size &c(Unavailable)'
           lore:
@@ -611,14 +723,20 @@ upgrades-gui:
       '4':
         slot: 23
         has-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&c&lMAX LEVEL'
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the members limit!'
         no-next-level:
-          sound: 'ANVIL_LAND'
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
           type: PLAYER_HEAD
           name: '&c&lMAX LEVEL'
           lore:

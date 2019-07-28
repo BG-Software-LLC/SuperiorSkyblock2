@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
@@ -43,12 +44,20 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
                 if(island != null) {
                     superiorPlayer.asPlayer().closeInventory();
+                    SoundWrapper sound = getSound(-1);
+                    if(sound != null)
+                        sound.playSound(e.getWhoClicked());
                     if(e.getAction() == InventoryAction.PICKUP_HALF){
                         IslandWarpsMenu.openInventory(superiorPlayer, this, island);
                     } else {
                         IslandValuesMenu.openInventory(superiorPlayer, this, island);
                     }
                     break;
+                }
+                else{
+                    SoundWrapper sound = getSound(-2);
+                    if(sound != null)
+                        sound.playSound(e.getWhoClicked());
                 }
 
             }
@@ -141,6 +150,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
         ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
         ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
+
+        islandsTopMenu.addSound(-1, getSound(cfg.getConfigurationSection("top-islands.island-item.sound")));
+        islandsTopMenu.addSound(-2, getSound(cfg.getConfigurationSection("top-islands.no-island-item.sound")));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("top-islands.slots").split(","))

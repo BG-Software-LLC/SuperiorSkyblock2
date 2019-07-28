@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
@@ -37,10 +38,20 @@ public final class IslandBiomesMenu extends SuperiorMenu {
                 int slot = get(biomeName + "-slot", Integer.class);
                 String permission = get(biomeName + "-permission", String.class);
 
-                if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                    superiorPlayer.getIsland().setBiome(biome);
-                    Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
-                    break;
+                if(slot == e.getRawSlot()){
+                    if (superiorPlayer.hasPermission(permission)) {
+                        SoundWrapper soundWrapper = get(biomeName + "-has-access-item-sound", SoundWrapper.class);
+                        if(soundWrapper != null)
+                            soundWrapper.playSound(superiorPlayer.asPlayer());
+                        superiorPlayer.getIsland().setBiome(biome);
+                        Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
+                        break;
+                    }
+                    else{
+                        SoundWrapper soundWrapper = get(biomeName + "-no-access-item-sound", SoundWrapper.class);
+                        if(soundWrapper != null)
+                            soundWrapper.playSound(superiorPlayer.asPlayer());
+                    }
                 }
             }
         }
@@ -98,8 +109,12 @@ public final class IslandBiomesMenu extends SuperiorMenu {
             biomesData.put(biome + "-slot", section.getInt(biome + ".slot"));
             biomesData.put(biome + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".has-access-item")));
+            biomesData.put(biome + "-has-access-item-sound",
+                    getSound(section.getConfigurationSection(biome + ".has-access-item.sound")));
             biomesData.put(biome + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".no-access-item")));
+            biomesData.put(biome + "-no-access-item-sound",
+                    getSound(section.getConfigurationSection(biome + ".no-access-item.sound")));
         }
     }
 

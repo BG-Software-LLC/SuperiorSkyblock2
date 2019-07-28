@@ -107,9 +107,6 @@ public final class FileUtil {
     }
 
     private static Inventory loadGUI(SuperiorMenu menu, Inventory inventory, ConfigurationSection section){
-        Sound openSound = getSound(section.getString("open-sound", ""));
-        Sound closeSound = getSound(section.getString("close-sound", ""));
-
         if(section.contains("fill-items")){
             ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
             for(String _name : fillItems.getKeys(false)){
@@ -119,9 +116,6 @@ public final class FileUtil {
                     inventory.setItem(Integer.valueOf(slot), fillItem);
             }
         }
-
-        menu.setOpenSound(openSound);
-        menu.setCloseSound(closeSound);
 
         return inventory;
     }

@@ -53,6 +53,7 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
             return;
 
         superiorPlayer.asPlayer().closeInventory();
+        super.onClick(e);
     }
 
     @Override
@@ -80,10 +81,12 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
         ItemStack confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
         confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);
+        confirmDisbandMenu.addSound(confirmSlot, getSound(cfg.getConfigurationSection("disband-gui.confirm.sound")));
         inventory.setItem(confirmSlot, confirmItem);
 
         ItemStack cancelItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
         cancelSlot = cfg.getInt("disband-gui.cancel.slot", 3);
+        confirmDisbandMenu.addSound(cancelSlot, getSound(cfg.getConfigurationSection("disband-gui.cancel.sound")));
         inventory.setItem(cancelSlot, cancelItem);
     }
 
