@@ -26,7 +26,7 @@ import java.util.Map;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
-    private static final Map<ChunkWrapper, StackedSnapshot> chunkSnapshots = new HashMap<>();
+    private static final Map<String, StackedSnapshot> chunkSnapshots = new HashMap<>();
 
     public BlocksProvider_WildStacker(){
         Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
@@ -34,34 +34,32 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     public static void cacheChunk(Chunk chunk){
         try {
-            chunkSnapshots.put(new ChunkWrapper(chunk), WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
+            chunkSnapshots.put(getId(chunk), WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
         }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
-        chunkSnapshots.remove(new ChunkWrapper(chunk));
+        chunkSnapshots.remove(getId(chunk));
     }
 
     @Override
     public Pair<Integer, EntityType> getSpawner(Location location) {
-        ChunkWrapper chunkWrapper = new ChunkWrapper(location);
-        if(chunkSnapshots.containsKey(chunkWrapper))
-            return new Pair<>(chunkSnapshots.get(chunkWrapper).getStackedSpawner(location));
+        String id = getId(location);
+        if(chunkSnapshots.containsKey(id))
+            return new Pair<>(chunkSnapshots.get(id).getStackedSpawner(location));
 
-        cacheChunk(location.getChunk());
-        return getSpawner(location);
+        throw new RuntimeException("Chunk " + id + " is not cached.");
     }
 
     @Override
     public Pair<Integer, Material> getBlock(Location location) {
-        ChunkWrapper chunkWrapper = new ChunkWrapper(location);
-        if(chunkSnapshots.containsKey(chunkWrapper)) {
-            Map.Entry<Integer, Material> entry = chunkSnapshots.get(chunkWrapper).getStackedBarrel(location);
+        String id = getId(location);
+        if(chunkSnapshots.containsKey(id)) {
+            Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
             return entry.getValue().name().contains("AIR") ? null : new Pair<>(entry);
         }
 
-        cacheChunk(location.getChunk());
-        return getBlock(location);
+        throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);
     }
 
     @SuppressWarnings("unused")
@@ -113,30 +111,16 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     }
 
-    private static class ChunkWrapper{
+    private static String getId(Location location){
+        return getId(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+    }
 
-        private int x, z;
+    private static String getId(Chunk chunk){
+        return getId(chunk.getX(), chunk.getZ());
+    }
 
-        ChunkWrapper(Chunk chunk){
-            this(chunk.getX(), chunk.getZ());
-        }
-
-        ChunkWrapper(Location location){
-            this(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        }
-
-        ChunkWrapper(int x, int z){
-            this.x = x;
-            this.z = z;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 19 * 3;
-            hash = 19 * hash + (int)(Double.doubleToLongBits(this.x) ^ Double.doubleToLongBits(this.x) >>> 32);
-            hash = 19 * hash + (int)(Double.doubleToLongBits(this.z) ^ Double.doubleToLongBits(this.z) >>> 32);
-            return hash;
-        }
+    private static String getId(int x, int z){
+        return x + "," + z;
     }
 
 }
