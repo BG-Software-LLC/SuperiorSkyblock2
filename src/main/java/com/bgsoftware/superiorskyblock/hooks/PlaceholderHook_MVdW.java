@@ -56,6 +56,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_exists");
         registerPlaceholder("superior_island_locked");
         registerPlaceholder("superior_island_name");
+        registerPlaceholder("superior_island_is_leader");
 
         registerPlaceholder("superior_island_location_center");
         registerPlaceholder("superior_island_location_x");
@@ -87,6 +88,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_exists");
         registerPlaceholder("superior_island_location_locked");
         registerPlaceholder("superior_island_location_name");
+        registerPlaceholder("superior_island_location_is_leader");
     }
 
     //Register placeholder without logging to console

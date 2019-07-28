@@ -136,9 +136,11 @@ public abstract class PlaceholderHook {
                     case "exists":
                         return "Yes";
                     case "locked":
-                        return island.isLocked() ? "True" : "False";
+                        return island.isLocked() ? "Yes" : "No";
                     case "name":
                         return island.getName();
+                    case "is_leader":
+                        return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
                 }
 
             }
