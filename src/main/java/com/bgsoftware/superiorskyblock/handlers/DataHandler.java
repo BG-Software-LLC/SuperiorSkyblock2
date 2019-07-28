@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -18,6 +19,9 @@ import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored",  "WeakerAccess"})
 public final class DataHandler {
@@ -147,14 +151,25 @@ public final class DataHandler {
             }
         });
 
+        ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock DB Thread").build());
+
         SuperiorSkyblockPlugin.log("Finished players!");
         SuperiorSkyblockPlugin.log("Starting to load islands...");
 
         SQLHelper.executeQuery("SELECT * FROM islands;", resultSet -> {
             SuperiorSkyblockPlugin.log("Received the result set. Starting to load everything...");
             while (resultSet.next()) {
-                plugin.getGrid().createIsland(new CachedResultSet(resultSet));
+                CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
+                executor.execute(() -> plugin.getGrid().createIsland(cachedResultSet));
             }
+
+            try {
+                executor.shutdown();
+                executor.awaitTermination(1, TimeUnit.HOURS);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+
             SuperiorSkyblockPlugin.log("Loading done!");
         });
 

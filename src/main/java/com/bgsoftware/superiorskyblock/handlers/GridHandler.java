@@ -74,10 +74,8 @@ public final class GridHandler implements GridManager {
     }
 
     public void createIsland(CachedResultSet resultSet){
-        new SuperiorThread(() -> {
-            UUID owner = UUID.fromString(resultSet.getString("owner"));
-            islands.add(owner, new SIsland(resultSet));
-        }).start();
+        UUID owner = UUID.fromString(resultSet.getString("owner"));
+        islands.add(owner, new SIsland(resultSet));
     }
 
     public void createIsland(CompoundTag tag){
