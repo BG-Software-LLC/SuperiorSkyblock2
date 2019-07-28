@@ -78,6 +78,9 @@ public final class IslandMembersMenu extends SuperiorMenu {
                 SoundWrapper sound = getSound(-1);
                 if(sound != null)
                     sound.playSound(e.getWhoClicked());
+                List<String> commands = getCommands(-1);
+                if(commands != null)
+                    commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                 previousMove = false;
                 MemberManageMenu.createInventory(targetPlayer).open(superiorPlayer, this);
             }
@@ -155,6 +158,10 @@ public final class IslandMembersMenu extends SuperiorMenu {
         islandMembersMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
         islandMembersMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
         islandMembersMenu.addSound(-1, getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
+        islandMembersMenu.addCommands(previousSlot, cfg.getStringList("members-panel.previous-page.commands"));
+        islandMembersMenu.addCommands(currentSlot, cfg.getStringList("members-panel.current-page.commands"));
+        islandMembersMenu.addCommands(nextSlot, cfg.getStringList("members-panel.next-page.commands"));
+        islandMembersMenu.addCommands(-1, cfg.getStringList("members-panel.member-item.commands"));
 
         inventory.setItem(previousSlot, previousButton);
         inventory.setItem(currentSlot, currentButton);

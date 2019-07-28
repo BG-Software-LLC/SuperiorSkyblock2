@@ -75,6 +75,9 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             SoundWrapper sound = getSound(-1);
             if(sound != null)
                 sound.playSound(e.getWhoClicked());
+            List<String> commands = getCommands(-1);
+            if(commands != null)
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
             if(island == null)
                 GlobalWarpsMenu.openInventory(superiorPlayer, null);
@@ -157,6 +160,10 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         globalWarpsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
         globalWarpsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
         globalWarpsMenu.addSound(-1, getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
+        globalWarpsMenu.addCommands(previousSlot, cfg.getStringList("global-gui.previous-page.commands"));
+        globalWarpsMenu.addCommands(currentSlot, cfg.getStringList("global-gui.current-page.commands"));
+        globalWarpsMenu.addCommands(nextSlot, cfg.getStringList("global-gui.next-page.commands"));
+        globalWarpsMenu.addCommands(-1, cfg.getStringList("global-gui.warp-item.commands"));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("global-gui.warp-item.slots").split(","))

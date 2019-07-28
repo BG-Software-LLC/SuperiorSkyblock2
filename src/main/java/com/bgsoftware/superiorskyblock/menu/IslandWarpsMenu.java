@@ -74,6 +74,9 @@ public final class IslandWarpsMenu extends SuperiorMenu {
                 SoundWrapper sound = getSound(-1);
                 if(sound != null)
                     sound.playSound(e.getWhoClicked());
+                List<String> commands = getCommands(-1);
+                if(commands != null)
+                    commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                 this.previousMenu = null;
                 island.warpPlayer(superiorPlayer, warpName);
             }
@@ -148,6 +151,10 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         islandValuesMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("warps-gui.current-page.sound")));
         islandValuesMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("warps-gui.next-page.sound")));
         islandValuesMenu.addSound(-1, getSound(cfg.getConfigurationSection("warps-gui.warp-item.sound")));
+        islandValuesMenu.addCommands(previousSlot, cfg.getStringList("warps-gui.previous-page.commands"));
+        islandValuesMenu.addCommands(currentSlot, cfg.getStringList("warps-gui.current-page.commands"));
+        islandValuesMenu.addCommands(nextSlot, cfg.getStringList("warps-gui.next-page.commands"));
+        islandValuesMenu.addCommands(-1, cfg.getStringList("warps-gui.warp-item.commands"));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("warps-gui.warp-item.slots").split(","))

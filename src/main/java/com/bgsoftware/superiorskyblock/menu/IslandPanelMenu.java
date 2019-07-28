@@ -60,6 +60,9 @@ public final class IslandPanelMenu extends SuperiorMenu {
         islandPanelMenu.addSound(membersSlot, getSound(cfg.getConfigurationSection("main-panel.members.sound")));
         islandPanelMenu.addSound(settingsSlot, getSound(cfg.getConfigurationSection("main-panel.settings.sound")));
         islandPanelMenu.addSound(visitorsSlot, getSound(cfg.getConfigurationSection("main-panel.visitors.sound")));
+        islandPanelMenu.addCommands(membersSlot, cfg.getStringList("main-panel.members.commands"));
+        islandPanelMenu.addCommands(settingsSlot, cfg.getStringList("main-panel.settings.commands"));
+        islandPanelMenu.addCommands(visitorsSlot, cfg.getStringList("main-panel.visitors.commands"));
 
         inventory.setItem(membersSlot, membersButton);
         inventory.setItem(settingsSlot, settingsButton);

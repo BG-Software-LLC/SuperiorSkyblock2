@@ -128,13 +128,16 @@ public final class UpgradesHandler {
         public ItemStack hasNextLevel, noNextLevel;
         public int slot;
         public SoundWrapper hasNextLevelSound, noNextLevelSound;
+        public List<String> hasNextLevelCommands, noNextLevelCommands;
 
-        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound){
+        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.slot = slot;
             this.hasNextLevelSound = hasNextLevelSound;
             this.noNextLevelSound = noNextLevelSound;
+            this.hasNextLevelCommands = hasNextLevelCommands;
+            this.noNextLevelCommands = noNextLevelCommands;
         }
 
     }

@@ -47,6 +47,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                     SoundWrapper sound = getSound(-1);
                     if(sound != null)
                         sound.playSound(e.getWhoClicked());
+                    List<String> commands = getCommands(-1);
+                    if(commands != null)
+                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                     if(e.getAction() == InventoryAction.PICKUP_HALF){
                         IslandWarpsMenu.openInventory(superiorPlayer, this, island);
                     } else {
@@ -58,6 +61,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                     SoundWrapper sound = getSound(-2);
                     if(sound != null)
                         sound.playSound(e.getWhoClicked());
+                    List<String> commands = getCommands(-2);
+                    if(commands != null)
+                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                 }
 
             }
@@ -153,6 +159,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
         islandsTopMenu.addSound(-1, getSound(cfg.getConfigurationSection("top-islands.island-item.sound")));
         islandsTopMenu.addSound(-2, getSound(cfg.getConfigurationSection("top-islands.no-island-item.sound")));
+        islandsTopMenu.addCommands(-1, cfg.getStringList("top-islands.island-item.commands"));
+        islandsTopMenu.addCommands(-2, cfg.getStringList("top-islands.no-island-item.commands"));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("top-islands.slots").split(","))

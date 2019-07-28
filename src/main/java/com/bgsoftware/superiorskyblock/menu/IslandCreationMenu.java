@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class IslandCreationMenu extends SuperiorMenu {
@@ -48,6 +49,10 @@ public final class IslandCreationMenu extends SuperiorMenu {
                         SoundWrapper sound = get(schematic + "-has-access-item-sound", SoundWrapper.class);
                         if(sound != null)
                             sound.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(schematic + "-has-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                         Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
                         plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
                         break;
@@ -56,6 +61,10 @@ public final class IslandCreationMenu extends SuperiorMenu {
                         SoundWrapper sound = get(schematic + "-no-access-item-sound", SoundWrapper.class);
                         if(sound != null)
                             sound.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(schematic + "-no-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                     }
                 }
             }
@@ -113,10 +122,12 @@ public final class IslandCreationMenu extends SuperiorMenu {
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
             schematicsData.put(schematic + "-has-access-item-sound",
                     getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
+            schematicsData.put(schematic + "-has-access-item-commands", section.getStringList(schematic + ".has-access-item.commands"));
             schematicsData.put(schematic + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
             schematicsData.put(schematic + "-no-access-item-sound",
                     getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
+            schematicsData.put(schematic + "-no-access-item-commands", section.getStringList(schematic + ".no-access-item.commands"));
         }
     }
 

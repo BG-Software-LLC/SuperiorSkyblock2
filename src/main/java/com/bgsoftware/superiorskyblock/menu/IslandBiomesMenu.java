@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class IslandBiomesMenu extends SuperiorMenu {
@@ -43,6 +44,10 @@ public final class IslandBiomesMenu extends SuperiorMenu {
                         SoundWrapper soundWrapper = get(biomeName + "-has-access-item-sound", SoundWrapper.class);
                         if(soundWrapper != null)
                             soundWrapper.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(biomeName + "-has-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                         superiorPlayer.getIsland().setBiome(biome);
                         Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
                         break;
@@ -51,6 +56,10 @@ public final class IslandBiomesMenu extends SuperiorMenu {
                         SoundWrapper soundWrapper = get(biomeName + "-no-access-item-sound", SoundWrapper.class);
                         if(soundWrapper != null)
                             soundWrapper.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(biomeName + "-no-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                     }
                 }
             }
@@ -111,10 +120,12 @@ public final class IslandBiomesMenu extends SuperiorMenu {
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".has-access-item")));
             biomesData.put(biome + "-has-access-item-sound",
                     getSound(section.getConfigurationSection(biome + ".has-access-item.sound")));
+            biomesData.put(biome + "-has-access-item-commands", section.getStringList(biome + ".has-access-item.commands"));
             biomesData.put(biome + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".no-access-item")));
             biomesData.put(biome + "-no-access-item-sound",
                     getSound(section.getConfigurationSection(biome + ".no-access-item.sound")));
+            biomesData.put(biome + "-no-access-item-commands", section.getStringList(biome + ".no-access-item.commands"));
         }
     }
 

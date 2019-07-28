@@ -78,6 +78,9 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
                 SoundWrapper sound = getSound(-1);
                 if(sound != null)
                     sound.playSound(e.getWhoClicked());
+                List<String> commands = getCommands(-1);
+                if(commands != null)
+                    commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
                 if (e.getClick().name().contains("RIGHT")) {
                     Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
                 } else if (e.getClick().name().contains("LEFT")) {
@@ -158,6 +161,10 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         islandVisitorsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("visitors-panel.current-page.sound")));
         islandVisitorsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("visitors-panel.next-page.sound")));
         islandVisitorsMenu.addSound(-1, getSound(cfg.getConfigurationSection("visitors-panel.visitor-item.sound")));
+        islandVisitorsMenu.addCommands(previousSlot, cfg.getStringList("visitors-panel.previous-page.commands"));
+        islandVisitorsMenu.addCommands(currentSlot, cfg.getStringList("visitors-panel.current-page.commands"));
+        islandVisitorsMenu.addCommands(nextSlot, cfg.getStringList("visitors-panel.next-page.commands"));
+        islandVisitorsMenu.addCommands(-1, cfg.getStringList("visitors-panel.visitor-item.commands"));
 
         Arrays.stream(cfg.getString("visitors-panel.visitor-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));

@@ -68,6 +68,9 @@ public final class MemberManageMenu extends SuperiorMenu {
         memberManageMenu.addSound(rolesSlot, getSound(cfg.getConfigurationSection("players-panel.roles.sound")));
         memberManageMenu.addSound(banSlot, getSound(cfg.getConfigurationSection("players-panel.ban.sound")));
         memberManageMenu.addSound(kickSlot, getSound(cfg.getConfigurationSection("players-panel.kick.sound")));
+        memberManageMenu.addCommands(rolesSlot, cfg.getStringList("players-panel.roles.commands"));
+        memberManageMenu.addCommands(banSlot, cfg.getStringList("players-panel.ban.commands"));
+        memberManageMenu.addCommands(kickSlot, cfg.getStringList("players-panel.kick.commands"));
 
         ItemStack rolesButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.roles"));
         ItemStack banButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.ban"));

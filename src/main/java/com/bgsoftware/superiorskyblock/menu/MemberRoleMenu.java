@@ -79,6 +79,10 @@ public final class MemberRoleMenu extends SuperiorMenu {
         memberRoleMenu.addSound(modSlot, getSound(cfg.getConfigurationSection("roles-panel.mod-role.sound")));
         memberRoleMenu.addSound(adminSlot, getSound(cfg.getConfigurationSection("roles-panel.admin-role.sound")));
         memberRoleMenu.addSound(leaderSlot, getSound(cfg.getConfigurationSection("roles-panel.leader-role.sound")));
+        memberRoleMenu.addCommands(memberSlot, cfg.getStringList("roles-panel.member-role.commands"));
+        memberRoleMenu.addCommands(modSlot, cfg.getStringList("roles-panel.mod-role.commands"));
+        memberRoleMenu.addCommands(adminSlot, cfg.getStringList("roles-panel.admin-role.commands"));
+        memberRoleMenu.addCommands(leaderSlot, cfg.getStringList("roles-panel.leader-role.commands"));
 
         inventory.setItem(memberSlot, memberButton);
         inventory.setItem(modSlot, modButton);
