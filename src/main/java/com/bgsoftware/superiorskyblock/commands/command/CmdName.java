@@ -34,7 +34,7 @@ public final class CmdName implements ICommand {
 
     @Override
     public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_LEAVE.getMessage();
+        return Locale.COMMAND_DESCRIPTION_NAME.getMessage();
     }
 
     @Override
