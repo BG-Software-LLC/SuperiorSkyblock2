@@ -278,7 +278,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     @Override
     public void clearInventory(OfflinePlayer offlinePlayer) {
         if(offlinePlayer.isOnline() || offlinePlayer instanceof Player){
-            Bukkit.broadcastMessage("Clearing inventory...");
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
             player.getInventory().clear();
             player.getEnderChest().clear();
