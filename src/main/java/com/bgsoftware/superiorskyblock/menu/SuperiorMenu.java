@@ -89,9 +89,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
         Inventory inventory = getInventory();
 
         Bukkit.getScheduler().runTask(plugin, () -> {
+            SuperiorMenu currentMenu = null;
+            if(superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder() instanceof SuperiorMenu)
+                currentMenu = (SuperiorMenu) superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
+
             superiorPlayer.asPlayer().openInventory(inventory);
 
-            this.previousMenu = previousMenu;
+            this.previousMenu = previousMenu == null && currentMenu != null ? currentMenu : previousMenu;
         });
     }
 
