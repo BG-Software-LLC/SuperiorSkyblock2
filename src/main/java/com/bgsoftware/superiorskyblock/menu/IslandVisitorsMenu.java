@@ -80,7 +80,9 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
                     sound.playSound(e.getWhoClicked());
                 List<String> commands = getCommands(-1);
                 if(commands != null)
-                    commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                    commands.forEach(command ->
+                            Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                    command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
                 if (e.getClick().name().contains("RIGHT")) {
                     Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
                 } else if (e.getClick().name().contains("LEFT")) {

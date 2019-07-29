@@ -44,7 +44,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
     }
 
-    void addCommands(int slot, List<String> commands) {
+    public void addCommands(int slot, List<String> commands) {
         if(commands != null && !commands.isEmpty()) {
             Map<Integer, List<String>> commandMap = SuperiorMenu.commands.getOrDefault(identifier, new HashMap<>());
             commandMap.put(slot, commands);
@@ -74,8 +74,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
             sound.playSound(player);
 
         List<String> commands = getCommands(e.getRawSlot());
-        if(commands != null && !commands.isEmpty())
-            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.getName())));
+        if(commands != null)
+            commands.forEach(command ->
+                    Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
+                            command.replace("PLAYER:", "").replace("%player%", player.getName())));
     }
 
     public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

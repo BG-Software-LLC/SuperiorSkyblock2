@@ -49,7 +49,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                         sound.playSound(e.getWhoClicked());
                     List<String> commands = getCommands(-1);
                     if(commands != null)
-                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                        commands.forEach(command ->
+                                Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                        command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
                     if(e.getAction() == InventoryAction.PICKUP_HALF){
                         IslandWarpsMenu.openInventory(superiorPlayer, this, island);
                     } else {
@@ -63,7 +65,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                         sound.playSound(e.getWhoClicked());
                     List<String> commands = getCommands(-2);
                     if(commands != null)
-                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                        commands.forEach(command ->
+                                Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                        command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
                 }
 
             }
