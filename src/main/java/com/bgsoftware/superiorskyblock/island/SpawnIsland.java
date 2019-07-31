@@ -20,9 +20,12 @@ public final class SpawnIsland extends SIsland {
         SpawnIsland.plugin = plugin;
 
         String[] loc = plugin.getSettings().spawnLocation.split(", ");
+        int x = (int) (double) Double.valueOf(loc[1]);
+        int y = Integer.valueOf(loc[2]);
+        int z = (int) (double) Double.valueOf(loc[3]);
         center = loc.length == 4 ?
-            new Location(Bukkit.getWorld(loc[0]), Double.valueOf(loc[1] + ".5"), Double.valueOf(loc[2]), Double.valueOf(loc[3] + ".5")) :
-            new Location(Bukkit.getWorld(loc[0]), Double.valueOf(loc[1] + ".5"), Double.valueOf(loc[2]), Double.valueOf(loc[3] + ".5"), Float.valueOf(loc[4]), Float.valueOf(loc[5]));
+            new Location(Bukkit.getWorld(loc[0]), x + 0.5, y, z + 0.5) :
+            new Location(Bukkit.getWorld(loc[0]), x + 0.5, y, z + 0.5, Float.valueOf(loc[4]), Float.valueOf(loc[5]));
     }
 
     @Override
