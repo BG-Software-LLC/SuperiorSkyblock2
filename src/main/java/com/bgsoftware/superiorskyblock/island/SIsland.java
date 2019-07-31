@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -51,6 +52,9 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SIsland extends DatabaseObject implements Island {
@@ -567,11 +571,12 @@ public class SIsland extends DatabaseObject implements Island {
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
         new SuperiorThread(() -> {
-            Set<Thread> threads = new HashSet<>();
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
+            ExecutorService scanService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
+
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
-                Thread thread = new Thread(() -> {
+                scanService.execute(() -> {
                     boolean emptyChunk = true;
 
                     double islandWorth = 0;
@@ -624,22 +629,15 @@ public class SIsland extends DatabaseObject implements Island {
                         }
                     }
                 });
-                thread.start();
-                threads.add(thread);
             }
 
-            for(Thread th : threads){
-                try{
-                    th.join();
-                }catch(Exception ignored){}
+            try{
+                scanService.shutdown();
+                scanService.awaitTermination(1, TimeUnit.MINUTES);
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
 
-            for(Chunk chunk : chunks)
-                BlocksProvider_WildStacker.uncacheChunk(chunk);
-
-            saveBlockCounts();
-
-            calcProcess = false;
             Bukkit.getScheduler().runTask(plugin, () -> {
                 Key blockKey;
                 int blockCount;
@@ -660,13 +658,20 @@ public class SIsland extends DatabaseObject implements Island {
 
                 if(asker != null)
                     Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsBigDecimal(), getIslandLevelAsBigDecimal());
-            });
 
-            if(islandCalcsQueue.size() != 0){
-                CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
-                        .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
-            }
+                for(Chunk chunk : chunks)
+                    BlocksProvider_WildStacker.uncacheChunk(chunk);
+
+                saveBlockCounts();
+
+                calcProcess = false;
+
+                if(islandCalcsQueue.size() != 0){
+                    CalcIslandData calcIslandData = islandCalcsQueue.pop();
+                    plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
+                            .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
+                }
+            });
         }).start();
     }
 
@@ -691,7 +696,7 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void handleBlockPlace(Key key, int amount, boolean save) {
+    public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
         double blockValue;
         if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
