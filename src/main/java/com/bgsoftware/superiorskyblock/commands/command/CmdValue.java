@@ -68,7 +68,7 @@ public final class CmdValue implements ICommand {
             toCheck = Key.of(inHand);
         }
         else{
-            toCheck = Key.of(args[1]);
+            toCheck = Key.of(args[1].toUpperCase());
         }
 
         double value = plugin.getGrid().getDecimalBlockValue(toCheck);
