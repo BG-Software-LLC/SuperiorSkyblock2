@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
@@ -116,7 +117,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandEnterProtected(IslandEnterProtectedEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Executor.sync(() -> {
             try {
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
             } catch (NullPointerException ignored) { }
@@ -142,7 +143,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Executor.sync(() -> {
             if(e.getPlayer().asOfflinePlayer().isOnline())
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
         }, 5L);
@@ -354,7 +355,7 @@ public final class PlayersListener implements Listener {
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         e.getPlayer().teleport(island.getTeleportLocation().add(0, 1, 0));
-        Bukkit.getScheduler().runTaskLater(plugin, () -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
+        Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
     }
 
     @EventHandler

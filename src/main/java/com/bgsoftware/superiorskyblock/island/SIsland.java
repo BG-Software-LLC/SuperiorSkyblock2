@@ -26,7 +26,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -546,7 +546,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
         if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> calcIslandWorth(asker));
+            Executor.sync(() -> calcIslandWorth(asker));
             return;
         }
 
@@ -570,7 +570,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
-        new SuperiorThread(() -> {
+        Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
             ExecutorService scanService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
@@ -638,7 +638,7 @@ public class SIsland extends DatabaseObject implements Island {
                 ex.printStackTrace();
             }
 
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Executor.sync(() -> {
                 Key blockKey;
                 int blockCount;
 
@@ -672,7 +672,7 @@ public class SIsland extends DatabaseObject implements Island {
                             .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
                 }
             });
-        }).start();
+        });
     }
 
     @Override

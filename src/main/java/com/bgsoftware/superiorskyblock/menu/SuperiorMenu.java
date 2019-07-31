@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -82,13 +82,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> open(superiorPlayer, previousMenu)).start();
+            Executor.async(() -> open(superiorPlayer, previousMenu));
             return;
         }
 
         Inventory inventory = getInventory();
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Executor.sync(() -> {
             SuperiorMenu currentMenu = null;
             if(superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder() instanceof SuperiorMenu)
                 currentMenu = (SuperiorMenu) superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
@@ -101,7 +101,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
         if(previousMenu != null) {
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Executor.sync(() -> {
                 if(previousMove)
                     previousMenu.open(superiorPlayer, previousMenu.previousMenu);
                 else

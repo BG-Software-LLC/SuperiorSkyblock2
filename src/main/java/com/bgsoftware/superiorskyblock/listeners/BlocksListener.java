@@ -7,10 +7,10 @@ import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.ItemUtil;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -65,7 +65,7 @@ public final class BlocksListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
             if (island != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getBlock(), 1), 1L);
+                Executor.sync(() -> island.handleBlockPlace(e.getBlock(), 1), 1L);
             }
         }
     }
@@ -76,7 +76,7 @@ public final class BlocksListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
 
             if (island != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
+                Executor.sync(() -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
             }
         }
     }
@@ -124,10 +124,6 @@ public final class BlocksListener implements Listener {
         ItemStack inHand = e.getItemInHand().clone();
         inHand.setAmount(amount);
         ItemUtil.removeItem(inHand, e);
-
-//        if(!e.getBlockReplacedState().getType().isSolid()){
-//            plugin.getGrid().setBlockAmount(e.getBlockAgainst(), plugin.getGrid().getBlockAmount(e.getBlockAgainst()) - 1);
-//        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -177,7 +173,7 @@ public final class BlocksListener implements Listener {
             return;
 
         recentlyClicked.add(e.getPlayer().getUniqueId());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
+        Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
         e.setCancelled(true);
 

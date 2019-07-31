@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
@@ -109,7 +110,7 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Executor.sync(() -> {
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
             if(superiorPlayer == null)

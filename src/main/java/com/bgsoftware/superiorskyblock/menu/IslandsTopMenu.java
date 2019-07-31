@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -81,7 +81,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
     private void reloadGUI(){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(this::reloadGUI).start();
+            Executor.async(this::reloadGUI);
             return;
         }
 

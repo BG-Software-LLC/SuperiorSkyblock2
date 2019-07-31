@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Lists;
@@ -82,7 +82,7 @@ public final class GridHandler implements GridManager {
         UUID owner = UUID.fromString(((StringTag) tag.getValue().get("owner")).getValue());
         Island island = new SIsland(tag);
         islands.add(owner, island);
-        Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertIsland(island));
+        Executor.sync(() -> plugin.getDataHandler().insertIsland(island));
     }
 
     @Override
@@ -126,9 +126,9 @@ public final class GridHandler implements GridManager {
                         if (islandCreateEvent.canTeleport()) {
                             superiorPlayer.asPlayer().teleport(islandLocation);
                             if (island.isInside(superiorPlayer.getLocation()))
-                                Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+                                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
                         }
-                        new SuperiorThread(() -> island.calcIslandWorth(null)).start();
+                        Executor.async(() -> island.calcIslandWorth(null));
                     }
                 });
 

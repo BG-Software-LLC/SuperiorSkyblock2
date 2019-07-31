@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -90,7 +91,7 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public void setFlowerPot(Location location, org.bukkit.inventory.ItemStack itemStack) {
         if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(SuperiorSkyblockPlugin.getPlugin(), () -> setFlowerPot(location, itemStack));
+            Executor.sync(() -> setFlowerPot(location, itemStack));
             return;
         }
 

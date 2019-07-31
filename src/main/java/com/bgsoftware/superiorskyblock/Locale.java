@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.LangComments;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -405,7 +405,7 @@ public enum Locale {
         if(!noInteractMessages.contains(player.getUniqueId())){
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player);
-            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> noInteractMessages.remove(player.getUniqueId()), 60L);
+            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), 60L);
         }
     }
 

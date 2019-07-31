@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
@@ -37,7 +37,7 @@ public final class DataHandler {
             loadDatabase();
         }catch(Exception ex){
             ex.printStackTrace();
-            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().disablePlugin(plugin));
+            Executor.sync(Bukkit::shutdown);
         }
     }
 
@@ -199,13 +199,13 @@ public final class DataHandler {
     }
 
     public void insertIsland(Island island){
-        new SuperiorThread(() -> {
+        Executor.async(() -> {
             if(!containsIsland(island)){
                 ((SIsland) island).executeInsertStatement(true);
             }else {
                 ((SIsland) island).executeUpdateStatement(true);
             }
-        }).start();
+        });
     }
 
     private boolean containsIsland(Island island){
@@ -213,7 +213,7 @@ public final class DataHandler {
     }
 
     public void deleteIsland(Island island){
-        new SuperiorThread(() -> SQLHelper.executeUpdate("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';")).start();
+        Executor.async(() -> SQLHelper.executeUpdate("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';"));
     }
 
     public void insertPlayer(SuperiorPlayer player){

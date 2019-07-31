@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -41,14 +41,14 @@ public final class TagUtil {
 
     public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
         Runnable _callback = () ->
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Executor.sync(() -> {
                 for(Tag tag : blocks){
                     assignIntoBlock((CompoundTag) tag, offset);
                 }
                 callback.run();
             }, 1L);
 
-        new SuperiorThread(() -> {
+        Executor.async(() -> {
             if(FAWEHook.isEnabled() && !version.contains("1.13") && !version.contains("1.14")){
                 FAWEHook.setBlocks(blocks, offset, _callback);
             }
@@ -57,14 +57,14 @@ public final class TagUtil {
                     Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
                     Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
                     int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
-                    Bukkit.getScheduler().runTask(plugin, () -> {
+                    Executor.sync(() -> {
                         plugin.getNMSAdapter().setBlock(block, combinedId);
                         if (blocks.indexOf(tag) == blocks.size() - 1)
                             _callback.run();
                     });
                 }
             }
-        }).start();
+        });
     }
 
     public static void assignIntoBlock(CompoundTag compoundTag, Location offset){

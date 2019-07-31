@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -101,7 +101,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
     private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
+            Executor.async(() -> open(superiorPlayer, page, previousMenu));
             return;
         }
 
@@ -127,9 +127,8 @@ public final class IslandMembersMenu extends SuperiorMenu {
                 .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Executor.sync(() -> {
             superiorPlayer.asPlayer().openInventory(inv);
-
             this.previousMenu = previousMenu;
         });
     }

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.database;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -55,7 +55,7 @@ public class StatementHolder {
 
     public void execute(boolean async) {
         if(async){
-            new SuperiorThread(() -> execute(false)).start();
+            Executor.async(() -> execute(false));
             return;
         }
 

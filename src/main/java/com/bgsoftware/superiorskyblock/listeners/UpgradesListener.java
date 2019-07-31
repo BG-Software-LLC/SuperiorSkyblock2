@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.UnsafeValues;
@@ -60,7 +61,7 @@ public final class UpgradesListener implements Listener {
         double cropGrowthMultiplier = island.getCropGrowthMultiplier();
 
         if(cropGrowthMultiplier > 1){
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Executor.sync(() -> {
                 byte newData = (byte) (e.getBlock().getData() + cropGrowthMultiplier);
                 if(newData > maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7))
                     newData = maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7);
@@ -94,13 +95,13 @@ public final class UpgradesListener implements Listener {
         double spawnerRatesMultiplier = island.getSpawnerRatesMultiplier();
 
         if(spawnerRatesMultiplier > 1){
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Executor.sync(() -> {
                 if(!alreadySet.contains(island.getOwner().getUniqueId())) {
                     alreadySet.add(island.getOwner().getUniqueId());
                     e.getSpawner().setDelay((int) (
                             plugin.getNMSAdapter().getSpawnerDelay(e.getSpawner()) / spawnerRatesMultiplier));
                     e.getSpawner().update();
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> alreadySet.remove(island.getOwner().getUniqueId()), 10L);
+                    Executor.sync(() -> alreadySet.remove(island.getOwner().getUniqueId()), 10L);
                 }
             }, 1L);
         }
@@ -147,7 +148,7 @@ public final class UpgradesListener implements Listener {
             return;
 
         noRightClickTwice.add(e.getPlayer().getUniqueId());
-        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin,() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
+        Executor.sync(() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
         island.handleBlockPlace(Key.of("HOPPER"), 1);
     }

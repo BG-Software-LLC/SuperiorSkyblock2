@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,7 +36,7 @@ public final class PlayersHandler implements PlayersManager {
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         if(!players.containsKey(uuid)) {
             players.put(uuid, new SSuperiorPlayer(uuid));
-            Bukkit.getScheduler().runTask(plugin, () -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
+            Executor.sync(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
         }
         return players.get(uuid);
     }
