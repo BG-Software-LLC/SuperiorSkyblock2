@@ -71,13 +71,13 @@ public final class CmdValue implements ICommand {
             toCheck = Key.of(args[1]);
         }
 
-        int value = plugin.getGrid().getBlockValue(toCheck);
+        double value = plugin.getGrid().getDecimalBlockValue(toCheck);
         String key = StringUtil.format(toCheck.toString().split(":")[0]);
 
         if(value == 0)
             Locale.BLOCK_VALUE_WORTHLESS.send(superiorPlayer, key);
         else
-            Locale.BLOCK_VALUE.send(superiorPlayer, key, value);
+            Locale.BLOCK_VALUE.send(superiorPlayer, key, StringUtil.format(value));
     }
 
     @Override

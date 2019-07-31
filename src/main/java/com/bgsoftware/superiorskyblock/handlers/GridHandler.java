@@ -274,6 +274,11 @@ public final class GridHandler implements GridManager {
 
     @Override
     public int getBlockValue(Key key){
+        return (int) getDecimalBlockValue(key);
+    }
+
+    @Override
+    public double getDecimalBlockValue(Key key) {
         return blockValues.getBlockValue(key);
     }
 
@@ -527,7 +532,7 @@ public final class GridHandler implements GridManager {
 
     private class BlockValuesHandler {
 
-        private final KeyMap<Integer> blockValues = new KeyMap<>();
+        private final KeyMap<Double> blockValues = new KeyMap<>();
 
         private BlockValuesHandler(){
             SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -540,11 +545,12 @@ public final class GridHandler implements GridManager {
             YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
             for(String key : cfg.getConfigurationSection("block-values").getKeys(false))
-                blockValues.put(Key.of(key), cfg.getInt("block-values." + key));
+                blockValues.put(Key.of(key), cfg.isDouble("block-values." + key) ? cfg.getDouble("block-values." + key) :
+                        (double) cfg.getInt("block-values." + key));
         }
 
-        int getBlockValue(Key key) {
-            return blockValues.getOrDefault(key, 0);
+        double getBlockValue(Key key) {
+            return blockValues.getOrDefault(key, 0D);
         }
     }
 

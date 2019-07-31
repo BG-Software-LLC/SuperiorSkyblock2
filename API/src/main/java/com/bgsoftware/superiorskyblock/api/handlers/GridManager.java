@@ -50,7 +50,10 @@ public interface GridManager {
 
     void openTopIslands(SuperiorPlayer superiorPlayer);
 
+    @Deprecated
     int getBlockValue(Key key);
+
+    double getDecimalBlockValue(Key key);
 
     int getBlockAmount(Block block);
 

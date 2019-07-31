@@ -692,8 +692,8 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockPlace(Key key, int amount, boolean save) {
-        int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+        double blockValue;
+        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
             blockCounts.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
@@ -724,8 +724,8 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
-        int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+        double blockValue;
+        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
 
             key = plugin.getGrid().getBlockValueKey(key);
