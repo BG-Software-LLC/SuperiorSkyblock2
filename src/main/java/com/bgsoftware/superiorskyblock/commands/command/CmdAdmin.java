@@ -113,7 +113,9 @@ public final class CmdAdmin implements ICommand {
         int page = 1;
 
         if(args.length == 2){
-            page = Integer.valueOf(args[1]);
+            try {
+                page = Integer.valueOf(args[1]);
+            }catch(Throwable ignored){}
         }
 
         if(page <= 0){
