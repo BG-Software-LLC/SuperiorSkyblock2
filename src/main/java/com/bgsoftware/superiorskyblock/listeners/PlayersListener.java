@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
@@ -274,7 +275,8 @@ public final class PlayersListener implements Listener {
             }
         }
 
-        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(String.valueOf(island == null ? "" : island.getName()));
+        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(island == null ? "" :
+                plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))

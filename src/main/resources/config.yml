@@ -373,3 +373,9 @@ island-names:
   - fuck
   - duck
   - hypixel
+
+  # Should names have color support enabled?
+  color-support: true
+
+  # Should names be displayed on island-top?
+  island-top: true

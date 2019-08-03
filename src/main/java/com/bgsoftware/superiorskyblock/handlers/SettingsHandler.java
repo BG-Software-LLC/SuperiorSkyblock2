@@ -54,6 +54,8 @@ public final class SettingsHandler {
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
     public final List<String> filteredIslandNames;
+    public final boolean islandNamesColorSupport;
+    public final boolean islandNamesIslandTop;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -109,6 +111,8 @@ public final class SettingsHandler {
         islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
         islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
         filteredIslandNames = cfg.getStringList("island-names.filtered-names");
+        islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
+        islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
     }
 
     public void updateValue(String path, Object value){

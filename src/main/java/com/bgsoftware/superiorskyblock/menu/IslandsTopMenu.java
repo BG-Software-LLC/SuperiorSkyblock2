@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -111,7 +112,11 @@ public final class IslandsTopMenu extends SuperiorMenu {
         ItemBuilder itemBuilder = new ItemBuilder(itemStack).asSkullOf(islandOwner);
 
         if(island != null && islandOwner != null) {
-            itemBuilder.replaceName("{0}", islandOwner.getName())
+            String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
+                    islandOwner.getName() : plugin.getSettings().islandNamesColorSupport ?
+                    ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+
+            itemBuilder.replaceName("{0}", islandName)
                     .replaceName("{1}", String.valueOf(place))
                     .replaceName("{2}", island.getIslandLevelAsBigDecimal().toString())
                     .replaceName("{3}", island.getWorthAsBigDecimal().toString());

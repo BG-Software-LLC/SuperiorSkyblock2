@@ -216,4 +216,12 @@ public final class ConfigComments {
     @Comment("A list of names that will be blacklisted.")
     public static String ISLAND_NAMES_FILTERED_NAMES = "island-names.filtered-names";
 
+    @Comment("")
+    @Comment("Should names have color support enabled?")
+    public static String ISLAND_NAMES_COLOR_SUPPORT = "island-names.color-support";
+
+    @Comment("")
+    @Comment("Should names be displayed on island-top?")
+    public static String ISLAND_NAMES_ISLAND_TOP = "island-names.island-top";
+
 }
