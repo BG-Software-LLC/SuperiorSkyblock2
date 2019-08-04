@@ -20,7 +20,7 @@ public final class CmdTeam implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("team", "showteam");
+        return Arrays.asList("team", "showteam", "online");
     }
 
     @Override
