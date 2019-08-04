@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -96,10 +97,13 @@ public final class CmdName implements ICommand {
 
         island.setName(islandName);
 
-        for(Player player : Bukkit.getOnlinePlayers())
-            Locale.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), islandName);
+        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+                ChatColor.translateAlternateColorCodes('&', islandName) : islandName;
 
-        Locale.CHANGED_NAME.send(superiorPlayer, islandName);
+        for(Player player : Bukkit.getOnlinePlayers())
+            Locale.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);
+
+        Locale.CHANGED_NAME.send(superiorPlayer, coloredName);
     }
 
     @Override
