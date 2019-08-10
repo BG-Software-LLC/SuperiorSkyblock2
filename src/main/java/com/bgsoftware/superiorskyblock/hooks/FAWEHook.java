@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
@@ -35,7 +35,7 @@ public final class FAWEHook {
         EditSession editSession = new EditSessionBuilder(world.getName()).fastmode(true).autoQueue(false).build();
         for(Tag tag : blocks){
             Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
-            Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+            Location block = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
             int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
             try {
                 editSession.setBlock(new Vector(block.getBlockX(), block.getBlockY(), block.getBlockZ()), new BaseBlock(combinedId & 4095, combinedId >> 12 & 15));

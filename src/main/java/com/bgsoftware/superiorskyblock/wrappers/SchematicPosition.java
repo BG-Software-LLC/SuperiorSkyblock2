@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.wrappers;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-public final class BlockPosition {
+public final class SchematicPosition {
 
     private int x, y, z;
 
-    private BlockPosition(int x, int y, int z){
+    private SchematicPosition(int x, int y, int z){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -34,17 +34,17 @@ public final class BlockPosition {
         return x + "," + y + "," + z;
     }
 
-    public static BlockPosition of(String string){
+    public static SchematicPosition of(String string){
         String[] sections = string.split(",");
-        return of(Integer.valueOf(sections[0]), Integer.valueOf(sections[1]), Integer.valueOf(sections[2]));
+        return of(Integer.parseInt(sections[0]), Integer.parseInt(sections[1]), Integer.parseInt(sections[2]));
     }
 
-    public static BlockPosition of(Block block){
+    public static SchematicPosition of(Block block){
         return of(block.getX(), block.getY(), block.getZ());
     }
 
-    public static BlockPosition of(int x, int y, int z){
-        return new BlockPosition(x, y, z);
+    public static SchematicPosition of(int x, int y, int z){
+        return new SchematicPosition(x, y, z);
     }
 
 }

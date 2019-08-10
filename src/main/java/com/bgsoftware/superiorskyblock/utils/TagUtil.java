@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
@@ -55,7 +55,7 @@ public final class TagUtil {
             else {
                 for (Tag tag : blocks) {
                     Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
-                    Location block = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+                    Location block = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
                     int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
                     Executor.sync(() -> {
                         plugin.getNMSAdapter().setBlock(block, combinedId);
@@ -69,7 +69,7 @@ public final class TagUtil {
 
     public static void assignIntoBlock(CompoundTag compoundTag, Location offset){
         Map<String, Tag> compoundValue = compoundTag.getValue();
-        Location blockLocation = BlockPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+        Location blockLocation = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
         Block block = blockLocation.getBlock();
         if(block.getState() instanceof Banner){
             Banner banner = (Banner) block.getState();
@@ -86,7 +86,7 @@ public final class TagUtil {
         else if(block.getType() == Material.FLOWER_POT){
             if(compoundValue.containsKey("flower")) {
                 String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
-                plugin.getNMSAdapter().setFlowerPot(blockLocation, new ItemStack(Material.valueOf(sections[0]), 1, Short.valueOf(sections[1])));
+                plugin.getNMSAdapter().setFlowerPot(blockLocation, new ItemStack(Material.valueOf(sections[0]), 1, Short.parseShort(sections[1])));
             }
         }
         else if(block.getState() instanceof Skull){
