@@ -29,4 +29,8 @@ public final class Executor {
         }
     }
 
+    public static void async(Runnable runnable, long delay){
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
+    }
+
 }

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -33,8 +34,10 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -251,24 +254,38 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        for(Block block : e.getBlocks()){
-            if(plugin.getGrid().getBlockAmount(block) > 1) {
-                e.setCancelled(true);
-                break;
+        Executor.async(() -> {
+            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            for(Block block : e.getBlocks()){
+                int blockAmount = plugin.getGrid().getBlockAmount(block);
+                if(blockAmount > 1){
+                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
+                    blocksToChange.put(block.getLocation(), 0);
+                }
             }
-        }
+
+            Executor.sync(() ->
+                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+        }, 2L);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        for(Block block : e.getBlocks()){
-            if(plugin.getGrid().getBlockAmount(block) > 1) {
-                e.setCancelled(true);
-                break;
+        Executor.async(() -> {
+            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            for(Block block : e.getBlocks()){
+                int blockAmount = plugin.getGrid().getBlockAmount(block);
+                if(blockAmount > 1){
+                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
+                    blocksToChange.put(block.getLocation(), 0);
+                }
             }
-        }
+
+            Executor.sync(() ->
+                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+        }, 2L);
     }
 
     /*
