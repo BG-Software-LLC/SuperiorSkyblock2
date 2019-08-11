@@ -82,10 +82,10 @@ public class CmdAdminSetLeader implements ICommand {
             return;
         }
 
-        island.transfer(newLeader);
-        Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-        island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(newLeader.getName()));
-
+        if(island.transferIsland(newLeader)) {
+            Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
+            island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(newLeader.getName()));
+        }
     }
 
     @Override

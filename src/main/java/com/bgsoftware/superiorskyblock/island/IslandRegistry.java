@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
@@ -54,14 +55,19 @@ public final class IslandRegistry implements Iterable<Island> {
         ownershipList.sort(Comparator.comparing(o -> islands.get(o)).reversed());
     }
 
-    public void transfer(UUID old, UUID now) {
-        Island island = islands.get(old);
+    public void transferIsland(UUID oldOwner, UUID newOwner){
+        Island island = islands.get(oldOwner);
 
-        islands.remove(old);
-        ownershipList.remove(old);
+        //Remove the old owner from list
+        ownershipList.remove(oldOwner);
 
-        islands.put(now, island);
-        ownershipList.add(now);
+        //Add the new owner to list
+        ownershipList.add(newOwner);
+
+        //Replace owners
+        islands.put(newOwner, island);
+
+        sort();
     }
 
 }

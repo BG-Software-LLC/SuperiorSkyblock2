@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
@@ -103,8 +104,6 @@ public class SIsland extends DatabaseObject implements Island {
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
 
-    private UUID prevOwner;
-
     public SIsland(CachedResultSet resultSet){
         this.owner = UUID.fromString(resultSet.getString("owner"));
 
@@ -151,13 +150,13 @@ public class SIsland extends DatabaseObject implements Island {
         for(String entry : resultSet.getString("blockCounts").split(";")){
             try{
                 String[] sections = entry.split("=");
-                handleBlockPlace(Key.of(sections[0]), Integer.valueOf(sections[1]), false);
+                handleBlockPlace(Key.of(sections[0]), Integer.parseInt(sections[1]), false);
             }catch(Exception ignored){}
         }
 
         for(String limit : resultSet.getString("blockLimits").split(",")){
             try {
-                this.hoppersLimit = Integer.valueOf(limit.split("=")[1]);
+                this.hoppersLimit = Integer.parseInt(limit.split("=")[1]);
             }catch(Exception ignored){}
         }
 
@@ -1087,33 +1086,43 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void transfer(SuperiorPlayer player) {
-        if (player.getUniqueId().equals(owner))
-            return;
+    public boolean transferIsland(SuperiorPlayer superiorPlayer) {
+        if(superiorPlayer.getUniqueId().equals(owner))
+            return false;
 
-        if (prevOwner == null)
-            prevOwner = owner;
+        SuperiorPlayer previousOwner = getOwner();
 
-        SuperiorPlayer previous = getOwner();
+        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(this, previousOwner, superiorPlayer);
+        Bukkit.getPluginManager().callEvent(islandTransferEvent);
 
-        members.remove(player.getUniqueId());
-        members.add(previous.getUniqueId());
-
-        owner = player.getUniqueId();
-
-        for (UUID member : getAllMembers())
-            Objects.requireNonNull(SSuperiorPlayer.of(member)).setTeamLeader(owner);
-
-        previous.setTeamLeader(owner);
-        player.setTeamLeader(owner);
-
-        player.setIslandRole(IslandRole.LEADER);
-        previous.setIslandRole(IslandRole.ADMIN);
-
-        plugin.getGrid().getIslandRegistry().transfer(previous.getUniqueId(), owner);
+        if(islandTransferEvent.isCancelled())
+            return false;
 
         executeDeleteStatement(true);
+
+        //Kick member without saving to database
+        members.remove(superiorPlayer.getUniqueId());
+        superiorPlayer.setIslandRole(IslandRole.LEADER);
+
+        //Add member without saving to database
+        members.add(previousOwner.getUniqueId());
+        previousOwner.setIslandRole(IslandRole.ADMIN);
+
+        //Changing owner of the island and updating all players
+        owner = superiorPlayer.getUniqueId();
+        for(UUID islandMember : getAllMembers())
+            SSuperiorPlayer.of(islandMember).setTeamLeader(owner);
+
         executeInsertStatement(true);
+
+        plugin.getGrid().getIslandRegistry().transferIsland(previousOwner.getUniqueId(), owner);
+
+        return true;
+    }
+
+    @Override
+    public void transfer(SuperiorPlayer player) {
+        transferIsland(player);
     }
 
     @Override
@@ -1202,7 +1211,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void executeDeleteStatement(boolean async){
         Query.ISLAND_DELETE.getStatementHolder()
-                .setString(prevOwner.toString())
+                .setString(owner.toString())
                 .execute(async);
     }
 
@@ -1291,7 +1300,7 @@ public class SIsland extends DatabaseObject implements Island {
                 new SPermissionNode(permissionNodes.get(IslandRole.ADMIN), plugin.getSettings().leaderPermissions));
     }
 
-    private class CalcIslandData{
+    private static class CalcIslandData{
 
         private UUID owner, asker;
 

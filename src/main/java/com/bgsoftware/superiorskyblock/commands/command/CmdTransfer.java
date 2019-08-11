@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,17 +51,14 @@ public class CmdTransfer implements ICommand {
         return false;
     }
 
+
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer player = SSuperiorPlayer.of((Player) sender);
-
-        if (player == null)
-            return;
-
+        SuperiorPlayer player = SSuperiorPlayer.of(sender);
         Island island = player.getIsland();
 
         if (island == null) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(player);
+            Locale.INVALID_ISLAND.send(player);
             return;
         }
 
@@ -71,24 +67,25 @@ public class CmdTransfer implements ICommand {
             return;
         }
 
-        SuperiorPlayer target = SSuperiorPlayer.of(args[1]);
-        if (target == null) {
-            Locale.INVALID_PLAYER.send(sender);
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+
+        if (targetPlayer == null) {
+            Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
 
-        if (!island.isMember(target)) {
+        if (!island.isMember(targetPlayer)) {
             Locale.TRANSFER_NOT_A_MEMBER.send(sender);
             return;
         }
 
-        if (island.getOwner().getUniqueId().equals(target.getUniqueId())) {
+        if (island.getOwner().getUniqueId().equals(targetPlayer.getUniqueId())) {
             Locale.TRANSFER_ALREADY_LEADER.send(player);
             return;
         }
 
-        island.transfer(target);
-        island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(target.getName()));
+        if(island.transferIsland(targetPlayer))
+            island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(targetPlayer.getName()));
     }
 
     @Override
@@ -96,7 +93,7 @@ public class CmdTransfer implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.getIslandRole() != IslandRole.LEADER){
+        if(args.length == 2 && island != null && superiorPlayer.getIslandRole() == IslandRole.LEADER){
             List<String> list = new ArrayList<>();
             SuperiorPlayer targetPlayer;
 
