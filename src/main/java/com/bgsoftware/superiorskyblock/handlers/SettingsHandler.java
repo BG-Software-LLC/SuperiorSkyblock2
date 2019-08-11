@@ -98,7 +98,7 @@ public final class SettingsHandler {
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
-        disbandCount = cfg.getInt("disband-counts", 5);
+        disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
