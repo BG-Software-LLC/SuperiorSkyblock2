@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -24,10 +25,13 @@ import java.util.UUID;
 
 public final class IslandsTopMenu extends SuperiorMenu {
 
+
     private static IslandsTopMenu instance = null;
     private static Inventory inventory = null;
+    private static String title;
 
     private static Integer[] slots;
+    private static int playerIslandSlot;
     private static ItemStack noIslandItem, islandItem;
 
     private IslandsTopMenu(){
@@ -39,45 +43,83 @@ public final class IslandsTopMenu extends SuperiorMenu {
     public void onClick(InventoryClickEvent e) {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
-        for(int i = 0; i < slots.length; i++){
-            if(slots[i] == e.getRawSlot()){
-                Island island = plugin.getGrid().getIsland(i);
-
-                if(island != null) {
-                    superiorPlayer.asPlayer().closeInventory();
-                    SoundWrapper sound = getSound(-1);
-                    if(sound != null)
-                        sound.playSound(e.getWhoClicked());
-                    List<String> commands = getCommands(-1);
-                    if(commands != null)
-                        commands.forEach(command ->
-                                Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
-                                        command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
-                    if(e.getAction() == InventoryAction.PICKUP_HALF){
-                        IslandWarpsMenu.openInventory(superiorPlayer, this, island);
-                    } else {
-                        IslandValuesMenu.openInventory(superiorPlayer, this, island);
-                    }
-                    break;
+        if(e.getRawSlot() == playerIslandSlot){
+            clickItem(superiorPlayer.getIsland(), superiorPlayer, e.getAction());
+        }
+        else {
+            for (int i = 0; i < slots.length; i++) {
+                if (slots[i] == e.getRawSlot()) {
+                    Island island = plugin.getGrid().getIsland(i);
+                    if(clickItem(island, superiorPlayer, e.getAction()))
+                        break;
                 }
-                else{
-                    SoundWrapper sound = getSound(-2);
-                    if(sound != null)
-                        sound.playSound(e.getWhoClicked());
-                    List<String> commands = getCommands(-2);
-                    if(commands != null)
-                        commands.forEach(command ->
-                                Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
-                                        command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
-                }
-
             }
         }
+    }
+
+    private boolean clickItem(Island island, SuperiorPlayer superiorPlayer, InventoryAction inventoryAction){
+        if(island != null) {
+            superiorPlayer.asPlayer().closeInventory();
+            SoundWrapper sound = getSound(-1);
+            if(sound != null)
+                sound.playSound(superiorPlayer.asPlayer());
+            List<String> commands = getCommands(-1);
+            if(commands != null)
+                commands.forEach(command ->
+                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
+            if(inventoryAction == InventoryAction.PICKUP_HALF){
+                IslandWarpsMenu.openInventory(superiorPlayer, this, island);
+            } else {
+                IslandValuesMenu.openInventory(superiorPlayer, this, island);
+            }
+            return true;
+        }
+
+        SoundWrapper sound = getSound(-2);
+        if(sound != null)
+            sound.playSound(superiorPlayer.asPlayer());
+        List<String> commands = getCommands(-2);
+        if(commands != null)
+            commands.forEach(command ->
+                    Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                            command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
+
+        return false;
     }
 
     @Override
     public Inventory getInventory() {
         return inventory;
+    }
+
+    @Override
+    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
+        if(Bukkit.isPrimaryThread()){
+            Executor.async(() -> open(superiorPlayer, previousMenu));
+            return;
+        }
+
+        reloadGUI();
+
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
+        reloadInventory(inv, superiorPlayer);
+
+        Executor.sync(() -> {
+            superiorPlayer.asPlayer().openInventory(inv);
+            this.previousMenu = previousMenu;
+        });
+    }
+
+    private void reloadInventory(Inventory inv, SuperiorPlayer superiorPlayer){
+        inv.setContents(inventory.getContents());
+
+        if(playerIslandSlot != -1){
+            IslandRegistry islands = plugin.getGrid().getIslandRegistry();
+            Island island = superiorPlayer.getIsland();
+            int i = island == null ? -1 : islands.indexOf(island) + 1;
+            inv.setItem(playerIslandSlot, getTopItem(island, i));
+        }
     }
 
     private void reloadGUI(){
@@ -94,6 +136,17 @@ public final class IslandsTopMenu extends SuperiorMenu {
             ItemStack itemStack = getTopItem(island, i + 1);
             inventory.setItem(slots[i], itemStack);
         }
+
+        if(playerIslandSlot != -1)
+            inventory.setItem(playerIslandSlot, getTopItem(null, -1));
+
+        Executor.async(() -> {
+            for(Player player : Bukkit.getOnlinePlayers()){
+                Inventory topInventory = player.getOpenInventory().getTopInventory();
+                if(topInventory != null && topInventory.getHolder() instanceof IslandsTopMenu)
+                    reloadInventory(topInventory, SSuperiorPlayer.of(player));
+            }
+        }, 2L);
     }
 
     private ItemStack getTopItem(Island island, int place){
@@ -126,12 +179,13 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
                 for(String line : itemStack.getItemMeta().getLore()){
                     if(line.contains("{4}")){
+                        List<UUID> members = plugin.getSettings().islandTopIncludeLeader ? island.getAllMembers() : island.getMembers();
                         String memberFormat = line.split("\\{4}:")[1];
-                        if(island.getMembers().size() == 0){
+                        if(members.size() == 0){
                             lore.add(memberFormat.replace("{}", "None"));
                         }
                         else {
-                            for (UUID memberUUID : plugin.getSettings().islandTopIncludeLeader ? island.getAllMembers() : island.getMembers()) {
+                            for (UUID memberUUID : members) {
                                 lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberUUID).getName()));
                             }
                         }
@@ -162,6 +216,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         inventory = FileUtil.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
+        title = ChatColor.translateAlternateColorCodes('&', cfg.getString("top-islands.title"));
 
         ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
         ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
@@ -178,6 +233,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
         IslandsTopMenu.islandItem = islandItem;
         IslandsTopMenu.noIslandItem = noIslandItem;
         IslandsTopMenu.slots = slots.toArray(new Integer[0]);
+        IslandsTopMenu.playerIslandSlot = cfg.getInt("top-islands.player-island-slot", -1);
 
         islandsTopMenu.reloadGUI();
     }

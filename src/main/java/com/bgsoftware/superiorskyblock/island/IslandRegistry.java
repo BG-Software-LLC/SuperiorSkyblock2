@@ -24,6 +24,10 @@ public final class IslandRegistry implements Iterable<Island> {
         return islands.get(ownershipList.get(index));
     }
 
+    public int indexOf(Island island){
+        return ownershipList.indexOf(island.getOwner().getUniqueId());
+    }
+
     public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
         ownershipList.remove(uuid);
