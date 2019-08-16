@@ -5,8 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
-import com.bgsoftware.wildstacker.api.events.BarrelAmountChangeEvent;
-import com.bgsoftware.wildstacker.api.events.SpawnerAmountChangeEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -64,29 +68,45 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelAmountChange(BarrelAmountChangeEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getStackedObject().getLocation());
-            if(island != null) {
-                if(e.getStackAmount() > e.getOriginalAmount()){
-                    island.handleBlockPlace(Key.of(e.getStackedObject().getBarrelItem(1)), e.getStackAmount() - e.getOriginalAmount());
-                }
-                else if(e.getStackAmount() < e.getOriginalAmount()){
-                    island.handleBlockBreak(Key.of(e.getStackedObject().getBarrelItem(1)), e.getOriginalAmount() - e.getStackAmount());
-                }
-            }
+        public void onBarrelPlace(BarrelPlaceEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if(island != null)
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerAmountChange(SpawnerAmountChangeEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getStackedObject().getLocation());
-            if(island != null) {
-                if(e.getStackAmount() > e.getOriginalAmount()){
-                    island.handleBlockPlace(Key.of(e.getStackedObject().getSpawner().getBlock()), e.getStackAmount() - e.getOriginalAmount());
-                }
-                else if(e.getStackAmount() < e.getOriginalAmount()){
-                    island.handleBlockBreak(Key.of(e.getStackedObject().getSpawner().getBlock()), e.getOriginalAmount() - e.getStackAmount());
-                }
-            }
+        public void onBarrelStack(BarrelStackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if(island != null)
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBarrelUnstack(BarrelUnstackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if(island != null)
+                island.handleBlockBreak(Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerPlace(SpawnerPlaceEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getSpawner().getStackAmount() - 1);
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerStack(SpawnerStackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getTarget().getStackAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerUnstack(SpawnerUnstackEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount());
         }
 
     }
