@@ -69,6 +69,7 @@ public final class IslandRegistry implements Iterable<Island> {
         ownershipList.add(newOwner);
 
         //Replace owners
+        islands.remove(oldOwner);
         islands.put(newOwner, island);
 
         sort();
