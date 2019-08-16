@@ -103,6 +103,11 @@ public final class CmdAccept implements ICommand {
             Locale.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
             Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
+
+        if(plugin.getSettings().teleportOnJoin)
+            superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
+        if(plugin.getSettings().clearOnJoin)
+            plugin.getNMSAdapter().clearInventory(superiorPlayer.asPlayer());
     }
 
     @Override

@@ -56,6 +56,8 @@ public final class SettingsHandler {
     public final List<String> filteredIslandNames;
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
+    public final boolean teleportOnJoin;
+    public final boolean clearOnJoin;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -113,6 +115,8 @@ public final class SettingsHandler {
         filteredIslandNames = cfg.getStringList("island-names.filtered-names");
         islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
+        teleportOnJoin = cfg.getBoolean("teleport-on-join", true);
+        clearOnJoin = cfg.getBoolean("clear-on-join", true);
     }
 
     public void updateValue(String path, Object value){

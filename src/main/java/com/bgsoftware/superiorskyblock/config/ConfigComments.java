@@ -224,4 +224,12 @@ public final class ConfigComments {
     @Comment("Should names be displayed on island-top?")
     public static String ISLAND_NAMES_ISLAND_TOP = "island-names.island-top";
 
+    @Comment("")
+    @Comment("Should players get teleported to the island after they accept an invite?")
+    public static String TELEPORT_ON_JOIN = "teleport-on-join";
+
+    @Comment("")
+    @Comment("Should the inventory of the players get cleared after they accept an invite?")
+    public static String CLEAR_ON_JOIN = "clear-on-join";
+
 }
