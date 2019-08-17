@@ -32,6 +32,8 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots;
 
+    private int currentPage = 1;
+
     private GlobalWarpsMenu(){
         super("globalWarpsPage");
     }
@@ -42,14 +44,16 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
+            int islandsSize = (int) plugin.getGrid().getListIslands().stream()
+                    .filter(island -> !island.getAllWarps().isEmpty()).count();
+
+            boolean nextPage = slots.size() * currentPage < islandsSize;
+
+            if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
+                return;
 
             open(superiorPlayer, e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1, null);
         }
@@ -129,6 +133,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
                 .replaceName("{0}", (islands.size() > page * slots.size() ? "&a" : "&c")).build());
 
         this.previousMenu = previousMenu;
+        this.currentPage = page;
 
         Executor.sync(() -> superiorPlayer.asPlayer().openInventory(inv));
     }
