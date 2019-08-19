@@ -16,6 +16,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -70,8 +71,17 @@ public final class BlocksListener implements Listener {
     public void onStructureGrow(StructureGrowEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
+        List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
+
         if(island != null)
-            e.getBlocks().forEach(blockState -> island.handleBlockPlace(Key.of(blockState.getData().toItemStack()), 1));
+            blockStates.forEach(blockState -> {
+                if(!island.isInsideRange(blockState.getLocation())){
+                    e.getBlocks().remove(blockState);
+                }
+                else {
+                    island.handleBlockPlace(Key.of(blockState.getData().toItemStack()), 1);
+                }
+            });
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
