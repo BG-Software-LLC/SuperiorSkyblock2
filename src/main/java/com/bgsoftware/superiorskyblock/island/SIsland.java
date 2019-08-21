@@ -1048,7 +1048,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
-        for(String warpName : warps.keySet()){
+        for(String warpName : new ArrayList<>(warps.keySet())){
             if(warps.get(warpName).distanceSquared(location) < 2){
                 warps.remove(warpName);
                 Locale.DELETE_WARP.send(superiorPlayer, warpName);
