@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
@@ -89,6 +91,13 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBarrelUnstack(BarrelPlaceInventoryEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if(island != null)
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getIncreaseAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
@@ -107,6 +116,13 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
                 island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerPlaceInventory(SpawnerPlaceInventoryEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getIncreaseAmount());
         }
 
     }
