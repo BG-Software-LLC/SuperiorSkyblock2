@@ -115,8 +115,8 @@ public final class SettingsHandler {
         filteredIslandNames = cfg.getStringList("island-names.filtered-names");
         islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
-        teleportOnJoin = cfg.getBoolean("teleport-on-join", true);
-        clearOnJoin = cfg.getBoolean("clear-on-join", true);
+        teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
+        clearOnJoin = cfg.getBoolean("clear-on-join", false);
     }
 
     public void updateValue(String path, Object value){
