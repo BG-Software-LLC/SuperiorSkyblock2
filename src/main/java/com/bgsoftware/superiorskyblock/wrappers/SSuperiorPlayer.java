@@ -196,7 +196,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     public void setDisbands(int disbands) {
-        this.disbands = disbands < 0 ? 0 : disbands;
+        this.disbands = Math.max(disbands, 0);
         Query.PLAYER_SET_DISBANDS.getStatementHolder()
                 .setInt(disbands)
                 .setString(player.toString())
