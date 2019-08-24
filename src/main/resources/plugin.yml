@@ -23,6 +23,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.biome:
             description: Change the biome of the island.
+          superior.island.border:
+            description: Change the border color of the islands.
           superior.island.close:
             description: Close the island to the public.
           superior.island.create:

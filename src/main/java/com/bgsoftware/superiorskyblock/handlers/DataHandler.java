@@ -111,7 +111,8 @@ public final class DataHandler {
                 "islandRole VARCHAR, " +
                 "textureValue VARCHAR, " +
                 "disbands INTEGER," +
-                "toggledPanel BOOLEAN" +
+                "toggledPanel BOOLEAN," +
+                "borderColor VARCHAR" +
                 ");");
 
         //Creating default grid table
@@ -142,6 +143,7 @@ public final class DataHandler {
         addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
         addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
         addColumnIfNotExists("name", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("borderColor", "players", "'BLUE'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

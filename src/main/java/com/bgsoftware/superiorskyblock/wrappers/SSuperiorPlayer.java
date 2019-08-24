@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
@@ -41,11 +42,11 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
+    private int disbands;
     private boolean toggledPanel = false;
     private boolean islandFly = false;
     private boolean adminSpyEnabled = false;
-
-    private int disbands;
+    private BorderColor borderColor = BorderColor.BLUE;
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
@@ -56,6 +57,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         disbands = resultSet.getInt("disbands");
         toggledPanel = resultSet.getBoolean("toggledPanel");
         islandFly = resultSet.getBoolean("islandFly");
+        borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -240,6 +242,21 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
     }
 
+    @Override
+    public BorderColor getBorderColor() {
+        return borderColor;
+    }
+
+    @Override
+    public void setBorderColor(BorderColor borderColor) {
+        this.borderColor = borderColor;
+
+        Query.PLAYER_SET_BORDER.getStatementHolder()
+                .setString(borderColor.name())
+                .setString(player.toString())
+                .execute(true);
+    }
+
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
@@ -287,6 +304,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setInt(disbands)
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
+                .setString(borderColor.name())
                 .setString(player.toString())
                 .execute(async);
     }
@@ -302,6 +320,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setInt(plugin.getSettings().disbandCount)
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
+                .setString(borderColor.name())
                 .execute(async);
     }
 
