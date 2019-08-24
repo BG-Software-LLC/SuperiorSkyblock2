@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
@@ -9,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
@@ -25,10 +27,11 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -47,10 +50,12 @@ import org.bukkit.entity.Player;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
-import java.sql.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SIsland extends DatabaseObject implements Island {
@@ -85,7 +90,8 @@ public class SIsland extends DatabaseObject implements Island {
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
     protected Location teleportLocation;
-    private boolean locked;
+    private boolean locked = false;
+    private String islandName = "";
 
     /*
      * SIsland multipliers & limits
@@ -98,12 +104,10 @@ public class SIsland extends DatabaseObject implements Island {
     private double spawnerRates = plugin.getSettings().defaultSpawnerRates;
     private double mobDrops = plugin.getSettings().defaultMobDrops;
 
-    private UUID prevOwner;
-
-    public SIsland(ResultSet resultSet) throws SQLException {
+    public SIsland(CachedResultSet resultSet){
         this.owner = UUID.fromString(resultSet.getString("owner"));
-        this.center = SBlockPosition.of(getLocation(resultSet.getString("center")));
 
+        this.center = SBlockPosition.of(getLocation(resultSet.getString("center")));
         this.teleportLocation = getLocation(resultSet.getString("teleportLocation"));
 
         for(String uuid : resultSet.getString("members").split(",")) {
@@ -146,20 +150,19 @@ public class SIsland extends DatabaseObject implements Island {
         for(String entry : resultSet.getString("blockCounts").split(";")){
             try{
                 String[] sections = entry.split("=");
-                handleBlockPlace(Key.of(sections[0]), Integer.valueOf(sections[1]), false);
+                handleBlockPlace(Key.of(sections[0]), Integer.parseInt(sections[1]), false);
+            }catch(Exception ignored){}
+        }
+
+        for(String limit : resultSet.getString("blockLimits").split(",")){
+            try {
+                this.hoppersLimit = Integer.parseInt(limit.split("=")[1]);
             }catch(Exception ignored){}
         }
 
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
         this.islandSize = resultSet.getInt("islandSize");
-
-        for(String limit : resultSet.getString("blockLimits").split(",")){
-            try {
-                this.hoppersLimit = Integer.valueOf(limit.split("=")[1]);
-            }catch(Exception ignored){}
-        }
-
         this.teamLimit = resultSet.getInt("teamLimit");
         this.warpsLimit =  resultSet.getInt("warpsLimit");
         this.cropGrowth = resultSet.getDouble("cropGrowth");
@@ -168,7 +171,8 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = resultSet.getString("discord");
         this.paypal = resultSet.getString("paypal");
         this.locked = resultSet.getBoolean("locked");
-        
+        this.islandName = resultSet.getString("name");
+
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
     }
@@ -217,11 +221,11 @@ public class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, Location location){
-        this(superiorPlayer, SBlockPosition.of(location));
+    public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
+        this(superiorPlayer, SBlockPosition.of(location), islandName);
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation){
+    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getTeamLeader();
             superiorPlayer.setIslandRole(IslandRole.LEADER);
@@ -229,6 +233,7 @@ public class SIsland extends DatabaseObject implements Island {
             this.owner = null;
         }
         this.center = wrappedLocation;
+        this.islandName = islandName;
         assignPermissionNodes();
     }
 
@@ -311,6 +316,11 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer){
         return banned.contains(superiorPlayer.getUniqueId());
+    }
+
+    @Override
+    public List<UUID> getAllBannedMembers() {
+        return new ArrayList<>(banned);
     }
 
     @Override
@@ -459,7 +469,12 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void disbandIsland(){
-        new HashSet<>(members).forEach(member -> kickMember(SSuperiorPlayer.of(member)));
+        getAllMembers().forEach(member -> {
+            if(members.contains(member))
+                kickMember(SSuperiorPlayer.of(member));
+            if(plugin.getSettings().disbandInventoryClear)
+                plugin.getNMSAdapter().clearInventory(Bukkit.getOfflinePlayer(member));
+        });
         plugin.getGrid().deleteIsland(this);
         if(!Bukkit.getBukkitVersion().contains("1.14")) {
             for (Chunk chunk : getAllChunks(true))
@@ -530,7 +545,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
         if(!Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTask(plugin, () -> calcIslandWorth(asker));
+            Executor.sync(() -> calcIslandWorth(asker));
             return;
         }
 
@@ -554,12 +569,13 @@ public class SIsland extends DatabaseObject implements Island {
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
-        new SuperiorThread(() -> {
-            Set<Thread> threads = new HashSet<>();
+        Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
+            ExecutorService scanService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
+
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
-                Thread thread = new Thread(() -> {
+                scanService.execute(() -> {
                     boolean emptyChunk = true;
 
                     double islandWorth = 0;
@@ -612,23 +628,16 @@ public class SIsland extends DatabaseObject implements Island {
                         }
                     }
                 });
-                thread.start();
-                threads.add(thread);
             }
 
-            for(Thread th : threads){
-                try{
-                    th.join();
-                }catch(Exception ignored){}
+            try{
+                scanService.shutdown();
+                scanService.awaitTermination(1, TimeUnit.MINUTES);
+            }catch(Exception ex){
+                ex.printStackTrace();
             }
 
-            for(Chunk chunk : chunks)
-                BlocksProvider_WildStacker.uncacheChunk(chunk);
-
-            saveBlockCounts();
-
-            calcProcess = false;
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Executor.sync(() -> {
                 Key blockKey;
                 int blockCount;
 
@@ -648,14 +657,21 @@ public class SIsland extends DatabaseObject implements Island {
 
                 if(asker != null)
                     Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsBigDecimal(), getIslandLevelAsBigDecimal());
-            });
 
-            if(islandCalcsQueue.size() != 0){
-                CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
-                        .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
-            }
-        }).start();
+                for(Chunk chunk : chunks)
+                    BlocksProvider_WildStacker.uncacheChunk(chunk);
+
+                saveBlockCounts();
+
+                calcProcess = false;
+
+                if(islandCalcsQueue.size() != 0){
+                    CalcIslandData calcIslandData = islandCalcsQueue.pop();
+                    plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
+                            .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
+                }
+            });
+        });
     }
 
     @Override
@@ -680,8 +696,8 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
-        int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+        double blockValue;
+        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
             blockCounts.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
             islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
@@ -712,8 +728,8 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
-        int blockValue;
-        if((blockValue = plugin.getGrid().getBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
+        double blockValue;
+        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
 
             key = plugin.getGrid().getBlockValueKey(key);
@@ -1032,7 +1048,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
-        for(String warpName : warps.keySet()){
+        for(String warpName : new ArrayList<>(warps.keySet())){
             if(warps.get(warpName).distanceSquared(location) < 2){
                 warps.remove(warpName);
                 Locale.DELETE_WARP.send(superiorPlayer, warpName);
@@ -1070,33 +1086,43 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void transfer(SuperiorPlayer player) {
-        if (player.getUniqueId().equals(owner))
-            return;
+    public boolean transferIsland(SuperiorPlayer superiorPlayer) {
+        if(superiorPlayer.getUniqueId().equals(owner))
+            return false;
 
-        if (prevOwner == null)
-            prevOwner = owner;
+        SuperiorPlayer previousOwner = getOwner();
 
-        SuperiorPlayer previous = getOwner();
+        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(this, previousOwner, superiorPlayer);
+        Bukkit.getPluginManager().callEvent(islandTransferEvent);
 
-        members.remove(player.getUniqueId());
-        members.add(previous.getUniqueId());
-
-        owner = player.getUniqueId();
-
-        for (UUID member : getAllMembers())
-            Objects.requireNonNull(SSuperiorPlayer.of(member)).setTeamLeader(owner);
-
-        previous.setTeamLeader(owner);
-        player.setTeamLeader(owner);
-
-        player.setIslandRole(IslandRole.LEADER);
-        previous.setIslandRole(IslandRole.ADMIN);
-
-        plugin.getGrid().getIslands().transfer(previous.getUniqueId(), owner);
+        if(islandTransferEvent.isCancelled())
+            return false;
 
         executeDeleteStatement(true);
+
+        //Kick member without saving to database
+        members.remove(superiorPlayer.getUniqueId());
+        superiorPlayer.setIslandRole(IslandRole.LEADER);
+
+        //Add member without saving to database
+        members.add(previousOwner.getUniqueId());
+        previousOwner.setIslandRole(IslandRole.ADMIN);
+
+        //Changing owner of the island and updating all players
+        owner = superiorPlayer.getUniqueId();
+        for(UUID islandMember : getAllMembers())
+            SSuperiorPlayer.of(islandMember).setTeamLeader(owner);
+
         executeInsertStatement(true);
+
+        plugin.getGrid().getIslandRegistry().transferIsland(previousOwner.getUniqueId(), owner);
+
+        return true;
+    }
+
+    @Override
+    public void transfer(SuperiorPlayer player) {
+        transferIsland(player);
     }
 
     @Override
@@ -1120,6 +1146,21 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_LOCKED.getStatementHolder()
                 .setBoolean(locked)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public String getName() {
+        return islandName;
+    }
+
+    @Override
+    public void setName(String islandName) {
+        this.islandName = islandName;
+
+        Query.ISLAND_SET_NAME.getStatementHolder()
+                .setString(islandName)
                 .setString(owner.toString())
                 .execute(true);
     }
@@ -1162,6 +1203,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
                 .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
+                .setString(islandName)
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1169,7 +1211,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void executeDeleteStatement(boolean async){
         Query.ISLAND_DELETE.getStatementHolder()
-                .setString(prevOwner.toString())
+                .setString(owner.toString())
                 .execute(async);
     }
 
@@ -1213,6 +1255,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(bonusWorth.getAsString())
                 .setBoolean(false)
                 .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
+                .setString(islandName)
                 .execute(async);
     }
 
@@ -1257,7 +1300,7 @@ public class SIsland extends DatabaseObject implements Island {
                 new SPermissionNode(permissionNodes.get(IslandRole.ADMIN), plugin.getSettings().leaderPermissions));
     }
 
-    private class CalcIslandData{
+    private static class CalcIslandData{
 
         private UUID owner, asker;
 

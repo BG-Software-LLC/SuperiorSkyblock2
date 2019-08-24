@@ -1,5 +1,5 @@
 name: SuperiorSkyblock2
-version: 0.1.3-BETA
+version: 0.1.5-BETA
 author: Ome_R
 load: STARTUP
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
@@ -47,6 +47,8 @@ permissions:
             description: Kick a player from your island.
           superior.island.leave:
             description: Leave your island.
+          superior.island.name:
+            description: Change the name of your island.
           superior.island.open:
             description: Open the island to the public.
           superior.island.panel:
@@ -125,6 +127,8 @@ permissions:
             description: Send a player a message without any prefixes.
           superior.admin.msgall:
             description: Send to all island members a message without any prefixes.
+          superior.admin.name:
+            description: Change the name of an island.
           superior.admin.open:
             description: Open an island to the public.
           superior.admin.promote:
@@ -155,5 +159,7 @@ permissions:
             description: Set the level of an upgrade for another player's island.
           superior.admin.setwarpslimit:
             description: Set the warps limit of an island.
+          superior.admin.spy:
+            description: Toggle chat spy mode.
           superior.admin.withdraw:
             description: Withdraw money from another player's island bank.

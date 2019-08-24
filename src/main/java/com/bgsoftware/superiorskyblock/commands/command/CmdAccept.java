@@ -31,7 +31,7 @@ public final class CmdAccept implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island accept <player-name>";
+        return "island accept <player-name/island-name>";
     }
 
     @Override
@@ -60,9 +60,17 @@ public final class CmdAccept implements ICommand {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
         Island island;
 
-        if(targetPlayer == null || !(island = plugin.getGrid().getIsland(targetPlayer)).isInvited(superiorPlayer)){
-            Locale.NO_ISLAND_INVITE.send(superiorPlayer);
-            return;
+        if(targetPlayer == null){
+            if((island = plugin.getGrid().getIsland(args[1])) == null || !island.isInvited(superiorPlayer)){
+                Locale.NO_ISLAND_INVITE.send(superiorPlayer);
+                return;
+            }
+        }
+        else{
+            if(!(island = plugin.getGrid().getIsland(targetPlayer)).isInvited(superiorPlayer)) {
+                Locale.NO_ISLAND_INVITE.send(superiorPlayer);
+                return;
+            }
         }
 
         if(superiorPlayer.getIsland() != null){
@@ -91,7 +99,15 @@ public final class CmdAccept implements ICommand {
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, IslandRole.MEMBER);
 
-        Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
+        if(targetPlayer == null)
+            Locale.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
+        else
+            Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
+
+        if(plugin.getSettings().teleportOnJoin)
+            superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
+        if(plugin.getSettings().clearOnJoin)
+            plugin.getNMSAdapter().clearInventory(superiorPlayer.asPlayer());
     }
 
     @Override
@@ -103,8 +119,12 @@ public final class CmdAccept implements ICommand {
 
             for(UUID uuid : plugin.getGrid().getAllIslands()){
                 island = plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid));
-                if(island.isInvited(superiorPlayer) && superiorPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
-                    list.add(SSuperiorPlayer.of(uuid).getName());
+                if(island.isInvited(superiorPlayer)) {
+                    if(island.getOwner().getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(island.getOwner().getName());
+                    if(island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(island.getName());
+                }
             }
 
             return list;

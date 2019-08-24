@@ -2,16 +2,15 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.Comment;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.GlobalSectionComments;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -21,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class GlobalWarpsMenu extends SuperiorMenu {
@@ -29,9 +29,10 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     private static String title = "";
 
     private static ItemStack previousButton, currentButton, nextButton, warpItem;
-    private static Sound previousSound, currentSound, nextSound, warpSound;
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots;
+
+    private int currentPage = 1;
 
     private GlobalWarpsMenu(){
         super("globalWarpsPage");
@@ -39,17 +40,20 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
+            int islandsSize = (int) plugin.getGrid().getListIslands().stream()
+                    .filter(island -> !island.getAllWarps().isEmpty()).count();
+
+            boolean nextPage = slots.size() * currentPage < islandsSize;
+
+            if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
+                return;
 
             open(superiorPlayer, e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1, null);
         }
@@ -70,7 +74,16 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
                 return;
 
             String ownerName = islands.get(indexOf);
-            Island island = SSuperiorPlayer.of(ownerName).getIsland();
+            Island island = Objects.requireNonNull(SSuperiorPlayer.of(ownerName)).getIsland();
+
+            SoundWrapper sound = getSound(-1);
+            if(sound != null)
+                sound.playSound(e.getWhoClicked());
+            List<String> commands = getCommands(-1);
+            if(commands != null)
+                commands.forEach(command ->
+                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
 
             if(island == null)
                 GlobalWarpsMenu.openInventory(superiorPlayer, null);
@@ -91,7 +104,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
 
     private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
         if (Bukkit.isPrimaryThread()) {
-            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
+            Executor.async(() -> open(superiorPlayer, page, previousMenu));
             return;
         }
 
@@ -119,12 +132,10 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (islands.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        if(openSound != null)
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
-
         this.previousMenu = previousMenu;
+        this.currentPage = page;
 
-        Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
+        Executor.sync(() -> superiorPlayer.asPlayer().openInventory(inv));
     }
 
     public static void init(){
@@ -151,10 +162,15 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         int previousSlot = cfg.getInt("global-gui.previous-page.slot");
         int currentSlot = cfg.getInt("global-gui.current-page.slot");
         int nextSlot = cfg.getInt("global-gui.next-page.slot");
-        Sound previousSound = getSound(cfg.getString("global-gui.previous-page.sound", ""));
-        Sound currentSound = getSound(cfg.getString("global-gui.current-page.sound", ""));
-        Sound nextSound = getSound(cfg.getString("global-gui.next-page.sound", ""));
-        Sound warpSound = getSound(cfg.getString("global-gui.warp-item.sound", ""));
+
+        globalWarpsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
+        globalWarpsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
+        globalWarpsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
+        globalWarpsMenu.addSound(-1, getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
+        globalWarpsMenu.addCommands(previousSlot, cfg.getStringList("global-gui.previous-page.commands"));
+        globalWarpsMenu.addCommands(currentSlot, cfg.getStringList("global-gui.current-page.commands"));
+        globalWarpsMenu.addCommands(nextSlot, cfg.getStringList("global-gui.next-page.commands"));
+        globalWarpsMenu.addCommands(-1, cfg.getStringList("global-gui.warp-item.commands"));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("global-gui.warp-item.slots").split(","))
@@ -165,13 +181,9 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         GlobalWarpsMenu.currentButton = currentButton;
         GlobalWarpsMenu.nextButton = nextButton;
         GlobalWarpsMenu.warpItem = warpItem;
-        GlobalWarpsMenu.previousSound = previousSound;
-        GlobalWarpsMenu.currentSound = currentSound;
-        GlobalWarpsMenu.nextSound = nextSound;
         GlobalWarpsMenu.previousSlot = previousSlot;
         GlobalWarpsMenu.currentSlot = currentSlot;
         GlobalWarpsMenu.nextSlot = nextSlot;
-        GlobalWarpsMenu.warpSound = warpSound;
         GlobalWarpsMenu.slots = slots;
     }
 

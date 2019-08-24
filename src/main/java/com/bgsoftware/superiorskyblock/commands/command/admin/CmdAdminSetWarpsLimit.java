@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class CmdAdminSetWarpsLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setwarpslimit <island-member-name> <amount>";
+        return "island admin setwarpslimit <player-name/island-name> <amount>";
     }
 
     @Override
@@ -51,16 +53,15 @@ public class CmdAdminSetWarpsLimit implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
-            return;
-        }
-
-        Island island = targetPlayer.getIsland();
+        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            if(args[2].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
@@ -79,13 +80,28 @@ public class CmdAdminSetWarpsLimit implements ICommand {
 
         island.setWarpsLimit(amount);
 
-        if (!(sender instanceof Player) || !island.isMember(SSuperiorPlayer.of((Player) sender)))
-            Locale.WARP_COUNT_SET_OTHER.send(sender, args[2], amount);
-        island.sendMessage(Locale.WARP_COUNT_SET.getMessage(amount));
+        if(targetPlayer == null)
+            Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, island.getName());
+        else
+            Locale.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 3){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                if (onlinePlayer.getIsland() != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(onlinePlayer.getIsland().getName());
+                }
+            }
+        }
+
+        return list;
     }
 }

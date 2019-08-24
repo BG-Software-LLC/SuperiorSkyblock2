@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class IslandCreationMenu extends SuperiorMenu {
@@ -25,9 +27,11 @@ public final class IslandCreationMenu extends SuperiorMenu {
     private static Map<String, Object> schematicsData = new HashMap<>();
 
     private SuperiorPlayer superiorPlayer;
+    private String islandName;
 
-    private IslandCreationMenu(){
+    private IslandCreationMenu(String islandName){
         super("islandCreationPage");
+        this.islandName = islandName;
     }
 
     @Override
@@ -37,13 +41,31 @@ public final class IslandCreationMenu extends SuperiorMenu {
                 int slot = get(schematic + "-slot", Integer.class);
                 String permission = get(schematic + "-permission", String.class);
 
-                if (superiorPlayer.hasPermission(permission) && slot == e.getRawSlot()) {
-                    BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
-                    Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
-                    superiorPlayer.asPlayer().closeInventory();
-                    Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                    plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome);
-                    break;
+                if(slot == e.getRawSlot()) {
+                    if (superiorPlayer.hasPermission(permission)) {
+                        BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
+                        Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
+                        superiorPlayer.asPlayer().closeInventory();
+                        SoundWrapper sound = get(schematic + "-has-access-item-sound", SoundWrapper.class);
+                        if(sound != null)
+                            sound.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(schematic + "-has-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
+                        plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
+                        break;
+                    }
+                    else{
+                        SoundWrapper sound = get(schematic + "-no-access-item-sound", SoundWrapper.class);
+                        if(sound != null)
+                            sound.playSound(superiorPlayer.asPlayer());
+                        //noinspection unchecked
+                        List<String> commands = get(schematic + "-no-access-item-commands", List.class);
+                        if(commands != null)
+                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                    }
                 }
             }
         }
@@ -78,7 +100,7 @@ public final class IslandCreationMenu extends SuperiorMenu {
     }
 
     public static void init(){
-        IslandCreationMenu islandCreationMenu = new IslandCreationMenu();
+        IslandCreationMenu islandCreationMenu = new IslandCreationMenu("");
         File file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if(!file.exists())
@@ -98,13 +120,19 @@ public final class IslandCreationMenu extends SuperiorMenu {
             schematicsData.put(schematic + "-slot", section.getInt(schematic + ".slot"));
             schematicsData.put(schematic + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
+            schematicsData.put(schematic + "-has-access-item-sound",
+                    getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
+            schematicsData.put(schematic + "-has-access-item-commands", section.getStringList(schematic + ".has-access-item.commands"));
             schematicsData.put(schematic + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
+            schematicsData.put(schematic + "-no-access-item-sound",
+                    getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
+            schematicsData.put(schematic + "-no-access-item-commands", section.getStringList(schematic + ".no-access-item.commands"));
         }
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
-        new IslandCreationMenu().open(superiorPlayer, previousMenu);
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
+        new IslandCreationMenu(islandName).open(superiorPlayer, previousMenu);
     }
 
 }

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,6 +87,6 @@ public final class CmdSetWarp implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        return new ArrayList<>();
     }
 }

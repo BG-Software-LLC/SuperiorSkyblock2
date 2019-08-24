@@ -2,33 +2,35 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminReload implements ICommand {
+public final class CmdAdminSpy implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("reload");
+        return Collections.singletonList("spy");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.reload";
+        return "superior.admin.spy";
     }
 
     @Override
     public String getUsage() {
-        return "island admin reload";
+        return "is admin spy";
     }
 
     @Override
     public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_RELOAD.getMessage();
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage();
     }
 
     @Override
@@ -43,16 +45,22 @@ public final class CmdAdminReload implements ICommand {
 
     @Override
     public boolean canBeExecutedByConsole() {
-        return true;
+        return false;
     }
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        new Thread(() -> {
-            Locale.RELOAD_PROCCESS_REQUEST.send(sender);
-            plugin.reloadPlugin(false);
-            Locale.RELOAD_COMPLETED.send(sender);
-        }).start();
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+
+        if(superiorPlayer.hasAdminSpyEnabled()){
+            Locale.TOGGLED_SPY_OFF.send(superiorPlayer);
+        }
+
+        else{
+            Locale.TOGGLED_SPY_ON.send(superiorPlayer);
+        }
+
+        superiorPlayer.toggleAdminSpy();
     }
 
     @Override

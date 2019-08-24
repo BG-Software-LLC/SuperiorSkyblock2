@@ -30,6 +30,7 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
         if(!upgradeName.isEmpty()){
@@ -94,8 +95,11 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
                             FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
                             FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
                             slot,
-                            getSound(upgrades.getString(_upgrade + "." + level + ".has-next-level.sound", "")),
-                            getSound(upgrades.getString(_upgrade + "." + level + ".no-next-level.sound", ""))));
+                            getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level.sound")),
+                            getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level.sound")),
+                            upgrades.getStringList(_upgrade + "." + level + ".has-next-level.commands"),
+                            upgrades.getStringList(_upgrade + "." + level + ".no-next-level.commands"))
+                    );
                 }
             }
         }

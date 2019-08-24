@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
 import com.bgsoftware.superiorskyblock.utils.TagUtil;
-import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Location;
@@ -28,7 +28,7 @@ public final class TagBuilder {
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private Map<String, Tag> compoundValue = new HashMap<>();
 
-    public TagBuilder withBlockPosition(BlockPosition blockPosition){
+    public TagBuilder withBlockPosition(SchematicPosition blockPosition){
         compoundValue.put("blockPosition", new StringTag(blockPosition.toString()));
         return this;
     }

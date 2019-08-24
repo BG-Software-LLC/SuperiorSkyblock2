@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -27,11 +27,11 @@ public final class IslandWarpsMenu extends SuperiorMenu {
     private static String title = "";
 
     private static ItemStack previousButton, currentButton, nextButton, warpItem;
-    private static Sound previousSound, currentSound, nextSound, warpSound;
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots;
 
     private Island island;
+    private int currentPage = 1;
 
     private IslandWarpsMenu(Island island){
         super("warpsPage");
@@ -40,17 +40,17 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
-            if(e.getCurrentItem().getItemMeta().getDisplayName().startsWith(ChatColor.RED + ""))
-                return;
-
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            int currentPage = Integer.valueOf(ChatColor.stripColor(e.getInventory().getItem(currentSlot)
-                    .getItemMeta().getLore().get(0)).split(" ")[1]);
+            boolean nextPage = slots.size() * currentPage < island.getAllWarps().size();
+
+            if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
+                return;
 
             open(superiorPlayer, e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1, null);
         }
@@ -71,6 +71,14 @@ public final class IslandWarpsMenu extends SuperiorMenu {
             Location location = island.getWarpLocation(warpName);
 
             if(location != null) {
+                SoundWrapper sound = getSound(-1);
+                if(sound != null)
+                    sound.playSound(e.getWhoClicked());
+                List<String> commands = getCommands(-1);
+                if(commands != null)
+                    commands.forEach(command ->
+                            Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                    command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
                 this.previousMenu = null;
                 island.warpPlayer(superiorPlayer, warpName);
             }
@@ -89,7 +97,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
     private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
         if (Bukkit.isPrimaryThread()) {
-            new SuperiorThread(() -> open(superiorPlayer, page, previousMenu)).start();
+            Executor.async(() -> open(superiorPlayer, page, previousMenu));
             return;
         }
 
@@ -116,12 +124,11 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceName("{0}", (warps.size() > page * slots.size() ? "&a" : "&c")).build());
 
-        if(openSound != null)
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), openSound, 1, 1);
-
         this.previousMenu = previousMenu;
 
-        Bukkit.getScheduler().runTask(plugin, () -> superiorPlayer.asPlayer().openInventory(inv));
+        this.currentPage = page;
+
+        Executor.sync(() -> superiorPlayer.asPlayer().openInventory(inv));
     }
 
     public static void init(){
@@ -143,10 +150,15 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         int previousSlot = cfg.getInt("warps-gui.previous-page.slot");
         int currentSlot = cfg.getInt("warps-gui.current-page.slot");
         int nextSlot = cfg.getInt("warps-gui.next-page.slot");
-        Sound previousSound = getSound(cfg.getString("warps-gui.previous-page.sound", ""));
-        Sound currentSound = getSound(cfg.getString("warps-gui.current-page.sound", ""));
-        Sound nextSound = getSound(cfg.getString("warps-gui.next-page.sound", ""));
-        Sound warpSound = getSound(cfg.getString("warps-gui.warp-item.sound", ""));
+
+        islandValuesMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("warps-gui.previous-page.sound")));
+        islandValuesMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("warps-gui.current-page.sound")));
+        islandValuesMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("warps-gui.next-page.sound")));
+        islandValuesMenu.addSound(-1, getSound(cfg.getConfigurationSection("warps-gui.warp-item.sound")));
+        islandValuesMenu.addCommands(previousSlot, cfg.getStringList("warps-gui.previous-page.commands"));
+        islandValuesMenu.addCommands(currentSlot, cfg.getStringList("warps-gui.current-page.commands"));
+        islandValuesMenu.addCommands(nextSlot, cfg.getStringList("warps-gui.next-page.commands"));
+        islandValuesMenu.addCommands(-1, cfg.getStringList("warps-gui.warp-item.commands"));
 
         List<Integer> slots = new ArrayList<>();
         Arrays.stream(cfg.getString("warps-gui.warp-item.slots").split(","))
@@ -157,13 +169,9 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         IslandWarpsMenu.currentButton = currentButton;
         IslandWarpsMenu.nextButton = nextButton;
         IslandWarpsMenu.warpItem = warpItem;
-        IslandWarpsMenu.previousSound = previousSound;
-        IslandWarpsMenu.currentSound = currentSound;
-        IslandWarpsMenu.nextSound = nextSound;
         IslandWarpsMenu.previousSlot = previousSlot;
         IslandWarpsMenu.currentSlot = currentSlot;
         IslandWarpsMenu.nextSlot = nextSlot;
-        IslandWarpsMenu.warpSound = warpSound;
         IslandWarpsMenu.slots = slots;
     }
 

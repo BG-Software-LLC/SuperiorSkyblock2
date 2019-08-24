@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -18,7 +17,7 @@ public final class MemberRoleMenu extends SuperiorMenu {
     private static Inventory inventory = null;
     private static String title = "";
     private static int memberSlot, modSlot, adminSlot, leaderSlot;
-    private static Sound memberSound, modSound, adminSound, leaderSound;
+    //private static Sound memberSound, modSound, adminSound, leaderSound;
 
     private SuperiorPlayer targetPlayer;
 
@@ -29,6 +28,7 @@ public final class MemberRoleMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(memberSlot == e.getRawSlot()){
@@ -75,10 +75,14 @@ public final class MemberRoleMenu extends SuperiorMenu {
         modSlot = cfg.getInt("roles-panel.mod-role.slot");
         adminSlot = cfg.getInt("roles-panel.admin-role.slot");
         leaderSlot = cfg.getInt("roles-panel.leader-role.slot");
-        memberSound = getSound(cfg.getString("roles-panel.member-role.sound", ""));
-        modSound = getSound(cfg.getString("roles-panel.mod-role.sound", ""));
-        adminSound = getSound(cfg.getString("roles-panel.admin-role.sound", ""));
-        leaderSound = getSound(cfg.getString("roles-panel.leader-role.sound", ""));
+        memberRoleMenu.addSound(memberSlot, getSound(cfg.getConfigurationSection("roles-panel.member-role.sound")));
+        memberRoleMenu.addSound(modSlot, getSound(cfg.getConfigurationSection("roles-panel.mod-role.sound")));
+        memberRoleMenu.addSound(adminSlot, getSound(cfg.getConfigurationSection("roles-panel.admin-role.sound")));
+        memberRoleMenu.addSound(leaderSlot, getSound(cfg.getConfigurationSection("roles-panel.leader-role.sound")));
+        memberRoleMenu.addCommands(memberSlot, cfg.getStringList("roles-panel.member-role.commands"));
+        memberRoleMenu.addCommands(modSlot, cfg.getStringList("roles-panel.mod-role.commands"));
+        memberRoleMenu.addCommands(adminSlot, cfg.getStringList("roles-panel.admin-role.commands"));
+        memberRoleMenu.addCommands(leaderSlot, cfg.getStringList("roles-panel.leader-role.commands"));
 
         inventory.setItem(memberSlot, memberButton);
         inventory.setItem(modSlot, modButton);

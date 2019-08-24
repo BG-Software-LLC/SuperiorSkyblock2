@@ -7,8 +7,6 @@
 
 disband-gui:
   title: '&l      Confirm Disband'
-  open-sound: 'CHEST_OPEN'
-  close-sound: 'CHEST_CLOSE'
 
   fill-items:
     '1':
@@ -17,6 +15,10 @@ disband-gui:
       slots: 0,2,4
 
   confirm:
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
     type: PLAYER_HEAD
     skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0NzJkNjA4ODIxZjQ1YTg4MDUzNzZlYzBjNmZmY2I3ODExNzgyOWVhNWY5NjAwNDFjMmEwOWQxMGUwNGNiNCJ9fX0='
     name: '&aConfirm'
@@ -24,6 +26,10 @@ disband-gui:
       - '&7Are you sure you want to delete your island?'
 
   cancel:
+    sound:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
     type: PLAYER_HEAD
     skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjk1M2IxMmEwOTQ2YjYyOWI0YzA4ODlkNDFmZDI2ZWQyNmZiNzI5ZDRkNTE0YjU5NzI3MTI0YzM3YmI3MGQ4ZCJ9fX0='
     name: '&4Cancel'

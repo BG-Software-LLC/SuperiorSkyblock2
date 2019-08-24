@@ -353,3 +353,35 @@ disband-confirm: true
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, MergedSpawner, StackSpawners, WildStacker, SilkSpawners, PvpingSpawners
 spawners-provider: 'AUTO'
+
+# Should inventories of island members get cleared after disbanding their island?
+disband-inventory-clear: true
+
+# All settings related to island names.
+island-names:
+  # Should creation of islands will ask for name (/is create <name>)?
+  required-for-creation: true
+
+  # The maximum length for names.
+  max-length: 16
+
+  # The minimum length for names.
+  min-length: 3
+
+  # A list of names that will be blacklisted.
+  filtered-names:
+  - fuck
+  - duck
+  - hypixel
+
+  # Should names have color support enabled?
+  color-support: true
+
+  # Should names be displayed on island-top?
+  island-top: true
+
+# Should players get teleported to the island after they accept an invite?
+teleport-on-join: false
+
+# Should the inventory of the players get cleared after they accept an invite?
+clear-on-join: false

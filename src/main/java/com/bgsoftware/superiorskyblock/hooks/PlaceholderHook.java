@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.regex.Matcher;
@@ -136,7 +137,11 @@ public abstract class PlaceholderHook {
                     case "exists":
                         return "Yes";
                     case "locked":
-                        return island.isLocked() ? "True" : "False";
+                        return island.isLocked() ? "Yes" : "No";
+                    case "name":
+                        return plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+                    case "is_leader":
+                        return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
                 }
 
             }

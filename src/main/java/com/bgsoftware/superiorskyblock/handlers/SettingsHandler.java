@@ -49,6 +49,15 @@ public final class SettingsHandler {
     public final Map<String, String> defaultPlaceholders;
     public final boolean disbandConfirm;
     public final String spawnersProvider;
+    public final boolean disbandInventoryClear;
+    public final boolean islandNamesRequiredForCreation;
+    public final int islandNamesMaxLength;
+    public final int islandNamesMinLength;
+    public final List<String> filteredIslandNames;
+    public final boolean islandNamesColorSupport;
+    public final boolean islandNamesIslandTop;
+    public final boolean teleportOnJoin;
+    public final boolean clearOnJoin;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -91,7 +100,7 @@ public final class SettingsHandler {
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
-        disbandCount = cfg.getInt("disband-counts", 5);
+        disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
@@ -99,6 +108,15 @@ public final class SettingsHandler {
         ));
         disbandConfirm = cfg.getBoolean("disband-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
+        disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
+        islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
+        islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
+        islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
+        filteredIslandNames = cfg.getStringList("island-names.filtered-names");
+        islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
+        islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
+        teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
+        clearOnJoin = cfg.getBoolean("clear-on-join", false);
     }
 
     public void updateValue(String path, Object value){

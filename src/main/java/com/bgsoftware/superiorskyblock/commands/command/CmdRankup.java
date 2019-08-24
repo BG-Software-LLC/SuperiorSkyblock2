@@ -8,14 +8,15 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdRankup implements ICommand {
+public final class CmdRankup implements ICommand {
 
     @Override
     public List<String> getAliases() {
@@ -74,6 +75,7 @@ public class CmdRankup implements ICommand {
             return;
         }
 
+
         int level = island.getUpgradeLevel(upgradeName);
         double nextUpgradePrice = plugin.getUpgrades().getUpgradePrice(upgradeName, level);
         boolean hasNextLevel;
@@ -94,14 +96,28 @@ public class CmdRankup implements ICommand {
             hasNextLevel = true;
         }
 
-        Sound sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
+        SoundWrapper sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
         if(sound != null)
-            superiorPlayer.asPlayer().playSound(superiorPlayer.getLocation(), sound, 1, 1);
+            sound.playSound(superiorPlayer.asPlayer());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        Island island = superiorPlayer.getIsland();
+
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.RANKUP)){
+            List<String> list = new ArrayList<>();
+
+            for(String upgrade : plugin.getUpgrades().getAllUpgrades()){
+                if(upgrade.toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(upgrade.toLowerCase());
+            }
+
+            return list;
+        }
+
+        return new ArrayList<>();
     }
 
     private String getUpgradesString(SuperiorSkyblockPlugin plugin){

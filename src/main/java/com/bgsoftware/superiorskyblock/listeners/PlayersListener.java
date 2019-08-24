@@ -12,10 +12,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
@@ -98,7 +100,7 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(e.getPlayer().getIsland().equals(e.getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getIsland().equals(e.getPlayer().getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -116,7 +118,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandEnterProtected(IslandEnterProtectedEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Executor.sync(() -> {
             try {
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
             } catch (NullPointerException ignored) { }
@@ -125,7 +127,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onIslandLeave(IslandLeaveEvent e){
-        if(e.getPlayer().getIsland().equals(e.getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getIsland().equals(e.getPlayer().getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             if(player.getGameMode() != GameMode.CREATIVE) {
                 player.setAllowFlight(false);
@@ -142,7 +144,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        Executor.sync(() -> {
             if(e.getPlayer().asOfflinePlayer().isOnline())
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
         }, 5L);
@@ -263,15 +265,26 @@ public final class PlayersListener implements Listener {
             else {
                 e.setCancelled(true);
                 island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage()));
+                Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage());
+                for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
+                    SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
+                    if(onlinePlayer.hasAdminSpyEnabled())
+                        Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getIslandRole(), superiorPlayer.getName(), e.getMessage());
+                }
                 return;
             }
         }
+
+        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(island == null ? "" :
+                plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
                 .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getIslandLevelAsBigDecimal())))
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getWorthAsBigDecimal()))));
+                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getWorthAsBigDecimal())))
+                .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
+        );
     }
 
     @EventHandler
@@ -344,7 +357,7 @@ public final class PlayersListener implements Listener {
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         e.getPlayer().teleport(island.getTeleportLocation().add(0, 1, 0));
-        Bukkit.getScheduler().runTaskLater(plugin, () -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
+        Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
     }
 
     @EventHandler

@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTOutputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -120,7 +120,7 @@ public final class SchematicsHandler implements SchematicManager {
                     Block block = world.getBlockAt(_x, _y, _z);
 
                     if(block.getType() != Material.AIR) {
-                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(BlockPosition.of(x, y, z)).withCombinedId(getCombinedId(block));
+                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z)).withCombinedId(getCombinedId(block));
 
                         if(block.getState() instanceof Banner){
                             tagBuilder.applyBanner((Banner) block.getState());

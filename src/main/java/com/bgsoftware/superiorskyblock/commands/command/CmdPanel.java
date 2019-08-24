@@ -13,6 +13,8 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class CmdPanel implements ICommand {
 
@@ -84,6 +86,13 @@ public final class CmdPanel implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 2){
+            list.addAll(Stream.of("members", "visitors", "toggle")
+                    .filter(value -> value.startsWith(args[1].toLowerCase())).collect(Collectors.toList()));
+        }
+
+        return list;
     }
 }

@@ -3,13 +3,15 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.utils.threads.SuperiorThread;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -17,6 +19,9 @@ import java.io.FileInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"ResultOfMethodCallIgnored",  "WeakerAccess"})
 public final class DataHandler {
@@ -32,7 +37,7 @@ public final class DataHandler {
             loadDatabase();
         }catch(Exception ex){
             ex.printStackTrace();
-            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().disablePlugin(plugin));
+            Executor.sync(Bukkit::shutdown);
         }
     }
 
@@ -94,7 +99,8 @@ public final class DataHandler {
                 "warpsLimit INTEGER, " +
                 "bonusWorth VARCHAR," +
                 "locked BOOLEAN," +
-                "blockCounts VARCHAR" +
+                "blockCounts VARCHAR," +
+                "name VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -135,6 +141,9 @@ public final class DataHandler {
         addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
         addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
         addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("name", "islands", "''", "VARCHAR");
+
+        SuperiorSkyblockPlugin.log("Starting to load players...");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
             while (resultSet.next()) {
@@ -142,11 +151,30 @@ public final class DataHandler {
             }
         });
 
+        ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock DB Thread").build());
+
+        SuperiorSkyblockPlugin.log("Finished players!");
+        SuperiorSkyblockPlugin.log("Starting to load islands...");
+
         SQLHelper.executeQuery("SELECT * FROM islands;", resultSet -> {
+            SuperiorSkyblockPlugin.log("Received the result set. Starting to load everything...");
             while (resultSet.next()) {
-                plugin.getGrid().createIsland(resultSet);
+                CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
+                executor.execute(() -> plugin.getGrid().createIsland(cachedResultSet));
             }
+
+            try {
+                executor.shutdown();
+                executor.awaitTermination(1, TimeUnit.HOURS);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+
+            SuperiorSkyblockPlugin.log("Loading done!");
         });
+
+        SuperiorSkyblockPlugin.log("Finished islands!");
+        SuperiorSkyblockPlugin.log("Starting to load grid...");
 
         SQLHelper.executeQuery("SELECT * FROM grid;", resultSet -> {
             if (resultSet.next()) {
@@ -154,11 +182,16 @@ public final class DataHandler {
             }
         });
 
+        SuperiorSkyblockPlugin.log("Finished grid!");
+        SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
+
         SQLHelper.executeQuery("SELECT * FROM stackedBlocks;", resultSet -> {
             while (resultSet.next()) {
                 plugin.getGrid().loadStackedBlocks(resultSet);
             }
         });
+
+        SuperiorSkyblockPlugin.log("Finished stacked blocks!");
     }
 
     public void closeConnection(){
@@ -166,13 +199,13 @@ public final class DataHandler {
     }
 
     public void insertIsland(Island island){
-        new SuperiorThread(() -> {
+        Executor.async(() -> {
             if(!containsIsland(island)){
                 ((SIsland) island).executeInsertStatement(true);
             }else {
                 ((SIsland) island).executeUpdateStatement(true);
             }
-        }).start();
+        });
     }
 
     private boolean containsIsland(Island island){
@@ -180,7 +213,7 @@ public final class DataHandler {
     }
 
     public void deleteIsland(Island island){
-        new SuperiorThread(() -> SQLHelper.executeUpdate("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';")).start();
+        Executor.async(() -> SQLHelper.executeUpdate("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';"));
     }
 
     public void insertPlayer(SuperiorPlayer player){

@@ -5,10 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,6 +75,17 @@ public class CmdAdminSetDisbands implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 3){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                if(!player.equals(sender) && player.getName().toLowerCase().startsWith(args[2].toLowerCase()) &&
+                        SSuperiorPlayer.of(player).getIsland() != null){
+                    list.add(player.getName());
+                }
+            }
+        }
+
+        return list;
     }
 }

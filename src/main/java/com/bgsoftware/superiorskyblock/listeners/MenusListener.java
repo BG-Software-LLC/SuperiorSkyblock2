@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,12 +19,6 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public final class MenusListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
-
-    public MenusListener(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
-    }
-
     private Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
 
     /**
@@ -37,7 +30,7 @@ public final class MenusListener implements Listener {
     public void onInventoryClickMonitor(InventoryClickEvent e){
         if(e.getCurrentItem() != null && e.isCancelled() && e.getInventory().getHolder() instanceof SuperiorMenu) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
+            Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }
 
@@ -45,7 +38,7 @@ public final class MenusListener implements Listener {
     public void onInventoryCloseMonitor(InventoryCloseEvent e){
         if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
             ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            Executor.sync(() -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
                 ((Player) e.getPlayer()).updateInventory();
             }, 1L);

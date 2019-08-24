@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
@@ -18,6 +19,7 @@ import net.minecraft.server.v1_13_R1.EntityLiving;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
 import net.minecraft.server.v1_13_R1.IBlockData;
 import net.minecraft.server.v1_13_R1.ItemStack;
+import net.minecraft.server.v1_13_R1.MinecraftServer;
 import net.minecraft.server.v1_13_R1.NBTBase;
 import net.minecraft.server.v1_13_R1.NBTTagByte;
 import net.minecraft.server.v1_13_R1.NBTTagByteArray;
@@ -32,22 +34,28 @@ import net.minecraft.server.v1_13_R1.NBTTagShort;
 import net.minecraft.server.v1_13_R1.NBTTagString;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_13_R1.PlayerInteractManager;
 import net.minecraft.server.v1_13_R1.TileEntityHopper;
 import net.minecraft.server.v1_13_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R1.World;
 
 import net.minecraft.server.v1_13_R1.WorldBorder;
+import net.minecraft.server.v1_13_R1.WorldServer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_13_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_13_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
@@ -265,6 +273,34 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
     @Override
     public Object getCustomHolder(InventoryHolder defaultHolder, String title) {
         return new CustomTileEntityHopper(defaultHolder, title);
+    }
+
+    @Override
+    public void clearInventory(OfflinePlayer offlinePlayer) {
+        if(offlinePlayer.isOnline() || offlinePlayer instanceof Player){
+            Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
+            player.getInventory().clear();
+            player.getEnderChest().clear();
+            return;
+        }
+
+        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
+
+        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        WorldServer worldServer = server.getWorldServer(0);
+        EntityPlayer entity = new EntityPlayer(server, worldServer, profile, new PlayerInteractManager(worldServer));
+        Player targetPlayer = entity.getBukkitEntity();
+
+        targetPlayer.loadData();
+
+        clearInventory(targetPlayer);
+
+        //Setting the entity to the spawn location
+        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter();
+        entity.world = ((CraftWorld) spawnLocation.getWorld()).getHandle();
+        entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
+
+        targetPlayer.saveData();
     }
 
     private class CustomTileEntityHopper extends TileEntityHopper{

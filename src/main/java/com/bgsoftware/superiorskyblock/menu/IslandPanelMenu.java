@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -15,7 +14,6 @@ public final class IslandPanelMenu extends SuperiorMenu {
 
     private static Inventory inventory = null;
     private static int membersSlot, settingsSlot, visitorsSlot;
-    private static Sound membersSound, settingsSound, visitorsSound;
 
     private IslandPanelMenu(){
         super("mainPage");
@@ -23,6 +21,7 @@ public final class IslandPanelMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
 
         if(membersSlot == e.getRawSlot()){
@@ -54,13 +53,16 @@ public final class IslandPanelMenu extends SuperiorMenu {
         ItemStack settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
         ItemStack visitorsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
 
-        membersSound = getSound(cfg.getString("main-panel.members.sound", ""));
-        settingsSound = getSound(cfg.getString("main-panel.settings.sound", ""));
-        visitorsSound = getSound(cfg.getString("main-panel.visitors.sound", ""));
-
         membersSlot = cfg.getInt("main-panel.members.slot");
         settingsSlot = cfg.getInt("main-panel.settings.slot");
         visitorsSlot = cfg.getInt("main-panel.visitors.slot");
+
+        islandPanelMenu.addSound(membersSlot, getSound(cfg.getConfigurationSection("main-panel.members.sound")));
+        islandPanelMenu.addSound(settingsSlot, getSound(cfg.getConfigurationSection("main-panel.settings.sound")));
+        islandPanelMenu.addSound(visitorsSlot, getSound(cfg.getConfigurationSection("main-panel.visitors.sound")));
+        islandPanelMenu.addCommands(membersSlot, cfg.getStringList("main-panel.members.commands"));
+        islandPanelMenu.addCommands(settingsSlot, cfg.getStringList("main-panel.settings.commands"));
+        islandPanelMenu.addCommands(visitorsSlot, cfg.getStringList("main-panel.visitors.commands"));
 
         inventory.setItem(membersSlot, membersButton);
         inventory.setItem(settingsSlot, settingsButton);

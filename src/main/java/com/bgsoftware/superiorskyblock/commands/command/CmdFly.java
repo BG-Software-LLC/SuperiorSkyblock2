@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,6 +76,6 @@ public final class CmdFly implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        return new ArrayList<>();
     }
 }

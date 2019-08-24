@@ -2,17 +2,21 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.ItemUtil;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,14 +27,18 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -59,13 +67,38 @@ public final class BlocksListener implements Listener {
             island.handleBlockBreak(e.getBlock());
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onStructureGrow(StructureGrowEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getLocation());
+
+        List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
+
+        if(island != null)
+            blockStates.forEach(blockState -> {
+                if(!island.isInsideRange(blockState.getLocation())){
+                    e.getBlocks().remove(blockState);
+                }
+                else {
+                    island.handleBlockPlace(Key.of(blockState.getData().toItemStack()), 1);
+                }
+            });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onLeavesDecay(LeavesDecayEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if(island != null)
+            island.handleBlockBreak(Key.of(e.getBlock()), 1);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDragonEggChangeMonitor(DragonEggChangeEvent e){
         if(plugin != null && plugin.getGrid() != null) {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
             if (island != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getBlock(), 1), 1L);
+                Executor.sync(() -> island.handleBlockPlace(e.getBlock(), 1), 1L);
             }
         }
     }
@@ -76,7 +109,7 @@ public final class BlocksListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
 
             if (island != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
+                Executor.sync(() -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
             }
         }
     }
@@ -89,6 +122,9 @@ public final class BlocksListener implements Listener {
     public void onBlockStack(BlockPlaceEvent e){
         if(!plugin.getSettings().stackedBlocksEnabled)
             return;
+
+        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
+            plugin.getGrid().setBlockAmount(e.getBlock(), 1);
 
         if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(e.getBlock().getWorld().getName()))
             return;
@@ -121,10 +157,6 @@ public final class BlocksListener implements Listener {
         ItemStack inHand = e.getItemInHand().clone();
         inHand.setAmount(amount);
         ItemUtil.removeItem(inHand, e);
-
-//        if(!e.getBlockReplacedState().getType().isSolid()){
-//            plugin.getGrid().setBlockAmount(e.getBlockAgainst(), plugin.getGrid().getBlockAmount(e.getBlockAgainst()) - 1);
-//        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -174,7 +206,7 @@ public final class BlocksListener implements Listener {
             return;
 
         recentlyClicked.add(e.getPlayer().getUniqueId());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
+        Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
         e.setCancelled(true);
 
@@ -232,24 +264,38 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        for(Block block : e.getBlocks()){
-            if(plugin.getGrid().getBlockAmount(block) > 1) {
-                e.setCancelled(true);
-                break;
+        Executor.async(() -> {
+            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            for(Block block : e.getBlocks()){
+                int blockAmount = plugin.getGrid().getBlockAmount(block);
+                if(blockAmount > 1){
+                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
+                    blocksToChange.put(block.getLocation(), 0);
+                }
             }
-        }
+
+            Executor.sync(() ->
+                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+        }, 2L);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        for(Block block : e.getBlocks()){
-            if(plugin.getGrid().getBlockAmount(block) > 1) {
-                e.setCancelled(true);
-                break;
+        Executor.async(() -> {
+            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            for(Block block : e.getBlocks()){
+                int blockAmount = plugin.getGrid().getBlockAmount(block);
+                if(blockAmount > 1){
+                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
+                    blocksToChange.put(block.getLocation(), 0);
+                }
             }
-        }
+
+            Executor.sync(() ->
+                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+        }, 2L);
     }
 
     /*
@@ -302,6 +348,193 @@ public final class BlocksListener implements Listener {
         }
 
         return true;
+    }
+
+    /**
+     * Adds a tree to the given lists.
+     *
+     * @param anchor anchor block
+     * @param logs logs
+     * @param leaves leaves
+     */
+    private void getTree(Block anchor, ArrayList<Block> logs, ArrayList<Block> leaves){
+        // Limits:
+        if(logs.size() > 150) return;
+
+        Block nextAnchor;
+
+        // North:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // North-east:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH_EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // East:
+        nextAnchor = anchor.getRelative(BlockFace.EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // South-east:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH_EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // South:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // South-west:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH_WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // West:
+        nextAnchor = anchor.getRelative(BlockFace.WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // North-west:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH_WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Shift anchor one up:
+        anchor = anchor.getRelative(BlockFace.UP);
+
+        // Up-north:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-north-east:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH_EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-east:
+        nextAnchor = anchor.getRelative(BlockFace.EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-south-east:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH_EAST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-south:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-south-west:
+        nextAnchor = anchor.getRelative(BlockFace.SOUTH_WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-west:
+        nextAnchor = anchor.getRelative(BlockFace.WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up-north-west:
+        nextAnchor = anchor.getRelative(BlockFace.NORTH_WEST);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
+
+        // Up:
+        nextAnchor = anchor.getRelative(BlockFace.SELF);
+        if(nextAnchor.getType().equals(Material.LOG) && !logs.contains(nextAnchor)){
+            logs.add(nextAnchor);
+            getTree(nextAnchor, logs, leaves);
+        }
+        else if(nextAnchor.getType().equals(Material.LEAVES) && !logs.contains(nextAnchor)){
+            leaves.add(nextAnchor);
+        }
     }
 
 }

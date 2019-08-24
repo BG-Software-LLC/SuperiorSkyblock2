@@ -5,8 +5,10 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public final class SuperiorSkyblockAPI {
@@ -56,9 +58,23 @@ public final class SuperiorSkyblockAPI {
      *
      * @param superiorPlayer owner of the island
      * @param schemName the schematic of the island to be pasted
+     * @deprecated see below
      */
     public static void createIsland(SuperiorPlayer superiorPlayer, String schemName){
         plugin.getGrid().createIsland(superiorPlayer, schemName);
+    }
+
+    /**
+     * Create a new island.
+     *
+     * @param superiorPlayer owner of the island
+     * @param schemName the schematic of the island to be pasted
+     * @param bonus The default island bonus level
+     * @param biome The default island biome
+     * @param islandName The island name
+     */
+    public static void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName){
+        plugin.getGrid().createIsland(superiorPlayer, schemName, bonus, biome, islandName);
     }
 
     /**

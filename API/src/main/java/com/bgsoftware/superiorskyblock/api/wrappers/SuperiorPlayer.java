@@ -89,6 +89,10 @@ public interface SuperiorPlayer {
 
     void toggleIslandFly();
 
+    boolean hasAdminSpyEnabled();
+
+    void toggleAdminSpy();
+
     boolean isInsideIsland();
 
 }

@@ -8,9 +8,12 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +31,7 @@ public final class CmdAdminWithdraw implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin withdraw <player-name> <amount>";
+        return "island admin withdraw <player-name/island-name> <amount>";
     }
 
     @Override
@@ -59,16 +62,15 @@ public final class CmdAdminWithdraw implements ICommand {
         }
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
-            return;
-        }
-
-        Island island = targetPlayer.getIsland();
+        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
-            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            if(args[2].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
@@ -94,11 +96,29 @@ public final class CmdAdminWithdraw implements ICommand {
         }
 
         island.withdrawMoney(amount);
-        Locale.WITHDRAWN_MONEY.send(sender, StringUtil.format(amount), targetPlayer.getName());
+
+        if(targetPlayer == null)
+            Locale.WITHDRAWN_MONEY_NAME.send(sender, StringUtil.format(amount), island.getName());
+        else
+            Locale.WITHDRAWN_MONEY.send(sender, StringUtil.format(amount), targetPlayer.getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return null;
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 3){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                if (onlinePlayer.getIsland() != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(onlinePlayer.getIsland().getName());
+                }
+            }
+        }
+
+        return list;
     }
 }

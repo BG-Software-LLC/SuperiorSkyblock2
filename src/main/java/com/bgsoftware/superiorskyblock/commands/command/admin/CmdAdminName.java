@@ -1,50 +1,50 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public final class CmdAdminSetUpgrade implements ICommand {
+public final class CmdAdminName implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("setupgrade");
+        return Arrays.asList("name", "setname", "rename");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.setupgrade";
+        return "superior.admin.name";
     }
 
     @Override
     public String getUsage() {
-        return "island admin setupgrade <player-name/island-name> <upgrade-name> <level>";
+        return "island admin name <player-name/island-name> <name>";
     }
 
     @Override
     public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE.getMessage();
+        return Locale.COMMAND_DESCRIPTION_ADMIN_NAME.getMessage();
     }
 
     @Override
     public int getMinArgs() {
-        return 5;
+        return 4;
     }
 
     @Override
     public int getMaxArgs() {
-        return 5;
+        return 4;
     }
 
     @Override
@@ -67,38 +67,46 @@ public final class CmdAdminSetUpgrade implements ICommand {
             return;
         }
 
-        String upgradeName = args[3].toLowerCase();
+        String islandName = args[3];
 
-        if(!plugin.getUpgrades().isUpgrade(upgradeName)){
-            Locale.INVALID_UPGRADE.send(sender, args[3], getUpgradesString(plugin));
+        if(islandName.length() > plugin.getSettings().islandNamesMaxLength){
+            Locale.NAME_TOO_LONG.send(sender);
             return;
         }
 
-        int level;
-
-        try{
-            level = Integer.valueOf(args[4]);
-        }catch (IllegalArgumentException ex){
-            Locale.INVALID_LEVEL.send(sender, args[4]);
+        if(islandName.length() < plugin.getSettings().islandNamesMinLength){
+            Locale.NAME_TOO_SHORT.send(sender);
             return;
         }
 
-        int maxLevel = plugin.getUpgrades().getMaxUpgradeLevel(upgradeName);
-
-        if(level > maxLevel){
-            Locale.MAXIMUM_LEVEL.send(sender, maxLevel);
+        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> name.equalsIgnoreCase(islandName))){
+            Locale.NAME_BLACKLISTED.send(sender);
             return;
         }
 
-        island.setUpgradeLevel(upgradeName, level);
+        if(island.getName().equals(islandName)){
+            Locale.SAME_NAME_CHANGE.send(sender);
+            return;
+        }
+
+        if(!island.getName().equalsIgnoreCase(islandName) && plugin.getGrid().getIsland(islandName) != null){
+            Locale.ISLAND_ALREADY_EXIST.send(sender);
+            return;
+        }
+
+        island.setName(islandName);
+
+        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+                ChatColor.translateAlternateColorCodes('&', islandName) : islandName;
+
+        for(Player player : Bukkit.getOnlinePlayers())
+            Locale.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);
 
         if(targetPlayer == null)
-            Locale.SET_UPGRADE_LEVEL_NAME.send(sender, upgradeName, island.getName());
+            Locale.CHANGED_NAME_OTHER_NAME.send(sender, island.getName(), coloredName);
         else
-            Locale.SET_UPGRADE_LEVEL.send(sender, upgradeName, targetPlayer.getName());
+            Locale.CHANGED_NAME_OTHER.send(sender, targetPlayer.getName(), coloredName);
     }
-
-
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
@@ -116,22 +124,6 @@ public final class CmdAdminSetUpgrade implements ICommand {
             }
         }
 
-        else if(args.length == 4){
-            list.addAll(plugin.getUpgrades().getAllUpgrades().stream()
-                    .filter(upgrade -> upgrade.toLowerCase().startsWith(args[3].toLowerCase()))
-                    .collect(Collectors.toList()));
-        }
-
         return list;
     }
-
-    private String getUpgradesString(SuperiorSkyblockPlugin plugin){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(String upgrade : plugin.getUpgrades().getAllUpgrades())
-            stringBuilder.append(", ").append(upgrade);
-
-        return stringBuilder.toString().substring(2);
-    }
-
 }

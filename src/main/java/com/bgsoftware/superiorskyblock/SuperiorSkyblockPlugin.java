@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.SaveTask;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
@@ -73,7 +74,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
-        getServer().getPluginManager().registerEvents(new MenusListener(this), this);
+        getServer().getPluginManager().registerEvents(new MenusListener(), this);
 
         loadNMSAdapter();
         loadAPI();
@@ -85,7 +86,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         boolean isWhitelisted = getServer().hasWhitelist();
         getServer().setWhitelist(true);
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Executor.sync(() -> {
             try {
                 reloadPlugin(true);
 
@@ -100,7 +101,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     log("");
                 }
 
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                Executor.sync(() -> {
                     for(Player player : Bukkit.getOnlinePlayers()){
                         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
                         if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
@@ -109,13 +110,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         }
                     }
                 }, 10L);
-
             }catch(Exception ex){
                 ex.printStackTrace();
                 Bukkit.getPluginManager().disablePlugin(this);
             }
         });
-
     }
 
     @Override
@@ -183,7 +182,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         loadMenus();
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Executor.sync(() -> {
             if (loadGrid)
                 dataHandler = new DataHandler(this);
 

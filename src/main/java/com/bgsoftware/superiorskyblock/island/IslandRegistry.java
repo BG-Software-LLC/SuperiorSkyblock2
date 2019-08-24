@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("WeakerAccess")
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
@@ -23,14 +24,18 @@ public final class IslandRegistry implements Iterable<Island> {
         return islands.get(ownershipList.get(index));
     }
 
-    public void add(UUID uuid, Island island){
+    public int indexOf(Island island){
+        return ownershipList.indexOf(island.getOwner().getUniqueId());
+    }
+
+    public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
         ownershipList.remove(uuid);
         ownershipList.add(uuid);
         sort();
     }
 
-    public void remove(UUID uuid){
+    public synchronized void remove(UUID uuid){
         islands.remove(uuid);
         ownershipList.remove(uuid);
         sort();
@@ -49,19 +54,25 @@ public final class IslandRegistry implements Iterable<Island> {
         return ownershipList.iterator();
     }
 
-    public void sort(){
+    public synchronized void sort(){
         //noinspection SuspiciousMethodCalls
         ownershipList.sort(Comparator.comparing(o -> islands.get(o)).reversed());
     }
 
-    public void transfer(UUID old, UUID now) {
-        Island island = islands.get(old);
+    public void transferIsland(UUID oldOwner, UUID newOwner){
+        Island island = islands.get(oldOwner);
 
-        islands.remove(old);
-        ownershipList.remove(old);
+        //Remove the old owner from list
+        ownershipList.remove(oldOwner);
 
-        islands.put(now, island);
-        ownershipList.add(now);
+        //Add the new owner to list
+        ownershipList.add(newOwner);
+
+        //Replace owners
+        islands.remove(oldOwner);
+        islands.put(newOwner, island);
+
+        sort();
     }
 
 }

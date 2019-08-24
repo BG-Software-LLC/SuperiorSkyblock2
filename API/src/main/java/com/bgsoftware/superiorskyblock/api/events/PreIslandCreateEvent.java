@@ -11,15 +11,26 @@ public class PreIslandCreateEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
+    private final String islandName;
     private boolean teleport = true;
     private boolean cancelled = false;
 
-    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer){
+    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName){
         this.superiorPlayer = superiorPlayer;
+        this.islandName = islandName;
+    }
+
+    @Deprecated
+    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer){
+        this(superiorPlayer, "");
     }
 
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
+    }
+
+    public String getIslandName() {
+        return islandName;
     }
 
     @Override

@@ -193,4 +193,43 @@ public final class ConfigComments {
     @Comment("Providers: Auto, MergedSpawner, StackSpawners, WildStacker, SilkSpawners, PvpingSpawners")
     public static String SPAWNERS_PROVIDER = "spawners-provider";
 
+    @Comment("")
+    @Comment("Should inventories of island members get cleared after disbanding their island?")
+    public static String DISBAND_INVENTORY_CLEAR = "disband-inventory-clear";
+
+    @Comment("")
+    @Comment("All settings related to island names.")
+    public static String ISLAND_NAMES = "island-names";
+
+    @Comment("Should creation of islands will ask for name (/is create <name>)?")
+    public static String ISLAND_NAMES_REQUIRED_FOR_CREATION = "island-names.required-for-creation";
+
+    @Comment("")
+    @Comment("The maximum length for names.")
+    public static String ISLAND_NAMES_MAX_LENGTH = "island-names.max-length";
+
+    @Comment("")
+    @Comment("The minimum length for names.")
+    public static String ISLAND_NAMES_MIN_LENGTH = "island-names.min-length";
+
+    @Comment("")
+    @Comment("A list of names that will be blacklisted.")
+    public static String ISLAND_NAMES_FILTERED_NAMES = "island-names.filtered-names";
+
+    @Comment("")
+    @Comment("Should names have color support enabled?")
+    public static String ISLAND_NAMES_COLOR_SUPPORT = "island-names.color-support";
+
+    @Comment("")
+    @Comment("Should names be displayed on island-top?")
+    public static String ISLAND_NAMES_ISLAND_TOP = "island-names.island-top";
+
+    @Comment("")
+    @Comment("Should players get teleported to the island after they accept an invite?")
+    public static String TELEPORT_ON_JOIN = "teleport-on-join";
+
+    @Comment("")
+    @Comment("Should the inventory of the players get cleared after they accept an invite?")
+    public static String CLEAR_ON_JOIN = "clear-on-join";
+
 }

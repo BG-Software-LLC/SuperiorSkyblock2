@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 
-import org.bukkit.Sound;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -80,9 +80,9 @@ public final class UpgradesHandler {
         return new ArrayList<>(upgrades.keySet());
     }
 
-    public Sound getClickSound(String upgradeName, int level, boolean hasNextLevel){
+    public SoundWrapper getClickSound(String upgradeName, int level, boolean hasNextLevel){
         UpgradeData upgradeData = upgrades.get(upgradeName);
-        Sound sound = null;
+        SoundWrapper sound = null;
 
         if(upgradeData.items.containsKey(level)){
             ItemData itemData = upgradeData.items.get(level);
@@ -113,6 +113,7 @@ public final class UpgradesHandler {
         }
     }
 
+    @SuppressWarnings("WeakerAccess")
     public class UpgradeData{
 
         public Map<Integer, Double> prices = new HashMap<>();
@@ -121,18 +122,22 @@ public final class UpgradesHandler {
 
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class ItemData{
 
         public ItemStack hasNextLevel, noNextLevel;
         public int slot;
-        public Sound hasNextLevelSound, noNextLevelSound;
+        public SoundWrapper hasNextLevelSound, noNextLevelSound;
+        public List<String> hasNextLevelCommands, noNextLevelCommands;
 
-        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, Sound hasNextLevelSound, Sound noNextLevelSound){
+        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.slot = slot;
             this.hasNextLevelSound = hasNextLevelSound;
             this.noNextLevelSound = noNextLevelSound;
+            this.hasNextLevelCommands = hasNextLevelCommands;
+            this.noNextLevelCommands = noNextLevelCommands;
         }
 
     }

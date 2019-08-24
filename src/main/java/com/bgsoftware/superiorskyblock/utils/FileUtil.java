@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
@@ -107,21 +106,20 @@ public final class FileUtil {
     }
 
     private static Inventory loadGUI(SuperiorMenu menu, Inventory inventory, ConfigurationSection section){
-        Sound openSound = getSound(section.getString("open-sound", ""));
-        Sound closeSound = getSound(section.getString("close-sound", ""));
-
         if(section.contains("fill-items")){
             ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
             for(String _name : fillItems.getKeys(false)){
                 String[] slots = fillItems.getString(_name + ".slots").split(",");
                 ItemStack fillItem = getItemStack(fillItems.getConfigurationSection(_name));
-                for(String slot : slots)
-                    inventory.setItem(Integer.valueOf(slot), fillItem);
+                List<String> commands = fillItems.getStringList(_name + ".commands");
+                for(String _slot : slots) {
+                    int slot = Integer.valueOf(_slot);
+                    inventory.setItem(slot, fillItem);
+                    if(!commands.isEmpty())
+                        menu.addCommands(slot, commands);
+                }
             }
         }
-
-        menu.setOpenSound(openSound);
-        menu.setCloseSound(closeSound);
 
         return inventory;
     }
@@ -158,14 +156,6 @@ public final class FileUtil {
             }
         }catch(Exception ex){
             ex.printStackTrace();
-        }
-    }
-
-    private static Sound getSound(String sound){
-        try{
-            return Sound.valueOf(sound);
-        }catch(IllegalArgumentException ex){
-            return null;
         }
     }
 

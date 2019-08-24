@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
@@ -40,7 +41,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
         public void onSpawnerStack(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null){
-                Bukkit.getScheduler().runTaskLater(plugin, () ->
+                Executor.sync(() ->
                         island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getSpawner().getFirstStack().getStackSize() - 1), 1L);
             }
         }
@@ -49,7 +50,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
         public void onSpawnerStack(SpawnerChangeEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null) {
-                Bukkit.getScheduler().runTaskLater(plugin, () ->
+                Executor.sync(() ->
                         island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getStackSize() - e.getOldStackSize()), 1L);
             }
         }

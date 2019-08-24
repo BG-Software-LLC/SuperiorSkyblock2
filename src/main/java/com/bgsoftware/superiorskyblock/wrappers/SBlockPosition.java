@@ -78,7 +78,7 @@ public final class SBlockPosition implements BlockPosition {
 
     public static SBlockPosition of(String location){
         String[] sections = location.split(", ");
-        return of(sections[0], Integer.valueOf(sections[1]), Integer.valueOf(sections[2]), Integer.valueOf(sections[3]));
+        return of(sections[0], Integer.parseInt(sections[1]), Integer.parseInt(sections[2]), Integer.parseInt(sections[3]));
     }
 
     public static SBlockPosition of(Location location){

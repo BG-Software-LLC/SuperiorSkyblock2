@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -18,7 +17,6 @@ public final class MemberManageMenu extends SuperiorMenu {
     private static Inventory inventory = null;
     private static String title = "";
     private static int rolesSlot, banSlot, kickSlot;
-    private static Sound rolesSound, banSound, kickSound;
 
     private SuperiorPlayer targetPlayer;
 
@@ -29,6 +27,7 @@ public final class MemberManageMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        super.onClick(e);
         if(e.getRawSlot() == rolesSlot){
             previousMove = false;
             MemberRoleMenu.createInventory(targetPlayer).open(SSuperiorPlayer.of(e.getWhoClicked()), this);
@@ -65,9 +64,13 @@ public final class MemberManageMenu extends SuperiorMenu {
         rolesSlot = cfg.getInt("players-panel.roles.slot");
         banSlot = cfg.getInt("players-panel.ban.slot");
         kickSlot = cfg.getInt("players-panel.kick.slot");
-        rolesSound = getSound(cfg.getString("players-panel.roles.sound", ""));
-        banSound = getSound(cfg.getString("players-panel.ban.sound", ""));
-        kickSound = getSound(cfg.getString("players-panel.kick.sound", ""));
+
+        memberManageMenu.addSound(rolesSlot, getSound(cfg.getConfigurationSection("players-panel.roles.sound")));
+        memberManageMenu.addSound(banSlot, getSound(cfg.getConfigurationSection("players-panel.ban.sound")));
+        memberManageMenu.addSound(kickSlot, getSound(cfg.getConfigurationSection("players-panel.kick.sound")));
+        memberManageMenu.addCommands(rolesSlot, cfg.getStringList("players-panel.roles.commands"));
+        memberManageMenu.addCommands(banSlot, cfg.getStringList("players-panel.ban.commands"));
+        memberManageMenu.addCommands(kickSlot, cfg.getStringList("players-panel.kick.commands"));
 
         ItemStack rolesButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.roles"));
         ItemStack banButton = FileUtil.getItemStack(cfg.getConfigurationSection("players-panel.ban"));

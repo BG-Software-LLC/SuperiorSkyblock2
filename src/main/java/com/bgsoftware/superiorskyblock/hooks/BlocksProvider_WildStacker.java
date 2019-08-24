@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
+import com.bgsoftware.wildstacker.api.events.SpawnerPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
@@ -26,7 +28,7 @@ import java.util.Map;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
-    private static final Map<Chunk, StackedSnapshot> chunkSnapshots = new HashMap<>();
+    private static final Map<String, StackedSnapshot> chunkSnapshots = new HashMap<>();
 
     public BlocksProvider_WildStacker(){
         Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
@@ -34,32 +36,32 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     public static void cacheChunk(Chunk chunk){
         try {
-            chunkSnapshots.put(chunk, WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
+            chunkSnapshots.put(getId(chunk), WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false));
         }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
-        chunkSnapshots.remove(chunk);
+        chunkSnapshots.remove(getId(chunk));
     }
 
     @Override
     public Pair<Integer, EntityType> getSpawner(Location location) {
-        if(chunkSnapshots.containsKey(location.getChunk()))
-            return new Pair<>(chunkSnapshots.get(location.getChunk()).getStackedSpawner(location));
+        String id = getId(location);
+        if(chunkSnapshots.containsKey(id))
+            return new Pair<>(chunkSnapshots.get(id).getStackedSpawner(location));
 
-        cacheChunk(location.getChunk());
-        return getSpawner(location);
+        throw new RuntimeException("Chunk " + id + " is not cached.");
     }
 
     @Override
     public Pair<Integer, Material> getBlock(Location location) {
-        if(chunkSnapshots.containsKey(location.getChunk())) {
-            Map.Entry<Integer, Material> entry = chunkSnapshots.get(location.getChunk()).getStackedBarrel(location);
+        String id = getId(location);
+        if(chunkSnapshots.containsKey(id)) {
+            Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
             return entry.getValue().name().contains("AIR") ? null : new Pair<>(entry);
         }
 
-        cacheChunk(location.getChunk());
-        return getBlock(location);
+        throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);
     }
 
     @SuppressWarnings("unused")
@@ -89,6 +91,13 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBarrelUnstack(BarrelPlaceInventoryEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+            if(island != null)
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getIncreaseAmount());
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
@@ -109,6 +118,25 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                 island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount());
         }
 
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerPlaceInventory(SpawnerPlaceInventoryEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getIncreaseAmount());
+        }
+
+    }
+
+    private static String getId(Location location){
+        return getId(location.getBlockX() >> 4, location.getBlockZ() >> 4);
+    }
+
+    private static String getId(Chunk chunk){
+        return getId(chunk.getX(), chunk.getZ());
+    }
+
+    private static String getId(int x, int z){
+        return x + "," + z;
     }
 
 }

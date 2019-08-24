@@ -43,6 +43,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
     private boolean toggledPanel = false;
     private boolean islandFly = false;
+    private boolean adminSpyEnabled = false;
 
     private int disbands;
 
@@ -222,6 +223,16 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setBoolean(islandFly)
                 .setString(player.toString())
                 .execute(true);
+    }
+
+    @Override
+    public boolean hasAdminSpyEnabled() {
+        return adminSpyEnabled;
+    }
+
+    @Override
+    public void toggleAdminSpy() {
+        adminSpyEnabled = !adminSpyEnabled;
     }
 
     @Override

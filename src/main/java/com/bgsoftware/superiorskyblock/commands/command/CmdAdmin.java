@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -25,9 +24,11 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminDemote());
         subCommands.add(new CmdAdminDeposit());
         subCommands.add(new CmdAdminDisband());
+        subCommands.add(new CmdAdminGiveDisbands());
         subCommands.add(new CmdAdminJoin());
         subCommands.add(new CmdAdminMsg());
         subCommands.add(new CmdAdminMsgAll());
+        subCommands.add(new CmdAdminName());
         subCommands.add(new CmdAdminOpen());
         subCommands.add(new CmdAdminPromote());
         subCommands.add(new CmdAdminReload());
@@ -43,8 +44,8 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetTeamLimit());
         subCommands.add(new CmdAdminSetUpgrade());
         subCommands.add(new CmdAdminSetWarpsLimit());
+        subCommands.add(new CmdAdminSpy());
         subCommands.add(new CmdAdminWithdraw());
-        subCommands.add(new CmdAdminGiveDisbands());
     }
 
     @Override
@@ -84,7 +85,7 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length > 1 && !NumberUtils.isNumber(args[1])){
+        if(args.length > 1 && !isNumber(args[1])){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[1].toLowerCase())){
                     if(!(sender instanceof Player) && !subCommand.canBeExecutedByConsole()){
@@ -112,7 +113,9 @@ public final class CmdAdmin implements ICommand {
         int page = 1;
 
         if(args.length == 2){
-            page = Integer.valueOf(args[1]);
+            try {
+                page = Integer.valueOf(args[1]);
+            }catch(Throwable ignored){}
         }
 
         if(page <= 0){
@@ -130,7 +133,7 @@ public final class CmdAdmin implements ICommand {
         }
 
         int lastPage = subCommands.size() / 7;
-        if(lastPage % 7 != 0) lastPage++;
+        if(subCommands.size() % 7 != 0) lastPage++;
 
         if(page > lastPage){
             Locale.INVALID_AMOUNT.send(sender, page);
@@ -194,6 +197,15 @@ public final class CmdAdmin implements ICommand {
         }
 
         return list;
+    }
+
+    private boolean isNumber(String str){
+        try{
+            Integer.valueOf(str);
+            return true;
+        }catch(NumberFormatException ex){
+            return false;
+        }
     }
 
 }

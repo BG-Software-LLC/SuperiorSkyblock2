@@ -43,6 +43,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdInvite());
         subCommands.add(new CmdKick());
         subCommands.add(new CmdLeave());
+        subCommands.add(new CmdName());
         subCommands.add(new CmdOpen());
         subCommands.add(new CmdPanel());
         subCommands.add(new CmdPardon());
@@ -103,7 +104,10 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
             if(superiorPlayer != null){
                 Island island = superiorPlayer.getIsland();
 
-                if(island == null){
+                if(args.length != 0){
+                    Bukkit.dispatchCommand(sender, "is help");
+                }
+                else if(island == null){
                     Bukkit.dispatchCommand(sender, "is create");
                 }
                 else if(superiorPlayer.hasToggledPanel()){

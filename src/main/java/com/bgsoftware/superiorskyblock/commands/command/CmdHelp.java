@@ -76,7 +76,7 @@ public final class CmdHelp implements ICommand {
         }
 
         int lastPage = subCommands.size() / 7;
-        if(lastPage % 7 != 0) lastPage++;
+        if(subCommands.size() % 7 != 0) lastPage++;
 
         if(page > lastPage){
             Locale.INVALID_AMOUNT.send(sender, page);
@@ -101,7 +101,21 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 2){
+            List<ICommand> subCommands = CommandsHandler.getSubCommands().stream()
+                    .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
+                    .collect(Collectors.toList());
+
+            int lastPage = subCommands.size() / 7;
+            if(subCommands.size() % 7 != 0) lastPage++;
+
+            for(int i = 1; i <= lastPage; i++)
+                list.add(i + "");
+        }
+
+        return list;
     }
 
 }
