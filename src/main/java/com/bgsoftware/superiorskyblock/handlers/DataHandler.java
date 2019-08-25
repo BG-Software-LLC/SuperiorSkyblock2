@@ -144,6 +144,7 @@ public final class DataHandler {
         addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
         addColumnIfNotExists("name", "islands", "''", "VARCHAR");
         addColumnIfNotExists("borderColor", "players", "'BLUE'", "VARCHAR");
+        addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

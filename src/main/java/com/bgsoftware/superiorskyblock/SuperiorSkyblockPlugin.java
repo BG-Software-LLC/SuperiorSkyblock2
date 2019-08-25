@@ -104,6 +104,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 Executor.sync(() -> {
                     for(Player player : Bukkit.getOnlinePlayers()){
                         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                        superiorPlayer.updateLastTimeStatus();
                         if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
                             player.setAllowFlight(true);
                             player.setFlying(true);
@@ -123,12 +124,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+            superiorPlayer.updateLastTimeStatus();
             nmsAdapter.setWorldBorder(superiorPlayer, null);
             if(superiorPlayer.hasIslandFlyEnabled()){
                 player.setAllowFlight(false);
                 player.setFlying(false);
             }
         }
+
         dataHandler.closeConnection();
         SaveTask.cancelTask();
         CalcTask.cancelTask();

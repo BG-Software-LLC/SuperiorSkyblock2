@@ -34,8 +34,9 @@ public enum Query {
     PLAYER_SET_TOGGLED_PANEL("UPDATE players SET toggledPanel=? WHERE player=?;"),
     PLAYER_SET_ISLAND_FLY("UPDATE players SET islandFly=? WHERE player=?;"),
     PLAYER_SET_BORDER("UPDATE players SET borderColor=? WHERE player=?;"),
-    PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=? WHERE player=?;"),
-    PLAYER_INSERT("INSERT INTO players VALUES(?,?,?,?,?,?,?,?,?);"),
+    PLAYER_SET_LAST_STATUS("UPDATE players SET lastTimeStatus=? WHERE player=?;"),
+    PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=? WHERE player=?;"),
+    PLAYER_INSERT("INSERT INTO players VALUES(?,?,?,?,?,?,?,?,?,?);"),
 
     STACKED_BLOCKS_UPDATE("UPDATE stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
     STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks VALUES(?,?,?,?,?);"),

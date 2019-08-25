@@ -47,6 +47,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean islandFly = false;
     private boolean adminSpyEnabled = false;
     private BorderColor borderColor = BorderColor.BLUE;
+    private long lastTimeStatus = -1;
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
@@ -58,6 +59,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         toggledPanel = resultSet.getBoolean("toggledPanel");
         islandFly = resultSet.getBoolean("islandFly");
         borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
+        lastTimeStatus = resultSet.getLong("lastTimeStatus");
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -255,6 +257,21 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(borderColor.name())
                 .setString(player.toString())
                 .execute(true);
+    }
+
+    @Override
+    public void updateLastTimeStatus() {
+        lastTimeStatus = System.currentTimeMillis() / 1000;
+
+        Query.PLAYER_SET_LAST_STATUS.getStatementHolder()
+                .setString(lastTimeStatus + "")
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public long getLastTimeStatus() {
+        return lastTimeStatus;
     }
 
     public BlockPosition getSchematicPos1() {

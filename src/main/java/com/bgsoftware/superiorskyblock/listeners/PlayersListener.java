@@ -62,6 +62,8 @@ public final class PlayersListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        superiorPlayer.updateLastTimeStatus();
+
         if(!superiorPlayer.getName().equals(e.getPlayer().getName())){
             superiorPlayer.updateName();
         }
@@ -76,6 +78,8 @@ public final class PlayersListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        superiorPlayer.updateLastTimeStatus();
+
         Island island = superiorPlayer.getIsland();
 
         if(island != null)

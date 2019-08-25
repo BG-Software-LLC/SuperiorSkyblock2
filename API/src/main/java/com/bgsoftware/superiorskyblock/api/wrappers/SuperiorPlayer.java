@@ -100,4 +100,8 @@ public interface SuperiorPlayer {
 
     void setBorderColor(BorderColor borderColor);
 
+    void updateLastTimeStatus();
+
+    long getLastTimeStatus();
+
 }
