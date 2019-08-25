@@ -87,6 +87,7 @@ default-permissions:
   - BREAK
   - BUILD
   - CHEST_ACCESS
+  - CLOSE_BYPASS
   - DEPOSIT_MONEY
   - DROP_ITEMS
   - EXPEL_BYPASS
@@ -95,6 +96,7 @@ default-permissions:
   - ITEM_FRAME
   - PAINTING
   - PICKUP_DROPS
+  - RANKUP
   - SIGN_INTERACT
   - USE
 
@@ -102,10 +104,12 @@ default-permissions:
   # Moderators have all permissions of members!
   mod:
   - BAN_MEMBER
+  - CLOSE_ISLAND
   - DELETE_WARP
   - EXPEL_PLAYERS
   - INVITE_MEMBER
   - KICK_MEMBER
+  - OPEN_ISLAND
   - SET_WARP
   - WITHDRAW_MONEY
 
