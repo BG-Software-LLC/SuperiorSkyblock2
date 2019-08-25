@@ -47,6 +47,9 @@ default-spawner-rates: 1
 # This multiplier can be expanded by using the /is admin setmobdrops command.
 default-mob-drops: 1
 
+# Set the default island height generation for islands.
+default-island-height: 100
+
 # Feature that adds per player world border in islands.
 # If you want to globally disable it, set this section to false.
 # World borders can be toggled by using the /is toggle border command.

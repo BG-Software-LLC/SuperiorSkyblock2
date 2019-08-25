@@ -64,6 +64,10 @@ public final class ConfigComments {
     public static String DEFAULT_MOB_DROPS = "default-mob-drops";
 
     @Comment("")
+    @Comment("Set the default island height generation for islands.")
+    public static String DEFAULT_ISLAND_HEIGHT = "default-island-height";
+
+    @Comment("")
     @Comment("Feature that adds per player world border in islands.")
     @Comment("If you want to globally disable it, set this section to false.")
     @Comment("World borders can be toggled by using the /is toggle border command.")

@@ -24,6 +24,7 @@ public final class SettingsHandler {
     public final int defaultCropGrowth;
     public final int defaultSpawnerRates;
     public final int defaultMobDrops;
+    public final int defaultIslandHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
     public final KeySet whitelistedStackedBlocks;
@@ -78,6 +79,7 @@ public final class SettingsHandler {
         defaultCropGrowth = cfg.getInt("default-crop-growth", 1);
         defaultSpawnerRates = cfg.getInt("default-spawner-rates", 1);
         defaultMobDrops = cfg.getInt("default-mob-drops", 1);
+        defaultIslandHeight = cfg.getInt("default-island-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");

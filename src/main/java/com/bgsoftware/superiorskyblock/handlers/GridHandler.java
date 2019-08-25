@@ -224,6 +224,7 @@ public final class GridHandler implements GridManager {
     @Override
     public Location getNextLocation(){
         Location location = lastIsland.parse().clone();
+        location.setY(plugin.getSettings().defaultIslandHeight);
         BlockFace islandFace = getIslandFace();
 
         int islandRange = plugin.getSettings().maxIslandSize * 3;
