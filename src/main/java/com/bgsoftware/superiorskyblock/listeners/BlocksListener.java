@@ -312,6 +312,7 @@ public final class BlocksListener implements Listener {
 
         if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().signWarpLine)){
             String warpName = e.getLine(1);
+            boolean privateFlag = e.getLine(2).equalsIgnoreCase("private");
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
                 Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
@@ -321,7 +322,7 @@ public final class BlocksListener implements Listener {
                 List<String> signWarp = plugin.getSettings().signWarp;
                 for (int i = 0; i < signWarp.size(); i++)
                     e.setLine(i, signWarp.get(i));
-                island.setWarpLocation(warpName, e.getBlock().getLocation());
+                island.setWarpLocation(warpName, e.getBlock().getLocation(), privateFlag);
                 Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(e.getBlock().getLocation()));
             }
         }

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class IslandWarpsMenu extends SuperiorMenu {
 
@@ -104,15 +106,19 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
-        List<String> warps = new ArrayList<>(island.getAllWarps());
-
-        warps.sort(String::compareTo);
+        List<String> warps = island.getAllWarps().stream()
+                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
+                .sorted(String::compareTo)
+                .collect(Collectors.toList());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < warps.size(); i++){
             String warpName = warps.get(i + (slots.size() * (page - 1)));
             inv.setItem(slots.get(i), new ItemBuilder(warpItem)
                     .replaceAll("{0}", warpName)
-                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString()).build());
+                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString())
+                    .replaceAll("{2}", island.isWarpPrivate(warpName) ?
+                            ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage()) : ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage()))
+                    .build());
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)
@@ -177,6 +183,10 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandWarpsMenu(island).open(superiorPlayer, previousMenu);
+    }
+
+    private String ensureNotNull(String check){
+        return check == null ? "" : check;
     }
 
 }

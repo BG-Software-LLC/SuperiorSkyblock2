@@ -28,7 +28,7 @@ public final class CmdSetWarp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setwarp <warp>";
+        return "island setwarp <warp> [private]";
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class CmdSetWarp implements ICommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -81,7 +81,9 @@ public final class CmdSetWarp implements ICommand {
             return;
         }
 
-        island.setWarpLocation(args[1], superiorPlayer.getLocation());
+        boolean privateFlag = args.length == 3 && args[2].equalsIgnoreCase("true");
+
+        island.setWarpLocation(args[1], superiorPlayer.getLocation(), privateFlag);
         Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
     }
 

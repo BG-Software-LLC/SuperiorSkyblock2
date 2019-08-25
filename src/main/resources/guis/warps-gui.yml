@@ -43,7 +43,7 @@ warps-gui:
       volume: 0.8
       pitch: 0.2
     type: BOOK
-    name: '&e{0}'
+    name: '&e{0} {2}'
     lore:
       - '&7Located at {1}.'
 

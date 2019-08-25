@@ -83,7 +83,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blockCounts = new KeyMap<>();
-    private final Map<String, Location> warps = new HashMap<>();
+    private final Map<String, WarpData> warps = new HashMap<>();
     private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted bonusWorth = BigDecimalFormatted.ZERO;
@@ -143,7 +143,8 @@ public class SIsland extends DatabaseObject implements Island {
         for(String entry : resultSet.getString("warps").split(";")) {
             try {
                 String[] sections = entry.split("=");
-                this.warps.put(sections[0], FileUtil.toLocation(sections[1]));
+                boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
+                this.warps.put(sections[0], new WarpData(FileUtil.toLocation(sections[1]), privateFlag));
             }catch(Exception ignored){}
         }
 
@@ -203,7 +204,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Map<String, Tag> warps = ((CompoundTag) compoundValues.get("warps")).getValue();
         for(String warp : warps.keySet())
-            this.warps.put(warp, FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()));
+            this.warps.put(warp, new WarpData(FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()), false));
 
         this.islandBank = BigDecimalFormatted.of(compoundValues.get("islandBank"));
         this.islandSize = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(plugin.getSettings().defaultIslandSize))).getValue();
@@ -1007,16 +1008,28 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getWarpLocation(String name){
-        return warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).clone() : null;
+        return warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).location.clone() : null;
+    }
+
+    @Override
+    public boolean isWarpPrivate(String name) {
+        return !warps.containsKey(name.toLowerCase()) || warps.get(name.toLowerCase()).privateFlag;
     }
 
     @Override
     public void setWarpLocation(String name, Location location){
-        warps.put(name.toLowerCase(), location.clone());
+        setWarpLocation(name, location, false);
+    }
+
+    @Override
+    public void setWarpLocation(String name, Location location, boolean privateFlag) {
+        warps.put(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
 
         StringBuilder warps = new StringBuilder();
-        this.warps.keySet().forEach(warp ->
-                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+        this.warps.keySet().forEach(warp -> {
+            WarpData warpData = this.warps.get(warp);
+            warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
+        });
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(warps.length() == 0 ? "" : warps.toString().substring(1))
@@ -1026,7 +1039,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
-        Location location = warps.get(warp.toLowerCase()).clone();
+        Location location = warps.get(warp.toLowerCase()).location.clone();
         Block warpBlock = location.getBlock();
 
         if(!isInsideRange(location)){
@@ -1049,7 +1062,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
         for(String warpName : new ArrayList<>(warps.keySet())){
-            if(warps.get(warpName).distanceSquared(location) < 2){
+            if(warps.get(warpName).location.distanceSquared(location) < 2){
                 warps.remove(warpName);
                 Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
@@ -1176,8 +1189,10 @@ public class SIsland extends DatabaseObject implements Island {
                 upgrades.append(",").append(upgrade).append("=").append(this.upgrades.get(upgrade)));
 
         StringBuilder warps = new StringBuilder();
-        this.warps.keySet().forEach(warp ->
-                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+        this.warps.keySet().forEach(warp -> {
+            WarpData warpData = this.warps.get(warp);
+            warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
+        });
 
         StringBuilder blockCounts = new StringBuilder();
         this.blockCounts.keySet().forEach(blockKey ->
@@ -1226,8 +1241,10 @@ public class SIsland extends DatabaseObject implements Island {
                 upgrades.append(",").append(upgrade).append("=").append(this.upgrades.get(upgrade)));
 
         StringBuilder warps = new StringBuilder();
-        this.warps.keySet().forEach(warp ->
-                warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(this.warps.get(warp))));
+        this.warps.keySet().forEach(warp -> {
+            WarpData warpData = this.warps.get(warp);
+            warps.append(";").append(warp).append("=").append(FileUtil.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
+        });
 
         StringBuilder blockCounts = new StringBuilder();
         this.blockCounts.keySet().forEach(blockKey ->
@@ -1307,6 +1324,18 @@ public class SIsland extends DatabaseObject implements Island {
         private CalcIslandData(UUID owner, UUID asker){
             this.owner = owner;
             this.asker = asker;
+        }
+
+    }
+
+    private static class WarpData{
+
+        private Location location;
+        private boolean privateFlag;
+
+        private WarpData(Location location, boolean privateFlag){
+            this.location = location;
+            this.privateFlag = privateFlag;
         }
 
     }

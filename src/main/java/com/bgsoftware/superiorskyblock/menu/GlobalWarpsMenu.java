@@ -112,7 +112,12 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         inv.setContents(inventory.getContents());
 
         List<String> islands = plugin.getGrid().getListIslands().stream()
-                .filter(island -> !island.getAllWarps().isEmpty())
+                .filter(island -> {
+                    if(superiorPlayer.getIsland().equals(island))
+                        return !island.getAllWarps().isEmpty();
+                    else
+                        return island.getAllWarps().stream().anyMatch(warp -> !island.isWarpPrivate(warp));
+                })
                 .map(island -> island.getOwner().getName())
                 .sorted(String::compareTo)
                 .collect(Collectors.toList());

@@ -186,7 +186,12 @@ public interface Island extends Comparable<Island> {
 
     Location getWarpLocation(String name);
 
+    boolean isWarpPrivate(String name);
+
+    @Deprecated
     void setWarpLocation(String name, Location location);
+
+    void setWarpLocation(String name, Location location, boolean privateFlag);
 
     void warpPlayer(SuperiorPlayer superiorPlayer, String warp);
 
