@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -99,7 +100,7 @@ public final class SchematicsHandler implements SchematicManager {
 
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
         if(Bukkit.isPrimaryThread() && !Bukkit.getBukkitVersion().contains("1.14")){
-            new Thread(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable)).start();
+            Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable));
             return;
         }
 

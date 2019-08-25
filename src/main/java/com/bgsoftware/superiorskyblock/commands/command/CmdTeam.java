@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -81,7 +82,7 @@ public final class CmdTeam implements ICommand {
             return;
         }
 
-        new Thread(() -> {
+        Executor.async(() -> {
             StringBuilder infoMessage = new StringBuilder(), leadersMessage = new StringBuilder(),
                     adminsMessage = new StringBuilder(), modsMessage = new StringBuilder(),
                     membersMessage = new StringBuilder();
@@ -130,7 +131,7 @@ public final class CmdTeam implements ICommand {
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage());
 
             Locale.sendMessage(sender, infoMessage.toString());
-        }).start();
+        });
     }
 
     @Override

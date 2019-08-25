@@ -43,7 +43,7 @@ public final class DataHandler {
 
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
-            new Thread(() -> saveDatabase(false)).start();
+            Executor.async(() -> saveDatabase(false));
             return;
         }
 

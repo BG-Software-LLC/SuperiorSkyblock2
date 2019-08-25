@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -48,11 +49,11 @@ public final class CmdAdminReload implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        new Thread(() -> {
+        Executor.async(() -> {
             Locale.RELOAD_PROCCESS_REQUEST.send(sender);
             plugin.reloadPlugin(false);
             Locale.RELOAD_COMPLETED.send(sender);
-        }).start();
+        });
     }
 
     @Override
