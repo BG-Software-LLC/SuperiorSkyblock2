@@ -83,16 +83,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getCommand("island").setExecutor(commandsHandler);
         getCommand("island").setTabCompleter(commandsHandler);
 
-        boolean isWhitelisted = getServer().hasWhitelist();
-        getServer().setWhitelist(true);
+        reloadPlugin(true);
 
         Executor.sync(() -> {
             try {
-                reloadPlugin(true);
-
                 loadWorld();
-
-                getServer().setWhitelist(isWhitelisted);
 
                 if (Updater.isOutdated()) {
                     log("");
