@@ -16,6 +16,7 @@ ALREADY_IN_ISLAND_OTHER: '&c&lError | &7This player is already a member of your 
 BAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was BANNED from the island by {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only ban players with a lower island role than yours.'
 BANNED_FROM_ISLAND: '&c&lError | &7You are banned from this island.'
+BLOCK_LEVEL: '&e&lLevel | &7The block {0}''s level is {1}.'
 BLOCK_VALUE: '&e&lWorth | &7The block {0} worth {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7The block {0} is worthless.'
 BONUS_SET_SUCCESS: '&e&lIsland | &7Successfully updated the island bonus to {0}.'

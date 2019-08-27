@@ -1,0 +1,12 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# Here you can set all the level values for your blocks.
+# To set specific spawner types, use 'MOB_SPAWNER:<ENTITY>': <AMOUNT>
+# If no level is found, the formula from config will be used.
+
+EXAMPLE: 5

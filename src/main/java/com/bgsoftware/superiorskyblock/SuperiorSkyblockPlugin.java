@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
+import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
@@ -54,6 +55,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static SuperiorSkyblockPlugin plugin;
 
     private GridHandler gridHandler;
+    private BlockValuesHandler blockValuesHandler;
     private PlayersHandler playersHandler;
     private SchematicsHandler schematicsHandler;
     private SettingsHandler settingsHandler;
@@ -166,15 +168,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
+        blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
 
         if(loadGrid) {
             gridHandler = new GridHandler(this);
             playersHandler = new PlayersHandler();
-        }else {
-            gridHandler.reloadBlockValues();
         }
+
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
 
@@ -236,6 +238,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public GridHandler getGrid(){
         return gridHandler;
+    }
+
+    public BlockValuesHandler getBlockValues() {
+        return blockValuesHandler;
     }
 
     public NMSAdapter getNMSAdapter() {

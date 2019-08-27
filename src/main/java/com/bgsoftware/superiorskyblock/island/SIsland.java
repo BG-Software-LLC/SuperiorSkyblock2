@@ -47,8 +47,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -64,7 +62,6 @@ public class SIsland extends DatabaseObject implements Island {
 
     private static boolean calcProcess = false;
     private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
-    private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
     private static NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
 
     /*
@@ -86,6 +83,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Map<String, WarpData> warps = new HashMap<>();
     private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
+    private BigDecimalFormatted islandLevel = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted bonusWorth = BigDecimalFormatted.ZERO;
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
@@ -567,6 +565,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         blockCounts.clear();
         islandWorth = BigDecimalFormatted.ZERO;
+        islandLevel = BigDecimalFormatted.ZERO;
 
         World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
 
@@ -697,12 +696,24 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
-        double blockValue;
-        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
-            int currentAmount = blockCounts.getOrDefault(key, 0);
-            blockCounts.put(plugin.getGrid().getBlockValueKey(key), currentAmount + amount);
-            islandWorth = islandWorth.add(new BigDecimal(blockValue).multiply(new BigDecimal(amount)));
+        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
+        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
+        boolean increaseAmount = false;
+
+        if(blockValue.doubleValue() > 0){
+            islandWorth = islandWorth.add(blockValue.multiply(new BigDecimal(amount)));
+            increaseAmount = true;
+        }
+
+        if(blockLevel.doubleValue() > 0){
+            islandLevel = islandLevel.add(blockLevel.multiply(new BigDecimal(amount)));
+            increaseAmount = true;
+        }
+
+        if(increaseAmount || Key.of("HOPPER").equals(key)) {
+            int currentAmount = blockCounts.getOrDefault(key, 0);
+            blockCounts.put(plugin.getBlockValues().getBlockKey(key), currentAmount + amount);
             if(save) saveBlockCounts();
         }
     }
@@ -729,19 +740,33 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
-        double blockValue;
-        if((blockValue = plugin.getGrid().getDecimalBlockValue(key)) > 0 || Key.of("HOPPER").equals(key)){
-            int currentAmount = blockCounts.getOrDefault(key, 0);
+        BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
+        BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
-            key = plugin.getGrid().getBlockValueKey(key);
+        boolean decreaseAmount = false;
+
+        if(blockValue.doubleValue() > 0){
+            islandWorth = islandWorth.subtract(blockValue.multiply(new BigDecimal(amount)));
+            if(islandWorth.doubleValue() < 0)
+                islandWorth = BigDecimalFormatted.ZERO;
+            decreaseAmount = true;
+        }
+
+        if(blockLevel.doubleValue() > 0){
+            islandLevel = islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount)));
+            if(islandLevel.doubleValue() < 0)
+                islandLevel = BigDecimalFormatted.ZERO;
+            decreaseAmount = true;
+        }
+
+        if(decreaseAmount){
+            int currentAmount = blockCounts.getOrDefault(key, 0);
+            key = plugin.getBlockValues().getBlockKey(key);
 
             if(currentAmount <= amount)
                 blockCounts.remove(key);
             else
                 blockCounts.put(key, currentAmount - amount);
-
-            if((islandWorth = islandWorth.subtract(new BigDecimal(blockValue).multiply(new BigDecimal(amount)))).doubleValue() < 0)
-                islandWorth = BigDecimalFormatted.ZERO;
 
             if(save) saveBlockCounts();
         }
@@ -816,14 +841,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public BigDecimal getIslandLevelAsBigDecimal() {
-        BigDecimalFormatted worth = (BigDecimalFormatted) getWorthAsBigDecimal();
-        try {
-            BigDecimal level = new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", worth.getAsString())).toString());
-            return BigDecimalFormatted.of(level.toBigInteger());
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return worth;
-        }
+        return islandLevel;
     }
 
     @Override
