@@ -322,6 +322,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
                 .setString(borderColor.name())
+                .setString(lastTimeStatus + "")
                 .setString(player.toString())
                 .execute(async);
     }
@@ -338,6 +339,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
                 .setString(borderColor.name())
+                .setString(lastTimeStatus + "")
                 .execute(async);
     }
 
