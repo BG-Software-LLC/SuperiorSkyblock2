@@ -97,6 +97,8 @@ permissions:
             description: Open upgrades panel.
           superior.island.value:
             description: Get the worth value of a block.
+          superior.island.visit:
+            description: Teleport to the visitors location of an island.
           superior.island.warp:
             description: Warp to an island warp.
           superior.island.warps:

@@ -113,6 +113,7 @@ COMMAND_DESCRIPTION_TOP: 'Open top islands panel.'
 COMMAND_DESCRIPTION_TRANSFER: 'Transfer your island''s leadership.'
 COMMAND_DESCRIPTION_UPGRADE: 'Open upgrades panel.'
 COMMAND_DESCRIPTION_VALUE: 'Get the worth value of a block.'
+COMMAND_DESCRIPTION_VISIT: 'Teleport to the visitors location of an island.'
 COMMAND_DESCRIPTION_WARP: 'Warp to an island warp.'
 COMMAND_DESCRIPTION_WARPS: 'Open the warps menu.'
 COMMAND_DESCRIPTION_WITHDRAW: 'Withdraw money from your island''s bank into your personal account.'
@@ -167,6 +168,8 @@ INVALID_TOGGLE_MODE: '&c&lError | &7Cannot toggle {0}.'
 INVALID_UPGRADE: |
   &c&lError | &7Couldn't find an upgrade called {0}.
   &c&lError | &7Upgrades: {1}
+INVALID_VISIT_LOCATION: '&c&lError | &7This island has no visitors location.'
+INVALID_VISIT_LOCATION_BYPASS: '&7&oYou have bypass mode, teleporting you to the island...'
 INVALID_WARP: '&c&lError | &7Invalid warp {0}.'
 INVITE_ANNOUNCEMENT: '&e&lIsland | &7{0} invited {1} to the island.'
 INVITE_BANNED_PLAYER: '&c&lError | &7This player is banned from the island and cannot get invited.'
