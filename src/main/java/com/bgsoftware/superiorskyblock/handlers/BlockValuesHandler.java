@@ -55,8 +55,10 @@ public final class BlockValuesHandler implements BlockValuesManager {
         File blockValuesFile = new File(plugin.getDataFolder(), "blockvalues.yml");
 
         if(blockValuesFile.exists()){
+            file.getParentFile().mkdirs();
             //noinspection ResultOfMethodCallIgnored
             blockValuesFile.renameTo(file);
+            file = new File(plugin.getDataFolder(), "block-values/worth.yml");
         }
 
         if(!file.exists())
