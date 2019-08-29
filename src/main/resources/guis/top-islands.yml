@@ -41,7 +41,8 @@ top-islands:
       type: ENTITY_EXPERIENCE_ORB_PICKUP
       volume: 0.2
       pitch: 0.2
-    type: PLAYER_HEAD
+    type: SKULL_ITEM
+    data: 3
     name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
     lore:
       - '&7'
@@ -61,7 +62,8 @@ top-islands:
       type: BLOCK_ANVIL_PLACE
       volume: 0.2
       pitch: 0.2
-    type: PLAYER_HEAD
+    type: SKULL_ITEM
+    data: 3
     name: '&cInvalid Island'
 
   player-island-slot: 49
