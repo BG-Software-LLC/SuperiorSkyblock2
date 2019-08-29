@@ -1,7 +1,6 @@
 name: SuperiorSkyblock2
 version: 0.1.6-BETA
 author: Ome_R
-load: STARTUP
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 api-version: 1.13
 commands:

@@ -85,34 +85,52 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getCommand("island").setExecutor(commandsHandler);
         getCommand("island").setTabCompleter(commandsHandler);
 
+        loadWorld();
+
         reloadPlugin(true);
 
+        if (Updater.isOutdated()) {
+            log("");
+            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+            log("");
+        }
+
         Executor.sync(() -> {
-            try {
-                loadWorld();
-
-                if (Updater.isOutdated()) {
-                    log("");
-                    log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-                    log("Version's description: \"" + Updater.getVersionDescription() + "\"");
-                    log("");
+            for(Player player : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                superiorPlayer.updateLastTimeStatus();
+                if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
+                    player.setAllowFlight(true);
+                    player.setFlying(true);
                 }
-
-                Executor.sync(() -> {
-                    for(Player player : Bukkit.getOnlinePlayers()){
-                        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-                        superiorPlayer.updateLastTimeStatus();
-                        if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        }
-                    }
-                }, 10L);
-            }catch(Exception ex){
-                ex.printStackTrace();
-                Bukkit.getPluginManager().disablePlugin(this);
             }
-        });
+        }, 1L);
+
+//        Executor.sync(() -> {
+//            try {
+//                if (Updater.isOutdated()) {
+//                    log("");
+//                    log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+//                    log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+//                    log("");
+//                }
+//
+//                Executor.sync(() -> {
+//                    for(Player player : Bukkit.getOnlinePlayers()){
+//                        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+//                        superiorPlayer.updateLastTimeStatus();
+//                        if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
+//                            player.setAllowFlight(true);
+//                            player.setFlying(true);
+//                        }
+//                    }
+//                }, 10L);
+//            }catch(Exception ex){
+//                ex.printStackTrace();
+//                Bukkit.getPluginManager().disablePlugin(this);
+//            }
+//        });
     }
 
     @Override

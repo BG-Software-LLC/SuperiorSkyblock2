@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,32 +23,34 @@ public final class ProvidersHandler {
     private BlocksProvider spawnersProvider;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
-        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
-            FAWEHook.register();
-        if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
-            LeaderHeadsHook.register();
+        Executor.sync(() -> {
+            if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
+                FAWEHook.register();
+            if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
+                LeaderHeadsHook.register();
 
-        String spawnersProvider = plugin.getSettings().spawnersProvider;
+            String spawnersProvider = plugin.getSettings().spawnersProvider;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
-                (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto")))
-            this.spawnersProvider = new BlocksProvider_MergedSpawner();
-        else if(Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto")))
-            this.spawnersProvider = new BlocksProvider_WildStacker();
-        else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
-                Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
-                (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
-            this.spawnersProvider = new BlocksProvider_SilkSpawners();
-        else if(Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
-                (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
-            this.spawnersProvider = new BlocksProvider_PvpingSpawners();
-        else if(Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
-                (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
-            this.spawnersProvider = new BlocksProvider_EpicSpawners();
-        else this.spawnersProvider = new BlocksProvider_Default();
+            if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
+                    (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto")))
+                this.spawnersProvider = new BlocksProvider_MergedSpawner();
+            else if(Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
+                    (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto")))
+                this.spawnersProvider = new BlocksProvider_WildStacker();
+            else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
+                    Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
+                    (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
+                this.spawnersProvider = new BlocksProvider_SilkSpawners();
+            else if(Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
+                    (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
+                this.spawnersProvider = new BlocksProvider_PvpingSpawners();
+            else if(Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
+                    (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
+                this.spawnersProvider = new BlocksProvider_EpicSpawners();
+            else this.spawnersProvider = new BlocksProvider_Default();
 
-        PlaceholderHook.register(plugin);
+            PlaceholderHook.register(plugin);
+        });
     }
 
     public Pair<Integer, EntityType> getSpawner(Location location){
