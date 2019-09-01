@@ -113,7 +113,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
 
         List<String> islands = plugin.getGrid().getListIslands().stream()
                 .filter(island -> {
-                    if(superiorPlayer.getIsland().equals(island))
+                    if(island.equals(superiorPlayer.getIsland()))
                         return !island.getAllWarps().isEmpty();
                     else
                         return island.getAllWarps().stream().anyMatch(warp -> !island.isWarpPrivate(warp));
