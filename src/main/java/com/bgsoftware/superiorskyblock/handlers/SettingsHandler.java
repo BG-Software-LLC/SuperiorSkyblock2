@@ -37,6 +37,7 @@ public final class SettingsHandler {
     public final List<String> guestPermissions, memberPermissions, modPermissions, adminPermission, leaderPermissions;
     public final String signWarpLine;
     public final List<String> signWarp;
+    public final String welcomeWarpLine;
     public final int bankWorthRate;
     public final String islandWorld;
     public final String spawnLocation;
@@ -94,6 +95,7 @@ public final class SettingsHandler {
         leaderPermissions = cfg.getStringList("default-permissions.leader");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = colorize(cfg.getStringList("sign-warp"));
+        welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorld = cfg.getString("island-world", "SuperiorWorld");
         spawnLocation = cfg.getString("spawn-location", "SuperiorWorld, 0, 100, 0, 0, 0");

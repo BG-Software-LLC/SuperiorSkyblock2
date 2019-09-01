@@ -68,7 +68,7 @@ public final class CmdVisit implements ICommand {
             return;
         }
 
-        Location visitLocation = targetIsland.getWarpLocation("visit");
+        Location visitLocation = targetIsland.getVisitorsLocation();
 
         if(visitLocation == null){
             Locale.INVALID_VISIT_LOCATION.send(sender);
@@ -97,7 +97,7 @@ public final class CmdVisit implements ICommand {
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island island = onlinePlayer.getIsland();
-                if (island != null && (island.getWarpLocation("visit") != null || superiorPlayer.hasBypassModeEnabled()) &&
+                if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
                         (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)) ) {
                     if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(player.getName());

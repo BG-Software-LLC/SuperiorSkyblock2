@@ -224,4 +224,8 @@ public interface Island extends Comparable<Island> {
 
     void setName(String islandName);
 
+    String getDescription();
+
+    void setDescription(String description);
+
 }

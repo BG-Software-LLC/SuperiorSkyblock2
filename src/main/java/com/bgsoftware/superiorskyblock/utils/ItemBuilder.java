@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -81,6 +80,25 @@ public final class ItemBuilder {
 
         for(String line : itemMeta.getLore()){
             loreList.add(line.replace(regex, replace));
+        }
+
+        withLore(loreList);
+        return this;
+    }
+
+    public ItemBuilder replaceLoreWithLines(String regex, String... lines){
+        if(!itemMeta.hasLore())
+            return this;
+
+        List<String> loreList = new ArrayList<>();
+
+        for(String line : itemMeta.getLore()){
+            if(line.contains(regex)){
+                loreList.addAll(Arrays.asList(lines));
+            }
+            else{
+                loreList.add(line);
+            }
         }
 
         withLore(loreList);

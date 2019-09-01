@@ -20,8 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class GlobalWarpsMenu extends SuperiorMenu {
 
@@ -31,6 +31,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     private static ItemStack previousButton, currentButton, nextButton, warpItem;
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots;
+    private static boolean visitorWarps;
 
     private int currentPage = 1;
 
@@ -62,10 +63,8 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             if(e.getCurrentItem() == null)
                 return;
 
-            List<String> islands = plugin.getGrid().getListIslands().stream()
-                    .filter(island -> !island.getAllWarps().isEmpty())
-                    .map(island -> island.getOwner().getName())
-                    .sorted(String::compareTo)
+            List<Island> islands = getFilteredIslands(superiorPlayer)
+                    .sorted(Comparable::compareTo)
                     .collect(Collectors.toList());
 
             int indexOf = slots.indexOf(e.getRawSlot());
@@ -73,8 +72,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             if(indexOf >= islands.size() || indexOf == -1)
                 return;
 
-            String ownerName = islands.get(indexOf);
-            Island island = Objects.requireNonNull(SSuperiorPlayer.of(ownerName)).getIsland();
+            Island island = islands.get(indexOf);
 
             SoundWrapper sound = getSound(-1);
             if(sound != null)
@@ -85,10 +83,17 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
                         Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
                                 command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
 
-            if(island == null)
-                GlobalWarpsMenu.openInventory(superiorPlayer, null);
-            else
+            if(visitorWarps){
+                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "is visit " + island.getOwner().getName());
+            }
+            else{
                 IslandWarpsMenu.openInventory(superiorPlayer, this, island);
+            }
+
+//            if(island == null)
+//                GlobalWarpsMenu.openInventory(superiorPlayer, null);
+//            else
+//                IslandWarpsMenu.openInventory(superiorPlayer, this, island);
         }
     }
 
@@ -111,21 +116,15 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
-        List<String> islands = plugin.getGrid().getListIslands().stream()
-                .filter(island -> {
-                    if(island.equals(superiorPlayer.getIsland()))
-                        return !island.getAllWarps().isEmpty();
-                    else
-                        return island.getAllWarps().stream().anyMatch(warp -> !island.isWarpPrivate(warp));
-                })
-                .map(island -> island.getOwner().getName())
-                .sorted(String::compareTo)
+        List<Island> islands = getFilteredIslands(superiorPlayer)
+                .sorted(Comparable::compareTo)
                 .collect(Collectors.toList());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < islands.size(); i++){
-            String ownerName = islands.get(i + (slots.size() * (page - 1)));
-            inv.setItem(slots.get(i), new ItemBuilder(warpItem).asSkullOf(SSuperiorPlayer.of(ownerName))
-                    .replaceAll("{0}", ownerName).build());
+            Island island = islands.get(i + (slots.size() * (page - 1)));
+            inv.setItem(slots.get(i), new ItemBuilder(warpItem).asSkullOf(island.getOwner())
+                    .replaceAll("{0}", island.getOwner().getName())
+                    .replaceLoreWithLines("{1}", island.getDescription().split("\n")).build());
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)
@@ -167,6 +166,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         int previousSlot = cfg.getInt("global-gui.previous-page.slot");
         int currentSlot = cfg.getInt("global-gui.current-page.slot");
         int nextSlot = cfg.getInt("global-gui.next-page.slot");
+        GlobalWarpsMenu.visitorWarps = cfg.getBoolean("global-gui.visitor-warps", false);
 
         globalWarpsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
         globalWarpsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
@@ -199,6 +199,18 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     private static void createGlobalSection(File file){
         CommentedConfiguration cfg = new CommentedConfiguration(GlobalSectionComments.class, file);
         cfg.resetYamlFile(plugin, "guis/warps-gui.yml");
+    }
+
+    private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer){
+        return plugin.getGrid().getListIslands().stream()
+                .filter(island -> {
+                    if(visitorWarps)
+                        return island.getVisitorsLocation() != null;
+                    else if(island.equals(superiorPlayer.getIsland()))
+                        return !island.getAllWarps().isEmpty();
+                    else
+                        return island.getAllWarps().stream().anyMatch(warp -> !island.isWarpPrivate(warp));
+                });
     }
 
 }

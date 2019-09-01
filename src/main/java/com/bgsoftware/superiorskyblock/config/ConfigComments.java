@@ -137,6 +137,10 @@ public final class ConfigComments {
     public static String SIGN_WARP = "sign-warp";
 
     @Comment("")
+    @Comment("Set the line to create the welcome sign.")
+    public static String WELCOME_SIGN_LINE = "welcome-sign-line";
+
+    @Comment("")
     @Comment("Set the divider for the island bank money in the total island worth.")
     @Comment("You can set it to 0 to disable island bank money to be calculated in island worth.")
     public static String BANK_WORTH_RATE = "bank-worth-rate";

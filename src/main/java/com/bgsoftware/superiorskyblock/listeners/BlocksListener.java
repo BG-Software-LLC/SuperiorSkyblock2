@@ -4,6 +4,7 @@ import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -12,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -310,6 +312,9 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
+        Location warpLocation = e.getBlock().getLocation();
+        warpLocation.setYaw(e.getPlayer().getLocation().getYaw());
+
         if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().signWarpLine)){
             String warpName = e.getLine(1);
             boolean privateFlag = e.getLine(2).equalsIgnoreCase("private");
@@ -322,9 +327,20 @@ public final class BlocksListener implements Listener {
                 List<String> signWarp = plugin.getSettings().signWarp;
                 for (int i = 0; i < signWarp.size(); i++)
                     e.setLine(i, signWarp.get(i));
-                island.setWarpLocation(warpName, e.getBlock().getLocation(), privateFlag);
-                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(e.getBlock().getLocation()));
+                island.setWarpLocation(warpName, warpLocation, privateFlag);
+                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
             }
+        }
+
+        else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().welcomeWarpLine)){
+            String description = e.getLine(1) + "\n" + e.getLine(2) + "\n" + e.getLine(3);
+            String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
+            e.setLine(0, welcomeColor + plugin.getSettings().welcomeWarpLine);
+            for (int i = 1; i < 3; i++)
+                e.setLine(i, ChatColor.translateAlternateColorCodes('&', e.getLine(i)));
+            island.setVisitorsLocation(warpLocation);
+            island.setDescription(description);
+            Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
         }
     }
 
@@ -334,10 +350,19 @@ public final class BlocksListener implements Listener {
         Sign sign = e.getSign();
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
-        if(island == null || !isWarpSign(sign.getLines()))
+        if(island == null)
             return;
 
-        island.deleteWarp(superiorPlayer, sign.getLocation());
+        if(isWarpSign(sign.getLines())){
+            island.deleteWarp(superiorPlayer, sign.getLocation());
+        }
+        else{
+            String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
+            if(sign.getLine(0).equalsIgnoreCase(welcomeColor + plugin.getSettings().welcomeWarpLine)){
+                island.setVisitorsLocation(null);
+                Locale.DELETE_WARP.send(superiorPlayer, SIsland.VISITORS_WARP_NAME);
+            }
+        }
     }
 
     private boolean isWarpSign(String[] lines){

@@ -97,10 +97,12 @@ public final class DataHandler {
                 "discord VARCHAR, " +
                 "paypal VARCHAR, " +
                 "warpsLimit INTEGER, " +
-                "bonusWorth VARCHAR," +
-                "locked BOOLEAN," +
-                "blockCounts VARCHAR," +
-                "name VARCHAR" +
+                "bonusWorth VARCHAR, " +
+                "locked BOOLEAN, " +
+                "blockCounts VARCHAR, " +
+                "name VARCHAR, " +
+                "visitorsLocation VARCHAR," +
+                "description VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -147,6 +149,8 @@ public final class DataHandler {
         addColumnIfNotExists("name", "islands", "''", "VARCHAR");
         addColumnIfNotExists("borderColor", "players", "'BLUE'", "VARCHAR");
         addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "VARCHAR");
+        addColumnIfNotExists("visitorsLocation", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("description", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
