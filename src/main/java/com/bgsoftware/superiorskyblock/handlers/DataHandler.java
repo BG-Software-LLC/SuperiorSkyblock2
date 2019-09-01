@@ -112,7 +112,9 @@ public final class DataHandler {
                 "textureValue VARCHAR, " +
                 "disbands INTEGER," +
                 "toggledPanel BOOLEAN," +
-                "borderColor VARCHAR" +
+                "islandFly BOOLEAN," +
+                "borderColor VARCHAR," +
+                "lastTimeStatus VARCHAR" +
                 ");");
 
         //Creating default grid table

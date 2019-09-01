@@ -51,7 +51,11 @@ public interface Island extends Comparable<Island> {
 
     Location getTeleportLocation();
 
+    Location getVisitorsLocation();
+
     void setTeleportLocation(Location teleportLocation);
+
+    void setVisitorsLocation(Location visitorsLocation);
 
     Location getMinimum();
 
