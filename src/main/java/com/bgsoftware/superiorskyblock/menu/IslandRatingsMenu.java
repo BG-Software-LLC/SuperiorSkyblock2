@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -32,12 +33,15 @@ public final class IslandRatingsMenu extends SuperiorMenu {
     private static List<Integer> slots = new ArrayList<>();
 
     private Map<UUID, Rating> ratings;
+    private double totalRating;
     private int page;
 
     private IslandRatingsMenu(Island island){
         super("ratingsPage");
-        if(island != null)
+        if(island != null) {
             this.ratings = island.getRatings();
+            this.totalRating = island.getTotalRating();
+        }
     }
 
     @Override
@@ -82,7 +86,7 @@ public final class IslandRatingsMenu extends SuperiorMenu {
 
         this.page = page;
 
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title.replace("{0}", StringUtil.format(totalRating)));
         inv.setContents(inventory.getContents());
 
         Iterator<UUID> uuids = ratings.keySet().iterator();
@@ -111,6 +115,8 @@ public final class IslandRatingsMenu extends SuperiorMenu {
                     .replaceAll("{0}", _superiorPlayer.getName())
                     .replaceAll("{1}", starsString.toString())
                     .asSkullOf(_superiorPlayer).build());
+
+            currentIndex++;
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)

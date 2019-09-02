@@ -64,7 +64,7 @@ rate-gui:
     name: '&2Five Stars'
 
 ratings-gui:
-  title: '&lIsland Ratings'
+  title: '&lIsland Ratings ({0}/5)'
   size: 6
 
   fill-items:
