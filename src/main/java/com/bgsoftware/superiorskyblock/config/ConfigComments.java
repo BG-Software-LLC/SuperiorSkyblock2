@@ -240,4 +240,8 @@ public final class ConfigComments {
     @Comment("Should the inventory of the players get cleared after they accept an invite?")
     public static String CLEAR_ON_JOIN = "clear-on-join";
 
+    @Comment("")
+    @Comment("Should players be able to rate their own islands?")
+    public static String RATE_OWN_ISLAND = "rate-own-island";
+
 }

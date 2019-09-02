@@ -14,22 +14,27 @@ public final class SpawnIsland extends SIsland {
     private static SuperiorSkyblockPlugin plugin;
 
     private Location center;
+    private String world;
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "");
         SpawnIsland.plugin = plugin;
 
         String[] loc = plugin.getSettings().spawnLocation.split(", ");
-        int x = (int) (double) Double.valueOf(loc[1]);
-        int y = Integer.valueOf(loc[2]);
-        int z = (int) (double) Double.valueOf(loc[3]);
-        center = loc.length == 4 ?
-            new Location(Bukkit.getWorld(loc[0]), x + 0.5, y, z + 0.5) :
-            new Location(Bukkit.getWorld(loc[0]), x + 0.5, y, z + 0.5, Float.valueOf(loc[4]), Float.valueOf(loc[5]));
+        this.world = loc[0];
+        double x = ((int) Double.parseDouble(loc[1])) + 0.5;
+        double y = Integer.parseInt(loc[2]);
+        double z = ((int) Double.parseDouble(loc[3])) + 0.5;
+        float yaw = loc.length == 6 ? Float.parseFloat(loc[4]) : 0;
+        float pitch = loc.length == 6 ? Float.parseFloat(loc[5]) : 0;
+        this.center = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
     }
 
     @Override
     public Location getCenter() {
+        if(center.getWorld() == null)
+            center.setWorld(Bukkit.getWorld(world));
+
         return center.clone();
     }
 

@@ -102,7 +102,8 @@ public final class DataHandler {
                 "blockCounts VARCHAR, " +
                 "name VARCHAR, " +
                 "visitorsLocation VARCHAR," +
-                "description VARCHAR" +
+                "description VARCHAR," +
+                "ratings VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -151,6 +152,7 @@ public final class DataHandler {
         addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "VARCHAR");
         addColumnIfNotExists("visitorsLocation", "islands", "''", "VARCHAR");
         addColumnIfNotExists("description", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

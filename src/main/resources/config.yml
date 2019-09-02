@@ -395,3 +395,6 @@ teleport-on-join: false
 
 # Should the inventory of the players get cleared after they accept an invite?
 clear-on-join: false
+
+# Should players be able to rate their own islands?
+rate-own-island: false

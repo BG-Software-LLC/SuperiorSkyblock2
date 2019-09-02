@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandRatingMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
@@ -221,6 +222,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandCreationMenu.init();
         IslandMembersMenu.init();
         IslandPanelMenu.init();
+        IslandRatingMenu.init();
         IslandsTopMenu.init();
         IslandUpgradesMenu.init();
         IslandValuesMenu.init();

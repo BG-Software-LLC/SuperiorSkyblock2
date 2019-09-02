@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -227,5 +228,13 @@ public interface Island extends Comparable<Island> {
     String getDescription();
 
     void setDescription(String description);
+
+    Rating getRating(UUID uuid);
+
+    void setRating(UUID uuid, Rating rating);
+
+    double getTotalRating();
+
+    int getRatingAmount();
 
 }

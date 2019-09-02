@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -92,6 +94,23 @@ public final class CmdShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
+        if(!Locale.ISLAND_INFO_RATE.isEmpty()) {
+            StringBuilder rateMessage = new StringBuilder();
+            double rating = island.getTotalRating();
+            if(rating >= 1)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            if(rating >= 2)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            if(rating >= 3)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            if(rating >= 4)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            if(rating >= 5)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            for(int i = 5; i > rating; i--)
+                rateMessage.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage());
+            infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(rateMessage.toString(), StringUtil.format(rating), island.getRatingAmount())).append("\n");
+        }
         if(!Locale.ISLAND_INFO_BANK.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyInBankAsBigDecimal())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty())

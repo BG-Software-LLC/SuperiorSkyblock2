@@ -60,6 +60,7 @@ public final class SettingsHandler {
     public final boolean islandNamesIslandTop;
     public final boolean teleportOnJoin;
     public final boolean clearOnJoin;
+    public final boolean rateOwnIsland;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -121,6 +122,7 @@ public final class SettingsHandler {
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
         teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
+        rateOwnIsland = cfg.getBoolean("rate-own-island", false);
     }
 
     public void updateValue(String path, Object value){

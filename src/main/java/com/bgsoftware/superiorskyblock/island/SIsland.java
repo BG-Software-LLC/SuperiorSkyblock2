@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
@@ -94,6 +95,7 @@ public class SIsland extends DatabaseObject implements Island {
     private boolean locked = false;
     private String islandName = "";
     private String description = "";
+    private Map<UUID, Rating> ratings = new HashMap<>();
 
     /*
      * SIsland multipliers & limits
@@ -155,6 +157,13 @@ public class SIsland extends DatabaseObject implements Island {
             try{
                 String[] sections = entry.split("=");
                 handleBlockPlace(Key.of(sections[0]), Integer.parseInt(sections[1]), false);
+            }catch(Exception ignored){}
+        }
+
+        for(String entry : resultSet.getString("ratings").split(";")){
+            try{
+                String[] sections = entry.split("=");
+                this.ratings.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
             }catch(Exception ignored){}
         }
 
@@ -1251,6 +1260,40 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public Rating getRating(UUID uuid) {
+        return ratings.getOrDefault(uuid, Rating.UNKNOWN);
+    }
+
+    @Override
+    public void setRating(UUID uuid, Rating rating) {
+        ratings.put(uuid, rating);
+
+        StringBuilder ratings = new StringBuilder();
+        this.ratings.keySet().forEach(_uuid ->
+                ratings.append(";").append(_uuid).append("=").append(this.ratings.get(_uuid).getValue()));
+
+        Query.ISLAND_SET_RATINGS.getStatementHolder()
+                .setString(ratings.length() == 0 ? "" : ratings.toString().substring(1))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public double getTotalRating() {
+        double avg = 0;
+
+        for(Rating rating : ratings.values())
+            avg += rating.getValue();
+
+        return avg == 0 ? 0 : avg / getRatingAmount();
+    }
+
+    @Override
+    public int getRatingAmount() {
+        return ratings.size();
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->
@@ -1269,6 +1312,10 @@ public class SIsland extends DatabaseObject implements Island {
         StringBuilder blockCounts = new StringBuilder();
         this.blockCounts.keySet().forEach(blockKey ->
                 blockCounts.append(";").append(blockKey).append("=").append(this.blockCounts.get(blockKey)));
+
+        StringBuilder ratings = new StringBuilder();
+        this.ratings.keySet().forEach(uuid ->
+                ratings.append(";").append(uuid).append("=").append(this.ratings.get(uuid).getValue()));
 
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(LocationUtil.getLocation(getTeleportLocation()))
@@ -1293,6 +1340,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1))
                 .setString(islandName)
                 .setString(description)
+                .setString(ratings.length() == 0 ? "" : ratings.toString().substring(1))
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1324,6 +1372,10 @@ public class SIsland extends DatabaseObject implements Island {
         this.blockCounts.keySet().forEach(blockKey ->
                 blockCounts.append(";").append(blockKey).append("=").append(this.blockCounts.get(blockKey)));
 
+        StringBuilder ratings = new StringBuilder();
+        this.ratings.keySet().forEach(uuid ->
+                ratings.append(";").append(uuid).append("=").append(this.ratings.get(uuid).getValue()));
+
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.toString())
                 .setString(LocationUtil.getLocation(center.getBlock().getLocation()))
@@ -1349,6 +1401,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(islandName)
                 .setString(LocationUtil.getLocation(visitorsLocation))
                 .setString(description)
+                .setString(ratings.length() == 0 ? "" : ratings.toString().substring(1))
                 .execute(async);
     }
 

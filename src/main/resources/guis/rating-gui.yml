@@ -1,0 +1,64 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+rating-gui:
+  title: '&l         Rate Island'
+
+  one_star:
+    slot: 0
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGQyNDU0ZTRjNjdiMzIzZDViZTk1M2I1YjNkNTQxNzRhYTI3MTQ2MDM3NGVlMjg0MTBjNWFlYWUyYzExZjUifX19'
+    name: '&4One Star'
+
+  two_stars:
+    slot: 1
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQxMGRiNjIzNzM1YzE0NmM3YzQ4N2UzNjkyZDFjNWI1ZTIzYmY2OTFlZjA2NjVjMmU5NTQ5NDc5ZDgyOGYifX19'
+    name: '&6Two Stars'
+
+  three_stars:
+    slot: 2
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmU5MDc2NzJhNDcwOTM4NTI1MDU4YzBlYTMxOWQ4YmU1YmEyOGQ5NzJjNTJmMmJkNTVkYmY0MTgyYjgifX19'
+    name: '&eThree Stars'
+
+  four_stars:
+    slot: 3
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjkyMGVjY2UxYzhjZGU1ZGJjYTU5MzhjNTM4NGY3MTRlNTViZWU0Y2NhODY2YjcyODNiOTVkNjllZWQzZDJjIn19fQ=='
+    name: '&aFour Stars'
+
+  five_stars:
+    slot: 4
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODRjOGMzNzEwZGEyNTU5YTI5MWFkYzM5NjI5ZTljY2VhMzFjYTlkM2QzNTg2YmZlYTZlNmUwNjEyNGIzYyJ9fX0='
+    name: '&2Five Stars'
