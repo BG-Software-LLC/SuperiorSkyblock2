@@ -118,13 +118,13 @@ public final class IslandMembersMenu extends SuperiorMenu {
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)
-                .replaceName("{0}", (page == 1 ? "&c" : "&a")).build());
+                .replaceAll("{0}", (page == 1 ? "&c" : "&a")).build());
 
         inv.setItem(currentSlot, new ItemBuilder(currentButton)
-                .replaceLore("{0}", page + "").build());
+                .replaceAll("{0}", page + "").build());
 
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
-                .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
+                .replaceAll("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
 
         Executor.sync(() -> {
