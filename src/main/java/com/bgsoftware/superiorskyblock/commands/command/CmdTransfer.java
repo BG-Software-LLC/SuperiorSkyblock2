@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class CmdTransfer implements ICommand {
+public final class CmdTransfer implements ICommand {
 
     @Override
     public List<String> getAliases() {
