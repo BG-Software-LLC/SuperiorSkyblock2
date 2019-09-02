@@ -62,6 +62,10 @@ permissions:
             description: Promote a member in your island.
           superior.island.rankup:
             description: Level up an upgrade.
+          superior.island.rate:
+            description: Rate an island.
+          superior.island.ratings:
+            description: Show all island ratings.
           superior.island.recalc:
             description: Re-calculates the island worth.
           superior.island.setdiscord:

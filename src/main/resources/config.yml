@@ -113,6 +113,7 @@ default-permissions:
   - INVITE_MEMBER
   - KICK_MEMBER
   - OPEN_ISLAND
+  - RATINGS_SHOW
   - SET_WARP
   - WITHDRAW_MONEY
 

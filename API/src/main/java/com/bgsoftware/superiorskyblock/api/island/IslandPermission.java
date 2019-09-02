@@ -34,6 +34,7 @@ public enum IslandPermission {
     PICKUP_DROPS,
     PROMOTE_MEMBERS,
     RANKUP,
+    RATINGS_SHOW,
     SET_BIOME,
     SET_DISCORD,
     SET_HOME,

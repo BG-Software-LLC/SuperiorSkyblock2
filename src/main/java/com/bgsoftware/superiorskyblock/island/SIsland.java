@@ -1294,6 +1294,11 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public Map<UUID, Rating> getRatings() {
+        return new HashMap<>(ratings);
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         StringBuilder permissionNodes = new StringBuilder();
         this.permissionNodes.keySet().forEach(islandRole ->

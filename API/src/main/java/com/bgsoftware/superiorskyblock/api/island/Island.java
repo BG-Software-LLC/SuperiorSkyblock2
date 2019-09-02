@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -236,5 +237,7 @@ public interface Island extends Comparable<Island> {
     double getTotalRating();
 
     int getRatingAmount();
+
+    Map<UUID, Rating> getRatings();
 
 }
