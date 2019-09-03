@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSetLeader implements ICommand {
+public final class CmdAdminSetLeader implements ICommand {
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("setleader");

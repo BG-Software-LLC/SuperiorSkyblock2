@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminGiveDisbands implements ICommand {
+public final class CmdAdminGiveDisbands implements ICommand {
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("givedisbands");

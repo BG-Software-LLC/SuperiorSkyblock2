@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CmdAdminSetWarpsLimit implements ICommand {
+public final class CmdAdminSetWarpsLimit implements ICommand {
     @Override
     public List<String> getAliases() {
         return Collections.singletonList("setwarpslimit");
