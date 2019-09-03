@@ -154,6 +154,7 @@ public enum Locale {
     GOT_DEMOTED,
     GOT_EXPELLED,
     GOT_INVITE,
+    GOT_INVITE_TOOLTIP,
     GOT_KICKED,
     GOT_PROMOTED,
     GOT_REVOKED,

@@ -8,6 +8,9 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -108,8 +111,13 @@ public final class CmdInvite implements ICommand {
 
             island.inviteMember(targetPlayer);
             message = Locale.INVITE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName());
-            if(targetPlayer.asOfflinePlayer().isOnline())
-                Locale.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
+            if(targetPlayer.asOfflinePlayer().isOnline() && !Locale.GOT_INVITE.isEmpty()) {
+                TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(superiorPlayer.getName()));
+                if(!Locale.GOT_INVITE_TOOLTIP.isEmpty())
+                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage())}));
+                textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + superiorPlayer.getName()));
+                targetPlayer.asPlayer().spigot().sendMessage(textComponent);
+            }
         }
 
         for (UUID uuid : island.getAllMembers()) {
