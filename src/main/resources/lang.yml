@@ -68,6 +68,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Set a player''s amount of island disban
 COMMAND_DESCRIPTION_ADMIN_SET_HOPPERS_LIMIT: 'Set hoppers limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Transfer an island to someone else.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Set the mob drops multiplier for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_SET_RATE: 'Set the rating of another player.'
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 'Change another player''s island size.'
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: 'Set the spawner rates multiplier for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: 'Set members limit for another player''s island.'
@@ -164,8 +165,11 @@ INVALID_LEVEL: '&c&lError | &7Invalid level {0}.'
 INVALID_LIMIT: '&c&lError | &7Invalid limit {0}.'
 INVALID_MULTIPLIER: '&c&lError | &7Invalid multiplier {0}.'
 INVALID_PLAYER: '&c&lError | &7Cannot find a player called {0}'
+INVALID_RATE: |
+  &c&lError | &7Couldn't find a rating with the name {0}.
+  &c&lError | &7Island Ratings: {1}
 INVALID_ROLE: |
-  &c&lError | &7Couldn''t find the island role {0}.
+  &c&lError | &7Couldn't find the island role {0}.
   &c&lError | &7Island Roles: {1}
 INVALID_SIZE: '&c&lError | &7Invalid size {0}.'
 INVALID_TOGGLE_MODE: '&c&lError | &7Cannot toggle {0}.'
@@ -306,6 +310,7 @@ PLAYER_NOT_ONLINE: '&c&lError | &7This player is not online!'
 PLAYER_QUIT_ANNOUNCEMENT: '&e&lIsland | &7{0} left the server.'
 PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only promote players with a lower island role than yours.'
 PROMOTED_MEMBER: '&e&lIsland | &7You promoted {0} to a {1} in his island.'
+RATE_CHANGE_OTHER: '&e&lIsland | &7You changed the rating of {0} to {1}.'
 RATE_OWN_ISLAND: '&c&lError | &7You can''t rate your own island.'
 RATE_SUCCESS: '&e&lIsland | &7You rated this island with {0} stars!'
 REACHED_HOPPERS_LIMIT: '&e&lUpgrades | &7You have reached the island''s hoppers limit.'

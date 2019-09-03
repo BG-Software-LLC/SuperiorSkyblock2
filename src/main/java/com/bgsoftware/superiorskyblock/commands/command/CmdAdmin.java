@@ -39,6 +39,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetLeader());
         subCommands.add(new CmdAdminSetMobDrops());
         subCommands.add(new CmdAdminSetDisbands());
+        subCommands.add(new CmdAdminSetRate());
         subCommands.add(new CmdAdminSetSize());
         subCommands.add(new CmdAdminSetSpawnerRates());
         subCommands.add(new CmdAdminSetTeamLimit());
@@ -114,7 +115,7 @@ public final class CmdAdmin implements ICommand {
 
         if(args.length == 2){
             try {
-                page = Integer.valueOf(args[1]);
+                page = Integer.parseInt(args[1]);
             }catch(Throwable ignored){}
         }
 

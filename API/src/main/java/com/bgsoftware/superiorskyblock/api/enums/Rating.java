@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.enums;
 
+import java.util.Arrays;
+
 public enum Rating {
 
     UNKNOWN,
@@ -11,6 +13,12 @@ public enum Rating {
 
     public int getValue(){
         return ordinal();
+    }
+
+    public static String getValuesString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        Arrays.stream(values()).forEach(rating -> stringBuilder.append(", ").append(rating.toString().toLowerCase()));
+        return stringBuilder.toString().substring(2);
     }
 
     public static Rating valueOf(int value){

@@ -1266,7 +1266,10 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setRating(UUID uuid, Rating rating) {
-        ratings.put(uuid, rating);
+        if(rating == Rating.UNKNOWN)
+            ratings.remove(uuid);
+        else
+            ratings.put(uuid, rating);
 
         StringBuilder ratings = new StringBuilder();
         this.ratings.keySet().forEach(_uuid ->
