@@ -244,4 +244,9 @@ public final class ConfigComments {
     @Comment("Should players be able to rate their own islands?")
     public static String RATE_OWN_ISLAND = "rate-own-island";
 
+    @Comment("")
+    @Comment("Should the bonus affect the island level?")
+    @Comment("When true, the formula will be used.")
+    public static String BONUS_AFFECT_LEVEL = "bonus-affect-level";
+
 }

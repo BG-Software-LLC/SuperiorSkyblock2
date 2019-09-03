@@ -41,7 +41,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
         return blockValues.containsKey(key) ? blockValues.getKey(key) : blockLevels.getKey(key);
     }
 
-    private String convertValueToLevel(BigDecimalFormatted value){
+    public String convertValueToLevel(BigDecimalFormatted value){
         try {
             return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.getAsString())).toString()).toString();
         }catch(Exception ex){

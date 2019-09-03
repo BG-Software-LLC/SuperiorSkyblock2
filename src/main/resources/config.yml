@@ -399,3 +399,7 @@ clear-on-join: false
 
 # Should players be able to rate their own islands?
 rate-own-island: false
+
+# Should the bonus affect the island level?
+# When true, the formula will be used.
+bonus-affect-level: true

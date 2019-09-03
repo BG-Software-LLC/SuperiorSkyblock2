@@ -878,7 +878,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public BigDecimal getIslandLevelAsBigDecimal() {
-        return islandLevel;
+        return plugin.getSettings().bonusAffectLevel ? islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth))) : islandLevel;
     }
 
     @Override
