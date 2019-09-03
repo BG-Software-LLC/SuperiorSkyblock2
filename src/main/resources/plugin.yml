@@ -142,6 +142,8 @@ permissions:
             description: Promote a member in another player's island.
           superior.admin.reload:
             description: Reload all configurations and tasks of the plugin.
+          superior.admin.removeratings:
+            description: Remove all ratings given by a player.
           superior.admin.save:
             description: Save the entire database to disk (async)
           superior.admin.schematic:
