@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -53,34 +52,7 @@ public final class CmdAdminSetHoppersLimit implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
-        }
-
-        int limit;
-
-        try{
-            limit = Integer.valueOf(args[3]);
-        }catch(IllegalArgumentException ex){
-            Locale.INVALID_LIMIT.send(sender, args[3]);
-            return;
-        }
-
-        island.setHoppersLimit(limit);
-
-        if(targetPlayer == null)
-            Locale.CHANGED_HOPPERS_LIMIT_NAME.send(sender, island.getName());
-        else
-            Locale.CHANGED_HOPPERS_LIMIT.send(sender, targetPlayer.getName());
+        Bukkit.dispatchCommand(sender, "is admin setblocklimit " + args[2] + " hopper " + args[3]);
     }
 
     @Override

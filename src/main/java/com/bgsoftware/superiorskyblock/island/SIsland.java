@@ -63,6 +63,7 @@ import java.util.concurrent.TimeUnit;
 public class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
+    public static final int NO_BLOCK_LIMIT = -1;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -86,7 +87,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blockCounts = new KeyMap<>();
-    private final KeyMap<Integer> blockLimits = new KeyMap<>();
+    private final KeyMap<Integer> blockLimits = new KeyMap<>(plugin.getSettings().defaultBlockLimits);
     private final Map<String, WarpData> warps = new HashMap<>();
     private BigDecimalFormatted islandBank = BigDecimalFormatted.ZERO;
     private BigDecimalFormatted islandWorth = BigDecimalFormatted.ZERO;
@@ -693,7 +694,7 @@ public class SIsland extends DatabaseObject implements Island {
             increaseAmount = true;
         }
 
-        if(increaseAmount || Key.of("HOPPER").equals(key)) {
+        if(increaseAmount || blockLimits.containsKey(key)) {
             int currentAmount = blockCounts.getOrDefault(key, 0);
             blockCounts.put(plugin.getBlockValues().getBlockKey(key), currentAmount + amount);
             if(save) saveBlockCounts();
@@ -741,7 +742,7 @@ public class SIsland extends DatabaseObject implements Island {
             decreaseAmount = true;
         }
 
-        if(decreaseAmount){
+        if(decreaseAmount || blockLimits.containsKey(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
             key = plugin.getBlockValues().getBlockKey(key);
 
@@ -866,7 +867,12 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getHoppersLimit(){
-        return blockLimits.getOrDefault(Key.of("HOPPER"), -1);
+        return getBlockLimit(Key.of("HOPPER"));
+    }
+
+    @Override
+    public int getBlockLimit(Key key) {
+        return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
     }
 
     @Override
@@ -905,7 +911,12 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setHoppersLimit(int hoppersLimit){
-        this.blockLimits.put(Key.of("HOPPER"), hoppersLimit);
+        setBlockLimit(Key.of("HOPPER"), hoppersLimit);
+    }
+
+    @Override
+    public void setBlockLimit(Key key, int limit) {
+        this.blockLimits.put(key, limit);
         Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
                 .setString(IslandSerializer.serializeBlockLimits(this.blockLimits))
                 .setString(owner.toString())

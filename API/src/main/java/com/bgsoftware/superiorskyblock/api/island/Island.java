@@ -117,6 +117,7 @@ public interface Island extends Comparable<Island> {
 
     void handleBlockBreak(Key key, int amount, boolean save);
 
+    @Deprecated
     int getHoppersAmount();
 
     int getBlockCount(Key key);
@@ -156,7 +157,10 @@ public interface Island extends Comparable<Island> {
 
     int getIslandSize();
 
+    @Deprecated
     int getHoppersLimit();
+
+    int getBlockLimit(Key key);
 
     int getTeamLimit();
 
@@ -168,7 +172,10 @@ public interface Island extends Comparable<Island> {
 
     void setIslandSize(int islandSize);
 
+    @Deprecated
     void setHoppersLimit(int hoppersLimit);
+
+    void setBlockLimit(Key key, int limit);
 
     void setTeamLimit(int teamLimit);
 

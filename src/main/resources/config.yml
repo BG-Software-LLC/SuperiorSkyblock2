@@ -23,9 +23,10 @@ max-island-size: 200
 # This island size can be expanded by using the /is admin setsize command.
 default-island-size: 20
 
-# Set the default hoppers limit of islands.
-# This limit can be expanded by using the /is admin sethopperslimit command.
-default-hoppers-limit: 8
+# Set the default block limits of islands.
+# This limit can be expanded by using the /is admin setblocklimit command.
+default-limits:
+- 'HOPPER:8'
 
 # The amount of warps an island can have
 # This limit can be expanded by using the /is admin setwarpslimit command.

@@ -148,6 +148,8 @@ permissions:
             description: Save the entire database to disk (async)
           superior.admin.schematic:
             description: Create schematics for the plugin.
+          superior.admin.setblocklimit:
+            description: Set block limit for another player's island.
           superior.admin.setcropgrowth:
             description: Set the crop growth multiplier for another player's island.
           superior.admin.setdisbands:

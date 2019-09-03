@@ -1,14 +1,17 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.ConfigComments;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,7 +21,7 @@ public final class SettingsHandler {
 
     public final int maxIslandSize;
     public final int defaultIslandSize;
-    public final int defaultHoppersLimit;
+    public final KeyMap<Integer> defaultBlockLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCropGrowth;
@@ -70,13 +73,25 @@ public final class SettingsHandler {
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
+
+        if(cfg.contains("default-hoppers-limit")){
+            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
+            cfg.set("default-hoppers-limit", null);
+        }
+
         cfg.resetYamlFile(plugin, "config.yml");
 
         saveInterval = cfg.getLong("save-interval", 6000);
         calcInterval = cfg.getLong("calc-interval", 6000);
         maxIslandSize = cfg.getInt("max-island-size", 200);
         defaultIslandSize = cfg.getInt("default-island-size", 20);
-        defaultHoppersLimit = cfg.getInt("default-hoppers-limit", 8);
+        defaultBlockLimits = new KeyMap<>();
+        for(String line : cfg.getStringList("default-limits")){
+            String[] sections = line.split(":");
+            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String limit = sections.length == 2 ? sections[1] : sections[2];
+            defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
+        }
         defaultTeamLimit = cfg.getInt("default-team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-warps-limit", 3);
         defaultCropGrowth = cfg.getInt("default-crop-growth", 1);

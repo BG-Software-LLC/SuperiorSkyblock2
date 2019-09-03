@@ -34,9 +34,9 @@ public final class ConfigComments {
     public static String DEFAULT_ISLAND_SIZE = "default-island-size";
 
     @Comment("")
-    @Comment("Set the default hoppers limit of islands.")
-    @Comment("This limit can be expanded by using the /is admin sethopperslimit command.")
-    public static String DEFAULT_HOPPERS_LIMIT = "default-hoppers-limit";
+    @Comment("Set the default block limits of islands.")
+    @Comment("This limit can be expanded by using the /is admin setblocklimit command.")
+    public static String DEFAULT_LIMITS = "default-limits";
 
     @Comment("")
     @Comment("The amount of warps an island can have")
