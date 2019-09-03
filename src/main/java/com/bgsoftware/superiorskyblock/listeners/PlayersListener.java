@@ -16,6 +16,9 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -73,6 +76,21 @@ public final class PlayersListener implements Listener {
 
         if(island != null)
             island.sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
+
+        Executor.async(() -> {
+            if(!Locale.GOT_INVITE.isEmpty()){
+                for(Island _island : plugin.getGrid().getIslands()){
+                    if(_island.isInvited(superiorPlayer)){
+                        TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(_island.getOwner().getName()));
+                        if(!Locale.GOT_INVITE_TOOLTIP.isEmpty())
+                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage())}));
+                        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + _island.getOwner().getName()));
+                        superiorPlayer.asPlayer().spigot().sendMessage(textComponent);
+                    }
+                }
+            }
+        }, 40L);
+
     }
 
     @EventHandler
