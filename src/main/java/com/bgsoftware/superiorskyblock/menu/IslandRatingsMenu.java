@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -95,25 +94,9 @@ public final class IslandRatingsMenu extends SuperiorMenu {
 
         while(uuids.hasNext() && currentIndex < slots.size() && (currentIndex + (slots.size() * (page - 1))) < ratings.size()){
             SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(uuids.next());
-
-            StringBuilder starsString = new StringBuilder();
-            int rating = ratings.get(_superiorPlayer.getUniqueId()).getValue();
-            if(rating >= 1)
-                starsString.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
-            if(rating >= 2)
-                starsString.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
-            if(rating >= 3)
-                starsString.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
-            if(rating >= 4)
-                starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
-            if(rating >= 5)
-                starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
-            for(int i = 5; i > rating; i--)
-                starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage());
-
             inv.setItem(slots.get(currentIndex), new ItemBuilder(rateItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
-                    .replaceAll("{1}", starsString.toString())
+                    .replaceAll("{1}", StringUtil.formatRating(ratings.get(_superiorPlayer.getUniqueId()).getValue()))
                     .asSkullOf(_superiorPlayer).build());
 
             currentIndex++;

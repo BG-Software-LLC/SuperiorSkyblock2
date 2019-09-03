@@ -142,6 +142,10 @@ public abstract class PlaceholderHook {
                         return plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
+                    case "rating":
+                        return StringUtil.format(island.getTotalRating());
+                    case "rating_stars":
+                        return StringUtil.formatRating(island.getTotalRating());
                 }
 
             }
