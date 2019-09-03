@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -94,11 +95,23 @@ public final class CmdAdminSetBlockLimit implements ICommand {
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
-                if (onlinePlayer.getIsland() != null) {
+                Island onlineIsland = onlinePlayer.getIsland();
+                if (onlineIsland != null) {
                     if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[2].toLowerCase()))
-                        list.add(onlinePlayer.getIsland().getName());
+                    if (onlineIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(onlineIsland.getName());
+                }
+            }
+        }
+        else if(args.length == 4){
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if(island != null){
+                for(Material material : Material.values()){
+                    if(material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().startsWith(args[3].toLowerCase()))
+                        list.add(material.name().toLowerCase());
                 }
             }
         }
