@@ -89,11 +89,6 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             else{
                 IslandWarpsMenu.openInventory(superiorPlayer, this, island);
             }
-
-//            if(island == null)
-//                GlobalWarpsMenu.openInventory(superiorPlayer, null);
-//            else
-//                IslandWarpsMenu.openInventory(superiorPlayer, this, island);
         }
     }
 
@@ -124,7 +119,8 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             Island island = islands.get(i + (slots.size() * (page - 1)));
             inv.setItem(slots.get(i), new ItemBuilder(warpItem).asSkullOf(island.getOwner())
                     .replaceAll("{0}", island.getOwner().getName())
-                    .replaceLoreWithLines("{1}", island.getDescription().split("\n")).build());
+                    .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
+                    .replaceAll("{2}", island.getAllWarps().size() + "").build());
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)

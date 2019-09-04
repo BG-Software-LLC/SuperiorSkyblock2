@@ -89,6 +89,7 @@ global-gui:
     name: '&e{0}''s Island'
     lore:
       - '&7Click to see all warps of this island.'
+      - '&8>> &7This island has {2} warps.'
 
   # When enabled, instead of showing warps, the visitor locations will be shown.
   # To show the description, use the {1} placeholder.
