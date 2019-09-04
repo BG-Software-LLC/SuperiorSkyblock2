@@ -26,6 +26,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             registerPlaceholder("superior_island_location_upgrade_" + upgrade);
         }
 
+        registerPlaceholder("superior_panel_toggle");
         registerPlaceholder("superior_island_center");
         registerPlaceholder("superior_island_x");
         registerPlaceholder("superior_island_y");

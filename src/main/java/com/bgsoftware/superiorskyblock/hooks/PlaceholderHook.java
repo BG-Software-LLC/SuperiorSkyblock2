@@ -35,6 +35,10 @@ public abstract class PlaceholderHook {
             Island island = superiorPlayer.getIsland();
             Matcher matcher;
 
+            if(placeholder.equalsIgnoreCase("superior_panel_toggle")){
+                return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
+            }
+
             if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
