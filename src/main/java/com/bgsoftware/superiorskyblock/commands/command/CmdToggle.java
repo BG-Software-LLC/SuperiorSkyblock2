@@ -55,6 +55,11 @@ public final class CmdToggle implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
         if(args[1].equalsIgnoreCase("border")) {
+            if(!sender.hasPermission("superior.island.toggle.border")){
+                Locale.NO_COMMAND_PERMISSION.send(sender);
+                return;
+            }
+
             if (superiorPlayer.hasWorldBorderEnabled()) {
                 Locale.TOGGLED_WORLD_BORDER_OFF.send(superiorPlayer);
             } else {
@@ -66,6 +71,11 @@ public final class CmdToggle implements ICommand {
         }
 
         else if(args[1].equalsIgnoreCase("blocks")){
+            if(!sender.hasPermission("superior.island.toggle.blocks")){
+                Locale.NO_COMMAND_PERMISSION.send(sender);
+                return;
+            }
+
             if(superiorPlayer.hasBlocksStackerEnabled()){
                 Locale.TOGGLED_STACKED_BLCOKS_OFF.send(superiorPlayer);
             } else{
@@ -87,7 +97,7 @@ public final class CmdToggle implements ICommand {
 
         if(args.length == 2){
             list.addAll(Stream.of("border", "blocks")
-                    .filter(value -> value.startsWith(args[1].toLowerCase())).collect(Collectors.toList()));
+                    .filter(value -> value.startsWith(args[1].toLowerCase()) && sender.hasPermission("superior.island.toggle." +  value)).collect(Collectors.toList()));
         }
 
         return list;

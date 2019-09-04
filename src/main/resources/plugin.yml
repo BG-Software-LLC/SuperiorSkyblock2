@@ -91,7 +91,12 @@ permissions:
           superior.island.teleport:
             description: Teleport to your island.
           superior.island.toggle:
-            description: Toggle island borders and stacked blocks placements.
+            description: Permission to use the /is toggle command.
+            children:
+              superior.island.toggle.border:
+                description: Toggle island borders.
+              superior.island.toggle.blocks:
+                description: Toggle stacked blocks placements.
           superior.island.top:
             description: Open top islands panel.
           superior.island.transfer:
