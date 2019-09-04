@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
+import com.bgsoftware.superiorskyblock.menu.BorderColorMenu;
 import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
@@ -108,31 +109,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 }
             }
         }, 1L);
-
-//        Executor.sync(() -> {
-//            try {
-//                if (Updater.isOutdated()) {
-//                    log("");
-//                    log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-//                    log("Version's description: \"" + Updater.getVersionDescription() + "\"");
-//                    log("");
-//                }
-//
-//                Executor.sync(() -> {
-//                    for(Player player : Bukkit.getOnlinePlayers()){
-//                        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-//                        superiorPlayer.updateLastTimeStatus();
-//                        if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
-//                            player.setAllowFlight(true);
-//                            player.setFlying(true);
-//                        }
-//                    }
-//                }, 10L);
-//            }catch(Exception ex){
-//                ex.printStackTrace();
-//                Bukkit.getPluginManager().disablePlugin(this);
-//            }
-//        });
     }
 
     @Override
@@ -217,6 +193,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadMenus(){
+        BorderColorMenu.init();
         ConfirmDisbandMenu.init();
         GlobalWarpsMenu.init();
         IslandBiomesMenu.init();
