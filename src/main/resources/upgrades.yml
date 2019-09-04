@@ -32,19 +32,19 @@ upgrades:
       price: 1000000.0
       commands:
         - 'island admin setupgrade %player% hoppers-limit 2'
-        - 'island admin sethopperslimit %player% 16'
+        - 'island admin setblocklimit %player% hopper 16'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 16!'
     '2':
       price: 3000000.0
       commands:
         - 'island admin setupgrade %player% hoppers-limit 3'
-        - 'island admin sethopperslimit %player% 32'
+        - 'island admin setblocklimit %player% hopper 32'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 32!'
     '3':
       price: 9000000.0
       commands:
         - 'island admin setupgrade %player% hoppers-limit 4'
-        - 'island admin sethopperslimit %player% 64'
+        - 'island admin setblocklimit %player% hopper 64'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 64!'
     '4':
       price: 0.0
