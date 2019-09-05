@@ -74,8 +74,6 @@ permissions:
             description: Set the paypal email of the island for island payouts.
           superior.island.setbiome:
             description: Change the biome of your island.
-          superior.island.setpermission:
-            description: Change permission for a role in your island.
           superior.island.setrole:
             description: Change the role of a player in your island.
           superior.island.setteleport:
