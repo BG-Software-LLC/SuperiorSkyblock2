@@ -336,7 +336,7 @@ public final class BlocksListener implements Listener {
             String description = e.getLine(1) + "\n" + e.getLine(2) + "\n" + e.getLine(3);
             String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
             e.setLine(0, welcomeColor + plugin.getSettings().welcomeWarpLine);
-            for (int i = 1; i < 3; i++)
+            for (int i = 1; i <= 3; i++)
                 e.setLine(i, ChatColor.translateAlternateColorCodes('&', e.getLine(i)));
             island.setVisitorsLocation(warpLocation);
             island.setDescription(description);
