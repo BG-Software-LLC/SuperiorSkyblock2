@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.Locale;
+
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
@@ -41,6 +43,24 @@ public final class StringUtil {
             return format((d / K)) + "K";
         else
             return d + "";
+    }
+
+    public static String formatRating(double rating){
+        StringBuilder starsString = new StringBuilder();
+        if(rating >= 1)
+            starsString.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+        if(rating >= 2)
+            starsString.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+        if(rating >= 3)
+            starsString.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+        if(rating >= 4)
+            starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+        if(rating >= 5)
+            starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+        for(int i = 5; i > rating; i--)
+            starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage());
+
+        return starsString.toString();
     }
 
 }

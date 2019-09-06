@@ -1,7 +1,6 @@
 name: SuperiorSkyblock2
-version: 0.1.5-BETA
+version: 0.1.7-BETA
 author: Ome_R
-load: STARTUP
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 api-version: 1.13
 commands:
@@ -23,6 +22,8 @@ permissions:
             description: Ban a player from your island.
           superior.island.biome:
             description: Change the biome of the island.
+          superior.island.border:
+            description: Change the border color of the islands.
           superior.island.close:
             description: Close the island to the public.
           superior.island.create:
@@ -61,6 +62,10 @@ permissions:
             description: Promote a member in your island.
           superior.island.rankup:
             description: Level up an upgrade.
+          superior.island.rate:
+            description: Rate an island.
+          superior.island.ratings:
+            description: Show all island ratings.
           superior.island.recalc:
             description: Re-calculates the island worth.
           superior.island.setdiscord:
@@ -69,8 +74,6 @@ permissions:
             description: Set the paypal email of the island for island payouts.
           superior.island.setbiome:
             description: Change the biome of your island.
-          superior.island.setpermission:
-            description: Change permission for a role in your island.
           superior.island.setrole:
             description: Change the role of a player in your island.
           superior.island.setteleport:
@@ -86,7 +89,12 @@ permissions:
           superior.island.teleport:
             description: Teleport to your island.
           superior.island.toggle:
-            description: Toggle island borders and stacked blocks placements.
+            description: Permission to use the /is toggle command.
+            children:
+              superior.island.toggle.border:
+                description: Toggle island borders.
+              superior.island.toggle.blocks:
+                description: Toggle stacked blocks placements.
           superior.island.top:
             description: Open top islands panel.
           superior.island.transfer:
@@ -95,6 +103,8 @@ permissions:
             description: Open upgrades panel.
           superior.island.value:
             description: Get the worth value of a block.
+          superior.island.visit:
+            description: Teleport to the visitors location of an island.
           superior.island.warp:
             description: Warp to an island warp.
           superior.island.warps:
@@ -135,10 +145,14 @@ permissions:
             description: Promote a member in another player's island.
           superior.admin.reload:
             description: Reload all configurations and tasks of the plugin.
+          superior.admin.removeratings:
+            description: Remove all ratings given by a player.
           superior.admin.save:
             description: Save the entire database to disk (async)
           superior.admin.schematic:
             description: Create schematics for the plugin.
+          superior.admin.setblocklimit:
+            description: Set block limit for another player's island.
           superior.admin.setcropgrowth:
             description: Set the crop growth multiplier for another player's island.
           superior.admin.setdisbands:
@@ -149,6 +163,8 @@ permissions:
             description: Transfer an island to someone else.
           superior.admin.setmobdrops:
             description: Set the mob drops multiplier for another player's island.
+          superior.admin.setrate:
+            description: Set the rating of another player.
           superior.admin.setsize:
             description: Change another player's island size.
           superior.admin.setspawnerrates:

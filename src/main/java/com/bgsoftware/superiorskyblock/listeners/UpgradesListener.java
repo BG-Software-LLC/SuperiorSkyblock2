@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
+import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -167,20 +169,19 @@ public final class UpgradesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onHopperPlace(BlockPlaceEvent e){
-        if(e.getBlockPlaced().getType() != Material.HOPPER && e.getBlockPlaced().getType() != Material.HOPPER_MINECART)
-            return;
-
+    public void onBlockPlace(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlockPlaced().getLocation());
 
         if(island == null)
             return;
 
-        int hoppersLimit = island.getHoppersLimit();
+        Key blockKey = Key.of(e.getBlock());
 
-        if(hoppersLimit >= 0 && island.getHoppersAmount() >= hoppersLimit){
+        int blockLimit = island.getBlockLimit(blockKey);
+
+        if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
             e.setCancelled(true);
-            Locale.REACHED_HOPPERS_LIMIT.send(e.getPlayer());
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtil.format(e.getBlock().getType().name()));
         }
     }
 
@@ -196,11 +197,13 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        int hoppersLimit = island.getHoppersLimit();
+        Key blockKey = Key.of("HOPPER");
 
-        if(hoppersLimit >= 0 && island.getHoppersAmount() >= hoppersLimit){
+        int blockLimit = island.getBlockLimit(blockKey);
+
+        if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
             e.setCancelled(true);
-            Locale.REACHED_HOPPERS_LIMIT.send(e.getPlayer());
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtil.format("hopper"));
         }
     }
 

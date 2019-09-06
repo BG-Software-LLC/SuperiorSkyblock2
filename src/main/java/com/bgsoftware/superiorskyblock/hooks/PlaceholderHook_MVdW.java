@@ -26,6 +26,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             registerPlaceholder("superior_island_location_upgrade_" + upgrade);
         }
 
+        registerPlaceholder("superior_panel_toggle");
         registerPlaceholder("superior_island_center");
         registerPlaceholder("superior_island_x");
         registerPlaceholder("superior_island_y");
@@ -57,6 +58,8 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_locked");
         registerPlaceholder("superior_island_name");
         registerPlaceholder("superior_island_is_leader");
+        registerPlaceholder("superior_island_rating");
+        registerPlaceholder("superior_island_rating_stars");
 
         registerPlaceholder("superior_island_location_center");
         registerPlaceholder("superior_island_location_x");
@@ -89,6 +92,8 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_locked");
         registerPlaceholder("superior_island_location_name");
         registerPlaceholder("superior_island_location_is_leader");
+        registerPlaceholder("superior_island_location_rating");
+        registerPlaceholder("superior_island_location_rating_stars");
     }
 
     //Register placeholder without logging to console

@@ -170,6 +170,15 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
                 worldBorder.setCenter(center.getX(), center.getZ());
             }
 
+            switch (superiorPlayer.getBorderColor()){
+                case GREEN:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                    break;
+                case RED:
+                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                    break;
+            }
+
             PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
             ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
         } catch (NullPointerException ignored) {}

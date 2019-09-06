@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
-import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -21,7 +21,7 @@ public final class CmdPermissions implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("permissions", "perms");
+        return Arrays.asList("permissions", "perms", "setpermission", "setperm");
     }
 
     @Override
@@ -64,18 +64,19 @@ public final class CmdPermissions implements ICommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION)){
-            Locale.NO_PERMISSION_CHECK_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.CHECK_PERMISSION));
+        if(!superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION) &&
+                !superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
+            Locale.NO_PERMISSION_CHECK_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_PERMISSION));
             return;
         }
 
-        PermissionNode permissionNode;
+        Object permissionHolder;
         String permissionHolderName;
 
         //Checks if entered an island role.
         try{
             IslandRole islandRole = IslandRole.valueOf(args[1].toUpperCase());
-            permissionNode = island.getPermisisonNode(islandRole);
+            permissionHolder = islandRole;
             permissionHolderName = islandRole.name();
         }catch(IllegalArgumentException ex){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
@@ -85,11 +86,11 @@ public final class CmdPermissions implements ICommand {
                 return;
             }
 
-            permissionNode = island.getPermisisonNode(targetPlayer);
+            permissionHolder = targetPlayer;
             permissionHolderName = targetPlayer.getName();
         }
 
-        Locale.PERMISSION_CHECK.send(superiorPlayer, permissionHolderName, permissionNode.getColoredPermissions());
+        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, permissionHolder, permissionHolderName);
     }
 
     @Override

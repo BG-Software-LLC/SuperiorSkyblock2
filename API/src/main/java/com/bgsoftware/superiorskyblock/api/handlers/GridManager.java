@@ -53,6 +53,7 @@ public interface GridManager {
     @Deprecated
     int getBlockValue(Key key);
 
+    @Deprecated
     double getDecimalBlockValue(Key key);
 
     int getBlockAmount(Block block);

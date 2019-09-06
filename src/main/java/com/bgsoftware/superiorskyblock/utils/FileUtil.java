@@ -113,7 +113,7 @@ public final class FileUtil {
                 ItemStack fillItem = getItemStack(fillItems.getConfigurationSection(_name));
                 List<String> commands = fillItems.getStringList(_name + ".commands");
                 for(String _slot : slots) {
-                    int slot = Integer.valueOf(_slot);
+                    int slot = Integer.parseInt(_slot);
                     inventory.setItem(slot, fillItem);
                     if(!commands.isEmpty())
                         menu.addCommands(slot, commands);
@@ -131,8 +131,8 @@ public final class FileUtil {
 
     public static Location toLocation(String location){
         String[] sections = location.split(",");
-        return new Location(Bukkit.getWorld(sections[0]), Double.valueOf(sections[1]), Double.valueOf(sections[2]),
-                Double.valueOf(sections[3]), Float.valueOf(sections[4]), Float.valueOf(sections[5]));
+        return new Location(Bukkit.getWorld(sections[0]), Double.parseDouble(sections[1]), Double.parseDouble(sections[2]),
+                Double.parseDouble(sections[3]), Float.parseFloat(sections[4]), Float.parseFloat(sections[5]));
     }
 
     public static void saveResource(String resourcePath){

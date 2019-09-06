@@ -4,10 +4,15 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,8 +75,28 @@ public final class CmdDelWarp implements ICommand {
             return;
         }
 
-        island.deleteWarp(args[1]);
+        boolean breakSign = false;
+
+        Block signBlock = island.getWarpLocation(args[1]).getBlock();
+        if(signBlock.getState() instanceof Sign){
+            signBlock.setType(Material.AIR);
+            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
+            breakSign = true;
+        }
+
+        if(args[1].equalsIgnoreCase(SIsland.VISITORS_WARP_NAME)){
+            island.setVisitorsLocation(null);
+        }
+        else{
+            island.deleteWarp(args[1]);
+        }
+
         Locale.DELETE_WARP.send(superiorPlayer, args[1]);
+
+        if(breakSign){
+            Locale.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
+        }
+
     }
 
     @Override

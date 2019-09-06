@@ -1,14 +1,17 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.ConfigComments;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,12 +21,13 @@ public final class SettingsHandler {
 
     public final int maxIslandSize;
     public final int defaultIslandSize;
-    public final int defaultHoppersLimit;
+    public final KeyMap<Integer> defaultBlockLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCropGrowth;
     public final int defaultSpawnerRates;
     public final int defaultMobDrops;
+    public final int defaultIslandHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
     public final KeySet whitelistedStackedBlocks;
@@ -36,6 +40,7 @@ public final class SettingsHandler {
     public final List<String> guestPermissions, memberPermissions, modPermissions, adminPermission, leaderPermissions;
     public final String signWarpLine;
     public final List<String> signWarp;
+    public final String welcomeWarpLine;
     public final int bankWorthRate;
     public final String islandWorld;
     public final String spawnLocation;
@@ -58,6 +63,8 @@ public final class SettingsHandler {
     public final boolean islandNamesIslandTop;
     public final boolean teleportOnJoin;
     public final boolean clearOnJoin;
+    public final boolean rateOwnIsland;
+    public final boolean bonusAffectLevel;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -66,18 +73,31 @@ public final class SettingsHandler {
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
+
+        if(cfg.contains("default-hoppers-limit")){
+            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
+            cfg.set("default-hoppers-limit", null);
+        }
+
         cfg.resetYamlFile(plugin, "config.yml");
 
         saveInterval = cfg.getLong("save-interval", 6000);
         calcInterval = cfg.getLong("calc-interval", 6000);
         maxIslandSize = cfg.getInt("max-island-size", 200);
         defaultIslandSize = cfg.getInt("default-island-size", 20);
-        defaultHoppersLimit = cfg.getInt("default-hoppers-limit", 8);
+        defaultBlockLimits = new KeyMap<>();
+        for(String line : cfg.getStringList("default-limits")){
+            String[] sections = line.split(":");
+            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String limit = sections.length == 2 ? sections[1] : sections[2];
+            defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
+        }
         defaultTeamLimit = cfg.getInt("default-team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-warps-limit", 3);
         defaultCropGrowth = cfg.getInt("default-crop-growth", 1);
         defaultSpawnerRates = cfg.getInt("default-spawner-rates", 1);
         defaultMobDrops = cfg.getInt("default-mob-drops", 1);
+        defaultIslandHeight = cfg.getInt("default-island-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
@@ -92,6 +112,7 @@ public final class SettingsHandler {
         leaderPermissions = cfg.getStringList("default-permissions.leader");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = colorize(cfg.getStringList("sign-warp"));
+        welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorld = cfg.getString("island-world", "SuperiorWorld");
         spawnLocation = cfg.getString("spawn-location", "SuperiorWorld, 0, 100, 0, 0, 0");
@@ -117,6 +138,8 @@ public final class SettingsHandler {
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
         teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
+        rateOwnIsland = cfg.getBoolean("rate-own-island", false);
+        bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
     }
 
     public void updateValue(String path, Object value){

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
+import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
@@ -18,12 +19,16 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
+import com.bgsoftware.superiorskyblock.menu.BorderColorMenu;
 import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
 import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandRateMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandRatingsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
@@ -54,6 +59,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static SuperiorSkyblockPlugin plugin;
 
     private GridHandler gridHandler;
+    private BlockValuesHandler blockValuesHandler;
     private PlayersHandler playersHandler;
     private SchematicsHandler schematicsHandler;
     private SettingsHandler settingsHandler;
@@ -83,38 +89,27 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getCommand("island").setExecutor(commandsHandler);
         getCommand("island").setTabCompleter(commandsHandler);
 
-        boolean isWhitelisted = getServer().hasWhitelist();
-        getServer().setWhitelist(true);
+        loadWorld();
+
+        reloadPlugin(true);
+
+        if (Updater.isOutdated()) {
+            log("");
+            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+            log("");
+        }
 
         Executor.sync(() -> {
-            try {
-                reloadPlugin(true);
-
-                loadWorld();
-
-                getServer().setWhitelist(isWhitelisted);
-
-                if (Updater.isOutdated()) {
-                    log("");
-                    log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-                    log("Version's description: \"" + Updater.getVersionDescription() + "\"");
-                    log("");
+            for(Player player : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                superiorPlayer.updateLastTimeStatus();
+                if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
+                    player.setAllowFlight(true);
+                    player.setFlying(true);
                 }
-
-                Executor.sync(() -> {
-                    for(Player player : Bukkit.getOnlinePlayers()){
-                        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-                        if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                        }
-                    }
-                }, 10L);
-            }catch(Exception ex){
-                ex.printStackTrace();
-                Bukkit.getPluginManager().disablePlugin(this);
             }
-        });
+        }, 1L);
     }
 
     @Override
@@ -123,12 +118,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+            superiorPlayer.updateLastTimeStatus();
             nmsAdapter.setWorldBorder(superiorPlayer, null);
             if(superiorPlayer.hasIslandFlyEnabled()){
                 player.setAllowFlight(false);
                 player.setFlying(false);
             }
         }
+
         dataHandler.closeConnection();
         SaveTask.cancelTask();
         CalcTask.cancelTask();
@@ -168,15 +165,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
+        blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
 
         if(loadGrid) {
             gridHandler = new GridHandler(this);
             playersHandler = new PlayersHandler();
-        }else {
-            gridHandler.reloadBlockValues();
         }
+
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
 
@@ -197,12 +194,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadMenus(){
+        BorderColorMenu.init();
         ConfirmDisbandMenu.init();
         GlobalWarpsMenu.init();
         IslandBiomesMenu.init();
         IslandCreationMenu.init();
         IslandMembersMenu.init();
         IslandPanelMenu.init();
+        IslandPermissionsMenu.init();
+        IslandRateMenu.init();
+        IslandRatingsMenu.init();
         IslandsTopMenu.init();
         IslandUpgradesMenu.init();
         IslandValuesMenu.init();
@@ -238,6 +239,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public GridHandler getGrid(){
         return gridHandler;
+    }
+
+    public BlockValuesHandler getBlockValues() {
+        return blockValuesHandler;
     }
 
     public NMSAdapter getNMSAdapter() {

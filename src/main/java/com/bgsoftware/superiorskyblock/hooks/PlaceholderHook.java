@@ -35,6 +35,10 @@ public abstract class PlaceholderHook {
             Island island = superiorPlayer.getIsland();
             Matcher matcher;
 
+            if(placeholder.equalsIgnoreCase("superior_panel_toggle")){
+                return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
+            }
+
             if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
@@ -142,6 +146,10 @@ public abstract class PlaceholderHook {
                         return plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
+                    case "rating":
+                        return StringUtil.format(island.getTotalRating());
+                    case "rating_stars":
+                        return StringUtil.formatRating(island.getTotalRating());
                 }
 
             }

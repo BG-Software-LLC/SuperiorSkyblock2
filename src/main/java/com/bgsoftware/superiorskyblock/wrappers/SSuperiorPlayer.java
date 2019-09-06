@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
@@ -41,11 +42,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
+    private int disbands;
     private boolean toggledPanel = false;
     private boolean islandFly = false;
     private boolean adminSpyEnabled = false;
-
-    private int disbands;
+    private BorderColor borderColor = BorderColor.BLUE;
+    private long lastTimeStatus = -1;
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
@@ -56,6 +58,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         disbands = resultSet.getInt("disbands");
         toggledPanel = resultSet.getBoolean("toggledPanel");
         islandFly = resultSet.getBoolean("islandFly");
+        borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
+        lastTimeStatus = resultSet.getLong("lastTimeStatus");
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -194,7 +198,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     public void setDisbands(int disbands) {
-        this.disbands = disbands < 0 ? 0 : disbands;
+        this.disbands = Math.max(disbands, 0);
         Query.PLAYER_SET_DISBANDS.getStatementHolder()
                 .setInt(disbands)
                 .setString(player.toString())
@@ -238,6 +242,36 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public boolean isInsideIsland() {
         return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
+    }
+
+    @Override
+    public BorderColor getBorderColor() {
+        return borderColor;
+    }
+
+    @Override
+    public void setBorderColor(BorderColor borderColor) {
+        this.borderColor = borderColor;
+
+        Query.PLAYER_SET_BORDER.getStatementHolder()
+                .setString(borderColor.name())
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void updateLastTimeStatus() {
+        lastTimeStatus = System.currentTimeMillis() / 1000;
+
+        Query.PLAYER_SET_LAST_STATUS.getStatementHolder()
+                .setString(lastTimeStatus + "")
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public long getLastTimeStatus() {
+        return lastTimeStatus;
     }
 
     public BlockPosition getSchematicPos1() {
@@ -287,6 +321,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setInt(disbands)
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
+                .setString(borderColor.name())
+                .setString(lastTimeStatus + "")
                 .setString(player.toString())
                 .execute(async);
     }
@@ -302,6 +338,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setInt(plugin.getSettings().disbandCount)
                 .setBoolean(toggledPanel)
                 .setBoolean(islandFly)
+                .setString(borderColor.name())
+                .setString(lastTimeStatus + "")
                 .execute(async);
     }
 

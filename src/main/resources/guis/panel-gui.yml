@@ -87,6 +87,8 @@ members-panel:
     type: SKULL_ITEM
     data: 3
     name: '&e{0}' #name must be the {0} symbol and colors only!
+    lore:
+      - '&eRole: &7{1}'
 
 visitors-panel:
   title: '&lIsland Visitors'

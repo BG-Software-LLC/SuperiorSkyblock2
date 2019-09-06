@@ -17,6 +17,10 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         this.map = new HashMap<>();
     }
 
+    public KeyMap(KeyMap<V> other){
+        this.map = new HashMap<>(other.map);
+    }
+
     @Override
     public Set<Entry<Key, V>> entrySet() {
         return asKeyMap().entrySet();

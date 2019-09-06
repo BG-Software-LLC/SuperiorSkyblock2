@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -81,7 +82,7 @@ public final class CmdTeam implements ICommand {
             return;
         }
 
-        new Thread(() -> {
+        Executor.async(() -> {
             StringBuilder infoMessage = new StringBuilder(), leadersMessage = new StringBuilder(),
                     adminsMessage = new StringBuilder(), modsMessage = new StringBuilder(),
                     membersMessage = new StringBuilder();
@@ -99,26 +100,27 @@ public final class CmdTeam implements ICommand {
 
             for(UUID member : members){
                 wrappedMember = SSuperiorPlayer.of(member);
+                long time = wrappedMember.getLastTimeStatus() == -1 ? -1 : (System.currentTimeMillis() / 1000) - wrappedMember.getLastTimeStatus();
                 switch (wrappedMember.getIslandRole()){
                     case LEADER:
                         if(!Locale.ISLAND_TEAM_STATUS_LEADER.isEmpty())
                             leadersMessage.append(Locale.ISLAND_TEAM_STATUS_LEADER.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                         break;
                     case ADMIN:
                         if(!Locale.ISLAND_TEAM_STATUS_ADMINS.isEmpty())
                             adminsMessage.append(Locale.ISLAND_TEAM_STATUS_ADMINS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                         break;
                     case MODERATOR:
                         if(!Locale.ISLAND_TEAM_STATUS_MODS.isEmpty())
                             modsMessage.append(Locale.ISLAND_TEAM_STATUS_MODS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                         break;
                     case MEMBER:
                         if(!Locale.ISLAND_TEAM_STATUS_MEMBERS.isEmpty())
                             membersMessage.append(Locale.ISLAND_TEAM_STATUS_MEMBERS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus)).append("\n");
+                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                         break;
                 }
             }
@@ -129,7 +131,7 @@ public final class CmdTeam implements ICommand {
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage());
 
             Locale.sendMessage(sender, infoMessage.toString());
-        }).start();
+        });
     }
 
     @Override
@@ -153,4 +155,35 @@ public final class CmdTeam implements ICommand {
 
         return list;
     }
+
+    private String getTime(long timeLeft){
+        String time = "";
+
+        if(timeLeft == -1)
+            return time;
+
+        if(timeLeft >= 3600) {
+            if (timeLeft / 3600 == 1)
+                time += "1 hour, ";
+            else time += (timeLeft / 3600) + " hours, ";
+            timeLeft %= 3600;
+        }
+
+        if(timeLeft >= 60){
+            if (timeLeft / 60 == 1)
+                time += "1 minute, ";
+            else time += (timeLeft / 60) + " minutes, ";
+            timeLeft %= 60;
+        }
+
+        if(timeLeft != 0) {
+            if (timeLeft == 1)
+                time += timeLeft + " second";
+            else time += timeLeft + " seconds";
+            return time;
+        }
+
+        return time.substring(0, time.length() - 2);
+    }
+
 }

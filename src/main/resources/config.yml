@@ -23,9 +23,10 @@ max-island-size: 200
 # This island size can be expanded by using the /is admin setsize command.
 default-island-size: 20
 
-# Set the default hoppers limit of islands.
-# This limit can be expanded by using the /is admin sethopperslimit command.
-default-hoppers-limit: 8
+# Set the default block limits of islands.
+# This limit can be expanded by using the /is admin setblocklimit command.
+default-limits:
+- 'HOPPER:8'
 
 # The amount of warps an island can have
 # This limit can be expanded by using the /is admin setwarpslimit command.
@@ -46,6 +47,9 @@ default-spawner-rates: 1
 # Set the default mob-drops multiplier of islands.
 # This multiplier can be expanded by using the /is admin setmobdrops command.
 default-mob-drops: 1
+
+# Set the default island height generation for islands.
+default-island-height: 100
 
 # Feature that adds per player world border in islands.
 # If you want to globally disable it, set this section to false.
@@ -87,6 +91,7 @@ default-permissions:
   - BREAK
   - BUILD
   - CHEST_ACCESS
+  - CLOSE_BYPASS
   - DEPOSIT_MONEY
   - DROP_ITEMS
   - EXPEL_BYPASS
@@ -95,6 +100,7 @@ default-permissions:
   - ITEM_FRAME
   - PAINTING
   - PICKUP_DROPS
+  - RANKUP
   - SIGN_INTERACT
   - USE
 
@@ -102,10 +108,13 @@ default-permissions:
   # Moderators have all permissions of members!
   mod:
   - BAN_MEMBER
+  - CLOSE_ISLAND
   - DELETE_WARP
   - EXPEL_PLAYERS
   - INVITE_MEMBER
   - KICK_MEMBER
+  - OPEN_ISLAND
+  - RATINGS_SHOW
   - SET_WARP
   - WITHDRAW_MONEY
 
@@ -139,6 +148,9 @@ sign-warp:
 - ''
 - ''
 - ''
+
+# Set the line to create the welcome sign.
+welcome-sign-line: '[Welcome]'
 
 # Set the divider for the island bank money in the total island worth.
 # You can set it to 0 to disable island bank money to be calculated in island worth.
@@ -385,3 +397,10 @@ teleport-on-join: false
 
 # Should the inventory of the players get cleared after they accept an invite?
 clear-on-join: false
+
+# Should players be able to rate their own islands?
+rate-own-island: false
+
+# Should the bonus affect the island level?
+# When true, the formula will be used.
+bonus-affect-level: true

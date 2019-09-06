@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -114,17 +115,18 @@ public final class IslandMembersMenu extends SuperiorMenu {
             SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(members.get(i + (slots.size() * (page - 1))));
             inv.setItem(slots.get(i), new ItemBuilder(memberItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
+                    .replaceAll("{1}", StringUtil.format( _superiorPlayer.getIslandRole().name()))
                     .asSkullOf(_superiorPlayer).build());
         }
 
         inv.setItem(previousSlot, new ItemBuilder(previousButton)
-                .replaceName("{0}", (page == 1 ? "&c" : "&a")).build());
+                .replaceAll("{0}", (page == 1 ? "&c" : "&a")).build());
 
         inv.setItem(currentSlot, new ItemBuilder(currentButton)
-                .replaceLore("{0}", page + "").build());
+                .replaceAll("{0}", page + "").build());
 
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
-                .replaceName("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
+                .replaceAll("{0}", (members.size() > page * slots.size() ? "&a" : "&c")).build());
 
 
         Executor.sync(() -> {

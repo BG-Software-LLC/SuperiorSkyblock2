@@ -31,6 +31,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdAdmin());
         subCommands.add(new CmdBan());
         subCommands.add(new CmdBiome());
+        subCommands.add(new CmdBorder());
         subCommands.add(new CmdClose());
         subCommands.add(new CmdCreate());
         subCommands.add(new CmdDelWarp());
@@ -50,10 +51,11 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdPermissions());
         subCommands.add(new CmdPromote());
         subCommands.add(new CmdRankup());
+        subCommands.add(new CmdRate());
+        subCommands.add(new CmdRatings());
         subCommands.add(new CmdRecalc());
         subCommands.add(new CmdSetDiscord());
         subCommands.add(new CmdSetPaypal());
-        subCommands.add(new CmdSetPermission());
         subCommands.add(new CmdSetRole());
         subCommands.add(new CmdSetTeleport());
         subCommands.add(new CmdSetWarp());
@@ -66,6 +68,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdTransfer());
         subCommands.add(new CmdUpgrade());
         subCommands.add(new CmdValue());
+        subCommands.add(new CmdVisit());
         subCommands.add(new CmdWarp());
         subCommands.add(new CmdWarps());
         subCommands.add(new CmdWithdraw());

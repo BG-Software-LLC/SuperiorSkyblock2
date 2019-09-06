@@ -34,9 +34,9 @@ public final class ConfigComments {
     public static String DEFAULT_ISLAND_SIZE = "default-island-size";
 
     @Comment("")
-    @Comment("Set the default hoppers limit of islands.")
-    @Comment("This limit can be expanded by using the /is admin sethopperslimit command.")
-    public static String DEFAULT_HOPPERS_LIMIT = "default-hoppers-limit";
+    @Comment("Set the default block limits of islands.")
+    @Comment("This limit can be expanded by using the /is admin setblocklimit command.")
+    public static String DEFAULT_LIMITS = "default-limits";
 
     @Comment("")
     @Comment("The amount of warps an island can have")
@@ -62,6 +62,10 @@ public final class ConfigComments {
     @Comment("Set the default mob-drops multiplier of islands.")
     @Comment("This multiplier can be expanded by using the /is admin setmobdrops command.")
     public static String DEFAULT_MOB_DROPS = "default-mob-drops";
+
+    @Comment("")
+    @Comment("Set the default island height generation for islands.")
+    public static String DEFAULT_ISLAND_HEIGHT = "default-island-height";
 
     @Comment("")
     @Comment("Feature that adds per player world border in islands.")
@@ -131,6 +135,10 @@ public final class ConfigComments {
     @Comment("")
     @Comment("Set the lines of the island warp.")
     public static String SIGN_WARP = "sign-warp";
+
+    @Comment("")
+    @Comment("Set the line to create the welcome sign.")
+    public static String WELCOME_SIGN_LINE = "welcome-sign-line";
 
     @Comment("")
     @Comment("Set the divider for the island bank money in the total island worth.")
@@ -231,5 +239,14 @@ public final class ConfigComments {
     @Comment("")
     @Comment("Should the inventory of the players get cleared after they accept an invite?")
     public static String CLEAR_ON_JOIN = "clear-on-join";
+
+    @Comment("")
+    @Comment("Should players be able to rate their own islands?")
+    public static String RATE_OWN_ISLAND = "rate-own-island";
+
+    @Comment("")
+    @Comment("Should the bonus affect the island level?")
+    @Comment("When true, the formula will be used.")
+    public static String BONUS_AFFECT_LEVEL = "bonus-affect-level";
 
 }

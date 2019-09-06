@@ -27,7 +27,6 @@ import com.google.common.collect.Maps;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 
 import org.bukkit.Bukkit;
@@ -38,11 +37,9 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -62,7 +59,6 @@ public final class GridHandler implements GridManager {
 
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
-    private BlockValuesHandler blockValues = new BlockValuesHandler();
 
     private SIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -224,6 +220,7 @@ public final class GridHandler implements GridManager {
     @Override
     public Location getNextLocation(){
         Location location = lastIsland.parse().clone();
+        location.setY(plugin.getSettings().defaultIslandHeight);
         BlockFace islandFace = getIslandFace();
 
         int islandRange = plugin.getSettings().maxIslandSize * 3;
@@ -274,16 +271,12 @@ public final class GridHandler implements GridManager {
 
     @Override
     public int getBlockValue(Key key){
-        return (int) getDecimalBlockValue(key);
+        return plugin.getBlockValues().getBlockWorth(key).intValue();
     }
 
     @Override
     public double getDecimalBlockValue(Key key) {
-        return blockValues.getBlockValue(key);
-    }
-
-    public Key getBlockValueKey(Key key){
-        return blockValues.blockValues.getKey(key);
+        return plugin.getBlockValues().getBlockWorth(key).doubleValue();
     }
 
     @Override
@@ -351,7 +344,7 @@ public final class GridHandler implements GridManager {
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
-                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.valueOf(sections[1]));
+                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]));
             }
         }
 
@@ -423,10 +416,6 @@ public final class GridHandler implements GridManager {
                 .execute(async);
     }
 
-    public void reloadBlockValues(){
-        blockValues = new BlockValuesHandler();
-    }
-
     private BlockFace getIslandFace(){
         //Possibilities: North / East
         if(lastIsland.getX() >= lastIsland.getZ()) {
@@ -445,7 +434,7 @@ public final class GridHandler implements GridManager {
                 .execute(true);
     }
 
-    private class CreateIslandData {
+    private static class CreateIslandData {
 
         public UUID player;
         public String schemName, islandName;
@@ -528,30 +517,6 @@ public final class GridHandler implements GridManager {
             return stringBuilder.toString().substring(1);
         }
 
-    }
-
-    private class BlockValuesHandler {
-
-        private final KeyMap<Double> blockValues = new KeyMap<>();
-
-        private BlockValuesHandler(){
-            SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-            File file = new File(plugin.getDataFolder(), "blockvalues.yml");
-
-            if(!file.exists())
-                plugin.saveResource("blockvalues.yml", true);
-
-            YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
-            for(String key : cfg.getConfigurationSection("block-values").getKeys(false))
-                blockValues.put(Key.of(key), cfg.isDouble("block-values." + key) ? cfg.getDouble("block-values." + key) :
-                        (double) cfg.getInt("block-values." + key));
-        }
-
-        double getBlockValue(Key key) {
-            return blockValues.getOrDefault(key, 0D);
-        }
     }
 
     public IslandRegistry getIslandRegistry() {

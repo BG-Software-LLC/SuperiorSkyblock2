@@ -43,7 +43,7 @@ public final class DataHandler {
 
     public void saveDatabase(boolean async) {
         if (async && Bukkit.isPrimaryThread()) {
-            new Thread(() -> saveDatabase(false)).start();
+            Executor.async(() -> saveDatabase(false));
             return;
         }
 
@@ -97,10 +97,13 @@ public final class DataHandler {
                 "discord VARCHAR, " +
                 "paypal VARCHAR, " +
                 "warpsLimit INTEGER, " +
-                "bonusWorth VARCHAR," +
-                "locked BOOLEAN," +
-                "blockCounts VARCHAR," +
-                "name VARCHAR" +
+                "bonusWorth VARCHAR, " +
+                "locked BOOLEAN, " +
+                "blockCounts VARCHAR, " +
+                "name VARCHAR, " +
+                "visitorsLocation VARCHAR," +
+                "description VARCHAR," +
+                "ratings VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -111,7 +114,10 @@ public final class DataHandler {
                 "islandRole VARCHAR, " +
                 "textureValue VARCHAR, " +
                 "disbands INTEGER," +
-                "toggledPanel BOOLEAN" +
+                "toggledPanel BOOLEAN," +
+                "islandFly BOOLEAN," +
+                "borderColor VARCHAR," +
+                "lastTimeStatus VARCHAR" +
                 ");");
 
         //Creating default grid table
@@ -142,6 +148,11 @@ public final class DataHandler {
         addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
         addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
         addColumnIfNotExists("name", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("borderColor", "players", "'BLUE'", "VARCHAR");
+        addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "VARCHAR");
+        addColumnIfNotExists("visitorsLocation", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("description", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
