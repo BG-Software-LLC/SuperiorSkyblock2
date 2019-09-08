@@ -235,13 +235,24 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onEntityAttack(EntityDamageByEntityEvent e){
-        if(e.getEntity() instanceof Painting || e.getEntity() instanceof ItemFrame)
+        if(e.getEntity() instanceof Painting || e.getEntity() instanceof ItemFrame || e.getEntity() instanceof Player)
             return;
 
-        if(e.getEntity() instanceof Player || !(e.getDamager() instanceof Player))
+        Player damager = null;
+
+        if(e.getDamager() instanceof Player){
+            damager = (Player) e.getDamager();
+        }
+        else if(e.getDamager() instanceof Projectile){
+            Projectile projectile = (Projectile) e.getDamager();
+            if(projectile.getShooter() instanceof Player)
+                damager = (Player) projectile.getShooter();
+        }
+
+        if(damager == null)
             return;
 
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
+        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island != null && !island.hasPermission(damagerPlayer, IslandPermission.ANIMAL_DAMAGE)){
