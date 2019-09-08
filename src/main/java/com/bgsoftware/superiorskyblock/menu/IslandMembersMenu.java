@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +36,15 @@ public final class IslandMembersMenu extends SuperiorMenu {
         super("membersPage");
         if(island != null) {
             this.members = island.getAllMembers();
-            members.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
+            members.sort((o1, o2) -> {
+                SuperiorPlayer player1 = SSuperiorPlayer.of(o1), player2 = SSuperiorPlayer.of(o2);
+                int compare = player1.getIslandRole().compareTo(player2.getIslandRole());
+
+                if(compare == 0)
+                    return player1.getName().compareTo(player2.getName());
+
+                return compare;
+            });
         }
     }
 
@@ -172,7 +179,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
         Arrays.stream(cfg.getString("members-panel.member-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
-        slots.sort(Integer::compareTo);
+        //slots.sort(Integer::compareTo);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
