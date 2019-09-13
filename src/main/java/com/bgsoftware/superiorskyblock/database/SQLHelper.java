@@ -66,6 +66,15 @@ public class SQLHelper {
 
     }
 
+    public static boolean isOpen(){
+        try {
+            return !conn.isClosed();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static void close(){
         try{
             conn.close();

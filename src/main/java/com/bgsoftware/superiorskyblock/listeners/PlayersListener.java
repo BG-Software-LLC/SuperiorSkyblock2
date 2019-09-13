@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -96,7 +97,8 @@ public final class PlayersListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        superiorPlayer.updateLastTimeStatus();
+        if(SQLHelper.isOpen())
+            superiorPlayer.updateLastTimeStatus();
 
         Island island = superiorPlayer.getIsland();
 
