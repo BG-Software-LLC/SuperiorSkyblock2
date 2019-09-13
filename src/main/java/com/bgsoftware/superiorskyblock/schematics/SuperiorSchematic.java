@@ -10,11 +10,11 @@ import com.bgsoftware.superiorskyblock.utils.TagUtil;
 
 import org.bukkit.Location;
 
-public final class SSchematic implements Schematic {
+public final class SuperiorSchematic implements Schematic {
 
     private CompoundTag compoundTag;
 
-    public SSchematic(CompoundTag compoundTag){
+    public SuperiorSchematic(CompoundTag compoundTag){
         this.compoundTag = compoundTag;
     }
 
@@ -44,9 +44,9 @@ public final class SSchematic implements Schematic {
         return compoundTag;
     }
 
-    @Override
-    public String toString() {
-        return compoundTag.toString();
-    }
+//    @Override
+//    public String toString() {
+//        return compoundTag.toString();
+//    }
 
 }

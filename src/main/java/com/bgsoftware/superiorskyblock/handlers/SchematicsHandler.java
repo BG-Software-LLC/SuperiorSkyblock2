@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
@@ -10,7 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.schematics.SSchematic;
+import com.bgsoftware.superiorskyblock.schematics.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.schematics.TagBuilder;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ByteTag;
@@ -68,7 +69,7 @@ public final class SchematicsHandler implements SchematicManager {
 
         //noinspection ConstantConditions
         for(File schemFile : schematicsFolder.listFiles()){
-            SSchematic schematic = loadFromFile(schemFile);
+            Schematic schematic = loadFromFile(schemFile);
             if(schematic != null)
                 schematics.put(schemFile.getName().replace(".schematic", ""), schematic);
         }
@@ -160,7 +161,7 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("offsetZ", new IntTag(offsetZ));
         compoundValue.put("version", new StringTag(version));
 
-        SSchematic schematic = new SSchematic(new CompoundTag(compoundValue));
+        SuperiorSchematic schematic = new SuperiorSchematic(new CompoundTag(compoundValue));
         schematics.put(schematicName, schematic);
         saveIntoFile(schematicName, schematic);
 
@@ -176,31 +177,35 @@ public final class SchematicsHandler implements SchematicManager {
         return plugin.getNMSAdapter().getFlowerPot(block.getLocation());
     }
 
-    private SSchematic loadFromFile(File file){
+    private Schematic loadFromFile(File file){
+        Schematic schematic = null;
+
         try {
             if(!file.exists()) {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
             }
 
-            try(NBTInputStream reader = new NBTInputStream(new FileInputStream(file))){
+            try (NBTInputStream reader = new NBTInputStream(new FileInputStream(file))) {
                 CompoundTag compoundTag = (CompoundTag) reader.readTag();
-                if(compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(version))
+                if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(version))
                     SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
-                return new SSchematic(compoundTag);
-            }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid. Make sure you use the built in system.");
-                return null;
+                if(compoundTag.getValue().isEmpty() && FAWEHook.isEnabled())
+                    schematic = FAWEHook.loadSchematic(file);
+                else
+                    schematic = new SuperiorSchematic(compoundTag);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid.");
             }
-
         }catch(IOException ex){
             ex.printStackTrace();
         }
 
-        return null;
+        return schematic;
     }
 
-    private void saveIntoFile(String name, SSchematic schematic){
+    private void saveIntoFile(String name, SuperiorSchematic schematic){
         try {
             File file = new File(plugin.getDataFolder(), "schematics/" + name + ".schematic");
 

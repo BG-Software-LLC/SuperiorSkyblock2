@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
-import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
@@ -24,8 +23,6 @@ public final class ProvidersHandler {
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
-            if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
-                FAWEHook.register();
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 LeaderHeadsHook.register();
 

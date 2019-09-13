@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
@@ -11,7 +10,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
-import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,7 +35,6 @@ import java.util.Map;
 public final class TagUtil {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static String version = Bukkit.getBukkitVersion();
 
     public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
         Runnable _callback = () ->
@@ -49,20 +46,15 @@ public final class TagUtil {
             }, 1L);
 
         Executor.async(() -> {
-            if(FAWEHook.isEnabled() && !version.contains("1.13") && !version.contains("1.14")){
-                FAWEHook.setBlocks(blocks, offset, _callback);
-            }
-            else {
-                for (Tag tag : blocks) {
-                    Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
-                    Location block = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
-                    int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
-                    Executor.sync(() -> {
-                        plugin.getNMSAdapter().setBlock(block, combinedId);
-                        if (blocks.indexOf(tag) == blocks.size() - 1)
-                            _callback.run();
-                    });
-                }
+            for (Tag tag : blocks) {
+                Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
+                Location block = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
+                int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
+                Executor.sync(() -> {
+                    plugin.getNMSAdapter().setBlock(block, combinedId);
+                    if (blocks.indexOf(tag) == blocks.size() - 1)
+                        _callback.run();
+                });
             }
         });
     }
