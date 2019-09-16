@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class IslandSerializer {
@@ -54,6 +55,13 @@ public final class IslandSerializer {
         ratings.keySet().forEach(_uuid ->
                 ratingsBuilder.append(";").append(_uuid).append("=").append(ratings.get(_uuid).getValue()));
         return ratingsBuilder.length() == 0 ? "" : ratingsBuilder.toString().substring(1);
+    }
+
+    public static String serializeMissions(Set<String> missions){
+        StringBuilder missionsBuilder = new StringBuilder();
+        missions.forEach(mission ->
+                missionsBuilder.append(";").append(mission));
+        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
 

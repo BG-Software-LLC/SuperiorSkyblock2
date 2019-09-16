@@ -157,10 +157,10 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         int currentSlot = cfg.getInt("warps-gui.current-page.slot");
         int nextSlot = cfg.getInt("warps-gui.next-page.slot");
 
-        islandValuesMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("warps-gui.previous-page.sound")));
-        islandValuesMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("warps-gui.current-page.sound")));
-        islandValuesMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("warps-gui.next-page.sound")));
-        islandValuesMenu.addSound(-1, getSound(cfg.getConfigurationSection("warps-gui.warp-item.sound")));
+        islandValuesMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("warps-gui.previous-page.sound")));
+        islandValuesMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("warps-gui.current-page.sound")));
+        islandValuesMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("warps-gui.next-page.sound")));
+        islandValuesMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("warps-gui.warp-item.sound")));
         islandValuesMenu.addCommands(previousSlot, cfg.getStringList("warps-gui.previous-page.commands"));
         islandValuesMenu.addCommands(currentSlot, cfg.getStringList("warps-gui.current-page.commands"));
         islandValuesMenu.addCommands(nextSlot, cfg.getStringList("warps-gui.next-page.commands"));

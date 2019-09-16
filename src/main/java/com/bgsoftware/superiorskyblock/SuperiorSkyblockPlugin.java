@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
@@ -25,6 +26,8 @@ import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandMainMissionsMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandMissionsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandRateMenu;
@@ -66,6 +69,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private DataHandler dataHandler;
     private UpgradesHandler upgradesHandler;
     private ProvidersHandler providersHandler;
+    private MissionsHandler missionsHandler;
 
     private NMSAdapter nmsAdapter;
 
@@ -126,9 +130,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
         }
 
-        dataHandler.closeConnection();
         SaveTask.cancelTask();
         CalcTask.cancelTask();
+        Executor.close();
+        dataHandler.closeConnection();
     }
 
     private void loadNMSAdapter(){
@@ -168,6 +173,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
+        missionsHandler = new MissionsHandler(this);
 
         if(loadGrid) {
             gridHandler = new GridHandler(this);
@@ -199,7 +205,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         GlobalWarpsMenu.init();
         IslandBiomesMenu.init();
         IslandCreationMenu.init();
+        IslandMainMissionsMenu.init();
         IslandMembersMenu.init();
+        IslandMissionsMenu.init();
         IslandPanelMenu.init();
         IslandPermissionsMenu.init();
         IslandRateMenu.init();
@@ -211,6 +219,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandWarpsMenu.init();
         MemberManageMenu.init();
         MemberRoleMenu.init();
+    }
+
+    @Override
+    public MissionsHandler getMissions() {
+        return missionsHandler;
     }
 
     public ProvidersHandler getProviders() {

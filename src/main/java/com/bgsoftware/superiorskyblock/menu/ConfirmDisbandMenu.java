@@ -81,13 +81,13 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
 
         ItemStack confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
         confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);
-        confirmDisbandMenu.addSound(confirmSlot, getSound(cfg.getConfigurationSection("disband-gui.confirm.sound")));
+        confirmDisbandMenu.addSound(confirmSlot, FileUtil.getSound(cfg.getConfigurationSection("disband-gui.confirm.sound")));
         confirmDisbandMenu.addCommands(confirmSlot, cfg.getStringList("disband-gui.confirm.commands"));
         inventory.setItem(confirmSlot, confirmItem);
 
         ItemStack cancelItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
         cancelSlot = cfg.getInt("disband-gui.cancel.slot", 3);
-        confirmDisbandMenu.addSound(cancelSlot, getSound(cfg.getConfigurationSection("disband-gui.cancel.sound")));
+        confirmDisbandMenu.addSound(cancelSlot, FileUtil.getSound(cfg.getConfigurationSection("disband-gui.cancel.sound")));
         confirmDisbandMenu.addCommands(cancelSlot, cfg.getStringList("disband-gui.cancel.commands"));
         inventory.setItem(cancelSlot, cancelItem);
     }

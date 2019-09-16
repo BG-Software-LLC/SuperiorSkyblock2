@@ -164,10 +164,10 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         int nextSlot = cfg.getInt("global-gui.next-page.slot");
         GlobalWarpsMenu.visitorWarps = cfg.getBoolean("global-gui.visitor-warps", false);
 
-        globalWarpsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
-        globalWarpsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
-        globalWarpsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
-        globalWarpsMenu.addSound(-1, getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
+        globalWarpsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
+        globalWarpsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
+        globalWarpsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
+        globalWarpsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
         globalWarpsMenu.addCommands(previousSlot, cfg.getStringList("global-gui.previous-page.commands"));
         globalWarpsMenu.addCommands(currentSlot, cfg.getStringList("global-gui.current-page.commands"));
         globalWarpsMenu.addCommands(nextSlot, cfg.getStringList("global-gui.next-page.commands"));

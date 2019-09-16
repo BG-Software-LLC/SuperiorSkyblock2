@@ -75,10 +75,10 @@ public final class MemberRoleMenu extends SuperiorMenu {
         modSlot = cfg.getInt("roles-panel.mod-role.slot");
         adminSlot = cfg.getInt("roles-panel.admin-role.slot");
         leaderSlot = cfg.getInt("roles-panel.leader-role.slot");
-        memberRoleMenu.addSound(memberSlot, getSound(cfg.getConfigurationSection("roles-panel.member-role.sound")));
-        memberRoleMenu.addSound(modSlot, getSound(cfg.getConfigurationSection("roles-panel.mod-role.sound")));
-        memberRoleMenu.addSound(adminSlot, getSound(cfg.getConfigurationSection("roles-panel.admin-role.sound")));
-        memberRoleMenu.addSound(leaderSlot, getSound(cfg.getConfigurationSection("roles-panel.leader-role.sound")));
+        memberRoleMenu.addSound(memberSlot, FileUtil.getSound(cfg.getConfigurationSection("roles-panel.member-role.sound")));
+        memberRoleMenu.addSound(modSlot, FileUtil.getSound(cfg.getConfigurationSection("roles-panel.mod-role.sound")));
+        memberRoleMenu.addSound(adminSlot, FileUtil.getSound(cfg.getConfigurationSection("roles-panel.admin-role.sound")));
+        memberRoleMenu.addSound(leaderSlot, FileUtil.getSound(cfg.getConfigurationSection("roles-panel.leader-role.sound")));
         memberRoleMenu.addCommands(memberSlot, cfg.getStringList("roles-panel.member-role.commands"));
         memberRoleMenu.addCommands(modSlot, cfg.getStringList("roles-panel.mod-role.commands"));
         memberRoleMenu.addCommands(adminSlot, cfg.getStringList("roles-panel.admin-role.commands"));

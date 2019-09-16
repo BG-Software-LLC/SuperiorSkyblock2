@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -84,6 +85,10 @@ public final class IslandDeserializer {
                 ratingsMap.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
             }catch(Exception ignored){}
         }
+    }
+
+    public static void deserializeMissions(String missions, Set<String> completedMissions){
+        completedMissions.addAll(Arrays.asList(missions.split(";")));
     }
 
 }

@@ -140,10 +140,10 @@ public final class IslandRatingsMenu extends SuperiorMenu {
         currentSlot = cfg.getInt("ratings-gui.current-page.slot");
         nextSlot = cfg.getInt("ratings-gui.next-page.slot");
 
-        islandRatingsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("ratings-gui.previous-page.sound")));
-        islandRatingsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("ratings-gui.current-page.sound")));
-        islandRatingsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("ratings-gui.next-page.sound")));
-        islandRatingsMenu.addSound(-1, getSound(cfg.getConfigurationSection("ratings-gui.rate-item.sound")));
+        islandRatingsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.previous-page.sound")));
+        islandRatingsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.current-page.sound")));
+        islandRatingsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.next-page.sound")));
+        islandRatingsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.rate-item.sound")));
         islandRatingsMenu.addCommands(previousSlot, cfg.getStringList("ratings-gui.previous-page.commands"));
         islandRatingsMenu.addCommands(currentSlot, cfg.getStringList("ratings-gui.current-page.commands"));
         islandRatingsMenu.addCommands(nextSlot, cfg.getStringList("ratings-gui.next-page.commands"));

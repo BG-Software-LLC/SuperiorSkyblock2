@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -246,5 +247,11 @@ public interface Island extends Comparable<Island> {
     int getRatingAmount();
 
     Map<UUID, Rating> getRatings();
+
+    void completeMission(Mission mission);
+
+    void resetMission(Mission mission);
+
+    boolean hasCompletedMission(Mission mission);
 
 }

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public final class Executor {
 
@@ -31,6 +32,15 @@ public final class Executor {
 
     public static void async(Runnable runnable, long delay){
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
+    }
+
+    public static void close(){
+        try{
+            executor.shutdown();
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 }

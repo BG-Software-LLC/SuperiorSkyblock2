@@ -221,8 +221,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
         ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.island-item"));
         ItemStack noIslandItem = FileUtil.getItemStack(cfg.getConfigurationSection("top-islands.no-island-item"));
 
-        islandsTopMenu.addSound(-1, getSound(cfg.getConfigurationSection("top-islands.island-item.sound")));
-        islandsTopMenu.addSound(-2, getSound(cfg.getConfigurationSection("top-islands.no-island-item.sound")));
+        islandsTopMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("top-islands.island-item.sound")));
+        islandsTopMenu.addSound(-2, FileUtil.getSound(cfg.getConfigurationSection("top-islands.no-island-item.sound")));
         islandsTopMenu.addCommands(-1, cfg.getStringList("top-islands.island-item.commands"));
         islandsTopMenu.addCommands(-2, cfg.getStringList("top-islands.no-island-item.commands"));
 

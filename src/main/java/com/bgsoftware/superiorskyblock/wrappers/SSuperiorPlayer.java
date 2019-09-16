@@ -5,11 +5,14 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
@@ -23,13 +26,16 @@ import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private final Set<String> completedMissions = new HashSet<>();
     private final UUID player;
 
     private UUID teamLeader;
@@ -60,6 +66,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         islandFly = resultSet.getBoolean("islandFly");
         borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
         lastTimeStatus = resultSet.getLong("lastTimeStatus");
+        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), completedMissions);
     }
 
     public SSuperiorPlayer(CompoundTag tag){
@@ -274,6 +281,31 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return lastTimeStatus;
     }
 
+    @Override
+    public void completeMission(Mission mission) {
+        completedMissions.add(mission.getName());
+
+        Query.PLAYER_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void resetMission(Mission mission) {
+        completedMissions.remove(mission.getName());
+
+        Query.PLAYER_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean hasCompletedMission(Mission mission) {
+        return completedMissions.contains(mission.getName());
+    }
+
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
@@ -323,6 +355,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setBoolean(islandFly)
                 .setString(borderColor.name())
                 .setString(lastTimeStatus + "")
+                .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(player.toString())
                 .execute(async);
     }
@@ -340,6 +373,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setBoolean(islandFly)
                 .setString(borderColor.name())
                 .setString(lastTimeStatus + "")
+                .setString(IslandSerializer.serializeMissions(completedMissions))
                 .execute(async);
     }
 

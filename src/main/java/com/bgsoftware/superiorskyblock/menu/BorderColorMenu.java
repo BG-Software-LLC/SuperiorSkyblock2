@@ -66,19 +66,19 @@ public final class BorderColorMenu extends SuperiorMenu {
 
         ItemStack greenColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.green_color"));
         greenColorSlot = cfg.getInt("border-gui.green_color.slot", 0);
-        islandRatingMenu.addSound(greenColorSlot, getSound(cfg.getConfigurationSection("border-gui.green_color.sound")));
+        islandRatingMenu.addSound(greenColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.green_color.sound")));
         islandRatingMenu.addCommands(greenColorSlot, cfg.getStringList("border-gui.green_color.commands"));
         inventory.setItem(greenColorSlot, greenColorItem);
 
         ItemStack blueColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.blue_color"));
         blueColorSlot = cfg.getInt("border-gui.blue_color.slot", 0);
-        islandRatingMenu.addSound(blueColorSlot, getSound(cfg.getConfigurationSection("border-gui.blue_color.sound")));
+        islandRatingMenu.addSound(blueColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.blue_color.sound")));
         islandRatingMenu.addCommands(blueColorSlot, cfg.getStringList("border-gui.blue_color.commands"));
         inventory.setItem(blueColorSlot, blueColorItem);
 
         ItemStack redColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.red_color"));
         redColorSlot = cfg.getInt("border-gui.red_color.slot", 0);
-        islandRatingMenu.addSound(redColorSlot, getSound(cfg.getConfigurationSection("border-gui.red_color.sound")));
+        islandRatingMenu.addSound(redColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.red_color.sound")));
         islandRatingMenu.addCommands(redColorSlot, cfg.getStringList("border-gui.red_color.commands"));
         inventory.setItem(redColorSlot, redColorItem);
     }

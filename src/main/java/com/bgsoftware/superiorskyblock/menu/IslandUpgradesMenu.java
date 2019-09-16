@@ -95,8 +95,8 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
                             FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
                             FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
                             slot,
-                            getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level.sound")),
-                            getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level.sound")),
+                            FileUtil.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level.sound")),
+                            FileUtil.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level.sound")),
                             upgrades.getStringList(_upgrade + "." + level + ".has-next-level.commands"),
                             upgrades.getStringList(_upgrade + "." + level + ".no-next-level.commands"))
                     );

@@ -119,12 +119,12 @@ public final class IslandBiomesMenu extends SuperiorMenu {
             biomesData.put(biome + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".has-access-item")));
             biomesData.put(biome + "-has-access-item-sound",
-                    getSound(section.getConfigurationSection(biome + ".has-access-item.sound")));
+                    FileUtil.getSound(section.getConfigurationSection(biome + ".has-access-item.sound")));
             biomesData.put(biome + "-has-access-item-commands", section.getStringList(biome + ".has-access-item.commands"));
             biomesData.put(biome + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(biome + ".no-access-item")));
             biomesData.put(biome + "-no-access-item-sound",
-                    getSound(section.getConfigurationSection(biome + ".no-access-item.sound")));
+                    FileUtil.getSound(section.getConfigurationSection(biome + ".no-access-item.sound")));
             biomesData.put(biome + "-no-access-item-commands", section.getStringList(biome + ".no-access-item.commands"));
         }
     }

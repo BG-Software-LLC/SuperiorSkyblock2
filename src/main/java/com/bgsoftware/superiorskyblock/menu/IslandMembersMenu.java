@@ -164,10 +164,10 @@ public final class IslandMembersMenu extends SuperiorMenu {
         currentSlot = cfg.getInt("members-panel.current-page.slot");
         nextSlot = cfg.getInt("members-panel.next-page.slot");
 
-        islandMembersMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("members-panel.previous-page.sound")));
-        islandMembersMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
-        islandMembersMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
-        islandMembersMenu.addSound(-1, getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
+        islandMembersMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.previous-page.sound")));
+        islandMembersMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
+        islandMembersMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
+        islandMembersMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
         islandMembersMenu.addCommands(previousSlot, cfg.getStringList("members-panel.previous-page.commands"));
         islandMembersMenu.addCommands(currentSlot, cfg.getStringList("members-panel.current-page.commands"));
         islandMembersMenu.addCommands(nextSlot, cfg.getStringList("members-panel.next-page.commands"));

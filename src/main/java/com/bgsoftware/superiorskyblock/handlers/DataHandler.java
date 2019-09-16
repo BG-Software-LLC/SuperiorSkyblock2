@@ -103,7 +103,8 @@ public final class DataHandler {
                 "name VARCHAR, " +
                 "visitorsLocation VARCHAR," +
                 "description VARCHAR," +
-                "ratings VARCHAR" +
+                "ratings VARCHAR," +
+                "missions VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -117,7 +118,8 @@ public final class DataHandler {
                 "toggledPanel BOOLEAN," +
                 "islandFly BOOLEAN," +
                 "borderColor VARCHAR," +
-                "lastTimeStatus VARCHAR" +
+                "lastTimeStatus VARCHAR," +
+                "missions VARCHAR" +
                 ");");
 
         //Creating default grid table
@@ -153,6 +155,8 @@ public final class DataHandler {
         addColumnIfNotExists("visitorsLocation", "islands", "''", "VARCHAR");
         addColumnIfNotExists("description", "islands", "''", "VARCHAR");
         addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("missions", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("missions", "players", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

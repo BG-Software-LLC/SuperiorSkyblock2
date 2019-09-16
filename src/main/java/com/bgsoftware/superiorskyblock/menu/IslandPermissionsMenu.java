@@ -171,11 +171,14 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
         inv.setItem(nextSlot, new ItemBuilder(nextButton)
                 .replaceAll("{0}", (permissionsAmount > page * slots.size() ? "&a" : "&c")).build());
 
-        this.previousMenu = previousMenu;
-
         this.currentPage = page;
 
-        Executor.sync(() -> superiorPlayer.asPlayer().openInventory(inv));
+        this.previousMenu = null;
+
+        Executor.sync(() -> {
+            superiorPlayer.asPlayer().openInventory(inv);
+            this.previousMenu = previousMenu;
+        });
     }
 
     private static <T> T get(String key, Class<T> type){
@@ -213,10 +216,10 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
         for(String permission : section.getKeys(false)){
             permission = permission.toLowerCase();
-            permissionsData.put(permission + "-has-access-sound", getSound(section.getConfigurationSection(permission + ".has-access.sound")));
-            permissionsData.put(permission + "-has-access-commands", getSound(section.getConfigurationSection(permission + ".has-access.commands")));
-            permissionsData.put(permission + "-no-access-sound", getSound(section.getConfigurationSection(permission + ".no-access.sound")));
-            permissionsData.put(permission + "-no-access-commands", getSound(section.getConfigurationSection(permission + ".no-access.commands")));
+            permissionsData.put(permission + "-has-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.sound")));
+            permissionsData.put(permission + "-has-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.commands")));
+            permissionsData.put(permission + "-no-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.sound")));
+            permissionsData.put(permission + "-no-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.commands")));
             permissionsData.put(permission + "-permission-enabled",
                     FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-enabled")));
             permissionsData.put(permission + "-permission-disabled",

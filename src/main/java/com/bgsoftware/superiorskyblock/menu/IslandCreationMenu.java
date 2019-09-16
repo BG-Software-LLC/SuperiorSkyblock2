@@ -121,12 +121,12 @@ public final class IslandCreationMenu extends SuperiorMenu {
             schematicsData.put(schematic + "-has-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
             schematicsData.put(schematic + "-has-access-item-sound",
-                    getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
+                    FileUtil.getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
             schematicsData.put(schematic + "-has-access-item-commands", section.getStringList(schematic + ".has-access-item.commands"));
             schematicsData.put(schematic + "-no-access-item",
                     FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
             schematicsData.put(schematic + "-no-access-item-sound",
-                    getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
+                    FileUtil.getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
             schematicsData.put(schematic + "-no-access-item-commands", section.getStringList(schematic + ".no-access-item.commands"));
         }
     }

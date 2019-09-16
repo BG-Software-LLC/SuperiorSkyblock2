@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -108,19 +106,6 @@ public abstract class SuperiorMenu implements InventoryHolder {
                     previousMove = true;
             });
         }
-    }
-
-    protected static SoundWrapper getSound(ConfigurationSection section){
-        Sound sound = null;
-
-        try{
-            sound = Sound.valueOf(section.getString("type"));
-        }catch(Exception ignored){}
-
-        if(sound == null)
-            return null;
-
-        return new SoundWrapper(sound, (float) section.getDouble("volume"), (float) section.getDouble("pitch"));
     }
 
 }

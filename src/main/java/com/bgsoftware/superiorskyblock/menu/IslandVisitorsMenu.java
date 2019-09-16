@@ -159,10 +159,10 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         currentSlot = cfg.getInt("visitors-panel.current-page.slot");
         nextSlot = cfg.getInt("visitors-panel.next-page.slot");
 
-        islandVisitorsMenu.addSound(previousSlot, getSound(cfg.getConfigurationSection("visitors-panel.previous-page.sound")));
-        islandVisitorsMenu.addSound(currentSlot, getSound(cfg.getConfigurationSection("visitors-panel.current-page.sound")));
-        islandVisitorsMenu.addSound(nextSlot, getSound(cfg.getConfigurationSection("visitors-panel.next-page.sound")));
-        islandVisitorsMenu.addSound(-1, getSound(cfg.getConfigurationSection("visitors-panel.visitor-item.sound")));
+        islandVisitorsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("visitors-panel.previous-page.sound")));
+        islandVisitorsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("visitors-panel.current-page.sound")));
+        islandVisitorsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("visitors-panel.next-page.sound")));
+        islandVisitorsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("visitors-panel.visitor-item.sound")));
         islandVisitorsMenu.addCommands(previousSlot, cfg.getStringList("visitors-panel.previous-page.commands"));
         islandVisitorsMenu.addCommands(currentSlot, cfg.getStringList("visitors-panel.current-page.commands"));
         islandVisitorsMenu.addCommands(nextSlot, cfg.getStringList("visitors-panel.next-page.commands"));

@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
@@ -157,6 +159,19 @@ public final class FileUtil {
         }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    public static SoundWrapper getSound(ConfigurationSection section){
+        Sound sound = null;
+
+        try{
+            sound = Sound.valueOf(section.getString("type"));
+        }catch(Exception ignored){}
+
+        if(sound == null)
+            return null;
+
+        return new SoundWrapper(sound, (float) section.getDouble("volume"), (float) section.getDouble("pitch"));
     }
 
 }

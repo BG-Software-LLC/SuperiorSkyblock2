@@ -48,6 +48,10 @@ permissions:
             description: Kick a player from your island.
           superior.island.leave:
             description: Leave your island.
+          superior.island.mission:
+            description: Complete a mission.
+          superior.island.missions:
+            description: Open the missions menu.
           superior.island.name:
             description: Change the name of your island.
           superior.island.open:

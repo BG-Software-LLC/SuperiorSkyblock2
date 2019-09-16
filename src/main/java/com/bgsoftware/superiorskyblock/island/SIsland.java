@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -99,7 +100,8 @@ public class SIsland extends DatabaseObject implements Island {
     private boolean locked = false;
     private String islandName = "";
     private String description = "";
-    private Map<UUID, Rating> ratings = new HashMap<>();
+    private final Map<UUID, Rating> ratings = new HashMap<>();
+    private final Set<String> completedMissions = new HashSet<>();
 
     /*
      * SIsland multipliers & limits
@@ -126,6 +128,7 @@ public class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeBlockCounts(resultSet.getString("blockCounts"), this);
         IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
+        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
 
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
@@ -1234,6 +1237,31 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public void completeMission(Mission mission) {
+        completedMissions.add(mission.getName());
+
+        Query.ISLAND_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void resetMission(Mission mission) {
+        completedMissions.remove(mission.getName());
+
+        Query.ISLAND_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean hasCompletedMission(Mission mission) {
+        return completedMissions.contains(mission.getName());
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(LocationUtil.getLocation(getTeleportLocation()))
@@ -1259,6 +1287,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(islandName)
                 .setString(description)
                 .setString(IslandSerializer.serializeRatings(ratings))
+                .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1298,6 +1327,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(LocationUtil.getLocation(visitorsLocation))
                 .setString(description)
                 .setString(IslandSerializer.serializeRatings(ratings))
+                .setString(IslandSerializer.serializeMissions(completedMissions))
                 .execute(async);
     }
 

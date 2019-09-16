@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.database;
 
-import com.google.common.util.concurrent.FutureCallback;
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -64,15 +62,6 @@ public class SQLHelper {
 
         void run(ResultSet resultSet) throws SQLException;
 
-    }
-
-    public static boolean isOpen(){
-        try {
-            return !conn.isClosed();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public static void close(){

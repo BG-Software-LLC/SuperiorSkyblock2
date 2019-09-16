@@ -23,4 +23,15 @@ public final class SoundWrapper {
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 
+    public Sound getSound() {
+        return sound;
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
 }
