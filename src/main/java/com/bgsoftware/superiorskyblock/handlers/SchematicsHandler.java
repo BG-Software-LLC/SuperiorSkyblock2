@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
+import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
@@ -58,21 +59,29 @@ public final class SchematicsHandler implements SchematicManager {
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
 
-        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+        Executor.sync(() -> {
+            File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
-        if(!schematicsFolder.exists()) {
-            schematicsFolder.mkdirs();
-            FileUtil.saveResource("schematics/normal.schematic");
-            FileUtil.saveResource("schematics/mycel.schematic");
-            FileUtil.saveResource("schematics/desert.schematic");
-        }
+            if(!schematicsFolder.exists()) {
+                schematicsFolder.mkdirs();
+                FileUtil.saveResource("schematics/normal.schematic");
+                FileUtil.saveResource("schematics/mycel.schematic");
+                FileUtil.saveResource("schematics/desert.schematic");
+            }
 
-        //noinspection ConstantConditions
-        for(File schemFile : schematicsFolder.listFiles()){
-            Schematic schematic = loadFromFile(schemFile);
-            if(schematic != null)
-                schematics.put(schemFile.getName().replace(".schematic", ""), schematic);
-        }
+            //noinspection ConstantConditions
+            for(File schemFile : schematicsFolder.listFiles()){
+                Schematic schematic = loadFromFile(schemFile);
+                if(schematic != null) {
+                    schematics.put(schemFile.getName().replace(".schematic", "").replace(".schem", ""), schematic);
+                    SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
+                            (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
+                }
+                else{
+                    SuperiorSkyblockPlugin.log("Couldn't load schematic " + schemFile.getName() + ".");
+                }
+            }
+        });
     }
 
     public Schematic getSchematic(String name) {
@@ -190,10 +199,13 @@ public final class SchematicsHandler implements SchematicManager {
                 CompoundTag compoundTag = (CompoundTag) reader.readTag();
                 if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(version))
                     SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
-                if(compoundTag.getValue().isEmpty() && FAWEHook.isEnabled())
-                    schematic = FAWEHook.loadSchematic(file);
-                else
+                if(compoundTag.getValue().isEmpty()) {
+                    if(FAWEHook.isEnabled())
+                        schematic = FAWEHook.loadSchematic(file);
+                }
+                else {
                     schematic = new SuperiorSchematic(compoundTag);
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid.");
