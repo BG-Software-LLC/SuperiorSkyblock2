@@ -47,7 +47,7 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         if(!file.exists())
-            plugin.saveResource("missions/missions.yml", true);
+            FileUtil.saveResource("missions/missions.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 

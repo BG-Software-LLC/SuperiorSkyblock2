@@ -1,0 +1,82 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+main-panel:
+  title: '&lMissions'
+  size: 5
+
+  fill-items:
+    '1':
+      type: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+      slots: 0,1,2,3,4,5,6,7,8,9,17,18,26,27,35,36,37,38,39,40,41,42,43,44
+
+  player-missions:
+    slot: 21
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
+    type: PLAYER_HEAD
+    name: '&ePlayer Missions'
+    lore:
+      - '&7Click to open your missions.'
+
+  island-missions:
+    slot: 23
+    sound:
+      type: BLOCK_CHEST_OPEN
+      volume: 0.8
+      pitch: 1
+    type: GRASS_BLOCK
+    name: '&eIsland Missions'
+    lore:
+      - '&7Click to open your island''s missions.'
+
+missions-panel:
+  player-title: '&lYour Missions'
+  island-title: '&lYour Island''s Missions'
+  size: 6
+
+  fill-items:
+    '1':
+      type: BLACK_STAINED_GLASS_PANE
+      name: '&f'
+      slots: 36,37,38,39,40,41,42,43,44
+
+  previous-page:
+    slot: 47
+    type: PAPER
+    name: '{0}Previous Page'
+
+  current-page:
+    slot: 49
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+
+  next-page:
+    slot: 51
+    type: PAPER
+    name: '{0}Next Page'
+
+  sounds:
+    completed:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
+    not-completed:
+      type: BLOCK_ANVIL_PLACE
+      volume: 0.2
+      pitch: 0.2
+    can-complete:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+
+  slots: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35
