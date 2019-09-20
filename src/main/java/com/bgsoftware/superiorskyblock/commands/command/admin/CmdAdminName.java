@@ -79,7 +79,7 @@ public final class CmdAdminName implements ICommand {
             return;
         }
 
-        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> name.equalsIgnoreCase(islandName))){
+        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
             Locale.NAME_BLACKLISTED.send(sender);
             return;
         }
