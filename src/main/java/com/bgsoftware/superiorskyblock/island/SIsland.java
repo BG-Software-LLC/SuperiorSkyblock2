@@ -699,6 +699,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         if(increaseAmount || blockLimits.containsKey(key)) {
             int currentAmount = blockCounts.getOrDefault(key, 0);
+            key = blockLimits.containsKey(key) ? blockLimits.getKey(key) : blockCounts.getKey(key);
             blockCounts.put(plugin.getBlockValues().getBlockKey(key), currentAmount + amount);
             if(save) saveBlockCounts();
         }
@@ -747,6 +748,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         if(decreaseAmount || blockLimits.containsKey(key)){
             int currentAmount = blockCounts.getOrDefault(key, 0);
+            key = blockLimits.containsKey(key) ? blockLimits.getKey(key) : blockCounts.getKey(key);
             key = plugin.getBlockValues().getBlockKey(key);
 
             if(currentAmount <= amount)
