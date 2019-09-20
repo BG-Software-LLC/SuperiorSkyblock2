@@ -151,8 +151,6 @@ permissions:
             description: Reload all configurations and tasks of the plugin.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
-          superior.admin.save:
-            description: Save the entire database to disk (async)
           superior.admin.schematic:
             description: Create schematics for the plugin.
           superior.admin.setblocklimit:

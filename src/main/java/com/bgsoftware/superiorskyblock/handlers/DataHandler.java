@@ -17,8 +17,6 @@ import org.bukkit.Bukkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -47,26 +45,7 @@ public final class DataHandler {
             return;
         }
 
-        List<Island> islands = new ArrayList<>();
-        plugin.getGrid().getAllIslands().forEach(uuid -> islands.add(plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid))));
-        List<SuperiorPlayer> players = plugin.getPlayers().getAllPlayers();
-
         try{
-            //Saving islands
-            for(Island island : islands){
-                SIsland sIsland = (SIsland) island;
-                if (sIsland != null)
-                    sIsland.executeUpdateStatement(false);
-            }
-
-            //Saving players
-            for(SuperiorPlayer player : players)
-                ((SSuperiorPlayer) player).executeUpdateStatement(false);
-
-            // Saving stacked blocks
-            SQLHelper.executeUpdate("DELETE FROM stackedBlocks;");
-            plugin.getGrid().executeStackedBlocksInsertStatement(false);
-
             //Saving grid
             SQLHelper.executeUpdate("DELETE FROM grid;");
             plugin.getGrid().executeGridInsertStatement(false);

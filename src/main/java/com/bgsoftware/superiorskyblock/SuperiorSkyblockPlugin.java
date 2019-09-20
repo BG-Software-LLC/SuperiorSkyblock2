@@ -42,7 +42,6 @@ import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
-import com.bgsoftware.superiorskyblock.tasks.SaveTask;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -119,6 +118,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void onDisable() {
         dataHandler.saveDatabase(false);
+
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.closeInventory();
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
@@ -130,7 +130,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
         }
 
-        SaveTask.cancelTask();
         CalcTask.cancelTask();
         Executor.close();
         dataHandler.closeConnection();
@@ -195,7 +194,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
 
         Locale.reload();
-        SaveTask.startTask();
         CalcTask.startTask();
     }
 
