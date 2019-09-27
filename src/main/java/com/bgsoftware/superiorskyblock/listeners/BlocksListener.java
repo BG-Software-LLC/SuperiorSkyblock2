@@ -116,6 +116,17 @@ public final class BlocksListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityExplodeMonitor(EntityExplodeEvent e){
+        if(plugin != null && plugin.getGrid() != null) {
+            for(Block block : e.blockList()){
+                Island island = plugin.getGrid().getIslandAt(block.getLocation());
+                if(island != null)
+                    island.handleBlockBreak(block, 1);
+            }
+        }
+    }
+
     /*
      *  Stacked Blocks
      */
