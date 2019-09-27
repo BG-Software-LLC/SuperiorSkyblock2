@@ -266,7 +266,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void banMember(SuperiorPlayer superiorPlayer){
         if(isMember(superiorPlayer))
             kickMember(superiorPlayer);
-        if(isInside(superiorPlayer.getLocation()))
+        if(superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
             superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
         banned.add(superiorPlayer.getUniqueId());
         Query.ISLAND_SET_BANNED.getStatementHolder()
