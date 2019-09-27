@@ -54,7 +54,10 @@ public final class CmdMission implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
         if(!args[1].equalsIgnoreCase("complete")){
-            Locale.sendMessage(sender, getDescription());
+            String description = getDescription();
+            if(description == null)
+                new NullPointerException("The description of the command " + getAliases().get(0) + " is null.").printStackTrace();
+            Locale.sendMessage(sender, description);
             return;
         }
 

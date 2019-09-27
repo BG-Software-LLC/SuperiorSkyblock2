@@ -148,7 +148,10 @@ public final class CmdAdmin implements ICommand {
 
         for(ICommand _subCommand : subCommands) {
             if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), _subCommand.getDescription());
+                String description = _subCommand.getDescription();
+                if(description == null)
+                    new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
+                Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), description);
             }
         }
 
