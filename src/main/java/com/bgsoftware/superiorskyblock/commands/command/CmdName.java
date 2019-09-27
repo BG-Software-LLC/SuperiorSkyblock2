@@ -69,13 +69,15 @@ public final class CmdName implements ICommand {
         }
 
         String islandName = args[1];
+        String strippedName = plugin.getSettings().islandNamesColorSupport ?
+                ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', islandName)) : islandName;
 
-        if(islandName.length() > plugin.getSettings().islandNamesMaxLength){
+        if(strippedName.length() > plugin.getSettings().islandNamesMaxLength){
             Locale.NAME_TOO_LONG.send(superiorPlayer);
             return;
         }
 
-        if(islandName.length() < plugin.getSettings().islandNamesMinLength){
+        if(strippedName.length() < plugin.getSettings().islandNamesMinLength){
             Locale.NAME_TOO_SHORT.send(superiorPlayer);
             return;
         }
