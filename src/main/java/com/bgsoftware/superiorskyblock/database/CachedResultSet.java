@@ -21,12 +21,16 @@ public final class CachedResultSet {
         return (int) cache.get(key);
     }
 
+    public long getLong(String key){
+        return (long) cache.get(key);
+    }
+
     public String getString(String key){
         return (String) cache.get(key);
     }
 
     public double getDouble(String key){
-        return cache.get(key) instanceof Integer ? getInt(key) : (double) cache.get(key);
+        return cache.get(key) instanceof Integer ? getInt(key) : cache.get(key) instanceof Long ? getLong(key) : (double) cache.get(key);
     }
 
     public boolean getBoolean(String key){
