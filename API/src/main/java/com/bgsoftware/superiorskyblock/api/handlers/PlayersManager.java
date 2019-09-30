@@ -22,5 +22,7 @@ public interface PlayersManager {
 
     PlayerRole getGuestRole();
 
+    PlayerRole getCoopRole();
+
     List<PlayerRole> getRoles();
 }

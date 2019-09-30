@@ -83,6 +83,7 @@ public class SIsland extends DatabaseObject implements Island {
      */
 
     private final Set<UUID> members = new HashSet<>();
+    private final Set<UUID> coop = new HashSet<>();
     private final Set<UUID> banned = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
@@ -122,6 +123,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         IslandDeserializer.deserializeMembers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializeBanned(resultSet.getString("banned"), this.banned);
+        IslandDeserializer.deserializeCoop(resultSet.getString("coop"), this.coop);
         IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.permissionNodes);
         IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
         IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
@@ -146,6 +148,8 @@ public class SIsland extends DatabaseObject implements Island {
 
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
+
+        assignPermissionNodes();
     }
 
     public SIsland(CompoundTag tag){
@@ -190,6 +194,8 @@ public class SIsland extends DatabaseObject implements Island {
 
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
+
+        assignPermissionNodes();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
@@ -259,11 +265,29 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public void addCoop(SuperiorPlayer superiorPlayer) {
+        coop.add(superiorPlayer.getUniqueId());
+        Query.ISLAND_SET_COOP.getStatementHolder()
+                .setString(coop.isEmpty() ? "" : getUuidCollectionString(coop))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
         members.remove(superiorPlayer.getUniqueId());
         superiorPlayer.setTeamLeader(superiorPlayer.getUniqueId());
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void removeCoop(SuperiorPlayer superiorPlayer) {
+        coop.remove(superiorPlayer.getUniqueId());
+        Query.ISLAND_SET_COOP.getStatementHolder()
+                .setString(coop.isEmpty() ? "" : getUuidCollectionString(coop))
                 .setString(owner.toString())
                 .execute(true);
     }
@@ -340,6 +364,11 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public boolean isCoop(SuperiorPlayer superiorPlayer) {
+        return coop.contains(superiorPlayer.getUniqueId());
+    }
+
+    @Override
     public Location getCenter(){
         return center.parse().add(0.5, 0, 0.5);
     }
@@ -401,14 +430,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
-        boolean playerPermission = false;
-
-        if(permissionNodes.containsKey(superiorPlayer.getUniqueId())){
-            playerPermission = permissionNodes.get(superiorPlayer.getUniqueId()).hasPermission(islandPermission);
-        }
-
-        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : SPlayerRole.guestRole();
-        return playerPermission || superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(playerRole).hasPermission(islandPermission);
+        return superiorPlayer.hasBypassModeEnabled() || getPermisisonNode(superiorPlayer).hasPermission(islandPermission);
     }
 
     @Override
@@ -454,7 +476,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public SPermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer) {
-        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : SPlayerRole.guestRole();
+        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
         return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermisisonNode(playerRole));
     }
 
@@ -1388,8 +1410,21 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     private void assignPermissionNodes(){
-        for(PlayerRole playerRole : plugin.getPlayers().getRoles())
-            permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions()));
+        boolean save = false;
+
+        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+            if(!permissionNodes.containsKey(playerRole)) {
+                permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions()));
+                save = true;
+            }
+        }
+
+        if(save && owner != null){
+            Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
+                    .setString(IslandSerializer.serializePermissions(permissionNodes))
+                    .setString(owner.toString())
+                    .execute(true);
+        }
     }
 
     private static class CalcIslandData{

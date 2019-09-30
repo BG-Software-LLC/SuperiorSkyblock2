@@ -35,7 +35,11 @@ public interface Island extends Comparable<Island> {
 
     void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole);
 
+    void addCoop(SuperiorPlayer superiorPlayer);
+
     void kickMember(SuperiorPlayer superiorPlayer);
+
+    void removeCoop(SuperiorPlayer superiorPlayer);
 
     void banMember(SuperiorPlayer superiorPlayer);
 
@@ -52,6 +56,8 @@ public interface Island extends Comparable<Island> {
     List<UUID> allPlayersInside();
 
     boolean isMember(SuperiorPlayer superiorPlayer);
+
+    boolean isCoop(SuperiorPlayer superiorPlayer);
 
     Location getCenter();
 

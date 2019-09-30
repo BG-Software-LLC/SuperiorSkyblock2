@@ -85,6 +85,10 @@ public final class SPlayerRole implements PlayerRole {
         return plugin.getPlayers().getGuestRole();
     }
 
+    public static PlayerRole coopRole(){
+        return plugin.getPlayers().getCoopRole();
+    }
+
     public static PlayerRole of(int weight){
         return plugin.getPlayers().getPlayerRole(weight);
     }

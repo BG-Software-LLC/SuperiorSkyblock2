@@ -22,7 +22,7 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler implements PlayersManager {
 
-    public static final int GUEST_ROLE_INDEX = -1;
+    private static final int GUEST_ROLE_INDEX = -1, COOP_ROLE_INDEX = -2;
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
@@ -31,7 +31,8 @@ public final class PlayersHandler implements PlayersManager {
 
     public PlayersHandler(){
         ConfigurationSection rolesSection = plugin.getSettings().islandRolesSection;
-        loadRole(rolesSection.getConfigurationSection("guest"), PlayersHandler.GUEST_ROLE_INDEX);
+        loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX);
+        loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX);
         for(String roleSection : rolesSection.getConfigurationSection("ladder").getKeys(false))
             loadRole(rolesSection.getConfigurationSection("ladder." + roleSection), 0);
     }
@@ -83,6 +84,11 @@ public final class PlayersHandler implements PlayersManager {
     @Override
     public PlayerRole getGuestRole() {
         return getPlayerRole(GUEST_ROLE_INDEX);
+    }
+
+    @Override
+    public PlayerRole getCoopRole() {
+        return getPlayerRole(COOP_ROLE_INDEX);
     }
 
     @Override

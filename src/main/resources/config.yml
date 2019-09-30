@@ -86,6 +86,28 @@ island-roles:
     # A list of default permissions for guests.
     permissions: []
 
+  # This role is given to players that are co-op.
+  coop:
+    name: 'Coop'
+    permissions:
+    - ANIMAL_BREED
+    - ANIMAL_DAMAGE
+    - BREAK
+    - BUILD
+    - CHEST_ACCESS
+    - CLOSE_BYPASS
+    - DEPOSIT_MONEY
+    - DROP_ITEMS
+    - EXPEL_BYPASS
+    - FARM_TRAMPING
+    - INTERACT
+    - ITEM_FRAME
+    - PAINTING
+    - PICKUP_DROPS
+    - RANKUP
+    - SIGN_INTERACT
+    - USE
+
   # The roles ladder for island members.
   # All the island member roles go here.
   #  - You can add as many roles as you'd like.

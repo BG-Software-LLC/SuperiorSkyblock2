@@ -26,6 +26,8 @@ permissions:
             description: Change the border color of the islands.
           superior.island.close:
             description: Close the island to the public.
+          superior.island.coop:
+            description: Add a player as a co-op to your island.
           superior.island.create:
             description: Create a new island.
           superior.island.delwarp:
