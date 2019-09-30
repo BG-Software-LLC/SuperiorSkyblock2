@@ -28,10 +28,6 @@ public final class IslandDeserializer {
         deserializeMembers(banned, bannedSet);
     }
 
-    public static void deserializeCoop(String banned, Set<UUID> bannedSet){
-        deserializeMembers(banned, bannedSet);
-    }
-
     public static void deserializePermissions(String permissions, Map<Object, SPermissionNode> permissionNodes){
         for(String entry : permissions.split(",")) {
             try {

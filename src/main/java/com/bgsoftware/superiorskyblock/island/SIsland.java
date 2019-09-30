@@ -123,7 +123,6 @@ public class SIsland extends DatabaseObject implements Island {
 
         IslandDeserializer.deserializeMembers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializeBanned(resultSet.getString("banned"), this.banned);
-        IslandDeserializer.deserializeCoop(resultSet.getString("coop"), this.coop);
         IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.permissionNodes);
         IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
         IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
@@ -267,10 +266,6 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void addCoop(SuperiorPlayer superiorPlayer) {
         coop.add(superiorPlayer.getUniqueId());
-        Query.ISLAND_SET_COOP.getStatementHolder()
-                .setString(coop.isEmpty() ? "" : getUuidCollectionString(coop))
-                .setString(owner.toString())
-                .execute(true);
     }
 
     @Override
@@ -286,10 +281,6 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
         coop.remove(superiorPlayer.getUniqueId());
-        Query.ISLAND_SET_COOP.getStatementHolder()
-                .setString(coop.isEmpty() ? "" : getUuidCollectionString(coop))
-                .setString(owner.toString())
-                .execute(true);
     }
 
     @Override

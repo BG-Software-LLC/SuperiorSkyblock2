@@ -26,9 +26,8 @@ public enum Query {
     ISLAND_SET_DESCRIPTION("UPDATE islands SET description=? WHERE owner=?;"),
     ISLAND_SET_RATINGS("UPDATE islands SET ratings=? WHERE owner=?;"),
     ISLAND_SET_MISSIONS("UPDATE islands SET missions=? WHERE owner=?;"),
-    ISLAND_SET_COOP("UPDATE islands SET coop=? WHERE owner=?;"),
-    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,coop=? WHERE owner=?;"),
-    ISLAND_INSERT("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=? WHERE owner=?;"),
+    ISLAND_INSERT("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),

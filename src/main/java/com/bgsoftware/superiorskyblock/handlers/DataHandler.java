@@ -83,8 +83,7 @@ public final class DataHandler {
                 "visitorsLocation VARCHAR," +
                 "description VARCHAR," +
                 "ratings VARCHAR," +
-                "missions VARCHAR," +
-                "coop VARCHAR" +
+                "missions VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -137,7 +136,6 @@ public final class DataHandler {
         addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
         addColumnIfNotExists("missions", "islands", "''", "VARCHAR");
         addColumnIfNotExists("missions", "players", "''", "VARCHAR");
-        addColumnIfNotExists("coop", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

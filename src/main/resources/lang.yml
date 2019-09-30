@@ -374,6 +374,7 @@ TRANSFER_BROADCAST: '&e&lIsland | &7The island''s leadership has been transferre
 TRANSFER_NOT_A_MEMBER: '&cThis player is not a member of your island.'
 UNBAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was UNBANNED from the island by {1}.'
 UNCOOP_ANNOUNCEMENT: '&e&lIsland | &7{0} removed {1} from being a co-op member.'
+UNCOOP_LEFT_ANNOUNCEMENT: '&e&lIsland | &7{0} left the game and is no longer a co-op member.'
 UNKNOWN_COMMAND: '&cUnknown command. Type "/island help" for help.'
 UNSAFE_WARP: '&e&lIsland | &7&oLooks like this warp is unsafe. Please try another warp.'
 UPDATED_PERMISSION: '&e&lIsland | &7Updated permissions for {0}.'

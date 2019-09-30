@@ -102,6 +102,14 @@ public final class PlayersListener implements Listener {
 
         if(island != null)
             island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
+
+        for(Island _island : plugin.getGrid().getIslands()){
+            if(_island.isCoop(superiorPlayer)) {
+                _island.removeCoop(superiorPlayer);
+                if(!Locale.UNCOOP_LEFT_ANNOUNCEMENT.isEmpty())
+                    _island.sendMessage(Locale.UNCOOP_LEFT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
