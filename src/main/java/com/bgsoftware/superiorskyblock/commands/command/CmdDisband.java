@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,7 +65,7 @@ public final class CmdDisband implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.DISBAND_ISLAND)){
-            Locale.NO_DISBAND_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.DISBAND_ISLAND));
+            Locale.NO_DISBAND_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DISBAND_ISLAND));
             return;
         }
 

@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
@@ -94,16 +94,16 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
             PermissionNode permissionNode;
 
-            if (permissionHolder instanceof IslandRole)
-                permissionNode = island.getPermisisonNode((IslandRole) permissionHolder);
+            if (permissionHolder instanceof PlayerRole)
+                permissionNode = island.getPermisisonNode((PlayerRole) permissionHolder);
             else {
                 permissionNode = island.getPermisisonNode((SuperiorPlayer) permissionHolder);
             }
 
             boolean currentValue = permissionNode.hasPermission(permission);
 
-            if (permissionHolder instanceof IslandRole)
-                island.setPermission((IslandRole) permissionHolder, permission, !currentValue);
+            if (permissionHolder instanceof PlayerRole)
+                island.setPermission((PlayerRole) permissionHolder, permission, !currentValue);
             else
                 island.setPermission((SuperiorPlayer) permissionHolder, permission, !currentValue);
 
@@ -150,8 +150,8 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
                 PermissionNode permissionNode;
 
-                if (permissionHolder instanceof IslandRole)
-                    permissionNode = island.getPermisisonNode((IslandRole) permissionHolder);
+                if (permissionHolder instanceof PlayerRole)
+                    permissionNode = island.getPermisisonNode((PlayerRole) permissionHolder);
                 else
                     permissionNode = island.getPermisisonNode((SuperiorPlayer) permissionHolder);
 

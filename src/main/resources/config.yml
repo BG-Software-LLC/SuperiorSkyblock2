@@ -77,67 +77,76 @@ island-level-formula: '{} / 2'
 # Set 'WORTH' if you want it to be ordered by island worth, or 'LEVEL' if you want it to be ordered by island levels.
 island-top-order: 'WORTH'
 
-# Set a set of default permissions for each role to be added to new islands.
-# Players can edit these permissions using the /is setpermission command.
-default-permissions:
-  # A list of default permissions for guests.
-  guest: []
+# All settings related to island roles.
+island-roles:
+  # This role is given to players that are not part of your island.
+  guest:
+    # A custom name for the role.
+    name: 'Guest'
+    # A list of default permissions for guests.
+    permissions: []
 
-  # A list of default permissions for members.
-  # Members have all permissions of guests!
-  member:
-  - ANIMAL_BREED
-  - ANIMAL_DAMAGE
-  - BREAK
-  - BUILD
-  - CHEST_ACCESS
-  - CLOSE_BYPASS
-  - DEPOSIT_MONEY
-  - DROP_ITEMS
-  - EXPEL_BYPASS
-  - FARM_TRAMPING
-  - INTERACT
-  - ITEM_FRAME
-  - PAINTING
-  - PICKUP_DROPS
-  - RANKUP
-  - SIGN_INTERACT
-  - USE
-
-  # A list of default permissions for moderators.
-  # Moderators have all permissions of members!
-  mod:
-  - BAN_MEMBER
-  - CLOSE_ISLAND
-  - DELETE_WARP
-  - EXPEL_PLAYERS
-  - INVITE_MEMBER
-  - KICK_MEMBER
-  - OPEN_ISLAND
-  - RATINGS_SHOW
-  - SET_WARP
-  - WITHDRAW_MONEY
-
-  # A list of default permissions for admins.
-  # Admins have all permissions of moderators!
-  admin:
-  - CHECK_PERMISSION
-  - DEMOTE_MEMBERS
-  - DISCORD_SHOW
-  - PAYPAL_SHOW
-  - PROMOTE_MEMBERS
-  - SET_BIOME
-  - SET_DISCORD
-  - SET_HOME
-  - SET_PAYPAL
-  - SET_PERMISSION
-  - SET_ROLE
-
-  # A list of default permissions for leaders.
-  # Leaders have all permissions of admins!
-  # Note: Permissions of leaders cannot be changed!
-  leader:
-  - ALL
+  # The roles ladder for island members.
+  # All the island member roles go here.
+  #  - You can add as many roles as you'd like.
+  #  - The default role for new members has a weight of 0.
+  #  - Every role has all the permissions of the role before it.
+  ladder:
+    member:
+      name: 'Member'
+      weight: 0
+      permissions:
+      - ANIMAL_BREED
+      - ANIMAL_DAMAGE
+      - BREAK
+      - BUILD
+      - CHEST_ACCESS
+      - CLOSE_BYPASS
+      - DEPOSIT_MONEY
+      - DROP_ITEMS
+      - EXPEL_BYPASS
+      - FARM_TRAMPING
+      - INTERACT
+      - ITEM_FRAME
+      - PAINTING
+      - PICKUP_DROPS
+      - RANKUP
+      - SIGN_INTERACT
+      - USE
+    mod:
+      name: 'Moderator'
+      weight: 1
+      permissions:
+      - BAN_MEMBER
+      - CLOSE_ISLAND
+      - DELETE_WARP
+      - EXPEL_PLAYERS
+      - INVITE_MEMBER
+      - KICK_MEMBER
+      - OPEN_ISLAND
+      - RATINGS_SHOW
+      - SET_WARP
+      - WITHDRAW_MONEY
+    admin:
+      name: 'Admin'
+      weight: 2
+      permissions:
+      - CHECK_PERMISSION
+      - DEMOTE_MEMBERS
+      - DISCORD_SHOW
+      - PAYPAL_SHOW
+      - PROMOTE_MEMBERS
+      - SET_BIOME
+      - SET_DISCORD
+      - SET_HOME
+      - SET_PAYPAL
+      - SET_PERMISSION
+      - SET_ROLE
+    leader:
+      name: 'Leader'
+      weight: 3
+      permissions:
+      - ALL
 
 # Set the line to create the warp sign.
 sign-warp-line: '[IslandWarp]'

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
-import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -165,8 +165,8 @@ public class SIsland extends DatabaseObject implements Island {
             this.banned.add(UUID.fromString(((StringTag) _tag).getValue()));
 
         Map<String, Tag> permissionNodes = ((CompoundTag) compoundValues.get("permissionNodes")).getValue();
-        for(String islandRole : permissionNodes.keySet())
-            this.permissionNodes.put(IslandRole.valueOf(islandRole), new SPermissionNode((ListTag) permissionNodes.get(islandRole)));
+        for(String playerRole : permissionNodes.keySet())
+            this.permissionNodes.put(SPlayerRole.of(playerRole), new SPermissionNode((ListTag) permissionNodes.get(playerRole)));
 
         Map<String, Tag> upgrades = ((CompoundTag) compoundValues.get("upgrades")).getValue();
         for(String upgrade : upgrades.keySet())
@@ -199,7 +199,7 @@ public class SIsland extends DatabaseObject implements Island {
     public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getTeamLeader();
-            superiorPlayer.setIslandRole(IslandRole.LEADER);
+            superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
         }else{
             this.owner = null;
         }
@@ -242,10 +242,16 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole){
+        addMember(superiorPlayer, SPlayerRole.of(islandRole.name()));
+    }
+
+    @Override
+    public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
         members.add(superiorPlayer.getUniqueId());
         superiorPlayer.setTeamLeader(owner);
-        superiorPlayer.setIslandRole(islandRole);
+        superiorPlayer.setPlayerRole(playerRole);
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
                 .setString(owner.toString())
@@ -401,13 +407,19 @@ public class SIsland extends DatabaseObject implements Island {
             playerPermission = permissionNodes.get(superiorPlayer.getUniqueId()).hasPermission(islandPermission);
         }
 
-        IslandRole islandRole = isMember(superiorPlayer) ? superiorPlayer.getIslandRole() : IslandRole.GUEST;
-        return playerPermission || superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(islandRole).hasPermission(islandPermission);
+        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : SPlayerRole.guestRole();
+        return playerPermission || superiorPlayer.hasBypassModeEnabled() || permissionNodes.get(playerRole).hasPermission(islandPermission);
     }
 
     @Override
+    @Deprecated
     public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value){
-        permissionNodes.get(islandRole).setPermission(islandPermission, value);
+        setPermission(SPlayerRole.of(islandRole.name()), islandPermission, value);
+    }
+
+    @Override
+    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
+        permissionNodes.get(playerRole).setPermission(islandPermission, value);
 
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
@@ -430,26 +442,38 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public SPermissionNode getPermisisonNode(IslandRole islandRole){
-        return permissionNodes.get(islandRole).clone();
+        return getPermisisonNode(SPlayerRole.of(islandRole.name()));
     }
 
     @Override
-    public PermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer) {
-        IslandRole islandRole = isMember(superiorPlayer) ? superiorPlayer.getIslandRole() : IslandRole.GUEST;
-        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermisisonNode(islandRole));
+    public SPermissionNode getPermisisonNode(PlayerRole playerRole) {
+        return permissionNodes.get(playerRole).clone();
     }
 
     @Override
+    public SPermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer) {
+        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : SPlayerRole.guestRole();
+        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermisisonNode(playerRole));
+    }
+
+    @Override
+    @Deprecated
     public IslandRole getRequiredRole(IslandPermission islandPermission){
-        IslandRole islandRole = IslandRole.LEADER;
+        return IslandRole.valueOf(getRequiredPlayerRole(islandPermission).toString().toUpperCase());
+    }
 
-        for(IslandRole _islandRole : IslandRole.values()){
-            if(_islandRole.isLessThan(islandRole) && permissionNodes.get(_islandRole).hasPermission(islandPermission))
-                islandRole = _islandRole;
+    @Override
+    public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
+        PlayerRole playerRole = SPlayerRole.lastRole();
+
+        for(PlayerRole _islandRole : plugin.getPlayers().getRoles()){
+            if(_islandRole.isLessThan(playerRole) && permissionNodes.get(_islandRole).hasPermission(islandPermission))
+                playerRole = _islandRole;
         }
 
-        return islandRole;
+        return playerRole;
     }
 
     @Override
@@ -1122,11 +1146,12 @@ public class SIsland extends DatabaseObject implements Island {
 
         //Kick member without saving to database
         members.remove(superiorPlayer.getUniqueId());
-        superiorPlayer.setIslandRole(IslandRole.LEADER);
+        superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
 
         //Add member without saving to database
         members.add(previousOwner.getUniqueId());
-        previousOwner.setIslandRole(IslandRole.ADMIN);
+        PlayerRole previousRole = SPlayerRole.lastRole().getPreviousRole();
+        previousOwner.setPlayerRole(previousRole == null ? SPlayerRole.lastRole() : previousRole);
 
         //Changing owner of the island and updating all players
         owner = superiorPlayer.getUniqueId();
@@ -1363,15 +1388,8 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     private void assignPermissionNodes(){
-        permissionNodes.put(IslandRole.GUEST, new SPermissionNode(null, plugin.getSettings().guestPermissions));
-        permissionNodes.put(IslandRole.MEMBER,
-                new SPermissionNode(permissionNodes.get(IslandRole.GUEST), plugin.getSettings().memberPermissions));
-        permissionNodes.put(IslandRole.MODERATOR,
-                new SPermissionNode(permissionNodes.get(IslandRole.MEMBER), plugin.getSettings().modPermissions));
-        permissionNodes.put(IslandRole.ADMIN,
-                new SPermissionNode(permissionNodes.get(IslandRole.MODERATOR), plugin.getSettings().adminPermission));
-        permissionNodes.put(IslandRole.LEADER,
-                new SPermissionNode(permissionNodes.get(IslandRole.ADMIN), plugin.getSettings().leaderPermissions));
+        for(PlayerRole playerRole : plugin.getPlayers().getRoles())
+            permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions()));
     }
 
     private static class CalcIslandData{

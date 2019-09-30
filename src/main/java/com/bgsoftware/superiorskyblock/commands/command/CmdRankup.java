@@ -64,7 +64,7 @@ public final class CmdRankup implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.RANKUP)){
-            Locale.NO_RANKUP_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.RANKUP));
+            Locale.NO_RANKUP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.RANKUP));
             return;
         }
 

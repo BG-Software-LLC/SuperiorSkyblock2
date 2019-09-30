@@ -63,7 +63,7 @@ public final class CmdBiome implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.SET_BIOME)){
-            Locale.NO_SET_BIOME_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_BIOME));
+            Locale.NO_SET_BIOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_BIOME));
             return;
         }
 

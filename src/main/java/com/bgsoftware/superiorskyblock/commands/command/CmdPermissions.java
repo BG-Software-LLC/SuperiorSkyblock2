@@ -4,9 +4,10 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public final class CmdPermissions implements ICommand {
 
         if(!superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION) &&
                 !superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
-            Locale.NO_PERMISSION_CHECK_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_PERMISSION));
+            Locale.NO_PERMISSION_CHECK_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_PERMISSION));
             return;
         }
 
@@ -75,9 +76,9 @@ public final class CmdPermissions implements ICommand {
 
         //Checks if entered an island role.
         try{
-            IslandRole islandRole = IslandRole.valueOf(args[1].toUpperCase());
-            permissionHolder = islandRole;
-            permissionHolderName = islandRole.name();
+            PlayerRole playerRole = SPlayerRole.of(args[1]);
+            permissionHolder = playerRole;
+            permissionHolderName = playerRole.toString();
         }catch(IllegalArgumentException ex){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
@@ -101,9 +102,10 @@ public final class CmdPermissions implements ICommand {
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION)){
             List<String> list = new ArrayList<>();
 
-            for(IslandRole islandRole : IslandRole.values()) {
-                if(islandRole.name().toLowerCase().startsWith(args[1].toLowerCase()))
-                    list.add(islandRole.name().toLowerCase());
+            for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+                String roleName = playerRole.toString().trim().toLowerCase();
+                if(roleName.startsWith(args[1].toLowerCase()))
+                    list.add(roleName);
             }
 
             for(Player player : Bukkit.getOnlinePlayers()){

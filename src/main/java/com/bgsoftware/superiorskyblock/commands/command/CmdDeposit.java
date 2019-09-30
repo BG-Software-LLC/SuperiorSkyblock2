@@ -70,14 +70,14 @@ public final class CmdDeposit implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.DEPOSIT_MONEY)){
-            Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.DEPOSIT_MONEY));
+            Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DEPOSIT_MONEY));
             return;
         }
 
         double amount = -1;
 
         try{
-            amount = Double.valueOf(args[1]);
+            amount = Double.parseDouble(args[1]);
         }catch(IllegalArgumentException ignored){}
 
         if(amount < 0){

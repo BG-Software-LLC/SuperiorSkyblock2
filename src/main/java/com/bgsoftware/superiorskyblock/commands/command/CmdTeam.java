@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -13,8 +14,11 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public final class CmdTeam implements ICommand {
@@ -83,9 +87,7 @@ public final class CmdTeam implements ICommand {
         }
 
         Executor.async(() -> {
-            StringBuilder infoMessage = new StringBuilder(), leadersMessage = new StringBuilder(),
-                    adminsMessage = new StringBuilder(), modsMessage = new StringBuilder(),
-                    membersMessage = new StringBuilder();
+            StringBuilder infoMessage = new StringBuilder();
 
             if(!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty())
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(island.getOwner().getName(),
@@ -94,38 +96,27 @@ public final class CmdTeam implements ICommand {
             List<UUID> members = island.getAllMembers();
             members.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
 
-            String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(),
-                    offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage();
-            SuperiorPlayer wrappedMember;
+            if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty()){
+                Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+                plugin.getPlayers().getRoles().stream().filter(PlayerRole::isRoleLadder)
+                        .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
-            for(UUID member : members){
-                wrappedMember = SSuperiorPlayer.of(member);
-                long time = wrappedMember.getLastTimeStatus() == -1 ? -1 : (System.currentTimeMillis() / 1000) - wrappedMember.getLastTimeStatus();
-                switch (wrappedMember.getIslandRole()){
-                    case LEADER:
-                        if(!Locale.ISLAND_TEAM_STATUS_LEADER.isEmpty())
-                            leadersMessage.append(Locale.ISLAND_TEAM_STATUS_LEADER.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
-                        break;
-                    case ADMIN:
-                        if(!Locale.ISLAND_TEAM_STATUS_ADMINS.isEmpty())
-                            adminsMessage.append(Locale.ISLAND_TEAM_STATUS_ADMINS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
-                        break;
-                    case MODERATOR:
-                        if(!Locale.ISLAND_TEAM_STATUS_MODS.isEmpty())
-                            modsMessage.append(Locale.ISLAND_TEAM_STATUS_MODS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
-                        break;
-                    case MEMBER:
-                        if(!Locale.ISLAND_TEAM_STATUS_MEMBERS.isEmpty())
-                            membersMessage.append(Locale.ISLAND_TEAM_STATUS_MEMBERS.getMessage(wrappedMember.getName(),
-                                    wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
-                        break;
+                String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(),
+                        offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage();
+
+                for(UUID member : members){
+                    SuperiorPlayer wrappedMember = SSuperiorPlayer.of(member);
+                    PlayerRole playerRole = wrappedMember.getPlayerRole();
+                    long time = wrappedMember.getLastTimeStatus() == -1 ? -1 : (System.currentTimeMillis() / 1000) - wrappedMember.getLastTimeStatus();
+                    rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(playerRole,
+                            wrappedMember.getName(), wrappedMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                 }
-            }
 
-            infoMessage.append(leadersMessage).append(adminsMessage).append(modsMessage).append(membersMessage);
+
+                rolesStrings.keySet().stream()
+                        .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
+                        .forEach(playerRole -> infoMessage.append(rolesStrings.get(playerRole)));
+            }
 
             if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty())
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage());

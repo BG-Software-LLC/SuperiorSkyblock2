@@ -61,7 +61,7 @@ public final class CmdSetDiscord implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.SET_DISCORD)){
-            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_DISCORD));
+            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_DISCORD));
             return;
         }
 

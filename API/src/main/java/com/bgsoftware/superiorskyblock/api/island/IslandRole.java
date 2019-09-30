@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 
 import java.util.Arrays;
 
+@Deprecated
 public enum IslandRole {
 
     GUEST, MEMBER, MODERATOR, ADMIN, LEADER;

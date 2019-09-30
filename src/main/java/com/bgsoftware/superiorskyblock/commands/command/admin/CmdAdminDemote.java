@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -68,15 +67,15 @@ public final class CmdAdminDemote implements ICommand {
             return;
         }
 
-        if(targetPlayer.getIslandRole().getPreviousRole() == IslandRole.GUEST){
+        if(targetPlayer.getPlayerRole().isFirstRole()){
             Locale.LAST_ROLE_DEMOTE.send(sender);
             return;
         }
 
-        targetPlayer.setIslandRole(targetPlayer.getIslandRole().getPreviousRole());
+        targetPlayer.setPlayerRole(targetPlayer.getPlayerRole().getPreviousRole());
 
-        Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getIslandRole());
-        Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getIslandRole());
+        Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
     @Override

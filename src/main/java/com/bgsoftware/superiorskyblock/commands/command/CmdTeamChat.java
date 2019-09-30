@@ -74,7 +74,7 @@ public final class CmdTeamChat implements ICommand {
             for(int i = 1; i < args.length; i++)
                 message.append(" ").append(args[i]);
 
-            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getIslandRole(), superiorPlayer.getName(),
+            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getPlayerRole(), superiorPlayer.getName(),
                     message.toString().substring(1)));
         }
 

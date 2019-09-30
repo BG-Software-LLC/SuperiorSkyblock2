@@ -61,7 +61,7 @@ public final class CmdSetTeleport implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.SET_HOME)){
-            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_HOME));
+            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_HOME));
             return;
         }
 

@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
@@ -33,11 +33,11 @@ public final class IslandDeserializer {
             try {
                 String[] sections = entry.split("=");
                 try {
-                    permissionNodes.put(IslandRole.valueOf(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+                    permissionNodes.put(SPlayerRole.of(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
                 }catch(Exception ex){
                     permissionNodes.put(UUID.fromString(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
                 }
-            }catch(Exception ignored){ }
+            }catch(Exception ignored){}
         }
     }
 

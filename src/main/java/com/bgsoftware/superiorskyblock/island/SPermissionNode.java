@@ -36,11 +36,7 @@ public final class SPermissionNode implements PermissionNode {
         }
     }
 
-    public SPermissionNode(SPermissionNode other, List<String> permissions){
-        if(other != null) {
-            this.nodes = new HashSet<>(other.nodes);
-        }
-
+    public SPermissionNode(List<String> permissions){
         List<IslandPermission> permissionList = new ArrayList<>();
 
         for(String permission : permissions)
@@ -84,7 +80,7 @@ public final class SPermissionNode implements PermissionNode {
             permissionNode.nodes = new HashSet<>(nodes);
             return permissionNode;
         }catch(CloneNotSupportedException ex){
-            return new SPermissionNode(this, new ArrayList<>());
+            return new SPermissionNode(new ArrayList<>());
         }
     }
 

@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -81,7 +81,7 @@ public final class CmdAdminJoin implements ICommand {
             }
         }
 
-        island.addMember(superiorPlayer, IslandRole.MEMBER);
+        island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
         if(targetPlayer == null)
             Locale.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());

@@ -66,7 +66,7 @@ public final class CmdDelWarp implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.DELETE_WARP)){
-            Locale.NO_DELETE_WARP_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.DELETE_WARP));
+            Locale.NO_DELETE_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DELETE_WARP));
             return;
         }
 

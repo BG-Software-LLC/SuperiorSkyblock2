@@ -199,20 +199,11 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Use /is help {0} for the next page.'
-ISLAND_INFO_ADMINS: |
-  &e&lIsland | &7Admins:
-  {0}
 ISLAND_INFO_BANK: '&e&lIsland | &7Bank: {0}'
 ISLAND_INFO_DISCORD: '&e&lIsland | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LOCATION: '&e&lIsland | &7Home: {0}'
-ISLAND_INFO_MEMBERS: |
-  &e&lIsland | &7Members:
-  {0}
-ISLAND_INFO_MODS: |
-  &e&lIsland | &7Moderators:
-  {0}
 ISLAND_INFO_NAME: '&e&lIsland | &7Name: {0}'
 ISLAND_INFO_OWNER: '&e&lIsland | &7Leader: {0}'
 ISLAND_INFO_PAYPAL: '&e&lIsland | &7Paypal: {0}'
@@ -225,18 +216,18 @@ ISLAND_INFO_RATE_TWO_COLOR: '&6'
 ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
+ISLAND_INFO_ROLES: |
+  &e&lIsland | &7{0}s:
+  {1}
 ISLAND_INFO_WORTH: '&e&lIsland | &7Worth: {0}'
 ISLAND_OPENED: '&e&lIsland | &7Successfully opened the island to the public.'
 ISLAND_PROTECTED: '&c&lError | &7This island is protected.'
 ISLAND_SAVE_ANNOUNCEMENT: '&6&lSuperiorSkyblock &7All islands and player database have been saved!'
-ISLAND_TEAM_STATUS_ADMINS: '&e&lIsland | &7 * [Admin] {0} {1} &7({2})'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lIsland | &7Members of {0}''s Island &8[&e{1}&8/&e{2}&8]&7:'
-ISLAND_TEAM_STATUS_LEADER: '&e&lIsland | &7 * [Leader] {0} {1} &7({2})'
-ISLAND_TEAM_STATUS_MEMBERS: '&e&lIsland | &7 * [Member] {0} {1} &7({2})'
-ISLAND_TEAM_STATUS_MODS: '&e&lIsland | &7 * [Moderator] {0} {1} &7({2})'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
 ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
+ISLAND_TEAM_STATUS_ROLES: '&e&lIsland | &7 * [{0}] {1} {2} &7({3})'
 ISLAND_WARP_PUBLIC: ''
 ISLAND_WARP_PRIVATE: '&c[Private]'
 ISLAND_WAS_CLOSED: '&e&lIsland | &7&oThe island you were in was closed and you were teleported back to spawn...'
@@ -326,11 +317,6 @@ RECALC_PROCCESS_REQUEST: '&e&lIsland | &7Processing your request...'
 RELOAD_COMPLETED: '&e&lIsland | &7Reload is finished!'
 RELOAD_PROCCESS_REQUEST: '&e&lIsland | &7Starting to reload configurations...'
 REVOKE_INVITE_ANNOUNCEMENT: '&e&lIsland | &7{0} revoked the invitation of {1} to the island.'
-ROLE_ADMIN: Admin
-ROLE_GUEST: Guest
-ROLE_LEADER: Leader
-ROLE_MEMBER: Member
-ROLE_MOD: Moderator
 SAME_NAME_CHANGE: '&c&lError | &7You must enter a different name from your current island name.'
 SAVE_PROCCESS_REQUEST: '&e&lData | &7Processing your request...'
 SAVED_DATABASE: '&e&lData | &7Saved database successfully!'

@@ -63,7 +63,7 @@ public final class CmdPardon implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
-            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.BAN_MEMBER));
+            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.BAN_MEMBER));
             return;
         }
 

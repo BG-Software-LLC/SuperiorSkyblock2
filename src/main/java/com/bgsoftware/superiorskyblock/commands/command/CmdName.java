@@ -64,7 +64,7 @@ public final class CmdName implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.CHANGE_NAME)){
-            Locale.NO_NAME_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.CHANGE_NAME));
+            Locale.NO_NAME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.CHANGE_NAME));
             return;
         }
 

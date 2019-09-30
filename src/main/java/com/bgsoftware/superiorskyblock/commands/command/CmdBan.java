@@ -63,7 +63,7 @@ public final class CmdBan implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
-            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.BAN_MEMBER));
+            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.BAN_MEMBER));
             return;
         }
 
@@ -75,7 +75,7 @@ public final class CmdBan implements ICommand {
         }
 
         if(superiorPlayer.getIsland().isMember(targetPlayer) &&
-                !targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole())) {
+                !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
             Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
@@ -107,7 +107,7 @@ public final class CmdBan implements ICommand {
 
             for(UUID uuid : island.getAllMembers()){
                 targetPlayer = SSuperiorPlayer.of(uuid);
-                if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
+                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }

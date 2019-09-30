@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -15,7 +16,11 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public final class CmdShow implements ICommand {
@@ -106,33 +111,26 @@ public final class CmdShow implements ICommand {
         if(!Locale.ISLAND_INFO_PAYPAL.isEmpty() && island.hasPermission(sender, IslandPermission.PAYPAL_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_PAYPAL.getMessage(island.getPaypal())).append("\n");
 
-        List<UUID> members = island.getMembers();
-        StringBuilder adminsString = new StringBuilder(), modsString = new StringBuilder(),
-                membersString = new StringBuilder();
+        if(!Locale.ISLAND_INFO_ROLES.isEmpty()) {
+            Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+            plugin.getPlayers().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
+                    .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
-        if(!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty()) {
-            for (UUID uuid : members) {
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
-                switch (superiorPlayer.getIslandRole()) {
-                    case ADMIN:
-                        adminsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
-                        break;
-                    case MODERATOR:
-                        modsString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
-                        break;
-                    case MEMBER:
-                        membersString.append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(SSuperiorPlayer.of(uuid).getName())).append("\n");
-                        break;
+            List<UUID> members = island.getMembers();
+
+            if (!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty()) {
+                for (UUID uuid : members) {
+                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
+                    rolesStrings.get(superiorPlayer.getPlayerRole())
+                            .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(superiorPlayer.getName())).append("\n");
                 }
             }
-        }
 
-        if(!Locale.ISLAND_INFO_ADMINS.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_ADMINS.getMessage(adminsString));
-        if(!Locale.ISLAND_INFO_MODS.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_MODS.getMessage(modsString));
-        if(!Locale.ISLAND_INFO_MEMBERS.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_MEMBERS.getMessage(membersString));
+            rolesStrings.keySet().stream()
+                    .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
+                    .forEach(playerRole ->
+                    infoMessage.append(Locale.ISLAND_INFO_ROLES.getMessage(playerRole, rolesStrings.get(playerRole))));
+        }
 
         if(!Locale.ISLAND_INFO_FOOTER.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_FOOTER.getMessage());

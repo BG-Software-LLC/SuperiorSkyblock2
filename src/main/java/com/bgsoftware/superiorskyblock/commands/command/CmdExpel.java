@@ -79,7 +79,7 @@ public final class CmdExpel implements ICommand {
             }
 
             if(!superiorPlayer.hasPermission(IslandPermission.EXPEL_PLAYERS)){
-                Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredRole(IslandPermission.EXPEL_PLAYERS));
+                Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredPlayerRole(IslandPermission.EXPEL_PLAYERS));
                 return;
             }
 

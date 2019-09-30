@@ -71,7 +71,7 @@ public final class CmdWithdraw implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.WITHDRAW_MONEY)){
-            Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.WITHDRAW_MONEY));
+            Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.WITHDRAW_MONEY));
             return;
         }
 

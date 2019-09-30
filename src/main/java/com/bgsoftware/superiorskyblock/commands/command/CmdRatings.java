@@ -62,7 +62,7 @@ public final class CmdRatings implements ICommand {
         }
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.RATINGS_SHOW)){
-            Locale.NO_RATINGS_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.RATINGS_SHOW));
+            Locale.NO_RATINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.RATINGS_SHOW));
             return;
         }
 

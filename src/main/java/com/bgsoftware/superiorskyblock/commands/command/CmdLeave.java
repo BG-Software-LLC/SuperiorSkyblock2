@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -14,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdLeave implements ICommand {
 
@@ -63,7 +61,7 @@ public final class CmdLeave implements ICommand {
             return;
         }
 
-        if(superiorPlayer.getIslandRole() == IslandRole.LEADER){
+        if(superiorPlayer.getPlayerRole().getNextRole() == null){
             Locale.LEAVE_ISLAND_AS_LEADER.send(superiorPlayer);
             return;
         }

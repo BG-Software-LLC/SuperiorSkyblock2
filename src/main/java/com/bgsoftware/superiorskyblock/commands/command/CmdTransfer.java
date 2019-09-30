@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -62,7 +61,7 @@ public final class CmdTransfer implements ICommand {
             return;
         }
 
-        if (player.getIslandRole() != IslandRole.LEADER) {
+        if (!player.getPlayerRole().isLastRole()) {
             Locale.NO_TRANSFER_PERMISSION.send(player);
             return;
         }
@@ -93,7 +92,7 @@ public final class CmdTransfer implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.getIslandRole() == IslandRole.LEADER){
+        if(args.length == 2 && island != null && superiorPlayer.getPlayerRole().isLastRole()){
             List<String> list = new ArrayList<>();
             SuperiorPlayer targetPlayer;
 

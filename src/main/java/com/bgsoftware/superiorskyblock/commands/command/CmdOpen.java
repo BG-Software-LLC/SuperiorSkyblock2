@@ -61,7 +61,7 @@ public final class CmdOpen implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.OPEN_ISLAND)){
-            Locale.NO_OPEN_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.OPEN_ISLAND));
+            Locale.NO_OPEN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.OPEN_ISLAND));
             return;
         }
 

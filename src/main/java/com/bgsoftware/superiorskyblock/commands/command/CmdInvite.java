@@ -68,7 +68,7 @@ public final class CmdInvite implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.INVITE_MEMBER)){
-            Locale.NO_INVITE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.INVITE_MEMBER));
+            Locale.NO_INVITE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.INVITE_MEMBER));
             return;
         }
 

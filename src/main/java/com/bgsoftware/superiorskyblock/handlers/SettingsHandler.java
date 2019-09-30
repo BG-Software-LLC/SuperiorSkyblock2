@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.config.ConfigComments;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -35,9 +37,9 @@ public final class SettingsHandler {
     public final String stackedBlocksName;
     public final String islandLevelFormula;
     public final String islandTopOrder;
+    public final ConfigurationSection islandRolesSection;
     public final long saveInterval;
     public final long calcInterval;
-    public final List<String> guestPermissions, memberPermissions, modPermissions, adminPermission, leaderPermissions;
     public final String signWarpLine;
     public final List<String> signWarp;
     public final String welcomeWarpLine;
@@ -73,12 +75,7 @@ public final class SettingsHandler {
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
-
-        if(cfg.contains("default-hoppers-limit")){
-            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
-            cfg.set("default-hoppers-limit", null);
-        }
-
+        convertData(cfg);
         cfg.resetYamlFile(plugin, "config.yml");
 
         saveInterval = cfg.getLong("save-interval", 6000);
@@ -105,11 +102,7 @@ public final class SettingsHandler {
         stackedBlocksName = ChatColor.translateAlternateColorCodes('&', cfg.getString("stacked-blocks.custom-name"));
         islandLevelFormula = cfg.getString("island-level-formula", "{} / 2");
         islandTopOrder = cfg.getString("island-top-order", "WORTH");
-        guestPermissions = cfg.getStringList("default-permissions.guest");
-        memberPermissions = cfg.getStringList("default-permissions.member");
-        modPermissions = cfg.getStringList("default-permissions.mod");
-        adminPermission = cfg.getStringList("default-permissions.admin");
-        leaderPermissions = cfg.getStringList("default-permissions.leader");
+        islandRolesSection = cfg.getConfigurationSection("island-roles");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = colorize(cfg.getStringList("sign-warp"));
         welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
@@ -173,6 +166,25 @@ public final class SettingsHandler {
             newList.add(ChatColor.translateAlternateColorCodes('&', line));
 
         return newList;
+    }
+
+    private void convertData(YamlConfiguration cfg){
+        if(cfg.contains("default-hoppers-limit")){
+            cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
+            cfg.set("default-hoppers-limit", null);
+        }
+        if(cfg.contains("default-permissions")){
+            cfg.set("island-roles.guest.name", "Guest");
+            cfg.set("island-roles.guest.permissions", cfg.getStringList("default-permissions.guest"));
+            cfg.set("island-roles.ladder.member.name", "Member");
+            cfg.set("island-roles.ladder.member.permissions", cfg.getStringList("default-permissions.member"));
+            cfg.set("island-roles.ladder.mod.name", "Moderator");
+            cfg.set("island-roles.ladder.mod.permissions", cfg.getStringList("default-permissions.mod"));
+            cfg.set("island-roles.ladder.admin.name", "Admin");
+            cfg.set("island-roles.ladder.admin.permissions", cfg.getStringList("default-permissions.admin"));
+            cfg.set("island-roles.ladder.leader.name", "Leader");
+            cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
+        }
     }
 
 }

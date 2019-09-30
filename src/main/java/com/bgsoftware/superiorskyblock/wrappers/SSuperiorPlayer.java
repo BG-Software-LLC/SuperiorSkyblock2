@@ -5,12 +5,14 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
@@ -40,7 +42,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     private UUID teamLeader;
     private String name, textureValue = "";
-    private IslandRole islandRole;
+    private PlayerRole playerRole;
 
     private boolean worldBorderEnabled = true;
     private boolean blocksStackerEnabled = true;
@@ -60,7 +62,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         teamLeader = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");
         textureValue = resultSet.getString("textureValue");
-        islandRole = IslandRole.valueOf(resultSet.getString("islandRole"));
+        playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
         disbands = resultSet.getInt("disbands");
         toggledPanel = resultSet.getBoolean("toggledPanel");
         islandFly = resultSet.getBoolean("islandFly");
@@ -75,7 +77,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         player = UUID.fromString(((StringTag) compoundValues.get("player")).getValue());
         teamLeader = UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue());
         name = ((StringTag) compoundValues.get("name")).getValue();
-        islandRole = IslandRole.valueOf(((StringTag) compoundValues.get("islandRole")).getValue());
+        playerRole = SPlayerRole.of(((StringTag) compoundValues.get("islandRole")).getValue());
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
         disbands = compoundValues.containsKey("disbands") ? (int) compoundValues.get("disbands").getValue() : plugin.getSettings().disbandCount;
 
@@ -88,22 +90,26 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         this.player = player;
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
         this.teamLeader = player;
-        this.islandRole = IslandRole.GUEST;
+        this.playerRole = SPlayerRole.guestRole();
         this.disbands = SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
     }
 
+    @Override
     public UUID getUniqueId(){
         return player;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getTextureValue() {
         return textureValue;
     }
 
+    @Override
     public void setTextureValue(String textureValue) {
         this.textureValue = textureValue;
         Query.PLAYER_SET_TEXTURE.getStatementHolder()
@@ -112,26 +118,31 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .execute(true);
     }
 
+    @Override
     public void updateName(){
-        this.name = Bukkit.getPlayer(player).getName();
+        this.name = asPlayer().getName();
         Query.PLAYER_SET_NAME.getStatementHolder()
                 .setString(name)
                 .setString(player.toString())
                 .execute(true);
     }
 
+    @Override
     public World getWorld(){
         return getLocation().getWorld();
     }
 
+    @Override
     public Location getLocation(){
         return asPlayer().getLocation();
     }
 
+    @Override
     public UUID getTeamLeader() {
         return teamLeader;
     }
 
+    @Override
     public void setTeamLeader(UUID teamLeader) {
         this.teamLeader = teamLeader;
         Query.PLAYER_SET_LEADER.getStatementHolder()
@@ -140,70 +151,98 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .execute(true);
     }
 
+    @Override
     public Island getIsland(){
         return plugin.getGrid().getIsland(this);
     }
 
+    @Override
+    @Deprecated
     public IslandRole getIslandRole() {
-        return islandRole;
+        return IslandRole.valueOf(getPlayerRole().toString().toUpperCase());
     }
 
+    @Override
+    public PlayerRole getPlayerRole() {
+        return playerRole;
+    }
+
+    @Override
+    @Deprecated
     public void setIslandRole(IslandRole islandRole) {
-        this.islandRole = islandRole;
+        setPlayerRole(SPlayerRole.of(islandRole.name()));
+    }
+
+    @Override
+    public void setPlayerRole(PlayerRole playerRole) {
+        this.playerRole = playerRole;
         Query.PLAYER_SET_ROLE.getStatementHolder()
-                .setString(islandRole.name())
+                .setString(playerRole.toString())
                 .setString(player.toString())
                 .execute(true);
     }
 
+    @Override
     public boolean hasWorldBorderEnabled() {
         return worldBorderEnabled;
     }
 
+    @Override
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
     }
 
+    @Override
     public boolean hasBlocksStackerEnabled() {
         return blocksStackerEnabled;
     }
 
+    @Override
     public void toggleBlocksStacker() {
         blocksStackerEnabled = !blocksStackerEnabled;
     }
 
+    @Override
     public boolean hasSchematicModeEnabled() {
         return schematicModeEnabled;
     }
 
+    @Override
     public void toggleSchematicMode() {
         schematicModeEnabled = !schematicModeEnabled;
     }
 
+    @Override
     public boolean hasTeamChatEnabled() {
         return teamChatEnabled;
     }
 
+    @Override
     public void toggleBypassMode(){
         bypassModeEnabled = !bypassModeEnabled;
     }
 
+    @Override
     public boolean hasBypassModeEnabled() {
         return bypassModeEnabled;
     }
 
+    @Override
     public void toggleTeamChat() {
         teamChatEnabled = !teamChatEnabled;
     }
 
+    @Override
     public boolean hasDisbands() {
         return disbands > 0;
     }
 
+    @Override
     public int getDisbands() {
         return disbands;
     }
 
+    @Override
     public void setDisbands(int disbands) {
         this.disbands = Math.max(disbands, 0);
         Query.PLAYER_SET_DISBANDS.getStatementHolder()
@@ -212,6 +251,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .execute(true);
     }
 
+    @Override
     public void setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
         Query.PLAYER_SET_TOGGLED_PANEL.getStatementHolder()
@@ -220,14 +260,17 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .execute(true);
     }
 
+    @Override
     public boolean hasToggledPanel() {
         return toggledPanel;
     }
 
+    @Override
     public boolean hasIslandFlyEnabled(){
         return islandFly;
     }
 
+    @Override
     public void toggleIslandFly(){
         islandFly = !islandFly;
         Query.PLAYER_SET_ISLAND_FLY.getStatementHolder()
@@ -306,38 +349,47 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return completedMissions.contains(mission.getName());
     }
 
+    @Override
     public BlockPosition getSchematicPos1() {
         return schematicPos1;
     }
 
+    @Override
     public void setSchematicPos1(Block block) {
         this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
     }
 
+    @Override
     public SBlockPosition getSchematicPos2() {
         return schematicPos2;
     }
 
+    @Override
     public void setSchematicPos2(Block block) {
         this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
     }
 
+    @Override
     public Player asPlayer(){
         return Bukkit.getPlayer(player);
     }
 
+    @Override
     public OfflinePlayer asOfflinePlayer(){
         return Bukkit.getOfflinePlayer(player);
     }
 
+    @Override
     public boolean isOnline(){
         return asOfflinePlayer().isOnline();
     }
 
+    @Override
     public boolean hasPermission(String permission){
         return permission.isEmpty() || asPlayer().hasPermission(permission);
     }
 
+    @Override
     public boolean hasPermission(IslandPermission permission){
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
@@ -348,7 +400,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_UPDATE.getStatementHolder()
                 .setString(teamLeader.toString())
                 .setString(name)
-                .setString(islandRole.name())
+                .setString(playerRole.toString())
                 .setString(textureValue)
                 .setInt(disbands)
                 .setBoolean(toggledPanel)
@@ -366,7 +418,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(player.toString())
                 .setString(teamLeader.toString())
                 .setString(name)
-                .setString(islandRole.name())
+                .setString(playerRole.toString())
                 .setString(textureValue)
                 .setInt(plugin.getSettings().disbandCount)
                 .setBoolean(toggledPanel)

@@ -62,7 +62,7 @@ public final class CmdSetWarp implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.SET_WARP)){
-            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_WARP));
+            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_WARP));
             return;
         }
 

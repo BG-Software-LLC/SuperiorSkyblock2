@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -63,7 +63,7 @@ public final class CmdPromote implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
-            Locale.NO_PROMOTE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.PROMOTE_MEMBERS));
+            Locale.NO_PROMOTE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.PROMOTE_MEMBERS));
             return;
         }
 
@@ -74,21 +74,23 @@ public final class CmdPromote implements ICommand {
             return;
         }
 
-        if(!targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) ||
-                targetPlayer.getIslandRole().getNextRole().isHigherThan(superiorPlayer.getIslandRole())){
-            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
-            return;
-        }
+        PlayerRole playerRole = targetPlayer.getPlayerRole();
+        PlayerRole nextRole = playerRole.getNextRole();
 
-        if(targetPlayer.getIslandRole().getNextRole() == IslandRole.LEADER){
+        if(playerRole.isLastRole() || nextRole.isLastRole()){
             Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
-        targetPlayer.setIslandRole(targetPlayer.getIslandRole().getNextRole());
+        if(!playerRole.isLessThan(superiorPlayer.getPlayerRole()) || nextRole.isHigherThan(superiorPlayer.getPlayerRole())){
+            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            return;
+        }
 
-        Locale.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getIslandRole());
-        Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getIslandRole());
+        targetPlayer.setPlayerRole(nextRole);
+
+        Locale.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
     @Override
@@ -102,9 +104,10 @@ public final class CmdPromote implements ICommand {
 
             for(UUID uuid : island.getMembers()){
                 targetPlayer = SSuperiorPlayer.of(uuid);
-                if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
-                        !targetPlayer.getIslandRole().getNextRole().isHigherThan(superiorPlayer.getIslandRole()) &&
-                        targetPlayer.getIslandRole().getNextRole() != IslandRole.LEADER &&
+                PlayerRole playerRole = targetPlayer.getPlayerRole();
+                PlayerRole nextRole = playerRole.getNextRole();
+                if(!playerRole.isLastRole() && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&
+                        !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }

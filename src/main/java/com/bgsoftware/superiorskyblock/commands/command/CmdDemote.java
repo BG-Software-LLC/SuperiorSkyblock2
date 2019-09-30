@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -63,7 +63,7 @@ public final class CmdDemote implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.DEMOTE_MEMBERS)){
-            Locale.NO_DEMOTE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.DEMOTE_MEMBERS));
+            Locale.NO_DEMOTE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DEMOTE_MEMBERS));
             return;
         }
 
@@ -74,20 +74,22 @@ public final class CmdDemote implements ICommand {
             return;
         }
 
-        if(!targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole())){
+        if(!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())){
             Locale.DEMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
 
-        if(targetPlayer.getIslandRole().getPreviousRole() == IslandRole.GUEST){
+        PlayerRole previousRole = targetPlayer.getPlayerRole().getPreviousRole();
+
+        if(previousRole == null){
             Locale.LAST_ROLE_DEMOTE.send(superiorPlayer);
             return;
         }
 
-        targetPlayer.setIslandRole(targetPlayer.getIslandRole().getPreviousRole());
+        targetPlayer.setPlayerRole(previousRole);
 
-        Locale.DEMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getIslandRole());
-        Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getIslandRole());
+        Locale.DEMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
     @Override
@@ -101,8 +103,8 @@ public final class CmdDemote implements ICommand {
 
             for(UUID uuid : island.getAllMembers()){
                 targetPlayer = SSuperiorPlayer.of(uuid);
-                if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
-                        targetPlayer.getIslandRole().getPreviousRole() != IslandRole.GUEST &&
+                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
+                        targetPlayer.getPlayerRole().getPreviousRole() != null &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }

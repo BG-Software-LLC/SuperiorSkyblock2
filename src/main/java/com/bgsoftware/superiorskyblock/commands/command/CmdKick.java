@@ -64,7 +64,7 @@ public final class CmdKick implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.KICK_MEMBER)){
-            Locale.NO_KICK_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.KICK_MEMBER));
+            Locale.NO_KICK_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.KICK_MEMBER));
             return;
         }
 
@@ -75,7 +75,7 @@ public final class CmdKick implements ICommand {
             return;
         }
 
-        if(!targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole())){
+        if(!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())){
             Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
@@ -105,7 +105,7 @@ public final class CmdKick implements ICommand {
 
             for(UUID uuid : island.getMembers()){
                 targetPlayer = SSuperiorPlayer.of(uuid);
-                if(targetPlayer.getIslandRole().isLessThan(superiorPlayer.getIslandRole()) &&
+                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }

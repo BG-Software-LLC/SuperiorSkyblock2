@@ -175,8 +175,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         missionsHandler = new MissionsHandler(this);
 
         if(loadGrid) {
-            gridHandler = new GridHandler(this);
             playersHandler = new PlayersHandler();
+            gridHandler = new GridHandler(this);
         }
 
         schematicsHandler = new SchematicsHandler(this);

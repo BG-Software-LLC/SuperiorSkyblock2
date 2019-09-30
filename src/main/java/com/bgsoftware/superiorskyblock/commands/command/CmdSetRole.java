@@ -2,8 +2,9 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -56,7 +57,6 @@ public final class CmdSetRole implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
-        IslandRole islandRole;
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[1]);
@@ -68,10 +68,14 @@ public final class CmdSetRole implements ICommand {
             return;
         }
 
+        PlayerRole playerRole = null;
+
         try{
-            islandRole = IslandRole.valueOf(args[2].toUpperCase());
-        }catch(IllegalArgumentException ex){
-            Locale.INVALID_ROLE.send(sender, args[2], IslandRole.getValuesString());
+            playerRole = SPlayerRole.of(args[2]);
+        }catch(IllegalArgumentException ignored){}
+
+        if(playerRole == null || !playerRole.isRoleLadder()){
+            Locale.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
             return;
         }
 
@@ -87,7 +91,7 @@ public final class CmdSetRole implements ICommand {
             }
 
             if(!superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
-                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_ROLE));
+                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_ROLE));
                 return;
             }
 
@@ -96,8 +100,9 @@ public final class CmdSetRole implements ICommand {
                 return;
             }
 
-            if(targetPlayer.getIslandRole().isHigherThan(superiorPlayer.getIslandRole()) || !islandRole.isLessThan(superiorPlayer.getIslandRole()) || islandRole == IslandRole.GUEST){
-                Locale.CANNOT_SET_ROLE.send(sender, islandRole);
+            if(targetPlayer.getPlayerRole().isHigherThan(superiorPlayer.getPlayerRole()) ||
+                    !playerRole.isLessThan(superiorPlayer.getPlayerRole())){
+                Locale.CANNOT_SET_ROLE.send(sender, playerRole);
                 return;
             }
         }else {
@@ -106,26 +111,26 @@ public final class CmdSetRole implements ICommand {
                 return;
             }
 
-            if(islandRole == IslandRole.LEADER || islandRole == IslandRole.GUEST){
-                Locale.CANNOT_SET_ROLE.send(sender, islandRole);
+            if(playerRole.isLastRole()){
+                Locale.CANNOT_SET_ROLE.send(sender, playerRole);
                 return;
             }
         }
 
-        if(targetPlayer.getIslandRole() == islandRole){
-            Locale.PLAYER_ALREADY_IN_ROLE.send(sender, targetPlayer.getName(), islandRole);
+        if(targetPlayer.getPlayerRole().equals(playerRole)){
+            Locale.PLAYER_ALREADY_IN_ROLE.send(sender, targetPlayer.getName(), playerRole);
             return;
         }
 
-        IslandRole currentRole = targetPlayer.getIslandRole();
-        targetPlayer.setIslandRole(islandRole);
+        PlayerRole currentRole = targetPlayer.getPlayerRole();
+        targetPlayer.setPlayerRole(playerRole);
 
-        if(currentRole.isLessThan(islandRole)){
-            Locale.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getIslandRole());
-            Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getIslandRole());
+        if(currentRole.isLessThan(playerRole)){
+            Locale.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+            Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
         }else{
-            Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getIslandRole());
-            Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getIslandRole());
+            Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+            Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
         }
     }
 
@@ -146,9 +151,10 @@ public final class CmdSetRole implements ICommand {
                 }
             }
             else if(args.length == 3){
-                for(IslandRole islandRole : IslandRole.values()) {
-                    if(islandRole.name().toLowerCase().startsWith(args[2].toLowerCase()))
-                        list.add(islandRole.name().toLowerCase());
+                for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+                    String roleName = playerRole.toString().trim().toLowerCase();
+                    if(roleName.startsWith(args[2].toLowerCase()))
+                        list.add(roleName);
                 }
             }
 

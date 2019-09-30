@@ -61,7 +61,7 @@ public final class CmdSetPaypal implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.SET_PAYPAL)){
-            Locale.NO_SET_PAYPAL_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.SET_PAYPAL));
+            Locale.NO_SET_PAYPAL_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_PAYPAL));
             return;
         }
 

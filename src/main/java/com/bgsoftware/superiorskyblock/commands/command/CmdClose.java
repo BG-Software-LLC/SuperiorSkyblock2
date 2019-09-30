@@ -61,7 +61,7 @@ public final class CmdClose implements ICommand {
         }
 
         if(!superiorPlayer.hasPermission(IslandPermission.CLOSE_ISLAND)){
-            Locale.NO_CLOSE_PERMISSION.send(superiorPlayer, island.getRequiredRole(IslandPermission.CLOSE_ISLAND));
+            Locale.NO_CLOSE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.CLOSE_ISLAND));
             return;
         }
 

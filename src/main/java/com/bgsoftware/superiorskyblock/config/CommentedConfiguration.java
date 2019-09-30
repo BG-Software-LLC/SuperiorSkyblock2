@@ -28,6 +28,7 @@ import java.util.Map;
 public final class CommentedConfiguration extends YamlConfiguration{
 
     private Class commentsClass;
+    private String[] ignoredSections = new String[] {"ladder"};
 
     public CommentedConfiguration(Class commentsClass, File file){
         this.commentsClass = commentsClass;
@@ -48,7 +49,7 @@ public final class CommentedConfiguration extends YamlConfiguration{
     private void copyConfigurationSection(ConfigurationSection source, ConfigurationSection dest){
         for(String key : dest.getKeys(false)){
             if(source.contains(key)) {
-                if (source.isConfigurationSection(key)) {
+                if (source.isConfigurationSection(key) && !Arrays.asList(ignoredSections).contains(key)) {
                     copyConfigurationSection(source.getConfigurationSection(key), dest.getConfigurationSection(key));
                 } else {
                     dest.set(key, source.get(key));
