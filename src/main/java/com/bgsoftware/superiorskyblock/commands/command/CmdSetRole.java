@@ -152,9 +152,11 @@ public final class CmdSetRole implements ICommand {
             }
             else if(args.length == 3){
                 for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-                    String roleName = playerRole.toString().trim().toLowerCase();
-                    if(roleName.startsWith(args[2].toLowerCase()))
-                        list.add(roleName);
+                    if(playerRole.isRoleLadder()) {
+                        String roleName = playerRole.toString().trim().toLowerCase();
+                        if (roleName.startsWith(args[2].toLowerCase()))
+                            list.add(roleName);
+                    }
                 }
             }
 
