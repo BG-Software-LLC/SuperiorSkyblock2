@@ -13,7 +13,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.UUID;
 
 public final class ConfirmDisbandMenu extends SuperiorMenu {
 
@@ -37,11 +36,8 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
             Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
             if(!islandDisbandEvent.isCancelled()) {
-                for(UUID uuid : island.getMembers()){
-                    if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                        Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
-                    }
-                }
+                if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
+                    island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
                 Locale.DISBANDED_ISLAND.send(superiorPlayer);
 

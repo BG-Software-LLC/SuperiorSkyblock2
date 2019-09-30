@@ -18,7 +18,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdInvite implements ICommand {
 
@@ -120,10 +119,8 @@ public final class CmdInvite implements ICommand {
             }
         }
 
-        for (UUID uuid : island.getAllMembers()) {
-            if (Bukkit.getOfflinePlayer(uuid).isOnline())
-                Locale.sendMessage(Bukkit.getPlayer(uuid), message);
-        }
+        if(message != null)
+            island.sendMessage(message);
     }
 
     @Override

@@ -81,11 +81,8 @@ public final class CmdPardon implements ICommand {
 
         island.unbanMember(targetPlayer);
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.UNBAN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), targetPlayer.getName(), superiorPlayer.getName());
-            }
-        }
+        if(!Locale.UNBAN_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.UNBAN_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
 
         Locale.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
     }

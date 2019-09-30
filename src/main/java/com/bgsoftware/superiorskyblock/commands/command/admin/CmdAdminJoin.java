@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdAdminJoin implements ICommand {
 
@@ -75,11 +74,8 @@ public final class CmdAdminJoin implements ICommand {
             return;
         }
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.JOIN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
-            }
-        }
+        if(!Locale.JOIN_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 

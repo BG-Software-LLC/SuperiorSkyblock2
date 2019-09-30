@@ -90,11 +90,8 @@ public final class CmdAccept implements ICommand {
         if(islandJoinEvent.isCancelled())
             return;
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.JOIN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid),  superiorPlayer.getName());
-            }
-        }
+        if(!Locale.JOIN_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());

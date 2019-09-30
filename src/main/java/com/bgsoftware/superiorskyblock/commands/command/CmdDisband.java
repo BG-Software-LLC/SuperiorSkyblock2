@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdDisband implements ICommand {
 
@@ -83,11 +82,8 @@ public final class CmdDisband implements ICommand {
             Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
             if(!islandDisbandEvent.isCancelled()) {
-                for(UUID uuid : island.getMembers()){
-                    if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                        Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName());
-                    }
-                }
+                if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
+                    island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
                 Locale.DISBANDED_ISLAND.send(superiorPlayer);
 

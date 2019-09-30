@@ -85,11 +85,8 @@ public final class CmdKick implements ICommand {
 
         island.kickMember(targetPlayer);
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.KICK_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), targetPlayer.getName(), superiorPlayer.getName());
-            }
-        }
+        if(!Locale.KICK_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.KICK_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
 
         Locale.GOT_KICKED.send(targetPlayer, superiorPlayer.getName());
     }

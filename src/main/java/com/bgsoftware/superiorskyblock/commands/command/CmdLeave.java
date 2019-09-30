@@ -74,7 +74,8 @@ public final class CmdLeave implements ICommand {
 
         island.kickMember(superiorPlayer);
 
-        island.sendMessage(Locale.LEAVE_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
+        if(!Locale.LEAVE_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.LEAVE_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
 
         Locale.LEFT_ISLAND.send(superiorPlayer);
     }

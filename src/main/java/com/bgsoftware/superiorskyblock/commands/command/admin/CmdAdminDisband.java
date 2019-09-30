@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdAdminDisband implements ICommand {
 
@@ -67,11 +66,8 @@ public final class CmdAdminDisband implements ICommand {
             return;
         }
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.DISBAND_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), sender.getName());
-            }
-        }
+        if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(sender.getName()));
 
         if(targetPlayer == null)
             Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());

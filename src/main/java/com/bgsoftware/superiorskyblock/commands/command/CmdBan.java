@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -87,11 +86,8 @@ public final class CmdBan implements ICommand {
 
         island.banMember(targetPlayer);
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.BAN_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), targetPlayer.getName(), superiorPlayer.getName());
-            }
-        }
+        if(!Locale.BAN_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.BAN_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
 
         Locale.GOT_BANNED.send(targetPlayer, island.getOwner().getName());
     }

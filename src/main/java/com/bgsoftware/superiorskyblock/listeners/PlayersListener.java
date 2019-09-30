@@ -74,7 +74,7 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null)
+        if(island != null && !Locale.PLAYER_JOIN_ANNOUNCEMENT.isEmpty())
             island.sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
 
         Executor.async(() -> {
@@ -100,7 +100,7 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null)
+        if(island != null && !Locale.PLAYER_QUIT_ANNOUNCEMENT.isEmpty())
             island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
 
         for(Island _island : plugin.getGrid().getIslands()){

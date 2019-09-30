@@ -9,14 +9,12 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdWithdraw implements ICommand {
 
@@ -78,7 +76,7 @@ public final class CmdWithdraw implements ICommand {
         double amount = -1;
 
         try{
-            amount = Double.valueOf(args[1]);
+            amount = Double.parseDouble(args[1]);
         }catch(IllegalArgumentException ignored){}
 
         if(amount < 0){
@@ -99,11 +97,8 @@ public final class CmdWithdraw implements ICommand {
         island.withdrawMoney(amount);
         EconomyHook.depositMoney(superiorPlayer.asPlayer(), amount);
 
-        for(UUID uuid : island.getAllMembers()){
-            if(Bukkit.getOfflinePlayer(uuid).isOnline()){
-                Locale.WITHDRAW_ANNOUNCEMENT.send(Bukkit.getPlayer(uuid), superiorPlayer.getName(), StringUtil.format(amount));
-            }
-        }
+        if(!Locale.WITHDRAW_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.WITHDRAW_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtil.format(amount)));
     }
 
     @Override
