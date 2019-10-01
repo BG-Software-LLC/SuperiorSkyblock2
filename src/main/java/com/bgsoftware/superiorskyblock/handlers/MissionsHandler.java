@@ -63,7 +63,11 @@ public final class MissionsHandler implements MissionsManager {
                     if (!missionClass.isPresent())
                         throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
 
-                    mission = createInstance(missionClass.get(), missionName);
+                    List<String> requiredMissions = missionSection.getStringList("required-missions");
+                    boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
+                            missionSection.getBoolean("only-show-if-required-completed");
+
+                    mission = createInstance(missionClass.get(), missionName, requiredMissions, onlyShowIfRequiredCompleted);
                     mission.load(plugin, missionSection);
                     missionMap.put(missionName.toLowerCase(), mission);
                 }
@@ -217,7 +221,7 @@ public final class MissionsHandler implements MissionsManager {
         return list;
     }
 
-    private Mission createInstance(Class clazz, String name) throws Exception{
+    private Mission createInstance(Class clazz, String name, List<String> requiredMissions, boolean onlyShowIfRequiredCompleted) throws Exception{
         if(!Mission.class.isAssignableFrom(clazz))
             throw new IllegalArgumentException("Class " + clazz + " is not a Mission.");
 
@@ -228,6 +232,9 @@ public final class MissionsHandler implements MissionsManager {
 
                 Mission mission = (Mission) constructor.newInstance();
                 mission.setName(name);
+                mission.addRequiredMission(requiredMissions.toArray(new String[0]));
+                if(onlyShowIfRequiredCompleted)
+                    mission.toggleOnlyShowIfRequiredCompleted();
 
                 return mission;
             }

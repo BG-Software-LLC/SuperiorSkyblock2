@@ -78,6 +78,9 @@ cobble-miner:
       types:
         - 'COBBLESTONE'
       amount: 48
+  required-missions:
+    - 'woodcutter'
+  only-show-if-required-completed: true
   icons:
     not-completed:
       type: PAPER

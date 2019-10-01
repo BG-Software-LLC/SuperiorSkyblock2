@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class IslandMissionsMenu extends SuperiorMenu {
 
@@ -80,12 +81,14 @@ public final class IslandMissionsMenu extends SuperiorMenu {
             if (mission != null) {
                 boolean completed = islandMissions ? island.hasCompletedMission(mission) : superiorPlayer.hasCompletedMission(mission);
                 boolean canComplete = mission.canComplete(superiorPlayer);
+                boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
+                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
 
                 SoundWrapper sound = getSound(completed ? -1 : canComplete ? -3 : -2);
                 if(sound != null)
                     sound.playSound(superiorPlayer.asPlayer());
 
-                if(canComplete){
+                if(canComplete && hasAllRequiredMissions){
                     plugin.getMissions().rewardMission(mission, superiorPlayer, false);
                     open(superiorPlayer, page, previousMenu);
                 }
@@ -113,7 +116,9 @@ public final class IslandMissionsMenu extends SuperiorMenu {
 
         this.page = page;
 
-        List<Mission> missions = islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions();
+        List<Mission> missions = (islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions()).stream()
+                .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
+                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
 
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), islandMissions ? islandTitle : playerTitle);
         inv.setContents(inventory.getContents());
@@ -123,7 +128,9 @@ public final class IslandMissionsMenu extends SuperiorMenu {
                 Mission mission = missions.get(i + (slots.size() * (page - 1)));
                 MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
                 boolean completed = islandMissions ? island.hasCompletedMission(mission) : superiorPlayer.hasCompletedMission(mission);
-                inv.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) ? missionData.canComplete : missionData.notCompleted);
+                boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
+                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
+                inv.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) && hasAllRequiredMissions ? missionData.canComplete : missionData.notCompleted);
             }
         }
 

@@ -68,6 +68,21 @@ public final class CmdMission implements ICommand {
             return;
         }
 
+        List<String> requiredMissions = mission.getRequiredMissions();
+
+        if(!requiredMissions.isEmpty()){
+            StringBuilder stringBuilder = new StringBuilder();
+            requiredMissions.forEach(requiredMission -> {
+                Mission _mission = plugin.getMissions().getMission(requiredMission);
+                if(!plugin.getMissions().hasCompleted(superiorPlayer, _mission))
+                    stringBuilder.append(_mission.getName()).append(", ");
+            });
+            if(stringBuilder.length() != 0) {
+                Locale.MISSION_NOT_COMPLETE_REQUIRED_MISSIONS.send(superiorPlayer, stringBuilder.substring(0, stringBuilder.length() - 2));
+                return;
+            }
+        }
+
         if(!mission.canComplete(superiorPlayer)){
             Locale.MISSION_CANNOT_COMPLETE.send(superiorPlayer);
             return;
