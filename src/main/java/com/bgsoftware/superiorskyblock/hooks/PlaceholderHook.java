@@ -100,7 +100,7 @@ public abstract class PlaceholderHook {
                     case "leader":
                         return island.getOwner().getName();
                     case "size":
-                        int size = island.getIslandSize() * 2;
+                        int size = (island.getIslandSize() * 2) + 1;
                         return size + " x " + size;
                     case "radius":
                         return String.valueOf(island.getIslandSize());
