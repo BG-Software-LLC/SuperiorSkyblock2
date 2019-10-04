@@ -44,9 +44,9 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     public synchronized void remove(UUID uuid){
-        islands.remove(uuid);
         for(TreeSet<UUID> sortedTree : sortedTrees.values())
             sortedTree.remove(uuid);
+        islands.remove(uuid);
     }
 
     public int size(){
@@ -73,19 +73,9 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     public void transferIsland(UUID oldOwner, UUID newOwner){
-        Island island = islands.get(oldOwner);
-
-        for(TreeSet<UUID> sortedTree : sortedTrees.values()) {
-            //Remove the old owner from list
-            sortedTree.remove(oldOwner);
-
-            //Add the new owner to list
-            sortedTree.add(newOwner);
-        }
-
-        //Replace owners
-        islands.remove(oldOwner);
-        islands.put(newOwner, island);
+        Island island = get(oldOwner);
+        remove(oldOwner);
+        add(newOwner, island);
     }
 
     private void ensureType(SortingType sortingType){
