@@ -99,8 +99,11 @@ public abstract class PlaceholderHook {
                         return String.valueOf(island.getTeamLimit());
                     case "leader":
                         return island.getOwner().getName();
+                    case "size_format":
                     case "size":
-                        int size = (island.getIslandSize() * 2) + 1;
+                        int size = island.getIslandSize() * 2 + 1, rounded = 5 * (Math.round(size / 5.0F));
+                        if(subPlaceholder.contains("format") && Math.abs(size - rounded) == 1)
+                            size = rounded;
                         return size + " x " + size;
                     case "radius":
                         return String.valueOf(island.getIslandSize());
