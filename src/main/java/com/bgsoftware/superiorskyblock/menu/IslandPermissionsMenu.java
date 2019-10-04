@@ -8,10 +8,12 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtil;
 import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtil;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -146,17 +148,22 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
             IslandPermission permission = IslandPermission.values()[i + (slots.size() * (page - 1))];
             String permissionName = permission.name().toLowerCase();
             if (permissionsData.containsKey(permissionName + "-permission-enabled")) {
-                ItemStack permissionItem = get(permissionName + "-permission-enabled", ItemStack.class);
-
-                PermissionNode permissionNode;
+                boolean hasPermission;
 
                 if (permissionHolder instanceof PlayerRole)
-                    permissionNode = island.getPermisisonNode((PlayerRole) permissionHolder);
+                    hasPermission = island.getPermisisonNode((PlayerRole) permissionHolder).hasPermission(permission);
                 else
-                    permissionNode = island.getPermisisonNode((SuperiorPlayer) permissionHolder);
+                    hasPermission = island.getPermisisonNode((SuperiorPlayer) permissionHolder).hasPermission(permission);
 
-                if (!permissionNode.hasPermission(permission))
-                    permissionItem = get(permissionName + "-permission-disabled", ItemStack.class);
+                Object permissionItemObject = get(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"), Object.class);
+                ItemStack permissionItem;
+
+                if(permissionItemObject instanceof ItemStack){
+                   permissionItem = (ItemStack) permissionItemObject;
+                }
+                else{
+                    permissionItem = ((ItemBuilder) permissionItemObject).copy().replaceAll("{}", StringUtil.format(permissionName)).build();
+                }
 
                 inv.setItem(slots.get(i), permissionItem);
             }
@@ -214,16 +221,24 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
         ConfigurationSection section = cfg.getConfigurationSection("permissions-gui.permissions");
 
-        for(String permission : section.getKeys(false)){
-            permission = permission.toLowerCase();
-            permissionsData.put(permission + "-has-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.sound")));
-            permissionsData.put(permission + "-has-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.commands")));
-            permissionsData.put(permission + "-no-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.sound")));
-            permissionsData.put(permission + "-no-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.commands")));
-            permissionsData.put(permission + "-permission-enabled",
-                    FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-enabled")));
-            permissionsData.put(permission + "-permission-disabled",
-                    FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-disabled")));
+        for(IslandPermission islandPermission : IslandPermission.values()){
+            String permission = islandPermission.name().toLowerCase();
+            if(section.contains(permission)){
+                permissionsData.put(permission + "-has-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.sound")));
+                permissionsData.put(permission + "-has-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.commands")));
+                permissionsData.put(permission + "-no-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.sound")));
+                permissionsData.put(permission + "-no-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.commands")));
+                permissionsData.put(permission + "-permission-enabled",
+                        FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-enabled")));
+                permissionsData.put(permission + "-permission-disabled",
+                        FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-disabled")));
+            }
+            else{
+                permissionsData.put(permission + "-permission-enabled",
+                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &aENABLED&7."));
+                permissionsData.put(permission + "-permission-disabled",
+                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &cDISABLED&7."));
+            }
         }
     }
 

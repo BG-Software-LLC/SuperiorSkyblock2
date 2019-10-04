@@ -325,6 +325,30 @@ permissions-gui:
           volume: 0.2
           pitch: 0.2
 
+    coop_member:
+      permission-enabled:
+        type: GOLDEN_APPLE
+        name: '&6Coop Member'
+        lore:
+          - '&7Access to add a player as a co-op member.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: GOLDEN_APPLE
+        name: '&6Coop Member'
+        lore:
+          - '&7Access to add a player as a co-op member.'
+          - '&7Currently &cDISABLED&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
     demote_members:
       permission-enabled:
         type: IRON_INGOT
@@ -961,6 +985,30 @@ permissions-gui:
         name: '&6Sign Interact'
         lore:
           - '&7Access to interact with signs inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
+    uncoop_member:
+      permission-enabled:
+        type: GOLDEN_APPLE
+        name: '&6Uncoop Member'
+        lore:
+          - '&7Access to remove co-op members from the island.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: GOLDEN_APPLE
+        name: '&6Uncoop Member'
+        lore:
+          - '&7Access to remove co-op members from the island.'
           - '&7Currently &cDISABLED&7.'
       has-access:
         sound:

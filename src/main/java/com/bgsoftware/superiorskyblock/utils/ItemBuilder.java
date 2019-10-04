@@ -126,4 +126,10 @@ public final class ItemBuilder {
         return textureValue.isEmpty() ? itemStack : HeadUtil.getPlayerHead(itemStack, textureValue);
     }
 
+    public ItemBuilder copy(){
+        ItemStack itemStack = this.itemStack.clone();
+        itemStack.setItemMeta(this.itemMeta.clone());
+        return new ItemBuilder(itemStack);
+    }
+
 }
