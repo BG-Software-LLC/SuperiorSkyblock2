@@ -177,12 +177,16 @@ public final class SettingsHandler {
             cfg.set("island-roles.guest.name", "Guest");
             cfg.set("island-roles.guest.permissions", cfg.getStringList("default-permissions.guest"));
             cfg.set("island-roles.ladder.member.name", "Member");
+            cfg.set("island-roles.ladder.member.weight", 0);
             cfg.set("island-roles.ladder.member.permissions", cfg.getStringList("default-permissions.member"));
             cfg.set("island-roles.ladder.mod.name", "Moderator");
+            cfg.set("island-roles.ladder.mod.weight", 1);
             cfg.set("island-roles.ladder.mod.permissions", cfg.getStringList("default-permissions.mod"));
             cfg.set("island-roles.ladder.admin.name", "Admin");
+            cfg.set("island-roles.ladder.admin.weight", 2);
             cfg.set("island-roles.ladder.admin.permissions", cfg.getStringList("default-permissions.admin"));
             cfg.set("island-roles.ladder.leader.name", "Leader");
+            cfg.set("island-roles.ladder.leader.weight", 3);
             cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
         }
     }
