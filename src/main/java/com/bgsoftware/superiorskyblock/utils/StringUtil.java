@@ -42,7 +42,7 @@ public final class StringUtil {
         else if(d > K)
             return format((d / K)) + "K";
         else
-            return d + "";
+            return format(d);
     }
 
     public static String formatRating(double rating){
