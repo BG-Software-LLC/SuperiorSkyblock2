@@ -49,7 +49,7 @@ public final class CommentedConfiguration extends YamlConfiguration{
     private void copyConfigurationSection(ConfigurationSection source, ConfigurationSection dest){
         for(String key : dest.getKeys(false)){
             if(source.contains(key)) {
-                if (source.isConfigurationSection(key) && !Arrays.asList(ignoredSections).contains(key)) {
+                if (source.isConfigurationSection(key) && (!Arrays.asList(ignoredSections).contains(key) || !dest.contains(key))) {
                     copyConfigurationSection(source.getConfigurationSection(key), dest.getConfigurationSection(key));
                 } else {
                     dest.set(key, source.get(key));
