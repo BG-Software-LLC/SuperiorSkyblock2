@@ -1,48 +1,56 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.google.common.collect.Lists;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
-    private List<UUID> ownershipList = Lists.newArrayList();
+    private Map<SortingType, TreeSet<UUID>> sortedTrees = new HashMap<>();
+
+    public IslandRegistry(){
+        for(SortingType sortingAlgorithm : SortingType.values())
+            sortedTrees.put(sortingAlgorithm, Sets.newTreeSet(sortingAlgorithm.getComparator()));
+    }
 
     public Island get(UUID uuid){
         return islands.get(uuid);
     }
 
-    public Island get(int index){
-        return islands.get(ownershipList.get(index));
+    public Island get(int index, SortingType sortingType){
+        ensureType(sortingType);
+        return get(Iterables.get(sortedTrees.get(sortingType), index));
     }
 
-    public int indexOf(Island island){
-        return ownershipList.indexOf(island.getOwner().getUniqueId());
+    public int indexOf(Island island, SortingType sortingType){
+        ensureType(sortingType);
+        return Iterables.indexOf(sortedTrees.get(sortingType), uuid -> island.getOwner().getUniqueId().equals(uuid));
     }
 
     public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
-        ownershipList.remove(uuid);
-        ownershipList.add(uuid);
-        sort();
+        for(TreeSet<UUID> sortedTree : sortedTrees.values())
+            sortedTree.add(uuid);
     }
 
     public synchronized void remove(UUID uuid){
         islands.remove(uuid);
-        ownershipList.remove(uuid);
-        sort();
+        for(TreeSet<UUID> sortedTree : sortedTrees.values())
+            sortedTree.remove(uuid);
     }
 
     public int size(){
-        return ownershipList.size();
+        return islands.size();
     }
 
     @Override
@@ -50,29 +58,39 @@ public final class IslandRegistry implements Iterable<Island> {
         return islands.values().iterator();
     }
 
-    public Iterator<UUID> uuidIterator(){
-        return ownershipList.iterator();
+    public Iterator<UUID> iterator(SortingType sortingType){
+        ensureType(sortingType);
+        return Iterables.unmodifiableIterable(sortedTrees.get(sortingType)).iterator();
     }
 
-    public synchronized void sort(){
-        //noinspection SuspiciousMethodCalls
-        ownershipList.sort(Comparator.comparing(o -> islands.get(o)).reversed());
+    public synchronized void sort(SortingType sortingType){
+        ensureType(sortingType);
+        TreeSet<UUID> sortedTree = sortedTrees.get(sortingType);
+        Iterator<UUID> worthIterator = Sets.newTreeSet(sortedTree).iterator();
+        sortedTree.clear();
+        while(worthIterator.hasNext())
+            sortedTree.add(worthIterator.next());
     }
 
     public void transferIsland(UUID oldOwner, UUID newOwner){
         Island island = islands.get(oldOwner);
 
-        //Remove the old owner from list
-        ownershipList.remove(oldOwner);
+        for(TreeSet<UUID> sortedTree : sortedTrees.values()) {
+            //Remove the old owner from list
+            sortedTree.remove(oldOwner);
 
-        //Add the new owner to list
-        ownershipList.add(newOwner);
+            //Add the new owner to list
+            sortedTree.add(newOwner);
+        }
 
         //Replace owners
         islands.remove(oldOwner);
         islands.put(newOwner, island);
+    }
 
-        sort();
+    private void ensureType(SortingType sortingType){
+        if(!sortedTrees.containsKey(sortingType))
+            throw new IllegalStateException("The sorting-type " + sortingType + " doesn't exist in the database. Please contact author!");
     }
 
 }

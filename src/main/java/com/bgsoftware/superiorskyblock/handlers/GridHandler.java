@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
@@ -184,7 +185,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIsland(int index){
-        return index >= islands.size() ? null : islands.get(index);
+        return index >= islands.size() ? null : islands.get(index, SortingTypes.BY_WORTH);
     }
 
     @Override
@@ -256,7 +257,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public List<UUID> getAllIslands(){
-        return Lists.newArrayList(islands.uuidIterator());
+        return Lists.newArrayList(islands.iterator(SortingTypes.BY_WORTH));
     }
 
     @Override
@@ -266,7 +267,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        IslandsTopMenu.openInventory(superiorPlayer, null);
+        IslandsTopMenu.openInventory(superiorPlayer, null, SortingTypes.BY_WORTH);
     }
 
     @Override

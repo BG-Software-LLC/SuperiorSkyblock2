@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
@@ -42,6 +43,7 @@ import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -94,6 +96,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         loadWorld();
 
+        loadSortingTypes();
         reloadPlugin(true);
 
         if (Updater.isOutdated()) {
@@ -195,6 +198,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         Locale.reload();
         CalcTask.startTask();
+    }
+
+    private void loadSortingTypes(){
+        SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR);
+        SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR);
+        SortingType.register("RATING", SortingComparators.RATING_COMPARATOR);
+        SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR);
     }
 
     private void loadMenus(){

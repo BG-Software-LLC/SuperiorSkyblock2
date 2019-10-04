@@ -66,5 +66,42 @@ top-islands:
     data: 3
     name: '&cInvalid Island'
 
-  player-island-slot: 49
+  worth-sort:
+    slot: 49
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: DIAMOND
+    name: '&6Sort by Worth'
+
+  level-sort:
+    slot: 50
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: GOLD_INGOT
+    name: '&6Sort by Level'
+
+  rating-sort:
+    slot: 51
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: EMERALD
+    name: '&6Sort by Rating'
+
+  players-sort:
+    slot: 52
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+    type: SKULL_ITEM
+    data: 3
+    name: '&6Sort by Players'
+
+  player-island-slot: 46
   slots: '13,21,23,28,29,30,31,32,33,34'
