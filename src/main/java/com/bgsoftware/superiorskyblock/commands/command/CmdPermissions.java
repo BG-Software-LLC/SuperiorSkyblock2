@@ -71,14 +71,15 @@ public final class CmdPermissions implements ICommand {
             return;
         }
 
+        PlayerRole holderRole = null;
         Object permissionHolder;
         String permissionHolderName;
 
         //Checks if entered an island role.
         try{
-            PlayerRole playerRole = SPlayerRole.of(args[1]);
-            permissionHolder = playerRole;
-            permissionHolderName = playerRole.toString();
+            holderRole = SPlayerRole.of(args[1]);
+            permissionHolder = holderRole;
+            permissionHolderName = holderRole.toString();
         }catch(IllegalArgumentException ex){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
@@ -87,8 +88,14 @@ public final class CmdPermissions implements ICommand {
                 return;
             }
 
+            holderRole = targetPlayer.getPlayerRole();
             permissionHolder = targetPlayer;
             permissionHolderName = targetPlayer.getName();
+        }
+
+        if(!superiorPlayer.getPlayerRole().isHigherThan(holderRole)){
+            Locale.CHANGE_PERMISSION_FOR_HIGHER_ROLE.send(superiorPlayer);
+            return;
         }
 
         IslandPermissionsMenu.openInventory(superiorPlayer, null, island, permissionHolder, permissionHolderName);
