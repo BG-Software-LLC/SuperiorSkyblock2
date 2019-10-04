@@ -103,6 +103,7 @@ public class SIsland extends DatabaseObject implements Island {
     private String description = "";
     private final Map<UUID, Rating> ratings = new HashMap<>();
     private final Set<String> completedMissions = new HashSet<>();
+    private Biome biome;
 
     /*
      * SIsland multipliers & limits
@@ -149,6 +150,8 @@ public class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
 
         assignPermissionNodes();
+
+        Executor.sync(() -> biome = getCenter().getBlock().getBiome());
     }
 
     public SIsland(CompoundTag tag){
@@ -1037,6 +1040,7 @@ public class SIsland extends DatabaseObject implements Island {
                 center.getWorld().setBiome(x, z, biome);
             }
         }
+        this.biome = biome;
     }
 
     @Override
@@ -1299,6 +1303,11 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean hasCompletedMission(Mission mission) {
         return completedMissions.contains(mission.getName());
+    }
+
+    @Override
+    public Biome getBiome() {
+        return biome;
     }
 
     @Override

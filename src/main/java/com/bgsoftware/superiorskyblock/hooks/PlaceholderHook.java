@@ -105,7 +105,7 @@ public abstract class PlaceholderHook {
                     case "radius":
                         return String.valueOf(island.getIslandSize());
                     case "biome":
-                        return StringUtil.format(island.getCenter().getBlock().getBiome().name());
+                        return StringUtil.format(island.getBiome().name());
                     case "level":
                         return island.getIslandLevelAsBigDecimal().toString();
                     case "level_format":

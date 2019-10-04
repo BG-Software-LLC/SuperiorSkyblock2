@@ -272,4 +272,6 @@ public interface Island extends Comparable<Island> {
 
     boolean hasCompletedMission(Mission mission);
 
+    Biome getBiome();
+
 }
