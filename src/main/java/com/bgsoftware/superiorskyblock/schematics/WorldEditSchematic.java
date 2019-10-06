@@ -40,7 +40,6 @@ public final class WorldEditSchematic implements Schematic {
             Object point = blockVector3AtMethod.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             editSession = (EditSession) blockVector3PasteMethod.invoke(schematic, new BukkitWorld(location.getWorld()), point, false, true, null);
         }catch(Throwable ex){
-            ex.printStackTrace();
             com.sk89q.worldedit.Vector point = new com.sk89q.worldedit.Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             editSession = schematic.paste(new BukkitWorld(location.getWorld()), point, false, true, null);
         }
