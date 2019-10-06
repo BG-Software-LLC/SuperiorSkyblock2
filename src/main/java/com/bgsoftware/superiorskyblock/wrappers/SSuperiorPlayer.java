@@ -224,6 +224,9 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public boolean hasBypassModeEnabled() {
+        if(bypassModeEnabled && isOnline() && !asPlayer().hasPermission("superior.admin.bypass"))
+            bypassModeEnabled = false;
+
         return bypassModeEnabled;
     }
 
