@@ -12,6 +12,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,24 +67,32 @@ public abstract class PlaceholderHook {
                     }
                 }
 
-                if ((matcher = Pattern.compile("island_upgrade_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = Pattern.compile("island_upgrade_(.+)").matcher(placeholder)).matches()) {
                     String upgradeName = matcher.group(1);
                     return String.valueOf(island.getUpgradeLevel(upgradeName));
                 }
 
-                if ((matcher = Pattern.compile("island_count_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = Pattern.compile("island_count_(.+)").matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1).toUpperCase();
                     return String.valueOf(island.getBlockCount(Key.of(keyName)));
                 }
 
-                if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {
                     try{
-                        int index = Integer.valueOf(matcher.group(1));
+                        int index = Integer.parseInt(matcher.group(1));
                         return String.valueOf(plugin.getGrid().getIsland(index).getOwner().getName());
                     }catch(IllegalArgumentException ignored){}
                 }
 
-                switch (subPlaceholder) {
+                else if ((matcher = Pattern.compile("island_member_(.+)").matcher(placeholder)).matches()) {
+                    try{
+                        int index = Integer.parseInt(matcher.group(1));
+                        List<UUID> members = island.getMembers();
+                        return index >= members.size() ? "" : SSuperiorPlayer.of(members.get(index)).getName();
+                    }catch(IllegalArgumentException ignored){}
+                }
+
+                else switch (subPlaceholder) {
                     case "center":
                         return SBlockPosition.of(island.getCenter()).toString();
                     case "x":

@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtil;
 import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
 import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
@@ -82,7 +83,7 @@ public class SIsland extends DatabaseObject implements Island {
      * SIsland data
      */
 
-    private final Set<UUID> members = new HashSet<>();
+    private final TreeSet<UUID> members = new TreeSet<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
     private final Set<UUID> coop = new HashSet<>();
     private final Set<UUID> banned = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();

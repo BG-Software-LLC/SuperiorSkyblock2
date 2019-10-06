@@ -35,15 +35,6 @@ public final class IslandMembersMenu extends SuperiorMenu {
         super("membersPage");
         if(island != null) {
             this.members = island.getAllMembers();
-            members.sort((o1, o2) -> {
-                SuperiorPlayer player1 = SSuperiorPlayer.of(o1), player2 = SSuperiorPlayer.of(o2);
-                int compare = player1.getPlayerRole().toString().compareTo(player2.getPlayerRole().toString());
-
-                if(compare == 0)
-                    return player1.getName().compareTo(player2.getName());
-
-                return compare;
-            });
         }
     }
 
