@@ -166,7 +166,7 @@ public final class PlayersListener implements Listener {
             Locale.ISLAND_FLY_DISABLED.send(player);
         }
 
-        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland());
+        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
         Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
         if(islandLeaveProtectedEvent.isCancelled())
             e.setCancelled(true);
@@ -175,7 +175,7 @@ public final class PlayersListener implements Listener {
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
         Executor.sync(() -> {
-            if(e.getPlayer().asOfflinePlayer().isOnline())
+            if(e.getPlayer().isOnline())
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
         }, 5L);
     }
