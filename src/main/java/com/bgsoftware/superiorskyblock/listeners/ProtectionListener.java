@@ -42,8 +42,12 @@ public final class ProtectionListener implements Listener {
     public void onBlockPlace(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
@@ -63,8 +67,12 @@ public final class ProtectionListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
@@ -93,8 +101,12 @@ public final class ProtectionListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(clickedBlock.getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         IslandPermission islandPermission;
 
@@ -119,8 +131,12 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getRemover());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(superiorPlayer.getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         IslandPermission islandPermission = e.getEntity() instanceof ItemFrame ? IslandPermission.ITEM_FRAME : IslandPermission.PAINTING;
         if(!island.hasPermission(superiorPlayer, islandPermission)){
@@ -134,8 +150,12 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
@@ -148,8 +168,12 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
@@ -160,12 +184,18 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null) {
-            for (Block block : e.getBlocks()) {
-                if (!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())) {
-                    e.setCancelled(true);
-                    break;
-                }
+
+        if(island == null) {
+            if(e.getBlock().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
+            return;
+        }
+
+        for (Block block : e.getBlocks()) {
+            if (!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())) {
+                e.setCancelled(true);
+                break;
             }
         }
     }
@@ -173,12 +203,18 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null){
-            for(Block block : e.getBlocks()){
-                if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
-                    e.setCancelled(true);
-                    break;
-                }
+
+        if(island == null) {
+            if(e.getBlock().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
+            return;
+        }
+
+        for(Block block : e.getBlocks()){
+            if(!island.isInsideRange(block.getRelative(e.getDirection()).getLocation())){
+                e.setCancelled(true);
+                break;
             }
         }
     }
@@ -191,7 +227,8 @@ public final class ProtectionListener implements Listener {
         Island fromIsland = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         Location toLocation = e.getBlock().getRelative(e.getFace()).getLocation();
 
-        if(fromIsland != null && !fromIsland.isInsideRange(toLocation)){
+        if((fromIsland == null && e.getBlock().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) ||
+                (fromIsland != null && !fromIsland.isInsideRange(toLocation))){
             e.setCancelled(true);
         }
     }
@@ -201,8 +238,12 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
             e.setCancelled(true);
@@ -215,8 +256,12 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+                e.setCancelled(true);
+
             return;
+        }
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
             e.setCancelled(true);
