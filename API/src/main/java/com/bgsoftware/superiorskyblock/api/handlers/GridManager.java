@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
@@ -31,6 +32,10 @@ public interface GridManager {
     Island getIsland(SuperiorPlayer superiorPlayer);
 
     Island getIsland(int index);
+
+    Island getIsland(int index, SortingType sortingType);
+
+    int getIslandIndex(Island island, SortingType sortingType);
 
     Island getIsland(UUID uuid);
 

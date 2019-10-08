@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -39,7 +41,9 @@ public abstract class PlaceholderHook {
             Island island = superiorPlayer.getIsland();
             Matcher matcher;
 
-            if(placeholder.equalsIgnoreCase("superior_panel_toggle")){
+            placeholder = placeholder.toLowerCase();
+
+            if(placeholder.equals("superior_panel_toggle")){
                 return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
             }
 
@@ -83,10 +87,35 @@ public abstract class PlaceholderHook {
                 }
 
                 else if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {
-                    try{
-                        int index = Integer.parseInt(matcher.group(1));
-                        return String.valueOf(plugin.getGrid().getIsland(index).getOwner().getName());
-                    }catch(IllegalArgumentException ignored){}
+                    String topType = matcher.group(1);
+                    SortingType sortingType;
+
+                    if((matcher = Pattern.compile("worth_(.+)").matcher(topType)).matches()){
+                        sortingType = SortingTypes.BY_WORTH;
+                    }
+                    else if((matcher = Pattern.compile("level_(.+)").matcher(topType)).matches()){
+                        sortingType = SortingTypes.BY_LEVEL;
+                    }
+                    else if((matcher = Pattern.compile("rating_(.+)").matcher(topType)).matches()){
+                        sortingType = SortingTypes.BY_RATING;
+                    }
+                    else if((matcher = Pattern.compile("players_(.+)").matcher(topType)).matches()){
+                        sortingType = SortingTypes.BY_PLAYERS;
+                    }
+                    else{
+                        matcher = Pattern.compile("island_top_(.+)").matcher(placeholder);
+                        sortingType = SortingTypes.BY_WORTH;
+                    }
+
+                    if(matcher.group(1).equals("position")){
+                        return String.valueOf(plugin.getGrid().getIslandIndex(island, sortingType) + 1);
+                    }
+                    else {
+                        try{
+                            int index = Integer.parseInt(matcher.group(1));
+                            return String.valueOf(plugin.getGrid().getIsland(index, sortingType).getOwner().getName());
+                        }catch(IllegalArgumentException ignored){}
+                    }
                 }
 
                 else if ((matcher = Pattern.compile("island_member_(.+)").matcher(placeholder)).matches()) {
@@ -141,7 +170,7 @@ public abstract class PlaceholderHook {
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getMoneyInBankAsBigDecimal());
                     case "hoppers_limit":
-                        return String.valueOf(island.getHoppersLimit());
+                        return String.valueOf(island.getBlockLimit(Key.of("HOPPER")));
                     case "crops_multiplier":
                         return String.valueOf(island.getCropGrowthMultiplier());
                     case "spawners_multiplier":
