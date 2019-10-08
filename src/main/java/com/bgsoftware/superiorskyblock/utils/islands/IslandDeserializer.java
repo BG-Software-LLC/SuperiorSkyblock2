@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public final class IslandDeserializer {
             try {
                 String[] sections = entry.split("=");
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
-                warpsMap.put(sections[0], new SIsland.WarpData(FileUtil.toLocation(sections[1]), privateFlag));
+                warpsMap.put(sections[0], new SIsland.WarpData(FileUtils.toLocation(sections[1]), privateFlag));
             }catch(Exception ignored){}
         }
     }

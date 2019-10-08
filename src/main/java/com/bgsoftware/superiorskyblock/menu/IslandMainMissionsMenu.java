@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -40,22 +40,22 @@ public final class IslandMainMissionsMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/missions-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/missions-gui.yml");
+            FileUtils.saveResource("guis/missions-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandMainMissionsMenu, cfg.getConfigurationSection("main-panel"), 5, "&lMissions");
+        inventory = FileUtils.loadGUI(islandMainMissionsMenu, cfg.getConfigurationSection("main-panel"), 5, "&lMissions");
 
-        ItemStack playerItem = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.player-missions"));
+        ItemStack playerItem = FileUtils.getItemStack(cfg.getConfigurationSection("main-panel.player-missions"));
         playerSlot = cfg.getInt("main-panel.player-missions.slot");
         inventory.setItem(playerSlot, playerItem);
 
-        ItemStack islandItem = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.island-missions"));
+        ItemStack islandItem = FileUtils.getItemStack(cfg.getConfigurationSection("main-panel.island-missions"));
         islandSlot = cfg.getInt("main-panel.island-missions.slot");
         inventory.setItem(islandSlot, islandItem);
 
-        islandMainMissionsMenu.addSound(playerSlot, FileUtil.getSound(cfg.getConfigurationSection("main-panel.player-missions.sound")));
-        islandMainMissionsMenu.addSound(islandSlot, FileUtil.getSound(cfg.getConfigurationSection("main-panel.island-missions.sound")));
+        islandMainMissionsMenu.addSound(playerSlot, FileUtils.getSound(cfg.getConfigurationSection("main-panel.player-missions.sound")));
+        islandMainMissionsMenu.addSound(islandSlot, FileUtils.getSound(cfg.getConfigurationSection("main-panel.island-missions.sound")));
         islandMainMissionsMenu.addCommands(playerSlot, cfg.getStringList("main-panel.player-missions.commands"));
         islandMainMissionsMenu.addCommands(islandSlot, cfg.getStringList("main-panel.island-missions.commands"));
     }

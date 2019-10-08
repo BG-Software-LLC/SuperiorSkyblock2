@@ -30,52 +30,51 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_Float</code> tag.
+ * The <code>TAG_Short</code> tag.
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
-public final class FloatTag extends Tag<Float> {
+public final class ShortTag extends Tag<Short> {
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public FloatTag(float value) {
+    public ShortTag(short value) {
         super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_Float: " + value;
+        return "TAG_Short: " + value;
     }
 
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagFloat");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
             //noinspection unchecked, ConstantConditions
-            return nbtTagClass.getConstructor(float.class).newInstance((Object) value);
+            return nbtTagClass.getConstructor(short.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static FloatTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagFloat");
+    public static ShortTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to FloatTag!");
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ShortTag!");
 
         try {
-            float value = plugin.getNMSAdapter().getNBTFloatValue(tag);
-            return new FloatTag(value);
+            short value = plugin.getNMSAdapter().getNBTShortValue(tag);
+            return new ShortTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

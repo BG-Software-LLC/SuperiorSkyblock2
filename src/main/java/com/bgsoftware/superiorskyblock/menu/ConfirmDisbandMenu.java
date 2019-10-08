@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -69,21 +69,21 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/confirm-disband.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/confirm-disband.yml");
+            FileUtils.saveResource("guis/confirm-disband.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(confirmDisbandMenu, cfg.getConfigurationSection("disband-gui"), InventoryType.HOPPER, "&l      Confirm Disband");
+        inventory = FileUtils.loadGUI(confirmDisbandMenu, cfg.getConfigurationSection("disband-gui"), InventoryType.HOPPER, "&l      Confirm Disband");
 
-        ItemStack confirmItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
+        ItemStack confirmItem = FileUtils.getItemStack(cfg.getConfigurationSection("disband-gui.confirm"));
         confirmSlot = cfg.getInt("disband-gui.confirm.slot", 1);
-        confirmDisbandMenu.addSound(confirmSlot, FileUtil.getSound(cfg.getConfigurationSection("disband-gui.confirm.sound")));
+        confirmDisbandMenu.addSound(confirmSlot, FileUtils.getSound(cfg.getConfigurationSection("disband-gui.confirm.sound")));
         confirmDisbandMenu.addCommands(confirmSlot, cfg.getStringList("disband-gui.confirm.commands"));
         inventory.setItem(confirmSlot, confirmItem);
 
-        ItemStack cancelItem = FileUtil.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
+        ItemStack cancelItem = FileUtils.getItemStack(cfg.getConfigurationSection("disband-gui.cancel"));
         cancelSlot = cfg.getInt("disband-gui.cancel.slot", 3);
-        confirmDisbandMenu.addSound(cancelSlot, FileUtil.getSound(cfg.getConfigurationSection("disband-gui.cancel.sound")));
+        confirmDisbandMenu.addSound(cancelSlot, FileUtils.getSound(cfg.getConfigurationSection("disband-gui.cancel.sound")));
         confirmDisbandMenu.addCommands(cancelSlot, cfg.getStringList("disband-gui.cancel.commands"));
         inventory.setItem(cancelSlot, cancelItem);
     }

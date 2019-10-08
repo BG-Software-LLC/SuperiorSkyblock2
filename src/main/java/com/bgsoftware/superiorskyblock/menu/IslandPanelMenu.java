@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,23 +43,23 @@ public final class IslandPanelMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/panel-gui.yml");
+            FileUtils.saveResource("guis/panel-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandPanelMenu, cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
+        inventory = FileUtils.loadGUI(islandPanelMenu, cfg.getConfigurationSection("main-panel"), 5, "&lIsland Panel");
 
-        ItemStack membersButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.members"));
-        ItemStack settingsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
-        ItemStack visitorsButton = FileUtil.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
+        ItemStack membersButton = FileUtils.getItemStack(cfg.getConfigurationSection("main-panel.members"));
+        ItemStack settingsButton = FileUtils.getItemStack(cfg.getConfigurationSection("main-panel.settings"));
+        ItemStack visitorsButton = FileUtils.getItemStack(cfg.getConfigurationSection("main-panel.visitors"));
 
         membersSlot = cfg.getInt("main-panel.members.slot");
         settingsSlot = cfg.getInt("main-panel.settings.slot");
         visitorsSlot = cfg.getInt("main-panel.visitors.slot");
 
-        islandPanelMenu.addSound(membersSlot, FileUtil.getSound(cfg.getConfigurationSection("main-panel.members.sound")));
-        islandPanelMenu.addSound(settingsSlot, FileUtil.getSound(cfg.getConfigurationSection("main-panel.settings.sound")));
-        islandPanelMenu.addSound(visitorsSlot, FileUtil.getSound(cfg.getConfigurationSection("main-panel.visitors.sound")));
+        islandPanelMenu.addSound(membersSlot, FileUtils.getSound(cfg.getConfigurationSection("main-panel.members.sound")));
+        islandPanelMenu.addSound(settingsSlot, FileUtils.getSound(cfg.getConfigurationSection("main-panel.settings.sound")));
+        islandPanelMenu.addSound(visitorsSlot, FileUtils.getSound(cfg.getConfigurationSection("main-panel.visitors.sound")));
         islandPanelMenu.addCommands(membersSlot, cfg.getStringList("main-panel.members.commands"));
         islandPanelMenu.addCommands(settingsSlot, cfg.getStringList("main-panel.settings.commands"));
         islandPanelMenu.addCommands(visitorsSlot, cfg.getStringList("main-panel.visitors.commands"));

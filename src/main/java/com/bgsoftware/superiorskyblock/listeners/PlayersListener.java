@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -321,9 +321,9 @@ public final class PlayersListener implements Listener {
 
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
-                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getIslandLevelAsBigDecimal())))
+                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal())))
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtil.fancyFormat(island.getWorthAsBigDecimal())))
+                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorthAsBigDecimal())))
                 .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
         );
     }

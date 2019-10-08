@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -83,9 +83,9 @@ public final class CmdAdminSetBlockLimit implements ICommand {
         island.setBlockLimit(key, limit);
 
         if(targetPlayer == null)
-            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtil.format(key.toString().split(":")[0]), island.getName());
+            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), island.getName());
         else
-            Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtil.format(key.toString().split(":")[0]), targetPlayer.getName());
+            Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.toString().split(":")[0]), targetPlayer.getName());
     }
 
     @Override

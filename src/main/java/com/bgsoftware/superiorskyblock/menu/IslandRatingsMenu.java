@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -85,7 +85,7 @@ public final class IslandRatingsMenu extends SuperiorMenu {
 
         this.page = page;
 
-        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title.replace("{0}", StringUtil.format(totalRating)));
+        Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title.replace("{0}", StringUtils.format(totalRating)));
         inv.setContents(inventory.getContents());
 
         Iterator<UUID> uuids = ratings.keySet().iterator();
@@ -96,7 +96,7 @@ public final class IslandRatingsMenu extends SuperiorMenu {
             SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(uuids.next());
             inv.setItem(slots.get(currentIndex), new ItemBuilder(rateItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
-                    .replaceAll("{1}", StringUtil.formatRating(ratings.get(_superiorPlayer.getUniqueId()).getValue()))
+                    .replaceAll("{1}", StringUtils.formatRating(ratings.get(_superiorPlayer.getUniqueId()).getValue()))
                     .asSkullOf(_superiorPlayer).build());
 
             currentIndex++;
@@ -124,26 +124,26 @@ public final class IslandRatingsMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/ratings-gui.yml");
+            FileUtils.saveResource("guis/ratings-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandRatingsMenu, cfg.getConfigurationSection("ratings-gui"), 6, "&lIsland Ratings");
+        inventory = FileUtils.loadGUI(islandRatingsMenu, cfg.getConfigurationSection("ratings-gui"), 6, "&lIsland Ratings");
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("ratings-gui.title"));
 
-        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("ratings-gui.previous-page"));
-        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("ratings-gui.current-page"));
-        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("ratings-gui.next-page"));
-        rateItem = FileUtil.getItemStack(cfg.getConfigurationSection("ratings-gui.rate-item"));
+        previousButton = FileUtils.getItemStack(cfg.getConfigurationSection("ratings-gui.previous-page"));
+        currentButton = FileUtils.getItemStack(cfg.getConfigurationSection("ratings-gui.current-page"));
+        nextButton = FileUtils.getItemStack(cfg.getConfigurationSection("ratings-gui.next-page"));
+        rateItem = FileUtils.getItemStack(cfg.getConfigurationSection("ratings-gui.rate-item"));
 
         previousSlot = cfg.getInt("ratings-gui.previous-page.slot");
         currentSlot = cfg.getInt("ratings-gui.current-page.slot");
         nextSlot = cfg.getInt("ratings-gui.next-page.slot");
 
-        islandRatingsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.previous-page.sound")));
-        islandRatingsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.current-page.sound")));
-        islandRatingsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.next-page.sound")));
-        islandRatingsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("ratings-gui.rate-item.sound")));
+        islandRatingsMenu.addSound(previousSlot, FileUtils.getSound(cfg.getConfigurationSection("ratings-gui.previous-page.sound")));
+        islandRatingsMenu.addSound(currentSlot, FileUtils.getSound(cfg.getConfigurationSection("ratings-gui.current-page.sound")));
+        islandRatingsMenu.addSound(nextSlot, FileUtils.getSound(cfg.getConfigurationSection("ratings-gui.next-page.sound")));
+        islandRatingsMenu.addSound(-1, FileUtils.getSound(cfg.getConfigurationSection("ratings-gui.rate-item.sound")));
         islandRatingsMenu.addCommands(previousSlot, cfg.getStringList("ratings-gui.previous-page.commands"));
         islandRatingsMenu.addCommands(currentSlot, cfg.getStringList("ratings-gui.current-page.commands"));
         islandRatingsMenu.addCommands(nextSlot, cfg.getStringList("ratings-gui.next-page.commands"));

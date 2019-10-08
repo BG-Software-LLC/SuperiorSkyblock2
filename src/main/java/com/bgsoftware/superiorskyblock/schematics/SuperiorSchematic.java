@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ByteTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.utils.TagUtil;
+import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 
 import org.bukkit.Location;
 
@@ -30,12 +30,12 @@ public final class SuperiorSchematic implements Schematic {
         Location min = location.clone().subtract(offsetX, offsetY, offsetZ);
 
         if(compoundTag.getValue().containsKey("blocks")) {
-            TagUtil.assignIntoBlocks(((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
+            TagUtils.assignIntoBlocks(((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
         }
 
         if(compoundTag.getValue().containsKey("entities")) {
             for (Tag tag : ((ListTag) compoundTag.getValue().get("entities")).getValue()) {
-                TagUtil.spawnEntity((CompoundTag) tag, location);
+                TagUtils.spawnEntity((CompoundTag) tag, location);
             }
         }
     }

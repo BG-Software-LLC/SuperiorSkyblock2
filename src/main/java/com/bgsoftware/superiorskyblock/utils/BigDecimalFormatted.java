@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.DoubleTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -45,7 +45,7 @@ public final class BigDecimalFormatted extends BigDecimal {
 
     @Override
     public String toString() {
-        return StringUtil.format(this);
+        return StringUtils.format(this);
     }
     
     public String getAsString(){

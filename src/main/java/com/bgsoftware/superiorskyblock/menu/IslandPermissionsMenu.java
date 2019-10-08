@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -162,7 +162,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
                    permissionItem = (ItemStack) permissionItemObject;
                 }
                 else{
-                    permissionItem = ((ItemBuilder) permissionItemObject).copy().replaceAll("{}", StringUtil.format(permissionName)).build();
+                    permissionItem = ((ItemBuilder) permissionItemObject).copy().replaceAll("{}", StringUtils.format(permissionName)).build();
                 }
 
                 inv.setItem(slots.get(i), permissionItem);
@@ -198,20 +198,20 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/permissions-gui.yml");
+            FileUtils.saveResource("guis/permissions-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("permissions-gui.title", "&lPermissions Controller ({0})"));
-        inventory = FileUtil.loadGUI(islandPanelMenu, cfg.getConfigurationSection("permissions-gui"), 1, "&lPermissions Controller ({0})");
+        inventory = FileUtils.loadGUI(islandPanelMenu, cfg.getConfigurationSection("permissions-gui"), 1, "&lPermissions Controller ({0})");
 
         slots = new ArrayList<>();
         Arrays.stream(cfg.getString("permissions-gui.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
 
-        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("permissions-gui.previous-page"));
-        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("permissions-gui.current-page"));
-        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("permissions-gui.next-page"));
+        previousButton = FileUtils.getItemStack(cfg.getConfigurationSection("permissions-gui.previous-page"));
+        currentButton = FileUtils.getItemStack(cfg.getConfigurationSection("permissions-gui.current-page"));
+        nextButton = FileUtils.getItemStack(cfg.getConfigurationSection("permissions-gui.next-page"));
         previousSlot = cfg.getInt("permissions-gui.previous-page.slot");
         currentSlot = cfg.getInt("permissions-gui.current-page.slot");
         nextSlot = cfg.getInt("permissions-gui.next-page.slot");
@@ -224,14 +224,14 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
         for(IslandPermission islandPermission : IslandPermission.values()){
             String permission = islandPermission.name().toLowerCase();
             if(section.contains(permission)){
-                permissionsData.put(permission + "-has-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.sound")));
-                permissionsData.put(permission + "-has-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".has-access.commands")));
-                permissionsData.put(permission + "-no-access-sound", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.sound")));
-                permissionsData.put(permission + "-no-access-commands", FileUtil.getSound(section.getConfigurationSection(permission + ".no-access.commands")));
+                permissionsData.put(permission + "-has-access-sound", FileUtils.getSound(section.getConfigurationSection(permission + ".has-access.sound")));
+                permissionsData.put(permission + "-has-access-commands", FileUtils.getSound(section.getConfigurationSection(permission + ".has-access.commands")));
+                permissionsData.put(permission + "-no-access-sound", FileUtils.getSound(section.getConfigurationSection(permission + ".no-access.sound")));
+                permissionsData.put(permission + "-no-access-commands", FileUtils.getSound(section.getConfigurationSection(permission + ".no-access.commands")));
                 permissionsData.put(permission + "-permission-enabled",
-                        FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-enabled")));
+                        FileUtils.getItemStack(section.getConfigurationSection(permission + ".permission-enabled")));
                 permissionsData.put(permission + "-permission-disabled",
-                        FileUtil.getItemStack(section.getConfigurationSection(permission + ".permission-disabled")));
+                        FileUtils.getItemStack(section.getConfigurationSection(permission + ".permission-disabled")));
             }
             else{
                 permissionsData.put(permission + "-permission-enabled",

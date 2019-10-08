@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -47,7 +47,7 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         if(!file.exists())
-            FileUtil.saveResource("missions/missions.yml");
+            FileUtils.saveResource("missions/missions.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -263,7 +263,7 @@ public final class MissionsHandler implements MissionsManager {
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                    ItemStack itemStack = FileUtil.getItemStack(section.getConfigurationSection("rewards.items." + key));
+                    ItemStack itemStack = FileUtils.getItemStack(section.getConfigurationSection("rewards.items." + key));
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
                     this.itemRewards.add(itemStack);
                 }
@@ -271,9 +271,9 @@ public final class MissionsHandler implements MissionsManager {
 
             this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-            this.notCompleted = FileUtil.getItemStack(section.getConfigurationSection("icons.not-completed"));
-            this.canComplete = FileUtil.getItemStack(section.getConfigurationSection("icons.can-complete"));
-            this.completed = FileUtil.getItemStack(section.getConfigurationSection("icons.completed"));
+            this.notCompleted = FileUtils.getItemStack(section.getConfigurationSection("icons.not-completed"));
+            this.canComplete = FileUtils.getItemStack(section.getConfigurationSection("icons.can-complete"));
+            this.completed = FileUtils.getItemStack(section.getConfigurationSection("icons.completed"));
         }
 
     }

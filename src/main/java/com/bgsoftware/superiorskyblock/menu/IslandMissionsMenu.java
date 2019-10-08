@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -157,28 +157,28 @@ public final class IslandMissionsMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/missions-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/missions-gui.yml");
+            FileUtils.saveResource("guis/missions-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandMissionsMenu, cfg.getConfigurationSection("missions-panel"), 6, "&lYour Missions");
+        inventory = FileUtils.loadGUI(islandMissionsMenu, cfg.getConfigurationSection("missions-panel"), 6, "&lYour Missions");
         playerTitle = ChatColor.translateAlternateColorCodes('&', cfg.getString("missions-panel.player-title"));
         islandTitle = ChatColor.translateAlternateColorCodes('&', cfg.getString("missions-panel.island-title"));
 
-        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("missions-panel.previous-page"));
-        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("missions-panel.current-page"));
-        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("missions-panel.next-page"));
+        previousButton = FileUtils.getItemStack(cfg.getConfigurationSection("missions-panel.previous-page"));
+        currentButton = FileUtils.getItemStack(cfg.getConfigurationSection("missions-panel.current-page"));
+        nextButton = FileUtils.getItemStack(cfg.getConfigurationSection("missions-panel.next-page"));
 
         previousSlot = cfg.getInt("missions-panel.previous-page.slot");
         currentSlot = cfg.getInt("missions-panel.current-page.slot");
         nextSlot = cfg.getInt("missions-panel.next-page.slot");
 
-        islandMissionsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.previous-page.sound")));
-        islandMissionsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.current-page.sound")));
-        islandMissionsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.next-page.sound")));
-        islandMissionsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.sounds.completed")));
-        islandMissionsMenu.addSound(-2, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.sounds.not-completed")));
-        islandMissionsMenu.addSound(-3, FileUtil.getSound(cfg.getConfigurationSection("missions-panel.sounds.can-complete")));
+        islandMissionsMenu.addSound(previousSlot, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.previous-page.sound")));
+        islandMissionsMenu.addSound(currentSlot, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.current-page.sound")));
+        islandMissionsMenu.addSound(nextSlot, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.next-page.sound")));
+        islandMissionsMenu.addSound(-1, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.sounds.completed")));
+        islandMissionsMenu.addSound(-2, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.sounds.not-completed")));
+        islandMissionsMenu.addSound(-3, FileUtils.getSound(cfg.getConfigurationSection("missions-panel.sounds.can-complete")));
         islandMissionsMenu.addCommands(previousSlot, cfg.getStringList("missions-panel.previous-page.commands"));
         islandMissionsMenu.addCommands(currentSlot, cfg.getStringList("missions-panel.current-page.commands"));
         islandMissionsMenu.addCommands(nextSlot, cfg.getStringList("missions-panel.next-page.commands"));

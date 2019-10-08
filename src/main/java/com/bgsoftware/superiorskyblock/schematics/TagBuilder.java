@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
-import com.bgsoftware.superiorskyblock.utils.TagUtil;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -45,7 +45,7 @@ public final class TagBuilder {
     }
 
     public TagBuilder applyContents(ItemStack[] contents){
-        compoundValue.put("contents", TagUtil.inventoryToCompound(contents));
+        compoundValue.put("contents", TagUtils.inventoryToCompound(contents));
         return this;
     }
 

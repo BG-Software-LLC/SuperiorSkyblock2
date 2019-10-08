@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -104,11 +104,11 @@ public final class IslandCreationMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/creation-gui.yml");
+            FileUtils.saveResource("guis/creation-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandCreationMenu, cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
+        inventory = FileUtils.loadGUI(islandCreationMenu, cfg.getConfigurationSection("creation-gui"), 1, "&lCreate a new island...");
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("creation-gui.title"));
 
         ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics");
@@ -119,14 +119,14 @@ public final class IslandCreationMenu extends SuperiorMenu {
             schematicsData.put(schematic + "-biome", section.getString(schematic + ".biome", "PLAINS"));
             schematicsData.put(schematic + "-slot", section.getInt(schematic + ".slot"));
             schematicsData.put(schematic + "-has-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
+                    FileUtils.getItemStack(section.getConfigurationSection(schematic + ".has-access-item")));
             schematicsData.put(schematic + "-has-access-item-sound",
-                    FileUtil.getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
+                    FileUtils.getSound(section.getConfigurationSection(schematic + ".has-access-item.sound")));
             schematicsData.put(schematic + "-has-access-item-commands", section.getStringList(schematic + ".has-access-item.commands"));
             schematicsData.put(schematic + "-no-access-item",
-                    FileUtil.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
+                    FileUtils.getItemStack(section.getConfigurationSection(schematic + ".no-access-item")));
             schematicsData.put(schematic + "-no-access-item-sound",
-                    FileUtil.getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
+                    FileUtils.getSound(section.getConfigurationSection(schematic + ".no-access-item.sound")));
             schematicsData.put(schematic + "-no-access-item-commands", section.getStringList(schematic + ".no-access-item.commands"));
         }
     }

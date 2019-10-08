@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -92,7 +92,7 @@ public final class CmdDeposit implements ICommand {
         EconomyHook.withdrawMoney(superiorPlayer.asPlayer(), amount);
 
         if(!Locale.DEPOSIT_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.DEPOSIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtil.format(amount)));
+            island.sendMessage(Locale.DEPOSIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtils.format(amount)));
     }
 
     @Override

@@ -18,18 +18,18 @@ import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
-import com.bgsoftware.superiorskyblock.utils.LocationUtil;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.DoubleTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.DoubleTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -119,9 +119,9 @@ public class SIsland extends DatabaseObject implements Island {
     public SIsland(CachedResultSet resultSet){
         this.owner = UUID.fromString(resultSet.getString("owner"));
 
-        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtil.getLocation(resultSet.getString("center"))));
-        this.teleportLocation = LocationUtil.getLocation(resultSet.getString("teleportLocation"));
-        this.visitorsLocation = LocationUtil.getLocation(resultSet.getString("visitorsLocation"));
+        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
+        this.teleportLocation = LocationUtils.getLocation(resultSet.getString("teleportLocation"));
+        this.visitorsLocation = LocationUtils.getLocation(resultSet.getString("visitorsLocation"));
 
         IslandDeserializer.deserializeMembers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializeBanned(resultSet.getString("banned"), this.banned);
@@ -161,7 +161,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
 
         this.teleportLocation = compoundValues.containsKey("teleportLocation") ?
-                LocationUtil.getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter();
+                LocationUtils.getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter();
 
         List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
         for(Tag _tag : members)
@@ -181,7 +181,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Map<String, Tag> warps = ((CompoundTag) compoundValues.get("warps")).getValue();
         for(String warp : warps.keySet())
-            this.warps.put(warp, new WarpData(FileUtil.toLocation(((StringTag) warps.get(warp)).getValue()), false));
+            this.warps.put(warp, new WarpData(FileUtils.toLocation(((StringTag) warps.get(warp)).getValue()), false));
 
         this.islandBank = BigDecimalFormatted.of(compoundValues.get("islandBank"));
         this.islandSize = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(plugin.getSettings().defaultIslandSize))).getValue();
@@ -386,7 +386,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void setTeleportLocation(Location teleportLocation) {
         this.teleportLocation = teleportLocation.clone();
         Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
-                .setString(LocationUtil.getLocation(getTeleportLocation()))
+                .setString(LocationUtils.getLocation(getTeleportLocation()))
                 .setString(owner.toString())
                 .execute(true);
     }
@@ -403,7 +403,7 @@ public class SIsland extends DatabaseObject implements Island {
         }
 
         Query.ISLAND_SET_VISITORS_LOCATION.getStatementHolder()
-                .setString(LocationUtil.getLocation(getVisitorsLocation()))
+                .setString(LocationUtils.getLocation(getVisitorsLocation()))
                 .setString(owner.toString())
                 .execute(true);
     }
@@ -1108,7 +1108,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
         for(String warpName : new ArrayList<>(warps.keySet())){
-            if(LocationUtil.isSameBlock(location, warps.get(warpName).location)){
+            if(LocationUtils.isSameBlock(location, warps.get(warpName).location)){
                 deleteWarp(warpName);
                 Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
@@ -1316,8 +1316,8 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void executeUpdateStatement(boolean async){
         Query.ISLAND_UPDATE.getStatementHolder()
-                .setString(LocationUtil.getLocation(getTeleportLocation()))
-                .setString(LocationUtil.getLocation(visitorsLocation))
+                .setString(LocationUtils.getLocation(getTeleportLocation()))
+                .setString(LocationUtils.getLocation(visitorsLocation))
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
@@ -1355,8 +1355,8 @@ public class SIsland extends DatabaseObject implements Island {
     public void executeInsertStatement(boolean async){
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.toString())
-                .setString(LocationUtil.getLocation(center.getBlock().getLocation()))
-                .setString(LocationUtil.getLocation(getTeleportLocation()))
+                .setString(LocationUtils.getLocation(center.getBlock().getLocation()))
+                .setString(LocationUtils.getLocation(getTeleportLocation()))
                 .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
                 .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
@@ -1376,7 +1376,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setBoolean(false)
                 .setString(IslandSerializer.serializeBlockCounts(blockCounts))
                 .setString(islandName)
-                .setString(LocationUtil.getLocation(visitorsLocation))
+                .setString(LocationUtils.getLocation(visitorsLocation))
                 .setString(description)
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(IslandSerializer.serializeMissions(completedMissions))

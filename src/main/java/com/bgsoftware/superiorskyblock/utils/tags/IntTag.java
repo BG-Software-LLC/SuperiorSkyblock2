@@ -30,51 +30,51 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_Short</code> tag.
+ * The <code>TAG_Int</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class ShortTag extends Tag<Short> {
+public final class IntTag extends Tag<Integer> {
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public ShortTag(short value) {
+    public IntTag(int value) {
         super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_Short: " + value;
+        return "TAG_Int: " + value;
     }
 
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagShort");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
             //noinspection unchecked, ConstantConditions
-            return nbtTagClass.getConstructor(short.class).newInstance((Object) value);
+            return nbtTagClass.getConstructor(int.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static ShortTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagShort");
+    public static IntTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ShortTag!");
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
-            short value = plugin.getNMSAdapter().getNBTShortValue(tag);
-            return new ShortTag(value);
+            int value = plugin.getNMSAdapter().getNBTIntValue(tag);
+            return new IntTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

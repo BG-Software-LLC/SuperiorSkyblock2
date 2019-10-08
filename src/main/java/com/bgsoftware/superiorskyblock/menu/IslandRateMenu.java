@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -78,39 +78,39 @@ public final class IslandRateMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/ratings-gui.yml");
+            FileUtils.saveResource("guis/ratings-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandRatingMenu, cfg.getConfigurationSection("rate-gui"), InventoryType.HOPPER, "&l         Rate Island");
+        inventory = FileUtils.loadGUI(islandRatingMenu, cfg.getConfigurationSection("rate-gui"), InventoryType.HOPPER, "&l         Rate Island");
 
-        ItemStack oneStarItem = FileUtil.getItemStack(cfg.getConfigurationSection("rate-gui.one_star"));
+        ItemStack oneStarItem = FileUtils.getItemStack(cfg.getConfigurationSection("rate-gui.one_star"));
         oneStarSlot = cfg.getInt("rate-gui.one_star.slot", 0);
-        islandRatingMenu.addSound(oneStarSlot, FileUtil.getSound(cfg.getConfigurationSection("rate-gui.one_star.sound")));
+        islandRatingMenu.addSound(oneStarSlot, FileUtils.getSound(cfg.getConfigurationSection("rate-gui.one_star.sound")));
         islandRatingMenu.addCommands(oneStarSlot, cfg.getStringList("rate-gui.one_star.commands"));
         inventory.setItem(oneStarSlot, oneStarItem);
 
-        ItemStack twoStarsItem = FileUtil.getItemStack(cfg.getConfigurationSection("rate-gui.two_stars"));
+        ItemStack twoStarsItem = FileUtils.getItemStack(cfg.getConfigurationSection("rate-gui.two_stars"));
         twoStarsSlot = cfg.getInt("rate-gui.two_stars.slot", 0);
-        islandRatingMenu.addSound(twoStarsSlot, FileUtil.getSound(cfg.getConfigurationSection("rate-gui.two_stars.sound")));
+        islandRatingMenu.addSound(twoStarsSlot, FileUtils.getSound(cfg.getConfigurationSection("rate-gui.two_stars.sound")));
         islandRatingMenu.addCommands(twoStarsSlot, cfg.getStringList("rate-gui.two_stars.commands"));
         inventory.setItem(twoStarsSlot, twoStarsItem);
 
-        ItemStack threeStarsItem = FileUtil.getItemStack(cfg.getConfigurationSection("rate-gui.three_stars"));
+        ItemStack threeStarsItem = FileUtils.getItemStack(cfg.getConfigurationSection("rate-gui.three_stars"));
         threeStarsSlot = cfg.getInt("rate-gui.three_stars.slot", 0);
-        islandRatingMenu.addSound(threeStarsSlot, FileUtil.getSound(cfg.getConfigurationSection("rate-gui.three_stars.sound")));
+        islandRatingMenu.addSound(threeStarsSlot, FileUtils.getSound(cfg.getConfigurationSection("rate-gui.three_stars.sound")));
         islandRatingMenu.addCommands(threeStarsSlot, cfg.getStringList("rate-gui.three_stars.commands"));
         inventory.setItem(threeStarsSlot, threeStarsItem);
 
-        ItemStack fourStarsItem = FileUtil.getItemStack(cfg.getConfigurationSection("rate-gui.four_stars"));
+        ItemStack fourStarsItem = FileUtils.getItemStack(cfg.getConfigurationSection("rate-gui.four_stars"));
         fourStarsSlot = cfg.getInt("rate-gui.four_stars.slot", 0);
-        islandRatingMenu.addSound(fourStarsSlot, FileUtil.getSound(cfg.getConfigurationSection("rate-gui.four_stars.sound")));
+        islandRatingMenu.addSound(fourStarsSlot, FileUtils.getSound(cfg.getConfigurationSection("rate-gui.four_stars.sound")));
         islandRatingMenu.addCommands(fourStarsSlot, cfg.getStringList("rate-gui.four_stars.commands"));
         inventory.setItem(fourStarsSlot, fourStarsItem);
 
-        ItemStack fiveStarsItem = FileUtil.getItemStack(cfg.getConfigurationSection("rate-gui.five_stars"));
+        ItemStack fiveStarsItem = FileUtils.getItemStack(cfg.getConfigurationSection("rate-gui.five_stars"));
         fiveStarsSlot = cfg.getInt("rate-gui.five_stars.slot", 0);
-        islandRatingMenu.addSound(fiveStarsSlot, FileUtil.getSound(cfg.getConfigurationSection("rate-gui.five_stars.sound")));
+        islandRatingMenu.addSound(fiveStarsSlot, FileUtils.getSound(cfg.getConfigurationSection("rate-gui.five_stars.sound")));
         islandRatingMenu.addCommands(fiveStarsSlot, cfg.getStringList("rate-gui.five_stars.commands"));
         inventory.setItem(fiveStarsSlot, fiveStarsItem);
     }

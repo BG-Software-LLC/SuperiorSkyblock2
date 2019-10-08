@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -138,26 +138,26 @@ public final class IslandMembersMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/panel-gui.yml");
+            FileUtils.saveResource("guis/panel-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandMembersMenu, cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
+        inventory = FileUtils.loadGUI(islandMembersMenu, cfg.getConfigurationSection("members-panel"), 6, "&lIsland Members");
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("members-panel.title"));
 
-        previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.previous-page"));
-        currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.current-page"));
-        nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.next-page"));
-        memberItem = FileUtil.getItemStack(cfg.getConfigurationSection("members-panel.member-item"));
+        previousButton = FileUtils.getItemStack(cfg.getConfigurationSection("members-panel.previous-page"));
+        currentButton = FileUtils.getItemStack(cfg.getConfigurationSection("members-panel.current-page"));
+        nextButton = FileUtils.getItemStack(cfg.getConfigurationSection("members-panel.next-page"));
+        memberItem = FileUtils.getItemStack(cfg.getConfigurationSection("members-panel.member-item"));
 
         previousSlot = cfg.getInt("members-panel.previous-page.slot");
         currentSlot = cfg.getInt("members-panel.current-page.slot");
         nextSlot = cfg.getInt("members-panel.next-page.slot");
 
-        islandMembersMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.previous-page.sound")));
-        islandMembersMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
-        islandMembersMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
-        islandMembersMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
+        islandMembersMenu.addSound(previousSlot, FileUtils.getSound(cfg.getConfigurationSection("members-panel.previous-page.sound")));
+        islandMembersMenu.addSound(currentSlot, FileUtils.getSound(cfg.getConfigurationSection("members-panel.current-page.sound")));
+        islandMembersMenu.addSound(nextSlot, FileUtils.getSound(cfg.getConfigurationSection("members-panel.next-page.sound")));
+        islandMembersMenu.addSound(-1, FileUtils.getSound(cfg.getConfigurationSection("members-panel.member-item.sound")));
         islandMembersMenu.addCommands(previousSlot, cfg.getStringList("members-panel.previous-page.commands"));
         islandMembersMenu.addCommands(currentSlot, cfg.getStringList("members-panel.current-page.commands"));
         islandMembersMenu.addCommands(nextSlot, cfg.getStringList("members-panel.next-page.commands"));

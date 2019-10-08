@@ -3,10 +3,10 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.HeadUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
@@ -56,15 +56,15 @@ public final class IslandValuesMenu extends SuperiorMenu {
             ItemStack itemStack = new ItemStack(Material.valueOf(sections[0]));
             int slot = countedBlocks.get(key);
 
-            String typeName = StringUtil.format(sections[0]);
+            String typeName = StringUtils.format(sections[0]);
             int amount = island.getBlockCount(Key.of(itemStack));
 
             if(sections.length == 2) {
                 if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
                     EntityType entityType = EntityType.valueOf(sections[1]);
                     amount = island.getBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
-                    itemStack = HeadUtil.getEntityHead(entityType);
-                    typeName = StringUtil.format(sections[1]) + " Spawner";
+                    itemStack = HeadUtils.getEntityHead(entityType);
+                    typeName = StringUtils.format(sections[1]) + " Spawner";
                 }
                 else {
                     itemStack.setDurability(Short.valueOf(sections[1]));
@@ -93,11 +93,11 @@ public final class IslandValuesMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/values-gui.yml");
+            FileUtils.saveResource("guis/values-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
+        inventory = FileUtils.loadGUI(islandValuesMenu, cfg.getConfigurationSection("values-gui"), 6, "{0} &n${1}");
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("values-gui.title"));
 
         String blockName = cfg.getString("values-gui.block-item.name", "&e&l[!] &7{0}");

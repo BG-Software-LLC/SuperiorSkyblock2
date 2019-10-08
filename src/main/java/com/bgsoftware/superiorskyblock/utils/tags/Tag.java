@@ -30,10 +30,10 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
  * Represents a single NBT tag.
@@ -71,29 +71,29 @@ public abstract class Tag<E> {
     public abstract Object toNBT();
 
     public static Tag fromNBT(Object tag){
-        if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagByteArray")))
+        if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray")))
             return ByteArrayTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagByte")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte")))
             return ByteTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagCompound")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound")))
             return CompoundTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagDouble")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble")))
             return DoubleTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagEnd")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagEnd")))
             return new EndTag();
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagFloat")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat")))
             return FloatTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagIntArray")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray")))
             return IntArrayTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagInt")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt")))
             return IntTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagList")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList")))
             return ListTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagLong")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong")))
             return LongTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagShort")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort")))
             return ShortTag.fromNBT(tag);
-        else if(tag.getClass().equals(ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagString")))
+        else if(tag.getClass().equals(ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString")))
             return StringTag.fromNBT(tag);
 
         throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to Tag!");

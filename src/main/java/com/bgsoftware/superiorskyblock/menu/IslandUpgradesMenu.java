@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -72,13 +72,13 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/upgrades-gui.yml");
+            FileUtils.saveResource("guis/upgrades-gui.yml");
 
         CommentedConfiguration cfg = new CommentedConfiguration(null, file);
 
         ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
 
-        inventory = FileUtil.loadGUI(islandUpgradesMenu, section, 4, "&lIsland Upgrades");
+        inventory = FileUtils.loadGUI(islandUpgradesMenu, section, 4, "&lIsland Upgrades");
         title = ChatColor.translateAlternateColorCodes('&', section.getString("title"));
 
         if(section.contains("upgrades")){
@@ -92,11 +92,11 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
                 for(String level : upgrades.getConfigurationSection(_upgrade).getKeys(false)) {
                     int slot = upgrades.getInt(_upgrade + "." + level + ".slot");
                     upgradeData.items.put(Integer.valueOf(level), new UpgradesHandler.ItemData(
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
-                            FileUtil.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
+                            FileUtils.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level")),
+                            FileUtils.getItemStack(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level")),
                             slot,
-                            FileUtil.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level.sound")),
-                            FileUtil.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level.sound")),
+                            FileUtils.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".has-next-level.sound")),
+                            FileUtils.getSound(upgrades.getConfigurationSection(_upgrade + "." + level + ".no-next-level.sound")),
                             upgrades.getStringList(_upgrade + "." + level + ".has-next-level.commands"),
                             upgrades.getStringList(_upgrade + "." + level + ".no-next-level.commands"))
                     );

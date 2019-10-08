@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import org.bukkit.Bukkit;
 
-public final class ReflectionUtil {
+public final class ReflectionUtils {
 
     private static String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 

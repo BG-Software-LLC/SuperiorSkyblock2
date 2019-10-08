@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Lists;
 
@@ -15,12 +15,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.schematics.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.schematics.TagBuilder;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ByteTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.NBTInputStream;
-import com.bgsoftware.superiorskyblock.utils.jnbt.NBTOutputStream;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
+import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
+import com.bgsoftware.superiorskyblock.utils.tags.NBTOutputStream;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.Bukkit;
@@ -64,9 +64,9 @@ public final class SchematicsHandler implements SchematicManager {
 
             if(!schematicsFolder.exists()) {
                 schematicsFolder.mkdirs();
-                FileUtil.saveResource("schematics/normal.schematic");
-                FileUtil.saveResource("schematics/mycel.schematic");
-                FileUtil.saveResource("schematics/desert.schematic");
+                FileUtils.saveResource("schematics/normal.schematic");
+                FileUtils.saveResource("schematics/mycel.schematic");
+                FileUtils.saveResource("schematics/desert.schematic");
             }
 
             //noinspection ConstantConditions

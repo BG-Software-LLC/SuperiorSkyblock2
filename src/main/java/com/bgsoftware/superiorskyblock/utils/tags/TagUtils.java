@@ -1,10 +1,10 @@
-package com.bgsoftware.superiorskyblock.utils;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.IntTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ShortTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ShortTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
-public final class TagUtil {
+public final class TagUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 

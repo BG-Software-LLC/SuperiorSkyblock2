@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.SKey;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import net.minecraft.server.v1_8_R2.Block;
 import net.minecraft.server.v1_8_R2.BlockPosition;
 import net.minecraft.server.v1_8_R2.Chunk;

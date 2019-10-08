@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -183,7 +183,7 @@ public final class UpgradesListener implements Listener {
 
         if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
             e.setCancelled(true);
-            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtil.format(e.getBlock().getType().name()));
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(e.getBlock().getType().name()));
         }
     }
 
@@ -205,7 +205,7 @@ public final class UpgradesListener implements Listener {
 
         if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
             e.setCancelled(true);
-            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtil.format("hopper"));
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format("hopper"));
         }
     }
 

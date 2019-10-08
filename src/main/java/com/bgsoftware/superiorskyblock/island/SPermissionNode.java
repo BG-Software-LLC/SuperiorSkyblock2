@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.StringTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;

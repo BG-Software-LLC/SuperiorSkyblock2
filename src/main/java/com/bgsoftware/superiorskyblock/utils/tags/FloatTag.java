@@ -30,51 +30,52 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_Int</code> tag.
+ * The <code>TAG_Float</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class IntTag extends Tag<Integer> {
+@SuppressWarnings("WeakerAccess")
+public final class FloatTag extends Tag<Float> {
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public IntTag(int value) {
+    public FloatTag(float value) {
         super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_Int: " + value;
+        return "TAG_Float: " + value;
     }
 
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagInt");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
             //noinspection unchecked, ConstantConditions
-            return nbtTagClass.getConstructor(int.class).newInstance((Object) value);
+            return nbtTagClass.getConstructor(float.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static IntTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagInt");
+    public static FloatTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntTag!");
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
-            int value = plugin.getNMSAdapter().getNBTIntValue(tag);
-            return new IntTag(value);
+            float value = plugin.getNMSAdapter().getNBTFloatValue(tag);
+            return new FloatTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

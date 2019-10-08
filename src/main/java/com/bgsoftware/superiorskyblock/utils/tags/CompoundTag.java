@@ -30,9 +30,9 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,8 +82,8 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagCompound");
-            Class nbtBaseClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTBase");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
+            Class nbtBaseClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
             //noinspection ConstantConditions
             Object nbtTagCompound = nbtTagClass.newInstance();
 
@@ -100,7 +100,7 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     }
 
     public static CompoundTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagCompound");
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to CompoundTag!");
 

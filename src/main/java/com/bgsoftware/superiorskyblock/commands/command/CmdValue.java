@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -75,7 +75,7 @@ public final class CmdValue implements ICommand {
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck),
                 blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
 
-        String key = StringUtil.format(toCheck.toString().split(":")[0]);
+        String key = StringUtils.format(toCheck.toString().split(":")[0]);
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -85,13 +85,13 @@ public final class CmdValue implements ICommand {
         }
         else{
             if(!Locale.BLOCK_VALUE.isEmpty())
-                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(key, StringUtil.format(blockWorth)));
+                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(key, StringUtils.format(blockWorth)));
         }
 
         if(!Locale.BLOCK_LEVEL.isEmpty()){
             if(stringBuilder.length() != 0)
                 stringBuilder.append("\n");
-            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(key, StringUtil.format(blockLevel)));
+            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(key, StringUtils.format(blockLevel)));
         }
 
         Locale.sendMessage(superiorPlayer, stringBuilder.toString());

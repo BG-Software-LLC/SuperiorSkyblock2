@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -41,7 +41,7 @@ public final class BorderColorMenu extends SuperiorMenu {
         superiorPlayer.setBorderColor(borderColor);
         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
 
-        Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer, StringUtil.format(borderColor.name()));
+        Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer, StringUtils.format(borderColor.name()));
 
         e.getWhoClicked().closeInventory();
         super.onClick(e);
@@ -58,27 +58,27 @@ public final class BorderColorMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/border-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/border-gui.yml");
+            FileUtils.saveResource("guis/border-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        inventory = FileUtil.loadGUI(islandRatingMenu, cfg.getConfigurationSection("border-gui"), InventoryType.HOPPER, "&l         Border Color");
+        inventory = FileUtils.loadGUI(islandRatingMenu, cfg.getConfigurationSection("border-gui"), InventoryType.HOPPER, "&l         Border Color");
 
-        ItemStack greenColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.green_color"));
+        ItemStack greenColorItem = FileUtils.getItemStack(cfg.getConfigurationSection("border-gui.green_color"));
         greenColorSlot = cfg.getInt("border-gui.green_color.slot", 0);
-        islandRatingMenu.addSound(greenColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.green_color.sound")));
+        islandRatingMenu.addSound(greenColorSlot, FileUtils.getSound(cfg.getConfigurationSection("border-gui.green_color.sound")));
         islandRatingMenu.addCommands(greenColorSlot, cfg.getStringList("border-gui.green_color.commands"));
         inventory.setItem(greenColorSlot, greenColorItem);
 
-        ItemStack blueColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.blue_color"));
+        ItemStack blueColorItem = FileUtils.getItemStack(cfg.getConfigurationSection("border-gui.blue_color"));
         blueColorSlot = cfg.getInt("border-gui.blue_color.slot", 0);
-        islandRatingMenu.addSound(blueColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.blue_color.sound")));
+        islandRatingMenu.addSound(blueColorSlot, FileUtils.getSound(cfg.getConfigurationSection("border-gui.blue_color.sound")));
         islandRatingMenu.addCommands(blueColorSlot, cfg.getStringList("border-gui.blue_color.commands"));
         inventory.setItem(blueColorSlot, blueColorItem);
 
-        ItemStack redColorItem = FileUtil.getItemStack(cfg.getConfigurationSection("border-gui.red_color"));
+        ItemStack redColorItem = FileUtils.getItemStack(cfg.getConfigurationSection("border-gui.red_color"));
         redColorSlot = cfg.getInt("border-gui.red_color.slot", 0);
-        islandRatingMenu.addSound(redColorSlot, FileUtil.getSound(cfg.getConfigurationSection("border-gui.red_color.sound")));
+        islandRatingMenu.addSound(redColorSlot, FileUtils.getSound(cfg.getConfigurationSection("border-gui.red_color.sound")));
         islandRatingMenu.addCommands(redColorSlot, cfg.getStringList("border-gui.red_color.commands"));
         inventory.setItem(redColorSlot, redColorItem);
     }

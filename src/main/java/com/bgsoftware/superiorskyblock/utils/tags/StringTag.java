@@ -30,46 +30,55 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
-
-import java.lang.reflect.Constructor;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_End</code> tag.
+ * The <code>TAG_String</code> tag.
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
-public final class EndTag extends Tag<Object> {
+public final class StringTag extends Tag<String> {
 
     /**
      * Creates the tag.
+     *
+     * @param value The value.
      */
-    public EndTag() {
-        super(null);
-        /* empty */
+    public StringTag(String value) {
+        super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_End";
+        return "TAG_String: " + value;
     }
 
     @Override
     public Object toNBT() {
-        try{
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagEnd");
+        try {
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
             //noinspection unchecked, ConstantConditions
-            Constructor constructor = nbtTagClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            Object nbtTagEnd = nbtTagClass.newInstance();
-            constructor.setAccessible(false);
-            return nbtTagEnd;
+            return nbtTagClass.getConstructor(String.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
+
+    public static StringTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
+        if(!tag.getClass().equals(nbtTagClass))
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to StringTag!");
+
+        try {
+            String value = plugin.getNMSAdapter().getNBTStringValue(tag);
+            return new StringTag(value);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
 }

@@ -30,86 +30,61 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_List</code> tag.
+ * The <code>TAG_Byte_Array</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class ListTag extends Tag<List<Tag>> {
-
-    /**
-     * The type.
-     */
-    private final Class<? extends Tag> type;
+@SuppressWarnings("WeakerAccess")
+public final class ByteArrayTag extends Tag<byte[]> {
 
     /**
      * Creates the tag.
      *
-     * @param type  The type of item in the list.
      * @param value The value.
      */
-    public ListTag(Class<? extends Tag> type, List<Tag> value) {
-        super(new ArrayList<>(value));
-        this.type = type;
-    }
-
-    /**
-     * Gets the type of item in this list.
-     *
-     * @return The type of item in this list.
-     */
-    public Class<? extends Tag> getType() {
-        return type;
-    }
-
-    public void addTag(Tag tag){
-        value.add(tag);
-    }
-
-    @Override
-    public List<Tag> getValue() {
-        return Collections.unmodifiableList(value);
+    public ByteArrayTag(byte[] value) {
+        super(value);
     }
 
     @Override
     public String toString() {
-        StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_List: ").append(value.size()).append(" entries of type ").append(NBTUtils.getTypeName(type)).append("\r\n{\r\n");
-        for (Tag t : value) {
-            bldr.append("   ").append(t.toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
+        StringBuilder hex = new StringBuilder();
+        for (byte b : value) {
+            String hexDigits = Integer.toHexString(b).toUpperCase();
+            if (hexDigits.length() == 1) {
+                hex.append("0");
+            }
+            hex.append(hexDigits).append(" ");
         }
-        bldr.append("}");
-        return bldr.toString();
+        return "TAG_Byte_Array: " + hex.toString();
     }
 
     @Override
     public Object toNBT() {
-        return plugin.getNMSAdapter().parseList(this);
+        try {
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
+            //noinspection unchecked, ConstantConditions
+            return nbtTagClass.getConstructor(byte[].class).newInstance((Object) value);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
-    public static ListTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagList");
+    public static ByteArrayTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ListTag!");
-
-        List<Tag> list = new ArrayList<>();
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteArrayTag!");
 
         try {
-            //noinspection unchecked
-            int size = (int) nbtTagClass.getMethod("size").invoke(tag);
-
-            for(int i = 0; i < size; i++)
-                list.add(Tag.fromNBT(plugin.getNMSAdapter().getNBTListIndexValue(tag, i)));
-
-            return new ListTag(size == 0 ? EndTag.class : list.get(0).getClass(), list);
+            byte[] value = plugin.getNMSAdapter().getNBTByteArrayValue(tag);
+            return new ByteArrayTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

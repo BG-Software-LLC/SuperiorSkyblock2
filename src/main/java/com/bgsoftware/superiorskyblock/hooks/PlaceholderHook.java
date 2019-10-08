@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -123,23 +123,23 @@ public abstract class PlaceholderHook {
                     case "radius":
                         return String.valueOf(island.getIslandSize());
                     case "biome":
-                        return StringUtil.format(island.getBiome().name());
+                        return StringUtils.format(island.getBiome().name());
                     case "level":
                         return island.getIslandLevelAsBigDecimal().toString();
                     case "level_format":
-                        return StringUtil.fancyFormat(island.getIslandLevelAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal());
                     case "worth":
                         return island.getWorthAsBigDecimal().toString();
                     case "worth_format":
-                        return StringUtil.fancyFormat(island.getWorthAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getWorthAsBigDecimal());
                     case "raw_worth":
                         return island.getRawWorthAsBigDecimal().toString();
                     case "raw_worth_format":
-                        return StringUtil.fancyFormat(island.getRawWorthAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getRawWorthAsBigDecimal());
                     case "bank":
                         return island.getMoneyInBankAsBigDecimal().toString();
                     case "bank_format":
-                        return StringUtil.fancyFormat(island.getMoneyInBankAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getMoneyInBankAsBigDecimal());
                     case "hoppers_limit":
                         return String.valueOf(island.getHoppersLimit());
                     case "crops_multiplier":
@@ -165,9 +165,9 @@ public abstract class PlaceholderHook {
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
                     case "rating":
-                        return StringUtil.format(island.getTotalRating());
+                        return StringUtils.format(island.getTotalRating());
                     case "rating_stars":
-                        return StringUtil.formatRating(island.getTotalRating());
+                        return StringUtils.formatRating(island.getTotalRating());
                 }
 
             }

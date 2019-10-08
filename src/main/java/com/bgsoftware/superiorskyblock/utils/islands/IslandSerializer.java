@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
 import java.util.Map;
@@ -45,7 +45,7 @@ public final class IslandSerializer {
         StringBuilder warpsBuilder = new StringBuilder();
         warps.keySet().forEach(warp -> {
             SIsland.WarpData warpData = warps.get(warp);
-            warpsBuilder.append(";").append(warp).append("=").append(FileUtil.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
+            warpsBuilder.append(";").append(warp).append("=").append(FileUtils.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
         });
         return warpsBuilder.length() == 0 ? "" : warpsBuilder.toString().substring(1);
     }

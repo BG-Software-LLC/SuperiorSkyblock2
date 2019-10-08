@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils;
+package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -36,7 +36,7 @@ public final class ItemBuilder {
 
     public ItemBuilder asSkullOf(SuperiorPlayer superiorPlayer){
         if(itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
-            textureValue = superiorPlayer == null ? HeadUtil.getNullPlayerTexture() :  superiorPlayer.getTextureValue();
+            textureValue = superiorPlayer == null ? HeadUtils.getNullPlayerTexture() :  superiorPlayer.getTextureValue();
         return this;
     }
 
@@ -123,7 +123,7 @@ public final class ItemBuilder {
 
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
-        return textureValue.isEmpty() ? itemStack : HeadUtil.getPlayerHead(itemStack, textureValue);
+        return textureValue.isEmpty() ? itemStack : HeadUtils.getPlayerHead(itemStack, textureValue);
     }
 
     public ItemBuilder copy(){

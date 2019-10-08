@@ -1,6 +1,6 @@
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 import java.util.Arrays;
 
@@ -105,7 +105,7 @@ public final class IntArrayTag extends Tag<int[]> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
             //noinspection unchecked, ConstantConditions
             return nbtTagClass.getConstructor(int[].class).newInstance((Object) value);
         }catch(Exception ex){
@@ -115,7 +115,7 @@ public final class IntArrayTag extends Tag<int[]> {
     }
 
     public static IntArrayTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntArrayTag!");
 

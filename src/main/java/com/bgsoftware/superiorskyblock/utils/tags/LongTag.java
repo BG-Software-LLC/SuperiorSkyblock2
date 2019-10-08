@@ -30,51 +30,52 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_Byte</code> tag.
+ * The <code>TAG_Long</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class ByteTag extends Tag<Byte> {
+@SuppressWarnings("WeakerAccess")
+public final class LongTag extends Tag<Long> {
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public ByteTag(byte value) {
+    public LongTag(long value) {
         super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_Byte: " + value;
+        return "TAG_Long: " + value;
     }
 
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagByte");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
             //noinspection unchecked, ConstantConditions
-            return nbtTagClass.getConstructor(byte.class).newInstance((Object) value);
+            return nbtTagClass.getConstructor(long.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static ByteTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagByte");
+    public static LongTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteTag!");
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
-            byte value = plugin.getNMSAdapter().getNBTByteValue(tag);
-            return new ByteTag(value);
+            long value = plugin.getNMSAdapter().getNBTLongValue(tag);
+            return new LongTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

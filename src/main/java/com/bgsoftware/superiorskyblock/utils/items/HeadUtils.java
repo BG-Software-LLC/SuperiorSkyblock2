@@ -1,8 +1,8 @@
-package com.bgsoftware.superiorskyblock.utils;
+package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.jnbt.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.jnbt.ListTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
-public final class HeadUtil {
+public final class HeadUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Map<String, String> entityNames = new HashMap<>();

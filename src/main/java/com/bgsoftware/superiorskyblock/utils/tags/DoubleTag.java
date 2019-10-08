@@ -30,51 +30,51 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.jnbt;
+package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtil;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
 
 /**
- * The <code>TAG_String</code> tag.
+ * The <code>TAG_Double</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class StringTag extends Tag<String> {
+public final class DoubleTag extends Tag<Double> {
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public StringTag(String value) {
+    public DoubleTag(double value) {
         super(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_String: " + value;
+        return "TAG_Double: " + value;
     }
 
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagString");
+            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
             //noinspection unchecked, ConstantConditions
-            return nbtTagClass.getConstructor(String.class).newInstance((Object) value);
+            return nbtTagClass.getConstructor(double.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static StringTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtil.getClass("net.minecraft.server.VERSION.NBTTagString");
+    public static DoubleTag fromNBT(Object tag){
+        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
         if(!tag.getClass().equals(nbtTagClass))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to StringTag!");
+            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to DoubleTag!");
 
         try {
-            String value = plugin.getNMSAdapter().getNBTStringValue(tag);
-            return new StringTag(value);
+            double value = plugin.getNMSAdapter().getNBTDoubleValue(tag);
+            return new DoubleTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

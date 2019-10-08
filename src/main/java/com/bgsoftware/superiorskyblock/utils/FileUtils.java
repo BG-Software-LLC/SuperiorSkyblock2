@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +21,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FileUtil {
+public final class FileUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
@@ -88,7 +89,7 @@ public final class FileUtil {
 
         if(inventory.getHolder() == null){
             try{
-                Class craftInventoryClass = ReflectionUtil.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
+                Class craftInventoryClass = ReflectionUtils.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
                 //noinspection all
                 Field field = craftInventoryClass.getDeclaredField("inventory");
                 field.setAccessible(true);

@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtil;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -98,7 +98,7 @@ public final class CmdWithdraw implements ICommand {
         EconomyHook.depositMoney(superiorPlayer.asPlayer(), amount);
 
         if(!Locale.WITHDRAW_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.WITHDRAW_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtil.format(amount)));
+            island.sendMessage(Locale.WITHDRAW_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtils.format(amount)));
     }
 
     @Override

@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.GlobalSectionComments;
-import com.bgsoftware.superiorskyblock.utils.FileUtil;
-import com.bgsoftware.superiorskyblock.utils.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -143,7 +143,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         File file = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if(!file.exists())
-            FileUtil.saveResource("guis/warps-gui.yml");
+            FileUtils.saveResource("guis/warps-gui.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
@@ -152,22 +152,22 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             cfg = YamlConfiguration.loadConfiguration(file);
         }
 
-        inventory = FileUtil.loadGUI(globalWarpsMenu, cfg.getConfigurationSection("global-gui"), 6, "&lIslands Warps");
+        inventory = FileUtils.loadGUI(globalWarpsMenu, cfg.getConfigurationSection("global-gui"), 6, "&lIslands Warps");
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("global-gui.title"));
 
-        ItemStack previousButton = FileUtil.getItemStack(cfg.getConfigurationSection("global-gui.previous-page"));
-        ItemStack currentButton = FileUtil.getItemStack(cfg.getConfigurationSection("global-gui.current-page"));
-        ItemStack nextButton = FileUtil.getItemStack(cfg.getConfigurationSection("global-gui.next-page"));
-        ItemStack warpItem = FileUtil.getItemStack(cfg.getConfigurationSection("global-gui.warp-item"));
+        ItemStack previousButton = FileUtils.getItemStack(cfg.getConfigurationSection("global-gui.previous-page"));
+        ItemStack currentButton = FileUtils.getItemStack(cfg.getConfigurationSection("global-gui.current-page"));
+        ItemStack nextButton = FileUtils.getItemStack(cfg.getConfigurationSection("global-gui.next-page"));
+        ItemStack warpItem = FileUtils.getItemStack(cfg.getConfigurationSection("global-gui.warp-item"));
         int previousSlot = cfg.getInt("global-gui.previous-page.slot");
         int currentSlot = cfg.getInt("global-gui.current-page.slot");
         int nextSlot = cfg.getInt("global-gui.next-page.slot");
         GlobalWarpsMenu.visitorWarps = cfg.getBoolean("global-gui.visitor-warps", false);
 
-        globalWarpsMenu.addSound(previousSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
-        globalWarpsMenu.addSound(currentSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
-        globalWarpsMenu.addSound(nextSlot, FileUtil.getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
-        globalWarpsMenu.addSound(-1, FileUtil.getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
+        globalWarpsMenu.addSound(previousSlot, FileUtils.getSound(cfg.getConfigurationSection("global-gui.previous-page.sound")));
+        globalWarpsMenu.addSound(currentSlot, FileUtils.getSound(cfg.getConfigurationSection("global-gui.current-page.sound")));
+        globalWarpsMenu.addSound(nextSlot, FileUtils.getSound(cfg.getConfigurationSection("global-gui.next-page.sound")));
+        globalWarpsMenu.addSound(-1, FileUtils.getSound(cfg.getConfigurationSection("global-gui.warp-item.sound")));
         globalWarpsMenu.addCommands(previousSlot, cfg.getStringList("global-gui.previous-page.commands"));
         globalWarpsMenu.addCommands(currentSlot, cfg.getStringList("global-gui.current-page.commands"));
         globalWarpsMenu.addCommands(nextSlot, cfg.getStringList("global-gui.next-page.commands"));

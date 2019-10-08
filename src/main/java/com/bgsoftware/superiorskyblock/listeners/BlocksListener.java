@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.utils.ItemUtil;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -169,7 +169,7 @@ public final class BlocksListener implements Listener {
 
         ItemStack inHand = e.getItemInHand().clone();
         inHand.setAmount(amount);
-        ItemUtil.removeItem(inHand, e);
+        ItemUtils.removeItem(inHand, e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

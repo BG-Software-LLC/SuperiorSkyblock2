@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public final class LocationUtil {
+public final class LocationUtils {
 
     public static boolean isSameBlock(Location loc1, Location loc2){
         return loc1.getWorld().getName().equals(loc2.getWorld().getName()) && loc1.getBlockX() == loc2.getBlockX() &&
