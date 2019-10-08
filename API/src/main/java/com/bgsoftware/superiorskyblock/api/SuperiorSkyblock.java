@@ -8,14 +8,29 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 
 public interface SuperiorSkyblock {
 
+    /**
+     * Get the grid of the core.
+     */
     GridManager getGrid();
 
+    /**
+     * Get the blocks manager of the core.
+     */
     BlockValuesManager getBlockValues();
 
+    /**
+     * Get the schematics manager of the core.
+     */
     SchematicManager getSchematics();
 
+    /**
+     * Get the players manager of the core.
+     */
     PlayersManager getPlayers();
 
+    /**
+     * Get the missions manager of the core.
+     */
     MissionsManager getMissions();
 
 }

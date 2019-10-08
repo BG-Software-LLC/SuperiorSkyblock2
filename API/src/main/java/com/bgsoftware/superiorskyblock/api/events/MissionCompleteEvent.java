@@ -9,6 +9,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+/**
+ * MissionCompleteEvent is called when a player is completing a mission.
+ */
 public class MissionCompleteEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -21,6 +24,14 @@ public class MissionCompleteEvent extends Event implements Cancellable {
     private List<String> commandRewards;
     private boolean cancelled = false;
 
+    /**
+     * The constructor of the event.
+     * @param superiorPlayer The player who completed the mission.
+     * @param mission The mission that was completed.
+     * @param islandMission Flag that determines whether or not the mission is an island mission.
+     * @param itemRewards The list of items that will be given as a reward.
+     * @param commandRewards The list of commands that will be ran as a reward.
+     */
     public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
         this.superiorPlayer = superiorPlayer;
         this.mission = mission;
@@ -29,22 +40,37 @@ public class MissionCompleteEvent extends Event implements Cancellable {
         this.commandRewards = commandRewards;
     }
 
+    /**
+     * Get the player who completed the mission.
+     */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
 
+    /**
+     * Get the mission that was completed.
+     */
     public Mission getMission() {
         return mission;
     }
 
+    /**
+     * Get the list of items that will be given as a reward.
+     */
     public List<ItemStack> getItemRewards() {
         return itemRewards;
     }
 
+    /**
+     * Get the list of commands that will be given as a reward.
+     */
     public List<String> getCommandRewards() {
         return commandRewards;
     }
 
+    /**
+     * Check whether or not the mission is an island mission.
+     */
     public boolean isIslandMission() {
         return islandMission;
     }

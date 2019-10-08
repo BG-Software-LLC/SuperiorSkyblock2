@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -49,7 +51,7 @@ public final class CmdTop implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        plugin.getGrid().openTopIslands(SSuperiorPlayer.of(sender));
+        IslandsTopMenu.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.BY_WORTH);
     }
 
     @Override

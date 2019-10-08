@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"WeakerAccess", "ResultOfMethodCallIgnored"})
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler implements SchematicManager {
 
     private static String version = Bukkit.getBukkitVersion().split("-")[0];
@@ -84,14 +84,17 @@ public final class SchematicsHandler implements SchematicManager {
         });
     }
 
+    @Override
     public Schematic getSchematic(String name) {
         return schematics.get(name);
     }
 
+    @Override
     public List<String> getSchematics(){
         return Lists.newArrayList(schematics.keySet());
     }
 
+    @Override
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName){
         Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();
         Location min = new Location(pos1.getWorld(),
@@ -104,10 +107,12 @@ public final class SchematicsHandler implements SchematicManager {
         superiorPlayer.setSchematicPos2(null);
     }
 
+    @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName){
         saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, null);
     }
 
+    @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
         if(Bukkit.isPrimaryThread() && !Bukkit.getBukkitVersion().contains("1.14")){
             Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable));

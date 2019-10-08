@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -127,7 +128,7 @@ public final class UpgradesListener implements Listener {
 
         if(mobDropsMultiplier > 1){
             for(ItemStack itemStack : e.getDrops()){
-                if(itemStack != null) {
+                if(itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack)) {
                     itemStack.setAmount((int) (itemStack.getAmount() * mobDropsMultiplier));
                 }
             }

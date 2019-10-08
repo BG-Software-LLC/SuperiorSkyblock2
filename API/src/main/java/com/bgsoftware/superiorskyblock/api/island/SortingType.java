@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
 public final class SortingType {
 
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
@@ -18,18 +17,31 @@ public final class SortingType {
         this.comparator = comparator;
     }
 
+    /**
+     * Get the name of the sorting type.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Get the comparator of the sorting type.
+     */
     public Comparator<UUID> getComparator() {
         return comparator;
     }
 
+    /**
+     * Get all the sorting types.
+     */
     public static Collection<SortingType> values(){
         return sortingTypes.values();
     }
 
+    /**
+     * Get a sorting type by it's name.
+     * @param name The name to check.
+     */
     public static SortingType getByName(String name){
         return sortingTypes.get(name);
     }
@@ -39,6 +51,11 @@ public final class SortingType {
         return "SortingType{name=" + name + "}";
     }
 
+    /**
+     * Register a new sorting type.
+     * @param name The name for the sorting type.
+     * @param comparator The comparator for sorting the islands.
+     */
     public static void register(String name, Comparator<UUID> comparator){
         if(sortingTypes.containsKey(name))
             throw new IllegalStateException("SortingType with the name " + name + " already exists.");

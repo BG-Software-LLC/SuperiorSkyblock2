@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.CachedResultSet;
@@ -142,21 +142,6 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome){
-        createIsland(superiorPlayer, schemName, bonus, biome, "");
-    }
-
-    @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus) {
-        createIsland(superiorPlayer, schemName, bonus, Biome.PLAINS);
-    }
-
-    @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName){
-        createIsland(superiorPlayer, schemName, BigDecimal.ZERO);
-    }
-
-    @Override
     public void deleteIsland(Island island){
         SuperiorPlayer targetPlayer;
         for(UUID uuid : island.allPlayersInside()){
@@ -185,7 +170,17 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIsland(int index){
-        return index >= islands.size() ? null : islands.get(index, SortingTypes.BY_WORTH);
+        return getIsland(index, SortingTypes.BY_WORTH);
+    }
+
+    @Override
+    public Island getIsland(int index, SortingType sortingType) {
+        return index >= islands.size() ? null : islands.get(index, sortingType);
+    }
+
+    @Override
+    public int getIslandPosition(Island island, SortingType sortingType) {
+        return islands.indexOf(island, sortingType);
     }
 
     @Override
@@ -257,7 +252,12 @@ public final class GridHandler implements GridManager {
 
     @Override
     public List<UUID> getAllIslands(){
-        return Lists.newArrayList(islands.iterator(SortingTypes.BY_WORTH));
+        return getAllIslands(SortingTypes.BY_WORTH);
+    }
+
+    @Override
+    public List<UUID> getAllIslands(SortingType sortingType) {
+        return Lists.newArrayList(islands.iterator(sortingType));
     }
 
     @Override
@@ -268,16 +268,6 @@ public final class GridHandler implements GridManager {
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
         IslandsTopMenu.openInventory(superiorPlayer, null, SortingTypes.BY_WORTH);
-    }
-
-    @Override
-    public int getBlockValue(Key key){
-        return plugin.getBlockValues().getBlockWorth(key).intValue();
-    }
-
-    @Override
-    public double getDecimalBlockValue(Key key) {
-        return plugin.getBlockValues().getBlockWorth(key).doubleValue();
     }
 
     @Override

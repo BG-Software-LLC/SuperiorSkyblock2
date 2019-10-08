@@ -108,7 +108,7 @@ public abstract class PlaceholderHook {
                     }
 
                     if(matcher.group(1).equals("position")){
-                        return String.valueOf(plugin.getGrid().getIslandIndex(island, sortingType) + 1);
+                        return String.valueOf(plugin.getGrid().getIslandPosition(island, sortingType) + 1);
                     }
                     else {
                         try{

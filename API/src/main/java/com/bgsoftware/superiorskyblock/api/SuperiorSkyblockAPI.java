@@ -58,17 +58,6 @@ public final class SuperiorSkyblockAPI {
      *
      * @param superiorPlayer owner of the island
      * @param schemName the schematic of the island to be pasted
-     * @deprecated see below
-     */
-    public static void createIsland(SuperiorPlayer superiorPlayer, String schemName){
-        plugin.getGrid().createIsland(superiorPlayer, schemName);
-    }
-
-    /**
-     * Create a new island.
-     *
-     * @param superiorPlayer owner of the island
-     * @param schemName the schematic of the island to be pasted
      * @param bonus The default island bonus level
      * @param biome The default island biome
      * @param islandName The island name

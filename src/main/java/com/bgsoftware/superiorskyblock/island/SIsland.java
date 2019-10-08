@@ -427,7 +427,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
-        return superiorPlayer.hasBypassModeEnabled() || getPermisisonNode(superiorPlayer).hasPermission(islandPermission);
+        return superiorPlayer.hasBypassModeEnabled() || getPermissionNode(superiorPlayer).hasPermission(islandPermission);
     }
 
     @Override
@@ -462,19 +462,19 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     @Deprecated
-    public SPermissionNode getPermisisonNode(IslandRole islandRole){
-        return getPermisisonNode(SPlayerRole.of(islandRole.name()));
+    public SPermissionNode getPermissionNode(IslandRole islandRole){
+        return getPermissionNode(SPlayerRole.of(islandRole.name()));
     }
 
     @Override
-    public SPermissionNode getPermisisonNode(PlayerRole playerRole) {
+    public SPermissionNode getPermissionNode(PlayerRole playerRole) {
         return permissionNodes.get(playerRole).clone();
     }
 
     @Override
-    public SPermissionNode getPermisisonNode(SuperiorPlayer superiorPlayer) {
+    public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
-        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermisisonNode(playerRole));
+        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
     }
 
     @Override
@@ -535,21 +535,9 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public double getMoneyInBank(){
-        return getMoneyInBankAsBigDecimal().doubleValue();
-    }
-
-    @Override
     public BigDecimal getMoneyInBankAsBigDecimal() {
         if(islandBank.doubleValue() < 0) islandBank = BigDecimalFormatted.ZERO;
         return islandBank;
-    }
-
-    @Override
-    @Deprecated
-    public String getMoneyAsString() {
-        return getMoneyInBankAsBigDecimal().toString();
     }
 
     @Override
@@ -682,10 +670,13 @@ public class SIsland extends DatabaseObject implements Island {
                 }
                 spawnersToCheck.clear();
 
-                Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, getIslandLevelAsBigDecimal(), asker));
+                BigDecimal islandLevel = getIslandLevelAsBigDecimal();
+                BigDecimal islandWorth = getWorthAsBigDecimal();
+
+                Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth));
 
                 if(asker != null)
-                    Locale.ISLAND_WORTH_RESULT.send(asker, getWorthAsBigDecimal(), getIslandLevelAsBigDecimal());
+                    Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
 
                 for(Chunk chunk : chunks)
                     BlocksProvider_WildStacker.uncacheChunk(chunk);
@@ -811,19 +802,8 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public int getHoppersAmount(){
-        return getBlockCount(Key.of("HOPPER"));
-    }
-
-    @Override
     public int getBlockCount(Key key){
         return blockCounts.getOrDefault(key, 0);
-    }
-
-    @Override
-    @Deprecated
-    public double getWorth(){
-        return getWorthAsBigDecimal().doubleValue();
     }
 
     @Override
@@ -835,20 +815,8 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public double getRawWorth(){
-        return getRawWorthAsBigDecimal().doubleValue();
-    }
-
-    @Override
     public BigDecimal getRawWorthAsBigDecimal() {
         return islandWorth;
-    }
-
-    @Override
-    @Deprecated
-    public String getWorthAsString(){
-        return getWorthAsBigDecimal().toString();
     }
 
     @Override
@@ -861,20 +829,8 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getIslandLevel(){
-        return getIslandLevelAsBigDecimal().intValue();
-    }
-
-    @Override
     public BigDecimal getIslandLevelAsBigDecimal() {
         return plugin.getSettings().bonusAffectLevel ? islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth))) : islandLevel;
-    }
-
-    @Override
-    @Deprecated
-    public String getLevelAsString() {
-        return getIslandLevelAsBigDecimal().toString();
     }
 
     @Override
@@ -914,11 +870,6 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public int getHoppersLimit(){
-        return getBlockLimit(Key.of("HOPPER"));
-    }
-
-    @Override
     public int getBlockLimit(Key key) {
         return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
     }
@@ -955,11 +906,6 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void updateBorder() {
         allPlayersInside().forEach(uuid -> plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), this));
-    }
-
-    @Override
-    public void setHoppersLimit(int hoppersLimit){
-        setBlockLimit(Key.of("HOPPER"), hoppersLimit);
     }
 
     @Override
@@ -1069,11 +1015,6 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void setWarpLocation(String name, Location location){
-        setWarpLocation(name, location, false);
-    }
-
-    @Override
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
         warps.put(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
 
@@ -1110,7 +1051,8 @@ public class SIsland extends DatabaseObject implements Island {
         for(String warpName : new ArrayList<>(warps.keySet())){
             if(LocationUtils.isSameBlock(location, warps.get(warpName).location)){
                 deleteWarp(warpName);
-                Locale.DELETE_WARP.send(superiorPlayer, warpName);
+                if(superiorPlayer != null)
+                    Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
         }
     }
@@ -1186,11 +1128,6 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void transfer(SuperiorPlayer player) {
-        transferIsland(player);
-    }
-
-    @Override
     public boolean isLocked() {
         return locked;
     }
@@ -1247,15 +1184,25 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Rating getRating(UUID uuid) {
-        return ratings.getOrDefault(uuid, Rating.UNKNOWN);
+        return getRating(SSuperiorPlayer.of(uuid));
+    }
+
+    @Override
+    public Rating getRating(SuperiorPlayer superiorPlayer) {
+        return ratings.getOrDefault(superiorPlayer.getUniqueId(), Rating.UNKNOWN);
     }
 
     @Override
     public void setRating(UUID uuid, Rating rating) {
+        setRating(SSuperiorPlayer.of(uuid), rating);
+    }
+
+    @Override
+    public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
         if(rating == Rating.UNKNOWN)
-            ratings.remove(uuid);
+            ratings.remove(superiorPlayer.getUniqueId());
         else
-            ratings.put(uuid, rating);
+            ratings.put(superiorPlayer.getUniqueId(), rating);
 
         Query.ISLAND_SET_RATINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeRatings(ratings))

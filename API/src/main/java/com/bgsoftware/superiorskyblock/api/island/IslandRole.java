@@ -2,6 +2,9 @@ package com.bgsoftware.superiorskyblock.api.island;
 
 import java.util.Arrays;
 
+/**
+ * @deprecated See PlayerRole
+ */
 @Deprecated
 public enum IslandRole {
 

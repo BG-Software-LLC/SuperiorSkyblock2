@@ -38,12 +38,12 @@ public final class SPlayerRole implements PlayerRole {
 
     @Override
     public boolean isFirstRole() {
-        return getPreviousRole() == null && getNextRole() != null;
+        return getWeight() == 0;
     }
 
     @Override
     public boolean isLastRole() {
-        return getPreviousRole() != null && getNextRole() == null;
+        return getWeight() == lastRole().getWeight();
     }
 
     @Override

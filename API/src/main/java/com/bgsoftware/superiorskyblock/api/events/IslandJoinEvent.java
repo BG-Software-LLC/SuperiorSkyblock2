@@ -6,7 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@SuppressWarnings("unused")
+/**
+ * IslandJoinEvent is called when a player is joining an island as a member of that island.
+ */
 public class IslandJoinEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -15,15 +17,26 @@ public class IslandJoinEvent extends Event implements Cancellable {
     private final Island island;
     private boolean cancelled = false;
 
+    /**
+     * The constructor to the event.
+     * @param superiorPlayer The player who joined the island as a new member.
+     * @param island The island that the player joined into.
+     */
     public IslandJoinEvent(SuperiorPlayer superiorPlayer, Island island){
         this.superiorPlayer = superiorPlayer;
         this.island = island;
     }
 
+    /**
+     * Get the player who joined the island as a new member.
+     */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
 
+    /**
+     * Get the island that the player joined into.
+     */
     public Island getIsland() {
         return island;
     }

@@ -6,7 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@SuppressWarnings("unused")
+/**
+ * IslandTransferEvent is called when the leadership of an island is transferred.
+ */
 public class IslandTransferEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -15,20 +17,35 @@ public class IslandTransferEvent extends Event implements Cancellable {
     private final Island island;
     private boolean cancelled = false;
 
+    /**
+     * The constructor of the event.
+     * @param island The island that the leadership of it is transferred.
+     * @param oldOwner The old owner of the island.
+     * @param newOwner The new owner of the island.
+     */
     public IslandTransferEvent(Island island, SuperiorPlayer oldOwner, SuperiorPlayer newOwner){
         this.island = island;
         this.oldOwner = oldOwner;
         this.newOwner = newOwner;
     }
 
+    /**
+     * Get the old owner of the island.
+     */
     public SuperiorPlayer getOldOwner() {
         return oldOwner;
     }
 
+    /**
+     * Get the new owner of the island.
+     */
     public SuperiorPlayer getNewOwner() {
         return newOwner;
     }
 
+    /**
+     * Get the island that the leadership of it is transferred.
+     */
     public Island getIsland() {
         return island;
     }

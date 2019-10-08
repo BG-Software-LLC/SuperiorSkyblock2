@@ -97,9 +97,9 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
             PermissionNode permissionNode;
 
             if (permissionHolder instanceof PlayerRole)
-                permissionNode = island.getPermisisonNode((PlayerRole) permissionHolder);
+                permissionNode = island.getPermissionNode((PlayerRole) permissionHolder);
             else {
-                permissionNode = island.getPermisisonNode((SuperiorPlayer) permissionHolder);
+                permissionNode = island.getPermissionNode((SuperiorPlayer) permissionHolder);
             }
 
             boolean currentValue = permissionNode.hasPermission(permission);
@@ -151,9 +151,9 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
                 boolean hasPermission;
 
                 if (permissionHolder instanceof PlayerRole)
-                    hasPermission = island.getPermisisonNode((PlayerRole) permissionHolder).hasPermission(permission);
+                    hasPermission = island.getPermissionNode((PlayerRole) permissionHolder).hasPermission(permission);
                 else
-                    hasPermission = island.getPermisisonNode((SuperiorPlayer) permissionHolder).hasPermission(permission);
+                    hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(permission);
 
                 Object permissionItemObject = get(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"), Object.class);
                 ItemStack permissionItem;

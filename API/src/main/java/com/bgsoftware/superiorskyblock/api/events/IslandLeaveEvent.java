@@ -6,7 +6,9 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-@SuppressWarnings("unused")
+/**
+ * IslandLeaveEvent is called when a player is walking out from the island's area.
+ */
 public class IslandLeaveEvent extends Event implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -15,15 +17,26 @@ public class IslandLeaveEvent extends Event implements Cancellable {
     private final Island island;
     private boolean cancelled = false;
 
+    /**
+     * The constructor of the event.
+     * @param superiorPlayer The player who left the island's area.
+     * @param island The island that the player left.
+     */
     public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island){
         this.superiorPlayer = superiorPlayer;
         this.island = island;
     }
 
+    /**
+     * Get the player who left the island's area.
+     */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
 
+    /**
+     * Get the island that the player left .
+     */
     public Island getIsland() {
         return island;
     }
