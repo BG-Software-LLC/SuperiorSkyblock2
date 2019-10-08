@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -31,9 +32,10 @@ public abstract class PlaceholderHook {
             new PlaceholderHook_PAPI();
     }
 
-    protected String parsePlaceholder(Player player, String placeholder) {
+    protected String parsePlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
         try {
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+            Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(offlinePlayer.getUniqueId());
             Island island = superiorPlayer.getIsland();
             Matcher matcher;
 
@@ -48,6 +50,9 @@ public abstract class PlaceholderHook {
                     return subPlaceholder.equals("exists") ? "No" : plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
 
                 if (subPlaceholder.startsWith("location_")) {
+                    if(player == null)
+                        throw new NullPointerException();
+
                     island = plugin.getGrid().getIslandAt(player.getLocation());
 
                     if (island == null)

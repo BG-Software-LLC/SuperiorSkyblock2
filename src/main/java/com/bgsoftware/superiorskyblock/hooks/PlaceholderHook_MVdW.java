@@ -105,7 +105,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             return;
 
         Iterator var3 = placeholderAddedHandlers.iterator();
-        PlaceholderReplacer replacer = e -> parsePlaceholder(e.getPlayer(), e.getPlaceholder().replace("superior_", ""));
+        PlaceholderReplacer replacer = e -> parsePlaceholder(e.getOfflinePlayer(), e.getPlaceholder().replace("superior_", ""));
 
         while(var3.hasNext()) {
             PlaceholderAddedEvent event = (PlaceholderAddedEvent)var3.next();

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("WeakerAccess")
@@ -29,6 +30,11 @@ public final class PlaceholderHook_PAPI extends PlaceholderHook {
 
         @Override
         public String onPlaceholderRequest(Player player, String placeholder) {
+            return onRequest(player, placeholder);
+        }
+
+        @Override
+        public String onRequest(OfflinePlayer player, String placeholder) {
             return parsePlaceholder(player, placeholder);
         }
 
