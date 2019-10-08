@@ -127,7 +127,9 @@ public final class UpgradesListener implements Listener {
 
         if(mobDropsMultiplier > 1){
             for(ItemStack itemStack : e.getDrops()){
-                itemStack.setAmount((int) (itemStack.getAmount() * mobDropsMultiplier));
+                if(itemStack != null) {
+                    itemStack.setAmount((int) (itemStack.getAmount() * mobDropsMultiplier));
+                }
             }
         }
     }
