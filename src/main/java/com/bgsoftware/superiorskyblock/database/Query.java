@@ -27,7 +27,7 @@ public enum Query {
     ISLAND_SET_RATINGS("UPDATE islands SET ratings=? WHERE owner=?;"),
     ISLAND_SET_MISSIONS("UPDATE islands SET missions=? WHERE owner=?;"),
     ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=? WHERE owner=?;"),
-    ISLAND_INSERT("INSERT INTO islands VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_INSERT("INSERT INTO islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),
@@ -41,14 +41,14 @@ public enum Query {
     PLAYER_SET_LAST_STATUS("UPDATE players SET lastTimeStatus=? WHERE player=?;"),
     PLAYER_SET_MISSIONS("UPDATE players SET missions=? WHERE player=?;"),
     PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=?,missions=? WHERE player=?;"),
-    PLAYER_INSERT("INSERT INTO players VALUES(?,?,?,?,?,?,?,?,?,?,?);"),
+    PLAYER_INSERT("INSERT INTO players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions) VALUES(?,?,?,?,?,?,?,?,?,?,?);"),
 
     STACKED_BLOCKS_UPDATE("UPDATE stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
-    STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks VALUES(?,?,?,?,?);"),
+    STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),
     STACKED_BLOCKS_DELETE("DELETE FROM stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
 
     GRID_UPDATE("UPDATE grid SET lastIsland=?;"),
-    GRID_INSERT("INSERT INTO grid VALUES(?,?,?,?);");
+    GRID_INSERT("INSERT INTO (lastIsland,stackedBlocks,maxIslandSize,world) grid VALUES(?,?,?,?);");
 
     private String query;
 

@@ -238,6 +238,8 @@ public class SIsland extends DatabaseObject implements Island {
             return;
 
         invitedPlayers.add(superiorPlayer.getUniqueId());
+        //Revoke the invite after 5 minutes
+        Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
 
     @Override

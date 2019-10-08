@@ -292,10 +292,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void setBlockAmount(Block block, int amount){
-        boolean insert = false;
-
-        if(!stackedBlocks.stackedBlocks.containsKey(SBlockPosition.of(block.getLocation())))
-            insert = true;
+        boolean insert = !stackedBlocks.stackedBlocks.containsKey(SBlockPosition.of(block.getLocation()));
 
         stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount);
         stackedBlocks.updateName(block);
