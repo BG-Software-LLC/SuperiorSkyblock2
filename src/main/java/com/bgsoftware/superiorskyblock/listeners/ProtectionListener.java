@@ -43,8 +43,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -68,8 +70,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -102,8 +106,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(clickedBlock.getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -132,8 +138,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
-            if(superiorPlayer.getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(superiorPlayer.getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(superiorPlayer);
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -151,8 +159,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -169,8 +179,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -239,8 +251,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
-            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
@@ -257,8 +271,10 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
-            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName()))
+            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.sendProtectionMessage(e.getPlayer());
                 e.setCancelled(true);
+            }
 
             return;
         }
