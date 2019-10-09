@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
 
 public final class StringUtils {
 
-    private static DecimalFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
+    private static DecimalFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,###.##");
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000, K = 1000D;
 
     public static String format(String type){
