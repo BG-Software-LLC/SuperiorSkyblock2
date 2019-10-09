@@ -23,16 +23,16 @@ public final class IslandRegistry implements Iterable<Island> {
             sortedTrees.put(sortingAlgorithm, Sets.newTreeSet(sortingAlgorithm.getComparator()));
     }
 
-    public Island get(UUID uuid){
+    public synchronized Island get(UUID uuid){
         return islands.get(uuid);
     }
 
-    public Island get(int index, SortingType sortingType){
+    public synchronized Island get(int index, SortingType sortingType){
         ensureType(sortingType);
         return get(Iterables.get(sortedTrees.get(sortingType), index));
     }
 
-    public int indexOf(Island island, SortingType sortingType){
+    public synchronized int indexOf(Island island, SortingType sortingType){
         ensureType(sortingType);
         return Iterables.indexOf(sortedTrees.get(sortingType), uuid -> island.getOwner().getUniqueId().equals(uuid));
     }
@@ -54,11 +54,11 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     @Override
-    public Iterator<Island> iterator() {
+    public synchronized Iterator<Island> iterator() {
         return islands.values().iterator();
     }
 
-    public Iterator<UUID> iterator(SortingType sortingType){
+    public synchronized Iterator<UUID> iterator(SortingType sortingType){
         ensureType(sortingType);
         return Iterables.unmodifiableIterable(sortedTrees.get(sortingType)).iterator();
     }
@@ -72,7 +72,7 @@ public final class IslandRegistry implements Iterable<Island> {
             sortedTree.add(worthIterator.next());
     }
 
-    public void transferIsland(UUID oldOwner, UUID newOwner){
+    public synchronized void transferIsland(UUID oldOwner, UUID newOwner){
         Island island = get(oldOwner);
         remove(oldOwner);
         add(newOwner, island);
