@@ -30,7 +30,7 @@ public final class MemberManageMenu extends SuperiorMenu {
         super.onClick(e);
         if(e.getRawSlot() == rolesSlot){
             previousMove = false;
-            MemberRoleMenu.createInventory(targetPlayer).open(SSuperiorPlayer.of(e.getWhoClicked()), this);
+            MemberRoleMenu.openInventory(SSuperiorPlayer.of(e.getWhoClicked()), this, targetPlayer);
         }
 
         else if(e.getRawSlot() == banSlot){
@@ -79,10 +79,6 @@ public final class MemberManageMenu extends SuperiorMenu {
         inventory.setItem(rolesSlot, rolesButton);
         inventory.setItem(banSlot, banButton);
         inventory.setItem(kickSlot, kickButton);
-    }
-
-    public static MemberManageMenu createInventory(SuperiorPlayer targetPlayer){
-        return new MemberManageMenu(targetPlayer);
     }
 
     public static SuperiorMenu getMenu(SuperiorPlayer targetPlayer){

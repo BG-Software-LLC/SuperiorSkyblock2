@@ -90,10 +90,6 @@ public final class MemberRoleMenu extends SuperiorMenu {
         inventory.setItem(leaderSlot, leaderButton);
     }
 
-    public static MemberRoleMenu createInventory(SuperiorPlayer targetPlayer){
-        return new MemberRoleMenu(targetPlayer);
-    }
-
     public static SuperiorMenu getMenu(SuperiorPlayer targetPlayer){
         return new MemberRoleMenu(targetPlayer);
     }

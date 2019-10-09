@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.hamcrest.core.Is;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -83,7 +82,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
                             Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
                                     command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
                 previousMove = false;
-                MemberManageMenu.createInventory(targetPlayer).open(superiorPlayer, this);
+                MemberManageMenu.openInventory(superiorPlayer, this, targetPlayer);
             }
         }
     }
@@ -170,7 +169,6 @@ public final class IslandMembersMenu extends SuperiorMenu {
 
         Arrays.stream(cfg.getString("members-panel.member-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
-        //slots.sort(Integer::compareTo);
     }
 
     public static SuperiorMenu getMenu(Island island){
