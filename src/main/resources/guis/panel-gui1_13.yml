@@ -179,54 +179,55 @@ roles-panel:
       name: '&f'
       slots: 0,1,2,3,4,5,6,7,8,9,17,18,26,27,35,36,37,38,39,40,41,42,43,44
 
-  member-role:
-    slot: 19
-    sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
-      volume: 0.2
-      pitch: 0.2
-    type: LEATHER_CHESTPLATE
-    name: '&eMember'
-    lore:
-      - '&7Click to set player''s role to member.'
-    flags:
-      - HIDE_ATTRIBUTES
+  roles:
+    member:
+      slot: 19
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+      type: LEATHER_CHESTPLATE
+      name: '&eMember'
+      lore:
+        - '&7Click to set player''s role to member.'
+      flags:
+        - HIDE_ATTRIBUTES
 
-  mod-role:
-    slot: 21
-    sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
-      volume: 0.2
-      pitch: 0.2
-    type: GOLDEN_CHESTPLATE
-    name: '&eModerator'
-    lore:
-      - '&7Click to set player''s role to moderator.'
-    flags:
-      - HIDE_ATTRIBUTES
+    moderator:
+      slot: 21
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+      type: GOLDEN_CHESTPLATE
+      name: '&eModerator'
+      lore:
+        - '&7Click to set player''s role to moderator.'
+      flags:
+        - HIDE_ATTRIBUTES
 
-  admin-role:
-    slot: 23
-    sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
-      volume: 0.2
-      pitch: 0.2
-    type: IRON_CHESTPLATE
-    name: '&eAdmin'
-    lore:
-      - '&7Click to set player''s role to admin.'
-    flags:
-      - HIDE_ATTRIBUTES
+    admin:
+      slot: 23
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+      type: IRON_CHESTPLATE
+      name: '&eAdmin'
+      lore:
+        - '&7Click to set player''s role to admin.'
+      flags:
+        - HIDE_ATTRIBUTES
 
-  leader-role:
-    slot: 25
-    sound:
-      type: ENTITY_EXPERIENCE_ORB_PICKUP
-      volume: 0.2
-      pitch: 0.2
-    type: DIAMOND_CHESTPLATE
-    name: '&eLeader'
-    lore:
-      - '&7Click to transfer leadership to player.'
-    flags:
-      - HIDE_ATTRIBUTES
+    leader:
+      slot: 25
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+      type: DIAMOND_CHESTPLATE
+      name: '&eLeader'
+      lore:
+        - '&7Click to transfer leadership to player.'
+      flags:
+        - HIDE_ATTRIBUTES
