@@ -156,6 +156,7 @@ GOT_PROMOTED: '&e&lIsland | &7You were promoted to a {0} in your island.'
 GOT_REVOKED: '&e&lIsland | &7{0} revoked your invitation to his island.'
 GOT_UNBANNED: '&e&lIsland | &7You were UNBANNED from {0}''s island.'
 HIT_PLAYER_IN_ISLAND: '&c&lError | &7You cannot hit players inside islands.'
+INTERACT_OUTSIDE_ISLAND: '&c&lError | &7You cannot interact outside of your protection range.'
 INVALID_AMOUNT: '&c&lError | &7Invalid amount {0}.'
 INVALID_BIOME: |
   &c&lError | &7Couldn't find the biome {0}.

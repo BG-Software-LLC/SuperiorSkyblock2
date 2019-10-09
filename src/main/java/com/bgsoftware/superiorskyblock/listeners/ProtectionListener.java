@@ -41,17 +41,16 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
             return;
         }
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
             e.setCancelled(true);
@@ -68,17 +67,16 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
             return;
         }
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
             e.setCancelled(true);
@@ -104,10 +102,11 @@ public final class ProtectionListener implements Listener {
         Block clickedBlock = e.getClickedBlock();
 
         Island island = plugin.getGrid().getIslandAt(clickedBlock.getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -123,9 +122,15 @@ public final class ProtectionListener implements Listener {
             islandPermission = e.getAction() == Action.PHYSICAL ? IslandPermission.FARM_TRAMPING : IslandPermission.BUILD;
         else islandPermission = IslandPermission.INTERACT;
 
-        if(!island.hasPermission(SSuperiorPlayer.of(e.getPlayer()), islandPermission)){
+        if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
+            Locale.sendProtectionMessage(superiorPlayer);
+            return;
+        }
+
+        if(!island.isInsideRange(clickedBlock.getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -138,8 +143,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
-            if(superiorPlayer.getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(superiorPlayer);
+            if(!superiorPlayer.hasBypassModeEnabled() && superiorPlayer.getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -150,6 +155,12 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
+            return;
+        }
+
+        if(!island.isInsideRange(e.getEntity().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -159,8 +170,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -170,6 +181,12 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getItemFrame().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -179,8 +196,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
 
         if(island == null) {
-            if(e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getPlayer().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -190,6 +207,12 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getItemFrame().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -251,8 +274,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
-            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -262,6 +285,12 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getBlockClicked().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
@@ -271,8 +300,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
-            if(e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
-                Locale.sendProtectionMessage(e.getPlayer());
+            if(!superiorPlayer.hasBypassModeEnabled() && e.getBlockClicked().getWorld().getName().equals(plugin.getGrid().getIslandsWorld().getName())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 e.setCancelled(true);
             }
 
@@ -282,6 +311,12 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getBlockClicked().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
