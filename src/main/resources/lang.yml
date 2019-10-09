@@ -77,6 +77,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: 'Set the spawner rates multiplier f
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: 'Set members limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: 'Set the level of an upgrade for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: 'Set the warps limit of an island.'
+COMMAND_DESCRIPTION_ADMIN_SHOW: 'Get information about an island.'
 COMMAND_DESCRIPTION_ADMIN_SPY: 'Toggle chat spy mode'
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 'Withdraw money from another player''s island bank.'
 COMMAND_DESCRIPTION_BAN: 'Ban a player from your island.'
@@ -205,6 +206,11 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Use /is help {0} for the next page.'
+ISLAND_INFO_ADMIN_SIZE: '&e&lIsland | &7Radius: {0}'
+ISLAND_INFO_ADMIN_UPGRADES: |
+  &e&lIsland | &7Upgrades:
+  {0}
+ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_BANK: '&e&lIsland | &7Bank: {0}'
 ISLAND_INFO_DISCORD: '&e&lIsland | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
