@@ -147,7 +147,8 @@ public final class BlocksListener implements Listener {
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(!superiorPlayer.hasBlocksStackerEnabled())
+        if(!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
+                !superiorPlayer.hasPermission("superior.island.stacker." + e.getBlock().getType())))
             return;
 
         //noinspection deprecation

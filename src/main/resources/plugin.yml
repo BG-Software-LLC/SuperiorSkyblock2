@@ -117,6 +117,8 @@ permissions:
             description: List of island warps.
           superior.island.withdraw:
             description: Withdraw money from your island's bank into your personal account.
+          superior.island.stacker.*:
+            description: Gives the ability to stack blocks.
       superior.admin.*:
         description: Permission for all admin commands
         default: op
