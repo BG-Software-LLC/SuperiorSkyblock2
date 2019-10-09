@@ -114,7 +114,7 @@ public final class GridHandler implements GridManager {
                 }
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-                schematic.pasteSchematic(islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                     island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);

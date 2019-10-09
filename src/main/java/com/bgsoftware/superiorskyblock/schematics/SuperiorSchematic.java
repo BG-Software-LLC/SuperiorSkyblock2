@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -20,6 +21,11 @@ public final class SuperiorSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Location location, Runnable callback){
+        pasteSchematic(null, location, callback);
+    }
+
+    @Override
+    public void pasteSchematic(Island island, Location location, Runnable callback) {
         byte xSize = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
         byte ySize = ((ByteTag) compoundTag.getValue().get("ySize")).getValue();
         byte zSize = ((ByteTag) compoundTag.getValue().get("zSize")).getValue();
@@ -30,7 +36,7 @@ public final class SuperiorSchematic implements Schematic {
         Location min = location.clone().subtract(offsetX, offsetY, offsetZ);
 
         if(compoundTag.getValue().containsKey("blocks")) {
-            TagUtils.assignIntoBlocks(((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
+            TagUtils.assignIntoBlocks(island, ((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
         }
 
         if(compoundTag.getValue().containsKey("entities")) {

@@ -1,10 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ShortTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -36,11 +32,11 @@ public final class TagUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static void assignIntoBlocks(List<Tag> blocks, Location offset, Runnable callback){
+    public static void assignIntoBlocks(Island island, List<Tag> blocks, Location offset, Runnable callback){
         Runnable _callback = () ->
             Executor.sync(() -> {
                 for(Tag tag : blocks){
-                    assignIntoBlock((CompoundTag) tag, offset);
+                    assignIntoBlock(island, (CompoundTag) tag, offset);
                 }
                 callback.run();
             }, 1L);
@@ -59,7 +55,7 @@ public final class TagUtils {
         });
     }
 
-    public static void assignIntoBlock(CompoundTag compoundTag, Location offset){
+    public static void assignIntoBlock(Island island, CompoundTag compoundTag, Location offset){
         Map<String, Tag> compoundValue = compoundTag.getValue();
         Location blockLocation = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue()).addToLocation(offset);
         Block block = blockLocation.getBlock();
@@ -96,7 +92,9 @@ public final class TagUtils {
             Sign sign = (Sign) block.getState();
             for(int i = 0; i < 4; i++)
                 if(compoundValue.containsKey("signLine" + i))
-                    sign.setLine(i, ((StringTag) compoundValue.get("signLine" + i)).getValue());
+                    sign.setLine(i, ((StringTag) compoundValue.get("signLine" + i)).getValue()
+                            .replace("{player}", island == null ? "" : island.getOwner().getName())
+                            .replace("{island}", island == null ? "" : island.getName()));
             sign.update();
         }
     }

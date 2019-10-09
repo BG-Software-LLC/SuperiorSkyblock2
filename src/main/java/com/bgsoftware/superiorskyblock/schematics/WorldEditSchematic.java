@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -34,6 +35,11 @@ public final class WorldEditSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Location location, Runnable callback) {
+        pasteSchematic(null, location, callback);
+    }
+
+    @Override
+    public void pasteSchematic(Island island, Location location, Runnable callback) {
         EditSession editSession;
 
         try{
@@ -46,5 +52,4 @@ public final class WorldEditSchematic implements Schematic {
 
         editSession.addNotifyTask(callback);
     }
-
 }
