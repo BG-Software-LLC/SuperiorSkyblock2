@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -219,7 +220,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
             itemBuilder.replaceName("{0}", islandName)
                     .replaceName("{1}", String.valueOf(place))
                     .replaceName("{2}", island.getIslandLevelAsBigDecimal().toString())
-                    .replaceName("{3}", island.getWorthAsBigDecimal().toString());
+                    .replaceName("{3}", island.getWorthAsBigDecimal().toString())
+                    .replaceName("{4}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
+                    .replaceName("{5}", StringUtils.fancyFormat(island.getWorthAsBigDecimal()));
 
             if(itemStack.getItemMeta().hasLore()){
                 List<String> lore = new ArrayList<>();
