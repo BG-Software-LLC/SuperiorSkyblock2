@@ -321,6 +321,10 @@ public final class IslandsTopMenu extends SuperiorMenu {
         IslandsTopMenu.playerIslandSlot = cfg.getInt("top-islands.player-island-slot", -1);
     }
 
+    public static SuperiorMenu getMenu(){
+        return instance;
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SortingType sortingType){
         instance.reloadGUI(sortingType);
         instance.open(superiorPlayer, previousMenu, sortingType);

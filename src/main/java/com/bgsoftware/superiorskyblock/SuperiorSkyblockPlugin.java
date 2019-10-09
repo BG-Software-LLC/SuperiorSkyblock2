@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
@@ -9,6 +10,7 @@ import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
@@ -21,25 +23,6 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
-import com.bgsoftware.superiorskyblock.menu.BorderColorMenu;
-import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
-import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMainMissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandRateMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandRatingsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
-import com.bgsoftware.superiorskyblock.menu.MemberManageMenu;
-import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -71,6 +54,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private UpgradesHandler upgradesHandler;
     private ProvidersHandler providersHandler;
     private MissionsHandler missionsHandler;
+    private MenusHandler menusHandler;
 
     private NMSAdapter nmsAdapter;
 
@@ -184,8 +168,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
-
-        loadMenus();
+        menusHandler = new MenusHandler();
 
         Executor.sync(() -> {
             if (loadGrid)
@@ -207,26 +190,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR);
     }
 
-    private void loadMenus(){
-        BorderColorMenu.init();
-        ConfirmDisbandMenu.init();
-        GlobalWarpsMenu.init();
-        IslandBiomesMenu.init();
-        IslandCreationMenu.init();
-        IslandMainMissionsMenu.init();
-        IslandMembersMenu.init();
-        IslandMissionsMenu.init();
-        IslandPanelMenu.init();
-        IslandPermissionsMenu.init();
-        IslandRateMenu.init();
-        IslandRatingsMenu.init();
-        IslandsTopMenu.init();
-        IslandUpgradesMenu.init();
-        IslandValuesMenu.init();
-        IslandVisitorsMenu.init();
-        IslandWarpsMenu.init();
-        MemberManageMenu.init();
-        MemberRoleMenu.init();
+    @Override
+    public MenusManager getMenus() {
+        return menusHandler;
     }
 
     @Override
@@ -250,18 +216,22 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return settingsHandler;
     }
 
+    @Override
     public SchematicsHandler getSchematics() {
         return schematicsHandler;
     }
 
+    @Override
     public PlayersHandler getPlayers() {
         return playersHandler;
     }
 
+    @Override
     public GridHandler getGrid(){
         return gridHandler;
     }
 
+    @Override
     public BlockValuesHandler getBlockValues() {
         return blockValuesHandler;
     }

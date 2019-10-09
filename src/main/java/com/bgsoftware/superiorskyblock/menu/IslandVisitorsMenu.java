@@ -173,6 +173,10 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         slots.sort(Integer::compareTo);
     }
 
+    public static SuperiorMenu getMenu(Island island){
+        return new IslandVisitorsMenu(island);
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandVisitorsMenu(island).open(superiorPlayer, previousMenu);
     }

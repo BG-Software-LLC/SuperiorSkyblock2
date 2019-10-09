@@ -115,6 +115,10 @@ public final class IslandRateMenu extends SuperiorMenu {
         inventory.setItem(fiveStarsSlot, fiveStarsItem);
     }
 
+    public static SuperiorMenu getMenu(){
+        return instance;
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, Island island, SuperiorMenu previousMenu){
         instance.open(superiorPlayer, island, previousMenu);
     }

@@ -188,6 +188,10 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         GlobalWarpsMenu.slots = slots;
     }
 
+    public static SuperiorMenu getMenu(){
+        return new GlobalWarpsMenu();
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         new GlobalWarpsMenu().open(superiorPlayer, previousMenu);
     }

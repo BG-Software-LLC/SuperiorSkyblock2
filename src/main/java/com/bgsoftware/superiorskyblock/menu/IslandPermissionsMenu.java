@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,13 +41,11 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
     private Island island;
     private Object permissionHolder;
     private String permissionHolderName;
-    private SuperiorPlayer superiorPlayer;
 
     private int currentPage = 1;
 
-    private IslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, Object permissionHolder, String permissionHolderName){
+    private IslandPermissionsMenu(Island island, Object permissionHolder, String permissionHolderName){
         super("permissionsPage");
-        this.superiorPlayer = superiorPlayer;
         this.island = island;
         this.permissionHolder = permissionHolder;
         this.permissionHolderName = permissionHolderName;
@@ -54,6 +53,8 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
     @Override
     public void onClick(InventoryClickEvent e) {
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked().getUniqueId());
+
         if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
             if(e.getRawSlot() == currentSlot)
                 return;
@@ -193,7 +194,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
     }
 
     public static void init(){
-        IslandPermissionsMenu islandPanelMenu = new IslandPermissionsMenu(null, null, null, null);
+        IslandPermissionsMenu islandPanelMenu = new IslandPermissionsMenu(null, null, null);
 
         File file = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
 
@@ -242,8 +243,12 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
         }
     }
 
+    public static SuperiorMenu getMenu(Island island, Object permissionHolder, String permissionHolderName){
+        return new IslandPermissionsMenu(island, permissionHolder, permissionHolderName);
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island, Object permissionHolder, String permissionHolderName){
-        new IslandPermissionsMenu(superiorPlayer, island, permissionHolder, permissionHolderName).open(superiorPlayer, previousMenu);
+        new IslandPermissionsMenu(island, permissionHolder, permissionHolderName).open(superiorPlayer, previousMenu);
     }
 
 }

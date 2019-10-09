@@ -119,6 +119,10 @@ public final class IslandValuesMenu extends SuperiorMenu {
         IslandValuesMenu.countedBlocks = countedBlocks;
     }
 
+    public static SuperiorMenu getMenu(Island island){
+        return new IslandValuesMenu(island);
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandValuesMenu(island).open(superiorPlayer, previousMenu);
     }

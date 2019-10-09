@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.hamcrest.core.Is;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -170,6 +171,10 @@ public final class IslandMembersMenu extends SuperiorMenu {
         Arrays.stream(cfg.getString("members-panel.member-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
         //slots.sort(Integer::compareTo);
+    }
+
+    public static SuperiorMenu getMenu(Island island){
+        return new IslandMembersMenu(island);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

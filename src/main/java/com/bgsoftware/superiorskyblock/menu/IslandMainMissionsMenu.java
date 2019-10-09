@@ -60,6 +60,10 @@ public final class IslandMainMissionsMenu extends SuperiorMenu {
         islandMainMissionsMenu.addCommands(islandSlot, cfg.getStringList("main-panel.island-missions.commands"));
     }
 
+    public static SuperiorMenu getMenu(){
+        return new IslandMainMissionsMenu();
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         new IslandMainMissionsMenu().open(superiorPlayer, previousMenu);
     }

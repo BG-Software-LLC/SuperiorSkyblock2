@@ -85,6 +85,10 @@ public final class MemberManageMenu extends SuperiorMenu {
         return new MemberManageMenu(targetPlayer);
     }
 
+    public static SuperiorMenu getMenu(SuperiorPlayer targetPlayer){
+        return new MemberManageMenu(targetPlayer);
+    }
+
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){
         new MemberManageMenu(targetPlayer).open(superiorPlayer, previousMenu);
     }
