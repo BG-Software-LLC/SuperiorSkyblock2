@@ -42,8 +42,8 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
 import java.math.BigDecimal;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -251,6 +251,21 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
+    public void transferIsland(UUID oldOwner, UUID newOwner) {
+        islands.transferIsland(oldOwner, newOwner);
+    }
+
+    @Override
+    public int getSize() {
+        return islands.size();
+    }
+
+    @Override
+    public void sortIslands(SortingType sortingType) {
+        islands.sort(sortingType);
+    }
+
+    @Override
     public List<UUID> getAllIslands(){
         return getAllIslands(SortingTypes.BY_WORTH);
     }
@@ -326,7 +341,7 @@ public final class GridHandler implements GridManager {
         return material == Materials.SPAWNER.toBukkitType();
     }
 
-    public void loadGrid(ResultSet resultSet) throws SQLException{
+    public void loadGrid(ResultSet resultSet) throws SQLException {
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
 
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
@@ -505,17 +520,6 @@ public final class GridHandler implements GridManager {
             return stringBuilder.toString().substring(1);
         }
 
-    }
-
-    public IslandRegistry getIslandRegistry() {
-        return islands;
-    }
-
-    public List<Island> getListIslands(){
-        List<Island> islands = new ArrayList<>();
-        for (Island island : this.islands)
-            islands.add(island);
-        return islands;
     }
 
 }

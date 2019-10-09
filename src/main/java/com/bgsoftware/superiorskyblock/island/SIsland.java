@@ -1122,7 +1122,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         executeInsertStatement(true);
 
-        plugin.getGrid().getIslandRegistry().transferIsland(previousOwner.getUniqueId(), owner);
+        plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner);
 
         return true;
     }

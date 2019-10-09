@@ -89,6 +89,24 @@ public interface GridManager {
     Island getIslandAt(Location location);
 
     /**
+     * Transfer an island's leadership to another owner.
+     * @param oldOwner The old owner of the island.
+     * @param newOwner The new owner of the island.
+     */
+    void transferIsland(UUID oldOwner, UUID newOwner);
+
+    /**
+     * Get the amount of islands.
+     */
+    int getSize();
+
+    /**
+     * Sort the islands.
+     * @param sortingType The sorting type to use.
+     */
+    void sortIslands(SortingType sortingType);
+
+    /**
      * Get the spawn island object.
      */
     Island getSpawnIsland();

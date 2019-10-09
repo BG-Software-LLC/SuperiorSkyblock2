@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -161,9 +160,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
         inv.setContents(inventories.get(sortingType).getContents());
 
         if(playerIslandSlot != -1){
-            IslandRegistry islands = plugin.getGrid().getIslandRegistry();
             Island island = superiorPlayer.getIsland();
-            int i = island == null ? -1 : islands.indexOf(island, sortingType) + 1;
+            int i = island == null ? -1 : plugin.getGrid().getIslandPosition(island, sortingType) + 1;
             inv.setItem(playerIslandSlot, getTopItem(island, i));
         }
     }
@@ -174,14 +172,14 @@ public final class IslandsTopMenu extends SuperiorMenu {
             return;
         }
 
-        IslandRegistry islands = plugin.getGrid().getIslandRegistry();
-        islands.sort(sortingType);
+
+        plugin.getGrid().sortIslands(sortingType);
 
         ensureType(sortingType);
         Inventory inventory = inventories.get(sortingType);
 
         for(int i = 0; i < slots.length; i++){
-            Island island = i >= islands.size() ? null : islands.get(i, sortingType);
+            Island island = i >= plugin.getGrid().getSize() ? null : plugin.getGrid().getIsland(i, sortingType);
             ItemStack itemStack = getTopItem(island, i + 1);
             inventory.setItem(slots[i], itemStack);
         }

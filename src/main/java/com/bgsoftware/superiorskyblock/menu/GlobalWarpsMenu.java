@@ -48,7 +48,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            int islandsSize = (int) plugin.getGrid().getListIslands().stream()
+            int islandsSize = (int) plugin.getGrid().getIslands().stream()
                     .filter(island -> !island.getAllWarps().isEmpty()).count();
 
             boolean nextPage = slots.size() * currentPage < islandsSize;
@@ -198,7 +198,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     }
 
     private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer){
-        return plugin.getGrid().getListIslands().stream()
+        return plugin.getGrid().getIslands().stream()
                 .filter(island -> {
                     if(visitorWarps)
                         return island.getVisitorsLocation() != null;
