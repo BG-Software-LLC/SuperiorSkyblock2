@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -32,6 +33,7 @@ public final class IslandRateMenu extends SuperiorMenu {
     @Override
     public void onClick(InventoryClickEvent e) {
         Island island = islands.get(e.getWhoClicked().getUniqueId());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
         Rating rating = Rating.UNKNOWN;
 
         if(e.getRawSlot() == oneStarSlot)
@@ -48,9 +50,12 @@ public final class IslandRateMenu extends SuperiorMenu {
         if(rating == Rating.UNKNOWN)
             return;
 
-        island.setRating(e.getWhoClicked().getUniqueId(), rating);
+        island.setRating(superiorPlayer, rating);
 
         Locale.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
+
+        if(!Locale.RATE_ANNOUNCEMENT.isEmpty())
+            island.sendMessage(Locale.RATE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), rating.getValue()));
 
         e.getWhoClicked().closeInventory();
         super.onClick(e);
