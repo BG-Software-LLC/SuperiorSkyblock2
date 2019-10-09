@@ -682,6 +682,11 @@ public interface Island extends Comparable<Island> {
     boolean hasCompletedMission(Mission mission);
 
     /**
+     * Get the list of the completed missions of the player.
+     */
+    List<Mission> getCompletedMissions();
+
+    /**
      * The current biome of the island.
      */
     Biome getBiome();

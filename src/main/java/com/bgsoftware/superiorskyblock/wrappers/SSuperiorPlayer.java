@@ -29,9 +29,11 @@ import org.bukkit.entity.Player;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
@@ -350,6 +352,11 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public boolean hasCompletedMission(Mission mission) {
         return completedMissions.contains(mission.getName());
+    }
+
+    @Override
+    public List<Mission> getCompletedMissions() {
+        return completedMissions.stream().map(plugin.getMissions()::getMission).collect(Collectors.toList());
     }
 
     @Override

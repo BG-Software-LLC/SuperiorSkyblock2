@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface SuperiorPlayer {
@@ -282,5 +283,10 @@ public interface SuperiorPlayer {
      * @param mission The mission to check.
      */
     boolean hasCompletedMission(Mission mission);
+
+    /**
+     * Get the list of the completed missions of the player.
+     */
+    List<Mission> getCompletedMissions();
 
 }

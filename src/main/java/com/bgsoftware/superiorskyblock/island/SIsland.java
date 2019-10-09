@@ -60,6 +60,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SIsland extends DatabaseObject implements Island {
@@ -498,11 +499,19 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void disbandIsland(){
         getAllMembers().forEach(member -> {
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(member);
+
             if(members.contains(member))
-                kickMember(SSuperiorPlayer.of(member));
+                kickMember(superiorPlayer);
+
             if(plugin.getSettings().disbandInventoryClear)
-                plugin.getNMSAdapter().clearInventory(Bukkit.getOfflinePlayer(member));
+                plugin.getNMSAdapter().clearInventory(superiorPlayer.asOfflinePlayer());
+
+            superiorPlayer.getCompletedMissions().stream()
+                    .filter(mission -> plugin.getMissions().getMissionData(mission).disbandReset)
+                    .forEach(superiorPlayer::resetMission);
         });
+
         plugin.getGrid().deleteIsland(this);
         if(!Bukkit.getBukkitVersion().contains("1.14")) {
             for (Chunk chunk : getAllChunks(true))
@@ -1253,6 +1262,11 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean hasCompletedMission(Mission mission) {
         return completedMissions.contains(mission.getName());
+    }
+
+    @Override
+    public List<Mission> getCompletedMissions() {
+        return completedMissions.stream().map(plugin.getMissions()::getMission).collect(Collectors.toList());
     }
 
     @Override

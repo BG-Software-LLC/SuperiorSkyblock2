@@ -251,8 +251,8 @@ public final class MissionsHandler implements MissionsManager {
         private final Mission mission;
         private final List<ItemStack> itemRewards = new ArrayList<>();
         private final List<String> commandRewards = new ArrayList<>();
-        private final boolean autoReward;
-        private final boolean islandMission;
+        private final boolean autoReward, islandMission;
+        public final boolean disbandReset;
         public final ItemStack notCompleted, canComplete, completed;
 
         MissionData(Mission mission, ConfigurationSection section){
@@ -260,6 +260,7 @@ public final class MissionsHandler implements MissionsManager {
             this.mission = mission;
             this.islandMission = section.getBoolean("island", false);
             this.autoReward = section.getBoolean("auto-reward", true);
+            this.disbandReset = section.getBoolean("disband-reset", false);
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {

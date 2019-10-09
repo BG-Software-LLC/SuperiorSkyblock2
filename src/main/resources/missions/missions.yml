@@ -69,6 +69,7 @@ cobble-miner:
   mission-file: ItemsMissions
   island: false
   auto-reward: false
+  disband-reset: true
   rewards:
     commands:
       - 'eco give %player% 500'
