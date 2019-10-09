@@ -71,7 +71,11 @@ public final class CmdShow implements ICommand {
                 return;
             }
 
-            island = SSuperiorPlayer.of(sender).getIsland();
+            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+
+            Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+
+            island = locationIsland == null ? superiorPlayer.getIsland() : locationIsland;
         }
         else{
             targetPlayer = SSuperiorPlayer.of(args[1]);
