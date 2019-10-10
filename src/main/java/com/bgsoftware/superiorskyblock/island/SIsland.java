@@ -450,7 +450,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
-        SPermissionNode permissionNode = permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), new SPermissionNode(""));
+        SPermissionNode permissionNode = permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), new SPermissionNode("", null));
 
         permissionNode.setPermission(islandPermission, value);
 
@@ -470,7 +470,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public SPermissionNode getPermissionNode(PlayerRole playerRole) {
-        return permissionNodes.get(playerRole).clone();
+        return permissionNodes.get(playerRole);
     }
 
     @Override
@@ -487,14 +487,9 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
-        PlayerRole playerRole = SPlayerRole.lastRole();
-
-        for(PlayerRole _islandRole : plugin.getPlayers().getRoles()){
-            if(_islandRole.isLessThan(playerRole) && permissionNodes.get(_islandRole).hasPermission(islandPermission))
-                playerRole = _islandRole;
-        }
-
-        return playerRole;
+        return plugin.getPlayers().getRoles().stream()
+                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPermission))
+                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 
     @Override
@@ -1381,7 +1376,8 @@ public class SIsland extends DatabaseObject implements Island {
 
         for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
             if(!permissionNodes.containsKey(playerRole)) {
-                permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions()));
+                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+                permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
                 save = true;
             }
         }

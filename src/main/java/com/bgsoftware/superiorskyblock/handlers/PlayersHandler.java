@@ -18,11 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler implements PlayersManager {
 
-    private static final int GUEST_ROLE_INDEX = -1, COOP_ROLE_INDEX = -2;
+    private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
@@ -93,7 +94,7 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public List<PlayerRole> getRoles(){
-        return new ArrayList<>(roles.values());
+        return new ArrayList<>(roles.keySet()).stream().sorted().map(roles::get).collect(Collectors.toList());
     }
 
 

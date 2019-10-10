@@ -51,6 +51,12 @@ permissions-gui:
         lore:
           - '&7Access to all the abilities of the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: BEDROCK
+        name: '&6All'
+        lore:
+          - '&7Access to all the abilities of the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -75,6 +81,12 @@ permissions-gui:
         lore:
           - '&7Access to breed animals inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        name: '&6Animal Breed'
+        type: WHEAT
+        lore:
+          - '&7Access to breed animals inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -99,6 +111,12 @@ permissions-gui:
         lore:
           - '&7Access to damage animals inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DIAMOND_SWORD
+        name: '&6Animal Damage'
+        lore:
+          - '&7Access to damage animals inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -123,6 +141,12 @@ permissions-gui:
         lore:
           - '&7Access to ban members from the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: SKULL_ITEM
+        name: '&6Ban Member'
+        lore:
+          - '&7Access to ban members from the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -147,6 +171,12 @@ permissions-gui:
         lore:
           - '&7Access to break blocks inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DIAMOND_PICKAXE
+        name: '&6Break'
+        lore:
+          - '&7Access to break blocks inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -171,6 +201,12 @@ permissions-gui:
         lore:
           - '&7Access to place blocks inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: COBBLESTONE
+        name: '&6Build'
+        lore:
+          - '&7Access to place blocks inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -195,6 +231,12 @@ permissions-gui:
         lore:
           - '&7Access to change the island''s name.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: NAME_TAG
+        name: '&6Change Name'
+        lore:
+          - '&7Access to change the island''s name.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -219,6 +261,12 @@ permissions-gui:
         lore:
           - '&7Access to check other members'' permissions.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: COMPASS
+        name: '&6Check Permission'
+        lore:
+          - '&7Access to check other members'' permissions.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -243,6 +291,12 @@ permissions-gui:
         lore:
           - '&7Access to open chests inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: CHEST
+        name: '&6Chest Access'
+        lore:
+          - '&7Access to open chests inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -267,6 +321,12 @@ permissions-gui:
         lore:
           - '&7Access to bypass the island''s lock.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: TRIPWIRE_HOOK
+        name: '&6Locked Bypass'
+        lore:
+          - '&7Access to bypass the island''s lock.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -291,6 +351,12 @@ permissions-gui:
         lore:
           - '&7Access to lock the island from public.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: BARRIER
+        name: '&6Lock Island'
+        lore:
+          - '&7Access to lock the island from public.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -315,6 +381,12 @@ permissions-gui:
         lore:
           - '&7Access to add a player as a co-op member.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: GOLDEN_APPLE
+        name: '&6Coop Member'
+        lore:
+          - '&7Access to add a player as a co-op member.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -339,6 +411,12 @@ permissions-gui:
         lore:
           - '&7Access to delete island warps.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: ENDER_PEARL
+        name: '&6Delete Warp'
+        lore:
+          - '&7Access to delete island warps.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -363,6 +441,12 @@ permissions-gui:
         lore:
           - '&7Access to demote members inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: IRON_INGOT
+        name: '&6Demote Members'
+        lore:
+          - '&7Access to demote members inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -387,6 +471,12 @@ permissions-gui:
         lore:
           - '&7Access to deposit money into the island''s bank.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: MAP
+        name: '&6Deposit Money'
+        lore:
+          - '&7Access to deposit money into the island''s bank.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -411,6 +501,12 @@ permissions-gui:
         lore:
           - '&7Access to disband the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: TNT
+        name: '&6Disband Island'
+        lore:
+          - '&7Access to disband the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -437,6 +533,13 @@ permissions-gui:
         lore:
           - '&7Access to check the island''s linked discord.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: STAINED_CLAY
+        data: 3
+        name: '&6Discord Show'
+        lore:
+          - '&7Access to check the island''s linked discord.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -461,6 +564,12 @@ permissions-gui:
         lore:
           - '&7Access to drop items inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: ARROW
+        name: '&6Drop Items'
+        lore:
+          - '&7Access to drop items inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -485,6 +594,12 @@ permissions-gui:
         lore:
           - '&7Access to bypass from being expelled.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: FEATHER
+        name: '&6Expel Bypass'
+        lore:
+          - '&7Access to bypass from being expelled.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -509,6 +624,12 @@ permissions-gui:
         lore:
           - '&7Access to expel players from the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DISPENSER
+        name: '&6Expel Players'
+        lore:
+          - '&7Access to expel players from the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -533,6 +654,12 @@ permissions-gui:
         lore:
           - '&7Access to tramp farmlands inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: SOIL
+        name: '&6Farm Tramping'
+        lore:
+          - '&7Access to tramp farmlands inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -557,6 +684,12 @@ permissions-gui:
         lore:
           - '&7Access to interact with blocks inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: PISTON_BASE
+        name: '&6Interact'
+        lore:
+          - '&7Access to interact with blocks inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -583,6 +716,13 @@ permissions-gui:
         lore:
           - '&7Access to invite new members to the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: SKULL_ITEM
+        data: 3
+        name: '&6Invite Member'
+        lore:
+          - '&7Access to invite new members to the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -607,6 +747,12 @@ permissions-gui:
         lore:
           - '&7Access to interact with item frames inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: ITEM_FRAME
+        name: '&6Item Frame'
+        lore:
+          - '&7Access to interact with item frames inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -631,6 +777,12 @@ permissions-gui:
         lore:
           - '&7Access to kick members from the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: SKULL_ITEM
+        name: '&6Kick Member'
+        lore:
+          - '&7Access to kick members from the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -655,6 +807,12 @@ permissions-gui:
         lore:
           - '&7Access to kick members from the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: REDSTONE_TORCH_ON
+        name: '&6Open Island'
+        lore:
+          - '&7Access to kick members from the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -679,6 +837,12 @@ permissions-gui:
         lore:
           - '&7Access to interact with paintings inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: PAINTING
+        name: '&6Painting'
+        lore:
+          - '&7Access to interact with paintings inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -705,6 +869,13 @@ permissions-gui:
         lore:
           - '&7Access to check the island''s linked paypal.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: WOOL
+        data: 11
+        name: '&6Paypal Show'
+        lore:
+          - '&7Access to check the island''s linked paypal.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -729,6 +900,12 @@ permissions-gui:
         lore:
           - '&7Access to pickup items inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: HOPPER
+        name: '&6Pickup Drops'
+        lore:
+          - '&7Access to pickup items inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -753,6 +930,12 @@ permissions-gui:
         lore:
           - '&7Access to promote members inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DIAMOND
+        name: '&6Promote Members'
+        lore:
+          - '&7Access to promote members inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -777,6 +960,12 @@ permissions-gui:
         lore:
           - '&7Access to rankup island''s upgrades.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: GOLD_INGOT
+        name: '&6Upgrades Rankup'
+        lore:
+          - '&7Access to rankup island''s upgrades.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -801,6 +990,12 @@ permissions-gui:
         lore:
           - '&7Access to see all island''s ratings.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: NETHER_STAR
+        name: '&6Ratings Show'
+        lore:
+          - '&7Access to see all island''s ratings.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -825,6 +1020,12 @@ permissions-gui:
         lore:
           - '&7Access to change the island''s biome.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: GRASS
+        name: '&6Set Biome'
+        lore:
+          - '&7Access to change the island''s biome.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -851,6 +1052,13 @@ permissions-gui:
         lore:
           - '&7Access to change the discord linked to the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: STAINED_CLAY
+        data: 3
+        name: '&6Set Discord'
+        lore:
+          - '&7Access to change the discord linked to the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -875,6 +1083,12 @@ permissions-gui:
         lore:
           - '&7Access to change the home location of the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: BED
+        name: '&6Set Home'
+        lore:
+          - '&7Access to change the home location of the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -901,6 +1115,13 @@ permissions-gui:
         lore:
           - '&7Access to change the paypal linked to the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: WOOL
+        data: 11
+        name: '&6Set Paypal'
+        lore:
+          - '&7Access to change the paypal linked to the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -925,6 +1146,12 @@ permissions-gui:
         lore:
           - '&7Access to change permissions for island members.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DIODE
+        name: '&6Set Permission'
+        lore:
+          - '&7Access to change permissions for island members.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -949,6 +1176,12 @@ permissions-gui:
         lore:
           - '&7Access to change roles for island members.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: DIAMOND_CHESTPLATE
+        name: '&6Set Role'
+        lore:
+          - '&7Access to change roles for island members.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -973,6 +1206,12 @@ permissions-gui:
         lore:
           - '&7Access to set new warps for the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: EYE_OF_ENDER
+        name: '&6Set Warp'
+        lore:
+          - '&7Access to set new warps for the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -997,6 +1236,12 @@ permissions-gui:
         lore:
           - '&7Access to remove co-op members from the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: GOLDEN_APPLE
+        name: '&6Uncoop Member'
+        lore:
+          - '&7Access to remove co-op members from the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1021,6 +1266,12 @@ permissions-gui:
         lore:
           - '&7Access to interact with signs inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: SIGN
+        name: '&6Sign Interact'
+        lore:
+          - '&7Access to interact with signs inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1045,6 +1296,12 @@ permissions-gui:
         lore:
           - '&7Access to use different blocks inside the island.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: STONE_BUTTON
+        name: '&6Use'
+        lore:
+          - '&7Access to use different blocks inside the island.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1069,6 +1326,12 @@ permissions-gui:
         lore:
           - '&7Access to withdraw money from the island''s bank.'
           - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: EMERALD
+        name: '&6Withdraw Money'
+        lore:
+          - '&7Access to withdraw money from the island''s bank.'
+          - '&7Role: &e{}&7.'
       has-access:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP

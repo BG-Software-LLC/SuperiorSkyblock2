@@ -97,12 +97,12 @@ public final class MenusHandler implements MenusManager {
 
     @Override
     public void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, PlayerRole playerRole) {
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, playerRole, playerRole.toString());
+        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, playerRole);
     }
 
     @Override
     public void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, targetPlayer, targetPlayer.getName());
+        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, targetPlayer);
     }
 
     @Override

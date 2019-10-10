@@ -22,7 +22,7 @@ public final class ItemBuilder {
 
     public ItemBuilder(ItemStack itemStack){
         this(itemStack.getType(), itemStack.getDurability());
-        this.itemMeta = itemStack.getItemMeta();
+        this.itemMeta = itemStack.getItemMeta().clone();
     }
 
     public ItemBuilder(Material type){
@@ -84,6 +84,10 @@ public final class ItemBuilder {
 
         withLore(loreList);
         return this;
+    }
+
+    public ItemBuilder replaceLoreWithLines(String regex, List<String> lines){
+        return replaceLoreWithLines(regex, lines.toArray(new String[0]));
     }
 
     public ItemBuilder replaceLoreWithLines(String regex, String... lines){

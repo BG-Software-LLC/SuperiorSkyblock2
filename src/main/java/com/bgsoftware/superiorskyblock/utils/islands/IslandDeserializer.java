@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
@@ -10,11 +12,14 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 public final class IslandDeserializer {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void deserializeMembers(String members, Set<UUID> membersSet){
         for(String uuid : members.split(",")) {
@@ -29,15 +34,22 @@ public final class IslandDeserializer {
     }
 
     public static void deserializePermissions(String permissions, Map<Object, SPermissionNode> permissionNodes){
+        Map<PlayerRole, String> permissionsMap = new HashMap<>();
+
         for(String entry : permissions.split(",")) {
             try {
                 String[] sections = entry.split("=");
                 try {
-                    permissionNodes.put(SPlayerRole.of(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+                    permissionsMap.put(SPlayerRole.of(sections[0]), sections.length == 1 ? "" : sections[1]);
                 }catch(Exception ex){
-                    permissionNodes.put(UUID.fromString(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1]));
+                    permissionNodes.put(UUID.fromString(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1], null));
                 }
             }catch(Exception ignored){}
+        }
+
+        for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
+            PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+            permissionNodes.put(playerRole, new SPermissionNode(permissionsMap.getOrDefault(playerRole, ""), permissionNodes.get(previousRole)));
         }
     }
 

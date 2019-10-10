@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -32,7 +31,7 @@ public final class CmdPermissions implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island permissions <island-role/player-name>";
+        return "island permissions [player-name]";
     }
 
     @Override
@@ -42,7 +41,7 @@ public final class CmdPermissions implements ICommand {
 
     @Override
     public int getMinArgs() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -65,22 +64,14 @@ public final class CmdPermissions implements ICommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION) &&
-                !superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
+        if(!superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
             Locale.NO_PERMISSION_CHECK_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_PERMISSION));
             return;
         }
 
-        PlayerRole holderRole = null;
-        Object permissionHolder;
-        String permissionHolderName;
+        Object permissionHolder = SPlayerRole.guestRole();
 
-        //Checks if entered an island role.
-        try{
-            holderRole = SPlayerRole.of(args[1]);
-            permissionHolder = holderRole;
-            permissionHolderName = holderRole.toString();
-        }catch(IllegalArgumentException ex){
+        if(args.length == 2){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
             if(targetPlayer == null){
@@ -88,17 +79,15 @@ public final class CmdPermissions implements ICommand {
                 return;
             }
 
-            holderRole = targetPlayer.getPlayerRole();
+            if(!superiorPlayer.getPlayerRole().isHigherThan(targetPlayer.getPlayerRole())){
+                Locale.CHANGE_PERMISSION_FOR_HIGHER_ROLE.send(superiorPlayer);
+                return;
+            }
+
             permissionHolder = targetPlayer;
-            permissionHolderName = targetPlayer.getName();
         }
 
-        if(!superiorPlayer.getPlayerRole().isHigherThan(holderRole)){
-            Locale.CHANGE_PERMISSION_FOR_HIGHER_ROLE.send(superiorPlayer);
-            return;
-        }
-
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, permissionHolder, permissionHolderName);
+        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, permissionHolder);
     }
 
     @Override
@@ -106,14 +95,8 @@ public final class CmdPermissions implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.CHECK_PERMISSION)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
             List<String> list = new ArrayList<>();
-
-            for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-                String roleName = playerRole.toString().trim().toLowerCase();
-                if(roleName.startsWith(args[1].toLowerCase()))
-                    list.add(roleName);
-            }
 
             for(Player player : Bukkit.getOnlinePlayers()){
                 if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
