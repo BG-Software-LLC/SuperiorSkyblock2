@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
+import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
@@ -498,19 +499,21 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void disbandIsland(){
-        getAllMembers().forEach(member -> {
+        for (UUID member : getAllMembers()) {
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(member);
 
-            if(members.contains(member))
+            if (members.contains(member))
                 kickMember(superiorPlayer);
 
-            if(plugin.getSettings().disbandInventoryClear)
+            if (plugin.getSettings().disbandInventoryClear)
                 plugin.getNMSAdapter().clearInventory(superiorPlayer.asOfflinePlayer());
 
-            superiorPlayer.getCompletedMissions().stream()
-                    .filter(mission -> plugin.getMissions().getMissionData(mission).disbandReset)
-                    .forEach(superiorPlayer::resetMission);
-        });
+            superiorPlayer.getCompletedMissions().forEach(mission -> {
+                MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
+                if (missionData != null && missionData.disbandReset)
+                    superiorPlayer.resetMission(mission);
+            });
+        }
 
         plugin.getGrid().deleteIsland(this);
         if(!Bukkit.getBukkitVersion().contains("1.14")) {
