@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
@@ -263,7 +264,7 @@ public final class PlayersListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island != null && !island.hasPermission(damagerPlayer, IslandPermission.ANIMAL_DAMAGE)){
+        if(island != null && !island.hasPermission(damagerPlayer, e.getEntity() instanceof Animals ? IslandPermission.ANIMAL_DAMAGE : IslandPermission.MONSTER_DAMAGE)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(damagerPlayer);
         }

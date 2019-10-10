@@ -26,6 +26,7 @@ public enum IslandPermission {
     INVITE_MEMBER,
     ITEM_FRAME,
     KICK_MEMBER,
+    MONSTER_DAMAGE,
     OPEN_ISLAND,
     PAINTING,
     PAYPAL_SHOW,
