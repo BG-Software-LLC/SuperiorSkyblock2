@@ -75,14 +75,14 @@ public final class CmdShow implements ICommand {
 
             Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-            island = locationIsland == null ? superiorPlayer.getIsland() : locationIsland;
+            island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
         }
         else{
             targetPlayer = SSuperiorPlayer.of(args[1]);
             island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
         }
 
-        if(island == null || island.isSpawn()){
+        if(island == null){
             if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
                 Locale.INVALID_ISLAND.send(sender);
             else if(targetPlayer == null)
