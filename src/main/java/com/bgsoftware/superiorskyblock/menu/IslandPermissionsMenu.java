@@ -39,6 +39,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
     private static List<Integer> slots;
     private static int previousSlot, currentSlot, nextSlot;
     private static ItemStack previousButton, currentButton, nextButton;
+    private static List<IslandPermission> islandPermissions;
 
     private Island island;
     private Object permissionHolder;
@@ -59,7 +60,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            boolean nextPage = slots.size() * currentPage < IslandPermission.values().length;
+            boolean nextPage = slots.size() * currentPage < islandPermissions.size();
 
             if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
                 return;
@@ -70,14 +71,14 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
             if(e.getCurrentItem() == null)
                 return;
 
-            int permissionsAmount = IslandPermission.values().length;
+            int permissionsAmount = islandPermissions.size();
 
             int indexOf = slots.indexOf(e.getRawSlot());
 
             if(indexOf >= permissionsAmount || indexOf == -1)
                 return;
 
-            IslandPermission permission = IslandPermission.values()[indexOf + (slots.size() * (currentPage - 1))];
+            IslandPermission permission = islandPermissions.get(indexOf + (slots.size() * (currentPage - 1)));
             String permissionName = permission.name().toLowerCase();
             String permissionHolderName = "";
 
@@ -188,10 +189,10 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), title);
         inv.setContents(inventory.getContents());
 
-        int permissionsAmount = IslandPermission.values().length;
+        int permissionsAmount = islandPermissions.size();
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < permissionsAmount; i++){
-            IslandPermission permission = IslandPermission.values()[i + (slots.size() * (page - 1))];
+            IslandPermission permission = islandPermissions.get(i + (slots.size() * (page - 1)));
             inv.setItem(slots.get(i), getItem(permission));
         }
 
@@ -222,22 +223,13 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
             if (permissionsData.containsKey(permissionName + "-role-permission")) {
                 PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
                 permissionItem = new ItemBuilder(get(permissionName + "-role-permission", ItemStack.class))
-                        .replaceAll("{%}", StringUtils.format(permissionName))
                         .replaceAll("{}", requiredRole.toString()).build();
             }
         }
         else{
             if (permissionsData.containsKey(permissionName + "-permission-enabled")) {
                 boolean hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(islandPermission);
-
-                Object permissionItemObject = get(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"), Object.class);
-
-                if(permissionItemObject instanceof ItemStack){
-                    permissionItem = (ItemStack) permissionItemObject;
-                }
-                else{
-                    permissionItem = ((ItemBuilder) permissionItemObject).copy().replaceAll("{}", StringUtils.format(permissionName)).build();
-                }
+                permissionItem = get(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"), ItemStack.class);
             }
         }
 
@@ -277,6 +269,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
         ConfigurationSection section = cfg.getConfigurationSection("permissions-gui.permissions");
 
+        islandPermissions = new ArrayList<>();
         for(IslandPermission islandPermission : IslandPermission.values()){
             String permission = islandPermission.name().toLowerCase();
             if(section.contains(permission)){
@@ -292,17 +285,18 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
                     permissionsData.put(permission + "-role-permission",
                             FileUtils.getItemStack(section.getConfigurationSection(permission + ".role-permission")));
                 }
-                else{
-                    permissionsData.put(permission + "-role-permission",
-                            new ItemBuilder(Material.BEDROCK).withName("&6{%}").withLore("&eRole: {}", "&7Currently &cDISABLED&7.").build());
-                }
+                islandPermissions.add(islandPermission);
+//                else{
+//                    permissionsData.put(permission + "-role-permission",
+//                            new ItemBuilder(Material.BEDROCK).withName("&6{%}").withLore("&eRole: {}", "&7Currently &cDISABLED&7.").build());
+//                }
             }
-            else{
-                permissionsData.put(permission + "-permission-enabled",
-                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &aENABLED&7."));
-                permissionsData.put(permission + "-permission-disabled",
-                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &cDISABLED&7."));
-            }
+//            else if(c){
+//                permissionsData.put(permission + "-permission-enabled",
+//                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &aENABLED&7."));
+//                permissionsData.put(permission + "-permission-disabled",
+//                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &cDISABLED&7."));
+//            }
         }
     }
 
