@@ -1292,6 +1292,36 @@ permissions-gui:
           volume: 0.2
           pitch: 0.2
 
+    set_settings:
+      permission-enabled:
+        type: LEVER
+        name: '&6Set Settings'
+        lore:
+          - '&7Access to change settings for islands.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: LEVER
+        name: '&6Set Settings'
+        lore:
+          - '&7Access to change settings for islands.'
+          - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: LEVER
+        name: '&6Set Settings'
+        lore:
+          - '&7Access to change settings for islands.'
+          - '&7Role: &e{}&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
     set_warp:
       permission-enabled:
         type: EYE_OF_ENDER

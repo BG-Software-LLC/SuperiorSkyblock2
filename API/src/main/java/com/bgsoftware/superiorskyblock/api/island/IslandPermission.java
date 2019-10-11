@@ -42,6 +42,7 @@ public enum IslandPermission {
     SET_PAYPAL,
     SET_PERMISSION,
     SET_ROLE,
+    SET_SETTINGS,
     SET_WARP,
     SIGN_INTERACT,
     UNCOOP_MEMBER,

@@ -107,6 +107,7 @@ COMMAND_DESCRIPTION_PROMOTE: 'Promote a member in your island.'
 COMMAND_DESCRIPTION_RANKUP: 'Level up an upgrade.'
 COMMAND_DESCRIPTION_RATE: 'Rate an island.'
 COMMAND_DESCRIPTION_RATINGS: 'Show all island ratings.'
+COMMAND_DESCRIPTION_SETTINGS: 'Open the settings menu.'
 COMMAND_DESCRIPTION_RECALC: 'Re-calculates the island worth.'
 COMMAND_DESCRIPTION_SET_DISCORD: 'Set the discord of the island for island payouts.'
 COMMAND_DESCRIPTION_SET_PAYPAL: 'Set the paypal email of the island for island payouts.'
@@ -300,6 +301,7 @@ NO_SET_DISCORD_PERMISSION: '&c&lError | &7You must be at least {0} in order to c
 NO_SET_HOME_PERMISSION: '&c&lError | &7You must be at least {0} in order to set the teleport location of the island.'
 NO_SET_PAYPAL_PERMISSION: '&c&lError | &7You must be at least {0} in order to change island paypal email.'
 NO_SET_ROLE_PERMISSION: '&c&lError | &7You must be at least {0} in order to set roles for players.'
+NO_SET_SETTINGS_PERMISSION: '&c&lError | &7You must be at least {0} in order to change island settings.'
 NO_SET_WARP_PERMISSION: '&c&lError | &7You must be at least {0} in order to set island warps.'
 NO_TRANSFER_PERMISSION: '&c&lError | &7You must be the island''s leader in order to transfer the leadership.'
 NO_UNCOOP_PERMISSION: '&c&lError | &7You must be at least {0} in order to remove players from being co-op members.'
@@ -390,6 +392,7 @@ UNCOOP_LEFT_ANNOUNCEMENT: '&e&lIsland | &7{0} left the game and is no longer a c
 UNKNOWN_COMMAND: '&cUnknown command. Type "/island help" for help.'
 UNSAFE_WARP: '&e&lIsland | &7&oLooks like this warp is unsafe. Please try another warp.'
 UPDATED_PERMISSION: '&e&lIsland | &7Updated permissions for {0}.'
+UPDATED_SETTINGS: '&e&lIsland | &7Updated the island settings {0}.'
 WARP_ALREADY_EXIST: '&c&lError | &7There is already a warp with this name.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBank | &7Island bank has only {0} dollars inside it.

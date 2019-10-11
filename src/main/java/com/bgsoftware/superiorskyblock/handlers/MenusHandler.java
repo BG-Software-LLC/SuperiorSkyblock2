@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandRateMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandRatingsMenu;
+import com.bgsoftware.superiorskyblock.menu.IslandSettingsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
@@ -41,6 +42,7 @@ public final class MenusHandler implements MenusManager {
         IslandPermissionsMenu.init();
         IslandRateMenu.init();
         IslandRatingsMenu.init();
+        IslandSettingsMenu.init();
         IslandsTopMenu.init();
         IslandUpgradesMenu.init();
         IslandValuesMenu.init();

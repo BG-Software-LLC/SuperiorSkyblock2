@@ -191,7 +191,9 @@ public final class DataHandler {
     }
 
     private String getDefaultSettings() {
-        return "NATURAL_ANIMALS_SPAWN;NATURAL_MONSTER_SPAWN;SPAWNER_ANIMALS_SPAWN;SPAWNER_MONSTER_SPAWN;WATER_FLOW;LAVA_FLOW;CROPS_GROWTH;TREE_GROWTH;FIRE_SPREAD;EGG_LAY";
+        StringBuilder stringBuilder = new StringBuilder();
+        plugin.getSettings().defaultSettings.forEach(setting -> stringBuilder.append(";").append(setting));
+        return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
     }
 
     public void closeConnection(){

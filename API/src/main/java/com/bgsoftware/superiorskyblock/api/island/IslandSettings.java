@@ -2,12 +2,6 @@ package com.bgsoftware.superiorskyblock.api.island;
 
 public enum IslandSettings {
 
-    NATURAL_ANIMALS_SPAWN,
-    NATURAL_MONSTER_SPAWN,
-    SPAWNER_ANIMALS_SPAWN,
-    SPAWNER_MONSTER_SPAWN,
-    WATER_FLOW,
-    LAVA_FLOW,
     ALWAYS_DAY,
     ALWAYS_MIDDLE_DAY,
     ALWAYS_NIGHT,
@@ -15,9 +9,15 @@ public enum IslandSettings {
     ALWAYS_RAIN,
     ALWAYS_SHINY,
     CROPS_GROWTH,
-    TREE_GROWTH,
+    EGG_LAY,
     FIRE_SPREAD,
+    LAVA_FLOW,
+    NATURAL_ANIMALS_SPAWN,
+    NATURAL_MONSTER_SPAWN,
     PVP,
-    EGG_LAY
+    SPAWNER_ANIMALS_SPAWN,
+    SPAWNER_MONSTER_SPAWN,
+    TREE_GROWTH,
+    WATER_FLOW
 
 }

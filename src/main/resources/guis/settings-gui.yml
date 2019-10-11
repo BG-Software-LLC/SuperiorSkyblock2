@@ -1,0 +1,357 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+settings-gui:
+  title: '&lIsland Settings'
+  size: 5
+
+  fill-items:
+    '1':
+      slots: 0,1,2,3,4,5,6,7,8,9,17,18,26,27,35,36,37,39,41,43,44
+      type: STAINED_GLASS_PANE
+      data: 3
+
+  slots: 10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34
+
+  previous-page:
+    slot: 38
+    sound: ''
+    type: PAPER
+    name: '{0}Previous Page'
+
+  current-page:
+    slot: 40
+    sound: ''
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+
+  next-page:
+    slot: 42
+    sound: ''
+    type: PAPER
+    name: '{0}Next Page'
+
+  settings:
+    always_day:
+      settings-enabled:
+        type: STAINED_CLAY
+        data: 4
+        name: '&6Always Day'
+        lore:
+          - '&7Set a day time on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: STAINED_CLAY
+        data: 4
+        name: '&6Always Day'
+        lore:
+          - '&7Set a day time on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    always_middle_day:
+      settings-enabled:
+        type: STAINED_CLAY
+        data: 1
+        name: '&6Always Middle Day'
+        lore:
+          - '&7Set a middle day time on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: STAINED_CLAY
+        data: 1
+        name: '&6Always Middle Day'
+        lore:
+          - '&7Set a middle day time on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    always_night:
+      settings-enabled:
+        type: STAINED_CLAY
+        data: 3
+        name: '&6Always Night'
+        lore:
+          - '&7Set a night time on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: STAINED_CLAY
+        data: 3
+        name: '&6Always Night'
+        lore:
+          - '&7Set a night time on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    always_middle_night:
+      settings-enabled:
+        type: STAINED_CLAY
+        data: 11
+        name: '&6Always Middle Night'
+        lore:
+          - '&7Set a middle night day time on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: STAINED_CLAY
+        data: 11
+        name: '&6Always Middle Night'
+        lore:
+          - '&7Set a middle night day time on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    always_rain:
+      settings-enabled:
+        type: WATER_LILY
+        name: '&6Always Rain'
+        lore:
+          - '&7Set a rainy weather on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: WATER_LILY
+        name: '&6Always Rain'
+        lore:
+          - '&7Set a rainy weather on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    always_shiny:
+      settings-enabled:
+        type: DEAD_BUSH
+        name: '&6Always Shiny'
+        lore:
+          - '&7Set a shiny weather on your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: DEAD_BUSH
+        name: '&6Always Shiny'
+        lore:
+          - '&7Set a shiny weather on your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    crops_growth:
+      settings-enabled:
+        type: SEEDS
+        name: '&6Crops Growth'
+        lore:
+          - '&7Allow growth of crops inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: SEEDS
+        name: '&6Crops Growth'
+        lore:
+          - '&7Allow growth of crops inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    egg_lay:
+      settings-enabled:
+        type: EGG
+        name: '&6Egg Lay'
+        lore:
+          - '&7Allow chickens to lay eggs inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: EGG
+        name: '&6Egg Lay'
+        lore:
+          - '&7Allow chickens to lay eggs inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    fire_spread:
+      settings-enabled:
+        type: FLINT_AND_STEEL
+        name: '&6Fire Spread'
+        lore:
+          - '&7Allow fire to spread inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: FLINT_AND_STEEL
+        name: '&6Fire Spread'
+        lore:
+          - '&7Allow fire to spread inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    lava_flow:
+      settings-enabled:
+        type: LAVA_BUCKET
+        name: '&6Lava Flow'
+        lore:
+          - '&7Allow lava to flow inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: LAVA_BUCKET
+        name: '&6Lava Flow'
+        lore:
+          - '&7Allow lava to flow inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    natural_animals_spawn:
+      settings-enabled:
+        type: MONSTER_EGG
+        data: 90
+        name: '&6Natural Animals Spawn'
+        lore:
+          - '&7Allow natural spawning of animals inside the island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: MONSTER_EGG
+        data: 90
+        name: '&6Natural Animals Spawn'
+        lore:
+          - '&7Allow natural spawning of animals inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    natural_monster_spawn:
+      settings-enabled:
+        type: MONSTER_EGG
+        data: 54
+        name: '&6Natural Monster Spawn'
+        lore:
+          - '&7Allow natural spawning of monsters inside the island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: MONSTER_EGG
+        data: 54
+        name: '&6Natural Monster Spawn'
+        lore:
+          - '&7Allow natural spawning of monsters inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    pvp:
+      settings-enabled:
+        type: DIAMOND_SWORD
+        name: '&6PvP'
+        lore:
+          - '&7Allow players to pvp inside the island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: DIAMOND_SWORD
+        name: '&6PvP'
+        lore:
+          - '&7Allow players to pvp inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    spawner_animals_spawn:
+      settings-enabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Animals Spawn'
+        lore:
+          - '&7Allow spawner spawning of animals inside the island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Animals Spawn'
+        lore:
+          - '&7Allow spawner spawning of animals inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    spawner_monster_spawn:
+      settings-enabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Monster Spawn'
+        lore:
+          - '&7Allow spawner spawning of monsters inside the island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Monster Spawn'
+        lore:
+          - '&7Allow spawner spawning of monsters inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    tree_growth:
+      settings-enabled:
+        type: SAPLING
+        name: '&6Tree Growth'
+        lore:
+          - '&7Allow growth of trees inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: SAPLING
+        name: '&6Tree Growth'
+        lore:
+          - '&7Allow growth of trees inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    water_flow:
+      settings-enabled:
+        type: WATER_BUCKET
+        name: '&6Water Flow'
+        lore:
+          - '&7Allow water to flow inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: WATER_BUCKET
+        name: '&6Water Flow'
+        lore:
+          - '&7Allow water to flow inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2

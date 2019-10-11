@@ -72,6 +72,8 @@ permissions:
             description: Rate an island.
           superior.island.ratings:
             description: Show all island ratings.
+          superior.island.settings:
+            description: Open the settings menu.
           superior.island.recalc:
             description: Re-calculates the island worth.
           superior.island.setdiscord:

@@ -61,6 +61,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         subCommands.add(new CmdSetPaypal());
         subCommands.add(new CmdSetRole());
         subCommands.add(new CmdSetTeleport());
+        subCommands.add(new CmdSettings());
         subCommands.add(new CmdSetWarp());
         subCommands.add(new CmdShow());
         subCommands.add(new CmdTeam());

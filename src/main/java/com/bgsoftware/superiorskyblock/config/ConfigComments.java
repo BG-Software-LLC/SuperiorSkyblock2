@@ -241,4 +241,8 @@ public final class ConfigComments {
     @Comment("When true, the formula will be used.")
     public static String BONUS_AFFECT_LEVEL = "bonus-affect-level";
 
+    @Comment("")
+    @Comment("A list of default settings for new islands.")
+    public static String DEFAULT_SETTINGS = "default-settings";
+
 }

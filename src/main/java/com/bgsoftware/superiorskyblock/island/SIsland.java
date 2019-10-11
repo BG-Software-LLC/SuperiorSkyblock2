@@ -45,6 +45,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -156,6 +157,7 @@ public class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
 
         assignPermissionNodes();
+        assignSettings();
 
         Executor.sync(() -> biome = getCenter().getBlock().getBiome());
     }
@@ -204,6 +206,7 @@ public class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
 
         assignPermissionNodes();
+        assignSettings();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
@@ -220,6 +223,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.center = wrappedLocation;
         this.islandName = islandName;
         assignPermissionNodes();
+        assignSettings();
     }
 
     @Override
@@ -1284,6 +1288,28 @@ public class SIsland extends DatabaseObject implements Island {
     public void enableSettings(IslandSettings settings) {
         islandSettings.add(settings);
 
+        //Updating times / weather if necessary
+        switch (settings){
+            case ALWAYS_DAY:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(0, false));
+                break;
+            case ALWAYS_MIDDLE_DAY:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(6000, false));
+                break;
+            case ALWAYS_NIGHT:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(14000, false));
+                break;
+            case ALWAYS_MIDDLE_NIGHT:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(18000, false));
+                break;
+            case ALWAYS_SHINY:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.CLEAR));
+                break;
+            case ALWAYS_RAIN:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.DOWNFALL));
+                break;
+        }
+
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setString(owner.toString())
@@ -1293,6 +1319,18 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void disableSettings(IslandSettings settings) {
         islandSettings.remove(settings);
+
+        switch (settings){
+            case ALWAYS_DAY:
+            case ALWAYS_MIDDLE_DAY:
+            case ALWAYS_NIGHT:
+            case ALWAYS_MIDDLE_NIGHT:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).resetPlayerTime());
+                break;
+            case ALWAYS_RAIN:
+            case ALWAYS_SHINY:
+                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).resetPlayerWeather());
+        }
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
@@ -1327,6 +1365,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(description)
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1367,6 +1406,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(description)
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(IslandSerializer.serializeSettings(islandSettings))
                 .execute(async);
     }
 
@@ -1416,6 +1456,22 @@ public class SIsland extends DatabaseObject implements Island {
                     .setString(owner.toString())
                     .execute(true);
         }
+    }
+
+    private void assignSettings(){
+        if(!islandSettings.isEmpty() || owner == null)
+            return;
+
+        plugin.getSettings().defaultSettings.forEach(setting -> {
+            try{
+                islandSettings.add(IslandSettings.valueOf(setting));
+            }catch(Exception ignored){}
+        });
+
+        Query.ISLAND_SET_SETTINGS.getStatementHolder()
+                .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setString(owner.toString())
+                .execute(true);
     }
 
     private static class CalcIslandData{
