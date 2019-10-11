@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -24,14 +23,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -42,13 +35,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -64,7 +53,6 @@ public final class PlayersListener implements Listener {
 
     public PlayersListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        new PlayerArrowPickup();
     }
 
     @EventHandler
@@ -247,57 +235,6 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityAttack(EntityDamageByEntityEvent e){
-        if(e.getEntity() instanceof Painting || e.getEntity() instanceof ItemFrame || e.getEntity() instanceof Player)
-            return;
-
-        Player damager = null;
-
-        if(e.getDamager() instanceof Player){
-            damager = (Player) e.getDamager();
-        }
-        else if(e.getDamager() instanceof Projectile){
-            Projectile projectile = (Projectile) e.getDamager();
-            if(projectile.getShooter() instanceof Player)
-                damager = (Player) projectile.getShooter();
-        }
-
-        if(damager == null)
-            return;
-
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        IslandPermission islandPermission = e.getEntity() instanceof ArmorStand ? IslandPermission.BREAK : e.getEntity() instanceof Animals ? IslandPermission.ANIMAL_DAMAGE : IslandPermission.MONSTER_DAMAGE;
-
-        if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(damagerPlayer);
-        }
-    }
-
-    @EventHandler
-    public void onEntityPlace(PlayerInteractEvent e){
-        if(e.getAction() != Action.RIGHT_CLICK_BLOCK || !e.hasItem())
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
-
-        EntityType spawnType = ItemUtils.getEntityType(e.getItem());
-
-        if(spawnType == EntityType.UNKNOWN)
-            return;
-
-        IslandPermission islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPermission.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPermission.ANIMAL_SPAWN : IslandPermission.MONSTER_SPAWN;
-
-        if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
-    @EventHandler
     public void onVisitorDamage(EntityDamageEvent e){
         if(!(e.getEntity() instanceof Player))
             return;
@@ -307,20 +244,6 @@ public final class PlayersListener implements Listener {
 
         if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)
             e.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onEntityInteract(PlayerInteractAtEntityEvent e){
-        if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
-
-        if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ? IslandPermission.INTERACT : IslandPermission.ANIMAL_BREED)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -382,28 +305,6 @@ public final class PlayersListener implements Listener {
             Locale.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
     }
 
-    @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
-
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.DROP_ITEMS)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerItemPickup(PlayerPickupItemEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
-
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
     private Set<UUID> noFallDamage = new HashSet<>();
 
     @EventHandler
@@ -433,35 +334,6 @@ public final class PlayersListener implements Listener {
     public void onPlayerFall(EntityDamageEvent e){
         if(e.getEntity() instanceof Player && e.getCause() == EntityDamageEvent.DamageCause.FALL && noFallDamage.contains(e.getEntity().getUniqueId()))
             e.setCancelled(true);
-    }
-
-    class PlayerArrowPickup implements Listener{
-
-        PlayerArrowPickup(){
-            if(load())
-                plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        }
-
-        boolean load(){
-            try{
-                Class.forName("org.bukkit.event.player.PlayerPickupArrowEvent");
-                return true;
-            }catch(ClassNotFoundException ex){
-                return false;
-            }
-        }
-
-        @EventHandler
-        public void onPlayerArrowPickup(PlayerPickupArrowEvent e){
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-            Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
-
-            if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
-                e.setCancelled(true);
-                Locale.sendProtectionMessage(superiorPlayer);
-            }
-        }
-
     }
 
 }
