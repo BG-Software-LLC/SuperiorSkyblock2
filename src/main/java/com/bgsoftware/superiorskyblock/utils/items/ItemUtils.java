@@ -1,11 +1,17 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 
 public final class ItemUtils {
+
+    private static final boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
 
     @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, BlockPlaceEvent event){
@@ -23,6 +29,26 @@ public final class ItemUtils {
         }catch(Exception ignored){}
 
         event.getPlayer().getInventory().removeItem(itemStack);
+    }
+
+    public static EntityType getEntityType(ItemStack itemStack){
+        if(!isValidAndSpawnEgg(itemStack))
+            return itemStack.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND : EntityType.UNKNOWN;
+
+        if(legacy) {
+            try {
+                SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
+                return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
+            } catch (NoClassDefFoundError error) {
+                return EntityType.fromId(itemStack.getDurability());
+            }
+        }else{
+            return EntityType.fromName(itemStack.getType().name().replace("_SPAWN_EGG", ""));
+        }
+    }
+
+    private static boolean isValidAndSpawnEgg(ItemStack itemStack){
+        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(legacy ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
 }

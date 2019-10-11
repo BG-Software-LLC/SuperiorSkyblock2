@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -23,10 +24,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -270,6 +273,27 @@ public final class PlayersListener implements Listener {
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(damagerPlayer);
+        }
+    }
+
+    @EventHandler
+    public void onEntityPlace(PlayerInteractEvent e){
+        if(e.getAction() != Action.RIGHT_CLICK_BLOCK || !e.hasItem())
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+        EntityType spawnType = ItemUtils.getEntityType(e.getItem());
+
+        if(spawnType == EntityType.UNKNOWN)
+            return;
+
+        IslandPermission islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPermission.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPermission.ANIMAL_SPAWN : IslandPermission.MONSTER_SPAWN;
+
+        if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 

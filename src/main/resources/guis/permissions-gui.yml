@@ -128,6 +128,39 @@ permissions-gui:
           volume: 0.2
           pitch: 0.2
 
+    animal_spawn:
+      permission-enabled:
+        type: MONSTER_EGG
+        data: 93
+        name: '&6Animal Spawn'
+        lore:
+          - '&7Access to spawn animals inside the island.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: MONSTER_EGG
+        data: 93
+        name: '&6Animal Spawn'
+        lore:
+          - '&7Access to spawn animals inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: MONSTER_EGG
+        data: 93
+        name: '&6Animal Spawn'
+        lore:
+          - '&7Access to spawn animals inside the island.'
+          - '&7Role: &e{}&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
     ban_member:
       permission-enabled:
         type: SKULL_ITEM
@@ -815,6 +848,39 @@ permissions-gui:
         name: '&6Monster Damage'
         lore:
           - '&7Access to damage monsters inside the island.'
+          - '&7Role: &e{}&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
+    monster_spawn:
+      permission-enabled:
+        type: MONSTER_EGG
+        data: 59
+        name: '&6Monster Spawn'
+        lore:
+          - '&7Access to spawn monsters inside the island.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: MONSTER_EGG
+        data: 59
+        name: '&6Monster Spawn'
+        lore:
+          - '&7Access to spawn monsters inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: MONSTER_EGG
+        data: 59
+        name: '&6Monster Spawn'
+        lore:
+          - '&7Access to spawn monsters inside the island.'
           - '&7Role: &e{}&7.'
       has-access:
         sound:

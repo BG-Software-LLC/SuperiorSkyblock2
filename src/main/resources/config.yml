@@ -94,17 +94,14 @@ island-roles:
     - ANIMAL_DAMAGE
     - BREAK
     - BUILD
-    - CHEST_ACCESS
     - CLOSE_BYPASS
-    - DEPOSIT_MONEY
     - DROP_ITEMS
-    - EXPEL_BYPASS
     - FARM_TRAMPING
     - INTERACT
     - ITEM_FRAME
+    - MONSTER_DAMAGE
     - PAINTING
     - PICKUP_DROPS
-    - RANKUP
     - SIGN_INTERACT
     - USE
 
@@ -118,23 +115,12 @@ island-roles:
       name: 'Member'
       weight: 0
       permissions:
-      - ANIMAL_BREED
-      - ANIMAL_DAMAGE
-      - BREAK
-      - BUILD
+      - ANIMAL_SPAWN
       - CHEST_ACCESS
-      - CLOSE_BYPASS
       - DEPOSIT_MONEY
-      - DROP_ITEMS
       - EXPEL_BYPASS
-      - FARM_TRAMPING
-      - INTERACT
-      - ITEM_FRAME
-      - PAINTING
-      - PICKUP_DROPS
+      - MONSTER_SPAWN
       - RANKUP
-      - SIGN_INTERACT
-      - USE
     mod:
       name: 'Moderator'
       weight: 1
