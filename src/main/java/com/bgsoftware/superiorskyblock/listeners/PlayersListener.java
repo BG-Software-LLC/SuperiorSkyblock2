@@ -317,7 +317,7 @@ public final class PlayersListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.ANIMAL_BREED)){
+        if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ? IslandPermission.INTERACT : IslandPermission.ANIMAL_BREED)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
