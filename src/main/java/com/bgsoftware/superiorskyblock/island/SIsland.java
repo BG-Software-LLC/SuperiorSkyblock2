@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
+import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -89,6 +90,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Set<UUID> coop = new HashSet<>();
     private final Set<UUID> banned = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
+    private final Set<IslandSettings> islandSettings = new HashSet<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blockCounts = new KeyMap<>();
@@ -134,6 +136,7 @@ public class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
+        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
 
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
@@ -1270,6 +1273,31 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public Biome getBiome() {
         return biome;
+    }
+
+    @Override
+    public boolean hasSettingsEnabled(IslandSettings settings) {
+        return islandSettings.contains(settings);
+    }
+
+    @Override
+    public void enableSettings(IslandSettings settings) {
+        islandSettings.add(settings);
+
+        Query.ISLAND_SET_SETTINGS.getStatementHolder()
+                .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void disableSettings(IslandSettings settings) {
+        islandSettings.remove(settings);
+
+        Query.ISLAND_SET_SETTINGS.getStatementHolder()
+                .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setString(owner.toString())
+                .execute(true);
     }
 
     @Override

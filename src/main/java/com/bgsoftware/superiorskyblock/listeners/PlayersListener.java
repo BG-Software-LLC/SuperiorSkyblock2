@@ -9,8 +9,8 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -23,24 +23,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -174,73 +167,17 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerAttack(EntityDamageByEntityEvent e){
-        if(!(e.getEntity() instanceof Player))
-            return;
-
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland))
-            return;
-
-        SuperiorPlayer damagerPlayer;
-
-        if(e.getDamager() instanceof Player){
-            damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
-        }
-
-        else if(e.getDamager() instanceof Projectile){
-            ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
-            if(shooter instanceof Player)
-                damagerPlayer = SSuperiorPlayer.of((Player) ((Projectile) e.getDamager()).getShooter());
-            else return;
-        }
-
-        else return;
-
-        if(damagerPlayer.equals(targetPlayer))
-            return;
-
-        e.setCancelled(true);
-
-        //Disable flame
-        if(e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
-            targetPlayer.asPlayer().setFireTicks(0);
-
-        Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
-    }
-
-    @EventHandler
-    public void onPoisonAttack(ProjectileHitEvent e){
-        if(e.getEntityType().name().equals("SPLASH_POTION") || !(e.getEntity().getShooter() instanceof Player))
-            return;
-
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland))
-            return;
-
-        for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){
-            if(entity instanceof Player){
-                SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) entity);
-
-                if(damagerPlayer.equals(targetPlayer))
-                    continue;
-
-                targetPlayer.asPlayer().removePotionEffect(PotionEffectType.POISON);
-            }
-        }
-    }
-
-    @EventHandler
     public void onVisitorDamage(EntityDamageEvent e){
         if(!(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        EntityDamageEvent.DamageCause damageCause = EntityUtils.getDamager(e);
+
+        if(damageCause == EntityDamageEvent.DamageCause.ENTITY_ATTACK)
+            return;
 
         if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)
             e.setCancelled(true);

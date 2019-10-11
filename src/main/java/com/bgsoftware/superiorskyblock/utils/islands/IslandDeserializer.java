@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class IslandDeserializer {
 
@@ -101,6 +103,17 @@ public final class IslandDeserializer {
 
     public static void deserializeMissions(String missions, Set<String> completedMissions){
         completedMissions.addAll(Arrays.asList(missions.split(";")));
+    }
+
+    public static void deserializeSettings(String settings, Set<IslandSettings> islandSettings){
+        islandSettings.addAll(Arrays.stream(settings.split(";")).filter(setting -> {
+            try{
+                IslandSettings.valueOf(setting);
+                return true;
+            }catch(Exception ex){
+                return false;
+            }
+        }).map(IslandSettings::valueOf).collect(Collectors.toList()));
     }
 
 }

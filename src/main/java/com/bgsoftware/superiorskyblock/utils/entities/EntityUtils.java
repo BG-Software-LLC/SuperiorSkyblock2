@@ -5,8 +5,13 @@ import org.bukkit.entity.ChestedHorse;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 public final class EntityUtils {
 
@@ -23,6 +28,19 @@ public final class EntityUtils {
 
         EntityEquipment entityEquipment = livingEntity.getEquipment();
         return contains(entityEquipment.getArmorContents(), itemStack) || itemStack.equals(entityEquipment.getItemInHand());
+    }
+
+    public static EntityDamageEvent.DamageCause getDamager(EntityDamageEvent e){
+        if(e instanceof EntityDamageByEntityEvent){
+            EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) e;
+            if(event.getDamager() instanceof Projectile){
+                ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();
+                if(shooter instanceof Player)
+                    return EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+            }
+        }
+
+        return e.getCause();
     }
 
     private static <T> boolean contains(T[] arr, T val){

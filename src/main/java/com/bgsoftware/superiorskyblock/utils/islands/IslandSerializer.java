@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -61,6 +62,13 @@ public final class IslandSerializer {
         StringBuilder missionsBuilder = new StringBuilder();
         missions.forEach(mission ->
                 missionsBuilder.append(";").append(mission));
+        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+    }
+
+    public static String serializeSettings(Set<IslandSettings> islandSettings){
+        StringBuilder missionsBuilder = new StringBuilder();
+        islandSettings.forEach(settings ->
+                missionsBuilder.append(";").append(settings));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 

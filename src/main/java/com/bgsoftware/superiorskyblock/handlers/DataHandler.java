@@ -83,7 +83,8 @@ public final class DataHandler {
                 "visitorsLocation VARCHAR," +
                 "description VARCHAR," +
                 "ratings VARCHAR," +
-                "missions VARCHAR" +
+                "missions VARCHAR," +
+                "settings VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -136,6 +137,7 @@ public final class DataHandler {
         addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
         addColumnIfNotExists("missions", "islands", "''", "VARCHAR");
         addColumnIfNotExists("missions", "players", "''", "VARCHAR");
+        addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -186,6 +188,10 @@ public final class DataHandler {
         });
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
+    }
+
+    private String getDefaultSettings() {
+        return "NATURAL_ANIMALS_SPAWN;NATURAL_MONSTER_SPAWN;SPAWNER_ANIMALS_SPAWN;SPAWNER_MONSTER_SPAWN;WATER_FLOW;LAVA_FLOW;CROPS_GROWTH;TREE_GROWTH;FIRE_SPREAD;EGG_LAY";
     }
 
     public void closeConnection(){

@@ -691,4 +691,22 @@ public interface Island extends Comparable<Island> {
      */
     Biome getBiome();
 
+    /**
+     * Check whether a settings is enabled or not.
+     * @param islandSettings The settings to check.
+     */
+    boolean hasSettingsEnabled(IslandSettings islandSettings);
+
+    /**
+     * Enable an island settings.
+     * @param islandSettings The settings to enable.
+     */
+    void enableSettings(IslandSettings islandSettings);
+
+    /**
+     * Disable an island settings.
+     * @param islandSettings The settings to disable.
+     */
+    void disableSettings(IslandSettings islandSettings);
+
 }
