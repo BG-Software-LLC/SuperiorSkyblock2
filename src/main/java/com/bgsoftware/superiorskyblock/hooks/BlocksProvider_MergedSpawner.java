@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
+import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -34,10 +35,17 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpawnerStack(MergedSpawnerPlaceEvent e){
+            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            if(island != null && e.getPlayer().isSneaking())
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getPlayer().getItemInHand().getAmount() - 1);
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(MergedSpawnerBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null)
-                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount());
+            if(island != null && e.getPlayer().isSneaking())
+                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount() - 1);
         }
 
     }
