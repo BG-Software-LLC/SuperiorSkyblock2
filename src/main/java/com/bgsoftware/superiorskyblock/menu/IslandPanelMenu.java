@@ -27,6 +27,9 @@ public final class IslandPanelMenu extends SuperiorMenu {
         if(membersSlot == e.getRawSlot()){
             IslandMembersMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
         }
+        else if (settingsSlot == e.getRawSlot()) {
+            IslandSettingsMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
+        }
         else if (visitorsSlot == e.getRawSlot()) {
             IslandVisitorsMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
         }

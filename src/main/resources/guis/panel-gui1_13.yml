@@ -33,7 +33,7 @@ main-panel:
       volume: 0.2
       pitch: 0.2
     type: BOOK
-    name: '&eSettings &c(Coming Soon)'
+    name: '&eSettings'
     lore:
       - '&7Click to manage island settings.'
 
