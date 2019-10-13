@@ -424,6 +424,7 @@ bonus-affect-level: true
 
 # A list of default settings for new islands.
 default-settings:
+- 'CREEPER_EXPLOSION'
 - 'NATURAL_ANIMALS_SPAWN'
 - 'NATURAL_MONSTER_SPAWN'
 - 'SPAWNER_ANIMALS_SPAWN'

@@ -154,6 +154,26 @@ settings-gui:
         volume: 0.2
         pitch: 0.2
 
+    creeper_explosion:
+      settings-enabled:
+        type: SKULL_ITEM
+        data: 4
+        name: '&6Creeper Explosion'
+        lore:
+          - '&7Allow creepers to explode blocks inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: SKULL_ITEM
+        data: 4
+        name: '&6Creeper Explosion'
+        lore:
+          - '&7Allow creepers to explode blocks inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
     crops_growth:
       settings-enabled:
         type: SEEDS
@@ -314,6 +334,24 @@ settings-gui:
         name: '&6Spawner Monster Spawn'
         lore:
           - '&7Allow spawner spawning of monsters inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
+    tnt_explosion:
+      settings-enabled:
+        type: TNT
+        name: '&6TNT Explosion'
+        lore:
+          - '&7Allow TNT to explode blocks inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: TNT
+        name: '&6TNT Explosion'
+        lore:
+          - '&7Allow TNT to explode blocks inside your island.'
           - '&7Currently &cDISABLED&7.'
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP

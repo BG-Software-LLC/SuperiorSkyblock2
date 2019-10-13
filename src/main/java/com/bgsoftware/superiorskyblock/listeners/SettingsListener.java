@@ -14,9 +14,11 @@ import org.bukkit.WeatherType;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,6 +28,7 @@ import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.world.StructureGrowEvent;
@@ -207,6 +210,16 @@ public final class SettingsListener implements Listener {
 
                 targetPlayer.asPlayer().removePotionEffect(PotionEffectType.POISON);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        if(island != null){
+            if((e.getEntity() instanceof Creeper && !island.hasSettingsEnabled(IslandSettings.CREEPER_EXPLOSION)) ||
+                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandSettings.TNT_EXPLOSION))
+            e.blockList().clear();
         }
     }
 

@@ -8,6 +8,7 @@ public enum IslandSettings {
     ALWAYS_MIDDLE_NIGHT,
     ALWAYS_RAIN,
     ALWAYS_SHINY,
+    CREEPER_EXPLOSION,
     CROPS_GROWTH,
     EGG_LAY,
     FIRE_SPREAD,
@@ -17,6 +18,7 @@ public enum IslandSettings {
     PVP,
     SPAWNER_ANIMALS_SPAWN,
     SPAWNER_MONSTER_SPAWN,
+    TNT_EXPLOSION,
     TREE_GROWTH,
     WATER_FLOW
 
