@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -10,7 +9,6 @@ import java.util.UUID;
 
 public final class SortingComparators {
 
-    private final static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private final static Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
         String firstName = o1.getName().isEmpty() ? o1.getOwner().getName() : o1.getName();
         String secondName = o2.getName().isEmpty() ? o2.getOwner().getName() : o2.getName();
@@ -19,34 +17,30 @@ public final class SortingComparators {
 
     private final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
 
-    public final static Comparator<UUID> WORTH_COMPARATOR = (o1, o2) -> {
-        Island firstIsland = plugin.getGrid().getIsland(o1), secondIsland = plugin.getGrid().getIsland(o2);
-        int compare = secondIsland.getWorthAsBigDecimal().compareTo(firstIsland.getWorthAsBigDecimal());
-        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(firstIsland, secondIsland) : compare;
+    public final static Comparator<Island> WORTH_COMPARATOR = (o1, o2) -> {
+        int compare = o2.getWorthAsBigDecimal().compareTo(o1.getWorthAsBigDecimal());
+        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
-    public final static Comparator<UUID> LEVEL_COMPARATOR = (o1, o2) -> {
-        Island firstIsland = plugin.getGrid().getIsland(o1), secondIsland = plugin.getGrid().getIsland(o2);
-        int compare = secondIsland.getIslandLevelAsBigDecimal().compareTo(firstIsland.getIslandLevelAsBigDecimal());
-        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(firstIsland, secondIsland) : compare;
+    public final static Comparator<Island> LEVEL_COMPARATOR = (o1, o2) -> {
+        int compare = o2.getIslandLevelAsBigDecimal().compareTo(o1.getIslandLevelAsBigDecimal());
+        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
-    public final static Comparator<UUID> RATING_COMPARATOR = (o1, o2) -> {
-        Island firstIsland = plugin.getGrid().getIsland(o1), secondIsland = plugin.getGrid().getIsland(o2);
-        int totalRatingsCompare = Double.compare(secondIsland.getTotalRating(), firstIsland.getTotalRating());
+    public final static Comparator<Island> RATING_COMPARATOR = (o1, o2) -> {
+        int totalRatingsCompare = Double.compare(o2.getTotalRating(), o1.getTotalRating());
 
         if(totalRatingsCompare == 0){
-            int ratingsAmountCompare = Integer.compare(secondIsland.getRatingAmount(), firstIsland.getRatingAmount());
-            return ratingsAmountCompare == 0 ? ISLAND_NAMES_COMPARATOR.compare(firstIsland, secondIsland) : ratingsAmountCompare;
+            int ratingsAmountCompare = Integer.compare(o2.getRatingAmount(), o1.getRatingAmount());
+            return ratingsAmountCompare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : ratingsAmountCompare;
         }
 
         return totalRatingsCompare;
     };
 
-    public final static Comparator<UUID> PLAYERS_COMPARATOR = (o1, o2) -> {
-        Island firstIsland = plugin.getGrid().getIsland(o1), secondIsland = plugin.getGrid().getIsland(o2);
-        int compare = Integer.compare(secondIsland.allPlayersInside().size(), firstIsland.allPlayersInside().size());
-        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(firstIsland, secondIsland) : compare;
+    public final static Comparator<Island> PLAYERS_COMPARATOR = (o1, o2) -> {
+        int compare = Integer.compare(o2.allPlayersInside().size(), o1.allPlayersInside().size());
+        return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
     public final static Comparator<UUID> ISLAND_MEMBERS_COMPARATOR = (o1, o2) -> {

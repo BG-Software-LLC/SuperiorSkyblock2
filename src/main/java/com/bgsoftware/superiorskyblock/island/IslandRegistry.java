@@ -16,7 +16,7 @@ import java.util.UUID;
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
-    private Map<SortingType, TreeSet<UUID>> sortedTrees = new HashMap<>();
+    private Map<SortingType, TreeSet<Island>> sortedTrees = new HashMap<>();
 
     public IslandRegistry(){
         for(SortingType sortingAlgorithm : SortingType.values())
@@ -29,23 +29,26 @@ public final class IslandRegistry implements Iterable<Island> {
 
     public synchronized Island get(int index, SortingType sortingType){
         ensureType(sortingType);
-        return get(Iterables.get(sortedTrees.get(sortingType), index));
+        return Iterables.get(sortedTrees.get(sortingType), index);
     }
 
     public synchronized int indexOf(Island island, SortingType sortingType){
         ensureType(sortingType);
-        return Iterables.indexOf(sortedTrees.get(sortingType), uuid -> island.getOwner().getUniqueId().equals(uuid));
+        return Iterables.indexOf(sortedTrees.get(sortingType), island::equals);
     }
 
     public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
-        for(TreeSet<UUID> sortedTree : sortedTrees.values())
-            sortedTree.add(uuid);
+        for(TreeSet<Island> sortedTree : sortedTrees.values())
+            sortedTree.add(island);
     }
 
     public synchronized void remove(UUID uuid){
-        for(TreeSet<UUID> sortedTree : sortedTrees.values())
-            sortedTree.remove(uuid);
+        Island island = get(uuid);
+        if(island != null) {
+            for (TreeSet<Island> sortedTree : sortedTrees.values())
+                sortedTree.remove(island);
+        }
         islands.remove(uuid);
     }
 
@@ -58,18 +61,18 @@ public final class IslandRegistry implements Iterable<Island> {
         return islands.values().iterator();
     }
 
-    public synchronized Iterator<UUID> iterator(SortingType sortingType){
+    public synchronized Iterator<Island> iterator(SortingType sortingType){
         ensureType(sortingType);
         return Iterables.unmodifiableIterable(sortedTrees.get(sortingType)).iterator();
     }
 
     public synchronized void sort(SortingType sortingType){
         ensureType(sortingType);
-        TreeSet<UUID> sortedTree = sortedTrees.get(sortingType);
-        Iterator<UUID> worthIterator = Sets.newTreeSet(sortedTree).iterator();
+        TreeSet<Island> sortedTree = sortedTrees.get(sortingType);
+        Iterator<Island> clonedTree = Sets.newTreeSet(sortedTree).iterator();
         sortedTree.clear();
-        while(worthIterator.hasNext())
-            sortedTree.add(worthIterator.next());
+        while(clonedTree.hasNext())
+            sortedTree.add(clonedTree.next());
     }
 
     public synchronized void transferIsland(UUID oldOwner, UUID newOwner){

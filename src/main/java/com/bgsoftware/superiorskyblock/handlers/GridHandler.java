@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class GridHandler implements GridManager {
@@ -272,7 +273,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public List<UUID> getAllIslands(SortingType sortingType) {
-        return Lists.newArrayList(islands.iterator(sortingType));
+        return Lists.newArrayList(islands.iterator(sortingType)).stream().map(island -> island.getOwner().getUniqueId()).collect(Collectors.toList());
     }
 
     @Override

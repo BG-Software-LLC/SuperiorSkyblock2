@@ -1418,7 +1418,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SIsland ? owner.equals(((SIsland) obj).owner) : super.equals(obj);
+        return obj instanceof SIsland && owner.equals(((SIsland) obj).owner);
     }
 
     @Override
