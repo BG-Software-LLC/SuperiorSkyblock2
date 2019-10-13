@@ -174,9 +174,7 @@ public final class PlayersListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        EntityDamageEvent.DamageCause damageCause = EntityUtils.getDamager(e);
-
-        if(damageCause == EntityDamageEvent.DamageCause.ENTITY_ATTACK)
+        if(EntityUtils.isPlayerDamager(e))
             return;
 
         if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)

@@ -38,17 +38,19 @@ public final class EntityUtils {
         return contains(entityEquipment.getArmorContents(), itemStack) || itemStack.equals(entityEquipment.getItemInHand());
     }
 
-    public static EntityDamageEvent.DamageCause getDamager(EntityDamageEvent e){
+    public static boolean isPlayerDamager(EntityDamageEvent e){
         if(e instanceof EntityDamageByEntityEvent){
             EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) e;
             if(event.getDamager() instanceof Projectile){
                 ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();
-                if(shooter instanceof Player)
-                    return EntityDamageEvent.DamageCause.ENTITY_ATTACK;
+                return shooter instanceof Player;
+            }
+            else {
+                return event.getDamager() instanceof Player;
             }
         }
 
-        return e.getCause();
+        return false;
     }
 
     private static <T> boolean contains(T[] arr, T val){
