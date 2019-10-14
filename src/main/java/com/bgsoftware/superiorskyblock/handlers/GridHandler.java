@@ -68,6 +68,10 @@ public final class GridHandler implements GridManager {
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
+        updateSpawn();
+    }
+
+    public void updateSpawn(){
         spawnIsland = new SpawnIsland(plugin);
     }
 
