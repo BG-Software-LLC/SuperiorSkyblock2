@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command.admin;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -66,15 +67,20 @@ public final class CmdAdminDisband implements ICommand {
             return;
         }
 
-        if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(sender.getName()));
+        IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(targetPlayer, island);
+        Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
-        if(targetPlayer == null)
-            Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());
-        else
-            Locale.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
+        if(!islandDisbandEvent.isCancelled()) {
+            if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
+                island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(sender.getName()));
 
-        island.disbandIsland();
+            if(targetPlayer == null)
+                Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());
+            else
+                Locale.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
+
+            island.disbandIsland();
+        }
     }
 
     @Override
