@@ -44,8 +44,8 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(MergedSpawnerBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null && e.getPlayer().isSneaking())
-                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getAmount() - 1);
+            if(island != null)
+                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getPlayer().isSneaking() ? e.getAmount() : 1);
         }
 
     }
