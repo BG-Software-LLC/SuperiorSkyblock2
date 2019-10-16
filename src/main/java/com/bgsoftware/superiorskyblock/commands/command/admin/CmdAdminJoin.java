@@ -95,11 +95,12 @@ public final class CmdAdminJoin implements ICommand {
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
-                if (onlinePlayer.getIsland() != null) {
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
                     if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if (onlinePlayer.getIsland() != null && onlinePlayer.getIsland().getName().toLowerCase().startsWith(args[2].toLowerCase()))
-                        list.add(onlinePlayer.getIsland().getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(playerIsland.getName());
                 }
             }
         }

@@ -119,7 +119,7 @@ public final class CmdAccept implements ICommand {
                 if(island != null && island.isInvited(superiorPlayer)) {
                     if(island.getOwner().getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(island.getOwner().getName());
-                    if(island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(island.getName());
                 }
             }

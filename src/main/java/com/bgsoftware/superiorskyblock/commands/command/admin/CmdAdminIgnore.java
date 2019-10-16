@@ -81,12 +81,12 @@ public final class CmdAdminIgnore implements ICommand {
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
-                Island island = onlinePlayer.getIsland();
-                if (island != null && !island.isIgnored()) {
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
                     if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if (island.getName().toLowerCase().startsWith(args[2].toLowerCase()))
-                        list.add(island.getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(playerIsland.getName());
                 }
             }
         }

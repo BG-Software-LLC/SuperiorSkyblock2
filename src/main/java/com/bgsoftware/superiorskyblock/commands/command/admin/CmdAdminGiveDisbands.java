@@ -60,7 +60,7 @@ public final class CmdAdminGiveDisbands implements ICommand {
 
         int amount;
         try {
-            amount = Integer.valueOf(args[3]);
+            amount = Integer.parseInt(args[3]);
         } catch (Exception e) {
             Locale.INVALID_AMOUNT.send(sender);
             return;

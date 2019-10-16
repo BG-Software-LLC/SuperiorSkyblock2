@@ -61,7 +61,7 @@ public final class CmdAdminRemoveRatings implements ICommand {
         }
 
         for(Island island : plugin.getGrid().getIslands()){
-            island.setRating(targetPlayer.getUniqueId(), Rating.UNKNOWN);
+            island.setRating(targetPlayer, Rating.UNKNOWN);
         }
 
         Locale.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());

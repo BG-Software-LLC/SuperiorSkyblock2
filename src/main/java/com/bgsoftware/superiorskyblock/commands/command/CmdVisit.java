@@ -101,7 +101,7 @@ public final class CmdVisit implements ICommand {
                         (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)) ) {
                     if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(player.getName());
-                    if (island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(island.getName());
                 }
             }

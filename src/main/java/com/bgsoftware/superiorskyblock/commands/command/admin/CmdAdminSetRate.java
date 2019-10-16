@@ -84,7 +84,7 @@ public final class CmdAdminSetRate implements ICommand {
             return;
         }
 
-        targetIsland.setRating(targetPlayer.getUniqueId(), rating);
+        targetIsland.setRating(targetPlayer, rating);
 
         Locale.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), StringUtils.format(rating.name()));
     }
@@ -96,12 +96,12 @@ public final class CmdAdminSetRate implements ICommand {
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
-                Island onlineIsland = onlinePlayer.getIsland();
-                if (onlineIsland != null) {
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
                     if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if (onlineIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
-                        list.add(onlineIsland.getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(playerIsland.getName());
                 }
             }
         }
