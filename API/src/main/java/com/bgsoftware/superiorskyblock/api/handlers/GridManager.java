@@ -143,6 +143,13 @@ public interface GridManager {
     List<Island> getIslands();
 
     /**
+     * Get all the islands ordered by a specific sorting type.
+     * @param sortingType The sorting type to order the list by.
+     * @return A list of uuids of the island owners.
+     */
+    List<Island> getIslands(SortingType sortingType);
+
+    /**
      * Open the top islands menu for a player.
      * @param superiorPlayer The player to open the menu for.
      */

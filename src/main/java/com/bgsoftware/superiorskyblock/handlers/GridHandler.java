@@ -286,6 +286,11 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
+    public List<Island> getIslands(SortingType sortingType) {
+        return Lists.newArrayList(islands.iterator(sortingType));
+    }
+
+    @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
         IslandsTopMenu.openInventory(superiorPlayer, null, SortingTypes.BY_WORTH);
     }
