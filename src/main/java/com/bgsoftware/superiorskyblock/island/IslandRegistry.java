@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
 
-@SuppressWarnings("WeakerAccess")
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
@@ -29,7 +28,7 @@ public final class IslandRegistry implements Iterable<Island> {
 
     public synchronized Island get(int index, SortingType sortingType){
         ensureType(sortingType);
-        return Iterables.get(sortedTrees.get(sortingType), index);
+        return index >= sortedTrees.get(sortingType).size() ? null : Iterables.get(sortedTrees.get(sortingType), index);
     }
 
     public synchronized int indexOf(Island island, SortingType sortingType){
@@ -69,10 +68,13 @@ public final class IslandRegistry implements Iterable<Island> {
     public synchronized void sort(SortingType sortingType){
         ensureType(sortingType);
         TreeSet<Island> sortedTree = sortedTrees.get(sortingType);
-        Iterator<Island> clonedTree = Sets.newTreeSet(sortedTree).iterator();
+        Iterator<Island> clonedTree = islands.values().iterator();
         sortedTree.clear();
-        while(clonedTree.hasNext())
-            sortedTree.add(clonedTree.next());
+        while(clonedTree.hasNext()) {
+            Island island = clonedTree.next();
+            if(!island.isIgnored())
+                sortedTree.add(island);
+        }
     }
 
     public synchronized void transferIsland(UUID oldOwner, UUID newOwner){

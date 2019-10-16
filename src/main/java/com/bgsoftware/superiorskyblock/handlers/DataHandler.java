@@ -84,7 +84,8 @@ public final class DataHandler {
                 "description VARCHAR," +
                 "ratings VARCHAR," +
                 "missions VARCHAR," +
-                "settings VARCHAR" +
+                "settings VARCHAR," +
+                "ignored BOOLEAN" +
                 ");");
 
         //Creating default players table
@@ -138,6 +139,7 @@ public final class DataHandler {
         addColumnIfNotExists("missions", "islands", "''", "VARCHAR");
         addColumnIfNotExists("missions", "players", "''", "VARCHAR");
         addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
+        addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

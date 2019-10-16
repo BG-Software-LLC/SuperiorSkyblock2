@@ -709,4 +709,14 @@ public interface Island extends Comparable<Island> {
      */
     void disableSettings(IslandSettings islandSettings);
 
+    /**
+     * Checks whether or not the island is ignored in the top islands.
+     */
+    boolean isIgnored();
+
+    /**
+     * Set whether or not the island should be ignored in the top islands.
+     */
+    void setIgnored(boolean ignored);
+
 }

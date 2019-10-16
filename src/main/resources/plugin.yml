@@ -141,6 +141,8 @@ permissions:
             description: Disband another player's island permanently.
           superior.admin.givedisbands:
             description: Give disbands to a player.
+          superior.admin.ignore:
+            description: Ignore an island from top islands.
           superior.admin.join:
             description: Join an island without an invitation.
           superior.admin.msg:
@@ -189,5 +191,7 @@ permissions:
             description: Get information about an island.
           superior.admin.spy:
             description: Toggle chat spy mode.
+          superior.admin.unignore:
+            description: Unignore an island from top islands.
           superior.admin.withdraw:
             description: Withdraw money from another player's island bank.

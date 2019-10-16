@@ -187,14 +187,6 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
         if(playerIslandSlot != -1)
             inventory.setItem(playerIslandSlot, getTopItem(null, -1));
-
-//        Executor.async(() -> {
-//            for(Player player : Bukkit.getOnlinePlayers()){
-//                Inventory topInventory = player.getOpenInventory().getTopInventory();
-//                if(topInventory != null && topInventory.getHolder() instanceof IslandsTopMenu)
-//                    reloadInventory(topInventory, SSuperiorPlayer.of(player));
-//            }
-//        }, 2L);
     }
 
     private ItemStack getTopItem(Island island, int place){

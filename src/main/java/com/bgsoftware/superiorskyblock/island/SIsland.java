@@ -110,6 +110,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final Map<UUID, Rating> ratings = new HashMap<>();
     private final Set<String> completedMissions = new HashSet<>();
     private Biome biome;
+    private boolean ignored = false;
 
     /*
      * SIsland multipliers & limits
@@ -152,6 +153,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.locked = resultSet.getBoolean("locked");
         this.islandName = resultSet.getString("name");
         this.description = resultSet.getString("description");
+        this.ignored = resultSet.getBoolean("ignored");
 
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
@@ -1339,6 +1341,21 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    @Override
+    public void setIgnored(boolean ignored) {
+        this.ignored = ignored;
+
+        Query.ISLAND_SET_IGNORED.getStatementHolder()
+                .setBoolean(ignored)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
     public void executeUpdateStatement(boolean async){
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(LocationUtils.getLocation(getTeleportLocation()))
@@ -1366,6 +1383,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setBoolean(ignored)
                 .setString(owner.toString())
                 .execute(async);
     }
@@ -1407,6 +1425,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setBoolean(ignored)
                 .execute(async);
     }
 

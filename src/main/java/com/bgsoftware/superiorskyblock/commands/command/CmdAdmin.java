@@ -25,6 +25,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminDeposit());
         subCommands.add(new CmdAdminDisband());
         subCommands.add(new CmdAdminGiveDisbands());
+        subCommands.add(new CmdAdminIgnore());
         subCommands.add(new CmdAdminJoin());
         subCommands.add(new CmdAdminMsg());
         subCommands.add(new CmdAdminMsgAll());
@@ -49,6 +50,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetWarpsLimit());
         subCommands.add(new CmdAdminShow());
         subCommands.add(new CmdAdminSpy());
+        subCommands.add(new CmdAdminUnignore());
         subCommands.add(new CmdAdminWithdraw());
     }
 
