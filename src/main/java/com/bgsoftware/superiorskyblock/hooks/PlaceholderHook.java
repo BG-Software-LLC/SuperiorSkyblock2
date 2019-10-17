@@ -113,7 +113,8 @@ public abstract class PlaceholderHook {
                     else {
                         try{
                             int index = Integer.parseInt(matcher.group(1));
-                            return String.valueOf(plugin.getGrid().getIsland(index, sortingType).getOwner().getName());
+                            if(index > 0)
+                                return String.valueOf(plugin.getGrid().getIsland(index - 1, sortingType).getOwner().getName());
                         }catch(IllegalArgumentException ignored){}
                     }
                 }
