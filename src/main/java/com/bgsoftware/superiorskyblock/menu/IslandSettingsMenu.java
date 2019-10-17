@@ -54,7 +54,7 @@ public final class IslandSettingsMenu extends SuperiorMenu {
             if(e.getRawSlot() == currentSlot)
                 return;
 
-            boolean nextPage = slots.size() * currentPage < settingsData.size();
+            boolean nextPage = slots.size() * currentPage < islandSettings.size();
 
             if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
                 return;
