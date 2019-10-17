@@ -75,7 +75,9 @@ public final class UpgradesListener implements Listener {
                         e.getBlock().getClass().getMethod("setBlockData", BlockData.class).invoke(e.getBlock(), blockData);
                     }catch(Exception ignored){}
                 }else{
-                    e.getBlock().setData(newData);
+                    try {
+                        e.getBlock().setData(newData);
+                    }catch(Throwable ignored){}
                 }
                 e.getBlock().getState().update();
             }, 2L);
