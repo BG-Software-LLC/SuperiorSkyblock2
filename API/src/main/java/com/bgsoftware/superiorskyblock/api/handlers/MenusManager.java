@@ -95,6 +95,13 @@ public interface MenusManager {
     void openIslandRatingsMenu(SuperiorPlayer superiorPlayer, Island island);
 
     /**
+     * Open the island settings menu for a player.
+     * @param superiorPlayer The player to open the menu for.
+     * @param island The island to get the settings from.
+     */
+    void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island);
+
+    /**
      * Open the islands top menu for a player.
      * @param superiorPlayer The player to open the menu for.
      * @param sortingType The sorting type you want to open.

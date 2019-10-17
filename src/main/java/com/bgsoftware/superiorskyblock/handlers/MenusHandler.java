@@ -118,6 +118,11 @@ public final class MenusHandler implements MenusManager {
     }
 
     @Override
+    public void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island) {
+        IslandSettingsMenu.openInventory(superiorPlayer, null, island);
+    }
+
+    @Override
     public void openIslandsTopMenu(SuperiorPlayer superiorPlayer, SortingType sortingType) {
         IslandsTopMenu.openInventory(superiorPlayer, null, sortingType);
     }
