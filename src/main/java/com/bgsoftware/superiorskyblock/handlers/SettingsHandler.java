@@ -68,6 +68,7 @@ public final class SettingsHandler {
     public final boolean rateOwnIsland;
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
+    public final boolean disableRedstoneOffline;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -135,6 +136,7 @@ public final class SettingsHandler {
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
+        disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
     }
 
     public void updateValue(String path, Object value){

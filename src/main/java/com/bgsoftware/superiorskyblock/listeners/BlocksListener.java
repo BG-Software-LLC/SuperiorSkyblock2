@@ -29,6 +29,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -125,6 +126,19 @@ public final class BlocksListener implements Listener {
                     island.handleBlockBreak(block, 1);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockRedstone(BlockRedstoneEvent e){
+        if(!plugin.getSettings().disableRedstoneOffline)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if(island == null || island.getAllMembers().stream().anyMatch(uuid -> SSuperiorPlayer.of(uuid).isOnline()))
+            return;
+
+        e.setNewCurrent(0);
     }
 
     /*

@@ -435,3 +435,7 @@ default-settings:
 - 'TREE_GROWTH'
 - 'FIRE_SPREAD'
 - 'EGG_LAY'
+
+# Should redstone be disabled on islands that none of the members are online?
+# This should increase performance on the server.
+disable-redstone-offline: true

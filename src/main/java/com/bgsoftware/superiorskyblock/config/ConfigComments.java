@@ -245,4 +245,9 @@ public final class ConfigComments {
     @Comment("A list of default settings for new islands.")
     public static String DEFAULT_SETTINGS = "default-settings";
 
+    @Comment("")
+    @Comment("Should redstone be disabled on islands that none of the members are online?")
+    @Comment("This should increase performance on the server.")
+    public static String DISABLE_REDSTONE_OFFLINE = "disable-redstone-offline";
+
 }
