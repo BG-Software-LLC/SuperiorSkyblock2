@@ -1361,27 +1361,53 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void enableSettings(IslandSettings settings) {
         islandSettings.add(settings);
+        boolean disableTime = false, disableWeather = false;
 
         //Updating times / weather if necessary
         switch (settings){
             case ALWAYS_DAY:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(0, false));
+                disableTime = true;
                 break;
             case ALWAYS_MIDDLE_DAY:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(6000, false));
+                disableTime = true;
                 break;
             case ALWAYS_NIGHT:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(14000, false));
+                disableTime = true;
                 break;
             case ALWAYS_MIDDLE_NIGHT:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(18000, false));
+                disableTime = true;
                 break;
             case ALWAYS_SHINY:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.CLEAR));
+                disableWeather = true;
                 break;
             case ALWAYS_RAIN:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.DOWNFALL));
+                disableWeather = true;
                 break;
+        }
+
+        if(disableTime){
+            //Disabling settings without saving to database.
+            if(settings != IslandSettings.ALWAYS_DAY)
+                islandSettings.remove(IslandSettings.ALWAYS_DAY);
+            if(settings != IslandSettings.ALWAYS_MIDDLE_DAY)
+                islandSettings.remove(IslandSettings.ALWAYS_MIDDLE_DAY);
+            if(settings != IslandSettings.ALWAYS_NIGHT)
+                islandSettings.remove(IslandSettings.ALWAYS_NIGHT);
+            if(settings != IslandSettings.ALWAYS_MIDDLE_NIGHT)
+                islandSettings.remove(IslandSettings.ALWAYS_MIDDLE_NIGHT);
+        }
+
+        if(disableWeather){
+            if(settings != IslandSettings.ALWAYS_RAIN)
+                islandSettings.remove(IslandSettings.ALWAYS_RAIN);
+            if(settings != IslandSettings.ALWAYS_SHINY)
+                islandSettings.remove(IslandSettings.ALWAYS_SHINY);
         }
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
