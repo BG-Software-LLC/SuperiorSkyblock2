@@ -148,19 +148,17 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void deleteIsland(Island island){
-        SuperiorPlayer targetPlayer;
-        for(UUID uuid : island.allPlayersInside()){
-            targetPlayer = SSuperiorPlayer.of(uuid);
-            targetPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
-            Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(targetPlayer);
-        }
+        island.getAllPlayersInside().forEach(superiorPlayer -> {
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
+        });
         islands.remove(island.getOwner().getUniqueId());
         plugin.getDataHandler().deleteIsland(island);
     }
 
     @Override
     public Island getIsland(SuperiorPlayer superiorPlayer){
-        return getIsland(superiorPlayer.getTeamLeader());
+        return getIsland(superiorPlayer.getIslandLeader().getUniqueId());
     }
 
     @Override

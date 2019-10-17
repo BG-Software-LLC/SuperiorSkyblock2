@@ -18,7 +18,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class IslandMembersMenu extends SuperiorMenu {
 
@@ -28,13 +27,13 @@ public final class IslandMembersMenu extends SuperiorMenu {
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots = new ArrayList<>();
 
-    private List<UUID> members;
+    private List<SuperiorPlayer> members;
     private int page;
 
     private IslandMembersMenu(Island island){
         super("membersPage");
         if(island != null) {
-            this.members = island.getAllMembers();
+            this.members = island.getIslandMembers(true);
         }
     }
 
@@ -70,7 +69,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
             if(indexOf < 0 || indexOf >= members.size())
                 return;
 
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(members.get(indexOf));
+            SuperiorPlayer targetPlayer = members.get(indexOf);
 
             if (targetPlayer != null) {
                 SoundWrapper sound = getSound(-1);
@@ -109,7 +108,7 @@ public final class IslandMembersMenu extends SuperiorMenu {
         inv.setContents(inventory.getContents());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < members.size(); i++){
-            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(members.get(i + (slots.size() * (page - 1))));
+            SuperiorPlayer _superiorPlayer = members.get(i + (slots.size() * (page - 1)));
             inv.setItem(slots.get(i), new ItemBuilder(memberItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
                     .replaceAll("{1}", _superiorPlayer.getPlayerRole() + "")

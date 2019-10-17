@@ -17,20 +17,79 @@ import java.util.UUID;
 
 public interface Island extends Comparable<Island> {
 
+    /*
+     *  General methods
+     */
+
     /**
      * Get the owner of the island.
      */
     SuperiorPlayer getOwner();
 
+    /*
+     *  Player related methods
+     */
+
     /**
      * Get the list of members of the island, excluding the owner.
+     *
+     * @deprecated See getIslandMembers
      */
+    @Deprecated
     List<UUID> getMembers();
 
     /**
-     * Checks whether or not the island is the spawn island.
+     * Get the list of all members, including the owner.
+     *
+     * @deprecated See getIslandMembers
      */
-    boolean isSpawn();
+    @Deprecated
+    List<UUID> getAllMembers();
+
+    /**
+     * Get the list of members of the island.
+     * @param includeOwner Whether or not the owner should be returned.
+     */
+    List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
+
+    /**
+     * Get the list of all banned players.
+     *
+     * @deprecated See getBannedPlayers
+     */
+    @Deprecated
+    List<UUID> getAllBannedMembers();
+
+    /**
+     * Get the list of all banned players.
+     */
+    List<SuperiorPlayer> getBannedPlayers();
+
+    /**
+     * Get the list of all visitors that are on the island.
+     *
+     * @deprecated See getIslandVisitors
+     */
+    @Deprecated
+    List<UUID> getVisitors();
+
+    /**
+     * Get the list of all visitors that are on the island.
+     */
+    List<SuperiorPlayer> getIslandVisitors();
+
+    /**
+     * Get the list of all the players that are on the island.
+     *
+     * @deprecated See getAllPlayersInside
+     */
+    @Deprecated
+    List<UUID> allPlayersInside();
+
+    /**
+     * Get the list of all the players that are on the island.
+     */
+    List<SuperiorPlayer> getAllPlayersInside();
 
     /**
      * Invite a player to the island.
@@ -67,22 +126,16 @@ public interface Island extends Comparable<Island> {
     void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole);
 
     /**
-     * Add a player to the island as a co-op member.
-     * @param superiorPlayer The player to add.
-     */
-    void addCoop(SuperiorPlayer superiorPlayer);
-
-    /**
      * Kick a member from the island.
      * @param superiorPlayer The player to kick.
      */
     void kickMember(SuperiorPlayer superiorPlayer);
 
     /**
-     * Remove a player from being a co-op member.
-     * @param superiorPlayer The player to remove.
+     * Check whether or not a player is a member of the island.
+     * @param superiorPlayer The player to check.
      */
-    void removeCoop(SuperiorPlayer superiorPlayer);
+    boolean isMember(SuperiorPlayer superiorPlayer);
 
     /**
      * Ban a member from the island.
@@ -103,36 +156,26 @@ public interface Island extends Comparable<Island> {
     boolean isBanned(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get the list of all banned players.
+     * Add a player to the island as a co-op member.
+     * @param superiorPlayer The player to add.
      */
-    List<UUID> getAllBannedMembers();
+    void addCoop(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get the list of all members, including the owner.
+     * Remove a player from being a co-op member.
+     * @param superiorPlayer The player to remove.
      */
-    List<UUID> getAllMembers();
-
-    /**
-     * Get the list of all visitors that are on the island.
-     */
-    List<UUID> getVisitors();
-
-    /**
-     * Get the list of all the players that are on the island.
-     */
-    List<UUID> allPlayersInside();
-
-    /**
-     * Check whether or not a player is a member of the island.
-     * @param superiorPlayer The player to check.
-     */
-    boolean isMember(SuperiorPlayer superiorPlayer);
+    void removeCoop(SuperiorPlayer superiorPlayer);
 
     /**
      * Check whether or not a player is a co-op member of the island.
      * @param superiorPlayer The player to check.
      */
     boolean isCoop(SuperiorPlayer superiorPlayer);
+
+    /*
+     *  Location related methods
+     */
 
     /**
      * Get the center location of the island.
@@ -170,6 +213,33 @@ public interface Island extends Comparable<Island> {
      * Get the maximum location of the island.
      */
     Location getMaximum();
+
+    /**
+     * Get all the chunks of the island.
+     */
+    List<Chunk> getAllChunks();
+
+    /**
+     * Get all the chunks of the island.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     */
+    List<Chunk> getAllChunks(boolean onlyProtected);
+
+    /**
+     * Check if the location is inside the island's area.
+     * @param location The location to check.
+     */
+    boolean isInside(Location location);
+
+    /**
+     * Check if the location is inside the island's protected area.
+     * @param location The location to check.
+     */
+    boolean isInsideRange(Location location);
+
+    /*
+     *  Permissions related methods
+     */
 
     /**
      * Check if a CommandSender has a permission.
@@ -246,21 +316,132 @@ public interface Island extends Comparable<Island> {
      */
     PlayerRole getRequiredPlayerRole(IslandPermission islandPermission);
 
+    /*
+     *  General methods
+     */
+
+    /**
+     * Checks whether or not the island is the spawn island.
+     */
+    boolean isSpawn();
+
+    /**
+     * Get the name of the island.
+     */
+    String getName();
+
+    /**
+     * Set the name of the island.
+     * @param islandName The name to set.
+     */
+    void setName(String islandName);
+
+    /**
+     * Get the description of the island.
+     */
+    String getDescription();
+
+    /**
+     * Set the description of the island.
+     * @param description The description to set.
+     */
+    void setDescription(String description);
+
     /**
      * Disband the island.
      */
     void disbandIsland();
 
     /**
-     * Get all the chunks of the island.
+     * Transfer the island's leadership to another player.
+     * @param superiorPlayer The player to transfer the leadership to.
+     * @return True if the transfer was succeed, otherwise false.
      */
-    List<Chunk> getAllChunks();
+    boolean transferIsland(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get all the chunks of the island.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * Recalculate the island's worth value.
+     * @param asker The player who makes the operation, may be null.
      */
-    List<Chunk> getAllChunks(boolean onlyProtected);
+    void calcIslandWorth(SuperiorPlayer asker);
+
+    /**
+     * Update the border of all the players inside the island.
+     */
+    void updateBorder();
+
+    /**
+     * Get the island radius of the island.
+     */
+    int getIslandSize();
+
+    /**
+     * Set the radius of the island.
+     * @param islandSize The radius for the island.
+     */
+    void setIslandSize(int islandSize);
+
+    /**
+     * Get the discord that is associated with the island.
+     */
+    String getDiscord();
+
+    /**
+     * Set the discord that will be associated with the island.
+     */
+    void setDiscord(String discord);
+
+    /**
+     * Get the paypal that is associated with the island.
+     */
+    String getPaypal();
+
+    /**
+     * Get the paypal that will be associated with the island.
+     */
+    void setPaypal(String paypal);
+
+    /**
+     * The current biome of the island.
+     */
+    Biome getBiome();
+
+    /**
+     * Change the biome of the island's area.
+     */
+    void setBiome(Biome biome);
+
+    /**
+     * Check whether or not the island is locked to visitors.
+     */
+    boolean isLocked();
+
+    /**
+     * Lock or unlock the island to visitors.
+     * @param locked Whether or not the island should be locked to visitors.
+     */
+    void setLocked(boolean locked);
+
+    /**
+     * Checks whether or not the island is ignored in the top islands.
+     */
+    boolean isIgnored();
+
+    /**
+     * Set whether or not the island should be ignored in the top islands.
+     */
+    void setIgnored(boolean ignored);
+
+    /**
+     * Send a plain message to all the members of the island.
+     * @param message The message to send
+     * @param ignoredMembers An array of ignored members.
+     */
+    void sendMessage(String message, UUID... ignoredMembers);
+
+    /*
+     *  Bank related methods
+     */
 
     /**
      * Get the money in the bank of the island.
@@ -279,11 +460,9 @@ public interface Island extends Comparable<Island> {
      */
     void withdrawMoney(double amount);
 
-    /**
-     * Recalculate the island's worth value.
-     * @param asker The player who makes the operation, may be null.
+    /*
+     *  Worth related methods
      */
-    void calcIslandWorth(SuperiorPlayer asker);
 
     /**
      * Handle a placement of a block.
@@ -384,17 +563,9 @@ public interface Island extends Comparable<Island> {
      */
     BigDecimal getIslandLevelAsBigDecimal();
 
-    /**
-     * Check if the location is inside the island's area.
-     * @param location The location to check.
+    /*
+     *  Upgrades related methods
      */
-    boolean isInside(Location location);
-
-    /**
-     * Check if the location is inside the island's protected area.
-     * @param location The location to check.
-     */
-    boolean isInsideRange(Location location);
 
     /**
      * Get the level of an upgrade for the island.
@@ -410,30 +581,15 @@ public interface Island extends Comparable<Island> {
     void setUpgradeLevel(String upgradeName, int level);
 
     /**
-     * Update the border of all the players inside the island.
-     */
-    void updateBorder();
-
-    /**
-     * Get the island radius of the island.
-     */
-    int getIslandSize();
-
-    /**
-     * Get the block limit of a block.
-     * @param key The block's key to check.
-     */
-    int getBlockLimit(Key key);
-
-    /**
-     * Get the team limit of the island.
-     */
-    int getTeamLimit();
-
-    /**
      * Get the crop-growth multiplier for the island.
      */
     double getCropGrowthMultiplier();
+
+    /**
+     * Set the crop-growth multiplier for the island.
+     * @param cropGrowth The multiplier to set.
+     */
+    void setCropGrowthMultiplier(double cropGrowth);
 
     /**
      * Get the spawner-rates multiplier for the island.
@@ -441,15 +597,27 @@ public interface Island extends Comparable<Island> {
     double getSpawnerRatesMultiplier();
 
     /**
+     * Set the spawner-rates multiplier for the island.
+     * @param spawnerRates The multiplier to set.
+     */
+    void setSpawnerRatesMultiplier(double spawnerRates);
+
+    /**
      * Get the mob-drops multiplier for the island.
      */
     double getMobDropsMultiplier();
 
     /**
-     * Set the radius of the island.
-     * @param islandSize The radius for the island.
+     * Set the mob-drops multiplier for the island.
+     * @param mobDrops The multiplier to set.
      */
-    void setIslandSize(int islandSize);
+    void setMobDropsMultiplier(double mobDrops);
+
+    /**
+     * Get the block limit of a block.
+     * @param key The block's key to check.
+     */
+    int getBlockLimit(Key key);
 
     /**
      * Set the block limit of a block.
@@ -459,60 +627,30 @@ public interface Island extends Comparable<Island> {
     void setBlockLimit(Key key, int limit);
 
     /**
+     * Get the team limit of the island.
+     */
+    int getTeamLimit();
+
+    /**
      * Set the team limit of the island.
      * @param teamLimit The team limit to set.
      */
     void setTeamLimit(int teamLimit);
 
     /**
-     * Set the crop-growth multiplier for the island.
-     * @param cropGrowth The multiplier to set.
+     * Get the warps limit of the island.
      */
-    void setCropGrowthMultiplier(double cropGrowth);
+    int getWarpsLimit();
 
     /**
-     * Set the spawner-rates multiplier for the island.
-     * @param spawnerRates The multiplier to set.
+     * Set the warps limit for the island.
+     * @param warpsLimit The limit to set.
      */
-    void setSpawnerRatesMultiplier(double spawnerRates);
+    void setWarpsLimit(int warpsLimit);
 
-    /**
-     * Set the mob-drops multiplier for the island.
-     * @param mobDrops The multiplier to set.
+    /*
+     *  Warps related methods
      */
-    void setMobDropsMultiplier(double mobDrops);
-
-    /**
-     * Get the discord that is associated with the island.
-     */
-    String getDiscord();
-
-    /**
-     * Set the discord that will be associated with the island.
-     */
-    void setDiscord(String discord);
-
-    /**
-     * Get the paypal that is associated with the island.
-     */
-    String getPaypal();
-
-    /**
-     * Get the paypal that will be associated with the island.
-     */
-    void setPaypal(String paypal);
-
-    /**
-     * Change the biome of the island's area.
-     */
-    void setBiome(Biome biome);
-
-    /**
-     * Send a plain message to all the members of the island.
-     * @param message The message to send
-     * @param ignoredMembers An array of ignored members.
-     */
-    void sendMessage(String message, UUID... ignoredMembers);
 
     /**
      * Get the location of a warp.
@@ -564,56 +702,9 @@ public interface Island extends Comparable<Island> {
      */
     boolean hasMoreWarpSlots();
 
-    /**
-     * Set the warps limit for the island.
-     * @param warpsLimit The limit to set.
+    /*
+     *  Ratings related methods
      */
-    void setWarpsLimit(int warpsLimit);
-
-    /**
-     * Get the warps limit of the island.
-     */
-    int getWarpsLimit();
-
-    /**
-     * Transfer the island's leadership to another player.
-     * @param superiorPlayer The player to transfer the leadership to.
-     * @return True if the transfer was succeed, otherwise false.
-     */
-    boolean transferIsland(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Check whether or not the island is locked to visitors.
-     */
-    boolean isLocked();
-
-    /**
-     * Lock or unlock the island to visitors.
-     * @param locked Whether or not the island should be locked to visitors.
-     */
-    void setLocked(boolean locked);
-
-    /**
-     * Get the name of the island.
-     */
-    String getName();
-
-    /**
-     * Set the name of the island.
-     * @param islandName The name to set.
-     */
-    void setName(String islandName);
-
-    /**
-     * Get the description of the island.
-     */
-    String getDescription();
-
-    /**
-     * Set the description of the island.
-     * @param description The description to set.
-     */
-    void setDescription(String description);
 
     /**
      * Get the rating that a player has given the island.
@@ -663,6 +754,10 @@ public interface Island extends Comparable<Island> {
      */
     Map<UUID, Rating> getRatings();
 
+    /*
+     *  Missions related methods
+     */
+
     /**
      * Complete a mission.
      * @param mission The mission to complete.
@@ -686,10 +781,9 @@ public interface Island extends Comparable<Island> {
      */
     List<Mission> getCompletedMissions();
 
-    /**
-     * The current biome of the island.
+    /*
+     *  Settings related methods
      */
-    Biome getBiome();
 
     /**
      * Check whether a settings is enabled or not.
@@ -708,15 +802,5 @@ public interface Island extends Comparable<Island> {
      * @param islandSettings The settings to disable.
      */
     void disableSettings(IslandSettings islandSettings);
-
-    /**
-     * Checks whether or not the island is ignored in the top islands.
-     */
-    boolean isIgnored();
-
-    /**
-     * Set whether or not the island should be ignored in the top islands.
-     */
-    void setIgnored(boolean ignored);
 
 }

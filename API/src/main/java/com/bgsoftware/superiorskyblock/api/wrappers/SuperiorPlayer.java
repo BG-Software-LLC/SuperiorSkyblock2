@@ -54,16 +54,46 @@ public interface SuperiorPlayer {
     Location getLocation();
 
     /**
+     * Teleport the player to a location.
+     * @param location The location to teleport the player to.
+     */
+    void teleport(Location location);
+
+    /**
+     * Teleport the player to an island.
+     * @param island The island to teleport the player to.
+     */
+    void teleport(Island island);
+
+    /**
+     * Get the island owner of the player's island.
+     *
+     * @deprecated getIslandLeader
+     */
+    @Deprecated
+    UUID getTeamLeader();
+
+    /**
      * Get the island owner of the player's island.
      */
-    UUID getTeamLeader();
+    SuperiorPlayer getIslandLeader();
 
     /**
      * Set the island owner of the player's island.
      * !Can cause issues if not used properly!
      * @param teamLeader The island owner's uuid.
+     *
+     * @deprecated See setIslandLeader(SuperiorPlayer)
      */
+    @Deprecated
     void setTeamLeader(UUID teamLeader);
+
+    /**
+     * Set the island owner of the player's island.
+     * !Can cause issues if not used properly!
+     * @param superiorPlayer The island owner's player.
+     */
+    void setIslandLeader(SuperiorPlayer superiorPlayer);
 
     /**
      * Get the island of the player.

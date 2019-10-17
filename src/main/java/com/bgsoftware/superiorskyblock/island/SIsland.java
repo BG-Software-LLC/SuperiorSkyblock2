@@ -80,20 +80,18 @@ public class SIsland extends DatabaseObject implements Island {
     /*
      * SIsland identifiers
      */
-    private UUID owner;
+    private SuperiorPlayer owner;
     private final BlockPosition center;
 
     /*
      * SIsland data
      */
 
-    private final TreeSet<UUID> members = new TreeSet<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
-    private final Set<UUID> coop = new HashSet<>();
-    private final Set<UUID> banned = new HashSet<>();
+    private final TreeSet<SuperiorPlayer> members = new TreeSet<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
+    private final Set<SuperiorPlayer> banned = new HashSet<>(), coop = new HashSet<>(), invitedPlayers = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Set<IslandSettings> islandSettings = new HashSet<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
-    private final Set<UUID> invitedPlayers = new HashSet<>();
     private final KeyMap<Integer> blockCounts = new KeyMap<>();
     private final KeyMap<Integer> blockLimits = new KeyMap<>(plugin.getSettings().defaultBlockLimits);
     private final Map<String, WarpData> warps = new HashMap<>();
@@ -123,7 +121,7 @@ public class SIsland extends DatabaseObject implements Island {
     private double mobDrops = plugin.getSettings().defaultMobDrops;
 
     public SIsland(CachedResultSet resultSet){
-        this.owner = UUID.fromString(resultSet.getString("owner"));
+        this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
 
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
         this.teleportLocation = LocationUtils.getLocation(resultSet.getString("teleportLocation"));
@@ -166,7 +164,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     public SIsland(CompoundTag tag){
         Map<String, Tag> compoundValues = tag.getValue();
-        this.owner = UUID.fromString(((StringTag) compoundValues.get("owner")).getValue());
+        this.owner = SSuperiorPlayer.of(UUID.fromString(((StringTag) compoundValues.get("owner")).getValue()));
         this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
 
         this.teleportLocation = compoundValues.containsKey("teleportLocation") ?
@@ -174,11 +172,11 @@ public class SIsland extends DatabaseObject implements Island {
 
         List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
         for(Tag _tag : members)
-            this.members.add(UUID.fromString(((StringTag) _tag).getValue()));
+            this.members.add(SSuperiorPlayer.of(UUID.fromString(((StringTag) _tag).getValue())));
 
         List<Tag> banned = ((ListTag) compoundValues.get("banned")).getValue();
         for(Tag _tag : banned)
-            this.banned.add(UUID.fromString(((StringTag) _tag).getValue()));
+            this.banned.add(SSuperiorPlayer.of(UUID.fromString(((StringTag) _tag).getValue())));
 
         Map<String, Tag> permissionNodes = ((CompoundTag) compoundValues.get("permissionNodes")).getValue();
         for(String playerRole : permissionNodes.keySet())
@@ -217,7 +215,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
         if(superiorPlayer != null){
-            this.owner = superiorPlayer.getTeamLeader();
+            this.owner = superiorPlayer.getIslandLeader();
             superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
         }else{
             this.owner = null;
@@ -228,39 +226,96 @@ public class SIsland extends DatabaseObject implements Island {
         assignSettings();
     }
 
+    /*
+     *  General methods
+     */
+
     @Override
     public SuperiorPlayer getOwner() {
-        return SSuperiorPlayer.of(owner);
+        return owner;
     }
+
+    /*
+     *  Player related methods
+     */
 
     @Override
     public List<UUID> getMembers() {
-        return new ArrayList<>(members);
+        return getIslandMembers(false).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
     }
 
     @Override
-    public boolean isSpawn() {
-        return false;
+    public List<UUID> getAllMembers() {
+        return getIslandMembers(true).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
+        List<SuperiorPlayer> members = new ArrayList<>();
+
+        if(includeOwner)
+            members.add(owner);
+
+        members.addAll(this.members);
+
+        return members;
+    }
+
+    @Override
+    public List<UUID> getAllBannedMembers() {
+        return getBannedPlayers().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SuperiorPlayer> getBannedPlayers() {
+        return new ArrayList<>(banned);
+    }
+
+    @Override
+    public List<UUID> getVisitors(){
+        return getIslandVisitors().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors() {
+        return getAllPlayersInside().stream().filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UUID> allPlayersInside(){
+        return getAllPlayersInside().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SuperiorPlayer> getAllPlayersInside() {
+        List<SuperiorPlayer> visitors = new ArrayList<>();
+
+        for(Player player : Bukkit.getOnlinePlayers()){
+            if(isInside(player.getLocation()))
+                visitors.add(SSuperiorPlayer.of(player));
+        }
+
+        return visitors;
     }
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer){
-        if(invitedPlayers.contains(superiorPlayer.getUniqueId()))
+        if(invitedPlayers.contains(superiorPlayer))
             return;
 
-        invitedPlayers.add(superiorPlayer.getUniqueId());
+        invitedPlayers.add(superiorPlayer);
         //Revoke the invite after 5 minutes
         Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
 
     @Override
     public void revokeInvite(SuperiorPlayer superiorPlayer){
-        invitedPlayers.remove(superiorPlayer.getUniqueId());
+        invitedPlayers.remove(superiorPlayer);
     }
 
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer){
-        return invitedPlayers.contains(superiorPlayer.getUniqueId());
+        return invitedPlayers.contains(superiorPlayer);
     }
 
     @Override
@@ -271,110 +326,78 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
-        members.add(superiorPlayer.getUniqueId());
-        superiorPlayer.setTeamLeader(owner);
+        members.add(superiorPlayer);
+        superiorPlayer.setIslandLeader(owner);
         superiorPlayer.setPlayerRole(playerRole);
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
-                .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
+                .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(owner.toString())
                 .execute(true);
-    }
-
-    @Override
-    public void addCoop(SuperiorPlayer superiorPlayer) {
-        coop.add(superiorPlayer.getUniqueId());
     }
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
-        members.remove(superiorPlayer.getUniqueId());
-        superiorPlayer.setTeamLeader(superiorPlayer.getUniqueId());
+        members.remove(superiorPlayer);
+        superiorPlayer.setIslandLeader(superiorPlayer);
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
-                .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
+                .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(owner.toString())
                 .execute(true);
     }
 
     @Override
-    public void removeCoop(SuperiorPlayer superiorPlayer) {
-        coop.remove(superiorPlayer.getUniqueId());
+    public boolean isMember(SuperiorPlayer superiorPlayer){
+        return owner.equals(superiorPlayer.getIslandLeader());
     }
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
+        banned.add(superiorPlayer);
+
         if(isMember(superiorPlayer))
             kickMember(superiorPlayer);
+
         if(superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
             superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
-        banned.add(superiorPlayer.getUniqueId());
+
         Query.ISLAND_SET_BANNED.getStatementHolder()
-                .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
+                .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
                 .setString(owner.toString())
                 .execute(true);
     }
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
-        banned.remove(superiorPlayer.getUniqueId());
+        banned.remove(superiorPlayer);
         Query.ISLAND_SET_BANNED.getStatementHolder()
-                .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
+                .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
                 .setString(owner.toString())
                 .execute(true);
     }
 
     @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer){
-        return banned.contains(superiorPlayer.getUniqueId());
+        return banned.contains(superiorPlayer);
     }
 
     @Override
-    public List<UUID> getAllBannedMembers() {
-        return new ArrayList<>(banned);
+    public void addCoop(SuperiorPlayer superiorPlayer) {
+        coop.add(superiorPlayer);
     }
 
     @Override
-    public List<UUID> getAllMembers() {
-        List<UUID> members = new ArrayList<>();
-
-        members.add(owner);
-        members.addAll(getMembers());
-
-        return members;
-    }
-
-    @Override
-    public List<UUID> getVisitors(){
-        List<UUID> visitors = new ArrayList<>();
-
-        for(Player player : Bukkit.getOnlinePlayers()){
-            if(!isMember(SSuperiorPlayer.of(player)) && isInside(player.getLocation()))
-                visitors.add(player.getUniqueId());
-        }
-
-        return visitors;
-    }
-
-    @Override
-    public List<UUID> allPlayersInside(){
-        List<UUID> visitors = new ArrayList<>();
-
-        for(Player player : Bukkit.getOnlinePlayers()){
-            if(isInside(player.getLocation()))
-                visitors.add(player.getUniqueId());
-        }
-
-        return visitors;
-    }
-
-    @Override
-    public boolean isMember(SuperiorPlayer superiorPlayer){
-        return owner.equals(superiorPlayer.getTeamLeader());
+    public void removeCoop(SuperiorPlayer superiorPlayer) {
+        coop.remove(superiorPlayer);
     }
 
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
-        return coop.contains(superiorPlayer.getUniqueId());
+        return coop.contains(superiorPlayer);
     }
+
+    /*
+     *  Location related methods
+     */
 
     @Override
     public Location getCenter(){
@@ -430,6 +453,50 @@ public class SIsland extends DatabaseObject implements Island {
         int islandDistance = plugin.getSettings().maxIslandSize;
         return getCenter().add(islandDistance, 0, islandDistance);
     }
+
+    @Override
+    public List<Chunk> getAllChunks() {
+        return getAllChunks(false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(boolean onlyProtected){
+        int islandSize = getIslandSize();
+        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
+        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
+        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
+            for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
+                chunks.add(minChunk.getWorld().getChunkAt(x, z));
+            }
+        }
+
+
+        return chunks;
+    }
+
+    @Override
+    public boolean isInside(Location location){
+        Location min = getMinimum(), max = getMaximum();
+        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
+                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+    }
+
+    @Override
+    public boolean isInsideRange(Location location){
+        int islandSize = getIslandSize();
+        Location min = center.parse().subtract(islandSize, 0, islandSize);
+        Location max = center.parse().add(islandSize, 0, islandSize);
+        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
+                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+    }
+
+    /*
+     *  Permissions related methods
+     */
 
     @Override
     public boolean hasPermission(CommandSender sender, IslandPermission islandPermission){
@@ -501,12 +568,49 @@ public class SIsland extends DatabaseObject implements Island {
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 
+    /*
+     *  General methods
+     */
+
+    @Override
+    public boolean isSpawn() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return islandName;
+    }
+
+    @Override
+    public void setName(String islandName) {
+        this.islandName = islandName;
+
+        Query.ISLAND_SET_NAME.getStatementHolder()
+                .setString(islandName)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+
+        Query.ISLAND_SET_DESCRIPTION.getStatementHolder()
+                .setString(description)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
     @Override
     public void disbandIsland(){
-        for (UUID member : getAllMembers()) {
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(member);
-
-            if (members.contains(member))
+        getIslandMembers(true).forEach(superiorPlayer -> {
+            if (members.contains(superiorPlayer))
                 kickMember(superiorPlayer);
 
             if (plugin.getSettings().disbandInventoryClear)
@@ -517,61 +621,13 @@ public class SIsland extends DatabaseObject implements Island {
                 if (missionData != null && missionData.disbandReset)
                     superiorPlayer.resetMission(mission);
             });
-        }
+        });
 
         plugin.getGrid().deleteIsland(this);
         if(!Bukkit.getBukkitVersion().contains("1.14")) {
             for (Chunk chunk : getAllChunks(true))
                 chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
         }
-    }
-
-    @Override
-    public List<Chunk> getAllChunks() {
-        return getAllChunks(false);
-    }
-
-    @Override
-    public List<Chunk> getAllChunks(boolean onlyProtected){
-        int islandSize = getIslandSize();
-        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
-        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
-        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
-
-        List<Chunk> chunks = new ArrayList<>();
-
-        for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
-            for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                chunks.add(minChunk.getWorld().getChunkAt(x, z));
-            }
-        }
-
-
-        return chunks;
-    }
-
-    @Override
-    public BigDecimal getMoneyInBankAsBigDecimal() {
-        if(islandBank.doubleValue() < 0) islandBank = BigDecimalFormatted.ZERO;
-        return islandBank;
-    }
-
-    @Override
-    public void depositMoney(double amount){
-        islandBank = islandBank.add(BigDecimalFormatted.of(amount));
-        Query.ISLAND_SET_BANK.getStatementHolder()
-                .setString(islandBank.getAsString())
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public void withdrawMoney(double amount){
-        islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
-        Query.ISLAND_SET_BANK.getStatementHolder()
-                .setString(islandBank.getAsString())
-                .setString(owner.toString())
-                .execute(true);
     }
 
     @Override
@@ -582,7 +638,7 @@ public class SIsland extends DatabaseObject implements Island {
         }
 
         if(calcProcess) {
-            islandCalcsQueue.push(new CalcIslandData(owner, asker == null ? null : asker.getUniqueId()));
+            islandCalcsQueue.push(new CalcIslandData(this, asker));
             return;
         }
 
@@ -703,12 +759,190 @@ public class SIsland extends DatabaseObject implements Island {
 
                 if(islandCalcsQueue.size() != 0){
                     CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                    plugin.getGrid().getIsland(SSuperiorPlayer.of(calcIslandData.owner))
-                            .calcIslandWorth(calcIslandData.asker == null ? null : SSuperiorPlayer.of(calcIslandData.asker));
+                    calcIslandData.island.calcIslandWorth(calcIslandData.asker);
                 }
             });
         });
     }
+
+    @Override
+    public void updateBorder() {
+        allPlayersInside().forEach(uuid -> plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), this));
+    }
+
+    @Override
+    public int getIslandSize() {
+        return islandSize;
+    }
+
+    @Override
+    public void setIslandSize(int islandSize) {
+        this.islandSize = islandSize;
+        Query.ISLAND_SET_SIZE.getStatementHolder()
+                .setInt(islandSize)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public String getDiscord() {
+        return discord;
+    }
+
+    @Override
+    public void setDiscord(String discord) {
+        this.discord = discord;
+        Query.ISLAND_SET_DISCORD.getStatementHolder()
+                .setString(discord)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public String getPaypal() {
+        return paypal;
+    }
+
+    @Override
+    public void setPaypal(String paypal) {
+        this.paypal = paypal;
+        Query.ISLAND_SET_PAYPAL.getStatementHolder()
+                .setString(paypal)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public Biome getBiome() {
+        return biome;
+    }
+
+    @Override
+    public void setBiome(Biome biome){
+        Location min = getMinimum(), max = getMaximum();
+        for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
+            for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
+                center.getWorld().setBiome(x, z, biome);
+            }
+        }
+        this.biome = biome;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return locked;
+    }
+
+    @Override
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+
+        if(locked){
+            for(UUID uuid : allPlayersInside()){
+                SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
+                if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
+                    victimPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
+                    Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
+                }
+            }
+        }
+
+        Query.ISLAND_SET_LOCKED.getStatementHolder()
+                .setBoolean(locked)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    @Override
+    public void setIgnored(boolean ignored) {
+        this.ignored = ignored;
+
+        Query.ISLAND_SET_IGNORED.getStatementHolder()
+                .setBoolean(ignored)
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean transferIsland(SuperiorPlayer superiorPlayer) {
+        if(superiorPlayer.equals(owner))
+            return false;
+
+        SuperiorPlayer previousOwner = getOwner();
+
+        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(this, previousOwner, superiorPlayer);
+        Bukkit.getPluginManager().callEvent(islandTransferEvent);
+
+        if(islandTransferEvent.isCancelled())
+            return false;
+
+        executeDeleteStatement(true);
+
+        //Kick member without saving to database
+        members.remove(superiorPlayer);
+        superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
+
+        //Add member without saving to database
+        members.add(previousOwner);
+        PlayerRole previousRole = SPlayerRole.lastRole().getPreviousRole();
+        previousOwner.setPlayerRole(previousRole == null ? SPlayerRole.lastRole() : previousRole);
+
+        //Changing owner of the island and updating all players
+        owner = superiorPlayer;
+        getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
+
+        executeInsertStatement(true);
+
+        plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner.getUniqueId());
+
+        return true;
+    }
+
+    @Override
+    public void sendMessage(String message, UUID... ignoredMembers){
+        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message));
+    }
+
+    /*
+     *  Bank related methods
+     */
+
+    @Override
+    public BigDecimal getMoneyInBankAsBigDecimal() {
+        if(islandBank.doubleValue() < 0) islandBank = BigDecimalFormatted.ZERO;
+        return islandBank;
+    }
+
+    @Override
+    public void depositMoney(double amount){
+        islandBank = islandBank.add(BigDecimalFormatted.of(amount));
+        Query.ISLAND_SET_BANK.getStatementHolder()
+                .setString(islandBank.getAsString())
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    @Override
+    public void withdrawMoney(double amount){
+        islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
+        Query.ISLAND_SET_BANK.getStatementHolder()
+                .setString(islandBank.getAsString())
+                .setString(owner.toString())
+                .execute(true);
+    }
+
+    /*
+     *  Worth related methods
+     */
 
     @Override
     public void handleBlockPlace(Block block){
@@ -810,13 +1044,6 @@ public class SIsland extends DatabaseObject implements Island {
         }
     }
 
-    private void saveBlockCounts(){
-        Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
-                .setString(IslandSerializer.serializeBlockCounts(blockCounts))
-                .setString(owner.toString())
-                .execute(true);
-    }
-
     @Override
     public int getBlockCount(Key key){
         return blockCounts.getOrDefault(key, 0);
@@ -849,21 +1076,16 @@ public class SIsland extends DatabaseObject implements Island {
         return plugin.getSettings().bonusAffectLevel ? islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth))) : islandLevel;
     }
 
-    @Override
-    public boolean isInside(Location location){
-        Location min = getMinimum(), max = getMaximum();
-        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
-                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+    private void saveBlockCounts(){
+        Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockCounts(blockCounts))
+                .setString(owner.toString())
+                .execute(true);
     }
 
-    @Override
-    public boolean isInsideRange(Location location){
-        int islandSize = getIslandSize();
-        Location min = center.parse().subtract(islandSize, 0, islandSize);
-        Location max = center.parse().add(islandSize, 0, islandSize);
-        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
-                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
-    }
+    /*
+     *  Upgrade related methods
+     */
 
     @Override
     public int getUpgradeLevel(String upgradeName){
@@ -881,65 +1103,8 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public int getIslandSize() {
-        return islandSize;
-    }
-
-    @Override
-    public int getBlockLimit(Key key) {
-        return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
-    }
-
-    @Override
-    public int getTeamLimit() {
-        return teamLimit;
-    }
-
-    @Override
     public double getCropGrowthMultiplier() {
         return cropGrowth;
-    }
-
-    @Override
-    public double getSpawnerRatesMultiplier() {
-        return spawnerRates;
-    }
-
-    @Override
-    public double getMobDropsMultiplier() {
-        return mobDrops;
-    }
-
-    @Override
-    public void setIslandSize(int islandSize) {
-        this.islandSize = islandSize;
-        Query.ISLAND_SET_SIZE.getStatementHolder()
-                .setInt(islandSize)
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public void updateBorder() {
-        allPlayersInside().forEach(uuid -> plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), this));
-    }
-
-    @Override
-    public void setBlockLimit(Key key, int limit) {
-        this.blockLimits.put(key, limit);
-        Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
-                .setString(IslandSerializer.serializeBlockLimits(this.blockLimits))
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public void setTeamLimit(int teamLimit) {
-        this.teamLimit = teamLimit;
-        Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
-                .setInt(teamLimit)
-                .setString(owner.toString())
-                .execute(true);
     }
 
     @Override
@@ -952,12 +1117,22 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public double getSpawnerRatesMultiplier() {
+        return spawnerRates;
+    }
+
+    @Override
     public void setSpawnerRatesMultiplier(double spawnerRates) {
         this.spawnerRates = spawnerRates;
         Query.ISLAND_SET_SPAWNER_RATES.getStatementHolder()
                 .setDouble(spawnerRates)
                 .setString(owner.toString())
                 .execute(true);
+    }
+
+    @Override
+    public double getMobDropsMultiplier() {
+        return mobDrops;
     }
 
     @Override
@@ -970,55 +1145,50 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public String getDiscord() {
-        return discord;
+    public int getBlockLimit(Key key) {
+        return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
     }
 
     @Override
-    public void setDiscord(String discord) {
-        this.discord = discord;
-        Query.ISLAND_SET_DISCORD.getStatementHolder()
-                .setString(discord)
+    public void setBlockLimit(Key key, int limit) {
+        this.blockLimits.put(key, limit);
+        Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockLimits(this.blockLimits))
                 .setString(owner.toString())
                 .execute(true);
     }
 
     @Override
-    public String getPaypal() {
-        return paypal;
+    public int getTeamLimit() {
+        return teamLimit;
     }
 
     @Override
-    public void setPaypal(String paypal) {
-        this.paypal = paypal;
-        Query.ISLAND_SET_PAYPAL.getStatementHolder()
-                .setString(paypal)
+    public void setTeamLimit(int teamLimit) {
+        this.teamLimit = teamLimit;
+        Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
+                .setInt(teamLimit)
                 .setString(owner.toString())
                 .execute(true);
     }
 
     @Override
-    public void setBiome(Biome biome){
-        Location min = getMinimum(), max = getMaximum();
-        for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
-            for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
-                center.getWorld().setBiome(x, z, biome);
-            }
-        }
-        this.biome = biome;
+    public int getWarpsLimit() {
+        return warpsLimit;
     }
 
     @Override
-    public void sendMessage(String message, UUID... ignoredMembers){
-        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
-        SuperiorPlayer targetPlayer;
-        for(UUID uuid : getAllMembers()){
-            if(!ignoredList.contains(uuid)) {
-                if ((targetPlayer = SSuperiorPlayer.of(uuid)).asOfflinePlayer().isOnline())
-                    Locale.sendMessage(targetPlayer, message);
-            }
-        }
+    public void setWarpsLimit(int warpsLimit) {
+        this.warpsLimit = warpsLimit;
+        Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder()
+                .setInt(warpsLimit)
+                .setString(owner.toString())
+                .execute(true);
     }
+
+    /*
+     *  Warps related methods
+     */
 
     @Override
     public Location getWarpLocation(String name){
@@ -1093,110 +1263,9 @@ public class SIsland extends DatabaseObject implements Island {
         return warps.size() < warpsLimit;
     }
 
-    @Override
-    public void setWarpsLimit(int warpsLimit) {
-        this.warpsLimit = warpsLimit;
-        Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder()
-                .setInt(warpsLimit)
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public int getWarpsLimit() {
-        return warpsLimit;
-    }
-
-    @Override
-    public boolean transferIsland(SuperiorPlayer superiorPlayer) {
-        if(superiorPlayer.getUniqueId().equals(owner))
-            return false;
-
-        SuperiorPlayer previousOwner = getOwner();
-
-        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(this, previousOwner, superiorPlayer);
-        Bukkit.getPluginManager().callEvent(islandTransferEvent);
-
-        if(islandTransferEvent.isCancelled())
-            return false;
-
-        executeDeleteStatement(true);
-
-        //Kick member without saving to database
-        members.remove(superiorPlayer.getUniqueId());
-        superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
-
-        //Add member without saving to database
-        members.add(previousOwner.getUniqueId());
-        PlayerRole previousRole = SPlayerRole.lastRole().getPreviousRole();
-        previousOwner.setPlayerRole(previousRole == null ? SPlayerRole.lastRole() : previousRole);
-
-        //Changing owner of the island and updating all players
-        owner = superiorPlayer.getUniqueId();
-        for(UUID islandMember : getAllMembers())
-            SSuperiorPlayer.of(islandMember).setTeamLeader(owner);
-
-        executeInsertStatement(true);
-
-        plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner);
-
-        return true;
-    }
-
-    @Override
-    public boolean isLocked() {
-        return locked;
-    }
-
-    @Override
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-
-        if(locked){
-            for(UUID uuid : allPlayersInside()){
-                SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
-                if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
-                    victimPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
-                    Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
-                }
-            }
-        }
-
-        Query.ISLAND_SET_LOCKED.getStatementHolder()
-                .setBoolean(locked)
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public String getName() {
-        return islandName;
-    }
-
-    @Override
-    public void setName(String islandName) {
-        this.islandName = islandName;
-
-        Query.ISLAND_SET_NAME.getStatementHolder()
-                .setString(islandName)
-                .setString(owner.toString())
-                .execute(true);
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-
-        Query.ISLAND_SET_DESCRIPTION.getStatementHolder()
-                .setString(description)
-                .setString(owner.toString())
-                .execute(true);
-    }
+    /*
+     *  Ratings related methods
+     */
 
     @Override
     public Rating getRating(UUID uuid) {
@@ -1246,6 +1315,10 @@ public class SIsland extends DatabaseObject implements Island {
         return new HashMap<>(ratings);
     }
 
+    /*
+     *  Missions related methods
+     */
+
     @Override
     public void completeMission(Mission mission) {
         completedMissions.add(mission.getName());
@@ -1276,10 +1349,9 @@ public class SIsland extends DatabaseObject implements Island {
         return completedMissions.stream().map(plugin.getMissions()::getMission).collect(Collectors.toList());
     }
 
-    @Override
-    public Biome getBiome() {
-        return biome;
-    }
+    /*
+     *  Settings related methods
+     */
 
     @Override
     public boolean hasSettingsEnabled(IslandSettings settings) {
@@ -1340,28 +1412,17 @@ public class SIsland extends DatabaseObject implements Island {
                 .execute(true);
     }
 
-    @Override
-    public boolean isIgnored() {
-        return ignored;
-    }
-
-    @Override
-    public void setIgnored(boolean ignored) {
-        this.ignored = ignored;
-
-        Query.ISLAND_SET_IGNORED.getStatementHolder()
-                .setBoolean(ignored)
-                .setString(owner.toString())
-                .execute(true);
-    }
+    /*
+     *  Data related methods
+     */
 
     @Override
     public void executeUpdateStatement(boolean async){
         Query.ISLAND_UPDATE.getStatementHolder()
                 .setString(LocationUtils.getLocation(getTeleportLocation()))
                 .setString(LocationUtils.getLocation(visitorsLocation))
-                .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
-                .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
+                .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
+                .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
@@ -1401,8 +1462,8 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(owner.toString())
                 .setString(LocationUtils.getLocation(center.getBlock().getLocation()))
                 .setString(LocationUtils.getLocation(getTeleportLocation()))
-                .setString(members.isEmpty() ? "" : getUuidCollectionString(members))
-                .setString(banned.isEmpty() ? "" : getUuidCollectionString(banned))
+                .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
+                .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
@@ -1429,15 +1490,18 @@ public class SIsland extends DatabaseObject implements Island {
                 .execute(async);
     }
 
-    private static String getUuidCollectionString(Collection<UUID> collection) {
-        StringBuilder builder = new StringBuilder();
-        collection.forEach(uuid -> builder.append(",").append(uuid.toString()));
-        return builder.toString();
-    }
+    /*
+     *  Object related methods
+     */
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SIsland && owner.equals(((SIsland) obj).owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return owner.hashCode();
     }
 
     @Override
@@ -1457,6 +1521,10 @@ public class SIsland extends DatabaseObject implements Island {
 
         return getOwner().getName().compareTo(other.getOwner().getName());
     }
+
+    /*
+     *  Private methods
+     */
 
     private void assignPermissionNodes(){
         boolean save = false;
@@ -1493,12 +1561,19 @@ public class SIsland extends DatabaseObject implements Island {
                 .execute(true);
     }
 
-    private static class CalcIslandData{
+    private static String getPlayerCollectionString(Collection<SuperiorPlayer> collection) {
+        StringBuilder builder = new StringBuilder();
+        collection.forEach(superiorPlayer -> builder.append(",").append(superiorPlayer.getUniqueId().toString()));
+        return builder.toString();
+    }
 
-        private UUID owner, asker;
+    private static class CalcIslandData {
 
-        private CalcIslandData(UUID owner, UUID asker){
-            this.owner = owner;
+        private Island island;
+        private SuperiorPlayer asker;
+
+        private CalcIslandData(Island island, SuperiorPlayer asker){
+            this.island = island;
             this.asker = asker;
         }
 

@@ -6,11 +6,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,15 +25,15 @@ public final class IslandDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static void deserializeMembers(String members, Set<UUID> membersSet){
+    public static void deserializeMembers(String members, Set<SuperiorPlayer> membersSet){
         for(String uuid : members.split(",")) {
             try {
-                membersSet.add(UUID.fromString(uuid));
+                membersSet.add(SSuperiorPlayer.of(UUID.fromString(uuid)));
             }catch(Exception ignored){}
         }
     }
 
-    public static void deserializeBanned(String banned, Set<UUID> bannedSet){
+    public static void deserializeBanned(String banned, Set<SuperiorPlayer> bannedSet){
         deserializeMembers(banned, bannedSet);
     }
 

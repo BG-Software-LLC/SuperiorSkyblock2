@@ -78,7 +78,7 @@ public final class CmdAccept implements ICommand {
             return;
         }
 
-        if(island.getTeamLimit() >= 0 && island.getAllMembers().size() >= island.getTeamLimit()){
+        if(island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()){
             Locale.JOIN_FULL_ISLAND.send(superiorPlayer);
             island.revokeInvite(superiorPlayer);
             return;

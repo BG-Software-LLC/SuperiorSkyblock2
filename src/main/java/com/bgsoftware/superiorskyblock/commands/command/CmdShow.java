@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public final class CmdShow implements ICommand {
 
@@ -120,14 +119,11 @@ public final class CmdShow implements ICommand {
             plugin.getPlayers().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
                     .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
-            List<UUID> members = island.getMembers();
+            List<SuperiorPlayer> members = island.getIslandMembers(false);
 
             if (!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty()) {
-                for (UUID uuid : members) {
-                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
-                    rolesStrings.get(superiorPlayer.getPlayerRole())
-                            .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(superiorPlayer.getName())).append("\n");
-                }
+                members.forEach(superiorPlayer -> rolesStrings.get(superiorPlayer.getPlayerRole())
+                        .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(superiorPlayer.getName())).append("\n"));
             }
 
             rolesStrings.keySet().stream()

@@ -65,7 +65,7 @@ public final class LeaderHeadsHook {
 
         @Override
         public Double getValue(Island island) {
-            return (double) island.allPlayersInside().size();
+            return (double) island.getAllPlayersInside().size();
         }
     }
 

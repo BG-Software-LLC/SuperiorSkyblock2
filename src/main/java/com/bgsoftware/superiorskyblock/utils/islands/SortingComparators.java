@@ -2,10 +2,8 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import java.util.Comparator;
-import java.util.UUID;
 
 public final class SortingComparators {
 
@@ -15,7 +13,7 @@ public final class SortingComparators {
         return firstName.compareTo(secondName);
     };
 
-    private final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
+    public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
 
     public final static Comparator<Island> WORTH_COMPARATOR = (o1, o2) -> {
         int compare = o2.getWorthAsBigDecimal().compareTo(o1.getWorthAsBigDecimal());
@@ -39,14 +37,13 @@ public final class SortingComparators {
     };
 
     public final static Comparator<Island> PLAYERS_COMPARATOR = (o1, o2) -> {
-        int compare = Integer.compare(o2.allPlayersInside().size(), o1.allPlayersInside().size());
+        int compare = Integer.compare(o2.getAllPlayersInside().size(), o1.getAllPlayersInside().size());
         return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
-    public final static Comparator<UUID> ISLAND_MEMBERS_COMPARATOR = (o1, o2) -> {
-        SuperiorPlayer firstPlayer = SSuperiorPlayer.of(o1), secondPlayer = SSuperiorPlayer.of(o2);
-        int compare = Integer.compare(secondPlayer.getPlayerRole().getWeight(), firstPlayer.getPlayerRole().getWeight());
-        return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(firstPlayer, secondPlayer) : compare;
+    public final static Comparator<SuperiorPlayer> ISLAND_MEMBERS_COMPARATOR = (o1, o2) -> {
+        int compare = Integer.compare(o2.getPlayerRole().getWeight(), o1.getPlayerRole().getWeight());
+        return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
 }

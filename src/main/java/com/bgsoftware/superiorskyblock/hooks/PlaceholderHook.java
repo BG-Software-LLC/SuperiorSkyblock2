@@ -16,7 +16,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,8 +120,8 @@ public abstract class PlaceholderHook {
                 else if ((matcher = Pattern.compile("island_member_(.+)").matcher(placeholder)).matches()) {
                     try{
                         int index = Integer.parseInt(matcher.group(1));
-                        List<UUID> members = island.getMembers();
-                        return index >= members.size() ? "" : SSuperiorPlayer.of(members.get(index)).getName();
+                        List<SuperiorPlayer> members = island.getIslandMembers(false);
+                        return index >= members.size() ? "" : members.get(index).getName();
                     }catch(IllegalArgumentException ignored){}
                 }
 
@@ -138,7 +137,7 @@ public abstract class PlaceholderHook {
                     case "world":
                         return String.valueOf(island.getCenter().getWorld().getName());
                     case "team_size":
-                        return String.valueOf(island.getAllMembers().size());
+                        return String.valueOf(island.getIslandMembers(true).size());
                     case "team_limit":
                         return String.valueOf(island.getTeamLimit());
                     case "leader":

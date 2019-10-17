@@ -42,7 +42,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private final Set<String> completedMissions = new HashSet<>();
     private final UUID player;
 
-    private UUID teamLeader;
+    private SuperiorPlayer islandLeader;
     private String name, textureValue = "";
     private PlayerRole playerRole;
 
@@ -61,7 +61,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
-        teamLeader = UUID.fromString(resultSet.getString("teamLeader"));
+        islandLeader = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("teamLeader")));
         name = resultSet.getString("name");
         textureValue = resultSet.getString("textureValue");
         playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
@@ -77,21 +77,21 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Map<String, Tag> compoundValues = tag.getValue();
 
         player = UUID.fromString(((StringTag) compoundValues.get("player")).getValue());
-        teamLeader = UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue());
+        islandLeader = SSuperiorPlayer.of(UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue()));
         name = ((StringTag) compoundValues.get("name")).getValue();
         playerRole = SPlayerRole.of(((StringTag) compoundValues.get("islandRole")).getValue());
         textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
         disbands = compoundValues.containsKey("disbands") ? (int) compoundValues.get("disbands").getValue() : plugin.getSettings().disbandCount;
 
-        if(plugin.getGrid().getIsland(SSuperiorPlayer.of(teamLeader)) == null)
-            teamLeader = player;
+        if(islandLeader.getIsland() == null)
+            islandLeader = this;
     }
 
     public SSuperiorPlayer(UUID player){
         OfflinePlayer offlinePlayer;
         this.player = player;
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
-        this.teamLeader = player;
+        this.islandLeader = this;
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
     }
@@ -140,15 +140,35 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     @Override
+    public void teleport(Location location) {
+        asPlayer().teleport(location);
+    }
+
+    @Override
+    public void teleport(Island island) {
+        teleport(island.getCenter());
+    }
+
+    @Override
     public UUID getTeamLeader() {
-        return teamLeader;
+        return getIslandLeader().getUniqueId();
+    }
+
+    @Override
+    public SuperiorPlayer getIslandLeader() {
+        return islandLeader;
     }
 
     @Override
     public void setTeamLeader(UUID teamLeader) {
-        this.teamLeader = teamLeader;
+        setIslandLeader(SSuperiorPlayer.of(teamLeader));
+    }
+
+    @Override
+    public void setIslandLeader(SuperiorPlayer superiorPlayer) {
+        this.islandLeader = superiorPlayer;
         Query.PLAYER_SET_LEADER.getStatementHolder()
-                .setString(teamLeader.toString())
+                .setString(islandLeader.getUniqueId().toString())
                 .setString(player.toString())
                 .execute(true);
     }
@@ -408,7 +428,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void executeUpdateStatement(boolean async) {
         Query.PLAYER_UPDATE.getStatementHolder()
-                .setString(teamLeader.toString())
+                .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
                 .setString(playerRole.toString())
                 .setString(textureValue)
@@ -426,7 +446,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void executeInsertStatement(boolean async) {
         Query.PLAYER_INSERT.getStatementHolder()
                 .setString(player.toString())
-                .setString(teamLeader.toString())
+                .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
                 .setString(playerRole.toString())
                 .setString(textureValue)
@@ -450,6 +470,16 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 "uuid=[" + player + "]," +
                 "name=[" + name + "]" +
                 "}";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SuperiorPlayer && player.equals(((SSuperiorPlayer) obj).player);
+    }
+
+    @Override
+    public int hashCode() {
+        return player.hashCode();
     }
 
     public static SuperiorPlayer of(CommandSender sender){

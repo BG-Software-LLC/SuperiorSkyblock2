@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public final class IslandsTopMenu extends SuperiorMenu {
 
@@ -221,15 +220,13 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
                 for(String line : itemStack.getItemMeta().getLore()){
                     if(line.contains("{4}")){
-                        List<UUID> members = plugin.getSettings().islandTopIncludeLeader ? island.getAllMembers() : island.getMembers();
+                        List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().islandTopIncludeLeader);
                         String memberFormat = line.split("\\{4}:")[1];
                         if(members.size() == 0){
                             lore.add(memberFormat.replace("{}", "None"));
                         }
                         else {
-                            for (UUID memberUUID : members) {
-                                lore.add(memberFormat.replace("{}", SSuperiorPlayer.of(memberUUID).getName()));
-                            }
+                            members.forEach(member -> lore.add(memberFormat.replace("{}", member.getName())));
                         }
                     }else{
                         lore.add(line

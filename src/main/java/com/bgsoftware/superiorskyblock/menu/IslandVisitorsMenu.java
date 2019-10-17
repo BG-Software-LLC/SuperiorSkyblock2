@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -17,9 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 public final class IslandVisitorsMenu extends SuperiorMenu {
 
@@ -29,14 +28,14 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots = new ArrayList<>();
 
-    private List<UUID> visitors;
+    private List<SuperiorPlayer> visitors;
     private int page;
 
     private IslandVisitorsMenu(Island island){
         super("visitorsPage");
         if(island != null) {
-            this.visitors = island.getVisitors();
-            visitors.sort(Comparator.comparing(o -> SSuperiorPlayer.of(o).getName()));
+            this.visitors = island.getIslandVisitors();
+            visitors.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
         }
     }
 
@@ -72,7 +71,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
             if(indexOf < 0 || indexOf >= visitors.size())
                 return;
 
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(visitors.get(indexOf));
+            SuperiorPlayer targetPlayer = visitors.get(indexOf);
 
             if (targetPlayer != null) {
                 SoundWrapper sound = getSound(-1);
@@ -114,7 +113,7 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         inv.setContents(inventory.getContents());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < visitors.size(); i++){
-            SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(visitors.get(i + (slots.size() * (page - 1))));
+            SuperiorPlayer _superiorPlayer = visitors.get(i + (slots.size() * (page - 1)));
             String islandOwner = "None";
             if(_superiorPlayer.getIsland() != null)
                 islandOwner = _superiorPlayer.getIsland().getOwner().getName();
