@@ -121,8 +121,11 @@ public abstract class PlaceholderHook {
                 else if ((matcher = Pattern.compile("island_member_(.+)").matcher(placeholder)).matches()) {
                     try{
                         int index = Integer.parseInt(matcher.group(1));
-                        List<SuperiorPlayer> members = island.getIslandMembers(false);
-                        return index >= members.size() ? "" : members.get(index).getName();
+                        if(index > 0) {
+                            List<SuperiorPlayer> members = island.getIslandMembers(false);
+                            if(index < members.size())
+                                return members.get(index - 1).getName();
+                        }
                     }catch(IllegalArgumentException ignored){}
                 }
 
