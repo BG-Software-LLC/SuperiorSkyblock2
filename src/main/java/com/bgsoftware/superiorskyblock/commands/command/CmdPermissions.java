@@ -79,7 +79,7 @@ public final class CmdPermissions implements ICommand {
                 return;
             }
 
-            if(island.isMember(superiorPlayer) && !superiorPlayer.getPlayerRole().isHigherThan(targetPlayer.getPlayerRole())){
+            if(island.isMember(targetPlayer) && !superiorPlayer.getPlayerRole().isHigherThan(targetPlayer.getPlayerRole())){
                 Locale.CHANGE_PERMISSION_FOR_HIGHER_ROLE.send(superiorPlayer);
                 return;
             }
