@@ -106,15 +106,44 @@ public abstract class PlaceholderHook {
                         sortingType = SortingTypes.BY_WORTH;
                     }
 
-                    if(matcher.group(1).equals("position")){
+                    String matcherValue = matcher.group(1);
+
+                    if(matcherValue.equals("position")){
                         return String.valueOf(plugin.getGrid().getIslandPosition(island, sortingType) + 1);
                     }
                     else {
-                        try{
-                            int index = Integer.parseInt(matcher.group(1));
-                            if(index > 0)
-                                return String.valueOf(plugin.getGrid().getIsland(index - 1, sortingType).getOwner().getName());
-                        }catch(IllegalArgumentException ignored){}
+                        boolean value = false;
+
+                        if((matcher = Pattern.compile("value_(.+)").matcher(matcherValue)).matches()){
+                            value = true;
+                            matcherValue = matcher.group(1);
+                        }
+
+                        try {
+                            int index = Integer.parseInt(matcherValue);
+                            if (index > 0) {
+                                Island _island = plugin.getGrid().getIsland(index - 1, sortingType);
+
+                                if(value){
+                                    if(sortingType.equals(SortingTypes.BY_WORTH)){
+                                        return island.getWorthAsBigDecimal().toString();
+                                    }
+                                    else if(sortingType.equals(SortingTypes.BY_LEVEL)){
+                                        return island.getIslandLevelAsBigDecimal().toString();
+                                    }
+                                    else if(sortingType.equals(SortingTypes.BY_RATING)){
+                                        return StringUtils.format(island.getTotalRating());
+                                    }
+                                    else if(sortingType.equals(SortingTypes.BY_PLAYERS)){
+                                        return StringUtils.format(island.getAllPlayersInside().size());
+                                    }
+                                }
+
+                                else{
+                                    return _island.getOwner().getName();
+                                }
+                            }
+                        } catch (IllegalArgumentException ignored) { }
                     }
                 }
 
