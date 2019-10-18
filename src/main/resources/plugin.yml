@@ -177,6 +177,8 @@ permissions:
             description: Transfer an island to someone else.
           superior.admin.setmobdrops:
             description: Set the mob drops multiplier for another player's island.
+          superior.admin.setpermission:
+            description: Set a required role for a permission for all the islands.
           superior.admin.setrate:
             description: Set the rating of another player.
           superior.admin.setsize:

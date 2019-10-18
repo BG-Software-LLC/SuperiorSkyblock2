@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 public final class StringUtils {
 
@@ -61,6 +63,12 @@ public final class StringUtils {
             starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage());
 
         return starsString.toString();
+    }
+
+    public static String getPermissionsString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        Arrays.stream(IslandPermission.values()).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
+        return stringBuilder.toString().substring(2);
     }
 
 }

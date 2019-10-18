@@ -72,6 +72,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Set a player''s amount of island disban
 COMMAND_DESCRIPTION_ADMIN_SET_HOPPERS_LIMIT: 'Set hoppers limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Transfer an island to someone else.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Set the mob drops multiplier for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 'Set a required role for a permission for all the islands.'
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: 'Set the rating of another player.'
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 'Change another player''s island size.'
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: 'Set the spawner rates multiplier for another player''s island.'
@@ -322,6 +323,7 @@ PERMISSION_CHECK: |
   &e&lIsland | &7{0}'s Permissions:
   &e&lIsland | &7{0}'s Permissions:
   {1}
+PERMISSION_CHANGED: '&e&lIsland | &7Successfully updated the permission for all the islands.'
 PERMISSION_SPACER: '&7, '
 PLAYER_ALREADY_BANNED: '&c&lError | &7This player is already banned.'
 PLAYER_ALREADY_COOP: '&c&lError | &7This player is already coop.'

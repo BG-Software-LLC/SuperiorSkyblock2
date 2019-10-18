@@ -41,6 +41,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetHoppersLimit());
         subCommands.add(new CmdAdminSetLeader());
         subCommands.add(new CmdAdminSetMobDrops());
+        subCommands.add(new CmdAdminSetPermission());
         subCommands.add(new CmdAdminSetDisbands());
         subCommands.add(new CmdAdminSetRate());
         subCommands.add(new CmdAdminSetSize());
