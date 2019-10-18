@@ -331,7 +331,7 @@ public class SIsland extends DatabaseObject implements Island {
         superiorPlayer.setPlayerRole(playerRole);
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -341,7 +341,7 @@ public class SIsland extends DatabaseObject implements Island {
         superiorPlayer.setIslandLeader(superiorPlayer);
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -362,7 +362,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -371,7 +371,7 @@ public class SIsland extends DatabaseObject implements Island {
         banned.remove(superiorPlayer);
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -421,7 +421,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.teleportLocation = teleportLocation.clone();
         Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
                 .setString(LocationUtils.getLocation(getTeleportLocation()))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -438,7 +438,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_VISITORS_LOCATION.getStatementHolder()
                 .setString(LocationUtils.getLocation(getVisitorsLocation()))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -520,7 +520,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -534,7 +534,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -588,7 +588,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_NAME.getStatementHolder()
                 .setString(islandName)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -603,7 +603,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_DESCRIPTION.getStatementHolder()
                 .setString(description)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -780,7 +780,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.islandSize = islandSize;
         Query.ISLAND_SET_SIZE.getStatementHolder()
                 .setInt(islandSize)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -794,7 +794,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.discord = discord;
         Query.ISLAND_SET_DISCORD.getStatementHolder()
                 .setString(discord)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -808,7 +808,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.paypal = paypal;
         Query.ISLAND_SET_PAYPAL.getStatementHolder()
                 .setString(paypal)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -849,7 +849,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_LOCKED.getStatementHolder()
                 .setBoolean(locked)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -864,7 +864,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_IGNORED.getStatementHolder()
                 .setBoolean(ignored)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -927,7 +927,7 @@ public class SIsland extends DatabaseObject implements Island {
         islandBank = islandBank.add(BigDecimalFormatted.of(amount));
         Query.ISLAND_SET_BANK.getStatementHolder()
                 .setString(islandBank.getAsString())
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -936,7 +936,7 @@ public class SIsland extends DatabaseObject implements Island {
         islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
         Query.ISLAND_SET_BANK.getStatementHolder()
                 .setString(islandBank.getAsString())
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1067,7 +1067,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.bonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
                 .setString(this.bonusWorth.getAsString())
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1079,7 +1079,7 @@ public class SIsland extends DatabaseObject implements Island {
     private void saveBlockCounts(){
         Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
                 .setString(IslandSerializer.serializeBlockCounts(blockCounts))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1098,7 +1098,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_UPGRADES.getStatementHolder()
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1112,7 +1112,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.cropGrowth = cropGrowth;
         Query.ISLAND_SET_CROP_GROWTH.getStatementHolder()
                 .setDouble(cropGrowth)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1126,7 +1126,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.spawnerRates = spawnerRates;
         Query.ISLAND_SET_SPAWNER_RATES.getStatementHolder()
                 .setDouble(spawnerRates)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1140,7 +1140,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.mobDrops = mobDrops;
         Query.ISLAND_SET_MOB_DROPS.getStatementHolder()
                 .setDouble(mobDrops)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1154,7 +1154,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.blockLimits.put(key, limit);
         Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
                 .setString(IslandSerializer.serializeBlockLimits(this.blockLimits))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1168,7 +1168,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.teamLimit = teamLimit;
         Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
                 .setInt(teamLimit)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1182,7 +1182,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.warpsLimit = warpsLimit;
         Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder()
                 .setInt(warpsLimit)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1206,7 +1206,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(IslandSerializer.serializeWarps(warps))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1249,7 +1249,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(IslandSerializer.serializeWarps(warps))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1291,7 +1291,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_RATINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeRatings(ratings))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1325,7 +1325,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1335,7 +1335,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1412,7 +1412,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1434,7 +1434,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
@@ -1471,21 +1471,21 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored)
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
 
     @Override
     public void executeDeleteStatement(boolean async){
         Query.ISLAND_DELETE.getStatementHolder()
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
 
     @Override
     public void executeInsertStatement(boolean async){
         Query.ISLAND_INSERT.getStatementHolder()
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .setString(LocationUtils.getLocation(center.getBlock().getLocation()))
                 .setString(LocationUtils.getLocation(getTeleportLocation()))
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
@@ -1566,7 +1566,7 @@ public class SIsland extends DatabaseObject implements Island {
         if(save && owner != null){
             Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                     .setString(IslandSerializer.serializePermissions(permissionNodes))
-                    .setString(owner.toString())
+                    .setString(owner.getUniqueId().toString())
                     .execute(true);
         }
     }
@@ -1583,7 +1583,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
-                .setString(owner.toString())
+                .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
