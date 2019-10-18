@@ -12,8 +12,7 @@ settings-gui:
   fill-items:
     '1':
       slots: 0,1,2,3,4,5,6,7,8,9,17,18,26,27,35,36,37,39,41,43,44
-      type: STAINED_GLASS_PANE
-      data: 3
+      type: LIGHT_BLUE_STAINED_GLASS_PANE
 
   slots: 10,11,12,13,14,15,16,19,20,21,22,23,24,25,28,29,30,31,32,33,34
 
@@ -26,7 +25,7 @@ settings-gui:
   current-page:
     slot: 40
     sound: ''
-    type: DOUBLE_PLANT
+    type: SUNFLOWER
     name: '&aCurrent Page'
     lore:
       - '&7Page {0}'
@@ -40,15 +39,13 @@ settings-gui:
   settings:
     always_day:
       settings-enabled:
-        type: STAINED_CLAY
-        data: 4
+        type: YELLOW_TERRACOTTA
         name: '&6Always Day'
         lore:
           - '&7Set a day time on your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: STAINED_CLAY
-        data: 4
+        type: YELLOW_TERRACOTTA
         name: '&6Always Day'
         lore:
           - '&7Set a day time on your island.'
@@ -60,15 +57,13 @@ settings-gui:
 
     always_middle_day:
       settings-enabled:
-        type: STAINED_CLAY
-        data: 1
+        type: ORANGE_TERRACOTTA
         name: '&6Always Middle Day'
         lore:
           - '&7Set a middle day time on your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: STAINED_CLAY
-        data: 1
+        type: ORANGE_TERRACOTTA
         name: '&6Always Middle Day'
         lore:
           - '&7Set a middle day time on your island.'
@@ -80,15 +75,13 @@ settings-gui:
 
     always_night:
       settings-enabled:
-        type: STAINED_CLAY
-        data: 3
+        type: LIGHT_BLUE_TERRACOTTA
         name: '&6Always Night'
         lore:
           - '&7Set a night time on your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: STAINED_CLAY
-        data: 3
+        type: LIGHT_BLUE_TERRACOTTA
         name: '&6Always Night'
         lore:
           - '&7Set a night time on your island.'
@@ -100,15 +93,13 @@ settings-gui:
 
     always_middle_night:
       settings-enabled:
-        type: STAINED_CLAY
-        data: 11
+        type: BLUE_TERRACOTTA
         name: '&6Always Middle Night'
         lore:
           - '&7Set a middle night day time on your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: STAINED_CLAY
-        data: 11
+        type: BLUE_TERRACOTTA
         name: '&6Always Middle Night'
         lore:
           - '&7Set a middle night day time on your island.'
@@ -120,13 +111,13 @@ settings-gui:
 
     always_rain:
       settings-enabled:
-        type: WATER_LILY
+        type: LILY_PAD
         name: '&6Always Rain'
         lore:
           - '&7Set a rainy weather on your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: WATER_LILY
+        type: LILY_PAD
         name: '&6Always Rain'
         lore:
           - '&7Set a rainy weather on your island.'
@@ -174,13 +165,13 @@ settings-gui:
 
     crops_growth:
       settings-enabled:
-        type: SEEDS
+        type: WHEAT_SEEDS
         name: '&6Crops Growth'
         lore:
           - '&7Allow growth of crops inside your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: SEEDS
+        type: WHEAT_SEEDS
         name: '&6Crops Growth'
         lore:
           - '&7Allow growth of crops inside your island.'
@@ -246,15 +237,13 @@ settings-gui:
 
     natural_animals_spawn:
       settings-enabled:
-        type: MONSTER_EGG
-        data: 90
+        type: PIG_SPAWN_EGG
         name: '&6Natural Animals Spawn'
         lore:
           - '&7Allow natural spawning of animals inside the island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: MONSTER_EGG
-        data: 90
+        type: PIG_SPAWN_EGG
         name: '&6Natural Animals Spawn'
         lore:
           - '&7Allow natural spawning of animals inside the island.'
@@ -266,15 +255,13 @@ settings-gui:
 
     natural_monster_spawn:
       settings-enabled:
-        type: MONSTER_EGG
-        data: 54
+        type: ZOMBIE_SPAWN_EGG
         name: '&6Natural Monster Spawn'
         lore:
           - '&7Allow natural spawning of monsters inside the island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: MONSTER_EGG
-        data: 54
+        type: ZOMBIE_SPAWN_EGG
         name: '&6Natural Monster Spawn'
         lore:
           - '&7Allow natural spawning of monsters inside the island.'
@@ -304,13 +291,13 @@ settings-gui:
 
     spawner_animals_spawn:
       settings-enabled:
-        type: MOB_SPAWNER
+        type: SPAWNER
         name: '&6Spawner Animals Spawn'
         lore:
           - '&7Allow spawner spawning of animals inside the island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: MOB_SPAWNER
+        type: SPAWNER
         name: '&6Spawner Animals Spawn'
         lore:
           - '&7Allow spawner spawning of animals inside the island.'
@@ -322,13 +309,13 @@ settings-gui:
 
     spawner_monster_spawn:
       settings-enabled:
-        type: MOB_SPAWNER
+        type: SPAWNER
         name: '&6Spawner Monster Spawn'
         lore:
           - '&7Allow spawner spawning of monsters inside the island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: MOB_SPAWNER
+        type: SPAWNER
         name: '&6Spawner Monster Spawn'
         lore:
           - '&7Allow spawner spawning of monsters inside the island.'
@@ -358,13 +345,13 @@ settings-gui:
 
     tree_growth:
       settings-enabled:
-        type: SAPLING
+        type: OAK_SAPLING
         name: '&6Tree Growth'
         lore:
           - '&7Allow growth of trees inside your island.'
           - '&7Currently &aENABLED&7.'
       settings-disabled:
-        type: SAPLING
+        type: OAK_SAPLING
         name: '&6Tree Growth'
         lore:
           - '&7Allow growth of trees inside your island.'
