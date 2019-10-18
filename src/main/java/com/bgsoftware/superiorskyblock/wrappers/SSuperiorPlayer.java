@@ -411,7 +411,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public boolean isOnline(){
-        return asOfflinePlayer().isOnline();
+        OfflinePlayer offlinePlayer = asOfflinePlayer();
+        return offlinePlayer != null && offlinePlayer.isOnline();
     }
 
     @Override
