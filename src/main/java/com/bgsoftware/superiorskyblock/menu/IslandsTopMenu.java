@@ -233,7 +233,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
                                 .replace("{0}", island.getOwner().getName())
                                 .replace("{1}", String.valueOf(place))
                                 .replace("{2}", island.getIslandLevelAsBigDecimal().toString())
-                                .replace("{3}", island.getWorthAsBigDecimal().toString()));
+                                .replace("{3}", island.getWorthAsBigDecimal().toString())
+                                .replace("{4}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
+                                .replace("{5}", StringUtils.fancyFormat(island.getWorthAsBigDecimal())));
                     }
                 }
 
