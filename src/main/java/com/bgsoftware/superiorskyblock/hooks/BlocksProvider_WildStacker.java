@@ -37,17 +37,15 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
     public static void cacheChunk(Chunk chunk){
         try {
             StackedSnapshot stackedSnapshot;
-            try{
+            try {
                 stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk);
-            }catch(Throwable ex){
+            } catch (Throwable ex) {
                 //noinspection deprecation
                 stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
             }
-            if(stackedSnapshot != null)
+            if (stackedSnapshot != null)
                 chunkSnapshots.put(getId(chunk), stackedSnapshot);
-        }catch(Throwable ex){
-            ex.printStackTrace();
-        }
+        }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
