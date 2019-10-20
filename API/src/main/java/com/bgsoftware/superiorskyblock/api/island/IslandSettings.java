@@ -20,6 +20,7 @@ public enum IslandSettings {
     SPAWNER_MONSTER_SPAWN,
     TNT_EXPLOSION,
     TREE_GROWTH,
-    WATER_FLOW
+    WATER_FLOW,
+    WITHER_EXPLOSION
 
 }

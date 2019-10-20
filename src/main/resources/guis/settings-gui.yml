@@ -393,3 +393,23 @@ settings-gui:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
         volume: 0.2
         pitch: 0.2
+
+    wither_explosion:
+      settings-enabled:
+        type: SKULL_ITEM
+        data: 1
+        name: '&6Wither Explosion'
+        lore:
+          - '&7Allow withers to explode blocks inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: SKULL_ITEM
+        data: 1
+        name: '&6Wither Explosion'
+        lore:
+          - '&7Allow withers to explode blocks inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2

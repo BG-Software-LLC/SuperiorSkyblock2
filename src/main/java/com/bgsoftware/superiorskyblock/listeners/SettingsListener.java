@@ -19,6 +19,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +29,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -218,8 +221,18 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
         if(island != null){
             if((e.getEntity() instanceof Creeper && !island.hasSettingsEnabled(IslandSettings.CREEPER_EXPLOSION)) ||
-                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandSettings.TNT_EXPLOSION))
+                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandSettings.TNT_EXPLOSION) ||
+                    ((e.getEntity() instanceof Wither || e.getEntity() instanceof WitherSkull) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION)))
             e.blockList().clear();
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlock(EntityChangeBlockEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null) {
+            if((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION))
+                e.setCancelled(true);
         }
     }
 
