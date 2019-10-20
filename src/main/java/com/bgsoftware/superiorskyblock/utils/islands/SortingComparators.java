@@ -26,7 +26,7 @@ public final class SortingComparators {
     };
 
     public final static Comparator<Island> RATING_COMPARATOR = (o1, o2) -> {
-        int totalRatingsCompare = Double.compare(o2.getTotalRating(), o1.getTotalRating());
+        int totalRatingsCompare = Double.compare(o2.getTotalRating() * o2.getRatingAmount(), o1.getTotalRating() * o1.getRatingAmount());
 
         if(totalRatingsCompare == 0){
             int ratingsAmountCompare = Integer.compare(o2.getRatingAmount(), o1.getRatingAmount());
