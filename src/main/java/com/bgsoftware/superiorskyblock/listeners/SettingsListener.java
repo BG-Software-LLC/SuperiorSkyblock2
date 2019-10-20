@@ -227,7 +227,7 @@ public final class SettingsListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if(island != null) {

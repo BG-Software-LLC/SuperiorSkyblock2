@@ -11,6 +11,7 @@ public enum IslandSettings {
     CREEPER_EXPLOSION,
     CROPS_GROWTH,
     EGG_LAY,
+    ENDERMAN_GRIEF,
     FIRE_SPREAD,
     LAVA_FLOW,
     NATURAL_ANIMALS_SPAWN,
