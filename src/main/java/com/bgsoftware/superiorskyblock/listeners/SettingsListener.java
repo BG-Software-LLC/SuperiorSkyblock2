@@ -15,6 +15,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -231,7 +232,8 @@ public final class SettingsListener implements Listener {
     public void onEntityChangeBlock(EntityChangeBlockEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if(island != null) {
-            if((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION))
+            if(((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION)) ||
+                    ((e.getEntity() instanceof Enderman) && !island.hasSettingsEnabled(IslandSettings.ENDERMAN_GRIEF)))
                 e.setCancelled(true);
         }
     }
