@@ -95,16 +95,16 @@ public final class BlocksListener implements Listener {
             island.handleBlockBreak(Key.of(e.getBlock()), 1);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onDragonEggChangeMonitor(DragonEggChangeEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-            if (island != null) {
-                Executor.sync(() -> island.handleBlockPlace(e.getBlock(), 1), 1L);
-            }
-        }
-    }
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onDragonEggChangeMonitor(DragonEggChangeEvent e){
+//        if(plugin != null && plugin.getGrid() != null) {
+//            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+//
+//            if (island != null) {
+//                Executor.sync(() -> island.handleBlockPlace(e.getBlock(), 1), 1L);
+//            }
+//        }
+//    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFromToMonitor(BlockFromToEvent e){
