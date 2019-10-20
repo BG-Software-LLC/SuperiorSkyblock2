@@ -123,19 +123,20 @@ public abstract class PlaceholderHook {
                             int index = Integer.parseInt(matcherValue);
                             if (index > 0) {
                                 Island _island = plugin.getGrid().getIsland(index - 1, sortingType);
+                                assert _island != null;
 
                                 if(value){
                                     if(sortingType.equals(SortingTypes.BY_WORTH)){
-                                        return island.getWorthAsBigDecimal().toString();
+                                        return _island.getWorthAsBigDecimal().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_LEVEL)){
-                                        return island.getIslandLevelAsBigDecimal().toString();
+                                        return _island.getIslandLevelAsBigDecimal().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_RATING)){
-                                        return StringUtils.format(island.getTotalRating());
+                                        return StringUtils.format(_island.getTotalRating());
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_PLAYERS)){
-                                        return StringUtils.format(island.getAllPlayersInside().size());
+                                        return StringUtils.format(_island.getAllPlayersInside().size());
                                     }
                                 }
 
