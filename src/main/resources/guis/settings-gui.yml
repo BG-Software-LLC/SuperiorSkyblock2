@@ -210,6 +210,24 @@ settings-gui:
         volume: 0.2
         pitch: 0.2
 
+    enderman_grief:
+      settings-enabled:
+        type: ENDER_PEARL
+        name: '&6Enderman Grief'
+        lore:
+          - '&7Allow enderman to grief blocks inside your island.'
+          - '&7Currently &aENABLED&7.'
+      settings-disabled:
+        type: ENDER_PEARL
+        name: '&6Enderman Grief'
+        lore:
+          - '&7Allow enderman to grief blocks inside your island.'
+          - '&7Currently &cDISABLED&7.'
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+
     fire_spread:
       settings-enabled:
         type: FLINT_AND_STEEL
