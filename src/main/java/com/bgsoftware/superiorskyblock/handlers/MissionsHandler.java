@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -120,6 +121,11 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
+        if(!Bukkit.isPrimaryThread()){
+            Executor.sync(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
+            return;
+        }
+
         MissionData missionData = getMissionData(mission);
         Island playerIsland = superiorPlayer.getIsland();
 
