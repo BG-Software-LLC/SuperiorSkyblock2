@@ -212,8 +212,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
                     .replaceName("{1}", String.valueOf(place))
                     .replaceName("{2}", island.getIslandLevelAsBigDecimal().toString())
                     .replaceName("{3}", island.getWorthAsBigDecimal().toString())
-                    .replaceName("{4}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
-                    .replaceName("{5}", StringUtils.fancyFormat(island.getWorthAsBigDecimal()));
+                    .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
+                    .replaceName("{6}", StringUtils.fancyFormat(island.getWorthAsBigDecimal()));
 
             if(itemStack.getItemMeta().hasLore()){
                 List<String> lore = new ArrayList<>();
@@ -234,8 +234,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
                                 .replace("{1}", String.valueOf(place))
                                 .replace("{2}", island.getIslandLevelAsBigDecimal().toString())
                                 .replace("{3}", island.getWorthAsBigDecimal().toString())
-                                .replace("{4}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
-                                .replace("{5}", StringUtils.fancyFormat(island.getWorthAsBigDecimal())));
+                                .replace("{5}", StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal()))
+                                .replace("{6}", StringUtils.fancyFormat(island.getWorthAsBigDecimal())));
                     }
                 }
 
