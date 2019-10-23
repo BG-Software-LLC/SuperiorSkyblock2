@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -23,16 +25,17 @@ public final class IslandPanelMenu extends SuperiorMenu {
     public void onClick(InventoryClickEvent e) {
         super.onClick(e);
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+        Island island = superiorPlayer.getIsland();
 
         if(membersSlot == e.getRawSlot()){
-            IslandMembersMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
+            IslandMembersMenu.openInventory(superiorPlayer, this, island);
         }
         else if (settingsSlot == e.getRawSlot()) {
-            if(superiorPlayer.hasPermission("superior.island.settings"))
-                IslandSettingsMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
+            if(superiorPlayer.hasPermission("superior.island.settings") && island.hasPermission(superiorPlayer, IslandPermission.SET_SETTINGS))
+                IslandSettingsMenu.openInventory(superiorPlayer, this, island);
         }
         else if (visitorsSlot == e.getRawSlot()) {
-            IslandVisitorsMenu.openInventory(superiorPlayer, this, superiorPlayer.getIsland());
+            IslandVisitorsMenu.openInventory(superiorPlayer, this, island);
         }
     }
 
