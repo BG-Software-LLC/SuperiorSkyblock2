@@ -48,6 +48,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
         if(!clickSort(superiorPlayer, e.getRawSlot())){
             if(e.getRawSlot() == playerIslandSlot){
                 clickItem(superiorPlayer.getIsland(), superiorPlayer, e.getAction());
+                return;
             }
 
             else {
@@ -55,11 +56,13 @@ public final class IslandsTopMenu extends SuperiorMenu {
                     if (slots[i] == e.getRawSlot()) {
                         Island island = plugin.getGrid().getIsland(i);
                         if(clickItem(island, superiorPlayer, e.getAction()))
-                            break;
+                            return;
                     }
                 }
             }
         }
+
+        super.onClick(e);
     }
 
     private boolean clickSort(SuperiorPlayer superiorPlayer, int slot){
