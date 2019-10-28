@@ -73,8 +73,8 @@ stacked-blocks:
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
 island-level-formula: '{} / 2'
 
-# How should the island top be ordered by?
-# Set 'WORTH' if you want it to be ordered by island worth, or 'LEVEL' if you want it to be ordered by island levels.
+# How should the island top be ordered by default?
+# Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'
 
 # All settings related to island roles.

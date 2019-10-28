@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 
 public final class SortingTypes {
@@ -8,5 +9,6 @@ public final class SortingTypes {
     public static SortingType BY_LEVEL = SortingType.getByName("LEVEL");
     public static SortingType BY_RATING = SortingType.getByName("RATING");
     public static SortingType BY_PLAYERS = SortingType.getByName("PLAYERS");
+    public static SortingType DEFAULT = SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopOrder);
 
 }

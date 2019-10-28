@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.GlobalSectionComments;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -64,7 +65,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
                 return;
 
             List<Island> islands = getFilteredIslands(superiorPlayer)
-                    .sorted(Comparable::compareTo)
+                    .sorted(SortingComparators.WORTH_COMPARATOR)
                     .collect(Collectors.toList());
 
             int indexOf = slots.indexOf(e.getRawSlot());

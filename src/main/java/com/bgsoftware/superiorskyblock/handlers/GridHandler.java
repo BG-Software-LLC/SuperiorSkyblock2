@@ -173,7 +173,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIsland(int index){
-        return getIsland(index, SortingTypes.BY_WORTH);
+        return getIsland(index, SortingTypes.DEFAULT);
     }
 
     @Override
@@ -273,7 +273,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public List<UUID> getAllIslands(){
-        return getAllIslands(SortingTypes.BY_WORTH);
+        return getAllIslands(SortingTypes.DEFAULT);
     }
 
     @Override
@@ -293,7 +293,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        IslandsTopMenu.openInventory(superiorPlayer, null, SortingTypes.BY_WORTH);
+        IslandsTopMenu.openInventory(superiorPlayer, null, SortingTypes.DEFAULT);
     }
 
     @Override

@@ -130,13 +130,13 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        ensureType(SortingTypes.BY_WORTH);
-        return inventories.get(SortingTypes.BY_WORTH);
+        ensureType(SortingTypes.DEFAULT);
+        return inventories.get(SortingTypes.DEFAULT);
     }
 
     @Override
     public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu) {
-        open(superiorPlayer, previousMenu, SortingTypes.BY_WORTH);
+        open(superiorPlayer, previousMenu, SortingTypes.DEFAULT);
     }
 
     private void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SortingType sortingType){

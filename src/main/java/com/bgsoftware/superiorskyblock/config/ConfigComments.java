@@ -95,8 +95,8 @@ public final class ConfigComments {
     public static String ISLAND_LEVEL_FORMULA = "island-level-formula";
 
     @Comment("")
-    @Comment("How should the island top be ordered by?")
-    @Comment("Set 'WORTH' if you want it to be ordered by island worth, or 'LEVEL' if you want it to be ordered by island levels.")
+    @Comment("How should the island top be ordered by default?")
+    @Comment("Use WORTH, LEVEL, RATING or PLAYERS.")
     public static String ISLAND_TOP_ORDER = "island-top-order";
 
     @Comment("")
