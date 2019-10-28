@@ -91,8 +91,8 @@ public final class CmdRate implements ICommand {
                 if (onlineIsland != null && (plugin.getSettings().rateOwnIsland || !onlineIsland.equals(island))) {
                     if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
-                        list.add(island.getName());
+                    if(!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                        list.add(onlineIsland.getName());
                 }
             }
         }
