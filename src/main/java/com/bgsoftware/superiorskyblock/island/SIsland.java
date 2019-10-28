@@ -49,7 +49,6 @@ import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -413,6 +412,10 @@ public class SIsland extends DatabaseObject implements Island {
     public Location getTeleportLocation() {
         if(teleportLocation == null)
             teleportLocation = getCenter();
+
+        if(!LocationUtils.isSafeBlock(teleportLocation.getBlock()))
+            setTeleportLocation(getCenter().getWorld().getHighestBlockAt(getCenter()).getLocation());
+
         return teleportLocation.clone();
     }
 
@@ -1221,8 +1224,7 @@ public class SIsland extends DatabaseObject implements Island {
             return;
         }
 
-        if(!warpBlock.getRelative(BlockFace.DOWN).getType().isSolid() &&
-                !warpBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType().isSolid()){
+        if(!LocationUtils.isSafeBlock(warpBlock)){
             Locale.UNSAFE_WARP.send(superiorPlayer);
             return;
         }

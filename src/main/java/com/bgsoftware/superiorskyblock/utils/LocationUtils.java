@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 public final class LocationUtils {
 
@@ -29,6 +31,11 @@ public final class LocationUtils {
 
     public static String getLocation(Location location){
         return location == null ? "" : location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw() + "," + location.getPitch();
+    }
+
+    public static boolean isSafeBlock(Block block){
+        Block underBlock = block.getRelative(BlockFace.DOWN);
+        return underBlock.getType().isSolid() && underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
     }
 
 }
