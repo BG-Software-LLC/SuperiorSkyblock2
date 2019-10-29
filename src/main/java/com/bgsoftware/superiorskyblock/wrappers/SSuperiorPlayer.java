@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -146,7 +147,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void teleport(Island island) {
-        teleport(island.getCenter());
+        if(!LocationUtils.isSafeBlock(island.getTeleportLocation().getBlock())) {
+            Location center = island.getCenter();
+            island.setTeleportLocation(center.getWorld().getHighestBlockAt(center).getLocation());
+        }
+
+        teleport(island.getTeleportLocation().add(0, 0.5, 0));
     }
 
     @Override

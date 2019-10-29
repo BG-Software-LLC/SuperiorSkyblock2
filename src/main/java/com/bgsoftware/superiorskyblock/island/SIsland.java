@@ -357,7 +357,7 @@ public class SIsland extends DatabaseObject implements Island {
             kickMember(superiorPlayer);
 
         if(superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
-            superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
 
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
@@ -412,9 +412,6 @@ public class SIsland extends DatabaseObject implements Island {
     public Location getTeleportLocation() {
         if(teleportLocation == null)
             teleportLocation = getCenter();
-
-        if(!LocationUtils.isSafeBlock(teleportLocation.getBlock()))
-            setTeleportLocation(getCenter().getWorld().getHighestBlockAt(getCenter()).getLocation());
 
         return teleportLocation.clone();
     }
@@ -844,7 +841,7 @@ public class SIsland extends DatabaseObject implements Island {
             for(UUID uuid : allPlayersInside()){
                 SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
                 if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
-                    victimPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
+                    victimPlayer.teleport(plugin.getGrid().getSpawnIsland());
                     Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
                 }
             }

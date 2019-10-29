@@ -102,7 +102,7 @@ public final class CmdAccept implements ICommand {
             Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
         if(plugin.getSettings().teleportOnJoin)
-            superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
+            superiorPlayer.teleport(island);
         if(plugin.getSettings().clearOnJoin)
             plugin.getNMSAdapter().clearInventory(superiorPlayer.asPlayer());
     }

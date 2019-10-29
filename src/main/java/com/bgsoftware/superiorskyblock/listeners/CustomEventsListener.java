@@ -119,7 +119,7 @@ public final class CustomEventsListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
             if(island != null && island.isBanned(superiorPlayer)){
-                superiorPlayer.asPlayer().teleport(plugin.getGrid().getSpawnIsland().getCenter());
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                 return;
             }
 

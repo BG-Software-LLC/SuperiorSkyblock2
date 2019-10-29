@@ -59,7 +59,7 @@ public final class CmdTeleport implements ICommand {
             return;
         }
 
-        superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
+        superiorPlayer.teleport(island);
         Locale.TELEPORTED_SUCCESS.send(superiorPlayer);
     }
 

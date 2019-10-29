@@ -85,7 +85,7 @@ public final class CmdAdminJoin implements ICommand {
             Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
         if(plugin.getSettings().teleportOnJoin)
-            superiorPlayer.asPlayer().teleport(island.getTeleportLocation());
+            superiorPlayer.teleport(island);
     }
 
     @Override

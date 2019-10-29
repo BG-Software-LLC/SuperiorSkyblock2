@@ -94,7 +94,7 @@ public final class CmdExpel implements ICommand {
             }
         }
 
-        target.teleport(plugin.getGrid().getSpawnIsland().getCenter());
+        targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
         target.getLocation().setDirection(plugin.getGrid().getSpawnIsland().getCenter().getDirection());
         Locale.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Locale.GOT_EXPELLED.send(targetPlayer, sender.getName());
