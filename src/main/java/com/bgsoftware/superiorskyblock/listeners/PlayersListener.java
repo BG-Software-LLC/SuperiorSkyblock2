@@ -262,7 +262,7 @@ public final class PlayersListener implements Listener {
         }
 
         noFallDamage.add(e.getPlayer().getUniqueId());
-        e.getPlayer().teleport(island.getTeleportLocation().add(0, 1, 0));
+        SSuperiorPlayer.of(e.getPlayer().getUniqueId()).teleport(island);
         Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
     }
 
