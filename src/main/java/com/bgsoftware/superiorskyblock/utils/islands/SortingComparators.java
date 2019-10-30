@@ -13,7 +13,16 @@ public final class SortingComparators {
         return firstName.compareTo(secondName);
     };
 
-    public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
+    public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = (o1, o2) -> {
+        int uuidCompare = o1.getUniqueId().compareTo(o2.getUniqueId());
+
+        if(uuidCompare == 0)
+            return 0;
+
+        int nameCompare = o1.getName().compareTo(o2.getName());
+
+        return nameCompare == 0 ? -1 : nameCompare;
+    };
 
     public final static Comparator<Island> WORTH_COMPARATOR = (o1, o2) -> {
         int compare = o2.getWorthAsBigDecimal().compareTo(o1.getWorthAsBigDecimal());

@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -135,7 +134,7 @@ public final class BlocksListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island == null || island.getIslandMembers(true).stream().anyMatch(SuperiorPlayer::isOnline))
+        if(island == null || island.isSpawn() || island.getIslandMembers(true).stream().anyMatch(SuperiorPlayer::isOnline))
             return;
 
         e.setNewCurrent(0);

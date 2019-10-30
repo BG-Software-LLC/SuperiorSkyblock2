@@ -247,9 +247,6 @@ public final class PlayersListener implements Listener {
         if(!plugin.getSettings().voidTeleport)
             return;
 
-        if (!e.getPlayer().getWorld().equals(plugin.getGrid().getIslandsWorld()))
-            return;
-
         Location from = e.getFrom(), to = e.getTo();
 
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
@@ -257,8 +254,12 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        if(island == null)
+        if(island == null) {
+            if (!e.getPlayer().getWorld().equals(plugin.getGrid().getIslandsWorld()))
+                return;
+
             island = plugin.getGrid().getSpawnIsland();
+        }
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         e.getPlayer().teleport(island.getTeleportLocation().add(0, 1, 0));
