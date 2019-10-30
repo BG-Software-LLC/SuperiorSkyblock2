@@ -45,6 +45,7 @@ public enum IslandPermission {
     SET_SETTINGS,
     SET_WARP,
     SIGN_INTERACT,
+    SPAWNER_BREAK,
     UNCOOP_MEMBER,
     USE,
     WITHDRAW_MONEY

@@ -1412,6 +1412,36 @@ permissions-gui:
           volume: 0.2
           pitch: 0.2
 
+    spawner_break:
+      permission-enabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Break'
+        lore:
+          - '&7Access to break spawners inside the island.'
+          - '&7Currently &aENABLED&7.'
+      permission-disabled:
+        type: MOB_SPAWNER
+        name: '&6Spawner Break'
+        lore:
+          - '&7Access to break spawners inside the island.'
+          - '&7Currently &cDISABLED&7.'
+      role-permission:
+        type: MOB_SPAWNER
+        name: '&6Spawner Break'
+        lore:
+          - '&7Access to break spawners inside the island.'
+          - '&7Role: &e{}&7.'
+      has-access:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+      no-access:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+
     use:
       permission-enabled:
         type: STONE_BUTTON

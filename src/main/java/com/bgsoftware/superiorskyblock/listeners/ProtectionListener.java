@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -91,7 +92,9 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
+        IslandPermission islandPermission = e.getBlock().getType() == Materials.SPAWNER.toBukkitType() ? IslandPermission.SPAWNER_BREAK : IslandPermission.BREAK;
+
+        if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -131,6 +134,7 @@ public final class ProtectionListener implements Listener {
         if(clickedBlock.getState() instanceof Chest) islandPermission = IslandPermission.CHEST_ACCESS;
         else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPermission.USE;
         else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPermission.SIGN_INTERACT;
+        else if(clickedBlock.getType() == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPermission.SPAWNER_BREAK;
         else if(clickedBlock.getType().name().equals("SOIL") || clickedBlock.getType().name().equals("FARMLAND"))
             islandPermission = e.getAction() == Action.PHYSICAL ? IslandPermission.FARM_TRAMPING : IslandPermission.BUILD;
         else islandPermission = IslandPermission.INTERACT;
