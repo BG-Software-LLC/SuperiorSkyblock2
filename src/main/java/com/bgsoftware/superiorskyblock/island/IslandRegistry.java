@@ -34,7 +34,8 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     public synchronized Island get(Location location){
-        return islandsByPositions.get(IslandPosition.of(location));
+        Island island = islandsByPositions.get(IslandPosition.of(location));
+        return island == null || !island.isInside(location) ? null : island;
     }
 
     public synchronized int indexOf(Island island, SortingType sortingType){
