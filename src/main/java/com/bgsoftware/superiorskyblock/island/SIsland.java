@@ -480,6 +480,9 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isInside(Location location){
+        if(!getCenter().getWorld().equals(location.getWorld()))
+            return false;
+
         Location min = getMinimum(), max = getMaximum();
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
@@ -487,6 +490,9 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isInsideRange(Location location){
+        if(!getCenter().getWorld().equals(location.getWorld()))
+            return false;
+
         int islandSize = getIslandSize();
         Location min = center.parse().subtract(islandSize, 0, islandSize);
         Location max = center.parse().add(islandSize, 0, islandSize);
