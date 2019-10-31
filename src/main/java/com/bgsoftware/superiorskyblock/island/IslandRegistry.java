@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public final class IslandRegistry implements Iterable<Island> {
 
     private Map<UUID, Island> islands = Maps.newHashMap();
+    private Map<IslandPosition, Island> islandsByPositions = Maps.newHashMap();
     private Map<SortingType, TreeSet<Island>> sortedTrees = new HashMap<>();
 
     public IslandRegistry(){
@@ -31,6 +33,10 @@ public final class IslandRegistry implements Iterable<Island> {
         return index >= sortedTrees.get(sortingType).size() ? null : Iterables.get(sortedTrees.get(sortingType), index);
     }
 
+    public synchronized Island get(Location location){
+        return islandsByPositions.get(IslandPosition.of(location));
+    }
+
     public synchronized int indexOf(Island island, SortingType sortingType){
         ensureType(sortingType);
         return Iterables.indexOf(sortedTrees.get(sortingType), island::equals);
@@ -38,6 +44,7 @@ public final class IslandRegistry implements Iterable<Island> {
 
     public synchronized void add(UUID uuid, Island island){
         islands.put(uuid, island);
+        islandsByPositions.put(IslandPosition.of(island), island);
         for(TreeSet<Island> sortedTree : sortedTrees.values())
             sortedTree.add(island);
     }
@@ -45,6 +52,7 @@ public final class IslandRegistry implements Iterable<Island> {
     public synchronized void remove(UUID uuid){
         Island island = get(uuid);
         if(island != null) {
+            islandsByPositions.remove(IslandPosition.of(island), island);
             for (TreeSet<Island> sortedTree : sortedTrees.values())
                 sortedTree.remove(island);
         }

@@ -44,7 +44,6 @@ import org.bukkit.entity.Entity;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -197,16 +196,7 @@ public final class GridHandler implements GridManager {
         if(!location.getWorld().getName().equals(plugin.getSettings().islandWorld))
             return null;
 
-        Iterator<Island> islands = this.islands.iterator();
-        Island island;
-
-        while(islands.hasNext()){
-            island = islands.next();
-            if(island.isInside(location))
-                return island;
-        }
-
-        return null;
+        return islands.get(location);
     }
 
     @Override
