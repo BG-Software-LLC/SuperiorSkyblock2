@@ -45,7 +45,9 @@ public final class IslandMissionsMenu extends SuperiorMenu {
         Island island = superiorPlayer.getIsland();
         int clickedSlot = e.getRawSlot();
 
-        List<Mission> missions = islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions();
+        List<Mission> missions = (islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions()).stream()
+                .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
+                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
 
         if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
             int nextPage;
