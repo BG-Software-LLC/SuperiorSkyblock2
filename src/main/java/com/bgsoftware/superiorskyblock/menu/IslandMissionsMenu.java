@@ -30,12 +30,18 @@ public final class IslandMissionsMenu extends SuperiorMenu {
     private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots = new ArrayList<>();
 
+    private List<Mission> missions;
     private boolean islandMissions;
     private int page;
 
-    private IslandMissionsMenu(boolean islandMissions){
+    private IslandMissionsMenu(boolean islandMissions, SuperiorPlayer superiorPlayer){
         super("missionsPage");
         this.islandMissions = islandMissions;
+        if(superiorPlayer != null) {
+            this.missions = (islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions()).stream()
+                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
+                            plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
+        }
     }
 
     @Override
@@ -44,10 +50,6 @@ public final class IslandMissionsMenu extends SuperiorMenu {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
         Island island = superiorPlayer.getIsland();
         int clickedSlot = e.getRawSlot();
-
-        List<Mission> missions = (islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions()).stream()
-                .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
-                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
 
         if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
             int nextPage;
@@ -118,10 +120,6 @@ public final class IslandMissionsMenu extends SuperiorMenu {
 
         this.page = page;
 
-        List<Mission> missions = (islandMissions ? plugin.getMissions().getIslandMissions() : plugin.getMissions().getPlayerMissions()).stream()
-                .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
-                        plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
-
         Inventory inv = Bukkit.createInventory(this, inventory.getSize(), islandMissions ? islandTitle : playerTitle);
         inv.setContents(inventory.getContents());
 
@@ -162,7 +160,7 @@ public final class IslandMissionsMenu extends SuperiorMenu {
     }
 
     public static void init(){
-        IslandMissionsMenu islandMissionsMenu = new IslandMissionsMenu(false);
+        IslandMissionsMenu islandMissionsMenu = new IslandMissionsMenu(false, null);
 
         File file = new File(plugin.getDataFolder(), "guis/missions-gui.yml");
 
@@ -201,12 +199,12 @@ public final class IslandMissionsMenu extends SuperiorMenu {
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
     }
 
-    public static SuperiorMenu getMenu(boolean islandMissions){
-        return new IslandMissionsMenu(islandMissions);
+    public static SuperiorMenu getMenu(boolean islandMissions, SuperiorPlayer superiorPlayer){
+        return new IslandMissionsMenu(islandMissions, superiorPlayer);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, boolean islandMissions){
-        new IslandMissionsMenu(islandMissions).open(superiorPlayer, previousMenu);
+        new IslandMissionsMenu(islandMissions, superiorPlayer).open(superiorPlayer, previousMenu);
     }
 
 }
