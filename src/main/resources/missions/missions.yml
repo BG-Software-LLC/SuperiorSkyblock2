@@ -401,9 +401,9 @@ enchanter:
       name: '&aEnchanter'
       lore:
         - '&7Enchant a Protection IV armor!'
-      - ''
-      - '&6Progress: &7100%'
-      - '&a&l ✔ &7Already Claimed.'
+        - ''
+        - '&6Progress: &7100%'
+        - '&a&l ✔ &7Already Claimed.'
 
 add-member:
   mission-file: IslandMissions

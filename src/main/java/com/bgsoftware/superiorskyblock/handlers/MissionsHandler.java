@@ -42,7 +42,9 @@ public final class MissionsHandler implements MissionsManager {
 
         if(!missionsDict.exists()){
             missionsDict.mkdirs();
+            plugin.saveResource("missions/BlocksMissions.jar", true);
             plugin.saveResource("missions/CraftingMissions.jar", true);
+            plugin.saveResource("missions/EnchantingMissions.jar", true);
             plugin.saveResource("missions/IslandMissions.jar", true);
             plugin.saveResource("missions/ItemsMissions.jar", true);
             plugin.saveResource("missions/KillsMissions.jar", true);
