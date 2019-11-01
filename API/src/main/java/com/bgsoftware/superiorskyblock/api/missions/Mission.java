@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.missions;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -69,10 +70,22 @@ public abstract class Mission {
     public abstract void load(JavaPlugin plugin, ConfigurationSection missionSection) throws MissionLoadException;
 
     /**
+     * Get the progress of a specific player.
+     * Method should return a value between 0.0 and 1.0
+     * @param superiorPlayer The player to check.
+     */
+    public abstract double getProgress(SuperiorPlayer superiorPlayer);
+
+    /**
      * Check whether or not a player can complete the mission.
      * @param superiorPlayer The player to check.
      */
-    public abstract boolean canComplete(SuperiorPlayer superiorPlayer);
+    public boolean canComplete(SuperiorPlayer superiorPlayer){
+        if(!superiorPlayer.getWorld().getName().equals(SuperiorSkyblockAPI.getIslandsWorld().getName()))
+            return false;
+
+        return getProgress(superiorPlayer) >= 1.0;
+    }
 
     /**
      * A function that is called when a player is completing the mission.
