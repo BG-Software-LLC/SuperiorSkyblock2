@@ -130,7 +130,10 @@ public final class IslandMissionsMenu extends SuperiorMenu {
                 boolean completed = islandMissions ? island.hasCompletedMission(mission) : superiorPlayer.hasCompletedMission(mission);
                 boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
                         plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
-                inv.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) && hasAllRequiredMissions ? missionData.canComplete : missionData.notCompleted);
+                int percentage = getPercentage(mission.getProgress(superiorPlayer));
+                inv.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) && hasAllRequiredMissions ?
+                        new ItemBuilder(missionData.canComplete).replaceAll("{0}", percentage + "").build() :
+                        new ItemBuilder(missionData.notCompleted).replaceAll("{0}", percentage + "").build());
             }
         }
 
@@ -149,6 +152,11 @@ public final class IslandMissionsMenu extends SuperiorMenu {
             superiorPlayer.asPlayer().openInventory(inv);
             this.previousMenu = previousMenu;
         });
+    }
+
+    private int getPercentage(double progress){
+        progress = Math.min(1.0, progress);
+        return Math.round((float) progress * 100);
     }
 
     public static void init(){
