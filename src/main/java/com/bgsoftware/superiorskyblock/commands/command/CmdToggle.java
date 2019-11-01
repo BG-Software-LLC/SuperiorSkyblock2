@@ -77,9 +77,9 @@ public final class CmdToggle implements ICommand {
             }
 
             if(superiorPlayer.hasBlocksStackerEnabled()){
-                Locale.TOGGLED_STACKED_BLCOKS_OFF.send(superiorPlayer);
+                Locale.TOGGLED_STACKED_BLOCKS_OFF.send(superiorPlayer);
             } else{
-                Locale.TOGGLED_STACKED_BLCOKS_ON.send(superiorPlayer);
+                Locale.TOGGLED_STACKED_BLOCKS_ON.send(superiorPlayer);
             }
 
             superiorPlayer.toggleBlocksStacker();

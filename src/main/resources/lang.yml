@@ -379,8 +379,8 @@ TOGGLED_SCHEMATIC_ON: |-
   &e&lSchematics | &7Select an area using a golden axe.
 TOGGLED_SPY_OFF: '&e&lSpy | &7Toggled spy chat &cOFF&7.'
 TOGGLED_SPY_ON: '&e&lSpy | &7Toggled spy chat &aON&7.'
-TOGGLED_STACKED_BLCOKS_OFF: '&e&lStacker | &7Toggling blocks stacker &cOFF&7.'
-TOGGLED_STACKED_BLCOKS_ON: '&e&lStacker | &7Toggling blocks stacker &aON&7.'
+TOGGLED_STACKED_BLOCKS_OFF: '&e&lStacker | &7Toggling blocks stacker &cOFF&7.'
+TOGGLED_STACKED_BLOCKS_ON: '&e&lStacker | &7Toggling blocks stacker &aON&7.'
 TOGGLED_TEAM_CHAT_OFF: '&e&lChat | &7Toggling team chat &cOFF&7.'
 TOGGLED_TEAM_CHAT_ON: '&e&lChat | &7Toggling team chat &aON&7.'
 TOGGLED_WORLD_BORDER_OFF: '&e&lBorder | &7Toggling world border &cOFF&7.'
