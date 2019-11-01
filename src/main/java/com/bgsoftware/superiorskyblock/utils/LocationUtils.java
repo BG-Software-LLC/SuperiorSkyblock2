@@ -33,6 +33,7 @@ public final class LocationUtils {
         return location == null ? "" : location.getWorld().getName() + "," + location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw() + "," + location.getPitch();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isSafeBlock(Block block){
         Block underBlock = block.getRelative(BlockFace.DOWN);
         return underBlock.getType().isSolid() && underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
