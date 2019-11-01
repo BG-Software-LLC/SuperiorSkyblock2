@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -71,6 +72,14 @@ public final class SpawnIsland extends SIsland {
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
         return !plugin.getSettings().spawnProtection || super.hasPermission(superiorPlayer, islandPermission);
+    }
+
+    @Override
+    public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
+    }
+
+    @Override
+    public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
     }
 
     @Override
