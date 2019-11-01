@@ -45,6 +45,7 @@ public final class MissionsHandler implements MissionsManager {
             plugin.saveResource("missions/CraftingMissions.jar", true);
             plugin.saveResource("missions/IslandMissions.jar", true);
             plugin.saveResource("missions/ItemsMissions.jar", true);
+            plugin.saveResource("missions/KillsMissions.jar", true);
         }
 
         if(!file.exists())
