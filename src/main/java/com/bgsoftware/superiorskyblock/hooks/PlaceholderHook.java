@@ -220,6 +220,8 @@ public abstract class PlaceholderHook {
                         return island.isLocked() ? "Yes" : "No";
                     case "name":
                         return plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+                    case "name_leader":
+                        return island.getName().isEmpty() ? island.getOwner().getName() : plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
                     case "rating":
