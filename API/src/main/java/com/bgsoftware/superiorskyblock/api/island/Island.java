@@ -543,6 +543,14 @@ public interface Island extends Comparable<Island> {
     int getBlockCount(Key key);
 
     /**
+     * Get the amount of blocks that are on the island.
+     * Unlike getBlockCount(Key), this method returns the count for
+     * the exactly block that is given as a parameter.
+     * @param key The block's key to check.
+     */
+    int getExactBlockCount(Key key);
+
+    /**
      * Get the worth value of the island, including the money in the bank.
      */
     BigDecimal getWorthAsBigDecimal();

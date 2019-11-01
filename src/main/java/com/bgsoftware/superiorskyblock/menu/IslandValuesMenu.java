@@ -62,7 +62,7 @@ public final class IslandValuesMenu extends SuperiorMenu {
             if(sections.length == 2) {
                 if(itemStack.getType() == Materials.SPAWNER.toBukkitType()) {
                     EntityType entityType = EntityType.valueOf(sections[1]);
-                    amount = island.getBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
+                    amount = island.getExactBlockCount(Key.of(Materials.SPAWNER.toBukkitType() + ":" + entityType));
                     itemStack = HeadUtils.getEntityHead(entityType);
                     typeName = StringUtils.format(sections[1]) + " Spawner";
                 }

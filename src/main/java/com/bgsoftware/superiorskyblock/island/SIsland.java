@@ -992,9 +992,16 @@ public class SIsland extends DatabaseObject implements Island {
         }
 
         if(increaseAmount || blockLimits.containsKey(key)) {
-            int currentAmount = blockCounts.getOrDefault(key, 0);
-            key = blockLimits.containsKey(key) ? blockLimits.getKey(key) : blockCounts.getKey(key);
-            blockCounts.put(plugin.getBlockValues().getBlockKey(key), currentAmount + amount);
+            key = plugin.getBlockValues().getBlockKey(key);
+            int currentAmount = blockCounts.getRaw(key, 0);
+            blockCounts.put(key, currentAmount + amount);
+
+            if(!key.toString().equals(blockLimits.getKey(key).toString())){
+                key = blockLimits.getKey(key);
+                currentAmount = blockCounts.getRaw(key, 0);
+                blockCounts.put(key, currentAmount + amount);
+            }
+
             if(save) saveBlockCounts();
         }
     }
@@ -1041,14 +1048,21 @@ public class SIsland extends DatabaseObject implements Island {
         }
 
         if(decreaseAmount || blockLimits.containsKey(key)){
-            int currentAmount = blockCounts.getOrDefault(key, 0);
-            key = blockLimits.containsKey(key) ? blockLimits.getKey(key) : blockCounts.getKey(key);
             key = plugin.getBlockValues().getBlockKey(key);
-
+            int currentAmount = blockCounts.getRaw(key, 0);
             if(currentAmount <= amount)
-                blockCounts.remove(key);
+                blockCounts.removeRaw(key);
             else
                 blockCounts.put(key, currentAmount - amount);
+
+            if(!key.toString().equals(blockLimits.getKey(key).toString())){
+                key = blockLimits.getKey(key);
+                currentAmount = blockCounts.getRaw(key, 0);
+                if(currentAmount <= amount)
+                    blockCounts.removeRaw(key);
+                else
+                    blockCounts.put(key, currentAmount - amount);
+            }
 
             if(save) saveBlockCounts();
         }
@@ -1057,6 +1071,11 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public int getBlockCount(Key key){
         return blockCounts.getOrDefault(key, 0);
+    }
+
+    @Override
+    public int getExactBlockCount(Key key) {
+        return blockCounts.getRaw(key, 0);
     }
 
     @Override

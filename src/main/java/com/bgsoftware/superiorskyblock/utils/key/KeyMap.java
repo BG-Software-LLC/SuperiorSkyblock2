@@ -74,6 +74,10 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         return map.remove(key);
     }
 
+    public V removeRaw(Key key){
+        return map.remove(key.toString());
+    }
+
     public V get(ItemStack itemStack) {
         return get(Key.of(itemStack));
     }
@@ -98,8 +102,14 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
                 return map.get(key.split(":")[0]);
             else if(key.contains(";") && map.containsKey(key.split(";")[0]))
                 return map.get(key.split(";")[0]);
+            else
+                return super.get(o.toString());
         }
         return super.get(o);
+    }
+
+    public V getRaw(Key key, V defaultValue){
+        return map.getOrDefault(key.toString(), defaultValue);
     }
 
     @Override
