@@ -199,10 +199,6 @@ public final class IslandMissionsMenu extends SuperiorMenu {
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
     }
 
-    public static SuperiorMenu getMenu(boolean islandMissions, SuperiorPlayer superiorPlayer){
-        return new IslandMissionsMenu(islandMissions, superiorPlayer);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, boolean islandMissions){
         new IslandMissionsMenu(islandMissions, superiorPlayer).open(superiorPlayer, previousMenu);
     }

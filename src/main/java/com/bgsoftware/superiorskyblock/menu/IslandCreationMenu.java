@@ -131,10 +131,6 @@ public final class IslandCreationMenu extends SuperiorMenu {
         }
     }
 
-    public static SuperiorMenu getMenu(String islandName){
-        return new IslandCreationMenu(islandName);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
         new IslandCreationMenu(islandName).open(superiorPlayer, previousMenu);
     }

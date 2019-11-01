@@ -170,10 +170,6 @@ public final class IslandMembersMenu extends SuperiorMenu {
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
     }
 
-    public static SuperiorMenu getMenu(Island island){
-        return new IslandMembersMenu(island);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandMembersMenu(island).open(superiorPlayer, previousMenu);
     }

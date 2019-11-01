@@ -82,10 +82,6 @@ public final class MemberRoleMenu extends SuperiorMenu {
         }
     }
 
-    public static SuperiorMenu getMenu(SuperiorPlayer targetPlayer){
-        return new MemberRoleMenu(targetPlayer);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){
         new MemberRoleMenu(targetPlayer).open(superiorPlayer, previousMenu);
     }

@@ -286,22 +286,8 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
                             FileUtils.getItemStack(section.getConfigurationSection(permission + ".role-permission")));
                 }
                 islandPermissions.add(islandPermission);
-//                else{
-//                    permissionsData.put(permission + "-role-permission",
-//                            new ItemBuilder(Material.BEDROCK).withName("&6{%}").withLore("&eRole: {}", "&7Currently &cDISABLED&7.").build());
-//                }
             }
-//            else if(c){
-//                permissionsData.put(permission + "-permission-enabled",
-//                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &aENABLED&7."));
-//                permissionsData.put(permission + "-permission-disabled",
-//                        new ItemBuilder(Material.BEDROCK).withName("&6{}").withLore("&7Currently &cDISABLED&7."));
-//            }
         }
-    }
-
-    public static SuperiorMenu getMenu(Island island, Object permissionHolder){
-        return new IslandPermissionsMenu(island, permissionHolder);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island, Object permissionHolder){

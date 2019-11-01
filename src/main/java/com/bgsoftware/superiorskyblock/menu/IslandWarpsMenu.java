@@ -181,10 +181,6 @@ public final class IslandWarpsMenu extends SuperiorMenu {
         IslandWarpsMenu.slots = slots;
     }
 
-    public static SuperiorMenu getMenu(Island island){
-        return new IslandWarpsMenu(island);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandWarpsMenu(island).open(superiorPlayer, previousMenu);
     }

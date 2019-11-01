@@ -67,7 +67,7 @@ public final class IslandValuesMenu extends SuperiorMenu {
                     typeName = StringUtils.format(sections[1]) + " Spawner";
                 }
                 else {
-                    itemStack.setDurability(Short.valueOf(sections[1]));
+                    itemStack.setDurability(Short.parseShort(sections[1]));
                     amount = island.getBlockCount(Key.of(itemStack));
                 }
             }
@@ -117,10 +117,6 @@ public final class IslandValuesMenu extends SuperiorMenu {
         IslandValuesMenu.blockName = blockName;
         IslandValuesMenu.blockLore = blockLore;
         IslandValuesMenu.countedBlocks = countedBlocks;
-    }
-
-    public static SuperiorMenu getMenu(Island island){
-        return new IslandValuesMenu(island);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

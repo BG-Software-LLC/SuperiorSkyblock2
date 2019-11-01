@@ -200,10 +200,6 @@ public final class IslandSettingsMenu extends SuperiorMenu {
         }
     }
 
-    public static SuperiorMenu getMenu(Island island){
-        return new IslandSettingsMenu(island);
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new IslandSettingsMenu(island).open(superiorPlayer, previousMenu);
     }

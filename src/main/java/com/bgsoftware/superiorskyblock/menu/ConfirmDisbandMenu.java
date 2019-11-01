@@ -88,10 +88,6 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
         inventory.setItem(cancelSlot, cancelItem);
     }
 
-    public static SuperiorMenu getMenu(){
-        return instance;
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         instance.open(superiorPlayer, previousMenu);
     }

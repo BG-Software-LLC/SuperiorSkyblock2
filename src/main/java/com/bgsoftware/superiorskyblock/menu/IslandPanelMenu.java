@@ -76,10 +76,6 @@ public final class IslandPanelMenu extends SuperiorMenu {
         inventory.setItem(visitorsSlot, visitorsButton);
     }
 
-    public static SuperiorMenu getMenu(){
-        return new IslandPanelMenu();
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         new IslandPanelMenu().open(superiorPlayer, previousMenu);
     }

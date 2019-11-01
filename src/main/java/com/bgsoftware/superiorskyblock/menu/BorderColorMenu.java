@@ -83,10 +83,6 @@ public final class BorderColorMenu extends SuperiorMenu {
         inventory.setItem(redColorSlot, redColorItem);
     }
 
-    public static SuperiorMenu getMenu(){
-        return instance;
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         instance.open(superiorPlayer, previousMenu);
     }

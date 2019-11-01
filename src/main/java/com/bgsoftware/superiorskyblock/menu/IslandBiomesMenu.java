@@ -129,10 +129,6 @@ public final class IslandBiomesMenu extends SuperiorMenu {
         }
     }
 
-    public static SuperiorMenu getMenu(){
-        return new IslandBiomesMenu();
-    }
-
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         new IslandBiomesMenu().open(superiorPlayer, previousMenu);
     }
