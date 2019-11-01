@@ -140,7 +140,7 @@ public abstract class PlaceholderHook {
                                 }
 
                                 else{
-                                    return _island.getOwner().getName();
+                                    return _island.getName().isEmpty() ? _island.getOwner().getName() : _island.getName();
                                 }
                             }
                         } catch (IllegalArgumentException ignored) { }
