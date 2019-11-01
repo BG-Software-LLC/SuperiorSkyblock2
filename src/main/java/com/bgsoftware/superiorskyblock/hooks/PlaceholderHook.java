@@ -102,8 +102,7 @@ public abstract class PlaceholderHook {
                         sortingType = SortingTypes.BY_PLAYERS;
                     }
                     else{
-                        matcher = Pattern.compile("island_top_(.+)").matcher(placeholder);
-                        sortingType = SortingTypes.BY_WORTH;
+                        throw new NullPointerException("Cannot find valid top type.");
                     }
 
                     String matcherValue = matcher.group(1);
