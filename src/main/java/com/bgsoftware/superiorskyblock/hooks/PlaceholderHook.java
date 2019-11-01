@@ -49,9 +49,6 @@ public abstract class PlaceholderHook {
             if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
-                if (island == null)
-                    return subPlaceholder.equals("exists") ? "No" : plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
-
                 if (subPlaceholder.startsWith("location_")) {
                     if(player == null)
                         throw new NullPointerException();
@@ -218,7 +215,7 @@ public abstract class PlaceholderHook {
                     case "paypal_all":
                         return island.getPaypal();
                     case "exists":
-                        return "Yes";
+                        return island != null ? "Yes" : "No";
                     case "locked":
                         return island.isLocked() ? "Yes" : "No";
                     case "name":
