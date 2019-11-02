@@ -28,7 +28,7 @@ public final class CmdAdminSetMobDrops implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setmobdrops <player-name/island-name> <multiplier>";
+        return "island admin setmobdrops <player-name/island-name/*> <multiplier>";
     }
 
     @Override
@@ -54,16 +54,26 @@ public final class CmdAdminSetMobDrops implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         double multiplier;
@@ -75,10 +85,10 @@ public final class CmdAdminSetMobDrops implements ICommand {
             return;
         }
 
-        island.setMobDropsMultiplier(multiplier);
+        islands.forEach(island -> island.setMobDropsMultiplier(multiplier));
 
         if(targetPlayer == null)
-            Locale.CHANGED_MOB_DROPS_NAME.send(sender, island.getName());
+            Locale.CHANGED_MOB_DROPS_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
     }

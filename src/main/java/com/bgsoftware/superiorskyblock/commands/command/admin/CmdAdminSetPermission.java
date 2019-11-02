@@ -2,11 +2,14 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ public final class CmdAdminSetPermission implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setpermission <permission> <role>";
+        return "island admin setpermission <player-name/island-name/*> <permission> <role>";
     }
 
     @Override
@@ -38,12 +41,12 @@ public final class CmdAdminSetPermission implements ICommand {
 
     @Override
     public int getMinArgs() {
-        return 4;
+        return 5;
     }
 
     @Override
     public int getMaxArgs() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -53,6 +56,29 @@ public final class CmdAdminSetPermission implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        List<Island> islands = new ArrayList<>();
+
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
+        }
+
         IslandPermission islandPermission;
 
         try{
@@ -71,7 +97,7 @@ public final class CmdAdminSetPermission implements ICommand {
             return;
         }
 
-        plugin.getGrid().getIslands().forEach(island -> island.setPermission(playerRole, islandPermission, true));
+        islands.forEach(island -> island.setPermission(playerRole, islandPermission, true));
 
         Locale.PERMISSION_CHANGED.send(sender);
     }

@@ -28,7 +28,7 @@ public final class CmdAdminSetHoppersLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin sethopperslimit <player-name/island-name> <limit>";
+        return "island admin sethopperslimit <player-name/island-name/*> <limit>";
     }
 
     @Override

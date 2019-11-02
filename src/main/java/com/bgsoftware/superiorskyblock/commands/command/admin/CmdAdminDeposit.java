@@ -31,7 +31,7 @@ public final class CmdAdminDeposit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin deposit <player-name/island-name> <amount>";
+        return "island admin deposit <player-name/island-name/*> <amount>";
     }
 
     @Override
@@ -62,33 +62,41 @@ public final class CmdAdminDeposit implements ICommand {
         }
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
         }
 
-        double amount = -1;
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
+        }
+
+        double amount;
 
         try{
             amount = Double.parseDouble(args[3]);
-        }catch(IllegalArgumentException ignored){}
-
-        if(amount < 0){
+        }catch(IllegalArgumentException ignored){
             Locale.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
 
-        island.depositMoney(amount);
+        islands.forEach(island -> island.depositMoney(amount));
 
         if(targetPlayer == null)
-            Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), island.getName());
+            Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.ADMIN_DEPOSIT_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
     }

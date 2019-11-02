@@ -31,7 +31,7 @@ public final class CmdAdminSetBlockLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setblocklimit <player-name/island-name> <block> <limit>";
+        return "island admin setblocklimit <player-name/island-name/*> <block> <limit>";
     }
 
     @Override
@@ -57,16 +57,26 @@ public final class CmdAdminSetBlockLimit implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")) {
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else{
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         Key key = Key.of(args[3].toUpperCase());
@@ -80,10 +90,10 @@ public final class CmdAdminSetBlockLimit implements ICommand {
             return;
         }
 
-        island.setBlockLimit(key, limit);
+        islands.forEach(island -> island.setBlockLimit(key, limit));
 
         if(targetPlayer == null)
-            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), island.getName());
+            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.toString().split(":")[0]), targetPlayer.getName());
     }

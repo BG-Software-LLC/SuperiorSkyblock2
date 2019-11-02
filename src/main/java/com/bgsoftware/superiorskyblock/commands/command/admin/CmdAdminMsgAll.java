@@ -29,7 +29,7 @@ public final class CmdAdminMsgAll implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin msgall <player-name/island-name> <msg...>";
+        return "island admin msgall <player-name/island-name/*> <msg...>";
     }
 
     @Override
@@ -55,16 +55,27 @@ public final class CmdAdminMsgAll implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+
+            islands.add(island);
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -72,10 +83,12 @@ public final class CmdAdminMsgAll implements ICommand {
         for(int i = 3; i < args.length; i++)
             stringBuilder.append(" ").append(ChatColor.translateAlternateColorCodes('&', args[i]));
 
-        island.sendMessage(stringBuilder.toString().substring(1));
+        String message = stringBuilder.toString().substring(1);
+
+        islands.forEach(island -> island.sendMessage(message));
 
         if(targetPlayer == null)
-            Locale.GLOBAL_MESSAGE_SENT_NAME.send(sender, island.getName());
+            Locale.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
     }

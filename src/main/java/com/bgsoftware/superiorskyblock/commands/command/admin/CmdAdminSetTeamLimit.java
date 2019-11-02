@@ -28,7 +28,7 @@ public final class CmdAdminSetTeamLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setteamlimit <player-name/island-name> <limit>";
+        return "island admin setteamlimit <player-name/island-name/*> <limit>";
     }
 
     @Override
@@ -54,16 +54,26 @@ public final class CmdAdminSetTeamLimit implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         int limit;
@@ -75,10 +85,10 @@ public final class CmdAdminSetTeamLimit implements ICommand {
             return;
         }
 
-        island.setTeamLimit(limit);
+        islands.forEach(island -> island.setTeamLimit(limit));
 
         if(targetPlayer == null)
-            Locale.CHANGED_TEAM_LIMIT_NAME.send(sender, island.getName());
+            Locale.CHANGED_TEAM_LIMIT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.CHANGED_TEAM_LIMIT.send(sender, targetPlayer.getName());
     }

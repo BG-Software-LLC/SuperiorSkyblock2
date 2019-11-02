@@ -27,7 +27,7 @@ public final class CmdAdminSetWarpsLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setwarpslimit <player-name/island-name> <amount>";
+        return "island admin setwarpslimit <player-name/island-name/*> <amount>";
     }
 
     @Override
@@ -53,16 +53,26 @@ public final class CmdAdminSetWarpsLimit implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         int amount;
@@ -78,10 +88,10 @@ public final class CmdAdminSetWarpsLimit implements ICommand {
             return;
         }
 
-        island.setWarpsLimit(amount);
+        islands.forEach(island -> island.setWarpsLimit(amount));
 
         if(targetPlayer == null)
-            Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, island.getName());
+            Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
     }

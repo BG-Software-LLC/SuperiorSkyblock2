@@ -30,7 +30,7 @@ public final class CmdAdminBonus implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin bonus <player-name/island-name> <amount>";
+        return "island admin bonus <player-name/island-name/*> <amount>";
     }
 
     @Override
@@ -56,16 +56,26 @@ public final class CmdAdminBonus implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")) {
+            islands = plugin.getGrid().getIslands();
+        }
+
+        else{
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         BigDecimal bonusWorth;
@@ -77,7 +87,7 @@ public final class CmdAdminBonus implements ICommand {
             return;
         }
 
-        island.setBonusWorth(bonusWorth);
+        islands.forEach(island -> island.setBonusWorth(bonusWorth));
 
         Locale.BONUS_SET_SUCCESS.send(sender, bonusWorth.toString());
     }
