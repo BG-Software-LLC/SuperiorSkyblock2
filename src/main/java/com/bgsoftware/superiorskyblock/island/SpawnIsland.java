@@ -49,7 +49,11 @@ public final class SpawnIsland extends SIsland {
 
     @Override
     public Location getTeleportLocation() {
-        return getCenter();
+        Location center = getCenter();
+        if(center.getWorld() == null)
+            center = this.center = new Location(plugin.getGrid().getIslandsWorld(), 0, 100, 0);
+
+        return center;
     }
 
     @Override
