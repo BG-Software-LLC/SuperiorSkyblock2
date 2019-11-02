@@ -176,19 +176,25 @@ bank-worth-rate: 1000
 # Set the name of the islands world.
 island-world: SuperiorWorld
 
-# Set the location of the spawn of the server.
-# Make sure you follow one of these formats:
-# <world>, <x>, <y>, <z>
-# <world>, <x>, <y>, <z>, <yaw>, <pitch>
-spawn-location: SuperiorWorld, 0, 100, 0, 0, 0
+# All settings related to the spawn island.
+spawn:
+  # The location of the island. Players will be teleported to this
+  # location in many events, such as disbanding islands & getting expelled from one.
+  location: SuperiorWorld, 0, 100, 0, 0, 0
 
-# When enabled, the islands protection will be on the spawn too.
-# If disabled, it's your responsibility to protect the spawn!
-spawn-protection: true
+  # Should the spawn be protected?
+  # When disabled, it's your responsibility to protect the spawn!
+  # Therefore, settings will be still applied to the area if false.
+  protection: true
 
-# When enabled, pvp will be enabled in the spawn.
-# Can be disabled using other plugins.
-spawn-pvp: false
+  # A list of settings that will be enabled for the spawn.
+  settings:
+    - CROPS_GROWTH
+    - LAVA_FLOW
+    - NATURAL_ANIMALS_SPAWN
+    - SPAWNER_ANIMALS_SPAWN
+    - TREE_GROWTH
+    - WATER_FLOW
 
 # When enabled, players will get teleported upon void fall.
 # If they fall not in an island, they will be teleported to spawn.

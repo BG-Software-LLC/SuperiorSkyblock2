@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public final class SpawnIsland extends SIsland {
@@ -22,6 +24,7 @@ public final class SpawnIsland extends SIsland {
     private Location center;
     private String world;
     private int islandSize;
+    private Set<String> islandSettings = new HashSet<>();
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "");
@@ -37,6 +40,7 @@ public final class SpawnIsland extends SIsland {
         this.center = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
 
         this.islandSize = plugin.getSettings().maxIslandSize;
+        this.islandSettings.addAll(plugin.getSettings().spawnSettings);
     }
 
     @Override
@@ -318,7 +322,7 @@ public final class SpawnIsland extends SIsland {
 
     @Override
     public boolean hasSettingsEnabled(IslandSettings islandSettings) {
-        return false;
+        return this.islandSettings.contains(islandSettings.name());
     }
 
     @Override
@@ -334,5 +338,10 @@ public final class SpawnIsland extends SIsland {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SpawnIsland;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }

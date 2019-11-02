@@ -142,19 +142,22 @@ public final class ConfigComments {
     public static String ISLAND_WORLD = "island-world";
 
     @Comment("")
-    @Comment("Set the location of the spawn of the server.")
-    @Comment("Make sure you follow the format: <world>, <x>, <y>, <z>")
-    public static String SPAWN_LOCATION = "spawn-location";
+    @Comment("All settings related to the spawn island.")
+    public static String SPAWN = "spawn";
+
+    @Comment("The location of the island. Players will be teleported to this")
+    @Comment("location in many events, such as disbanding islands & getting expelled from one.")
+    public static String SPAWN_LOCATION = "spawn.location";
 
     @Comment("")
-    @Comment("When enabled, the islands protection will be on the spawn too.")
-    @Comment("If disabled, it's your responsibility to protect the spawn!")
-    public static String SPAWN_PROTECTION = "spawn-protection";
+    @Comment("Should the spawn be protected?")
+    @Comment("When disabled, it's your responsibility to protect the spawn!")
+    @Comment("Therefore, settings will be still applied to the area if false.")
+    public static String SPAWN_PROTECTION = "spawn.protection";
 
     @Comment("")
-    @Comment("When enabled, pvp will be enabled in the spawn.")
-    @Comment("Can be disabled using other plugins.")
-    public static String SPAWN_PVP = "spawn-pvp";
+    @Comment("A list of settings that will be enabled for the spawn.")
+    public static String SPAWN_SETTINGS = "spawn.settings";
 
     @Comment("")
     @Comment("When enabled, players will get teleported upon void fall.")

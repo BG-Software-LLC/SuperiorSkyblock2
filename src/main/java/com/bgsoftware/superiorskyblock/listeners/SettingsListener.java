@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -169,7 +168,7 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland) || island.hasSettingsEnabled(IslandSettings.PVP))
+        if(island == null || island.hasSettingsEnabled(IslandSettings.PVP))
             return;
 
         SuperiorPlayer damagerPlayer;
@@ -207,7 +206,7 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (plugin.getSettings().spawnPvp && island instanceof SpawnIsland) || island.hasSettingsEnabled(IslandSettings.PVP))
+        if(island == null || island.hasSettingsEnabled(IslandSettings.PVP))
             return;
 
         for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){

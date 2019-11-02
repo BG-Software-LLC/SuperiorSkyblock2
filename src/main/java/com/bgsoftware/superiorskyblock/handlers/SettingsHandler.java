@@ -47,7 +47,7 @@ public final class SettingsHandler {
     public final String islandWorld;
     public final String spawnLocation;
     public final boolean spawnProtection;
-    public final boolean spawnPvp;
+    public final List<String> spawnSettings;
     public final boolean voidTeleport;
     public final List<String> interactables;
     public final boolean visitorsDamage;
@@ -110,9 +110,9 @@ public final class SettingsHandler {
         welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorld = cfg.getString("island-world", "SuperiorWorld");
-        spawnLocation = cfg.getString("spawn-location", "SuperiorWorld, 0, 100, 0, 0, 0");
-        spawnProtection = cfg.getBoolean("spawn-protection", true);
-        spawnPvp = cfg.getBoolean("spawn-pvp", false);
+        spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
+        spawnProtection = cfg.getBoolean("spawn.protection", true);
+        spawnSettings = cfg.getStringList("spawn.settings");
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
@@ -193,6 +193,12 @@ public final class SettingsHandler {
             cfg.set("island-roles.ladder.leader.weight", 3);
             cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
         }
+        if(cfg.contains("spawn-location"))
+            cfg.set("spawn.location", cfg.getString("spawn-location"));
+        if(cfg.contains("spawn-protection"))
+            cfg.set("spawn.protection", cfg.getString("spawn-protection"));
+        if(cfg.getBoolean("spawn-pvp", false))
+            cfg.set("spawn.settings", Collections.singletonList("PVP"));
     }
 
 }
