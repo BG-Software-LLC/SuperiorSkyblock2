@@ -64,7 +64,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings("unused")
 public class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
@@ -671,18 +671,10 @@ public class SIsland extends DatabaseObject implements Island {
 
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 scanService.execute(() -> {
-                    boolean emptyChunk = true;
+                    if(LocationUtils.isChunkEmpty(chunkSnapshot))
+                        return;
 
                     double islandWorth = 0;
-
-                    for(int i = 0; i < 16 && emptyChunk; i++){
-                        if(!chunkSnapshot.isSectionEmpty(i)){
-                            emptyChunk = false;
-                        }
-                    }
-
-                    if(emptyChunk)
-                        return;
 
                     for (int x = 0; x < 16; x++) {
                         for (int z = 0; z < 16; z++) {

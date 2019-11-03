@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -36,7 +37,17 @@ public final class LocationUtils {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isSafeBlock(Block block){
         Block underBlock = block.getRelative(BlockFace.DOWN);
-        return underBlock.getType().isSolid() && underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
+        return underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
+    }
+
+    public static boolean isChunkEmpty(ChunkSnapshot chunkSnapshot){
+        for(int i = 0; i < 16; i++){
+            if(!chunkSnapshot.isSectionEmpty(i)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
