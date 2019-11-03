@@ -181,6 +181,8 @@ permissions:
             description: Set a required role for a permission for all the islands.
           superior.admin.setrate:
             description: Set the rating of another player.
+          superior.admin.setsettings:
+            description: Toggle settings for a specific island.
           superior.admin.setsize:
             description: Change another player's island size.
           superior.admin.setspawnerrates:
