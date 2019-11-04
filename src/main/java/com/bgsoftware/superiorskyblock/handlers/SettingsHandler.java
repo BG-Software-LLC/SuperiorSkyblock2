@@ -48,6 +48,7 @@ public final class SettingsHandler {
     public final String spawnLocation;
     public final boolean spawnProtection;
     public final List<String> spawnSettings;
+    public final boolean spawnWorldBorder;
     public final boolean voidTeleport;
     public final List<String> interactables;
     public final boolean visitorsDamage;
@@ -113,6 +114,7 @@ public final class SettingsHandler {
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = cfg.getBoolean("spawn.protection", true);
         spawnSettings = cfg.getStringList("spawn.settings");
+        spawnWorldBorder = cfg.getBoolean("spawn.world-border", false);
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = cfg.getStringList("interactables");
         visitorsDamage = cfg.getBoolean("visitors-damage", false);

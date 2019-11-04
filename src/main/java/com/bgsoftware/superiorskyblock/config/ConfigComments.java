@@ -160,6 +160,10 @@ public final class ConfigComments {
     public static String SPAWN_SETTINGS = "spawn.settings";
 
     @Comment("")
+    @Comment("Should a world border be displayed in the spawn?")
+    public static String SPAWN_WORLD_BORDER = "spawn.world-border";
+
+    @Comment("")
     @Comment("When enabled, players will get teleported upon void fall.")
     @Comment("If they fall not in an island, they will be teleported to spawn.")
     public static String VOID_TELEPORT = "void-teleport";

@@ -160,7 +160,7 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
             WorldBorder worldBorder = new WorldBorder();
 
             worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
-            worldBorder.setSize(disabled || island == null ? Integer.MAX_VALUE : (island.getIslandSize() * 2) + 1);
+            worldBorder.setSize(disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn()) ? Integer.MAX_VALUE : (island.getIslandSize() * 2) + 1);
 
             Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
 
