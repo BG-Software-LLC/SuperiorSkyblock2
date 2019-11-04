@@ -28,6 +28,7 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
@@ -68,7 +69,7 @@ public final class BlocksListener implements Listener {
             island.handleBlockBreak(e.getBlock());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
@@ -83,6 +84,14 @@ public final class BlocksListener implements Listener {
                     island.handleBlockPlace(Key.of(blockState.getData().toItemStack()), 1);
                 }
             });
+    }
+
+    //Checking for chorus flower spread outside island.
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockSpread(BlockSpreadEvent e){
+        Island sourceIsland = plugin.getGrid().getIslandAt(e.getSource().getLocation());
+        if(sourceIsland != null && !sourceIsland.isInsideRange(e.getBlock().getLocation()))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
