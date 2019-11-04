@@ -231,6 +231,11 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void handleBlockPlace(Key key, int amount, boolean save) {
+
+    }
+
+    @Override
     public void handleBlockBreak(Key key, int amount, boolean save) {
 
     }
