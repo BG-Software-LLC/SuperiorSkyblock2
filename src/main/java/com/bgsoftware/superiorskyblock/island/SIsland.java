@@ -86,7 +86,7 @@ public class SIsland extends DatabaseObject implements Island {
      * SIsland data
      */
 
-    private final TreeSet<SuperiorPlayer> members = new TreeSet<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
+    private final PriorityQueue<SuperiorPlayer> members = new PriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
     private final Set<SuperiorPlayer> banned = new HashSet<>(), coop = new HashSet<>(), invitedPlayers = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Set<IslandSettings> islandSettings = new HashSet<>();
