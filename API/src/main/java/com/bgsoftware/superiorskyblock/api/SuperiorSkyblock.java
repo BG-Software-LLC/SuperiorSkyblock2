@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api;
 
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
+import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
@@ -38,5 +39,10 @@ public interface SuperiorSkyblock {
      * Get the menus manager of the core.
      */
     MenusManager getMenus();
+
+    /**
+     * Get the keys manager of the core.
+     */
+    KeysManager getKeys();
 
 }

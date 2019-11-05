@@ -13,6 +13,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_SilkSpawners implements BlocksProvider {
 
@@ -23,6 +24,12 @@ public final class BlocksProvider_SilkSpawners implements BlocksProvider {
     @Override
     public Pair<Integer, EntityType> getSpawner(Location location) {
         return new Pair<>(1, null);
+    }
+
+    @Override
+    public Key getSpawnerKey(ItemStack itemStack) {
+        String name = itemStack.getItemMeta().getLore().get(0).replaceAll("§e", "");
+        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + EntityType.fromName(name));
     }
 
     @SuppressWarnings("unused")

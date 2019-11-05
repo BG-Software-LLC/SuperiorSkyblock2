@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
@@ -56,6 +57,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private ProvidersHandler providersHandler;
     private MissionsHandler missionsHandler;
     private MenusHandler menusHandler;
+    private KeysHandler keysHandler;
 
     private NMSAdapter nmsAdapter;
 
@@ -174,6 +176,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
         menusHandler = new MenusHandler();
+        keysHandler = new KeysHandler(this);
 
         Executor.sync(() -> {
             if (loadGrid)
@@ -193,6 +196,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR);
         SortingType.register("RATING", SortingComparators.RATING_COMPARATOR);
         SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR);
+    }
+
+    @Override
+    public KeysHandler getKeys() {
+        return keysHandler;
     }
 
     @Override

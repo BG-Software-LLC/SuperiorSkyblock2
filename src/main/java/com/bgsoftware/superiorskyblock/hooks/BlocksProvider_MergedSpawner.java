@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
@@ -12,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_MergedSpawner implements BlocksProvider {
 
@@ -27,6 +30,11 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
             blockCount = spawnerAPI.getCountFor(location.getBlock());
         }
         return new Pair<>(blockCount, null);
+    }
+
+    @Override
+    public Key getSpawnerKey(ItemStack itemStack) {
+        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + MergedSpawnerAPI.getInstance().getEntityType(itemStack));
     }
 
     @SuppressWarnings("unused")

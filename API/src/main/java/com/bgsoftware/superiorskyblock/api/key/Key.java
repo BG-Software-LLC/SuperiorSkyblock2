@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -51,9 +51,7 @@ public final class Key {
      * @param block The block to check.
      */
     public static Key of(Block block){
-        return SuperiorSkyblockAPI.getSuperiorSkyblock().getGrid().isSpawner(block.getType()) ?
-                of(block.getType() + ":" + ((CreatureSpawner) block.getState()).getSpawnedType()) :
-                of(block.getState().getData().toItemStack());
+        return of(block.getState().getData().toItemStack());
     }
 
     /**
@@ -61,7 +59,8 @@ public final class Key {
      * @param itemStack The item-stack to check.
      */
     public static Key of(ItemStack itemStack){
-        return of(itemStack.getType(), itemStack.getDurability());
+        KeysManager keysManager = SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys();
+        return keysManager.isSpawner(itemStack.getType()) ? keysManager.getSpawnerKey(itemStack) : of(itemStack.getType(), itemStack.getDurability());
     }
 
     /**

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -58,6 +59,7 @@ public final class CmdValue implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
         Key toCheck;
+        String keyName = "";
 
         if(args.length == 1){
             ItemStack inHand = superiorPlayer.asPlayer().getItemInHand();
@@ -67,31 +69,35 @@ public final class CmdValue implements ICommand {
             }
 
             toCheck = Key.of(inHand);
+
+            if(inHand.getType() == Materials.SPAWNER.toBukkitType())
+                keyName = StringUtils.format(toCheck.toString().split(":")[1] + "_Spawner");
         }
         else{
             toCheck = Key.of(args[1].toUpperCase());
         }
 
+        if(keyName.isEmpty())
+            keyName = StringUtils.format(toCheck.toString().split(":")[0]);
+
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck),
                 blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
-
-        String key = StringUtils.format(toCheck.toString().split(":")[0]);
 
         StringBuilder stringBuilder = new StringBuilder();
 
         if(blockWorth.doubleValue() == 0) {
             if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty())
-                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(key));
+                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(keyName));
         }
         else{
             if(!Locale.BLOCK_VALUE.isEmpty())
-                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(key, StringUtils.format(blockWorth)));
+                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(keyName, StringUtils.format(blockWorth)));
         }
 
         if(!Locale.BLOCK_LEVEL.isEmpty()){
             if(stringBuilder.length() != 0)
                 stringBuilder.append("\n");
-            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(key, StringUtils.format(blockLevel)));
+            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(keyName, StringUtils.format(blockLevel)));
         }
 
         Locale.sendMessage(superiorPlayer, stringBuilder.toString());

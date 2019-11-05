@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 public final class ProvidersHandler {
 
@@ -52,6 +54,10 @@ public final class ProvidersHandler {
 
     public Pair<Integer, EntityType> getSpawner(Location location){
         return spawnersProvider.getSpawner(location);
+    }
+
+    public Key getSpawnerKey(ItemStack itemStack){
+        return spawnersProvider.getSpawnerKey(itemStack);
     }
 
     public Pair<Integer, Material> getBlock(Location location){

@@ -183,7 +183,10 @@ public interface GridManager {
     /**
      * Checks whether or not the material is a spawner.
      * @param material The material to check.
+     *
+     * @deprecated See KeysManager.
      */
+    @Deprecated
     boolean isSpawner(Material material);
 
 }

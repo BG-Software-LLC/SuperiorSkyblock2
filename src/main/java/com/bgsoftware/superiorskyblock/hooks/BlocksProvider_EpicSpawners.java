@@ -18,6 +18,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
@@ -34,6 +35,11 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
             blockCount = instance.getSpawnerManager().getSpawnerFromWorld(location).getFirstStack().getStackSize();
         }
         return new Pair<>(blockCount, null);
+    }
+
+    @Override
+    public Key getSpawnerKey(ItemStack itemStack) {
+        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0));
     }
 
     @SuppressWarnings("unused")
