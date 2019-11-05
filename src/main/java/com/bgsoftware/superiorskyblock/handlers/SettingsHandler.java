@@ -198,7 +198,7 @@ public final class SettingsHandler {
         if(cfg.contains("spawn-location"))
             cfg.set("spawn.location", cfg.getString("spawn-location"));
         if(cfg.contains("spawn-protection"))
-            cfg.set("spawn.protection", cfg.getString("spawn-protection"));
+            cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
         if(cfg.getBoolean("spawn-pvp", false))
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
     }
