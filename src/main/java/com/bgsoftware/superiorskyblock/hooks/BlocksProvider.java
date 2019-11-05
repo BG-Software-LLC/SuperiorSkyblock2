@@ -20,7 +20,7 @@ public interface BlocksProvider {
             return Key.of(Materials.SPAWNER.toBukkitType() + ":" + creatureSpawner.getSpawnedType());
         }
 
-        return Key.of(Materials.SPAWNER.toBukkitType() + "");
+        return Key.of(itemStack);
     }
 
     default Pair<Integer, Material> getBlock(Location location){

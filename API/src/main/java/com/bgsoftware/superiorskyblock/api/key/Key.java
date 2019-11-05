@@ -51,7 +51,8 @@ public final class Key {
      * @param block The block to check.
      */
     public static Key of(Block block){
-        return of(block.getState().getData().toItemStack());
+        KeysManager keysManager = SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys();
+        return keysManager.isSpawner(block.getType()) ? keysManager.getSpawnerKey(block) : of(block.getState().getData().toItemStack());
     }
 
     /**
