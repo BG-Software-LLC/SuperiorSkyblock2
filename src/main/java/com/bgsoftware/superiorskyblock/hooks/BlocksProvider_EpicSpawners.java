@@ -58,7 +58,10 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
             int blockLimit = island.getBlockLimit(blockKey), increaseAmount = e.getSpawner().getFirstStack().getStackSize() - 1;
 
-            if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) + increaseAmount > blockLimit){
+            //We check for increaseAmount + 1 because this event is called before the main block place listener.
+            //If we check only for increaseAmount, on regular placement, it will be 0.
+            //If we don't cancel it here, the will still be placed down.
+            if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) + increaseAmount + 1 > blockLimit){
                 e.setCancelled(true);
                 Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(Materials.SPAWNER.toBukkitType() + ""));
             }
