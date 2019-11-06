@@ -144,18 +144,30 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
         SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
+            ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Players Loader #%d").build());
+
             while (resultSet.next()) {
-                plugin.getPlayers().loadPlayer(resultSet);
+                CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
+                executor.execute(() -> plugin.getPlayers().loadPlayer(cachedResultSet));
+            }
+
+            try {
+                executor.shutdown();
+                if(!executor.awaitTermination(3, TimeUnit.MINUTES)){
+                    Bukkit.getPluginManager().disablePlugin(plugin);
+                    throw new RuntimeException("Loading players timed out.");
+                }
+            }catch(InterruptedException ex){
+                ex.printStackTrace();
             }
         });
-
-        ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock DB Thread").build());
 
         SuperiorSkyblockPlugin.log("Finished players!");
         SuperiorSkyblockPlugin.log("Starting to load islands...");
 
         SQLHelper.executeQuery("SELECT * FROM islands;", resultSet -> {
-            SuperiorSkyblockPlugin.log("Received the result set. Starting to load everything...");
+            ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Islands Loader #%d").build());
+
             while (resultSet.next()) {
                 CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
                 executor.execute(() -> plugin.getGrid().createIsland(cachedResultSet));
@@ -163,12 +175,13 @@ public final class DataHandler {
 
             try {
                 executor.shutdown();
-                executor.awaitTermination(1, TimeUnit.HOURS);
-            }catch(Exception ex){
+                if(!executor.awaitTermination(3, TimeUnit.MINUTES)){
+                    Bukkit.getPluginManager().disablePlugin(plugin);
+                    throw new RuntimeException("Loading islands timed out.");
+                }
+            }catch(InterruptedException ex){
                 ex.printStackTrace();
             }
-
-            SuperiorSkyblockPlugin.log("Loading done!");
         });
 
         SuperiorSkyblockPlugin.log("Finished islands!");

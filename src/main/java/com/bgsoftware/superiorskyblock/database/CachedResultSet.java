@@ -22,7 +22,10 @@ public final class CachedResultSet {
     }
 
     public long getLong(String key){
-        return (long) cache.get(key);
+        if(cache.get(key) instanceof String)
+            return Long.parseLong((String) cache.get(key));
+        else
+            return (long) cache.get(key);
     }
 
     public String getString(String key){

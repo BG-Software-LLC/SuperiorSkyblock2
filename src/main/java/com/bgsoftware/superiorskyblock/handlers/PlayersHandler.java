@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
@@ -98,9 +99,12 @@ public final class PlayersHandler implements PlayersManager {
     }
 
 
-    public void loadPlayer(ResultSet resultSet) throws SQLException {
+    public void loadPlayer(CachedResultSet resultSet){
         UUID player = UUID.fromString(resultSet.getString("player"));
-        players.put(player, new SSuperiorPlayer(resultSet));
+        SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
+        synchronized (this) {
+            players.put(player, superiorPlayer);
+        }
     }
 
 

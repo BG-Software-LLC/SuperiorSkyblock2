@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -27,7 +28,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +60,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private BorderColor borderColor = BorderColor.BLUE;
     private long lastTimeStatus = -1;
 
-    public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
+    public SSuperiorPlayer(CachedResultSet resultSet){
         player = UUID.fromString(resultSet.getString("player"));
         islandLeader = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("teamLeader")));
         name = resultSet.getString("name");
