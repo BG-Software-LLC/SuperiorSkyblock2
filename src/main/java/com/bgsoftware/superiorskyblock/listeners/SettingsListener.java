@@ -49,14 +49,13 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL && e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.SPAWNER)
-            return;
-
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
         boolean animal = e.getEntity() instanceof Animals;
 
         if(island != null){
             switch (e.getSpawnReason()){
+                case JOCKEY:
+                case CHUNK_GEN:
                 case NATURAL:
                     if(!island.hasSettingsEnabled(animal ? IslandSettings.NATURAL_ANIMALS_SPAWN : IslandSettings.NATURAL_MONSTER_SPAWN))
                         e.setCancelled(true);
