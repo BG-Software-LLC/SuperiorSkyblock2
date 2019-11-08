@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -182,11 +181,9 @@ public final class UpgradesListener implements Listener {
 
         Key blockKey = Key.of(e.getBlock());
 
-        int blockLimit = island.getBlockLimit(blockKey);
-
-        if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
+        if(island.hasReachedBlockLimit(blockKey)){
             e.setCancelled(true);
-            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(e.getBlock().getType().name()));
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
         }
     }
 
@@ -202,11 +199,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        Key blockKey = Key.of("HOPPER");
-
-        int blockLimit = island.getBlockLimit(blockKey);
-
-        if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) >= blockLimit){
+        if(island.hasReachedBlockLimit(Key.of("HOPPER"))){
             e.setCancelled(true);
             Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format("hopper"));
         }

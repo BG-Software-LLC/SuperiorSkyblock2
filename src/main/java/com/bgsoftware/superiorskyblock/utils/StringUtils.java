@@ -16,6 +16,8 @@ public final class StringUtils {
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();
 
+        type = type.replace(":", "_-_");
+
         for(String subKey : type.split("_"))
             formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase()).append(subKey.substring(1).toLowerCase());
 

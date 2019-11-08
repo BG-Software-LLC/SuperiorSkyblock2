@@ -628,11 +628,34 @@ public interface Island extends Comparable<Island> {
     int getBlockLimit(Key key);
 
     /**
+     * Get the block limit of a block.
+     * Unlike getBlockLimit(Key), this method returns the count for
+     * the exactly block that is given as a parameter.
+     * @param key The block's key to check.
+     */
+    int getExactBlockLimit(Key key);
+
+    /**
      * Set the block limit of a block.
      * @param key The block's key to set the limit to.
      * @param limit The limit to set.
      */
     void setBlockLimit(Key key, int limit);
+
+    /**
+     * A method to check if a specific block has reached the limit.
+     * This method checks for the block and it's global block key.
+     * @param key The block's key to check.
+     */
+    boolean hasReachedBlockLimit(Key key);
+
+    /**
+     * A method to check if a specific block has reached the limit.
+     * This method checks for the block and it's global block key.
+     * @param key The block's key to check.
+     * @param amount Amount of the block to be placed.
+     */
+    boolean hasReachedBlockLimit(Key key, int amount);
 
     /**
      * Get the team limit of the island.

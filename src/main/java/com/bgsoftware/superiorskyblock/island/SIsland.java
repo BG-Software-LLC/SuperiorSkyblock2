@@ -1176,12 +1176,41 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public int getExactBlockLimit(Key key) {
+        return blockLimits.getRaw(key, NO_BLOCK_LIMIT);
+    }
+
+    @Override
     public void setBlockLimit(Key key, int limit) {
-        this.blockLimits.put(key, limit);
+        if(limit <= NO_BLOCK_LIMIT)
+            this.blockLimits.removeRaw(key);
+        else
+            this.blockLimits.put(key, limit);
+
         Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
                 .setString(IslandSerializer.serializeBlockLimits(this.blockLimits))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
+    }
+
+    @Override
+    public boolean hasReachedBlockLimit(Key key) {
+        return hasReachedBlockLimit(key, 1);
+    }
+
+    @Override
+    public boolean hasReachedBlockLimit(Key key, int amount) {
+        int blockLimit = getExactBlockLimit(key);
+
+        //Checking for the specific provided key.
+        if(blockLimit > SIsland.NO_BLOCK_LIMIT)
+            return getBlockCount(key) + amount > blockLimit;
+
+        //Getting the global key values.
+        key = Key.of(key.toString().split(":")[0]);
+        blockLimit = getBlockLimit(key);
+
+        return blockLimit > SIsland.NO_BLOCK_LIMIT && getBlockCount(key) + amount > blockLimit;
     }
 
     @Override

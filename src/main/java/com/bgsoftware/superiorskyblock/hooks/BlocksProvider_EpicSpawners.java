@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -55,19 +54,15 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
                 return;
 
             Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName().toUpperCase().replace(' ', '_'));
+            int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
-            int blockLimit = island.getBlockLimit(blockKey), increaseAmount = e.getSpawner().getFirstStack().getStackSize() - 1;
-
-            //We check for increaseAmount + 1 because this event is called before the main block place listener.
-            //If we check only for increaseAmount, on regular placement, it will be 0.
-            //If we don't cancel it here, the will still be placed down.
-            if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) + increaseAmount + 1 > blockLimit){
+            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(Materials.SPAWNER.toBukkitType() + ""));
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             }
 
             else{
-                island.handleBlockPlace(blockKey, increaseAmount);
+                island.handleBlockPlace(blockKey, increaseAmount - 1);
             }
         }
 
@@ -80,14 +75,15 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
             Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName().toUpperCase().replace(' ', '_'));
 
-            int blockLimit = island.getBlockLimit(blockKey), increaseAmount = e.getStackSize() - e.getOldStackSize();
+            int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
             if(increaseAmount < 0){
                 island.handleBlockBreak(blockKey, -increaseAmount);
             }
-            else if(blockLimit > SIsland.NO_BLOCK_LIMIT && island.getBlockCount(blockKey) + increaseAmount > blockLimit){
+
+            else if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(Materials.SPAWNER.toBukkitType() + ""));
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             }
 
             else{
