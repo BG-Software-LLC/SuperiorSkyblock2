@@ -72,5 +72,11 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
+    public static String serializeGenerator(Map<String, Integer> cobbleGenerator){
+        StringBuilder missionsBuilder = new StringBuilder();
+        cobbleGenerator.forEach((key, value) ->
+                missionsBuilder.append(",").append(key).append("=").append(value));
+        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+    }
 
 }

@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -118,6 +117,15 @@ public final class IslandDeserializer {
                 return false;
             }
         }).map(IslandSettings::valueOf).collect(Collectors.toList()));
+    }
+
+    public static void deserializeGenerators(String generator, Map<String, Integer> cobbleGenerator){
+        for(String limit : generator.split(",")){
+            try {
+                String[] sections = limit.split("=");
+                cobbleGenerator.put(sections[0], Integer.parseInt(sections[1]));
+            }catch(Exception ignored){}
+        }
     }
 
 }

@@ -74,4 +74,6 @@ public interface NMSAdapter {
 
     void clearInventory(OfflinePlayer offlinePlayer);
 
+    void playGeneratorSound(Location location);
+
 }

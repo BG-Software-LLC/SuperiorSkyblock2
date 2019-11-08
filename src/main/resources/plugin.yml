@@ -183,6 +183,8 @@ permissions:
             description: Set the rating of another player.
           superior.admin.setsettings:
             description: Toggle settings for a specific island.
+          superior.admin.setgenerator:
+            description: Change percentage of a material for the cobblestone generator.
           superior.admin.setsize:
             description: Change another player's island size.
           superior.admin.setspawnerrates:

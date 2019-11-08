@@ -15,6 +15,7 @@ import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityLiving;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.EnumParticle;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.ItemStack;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
@@ -33,6 +34,8 @@ import net.minecraft.server.v1_12_R1.NBTTagString;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_12_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_12_R1.PlayerInteractManager;
+import net.minecraft.server.v1_12_R1.SoundCategory;
+import net.minecraft.server.v1_12_R1.SoundEffects;
 import net.minecraft.server.v1_12_R1.TileEntityFlowerPot;
 import net.minecraft.server.v1_12_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_12_R1.World;
@@ -282,6 +285,17 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 
         targetPlayer.saveData();
+    }
+
+    @Override
+    public void playGeneratorSound(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        double x = location.getX(), y = location.getY(), z = location.getZ();
+        BlockPosition blockPosition = new BlockPosition(x, y, z);
+        world.a(null, blockPosition, SoundEffects.dE, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+
+        for(int i = 0; i < 8; i++)
+            world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
     }
 
 }

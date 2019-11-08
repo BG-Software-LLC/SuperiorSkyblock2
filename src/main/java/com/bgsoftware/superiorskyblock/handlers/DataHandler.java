@@ -85,7 +85,8 @@ public final class DataHandler {
                 "ratings VARCHAR," +
                 "missions VARCHAR," +
                 "settings VARCHAR," +
-                "ignored BOOLEAN" +
+                "ignored BOOLEAN," +
+                "generator VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -140,6 +141,7 @@ public final class DataHandler {
         addColumnIfNotExists("missions", "players", "''", "VARCHAR");
         addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
         addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -208,6 +210,12 @@ public final class DataHandler {
     private String getDefaultSettings() {
         StringBuilder stringBuilder = new StringBuilder();
         plugin.getSettings().defaultSettings.forEach(setting -> stringBuilder.append(";").append(setting));
+        return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
+    }
+
+    private String getDefaultGenerator() {
+        StringBuilder stringBuilder = new StringBuilder();
+        plugin.getSettings().defaultGenerator.forEach((key, value) -> stringBuilder.append(",").append(key).append("=").append(value));
         return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
     }
 

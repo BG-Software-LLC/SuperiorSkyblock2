@@ -257,4 +257,10 @@ public final class ConfigComments {
     @Comment("This should increase performance on the server.")
     public static String DISABLE_REDSTONE_OFFLINE = "disable-redstone-offline";
 
+    @Comment("")
+    @Comment("A list of default generator percentages for new islands.")
+    @Comment("By default, all generators will generate cobblestone only.")
+    @Comment("Example: 'DIAMOND_BLOCK:50' will set 50% chance for diamond block.")
+    public static String DEFAULT_GENERATOR = "default-generator";
+
 }

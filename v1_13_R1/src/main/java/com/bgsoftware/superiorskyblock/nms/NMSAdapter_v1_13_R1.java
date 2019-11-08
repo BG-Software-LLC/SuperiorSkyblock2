@@ -34,7 +34,10 @@ import net.minecraft.server.v1_13_R1.NBTTagShort;
 import net.minecraft.server.v1_13_R1.NBTTagString;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_13_R1.Particles;
 import net.minecraft.server.v1_13_R1.PlayerInteractManager;
+import net.minecraft.server.v1_13_R1.SoundCategory;
+import net.minecraft.server.v1_13_R1.SoundEffects;
 import net.minecraft.server.v1_13_R1.TileEntityHopper;
 import net.minecraft.server.v1_13_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R1.World;
@@ -312,7 +315,18 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         targetPlayer.saveData();
     }
 
-    private class CustomTileEntityHopper extends TileEntityHopper{
+    @Override
+    public void playGeneratorSound(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        double x = location.getX(), y = location.getY(), z = location.getZ();
+        BlockPosition blockPosition = new BlockPosition(x, y, z);
+        world.a(null, blockPosition, SoundEffects.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+
+        for(int i = 0; i < 8; i++)
+            world.addParticle(Particles.F, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
+    }
+
+    private static class CustomTileEntityHopper extends TileEntityHopper{
 
         private InventoryHolder holder;
 

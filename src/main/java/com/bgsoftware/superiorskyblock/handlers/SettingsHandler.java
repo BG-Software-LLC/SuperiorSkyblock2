@@ -14,6 +14,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,6 +70,7 @@ public final class SettingsHandler {
     public final boolean rateOwnIsland;
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
+    public final Map<String, Integer> defaultGenerator;
     public final boolean disableRedstoneOffline;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
@@ -138,6 +140,13 @@ public final class SettingsHandler {
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
+        defaultGenerator = new HashMap<>();
+        for(String line : cfg.getStringList("default-generator")){
+            String[] sections = line.split(":");
+            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String percentage = sections.length == 2 ? sections[1] : sections[2];
+            defaultGenerator.put(key, Integer.parseInt(percentage));
+        }
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
     }
 

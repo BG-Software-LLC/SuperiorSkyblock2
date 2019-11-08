@@ -811,4 +811,24 @@ public interface Island extends Comparable<Island> {
      */
     void disableSettings(IslandSettings islandSettings);
 
+    /*
+     *  Generator related methods
+     */
+
+    /**
+     * Set a percentage for a specific key.
+     * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     */
+    void setGeneratorPercentage(Key key, int percentage);
+
+    /**
+     * Get the percentage for a specific key.
+     */
+    int getGeneratorPercentage(Key key);
+
+    /**
+     * Get the percentages of the materials for the cobblestone generator in the island.
+     */
+    Map<String, Integer> getGeneratorPercentages();
+
 }

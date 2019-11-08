@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
+import com.bgsoftware.superiorskyblock.listeners.GeneratorsListener;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
@@ -67,13 +68,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         new Metrics(this);
 
 
-        getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
-        getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
-        getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
-        getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
+        getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
+        getServer().getPluginManager().registerEvents(new GeneratorsListener(this), this);
         getServer().getPluginManager().registerEvents(new MenusListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
+        getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
         getServer().getPluginManager().registerEvents(new SettingsListener(this), this);
+        getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
 
         loadNMSAdapter();
         loadAPI();

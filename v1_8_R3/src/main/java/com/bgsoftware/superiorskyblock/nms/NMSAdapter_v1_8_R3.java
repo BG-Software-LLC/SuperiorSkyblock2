@@ -17,6 +17,7 @@ import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
@@ -291,6 +292,16 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 
         targetPlayer.saveData();
+    }
+
+    @Override
+    public void playGeneratorSound(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        double x = location.getX(), y = location.getY(), z = location.getZ();
+        world.makeSound(x + 0.5D, y + 0.5D, z + 0.5D, "random.fizz", 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+
+        for(int i = 0; i < 8; i++)
+            world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
     }
 
 }

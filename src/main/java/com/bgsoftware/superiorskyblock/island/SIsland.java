@@ -89,6 +89,7 @@ public class SIsland extends DatabaseObject implements Island {
     private final PriorityQueue<SuperiorPlayer> members = new PriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
     private final Set<SuperiorPlayer> banned = new HashSet<>(), coop = new HashSet<>(), invitedPlayers = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
+    private final Map<String, Integer> cobbleGenerator = new HashMap<>();
     private final Set<IslandSettings> islandSettings = new HashSet<>();
     private final Map<String, Integer> upgrades = new HashMap<>();
     private final KeyMap<Integer> blockCounts = new KeyMap<>();
@@ -136,6 +137,7 @@ public class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
         IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
+        IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGenerator);
 
         this.islandBank = BigDecimalFormatted.of(resultSet.getString("islandBank"));
         this.bonusWorth = BigDecimalFormatted.of(resultSet.getString("bonusWorth"));
@@ -157,6 +159,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         assignPermissionNodes();
         assignSettings();
+        assignGenerator();
 
         Executor.sync(() -> biome = getCenter().getBlock().getBiome());
     }
@@ -206,6 +209,7 @@ public class SIsland extends DatabaseObject implements Island {
 
         assignPermissionNodes();
         assignSettings();
+        assignGenerator();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
@@ -223,6 +227,7 @@ public class SIsland extends DatabaseObject implements Island {
         this.islandName = islandName;
         assignPermissionNodes();
         assignSettings();
+        assignGenerator();
     }
 
     /*
@@ -1459,6 +1464,42 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     /*
+     *  Generator related methods
+     */
+
+    @Override
+    public void setGeneratorPercentage(Key key, int percentage) {
+        if(percentage < 0 || percentage > 100)
+            throw new IllegalArgumentException("Percentage must be between 0 and 100.");
+
+        if(percentage == 0)
+            cobbleGenerator.remove(key.toString());
+        else
+            cobbleGenerator.put(key.toString(), percentage);
+
+        Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
+    public int getGeneratorPercentage(Key key) {
+        String keyStr = key.toString();
+        int percentage = cobbleGenerator.getOrDefault(keyStr, 0);
+
+        if((percentage <= 0 || percentage > 100) && cobbleGenerator.containsKey(keyStr))
+            setGeneratorPercentage(key, 0);
+
+        return cobbleGenerator.getOrDefault(keyStr, 0);
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorPercentages() {
+        return new HashMap<>(cobbleGenerator);
+    }
+
+    /*
      *  Data related methods
      */
 
@@ -1491,6 +1532,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored)
+                .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -1533,6 +1575,7 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored)
+                .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .execute(async);
     }
 
@@ -1603,6 +1646,18 @@ public class SIsland extends DatabaseObject implements Island {
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    private void assignGenerator(){
+        if(!cobbleGenerator.isEmpty() || owner == null)
+            return;
+
+        cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
+
+        Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }

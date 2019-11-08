@@ -28,8 +28,9 @@ public enum Query {
     ISLAND_SET_MISSIONS("UPDATE islands SET missions=? WHERE owner=?;"),
     ISLAND_SET_SETTINGS("UPDATE islands SET settings=? WHERE owner=?;"),
     ISLAND_SET_IGNORED("UPDATE islands SET ignored=? WHERE owner=?;"),
-    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,settings=?,ignored=? WHERE owner=?;"),
-    ISLAND_INSERT("INSERT INTO islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_SET_GENERATOR("UPDATE islands SET generator=? WHERE owner=?;"),
+    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,settings=?,ignored=?generator=? WHERE owner=?;"),
+    ISLAND_INSERT("INSERT INTO islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored,generator) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),

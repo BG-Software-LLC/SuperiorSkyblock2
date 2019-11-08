@@ -312,7 +312,14 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         targetPlayer.saveData();
     }
 
-    private class CustomTileEntityHopper extends TileEntityHopper {
+    @Override
+    public void playGeneratorSound(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+        world.triggerEffect(1501, blockPosition, 0);
+    }
+
+    private static class CustomTileEntityHopper extends TileEntityHopper {
 
         private InventoryHolder holder;
 
