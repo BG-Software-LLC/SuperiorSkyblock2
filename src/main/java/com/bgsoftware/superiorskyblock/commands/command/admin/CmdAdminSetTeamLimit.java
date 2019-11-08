@@ -87,8 +87,10 @@ public final class CmdAdminSetTeamLimit implements ICommand {
 
         islands.forEach(island -> island.setTeamLimit(limit));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_TEAM_LIMIT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+        if(islands.size() > 1)
+            Locale.CHANGED_TEAM_LIMIT_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_TEAM_LIMIT_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_TEAM_LIMIT.send(sender, targetPlayer.getName());
     }

@@ -90,8 +90,10 @@ public final class CmdAdminSetWarpsLimit implements ICommand {
 
         islands.forEach(island -> island.setWarpsLimit(amount));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+        if(islands.size() > 1)
+            Locale.CHANGED_WARPS_LIMIT_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());
     }

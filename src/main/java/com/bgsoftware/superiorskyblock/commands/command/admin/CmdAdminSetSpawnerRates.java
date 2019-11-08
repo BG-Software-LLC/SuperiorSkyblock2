@@ -87,8 +87,10 @@ public final class CmdAdminSetSpawnerRates implements ICommand {
 
         islands.forEach(island -> island.setSpawnerRatesMultiplier(multiplier));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+        if(islands.size() > 1)
+            Locale.CHANGED_SPAWNER_RATES_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
     }

@@ -87,8 +87,10 @@ public final class CmdAdminSetMobDrops implements ICommand {
 
         islands.forEach(island -> island.setMobDropsMultiplier(multiplier));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_MOB_DROPS_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+        if(islands.size() > 1)
+            Locale.CHANGED_MOB_DROPS_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
     }

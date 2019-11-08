@@ -99,7 +99,12 @@ public final class CmdAdminSetPermission implements ICommand {
 
         islands.forEach(island -> island.setPermission(playerRole, islandPermission, true));
 
-        Locale.PERMISSION_CHANGED.send(sender);
+        if(islands.size() > 1)
+            Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPermission.name()));
+        else if(targetPlayer == null)
+            Locale.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPermission.name()), islands.get(0).getName());
+        else
+            Locale.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPermission.name()), targetPlayer.getName());
     }
 
     @Override
