@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -59,6 +60,8 @@ public final class GeneratorsListener implements Listener {
                 if(typeSections.length == 2)
                     //noinspection deprecation
                     e.getBlock().setData(Byte.parseByte(typeSections[1]));
+
+                island.handleBlockPlace(Key.of(cachedMaterials[0]), 1);
 
                 plugin.getNMSAdapter().playGeneratorSound(e.getBlock().getLocation());
             });
