@@ -94,20 +94,31 @@ public final class CmdAdminSetLeader implements ICommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(!player.equals(sender) && player.getName().toLowerCase().startsWith(args[2].toLowerCase()) &&
-                        SSuperiorPlayer.of(player).getIsland() != null){
-                    list.add(player.getName());
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(playerIsland.getName());
                 }
             }
         }
+
         else if(args.length == 4){
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(args[2]);
             if(superiorPlayer != null && superiorPlayer.getIsland() != null) {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!player.equals(sender) && !player.getUniqueId().equals(superiorPlayer.getUniqueId()) &&
-                            player.getName().toLowerCase().startsWith(args[3].toLowerCase()) &&
-                            superiorPlayer.getIsland().equals(SSuperiorPlayer.of(player).getIsland())){
-                        list.add(player.getName());
+                Island playerIsland = superiorPlayer.getIsland();
+                for(Player player : Bukkit.getOnlinePlayers()){
+                    SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                    if(!onlinePlayer.equals(superiorPlayer)) {
+                        Island onlineIsland = onlinePlayer.getIsland();
+                        if (onlineIsland != null && !onlineIsland.equals(playerIsland)) {
+                            if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                                list.add(player.getName());
+                            if (!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                                list.add(onlineIsland.getName());
+                        }
                     }
                 }
             }

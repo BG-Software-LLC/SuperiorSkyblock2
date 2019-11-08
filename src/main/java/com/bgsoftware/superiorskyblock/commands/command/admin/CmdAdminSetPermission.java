@@ -10,7 +10,9 @@ import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,16 +114,30 @@ public final class CmdAdminSetPermission implements ICommand {
         List<String> list = new ArrayList<>();
 
         if(args.length == 3){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(playerIsland.getName());
+                }
+            }
+        }
+
+        else if(args.length == 4){
             list.addAll(Arrays.stream(IslandPermission.values())
                     .map(islandPermission -> islandPermission.toString().toLowerCase())
-                    .filter(islandPermissionName -> islandPermissionName.startsWith(args[2].toLowerCase()))
+                    .filter(islandPermissionName -> islandPermissionName.startsWith(args[3].toLowerCase()))
                     .collect(Collectors.toList())
             );
         }
-        else if(args.length == 4){
+
+        else if(args.length == 5){
             list.addAll(plugin.getPlayers().getRoles().stream()
                     .map(playerRole -> playerRole.toString().toLowerCase())
-                    .filter(playerRoleName -> playerRoleName.startsWith(args[3].toLowerCase()))
+                    .filter(playerRoleName -> playerRoleName.startsWith(args[4].toLowerCase()))
                     .collect(Collectors.toList())
             );
         }

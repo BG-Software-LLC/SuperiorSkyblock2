@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -79,9 +80,13 @@ public final class CmdAdminGiveDisbands implements ICommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(!player.equals(sender) && player.getName().toLowerCase().startsWith(args[2].toLowerCase()) &&
-                        SSuperiorPlayer.of(player).getIsland() != null){
-                    list.add(player.getName());
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                Island playerIsland = onlinePlayer.getIsland();
+                if (playerIsland != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(player.getName());
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                        list.add(playerIsland.getName());
                 }
             }
         }

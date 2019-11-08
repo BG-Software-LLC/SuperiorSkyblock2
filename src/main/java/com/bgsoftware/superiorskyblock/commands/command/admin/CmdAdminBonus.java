@@ -103,7 +103,7 @@ public final class CmdAdminBonus implements ICommand {
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
