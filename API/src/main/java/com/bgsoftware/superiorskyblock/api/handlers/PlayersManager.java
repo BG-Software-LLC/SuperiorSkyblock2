@@ -23,6 +23,11 @@ public interface PlayersManager {
     SuperiorPlayer getSuperiorPlayer(UUID uuid);
 
     /**
+     * Get all the players that joined the server.
+     */
+    List<SuperiorPlayer> getAllPlayers();
+
+    /**
      * Get a player role by it's weight.
      * @param weight The weight to check.
      * @return The player role with that weight. May be null.

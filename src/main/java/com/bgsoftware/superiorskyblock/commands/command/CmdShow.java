@@ -122,8 +122,14 @@ public final class CmdShow implements ICommand {
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
             if (!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty()) {
-                members.forEach(superiorPlayer -> rolesStrings.get(superiorPlayer.getPlayerRole())
-                        .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(superiorPlayer.getName())).append("\n"));
+                members.forEach(superiorPlayer -> {
+                    try{
+                        rolesStrings.get(superiorPlayer.getPlayerRole())
+                                .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(superiorPlayer.getName())).append("\n");
+                    }catch(NullPointerException ex){
+                        SuperiorSkyblockPlugin.log("[Warn] It seems like " + superiorPlayer.getName() + " isn't part of the island of " + island.getOwner().getName() + ".");
+                    }
+                });
             }
 
             rolesStrings.keySet().stream()
