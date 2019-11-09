@@ -57,6 +57,11 @@ public final class PlayersHandler implements PlayersManager {
     }
 
     @Override
+    public List<SuperiorPlayer> getAllPlayers() {
+        return new ArrayList<>(players.values());
+    }
+
+    @Override
     public PlayerRole getPlayerRole(int index) {
         return roles.get(index);
     }

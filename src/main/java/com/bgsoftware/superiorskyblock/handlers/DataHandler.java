@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
@@ -205,6 +206,19 @@ public final class DataHandler {
         });
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
+
+
+        /*
+         *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
+         */
+
+        for(SuperiorPlayer superiorPlayer : plugin.getPlayers().getAllPlayers()){
+            if(superiorPlayer.getIslandLeader().getUniqueId().equals(superiorPlayer.getUniqueId()) && superiorPlayer.getIsland() != null && !superiorPlayer.getPlayerRole().isLastRole()){
+                SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + " is an island leader, but have a guest role - fixing it...");
+                superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
+            }
+        }
+
     }
 
     private String getDefaultSettings() {
