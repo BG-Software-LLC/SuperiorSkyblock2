@@ -43,6 +43,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private final Set<String> completedMissions = new HashSet<>();
     private final UUID player;
 
+    private UUID islandLeaderFromCache;
+
     private SuperiorPlayer islandLeader;
     private String name, textureValue = "";
     private PlayerRole playerRole;
@@ -62,7 +64,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public SSuperiorPlayer(CachedResultSet resultSet){
         player = UUID.fromString(resultSet.getString("player"));
-        islandLeader = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("teamLeader")));
+        islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");
         textureValue = resultSet.getString("textureValue");
         playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
@@ -162,6 +164,11 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public SuperiorPlayer getIslandLeader() {
+        if(islandLeaderFromCache != null){
+            islandLeader = SSuperiorPlayer.of(islandLeaderFromCache);
+            islandLeaderFromCache = null;
+        }
+
         return islandLeader;
     }
 
