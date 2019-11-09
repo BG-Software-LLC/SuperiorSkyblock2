@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdPromote implements ICommand {
 
@@ -74,6 +73,11 @@ public final class CmdPromote implements ICommand {
             return;
         }
 
+        if(!island.isMember(targetPlayer)){
+            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            return;
+        }
+
         PlayerRole playerRole = targetPlayer.getPlayerRole();
         PlayerRole nextRole = playerRole.getNextRole();
 
@@ -100,10 +104,8 @@ public final class CmdPromote implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.PROMOTE_MEMBERS)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getMembers()){
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
                 PlayerRole playerRole = targetPlayer.getPlayerRole();
                 PlayerRole nextRole = playerRole.getNextRole();
                 if(!playerRole.isLastRole() && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&

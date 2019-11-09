@@ -13,7 +13,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdDemote implements ICommand {
 
@@ -74,6 +73,11 @@ public final class CmdDemote implements ICommand {
             return;
         }
 
+        if(!island.isMember(targetPlayer)){
+            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            return;
+        }
+
         if(!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())){
             Locale.DEMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
@@ -99,10 +103,8 @@ public final class CmdDemote implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.DEMOTE_MEMBERS)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getAllMembers()){
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
                 if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getPlayerRole().getPreviousRole() != null &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
