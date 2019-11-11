@@ -160,6 +160,7 @@ public class SIsland extends DatabaseObject implements Island {
         assignPermissionNodes();
         assignSettings();
         assignGenerator();
+        checkMembersDuplication();
 
         Executor.sync(() -> biome = getCenter().getBlock().getBiome());
     }
@@ -210,6 +211,7 @@ public class SIsland extends DatabaseObject implements Island {
         assignPermissionNodes();
         assignSettings();
         assignGenerator();
+        checkMembersDuplication();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
@@ -1689,6 +1691,26 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
+    }
+
+    private void checkMembersDuplication(){
+        Iterator<SuperiorPlayer> iterator = members.iterator();
+        boolean removed = false;
+
+        while (iterator.hasNext()){
+            SuperiorPlayer superiorPlayer = iterator.next();
+            if(!superiorPlayer.getIslandLeader().equals(owner)){
+                iterator.remove();
+                removed = true;
+            }
+        }
+
+        if(removed){
+            Query.ISLAND_SET_MEMBERS.getStatementHolder()
+                    .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
+                    .setString(owner.getUniqueId().toString())
+                    .execute(true);
+        }
     }
 
     private static String getPlayerCollectionString(Collection<SuperiorPlayer> collection) {
