@@ -317,10 +317,11 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
+        List<Block> blocks = e.getBlocks();
         Executor.async(() -> {
             Map<Location, Integer> blocksToChange = new HashMap<>();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            for(Block block : e.getBlocks()){
+            for(Block block : blocks){
                 int blockAmount = plugin.getGrid().getBlockAmount(block);
                 if(blockAmount > 1){
                     blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
