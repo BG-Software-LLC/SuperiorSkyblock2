@@ -68,7 +68,7 @@ import java.util.stream.Collectors;
 public class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
-    public static final int NO_BLOCK_LIMIT = -1;
+    private static final int NO_BLOCK_LIMIT = -1;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -218,6 +218,7 @@ public class SIsland extends DatabaseObject implements Island {
         this(superiorPlayer, SBlockPosition.of(location), islandName);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getIslandLeader();
