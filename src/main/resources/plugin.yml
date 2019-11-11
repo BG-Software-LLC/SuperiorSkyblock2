@@ -109,6 +109,8 @@ permissions:
             description: Open top islands panel.
           superior.island.transfer:
             description: Transfer your island's leadership.
+          superior.island.uncoop:
+            description: Remove a player from being a co-op in your island.
           superior.island.upgrade:
             description: Open upgrades panel.
           superior.island.value:
