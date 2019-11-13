@@ -39,7 +39,7 @@ public final class CmdCreate implements ICommand {
 
     @Override
     public int getMinArgs() {
-        return 1;
+        return plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1;
     }
 
     @Override
@@ -61,10 +61,10 @@ public final class CmdCreate implements ICommand {
             return;
         }
 
-        if(!plugin.getSettings().islandNamesRequiredForCreation && args.length == 2){
-            Locale.COMMAND_USAGE.send(sender, getUsage());
-            return;
-        }
+//        if(!plugin.getSettings().islandNamesRequiredForCreation && args.length == 2){
+//            Locale.COMMAND_USAGE.send(sender, getUsage());
+//            return;
+//        }
 
         String islandName = "";
 
