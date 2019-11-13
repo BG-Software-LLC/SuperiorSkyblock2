@@ -16,6 +16,13 @@ public final class StringUtils {
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();
 
+        try{
+            String[] split = type.split(":");
+            //Checking if the type is <TYPE>:<INTEGER>
+            Integer.parseInt(split[1]);
+            type = split[0];
+        }catch(Throwable ignored){}
+
         type = type.replace(":", "_-_");
 
         for(String subKey : type.split("_"))
