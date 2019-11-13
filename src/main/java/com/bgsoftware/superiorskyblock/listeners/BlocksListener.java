@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
@@ -43,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
@@ -317,21 +319,40 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
-        List<Block> blocks = e.getBlocks();
+        List<Location> locations = e.getBlocks().stream().map(Block::getLocation).collect(Collectors.toList());
         Executor.async(() -> {
             Map<Location, Integer> blocksToChange = new HashMap<>();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            for(Block block : blocks){
-                int blockAmount = plugin.getGrid().getBlockAmount(block);
+            for(Location location : locations){
+                int blockAmount = plugin.getGrid().getBlockAmount(location);
                 if(blockAmount > 1){
-                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
-                    blocksToChange.put(block.getLocation(), 0);
+                    blocksToChange.put(getRelative(location, e.getDirection()), blockAmount);
+                    blocksToChange.put(location, 0);
                 }
             }
 
             Executor.sync(() ->
                     blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
         }, 2L);
+    }
+
+    private Location getRelative(Location location, BlockFace blockFace){
+        switch (blockFace){
+            case NORTH:
+                return location.clone().subtract(0, 0, 1);
+            case SOUTH:
+                return location.clone().add(0, 0, 1);
+            case WEST:
+                return location.clone().subtract(1, 0, 0);
+            case EAST:
+                return location.clone().add(1, 0, 0);
+            case DOWN:
+                return location.clone().subtract(0, 1, 0);
+            case UP:
+                return location.clone().add(0, 1, 0);
+            default:
+                return location;
+        }
     }
 
     /*
