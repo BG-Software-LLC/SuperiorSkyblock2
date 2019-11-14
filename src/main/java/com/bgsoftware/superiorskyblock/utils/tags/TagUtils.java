@@ -104,8 +104,8 @@ public final class TagUtils {
         EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
         SBlockPosition offset = SBlockPosition.of(((StringTag) compoundValue.get("offset")).getValue());
         CompoundTag nbtTagCompound = (CompoundTag) compoundValue.get("NBT");
-
-        LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(offset.parse(center.getWorld()).add(center), entityType);
+        Location location = offset.parse(center.getWorld()).add(center.clone().add(0.5, 1, 0.5));
+        LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(location, entityType);
         plugin.getNMSAdapter().getFromNBTTag(livingEntity, nbtTagCompound);
     }
 

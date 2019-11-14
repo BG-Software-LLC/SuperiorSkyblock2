@@ -124,6 +124,8 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         NBTTagCompound nbtTagCompound = new NBTTagCompound();
         entityLiving.b(nbtTagCompound);
+        nbtTagCompound.set("Yaw", new NBTTagFloat(entityLiving.yaw));
+        nbtTagCompound.set("Pitch", new NBTTagFloat(entityLiving.pitch));
         return CompoundTag.fromNBT(nbtTagCompound);
     }
 
@@ -131,8 +133,16 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public void getFromNBTTag(LivingEntity livingEntity, CompoundTag compoundTag) {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         NBTTagCompound nbtTagCompound = (NBTTagCompound) compoundTag.toNBT();
-        if(nbtTagCompound != null)
+        if(nbtTagCompound != null) {
             entityLiving.a(nbtTagCompound);
+            if(nbtTagCompound.hasKey("Yaw") && nbtTagCompound.hasKey("Pitch")){
+                entityLiving.setLocation(
+                        entityLiving.locX, entityLiving.locY, entityLiving.locZ,
+                        nbtTagCompound.getFloat("Yaw"),
+                        nbtTagCompound.getFloat("Pitch")
+                );
+            }
+        }
     }
 
     @Override

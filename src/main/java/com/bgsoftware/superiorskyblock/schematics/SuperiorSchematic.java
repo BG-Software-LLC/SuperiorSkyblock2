@@ -36,13 +36,15 @@ public final class SuperiorSchematic implements Schematic {
         Location min = location.clone().subtract(offsetX, offsetY, offsetZ);
 
         if(compoundTag.getValue().containsKey("blocks")) {
-            TagUtils.assignIntoBlocks(island, ((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, callback);
-        }
+            TagUtils.assignIntoBlocks(island, ((ListTag) compoundTag.getValue().get("blocks")).getValue(), min, () -> {
+                if(compoundTag.getValue().containsKey("entities")) {
+                    for (Tag tag : ((ListTag) compoundTag.getValue().get("entities")).getValue()) {
+                        TagUtils.spawnEntity((CompoundTag) tag, location);
+                    }
+                }
 
-        if(compoundTag.getValue().containsKey("entities")) {
-            for (Tag tag : ((ListTag) compoundTag.getValue().get("entities")).getValue()) {
-                TagUtils.spawnEntity((CompoundTag) tag, location);
-            }
+                callback.run();
+            });
         }
     }
 
