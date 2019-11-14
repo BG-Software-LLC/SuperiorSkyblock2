@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -20,20 +21,24 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
@@ -149,12 +154,86 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void teleport(Island island) {
-        if(!LocationUtils.isSafeBlock(island.getTeleportLocation().getBlock())) {
-            Location center = island.getCenter();
-            island.setTeleportLocation(center.getWorld().getHighestBlockAt(center).getLocation());
+        teleport(island, null);
+    }
+
+    @Override
+    public void teleport(Island island, Consumer<Boolean> result) {
+        Location toTeleport = null;
+
+        //We check if the island's teleport location is safe.
+        if(LocationUtils.isSafeBlock(island.getTeleportLocation().getBlock())){
+            toTeleport = island.getTeleportLocation();
         }
 
-        teleport(island.getTeleportLocation().add(0, 0.5, 0));
+        //We check if the island's center location is safe.
+        else if(LocationUtils.isSafeBlock(island.getCenter().getBlock())){
+            island.setTeleportLocation(island.getCenter());
+            toTeleport = island.getTeleportLocation();
+        }
+
+        //We check if the highest block at the island's center location is safe.
+        else if(LocationUtils.isSafeBlock(island.getCenter().getWorld().getHighestBlockAt(island.getCenter()))){
+            island.setTeleportLocation(island.getCenter());
+            toTeleport = island.getTeleportLocation();
+        }
+
+        //Checking if one of the options above is safe.
+        if(toTeleport != null){
+            teleport(toTeleport.add(0, 0.5, 0));
+            if(result != null)
+                result.accept(true);
+            return;
+        }
+
+        /*
+         *   Finding a new block to teleport the player to.
+         */
+
+        List<ChunkSnapshot> chunkSnapshots = island.getAllChunks(true).stream()
+                .map(Chunk::getChunkSnapshot).collect(Collectors.toList());
+
+        Executor.async(() -> {
+            for(ChunkSnapshot chunkSnapshot : chunkSnapshots) {
+                if (LocationUtils.isChunkEmpty(chunkSnapshot))
+                    continue;
+
+                for(int x = 0; x < 16; x++){
+                    for(int z = 0; z < 16; z++){
+                        int y = chunkSnapshot.getHighestBlockYAt(x, z);
+                        Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z),
+                                belowKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
+
+                        Material blockType, belowType;
+
+                        try {
+                            blockType = Material.valueOf(blockKey.toString().split(":")[0]);
+                            belowType = Material.valueOf(belowKey.toString().split(":")[0]);
+                        }catch(IllegalArgumentException ex){
+                            continue;
+                        }
+
+                        if(blockType.isSolid() || belowType.isSolid()){
+                            Location islandLocation = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                                    chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z);
+
+                            Executor.sync(() -> {
+                                island.setTeleportLocation(islandLocation);
+                                teleport(islandLocation.add(0.5, 0.5, 0.5));
+
+                                if(result != null)
+                                    result.accept(true);
+                            });
+
+                            return;
+                        }
+                    }
+                }
+            }
+
+            if(result != null)
+                Executor.sync(() -> result.accept(false));
+        });
     }
 
     @Override

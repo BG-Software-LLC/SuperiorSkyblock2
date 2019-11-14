@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface SuperiorPlayer {
 
@@ -64,6 +65,13 @@ public interface SuperiorPlayer {
      * @param island The island to teleport the player to.
      */
     void teleport(Island island);
+
+    /**
+     * Teleport the player to an island.
+     * @param island The island to teleport the player to.
+     * @param result Consumer that will be ran when task is finished.
+     */
+    void teleport(Island island, Consumer<Boolean> result);
 
     /**
      * Get the island owner of the player's island.

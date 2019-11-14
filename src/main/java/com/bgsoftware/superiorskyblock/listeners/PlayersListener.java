@@ -262,8 +262,14 @@ public final class PlayersListener implements Listener {
         }
 
         noFallDamage.add(e.getPlayer().getUniqueId());
-        SSuperiorPlayer.of(e.getPlayer().getUniqueId()).teleport(island);
-        Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        superiorPlayer.teleport(island, result -> {
+            if(!result){
+                Locale.TELEPORTED_FAILED.send(superiorPlayer);
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            }
+            Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
+        });
     }
 
     @EventHandler
