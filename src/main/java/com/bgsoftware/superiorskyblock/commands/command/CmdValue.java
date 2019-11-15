@@ -85,7 +85,7 @@ public final class CmdValue implements ICommand {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(blockWorth.doubleValue() == 0) {
+        if(blockWorth.doubleValue() <= 0) {
             if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty())
                 stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(keyName));
         }

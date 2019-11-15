@@ -28,7 +28,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockWorth(Key key) {
-        return BigDecimalFormatted.of(blockValues.getOrDefault(key, "0"));
+        return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
     @Override

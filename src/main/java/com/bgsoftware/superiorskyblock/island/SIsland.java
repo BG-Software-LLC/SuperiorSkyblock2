@@ -981,12 +981,12 @@ public class SIsland extends DatabaseObject implements Island {
 
         boolean increaseAmount = false;
 
-        if(blockValue.doubleValue() > 0){
+        if(blockValue.doubleValue() >= 0){
             islandWorth = islandWorth.add(blockValue.multiply(new BigDecimal(amount)));
             increaseAmount = true;
         }
 
-        if(blockLevel.doubleValue() > 0){
+        if(blockLevel.doubleValue() >= 0){
             islandLevel = islandLevel.add(blockLevel.multiply(new BigDecimal(amount)));
             increaseAmount = true;
         }
