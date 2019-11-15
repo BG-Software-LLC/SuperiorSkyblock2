@@ -21,9 +21,7 @@ public final class WorldEditSchematic implements Schematic {
             blockVector3AtMethod = blockVector3Class.getMethod("at", int.class, int.class, int.class);
             blockVector3PasteMethod = com.boydti.fawe.object.schematic.Schematic.class
                     .getMethod("paste", World.class, blockVector3Class, boolean.class, boolean.class, Transform.class);
-        }catch(Throwable ex){
-            ex.printStackTrace();
-        }
+        }catch(Throwable ignored){ }
     }
 
     private com.boydti.fawe.object.schematic.Schematic schematic;
