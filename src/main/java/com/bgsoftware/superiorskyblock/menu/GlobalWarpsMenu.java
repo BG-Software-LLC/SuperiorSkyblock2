@@ -113,7 +113,7 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
         inv.setContents(inventory.getContents());
 
         List<Island> islands = getFilteredIslands(superiorPlayer)
-                .sorted(Comparable::compareTo)
+                .sorted(SortingComparators.WORTH_COMPARATOR)
                 .collect(Collectors.toList());
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < islands.size(); i++){
