@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,7 +36,7 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
 
         if(!upgradeName.isEmpty()){
             Bukkit.dispatchCommand(e.getWhoClicked(), "is rankup " + upgradeName);
-            e.getWhoClicked().closeInventory();
+            Executor.sync(() -> e.getWhoClicked().closeInventory(), 1L);
         }
     }
 
