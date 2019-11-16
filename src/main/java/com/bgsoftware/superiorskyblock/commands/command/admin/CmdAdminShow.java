@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -81,8 +82,6 @@ public final class CmdAdminShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_OWNER.getMessage(island.getOwner().getName())).append("\n");
         if(!Locale.ISLAND_INFO_NAME.isEmpty() && !island.getName().isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(island.getName())).append("\n");
-        if(!Locale.ISLAND_INFO_ADMIN_SIZE.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_SIZE.getMessage(island.getIslandSize())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty()) {
@@ -104,6 +103,33 @@ public final class CmdAdminShow implements ICommand {
                 upgradesString.append(Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(upgrade, island.getUpgradeLevel(upgrade))).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_UPGRADES.getMessage(upgradesString));
+        }
+
+        if(!Locale.ISLAND_INFO_ADMIN_SIZE.isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_SIZE.getMessage(island.getIslandSize())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_TEAM_LIMIT.isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_TEAM_LIMIT.getMessage(island.getTeamLimit())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(island.getSpawnerRatesMultiplier())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.getMessage(island.getMobDropsMultiplier())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.isEmpty())
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.getMessage(island.getCropGrowthMultiplier())).append("\n");
+
+        if(!Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.isEmpty() && !Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.isEmpty()){
+            StringBuilder blocksString = new StringBuilder();
+            for(Map.Entry<Key, Integer> entry : island.getBlocksLimits().entrySet()){
+                blocksString.append(Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(StringUtils.format(entry.getKey().toString()), entry.getValue())).append("\n");
+            }
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.getMessage(blocksString));
+        }
+
+        if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty() && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty()){
+            StringBuilder generatorString = new StringBuilder();
+            for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
+                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(StringUtils.format(entry.getKey().toString()), entry.getValue())).append("\n");
+            }
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(generatorString));
         }
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty()) {

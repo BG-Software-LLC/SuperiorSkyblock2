@@ -636,6 +636,11 @@ public interface Island extends Comparable<Island> {
     int getExactBlockLimit(Key key);
 
     /**
+     * Get all the blocks limits for the island.
+     */
+    Map<Key, Integer> getBlocksLimits();
+
+    /**
      * Set the block limit of a block.
      * @param key The block's key to set the limit to.
      * @param limit The limit to set.

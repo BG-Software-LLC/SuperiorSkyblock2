@@ -1184,6 +1184,11 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public Map<Key, Integer> getBlocksLimits() {
+        return blockLimits.asKeyMap();
+    }
+
+    @Override
     public void setBlockLimit(Key key, int limit) {
         if(limit <= NO_BLOCK_LIMIT)
             this.blockLimits.removeRaw(key);

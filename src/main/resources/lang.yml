@@ -228,7 +228,19 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Use /is help {0} for the next page.'
-ISLAND_INFO_ADMIN_SIZE: '&e&lIsland | &7Radius: {0}'
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+  &e&lIsland | &7Blocks Limits:
+  {0}
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsland | &7Crops Multiplier: {0}'
+ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsland | &7Drops Multiplier: {0}'
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+  &e&lIsland | &7Generator Rates:
+  {0}
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsland | &7  {0}: {1}%'
+ISLAND_INFO_ADMIN_SIZE: '&e&lIsland | &7Border Size: {0}'
+ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIsland | &7Spawners Multiplier: {0}'
+ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lIsland | &7Team Limit: {0}'
 ISLAND_INFO_ADMIN_UPGRADES: |
   &e&lIsland | &7Upgrades:
   {0}

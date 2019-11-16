@@ -127,7 +127,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         map.clear();
     }
 
-    private Map<Key, V> asKeyMap(){
+    public Map<Key, V> asKeyMap(){
         Map<Key, V> map = new HashMap<>();
         this.map.forEach((key, value) -> map.put(Key.of(key), value));
         return map;
