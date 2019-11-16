@@ -15,14 +15,13 @@ upgrades-gui:
     '1':
       type: CYAN_STAINED_GLASS_PANE
       name: '&f'
-      slots: 0,1,7,8,9,17,18,19,25,26,27,28,29,33,34,35
+      slots: 0,1,7,8,9,17,18,26,27,28,29,33,34,35
     '2':
       type: BLUE_STAINED_GLASS_PANE
       name: '&f'
       slots: 2,3,5,6,10,16,20,24,30,32
     '3':
       type: LIGHT_BLUE_STAINED_GLASS_PANE
-      data: 11
       name: '&f'
       slots: 4,12,14,22,31
 
@@ -458,7 +457,7 @@ upgrades-gui:
             - '&7level of the spawner rates!'
     mob-drops:
       '1':
-        slot: 21
+        slot: 19
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -498,7 +497,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '2':
-        slot: 21
+        slot: 19
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -538,7 +537,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '3':
-        slot: 21
+        slot: 19
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -578,7 +577,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '4':
-        slot: 21
+        slot: 19
         has-next-level:
           sound:
             type: BLOCK_ANVIL_PLACE
@@ -601,7 +600,7 @@ upgrades-gui:
             - '&7level of the mob drops!'
     members-limit:
       '1':
-        slot: 23
+        slot: 21
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -641,7 +640,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '2':
-        slot: 23
+        slot: 21
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -670,7 +669,7 @@ upgrades-gui:
           name: '&2&lMembers Size &c(Unavailable)'
           lore:
             - '&7'
-            - '&2Next Level: &e2'
+            - '&2Next Level: &e3'
             - '&7'
             - '&7Purchasing the members upgrade'
             - '&7will increase the maximum allowed'
@@ -681,7 +680,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '3':
-        slot: 23
+        slot: 21
         has-next-level:
           sound:
             type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -721,7 +720,7 @@ upgrades-gui:
             - '&7'
             - '&aLeft-click to purchase upgrade.'
       '4':
-        slot: 23
+        slot: 21
         has-next-level:
           sound:
             type: BLOCK_ANVIL_PLACE
@@ -742,3 +741,327 @@ upgrades-gui:
           lore:
             - '&7You have reached the maxmimum'
             - '&7level of the members limit!'
+    border-size:
+      '1':
+        slot: 23
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &a(Available)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f50 Blocks'
+            - '&9Price: &f$30,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f50 Blocks'
+            - '&9Price: &f$30,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 23
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &a(Available)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f75 Blocks'
+            - '&9Price: &f$80,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f75 Blocks'
+            - '&9Price: &f$80,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 23
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &a(Available)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f125 Blocks'
+            - '&9Price: &f$150,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&9&lBorder Size &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&9Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the border upgrade'
+            - '&7will increase the radius'
+            - '&7of your island.'
+            - '&7'
+            - '&9Radius: &f125 Blocks'
+            - '&9Price: &f$150,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 23
+        has-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the border size!'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: BARRIER
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the border size!'
+    generator-rates:
+      '1':
+        slot: 25
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f92% Stone'
+            - ' &7 - &f5% Coal Ore'
+            - ' &7 - &f3% Redstone Ore'
+            - '&7'
+            - '&3Price: &f$25,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e2'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f92% Stone'
+            - ' &7 - &f5% Coal Ore'
+            - ' &7 - &f3% Redstone Ore'
+            - '&7'
+            - '&3Price: &f$25,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '2':
+        slot: 25
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f80% Stone'
+            - ' &7 - &f8% Coal Ore'
+            - ' &7 - &f6% Redstone Ore'
+            - ' &7 - &f4% Lapis Ore'
+            - ' &7 - &f2% Iron Ore'
+            - '&7'
+            - '&3Price: &f$75,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e3'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f80% Stone'
+            - ' &7 - &f8% Coal Ore'
+            - ' &7 - &f6% Redstone Ore'
+            - ' &7 - &f4% Lapis Ore'
+            - ' &7 - &f2% Iron Ore'
+            - '&7'
+            - '&3Price: &f$75,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '3':
+        slot: 25
+        has-next-level:
+          sound:
+            type: ENTITY_EXPERIENCE_ORB_PICKUP
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &a(Available)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f65% Stone'
+            - ' &7 - &f10% Coal Ore'
+            - ' &7 - &f9% Redstone Ore'
+            - ' &7 - &f6% Lapis Ore'
+            - ' &7 - &f4% Iron Ore'
+            - ' &7 - &f3% Gold Ore'
+            - ' &7 - &f2% Diamond Ore'
+            - ' &7 - &f1% Emerald Ore'
+            - '&7'
+            - '&3Price: &f$150,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&3&lGenerator Boost &c(Unavailable)'
+          lore:
+            - '&7'
+            - '&3Next Level: &e4'
+            - '&7'
+            - '&7Purchasing the generator upgrade'
+            - '&7will increase rates of ores from'
+            - '&7cobblestone generators in your island.'
+            - '&7'
+            - '&3Rates:'
+            - ' &7 - &f65% Stone'
+            - ' &7 - &f10% Coal Ore'
+            - ' &7 - &f9% Redstone Ore'
+            - ' &7 - &f6% Lapis Ore'
+            - ' &7 - &f4% Iron Ore'
+            - ' &7 - &f3% Gold Ore'
+            - ' &7 - &f2% Diamond Ore'
+            - ' &7 - &f1% Emerald Ore'
+            - '&7'
+            - '&3Price: &f$150,000'
+            - '&7'
+            - '&aLeft-click to purchase upgrade.'
+      '4':
+        slot: 25
+        has-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the generator rates!'
+        no-next-level:
+          sound:
+            type: BLOCK_ANVIL_PLACE
+            volume: 0.2
+            pitch: 0.2
+          type: COBBLESTONE
+          name: '&c&lMAX LEVEL'
+          lore:
+            - '&7You have reached the maxmimum'
+            - '&7level of the generator rates!'

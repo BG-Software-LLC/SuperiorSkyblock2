@@ -142,3 +142,62 @@ upgrades:
       price: 0.0
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for members limit.'
+  border-size:
+    '1':
+      price: 30000.0
+      commands:
+        - 'island admin setupgrade %player% border-size 2'
+        - 'island admin setsize %player% 50'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 50 blocks!'
+    '2':
+      price: 80000.0
+      commands:
+        - 'island admin setupgrade %player% border-size 3'
+        - 'island admin setsize %player% 75'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 75 blocks!'
+    '3':
+      price: 150000.0
+      commands:
+        - 'island admin setupgrade %player% border-size 4'
+        - 'island admin setteamlimit %player% 125'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 125 blocks!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for border size.'
+  generator-rates:
+    '1':
+      price: 25000.0
+      commands:
+        - 'island admin setupgrade %player% generator-rates 2'
+        - 'island admin setgenerator %player% stone 92'
+        - 'island admin setgenerator %player% coal_ore 5'
+        - 'island admin setgenerator %player% redstone_ore 3'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 2!'
+    '2':
+      price: 75000.0
+      commands:
+        - 'island admin setupgrade %player% generator-rates 3'
+        - 'island admin setgenerator %player% stone 80'
+        - 'island admin setgenerator %player% coal_ore 8'
+        - 'island admin setgenerator %player% redstone_ore 6'
+        - 'island admin setgenerator %player% lapis_ore 4'
+        - 'island admin setgenerator %player% iron_ore 2'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 3!'
+    '3':
+      price: 150000.0
+      commands:
+        - 'island admin setupgrade %player% generator-rates 4'
+        - 'island admin setgenerator %player% stone 65'
+        - 'island admin setgenerator %player% coal_ore 10'
+        - 'island admin setgenerator %player% redstone_ore 9'
+        - 'island admin setgenerator %player% lapis_ore 6'
+        - 'island admin setgenerator %player% iron_ore 4'
+        - 'island admin setgenerator %player% gold_ore 3'
+        - 'island admin setgenerator %player% diamond_ore 2'
+        - 'island admin setgenerator %player% emerald_ore 1'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 4!'
+    '4':
+      price: 0.0
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for generator.'
