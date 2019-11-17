@@ -67,7 +67,7 @@ public final class CmdAccept implements ICommand {
             }
         }
         else{
-            if(!(island = plugin.getGrid().getIsland(targetPlayer)).isInvited(superiorPlayer)) {
+            if((island = plugin.getGrid().getIsland(targetPlayer)) == null || !island.isInvited(superiorPlayer)) {
                 Locale.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
