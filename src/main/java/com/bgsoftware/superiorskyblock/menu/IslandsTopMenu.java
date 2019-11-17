@@ -36,6 +36,8 @@ public final class IslandsTopMenu extends SuperiorMenu {
     private static int playerIslandSlot, worthSortSlot = -1, levelSortSlot = -1, ratingSortSlot = -1, playersSortSlot = -1;
     private static ItemStack noIslandItem, islandItem;
 
+    private SortingType sortingType = SortingTypes.DEFAULT;
+
     private IslandsTopMenu(){
         super("islandTop");
         instance = this;
@@ -54,7 +56,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
             else {
                 for (int i = 0; i < slots.length; i++) {
                     if (slots[i] == e.getRawSlot()) {
-                        Island island = plugin.getGrid().getIsland(i);
+                        Island island = plugin.getGrid().getIsland(i, sortingType);
                         if(clickItem(island, superiorPlayer, e.getAction()))
                             return;
                     }
@@ -175,10 +177,12 @@ public final class IslandsTopMenu extends SuperiorMenu {
             return;
         }
 
+        ensureType(sortingType);
+
+        this.sortingType = sortingType;
 
         plugin.getGrid().sortIslands(sortingType);
 
-        ensureType(sortingType);
         Inventory inventory = inventories.get(sortingType);
 
         for(int i = 0; i < slots.length; i++){
