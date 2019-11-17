@@ -45,7 +45,11 @@ public final class BigDecimalFormatted extends BigDecimal {
 
     @Override
     public String toString() {
-        return StringUtils.format(this);
+        try {
+            return StringUtils.format(this);
+        }catch(Exception ex){
+            return "";
+        }
     }
     
     public String getAsString(){
