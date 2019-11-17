@@ -9,6 +9,7 @@ import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import net.minecraft.server.v1_8_R1.BiomeBase;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.EntityLiving;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
@@ -44,17 +45,20 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_8_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -307,4 +311,18 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
         for(int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
     }
+
+    @Override
+    public void setBiome(Location min, Location max, Biome biome) {
+        byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
+        World world = ((CraftWorld) min.getWorld()).getHandle();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                Chunk chunk = world.getChunkAt(x, z);
+                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+            }
+        }
+    }
+
 }

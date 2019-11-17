@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import net.minecraft.server.v1_13_R1.BiomeBase;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockFlowerPot;
 import net.minecraft.server.v1_13_R1.BlockPosition;
@@ -49,10 +50,12 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_13_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
@@ -62,6 +65,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -334,6 +338,20 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
         for(int i = 0; i < 8; i++)
             world.addParticle(Particles.F, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
+    }
+
+    @Override
+    public void setBiome(Location min, Location max, Biome biome) {
+        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
+        World world = ((CraftWorld) min.getWorld()).getHandle();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                Chunk chunk = world.getChunkAt(x, z);
+                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+                chunk.markDirty();
+            }
+        }
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper{

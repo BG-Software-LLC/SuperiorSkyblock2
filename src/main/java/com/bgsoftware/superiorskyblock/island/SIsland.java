@@ -827,14 +827,8 @@ public class SIsland extends DatabaseObject implements Island {
     public void setBiome(Biome biome){
         //We need to load all chunks so the biome will get changed.
         getAllChunks().forEach(Chunk::load);
-
-        Location min = getMinimum(), max = getMaximum();
-        for(int x = min.getBlockX(); x <= max.getBlockX(); x++){
-            for(int z = min.getBlockZ(); z <= max.getBlockZ(); z++){
-                center.getWorld().setBiome(x, z, biome);
-            }
-        }
-
+        //We use the nms method as it's much more optimized and better in general.
+        plugin.getNMSAdapter().setBiome(getMinimum(), getMaximum(), biome);
         this.biome = biome;
     }
 

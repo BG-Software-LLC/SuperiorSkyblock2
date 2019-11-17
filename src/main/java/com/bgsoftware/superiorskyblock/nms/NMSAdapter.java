@@ -9,6 +9,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -75,5 +76,7 @@ public interface NMSAdapter {
     void clearInventory(OfflinePlayer offlinePlayer);
 
     void playGeneratorSound(Location location);
+
+    void setBiome(Location min, Location max, Biome biome);
 
 }

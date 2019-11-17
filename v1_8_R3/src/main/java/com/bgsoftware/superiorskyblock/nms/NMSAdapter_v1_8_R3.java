@@ -47,16 +47,19 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -312,6 +315,19 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
         for(int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
+    }
+
+    @Override
+    public void setBiome(Location min, Location max, Biome biome) {
+        byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
+        World world = ((CraftWorld) min.getWorld()).getHandle();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                Chunk chunk = world.getChunkAt(x, z);
+                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+            }
+        }
     }
 
 }
