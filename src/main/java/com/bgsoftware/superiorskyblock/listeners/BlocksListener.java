@@ -24,7 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -116,12 +116,12 @@ public final class BlocksListener implements Listener {
 //    }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onBlockFromToMonitor(BlockFromToEvent e){
+    public void onBlockFromToMonitor(BlockFormEvent e){
         if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
+            Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
 
             if (island != null) {
-                Executor.sync(() -> island.handleBlockPlace(e.getToBlock(), 1), 1L);
+                Executor.sync(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1), 1L);
             }
         }
     }

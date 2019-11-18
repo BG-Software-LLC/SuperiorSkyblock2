@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,11 +30,16 @@ public final class KeysHandler implements KeysManager {
 
     @Override
     public Key getSpawnerKey(Block block) {
-        if(block.getState() instanceof CreatureSpawner){
-            CreatureSpawner creatureSpawner = (CreatureSpawner) block.getState();
+        return getSpawnerKey(block.getState());
+    }
+
+    @Override
+    public Key getSpawnerKey(BlockState blockState) {
+        if(blockState instanceof CreatureSpawner){
+            CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
             return Key.of(Materials.SPAWNER.toBukkitType() + ":" + creatureSpawner.getSpawnedType());
         }
 
-        return Key.of(block.getState().getData().toItemStack());
+        return Key.of(blockState.getData().toItemStack());
     }
 }

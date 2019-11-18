@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,12 +48,20 @@ public final class Key {
     }
 
     /**
-     * Get the key of a block..
+     * Get the key of a block.
      * @param block The block to check.
      */
     public static Key of(Block block){
+        return of(block.getState());
+    }
+
+    /**
+     * Get the key of a block-state.
+     * @param blockState The block-state to check.
+     */
+    public static Key of(BlockState blockState){
         KeysManager keysManager = SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys();
-        return keysManager.isSpawner(block.getType()) ? keysManager.getSpawnerKey(block) : of(block.getState().getData().toItemStack());
+        return keysManager.isSpawner(blockState.getType()) ? keysManager.getSpawnerKey(blockState) : of(blockState.getData().toItemStack());
     }
 
     /**
