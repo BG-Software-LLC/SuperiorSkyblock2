@@ -25,31 +25,36 @@ import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.menu.MemberManageMenu;
 import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 public final class MenusHandler implements MenusManager {
 
-    public MenusHandler(){
-        //Reload all menus
-        BorderColorMenu.init();
-        ConfirmDisbandMenu.init();
-        GlobalWarpsMenu.init();
-        IslandBiomesMenu.init();
-        IslandCreationMenu.init();
-        IslandMainMissionsMenu.init();
-        IslandMembersMenu.init();
-        IslandMissionsMenu.init();
-        IslandPanelMenu.init();
-        IslandPermissionsMenu.init();
-        IslandRateMenu.init();
-        IslandRatingsMenu.init();
-        IslandSettingsMenu.init();
-        IslandsTopMenu.init();
-        IslandUpgradesMenu.init();
-        IslandValuesMenu.init();
-        IslandVisitorsMenu.init();
-        IslandWarpsMenu.init();
-        MemberManageMenu.init();
-        MemberRoleMenu.init();
+    public MenusHandler() throws HandlerLoadException {
+        try {
+            //Reload all menus
+            BorderColorMenu.init();
+            ConfirmDisbandMenu.init();
+            GlobalWarpsMenu.init();
+            IslandBiomesMenu.init();
+            IslandCreationMenu.init();
+            IslandMainMissionsMenu.init();
+            IslandMembersMenu.init();
+            IslandMissionsMenu.init();
+            IslandPanelMenu.init();
+            IslandPermissionsMenu.init();
+            IslandRateMenu.init();
+            IslandRatingsMenu.init();
+            IslandSettingsMenu.init();
+            IslandsTopMenu.init();
+            IslandUpgradesMenu.init();
+            IslandValuesMenu.init();
+            IslandVisitorsMenu.init();
+            IslandWarpsMenu.init();
+            MemberManageMenu.init();
+            MemberRoleMenu.init();
+        }catch(Exception ex){
+            throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
+        }
     }
 
     @Override

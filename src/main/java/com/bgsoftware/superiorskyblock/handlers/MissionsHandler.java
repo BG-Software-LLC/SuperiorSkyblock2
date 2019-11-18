@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -81,7 +82,7 @@ public final class MissionsHandler implements MissionsManager {
                 SuperiorSkyblockPlugin.log("Registered mission " + missionName);
             }catch(Exception ex){
                 SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
-                ex.printStackTrace();
+                new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
         }
     }

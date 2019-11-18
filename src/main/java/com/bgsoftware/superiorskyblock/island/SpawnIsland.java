@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,11 +27,15 @@ public final class SpawnIsland extends SIsland {
     private int islandSize;
     private Set<String> islandSettings = new HashSet<>();
 
-    public SpawnIsland(SuperiorSkyblockPlugin plugin) {
+    public SpawnIsland(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "");
         SpawnIsland.plugin = plugin;
 
         String[] loc = plugin.getSettings().spawnLocation.split(", ");
+
+        if(Bukkit.getWorld(loc[0]) == null)
+            throw new HandlerLoadException("The spawn location has an invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN);
+
         this.world = loc[0];
         double x = ((int) Double.parseDouble(loc[1])) + 0.5;
         double y = Integer.parseInt(loc[2]);

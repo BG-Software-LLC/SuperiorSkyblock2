@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
@@ -64,13 +65,13 @@ public final class GridHandler implements GridManager {
     private SIsland spawnIsland;
     private SBlockPosition lastIsland;
 
-    public GridHandler(SuperiorSkyblockPlugin plugin){
+    public GridHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         updateSpawn();
     }
 
-    public void updateSpawn(){
+    public void updateSpawn() throws HandlerLoadException{
         spawnIsland = new SpawnIsland(plugin);
     }
 

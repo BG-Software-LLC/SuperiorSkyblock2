@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
@@ -27,7 +28,7 @@ public final class DataHandler {
 
     public SuperiorSkyblockPlugin plugin;
 
-    public DataHandler(SuperiorSkyblockPlugin plugin){
+    public DataHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
 
         try {
@@ -35,8 +36,7 @@ public final class DataHandler {
             loadOldDatabase();
             loadDatabase();
         }catch(Exception ex){
-            ex.printStackTrace();
-            Executor.sync(Bukkit::shutdown);
+            throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
     }
 

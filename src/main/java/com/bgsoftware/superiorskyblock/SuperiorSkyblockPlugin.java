@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -43,22 +44,23 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    private GridHandler gridHandler;
-    private BlockValuesHandler blockValuesHandler;
-    private PlayersHandler playersHandler;
-    private SchematicsHandler schematicsHandler;
-    private SettingsHandler settingsHandler;
-    private DataHandler dataHandler;
-    private UpgradesHandler upgradesHandler;
-    private ProvidersHandler providersHandler;
-    private MissionsHandler missionsHandler;
-    private MenusHandler menusHandler;
-    private KeysHandler keysHandler;
+    private GridHandler gridHandler = null;
+    private BlockValuesHandler blockValuesHandler = null;
+    private PlayersHandler playersHandler = null;
+    private SchematicsHandler schematicsHandler = null;
+    private SettingsHandler settingsHandler = null;
+    private DataHandler dataHandler = null;
+    private UpgradesHandler upgradesHandler = null;
+    private ProvidersHandler providersHandler = null;
+    private MissionsHandler missionsHandler = null;
+    private MenusHandler menusHandler = null;
+    private KeysHandler keysHandler = null;
 
     private NMSAdapter nmsAdapter;
 
@@ -66,7 +68,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public void onEnable() {
         plugin = this;
         new Metrics(this);
-
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
@@ -110,22 +111,24 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onDisable() {
-        dataHandler.saveDatabase(false);
+        try {
+            dataHandler.saveDatabase(false);
 
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            player.closeInventory();
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-            superiorPlayer.updateLastTimeStatus();
-            nmsAdapter.setWorldBorder(superiorPlayer, null);
-            if(superiorPlayer.hasIslandFlyEnabled()){
-                player.setAllowFlight(false);
-                player.setFlying(false);
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.closeInventory();
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                superiorPlayer.updateLastTimeStatus();
+                nmsAdapter.setWorldBorder(superiorPlayer, null);
+                if (superiorPlayer.hasIslandFlyEnabled()) {
+                    player.setAllowFlight(false);
+                    player.setFlying(false);
+                }
             }
-        }
 
-        CalcTask.cancelTask();
-        Executor.close();
-        dataHandler.closeConnection();
+            CalcTask.cancelTask();
+            Executor.close();
+            dataHandler.closeConnection();
+        }catch(Exception ignored){}
     }
 
     private void loadNMSAdapter(){
@@ -169,24 +172,46 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         if(loadGrid) {
             playersHandler = new PlayersHandler();
-            gridHandler = new GridHandler(this);
+            try {
+                gridHandler = new GridHandler(this);
+            }catch(HandlerLoadException ex){
+                if(!HandlerLoadException.handle(ex))
+                    return;
+            }
         }
         else{
-            gridHandler.updateSpawn();
+            try {
+                gridHandler.updateSpawn();
+            }catch(HandlerLoadException ex){
+                if(!HandlerLoadException.handle(ex))
+                    return;
+            }
         }
 
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
-        menusHandler = new MenusHandler();
+
+        try {
+            menusHandler = new MenusHandler();
+        }catch(HandlerLoadException ex){
+            if(!HandlerLoadException.handle(ex))
+                return;
+        }
+
         keysHandler = new KeysHandler(this);
 
         Executor.sync(() -> {
-            if (loadGrid)
-                dataHandler = new DataHandler(this);
+            if (loadGrid) {
+                try {
+                    dataHandler = new DataHandler(this);
+                }catch(HandlerLoadException ex){
+                    if(!HandlerLoadException.handle(ex))
+                        return;
+                }
+            }
 
             for(Player player : Bukkit.getOnlinePlayers())
                 nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
-
         });
 
         Locale.reload();
