@@ -344,7 +344,7 @@ NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lError | &7You don''t have enough money to depo
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lError | &7You don''t have enough money.'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Toggled island panel &cOFF&7.
-  &e&lPanel | &7Running /is will teleport you to the island.'
+  &e&lPanel | &7Running /is will teleport you to the island.
 PANEL_TOGGLE_ON: |-
   &e&lPanel | &7Toggled island panel &aON&7.
   &e&lPanel | &7Running /is will open the panel for you.
