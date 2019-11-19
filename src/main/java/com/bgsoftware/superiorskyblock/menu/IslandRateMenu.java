@@ -80,6 +80,8 @@ public final class IslandRateMenu extends SuperiorMenu {
     public static void init(){
         IslandRateMenu islandRatingMenu = new IslandRateMenu();
 
+        islandRatingMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if(!file.exists())

@@ -70,6 +70,9 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
 
     public static void init(){
         IslandUpgradesMenu islandUpgradesMenu = new IslandUpgradesMenu(null);
+
+        islandUpgradesMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
 
         if(!file.exists())

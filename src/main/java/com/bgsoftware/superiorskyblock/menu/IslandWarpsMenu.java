@@ -139,6 +139,9 @@ public final class IslandWarpsMenu extends SuperiorMenu {
 
     public static void init(){
         IslandWarpsMenu islandValuesMenu = new IslandWarpsMenu(null);
+
+        islandValuesMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if(!file.exists())

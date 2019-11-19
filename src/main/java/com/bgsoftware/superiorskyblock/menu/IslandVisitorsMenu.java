@@ -167,6 +167,8 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
         islandVisitorsMenu.addCommands(nextSlot, cfg.getStringList("visitors-panel.next-page.commands"));
         islandVisitorsMenu.addCommands(-1, cfg.getStringList("visitors-panel.visitor-item.commands"));
 
+        slots.clear();
+
         Arrays.stream(cfg.getString("visitors-panel.visitor-item.slots").split(","))
                 .forEach(slot -> slots.add(Integer.valueOf(slot)));
         slots.sort(Integer::compareTo);

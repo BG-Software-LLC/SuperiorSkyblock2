@@ -90,6 +90,9 @@ public final class IslandValuesMenu extends SuperiorMenu {
 
     public static void init(){
         IslandValuesMenu islandValuesMenu = new IslandValuesMenu(null);
+
+        islandValuesMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/values-gui.yml");
 
         if(!file.exists())

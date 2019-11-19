@@ -35,7 +35,7 @@ public final class IslandSettingsMenu extends SuperiorMenu {
     private static List<Integer> slots;
     private static int previousSlot, currentSlot, nextSlot;
     private static ItemStack previousButton, currentButton, nextButton;
-    private static List<IslandSettings> islandSettings;
+    private static List<IslandSettings> islandSettings = new ArrayList<>();
 
     private Island island;
 
@@ -159,6 +159,10 @@ public final class IslandSettingsMenu extends SuperiorMenu {
     public static void init(){
         IslandSettingsMenu islandSettingsMenu = new IslandSettingsMenu(null);
 
+        islandSettingsMenu.resetData();
+        islandSettings.clear();
+        settingsData.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/settings-gui.yml");
 
         if(!file.exists())
@@ -185,7 +189,6 @@ public final class IslandSettingsMenu extends SuperiorMenu {
 
         ConfigurationSection section = cfg.getConfigurationSection("settings-gui.settings");
 
-        islandSettings = new ArrayList<>();
         for(IslandSettings islandSettings : IslandSettings.values()){
             String settings = islandSettings.name().toLowerCase();
             if(section.contains(settings)){

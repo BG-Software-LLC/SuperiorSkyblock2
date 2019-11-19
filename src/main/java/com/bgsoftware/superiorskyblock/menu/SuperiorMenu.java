@@ -50,6 +50,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
     }
 
+    public void resetData(){
+        sounds.clear();
+        commands.clear();
+    }
+
     SoundWrapper getSound(int slot){
         return sounds.containsKey(identifier) ? sounds.get(identifier).get(slot) : null;
     }

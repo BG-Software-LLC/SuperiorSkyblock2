@@ -100,6 +100,10 @@ public final class IslandBiomesMenu extends SuperiorMenu {
 
     public static void init(){
         IslandBiomesMenu islandBiomesMenu = new IslandBiomesMenu();
+
+        islandBiomesMenu.resetData();
+        biomesData.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
 
         if(!file.exists())

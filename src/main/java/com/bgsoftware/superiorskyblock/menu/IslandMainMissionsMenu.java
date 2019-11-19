@@ -37,6 +37,8 @@ public final class IslandMainMissionsMenu extends SuperiorMenu {
     public static void init(){
         IslandMainMissionsMenu islandMainMissionsMenu = new IslandMainMissionsMenu();
 
+        islandMainMissionsMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/missions-gui.yml");
 
         if(!file.exists())

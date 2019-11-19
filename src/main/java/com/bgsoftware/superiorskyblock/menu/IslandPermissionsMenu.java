@@ -39,7 +39,7 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
     private static List<Integer> slots;
     private static int previousSlot, currentSlot, nextSlot;
     private static ItemStack previousButton, currentButton, nextButton;
-    private static List<IslandPermission> islandPermissions;
+    private static List<IslandPermission> islandPermissions = new ArrayList<>();
 
     private Island island;
     private Object permissionHolder;
@@ -243,6 +243,10 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
     public static void init(){
         IslandPermissionsMenu islandPanelMenu = new IslandPermissionsMenu(null, null);
 
+        islandPanelMenu.resetData();
+        islandPermissions.clear();
+        permissionsData.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/permissions-gui.yml");
 
         if(!file.exists())
@@ -269,7 +273,6 @@ public final class IslandPermissionsMenu extends SuperiorMenu {
 
         ConfigurationSection section = cfg.getConfigurationSection("permissions-gui.permissions");
 
-        islandPermissions = new ArrayList<>();
         for(IslandPermission islandPermission : IslandPermission.values()){
             String permission = islandPermission.name().toLowerCase();
             if(section.contains(permission)){

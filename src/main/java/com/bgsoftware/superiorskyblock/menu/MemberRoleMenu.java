@@ -57,6 +57,10 @@ public final class MemberRoleMenu extends SuperiorMenu {
 
     public static void init(){
         MemberRoleMenu memberRoleMenu = new MemberRoleMenu(null);
+
+        memberRoleMenu.resetData();
+        roleSlots.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())

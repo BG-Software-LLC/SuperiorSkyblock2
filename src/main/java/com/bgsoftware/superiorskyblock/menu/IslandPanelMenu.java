@@ -47,6 +47,8 @@ public final class IslandPanelMenu extends SuperiorMenu {
     public static void init(){
         IslandPanelMenu islandPanelMenu = new IslandPanelMenu();
 
+        islandPanelMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())

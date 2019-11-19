@@ -66,6 +66,8 @@ public final class ConfirmDisbandMenu extends SuperiorMenu {
     public static void init(){
         ConfirmDisbandMenu confirmDisbandMenu = new ConfirmDisbandMenu();
 
+        confirmDisbandMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/confirm-disband.yml");
 
         if(!file.exists())

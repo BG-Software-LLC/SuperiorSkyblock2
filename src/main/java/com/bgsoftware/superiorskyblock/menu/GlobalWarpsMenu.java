@@ -141,6 +141,9 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
 
     public static void init(){
         GlobalWarpsMenu globalWarpsMenu = new GlobalWarpsMenu();
+
+        globalWarpsMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
         if(!file.exists())

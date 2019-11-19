@@ -261,6 +261,9 @@ public final class IslandsTopMenu extends SuperiorMenu {
     public static void init(){
         IslandsTopMenu islandsTopMenu = new IslandsTopMenu();
 
+        islandsTopMenu.resetData();
+        inventories.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
         if(!file.exists())

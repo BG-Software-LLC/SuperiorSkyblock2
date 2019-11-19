@@ -101,6 +101,10 @@ public final class IslandCreationMenu extends SuperiorMenu {
 
     public static void init(){
         IslandCreationMenu islandCreationMenu = new IslandCreationMenu("");
+
+        islandCreationMenu.resetData();
+        schematicsData.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if(!file.exists())

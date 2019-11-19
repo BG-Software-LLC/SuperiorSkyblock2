@@ -51,6 +51,9 @@ public final class MemberManageMenu extends SuperiorMenu {
 
     public static void init(){
         MemberManageMenu memberManageMenu = new MemberManageMenu(null);
+
+        memberManageMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())

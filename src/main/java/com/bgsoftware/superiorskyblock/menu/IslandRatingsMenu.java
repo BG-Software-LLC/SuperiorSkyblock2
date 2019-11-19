@@ -121,6 +121,9 @@ public final class IslandRatingsMenu extends SuperiorMenu {
     public static void init(){
         IslandRatingsMenu islandRatingsMenu = new IslandRatingsMenu(null);
 
+        islandRatingsMenu.resetData();
+        slots.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if(!file.exists())

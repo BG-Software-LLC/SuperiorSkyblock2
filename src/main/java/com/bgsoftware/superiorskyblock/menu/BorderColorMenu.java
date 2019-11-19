@@ -55,6 +55,8 @@ public final class BorderColorMenu extends SuperiorMenu {
     public static void init(){
         BorderColorMenu islandRatingMenu = new BorderColorMenu();
 
+        islandRatingMenu.resetData();
+
         File file = new File(plugin.getDataFolder(), "guis/border-gui.yml");
 
         if(!file.exists())

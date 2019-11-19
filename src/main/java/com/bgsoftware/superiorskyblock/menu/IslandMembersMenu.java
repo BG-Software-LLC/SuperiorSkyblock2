@@ -134,6 +134,9 @@ public final class IslandMembersMenu extends SuperiorMenu {
     public static void init(){
         IslandMembersMenu islandMembersMenu = new IslandMembersMenu(null);
 
+        islandMembersMenu.resetData();
+        slots.clear();
+
         File file = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if(!file.exists())
