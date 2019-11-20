@@ -354,6 +354,11 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
         }
     }
 
+    @Override
+    public Object getBlockData(org.bukkit.block.Block block) {
+        return block.getBlockData();
+    }
+
     private static class CustomTileEntityHopper extends TileEntityHopper {
 
         private InventoryHolder holder;

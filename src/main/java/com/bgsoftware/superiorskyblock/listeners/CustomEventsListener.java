@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -231,10 +232,20 @@ public final class CustomEventsListener implements Listener {
         }else{
             for(BlockFace blockFace : BlockFace.values()){
                 Block faceBlock = e.getBlock().getRelative(blockFace);
-                if(faceBlock.getState() instanceof Sign &&
-                        ((org.bukkit.material.Sign) faceBlock.getState().getData()).getAttachedFace().getOppositeFace() == blockFace){
-                    SignBreakEvent signBreakEvent = new SignBreakEvent(SSuperiorPlayer.of(e.getPlayer()), (Sign) faceBlock.getState());
-                    Bukkit.getPluginManager().callEvent(signBreakEvent);
+                if(faceBlock.getState() instanceof Sign){
+                    boolean isSign;
+
+                    if(ServerVersion.isLegacy()) {
+                        isSign = ((org.bukkit.material.Sign) faceBlock.getState().getData()).getAttachedFace().getOppositeFace() == blockFace;
+                    }
+                    else {
+                        isSign = ((org.bukkit.block.data.Directional) plugin.getNMSAdapter().getBlockData(faceBlock)).getFacing().getOppositeFace() == blockFace;
+                    }
+
+                    if(isSign) {
+                        SignBreakEvent signBreakEvent = new SignBreakEvent(SSuperiorPlayer.of(e.getPlayer()), (Sign) faceBlock.getState());
+                        Bukkit.getPluginManager().callEvent(signBreakEvent);
+                    }
                 }
             }
         }
