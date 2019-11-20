@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -51,7 +52,6 @@ import java.util.Map;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler implements SchematicManager {
 
-    private static String version = Bukkit.getBukkitVersion().split("-")[0];
     private SuperiorSkyblockPlugin plugin;
 
     private Map<String, Schematic> schematics = new HashMap<>();
@@ -114,7 +114,7 @@ public final class SchematicsHandler implements SchematicManager {
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
-        if(Bukkit.isPrimaryThread() && !Bukkit.getBukkitVersion().contains("1.14")){
+        if(Bukkit.isPrimaryThread() && !ServerVersion.isEquals(ServerVersion.v1_14)){
             Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable));
             return;
         }
@@ -173,7 +173,7 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("offsetX", new IntTag(offsetX));
         compoundValue.put("offsetY", new IntTag(offsetY));
         compoundValue.put("offsetZ", new IntTag(offsetZ));
-        compoundValue.put("version", new StringTag(version));
+        compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
         SuperiorSchematic schematic = new SuperiorSchematic(new CompoundTag(compoundValue));
         schematics.put(schematicName, schematic);
@@ -202,7 +202,7 @@ public final class SchematicsHandler implements SchematicManager {
 
             try (NBTInputStream reader = new NBTInputStream(new FileInputStream(file))) {
                 CompoundTag compoundTag = (CompoundTag) reader.readTag();
-                if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(version))
+                if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(ServerVersion.getBukkitVersion()))
                     SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
                 if(compoundTag.getValue().isEmpty()) {
                     if(FAWEHook.isEnabled())

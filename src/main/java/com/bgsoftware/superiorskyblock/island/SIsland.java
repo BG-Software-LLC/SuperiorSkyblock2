@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -638,7 +639,7 @@ public class SIsland extends DatabaseObject implements Island {
         });
 
         plugin.getGrid().deleteIsland(this);
-        if(!Bukkit.getBukkitVersion().contains("1.14")) {
+        if(!ServerVersion.isEquals(ServerVersion.v1_14)) {
             for (Chunk chunk : getAllChunks(true))
                 chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
         }

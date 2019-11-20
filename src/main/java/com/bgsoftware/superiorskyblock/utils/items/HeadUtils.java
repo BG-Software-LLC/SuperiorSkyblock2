@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -18,7 +19,6 @@ public final class HeadUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Map<String, String> entityNames = new HashMap<>();
-    private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
 
     static {
         entityNames.put("DONKEY", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZiNmMzYzA1MmNmNzg3ZDIzNmEyOTE1ZjgwNzJiNzdjNTQ3NDk3NzE1ZDFkMmY4Y2JjOWQyNDFkODhhIn19fQ==");
@@ -68,7 +68,7 @@ public final class HeadUtils {
     }
 
     public static String getMaterial() {
-        return legacy ? "SKULL_ITEM:3" : "PLAYER_HEAD";
+        return ServerVersion.isLegacy() ? "SKULL_ITEM:3" : "PLAYER_HEAD";
     }
 
     public static ItemStack getEntityHead(EntityType entityType){

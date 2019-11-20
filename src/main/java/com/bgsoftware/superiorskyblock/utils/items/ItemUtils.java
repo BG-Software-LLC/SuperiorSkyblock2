@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -10,8 +11,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
 public final class ItemUtils {
-
-    private static final boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
 
     @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, BlockPlaceEvent event){
@@ -35,7 +34,7 @@ public final class ItemUtils {
         if(!isValidAndSpawnEgg(itemStack))
             return itemStack.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND : EntityType.UNKNOWN;
 
-        if(legacy) {
+        if(ServerVersion.isLegacy()) {
             try {
                 SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
                 return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
@@ -48,7 +47,7 @@ public final class ItemUtils {
     }
 
     private static boolean isValidAndSpawnEgg(ItemStack itemStack){
-        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(legacy ? "MONSTER_EGG" : "SPAWN_EGG");
+        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
 }

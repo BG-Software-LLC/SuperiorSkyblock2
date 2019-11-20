@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -67,7 +68,7 @@ public final class UpgradesListener implements Listener {
                 byte newData = (byte) (e.getBlock().getData() + cropGrowthMultiplier);
                 if(newData > maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7))
                     newData = maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7);
-                if(Bukkit.getBukkitVersion().contains("1.13") || Bukkit.getBukkitVersion().contains("1.14")){
+                if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
                     try {
                         Object blockData = UnsafeValues.class.getMethod("fromLegacy", Material.class, byte.class)
                                 .invoke(Bukkit.getUnsafe(), e.getBlock().getType(), newData);

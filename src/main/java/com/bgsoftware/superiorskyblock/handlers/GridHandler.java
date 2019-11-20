@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -111,7 +112,7 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                if(!Bukkit.getBukkitVersion().contains("1.14")) {
+                if(!ServerVersion.isEquals(ServerVersion.v1_14)){
                     for (Chunk chunk : island.getAllChunks(true)) {
                         chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
                         plugin.getNMSAdapter().refreshChunk(chunk);

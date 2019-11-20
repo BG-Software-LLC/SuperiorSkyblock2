@@ -24,8 +24,6 @@ import java.util.List;
 public final class FileUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static boolean legacy = !Bukkit.getBukkitVersion().contains("1.13") && !Bukkit.getBukkitVersion().contains("1.14");
-    private static boolean v1_14 = Bukkit.getBukkitVersion().contains("1.14");
 
     public static ItemStack getItemStack(ConfigurationSection section){
         if(section == null)
@@ -142,10 +140,10 @@ public final class FileUtils {
         try {
             String destination = resourcePath;
 
-            if(v1_14)
+            if(ServerVersion.isEquals(ServerVersion.v1_14))
                 resourcePath = resourcePath.replace(".yml", "1_13.yml")
                         .replace(".schematic", "1_14.schematic");
-            else if(!legacy)
+            else if(!ServerVersion.isLegacy())
                 resourcePath = resourcePath.replace(".yml", "1_13.yml")
                     .replace(".schematic", "1_13.schematic");
 
