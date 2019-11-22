@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.listeners.events.BlockGenerateEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -30,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -275,6 +277,41 @@ public final class CustomEventsListener implements Listener {
             DragonEggChangeEvent dragonEggChangeEvent = new DragonEggChangeEvent(e.getEntity().getLocation().getBlock());
             Bukkit.getPluginManager().callEvent(dragonEggChangeEvent);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBlockFormEvent(BlockFromToEvent e){
+        Block block = e.getToBlock();
+
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
+
+        if(island == null)
+            return;
+
+        Executor.sync(() -> {
+            if(block.getType() == Material.COBBLESTONE){
+                Executor.async(() -> {
+                    BlockGenerateEvent blockGenerateEvent = new BlockGenerateEvent(block, island);
+                    Bukkit.getPluginManager().callEvent(blockGenerateEvent);
+
+                    String[] typeSections = blockGenerateEvent.getNewStateKey().toString().split(":");
+
+                    if(typeSections[0].contains("COBBLESTONE"))
+                        return;
+
+                    Executor.sync(() -> {
+                        block.setType(Material.valueOf(typeSections[0]));
+                        if(typeSections.length == 2)
+                            //noinspection deprecation
+                            block.setData(Byte.parseByte(typeSections[1]));
+
+                        island.handleBlockPlace(blockGenerateEvent.getNewStateKey(), 1);
+
+                        plugin.getNMSAdapter().playGeneratorSound(block.getLocation());
+                    });
+                });
+            }
+        }, 1L);
     }
 
 }

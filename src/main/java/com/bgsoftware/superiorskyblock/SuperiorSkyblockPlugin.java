@@ -44,7 +44,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
-import java.util.logging.Level;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -71,7 +70,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
-        getServer().getPluginManager().registerEvents(new GeneratorsListener(this), this);
+        getServer().getPluginManager().registerEvents(new GeneratorsListener(), this);
         getServer().getPluginManager().registerEvents(new MenusListener(), this);
         getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
         getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
