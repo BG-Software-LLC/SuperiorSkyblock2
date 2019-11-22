@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -233,7 +234,15 @@ public final class IslandsTopMenu extends SuperiorMenu {
                             lore.add(memberFormat.replace("{}", "None"));
                         }
                         else {
-                            members.forEach(member -> lore.add(memberFormat.replace("{}", member.getName())));
+                            members.forEach(member -> {
+                                String onlineMessage = member.isOnline() ? Locale.ISLAND_TOP_STATUS_ONLINE.getMessage() : Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage();
+
+                                lore.add(memberFormat
+                                        .replace("{}", member.getName())
+                                        .replace("{0}", member.getName())
+                                        .replace("{1}", onlineMessage == null ? "" : onlineMessage)
+                                );
+                            });
                         }
                     }else{
                         lore.add(line

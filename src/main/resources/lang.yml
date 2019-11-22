@@ -274,6 +274,8 @@ ISLAND_TEAM_STATUS_HEADER: '&e&lIsland | &7Members of {0}''s Island &8[&e{1}&8/&
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'
 ISLAND_TEAM_STATUS_ONLINE: '&a(Online)'
 ISLAND_TEAM_STATUS_ROLES: '&e&lIsland | &7 * [{0}] {1} {2} &7({3})'
+ISLAND_TOP_STATUS_OFFLINE: '&c(Offline)'
+ISLAND_TOP_STATUS_ONLINE: '&a(Online)'
 ISLAND_WARP_PUBLIC: ''
 ISLAND_WARP_PRIVATE: '&c[Private]'
 ISLAND_WAS_CLOSED: '&e&lIsland | &7&oThe island you were in was closed and you were teleported back to spawn...'
