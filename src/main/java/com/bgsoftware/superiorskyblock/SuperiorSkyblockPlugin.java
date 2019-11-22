@@ -171,20 +171,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         if(loadGrid) {
             playersHandler = new PlayersHandler();
-            try {
-                gridHandler = new GridHandler(this);
-            }catch(HandlerLoadException ex){
-                if(!HandlerLoadException.handle(ex))
-                    return;
-            }
+            gridHandler = new GridHandler(this);
         }
         else{
-            try {
-                gridHandler.updateSpawn();
-            }catch(HandlerLoadException ex){
-                if(!HandlerLoadException.handle(ex))
-                    return;
-            }
+            gridHandler.updateSpawn();
         }
 
         schematicsHandler = new SchematicsHandler(this);
@@ -200,6 +190,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         keysHandler = new KeysHandler(this);
 
         Executor.sync(() -> {
+            if(Bukkit.getWorld(gridHandler.getSpawnIsland().getWorldName()) == null) {
+                new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
+
             if (loadGrid) {
                 try {
                     dataHandler = new DataHandler(this);

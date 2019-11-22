@@ -27,14 +27,11 @@ public final class SpawnIsland extends SIsland {
     private int islandSize;
     private Set<String> islandSettings = new HashSet<>();
 
-    public SpawnIsland(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
+    public SpawnIsland(SuperiorSkyblockPlugin plugin){
         super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "");
         SpawnIsland.plugin = plugin;
 
         String[] loc = plugin.getSettings().spawnLocation.split(", ");
-
-        if(Bukkit.getWorld(loc[0]) == null)
-            throw new HandlerLoadException("The spawn location has an invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN);
 
         this.world = loc[0];
         double x = ((int) Double.parseDouble(loc[1])) + 0.5;
@@ -46,6 +43,10 @@ public final class SpawnIsland extends SIsland {
 
         this.islandSize = plugin.getSettings().maxIslandSize;
         this.islandSettings.addAll(plugin.getSettings().spawnSettings);
+    }
+
+    public String getWorldName(){
+        return world;
     }
 
     @Override

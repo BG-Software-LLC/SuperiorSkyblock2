@@ -63,16 +63,16 @@ public final class GridHandler implements GridManager {
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
 
-    private SIsland spawnIsland;
+    private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
 
-    public GridHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
+    public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
         updateSpawn();
     }
 
-    public void updateSpawn() throws HandlerLoadException{
+    public void updateSpawn(){
         spawnIsland = new SpawnIsland(plugin);
     }
 
@@ -202,7 +202,7 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
-    public Island getSpawnIsland(){
+    public SpawnIsland getSpawnIsland(){
         return spawnIsland;
     }
 
