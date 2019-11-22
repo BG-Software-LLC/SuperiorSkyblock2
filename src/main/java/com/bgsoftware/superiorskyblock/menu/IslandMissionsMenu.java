@@ -131,9 +131,14 @@ public final class IslandMissionsMenu extends SuperiorMenu {
                 boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
                         plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
                 int percentage = getPercentage(mission.getProgress(superiorPlayer));
+                int progressValue = mission.getProgressValue(superiorPlayer);
                 inv.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) && hasAllRequiredMissions ?
-                        new ItemBuilder(missionData.canComplete).replaceAll("{0}", percentage + "").build() :
-                        new ItemBuilder(missionData.notCompleted).replaceAll("{0}", percentage + "").build());
+                        new ItemBuilder(missionData.canComplete)
+                                .replaceAll("{0}", percentage + "")
+                                .replaceAll("{1}", progressValue + "").build() :
+                        new ItemBuilder(missionData.notCompleted)
+                                .replaceAll("{0}", percentage + "")
+                                .replaceAll("{1}", progressValue + "").build());
             }
         }
 

@@ -41,6 +41,7 @@ woodcutter:
         - '&6Rewards:'
         - '&8 - &7x16 Oak Saplings'
         - ''
+        - '&6Cut Logs: &7{1}/320'
         - '&6Progress: &7{0}%'
         - '&c&l ✘ &7Not Completed'
     can-complete:
@@ -55,6 +56,7 @@ woodcutter:
         - '&6Rewards:'
         - '&8 - &7x16 Oak Saplings'
         - ''
+        - '&6Cut Logs: &7320/320'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
@@ -67,6 +69,7 @@ woodcutter:
       lore:
         - '&7Cut 320 logs.'
         - ''
+        - '&6Cut Logs: &7320/320'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Already Claimed.'
 
@@ -101,6 +104,7 @@ cobble-miner:
         - '&6Rewards:'
         - '&8 - &7$500'
         - ''
+        - '&6Mined Blocks: &7{1}/48'
         - '&6Progress: &7{0}%'
         - '&c&l ✘ &7Not Completed'
     can-complete:
@@ -115,6 +119,7 @@ cobble-miner:
         - '&6Rewards:'
         - '&8 - &7$500'
         - ''
+        - '&6Mined Blocks: &748/48'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
@@ -127,6 +132,7 @@ cobble-miner:
       lore:
         - '&7Mine 48 cobblestone.'
         - ''
+        - '&6Mined Blocks: &748/48'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Already Claimed.'
 
@@ -297,6 +303,7 @@ mobs-killer:
         - '&6Rewards:'
         - '&8 - &7$300'
         - ''
+        - '&6Kills: &7{1}/50'
         - '&6Progress: &7{0}%'
         - '&c&l ✘ &7Not Completed'
     can-complete:
@@ -308,6 +315,7 @@ mobs-killer:
         - '&6Rewards:'
         - '&8 - &7$300'
         - ''
+        - '&6Kills: &750/50'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
@@ -320,6 +328,7 @@ mobs-killer:
       lore:
         - '&7Kill 50 mobs!'
         - ''
+        - '&6Kills: &750/50'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Already Claimed.'
 
@@ -378,6 +387,7 @@ enchanter:
         - '&6Rewards:'
         - '&8 - &7$1500'
         - ''
+        - '&6Enchanted Items: &7{1}/4'
         - '&6Progress: &7{0}%'
         - '&c&l ✘ &7Not Completed'
     can-complete:
@@ -389,6 +399,7 @@ enchanter:
         - '&6Rewards:'
         - '&8 - &7$1500'
         - ''
+        - '&6Enchanted Items: &74/4'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
@@ -401,6 +412,7 @@ enchanter:
       lore:
         - '&7Enchant a Protection IV armor!'
         - ''
+        - '&6Enchanted Items: &74/4'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Already Claimed.'
 
@@ -472,6 +484,7 @@ dragon-killer:
         - '&6Rewards:'
         - '&8 - &7$10,000'
         - ''
+        - '&6Collected Eggs: &70/1'
         - '&6Progress: &7{0}%'
         - '&c&l ✘ &7Not Completed'
     can-complete:
@@ -486,6 +499,7 @@ dragon-killer:
         - '&6Rewards:'
         - '&8 - &7$10,000'
         - ''
+        - '&6Collected Eggs: &71/1'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
@@ -498,5 +512,6 @@ dragon-killer:
       lore:
         - '&7Hold the ender dragon''s egg.'
         - ''
+        - '&6Collected Eggs: &71/1'
         - '&6Progress: &7100%'
         - '&a&l ✔ &7Already Claimed.'

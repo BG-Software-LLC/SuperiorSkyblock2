@@ -77,6 +77,15 @@ public abstract class Mission {
     public abstract double getProgress(SuperiorPlayer superiorPlayer);
 
     /**
+     * Get the progress value of a specific player.
+     * For example: amount of broken cobblestone, amount of kills, etc.
+     * @param superiorPlayer The player to check.
+     */
+    public int getProgressValue(SuperiorPlayer superiorPlayer){
+        return 0;
+    }
+
+    /**
      * Check whether or not a player can complete the mission.
      * @param superiorPlayer The player to check.
      */
