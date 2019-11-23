@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -179,13 +180,31 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the center location of the island.
+     *
+     * @deprecated See getCenter(Environment)
      */
+    @Deprecated
     Location getCenter();
 
     /**
-     * Get the members' teleport location of the island.
+     * Get the center location of the island, depends on the world environment.
+     * @param environment The environment.
      */
+    Location getCenter(World.Environment environment);
+
+    /**
+     * Get the members' teleport location of the island.
+     *
+     * @deprecated See getTeleportLocation(Environment)
+     */
+    @Deprecated
     Location getTeleportLocation();
+
+    /**
+     * Get the members' teleport location of the island, depends on the world environment.
+     * @param environment The environment.
+     */
+    Location getTeleportLocation(World.Environment environment);
 
     /**
      * Get the visitors' teleport location of the island.

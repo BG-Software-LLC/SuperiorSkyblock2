@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -100,7 +101,7 @@ public final class CmdShow implements ICommand {
         if(!Locale.ISLAND_INFO_NAME.isEmpty() && !island.getName().isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty()) {
             double rating = island.getTotalRating();
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(StringUtils.formatRating(rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");

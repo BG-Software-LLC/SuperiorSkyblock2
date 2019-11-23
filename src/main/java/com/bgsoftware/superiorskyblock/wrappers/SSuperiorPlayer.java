@@ -159,23 +159,26 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void teleport(Island island, Consumer<Boolean> result) {
+        Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
+        Location islandCenterLocation = island.getCenter(World.Environment.NORMAL);
+
         Location toTeleport = null;
 
         //We check if the island's teleport location is safe.
-        if(LocationUtils.isSafeBlock(island.getTeleportLocation().getBlock())){
-            toTeleport = island.getTeleportLocation();
+        if(LocationUtils.isSafeBlock(islandTeleportLocation.getBlock())){
+            toTeleport = islandTeleportLocation;
         }
 
         //We check if the island's center location is safe.
-        else if(LocationUtils.isSafeBlock(island.getCenter().getBlock())){
-            island.setTeleportLocation(island.getCenter());
-            toTeleport = island.getTeleportLocation();
+        else if(LocationUtils.isSafeBlock(islandCenterLocation.getBlock())){
+            island.setTeleportLocation(islandCenterLocation);
+            toTeleport = islandCenterLocation;
         }
 
         //We check if the highest block at the island's center location is safe.
-        else if(LocationUtils.isSafeBlock(island.getCenter().getWorld().getHighestBlockAt(island.getCenter()))){
-            island.setTeleportLocation(island.getCenter());
-            toTeleport = island.getTeleportLocation();
+        else if(LocationUtils.isSafeBlock(islandCenterLocation.getWorld().getHighestBlockAt(islandCenterLocation))){
+            island.setTeleportLocation(islandCenterLocation);
+            toTeleport = islandCenterLocation;
         }
 
         //Checking if one of the options above is safe.

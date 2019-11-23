@@ -179,9 +179,11 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
             worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
             worldBorder.setSize(disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn()) ? Integer.MAX_VALUE : (island.getIslandSize() * 2) + 1);
 
-            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
+            org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
 
-            if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter(environment);
+
+            if (environment == org.bukkit.World.Environment.NETHER) {
                 worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
             } else {
                 worldBorder.setCenter(center.getX(), center.getZ());
@@ -294,7 +296,7 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
         clearInventory(targetPlayer);
 
         //Setting the entity to the spawn location
-        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter();
+        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(org.bukkit.World.Environment.NORMAL);
         entity.world = ((CraftWorld) spawnLocation.getWorld()).getHandle();
         entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 

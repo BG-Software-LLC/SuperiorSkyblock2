@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -76,7 +77,7 @@ public final class CmdVisit implements ICommand {
             if(!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getTeleportLocation();
+            visitLocation = targetIsland.getTeleportLocation(World.Environment.NORMAL);
             Locale.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 

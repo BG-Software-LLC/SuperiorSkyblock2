@@ -50,7 +50,7 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
-    public Location getCenter() {
+    public Location getCenter(World.Environment environment) {
         if(center.getWorld() == null)
             center.setWorld(Bukkit.getWorld(world));
 
@@ -58,8 +58,8 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
-    public Location getTeleportLocation() {
-        Location center = getCenter();
+    public Location getTeleportLocation(World.Environment environment) {
+        Location center = getCenter(World.Environment.NORMAL);
         if(center.getWorld() == null)
             center = this.center = new Location(plugin.getGrid().getIslandsWorld(World.Environment.NORMAL), 0, 100, 0);
 

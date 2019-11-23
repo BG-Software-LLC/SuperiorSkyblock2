@@ -102,7 +102,8 @@ public class SIsland extends DatabaseObject implements Island {
     private BigDecimalFormatted bonusWorth = BigDecimalFormatted.ZERO;
     private String discord = "None", paypal = "None";
     private int islandSize = plugin.getSettings().defaultIslandSize;
-    private Location teleportLocation, visitorsLocation;
+    private Map<World.Environment, Location> teleportLocations = new HashMap<>();
+    private Location visitorsLocation;
     private boolean locked = false;
     private String islandName = "";
     private String description = "";
@@ -125,9 +126,9 @@ public class SIsland extends DatabaseObject implements Island {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
 
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-        this.teleportLocation = LocationUtils.getLocation(resultSet.getString("teleportLocation"));
         this.visitorsLocation = LocationUtils.getLocation(resultSet.getString("visitorsLocation"));
 
+        IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
         IslandDeserializer.deserializeMembers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializeBanned(resultSet.getString("banned"), this.banned);
         IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.permissionNodes);
@@ -163,7 +164,7 @@ public class SIsland extends DatabaseObject implements Island {
         assignGenerator();
         checkMembersDuplication();
 
-        Executor.sync(() -> biome = getCenter().getBlock().getBiome());
+        Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
     }
 
     public SIsland(CompoundTag tag){
@@ -171,8 +172,8 @@ public class SIsland extends DatabaseObject implements Island {
         this.owner = SSuperiorPlayer.of(UUID.fromString(((StringTag) compoundValues.get("owner")).getValue()));
         this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
 
-        this.teleportLocation = compoundValues.containsKey("teleportLocation") ?
-                LocationUtils.getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter();
+        this.teleportLocations.put(World.Environment.NORMAL, compoundValues.containsKey("teleportLocation") ?
+                LocationUtils.getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter(World.Environment.NORMAL));
 
         List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
         for(Tag _tag : members)
@@ -409,7 +410,12 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getCenter(){
-        return center.parse().add(0.5, 0, 0.5);
+        return getCenter(World.Environment.NORMAL);
+    }
+
+    @Override
+    public Location getCenter(World.Environment environment){
+        return center.parse(plugin.getGrid().getIslandsWorld(environment)).add(0.5, 0, 0.5);
     }
 
     @Override
@@ -419,17 +425,24 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getTeleportLocation() {
+        return getTeleportLocation(World.Environment.NORMAL);
+    }
+
+    @Override
+    public Location getTeleportLocation(World.Environment environment) {
+        Location teleportLocation = teleportLocations.get(environment);
+
         if(teleportLocation == null)
-            teleportLocation = getCenter();
+            teleportLocation = getCenter(environment);
 
         return teleportLocation.clone();
     }
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
-        this.teleportLocation = teleportLocation.clone();
+        teleportLocations.put(teleportLocation.getWorld().getEnvironment(), teleportLocation.clone());
         Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
-                .setString(LocationUtils.getLocation(getTeleportLocation()))
+                .setString(IslandSerializer.serializeLocations(teleportLocations))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
@@ -454,13 +467,13 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public Location getMinimum(){
         int islandDistance = plugin.getSettings().maxIslandSize;
-        return getCenter().subtract(islandDistance, 0, islandDistance);
+        return getCenter(World.Environment.NORMAL).subtract(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMaximum(){
         int islandDistance = plugin.getSettings().maxIslandSize;
-        return getCenter().add(islandDistance, 0, islandDistance);
+        return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
     }
 
     @Override
@@ -499,7 +512,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isInsideRange(Location location){
-        if(!getCenter().getWorld().equals(location.getWorld()))
+        if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
         int islandSize = getIslandSize();
@@ -1538,7 +1551,7 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void executeUpdateStatement(boolean async){
         Query.ISLAND_UPDATE.getStatementHolder()
-                .setString(LocationUtils.getLocation(getTeleportLocation()))
+                .setString(LocationUtils.getLocation(getTeleportLocation(World.Environment.NORMAL)))
                 .setString(LocationUtils.getLocation(visitorsLocation))
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
@@ -1581,7 +1594,7 @@ public class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.getUniqueId().toString())
                 .setString(LocationUtils.getLocation(center.getBlock().getLocation()))
-                .setString(LocationUtils.getLocation(getTeleportLocation()))
+                .setString(IslandSerializer.serializeLocations(teleportLocations))
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
                 .setString(IslandSerializer.serializePermissions(permissionNodes))

@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -104,7 +105,7 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.BANNED_FROM_ISLAND.send(e.getPlayer());
             if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
-                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter());
+                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter(World.Environment.NORMAL));
             return;
         }
 
@@ -112,7 +113,7 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.NO_CLOSE_BYPASS.send(e.getPlayer());
             if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
-                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter());
+                e.setCancelTeleport(plugin.getGrid().getSpawnIsland().getCenter(World.Environment.NORMAL));
             return;
         }
 

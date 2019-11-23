@@ -7,13 +7,13 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdExpel implements ICommand {
 
@@ -95,7 +95,7 @@ public final class CmdExpel implements ICommand {
         }
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
-        target.getLocation().setDirection(plugin.getGrid().getSpawnIsland().getCenter().getDirection());
+        target.getLocation().setDirection(plugin.getGrid().getSpawnIsland().getCenter(World.Environment.NORMAL).getDirection());
         Locale.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Locale.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }
@@ -107,10 +107,8 @@ public final class CmdExpel implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.EXPEL_BYPASS)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for (UUID uuid : superiorPlayer.getIsland().getVisitors()) {
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for (SuperiorPlayer targetPlayer : superiorPlayer.getIsland().getIslandVisitors()) {
                 if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                     list.add(targetPlayer.getName());
             }

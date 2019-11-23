@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +79,16 @@ public final class IslandSerializer {
         cobbleGenerator.forEach((key, value) ->
                 missionsBuilder.append(",").append(key).append("=").append(value));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+    }
+
+    public static String serializeLocations(Map<World.Environment, Location> locations){
+        StringBuilder locationsBuilder = new StringBuilder();
+        for(Map.Entry<World.Environment, Location> entry : locations.entrySet()){
+            Location loc = entry.getValue();
+            String locationString = loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw() + "," + loc.getPitch();
+            locationsBuilder.append(";").append(entry.getKey().name().toLowerCase()).append("=").append(locationString);
+        }
+        return locationsBuilder.length() == 0 ? "" : locationsBuilder.substring(1);
     }
 
 }

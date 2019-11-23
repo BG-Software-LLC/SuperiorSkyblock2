@@ -151,8 +151,24 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer == null)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getFrom());
+
+        if(island == null)
+            return;
+
+        e.setCancelled(true);
+
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerPortalMonitor(PlayerPortalEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(superiorPlayer == null)

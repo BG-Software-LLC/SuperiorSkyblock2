@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -83,7 +84,7 @@ public final class CmdAdminShow implements ICommand {
         if(!Locale.ISLAND_INFO_NAME.isEmpty() && !island.getName().isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter()))).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty()) {
             double rating = island.getTotalRating();
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(StringUtils.formatRating(rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
@@ -127,7 +128,7 @@ public final class CmdAdminShow implements ICommand {
         if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty() && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty()){
             StringBuilder generatorString = new StringBuilder();
             for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
-                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(StringUtils.format(entry.getKey().toString()), entry.getValue())).append("\n");
+                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(StringUtils.format(entry.getKey()), entry.getValue())).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(generatorString));
         }

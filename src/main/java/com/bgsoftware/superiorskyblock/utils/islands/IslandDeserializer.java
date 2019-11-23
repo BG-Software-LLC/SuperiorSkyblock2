@@ -11,8 +11,11 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -124,6 +127,20 @@ public final class IslandDeserializer {
             try {
                 String[] sections = limit.split("=");
                 cobbleGenerator.put(sections[0], Integer.parseInt(sections[1]));
+            }catch(Exception ignored){}
+        }
+    }
+
+    public static void deserializeLocations(String location, Map<World.Environment, Location> locations){
+        if(!location.contains("=")){
+            location = "normal=" + location;
+        }
+
+        for(String worldSection : location.split(";")){
+            try {
+                String[] locationSection = worldSection.split(";");
+                String environment = locationSection[0].toUpperCase();
+                locations.put(World.Environment.valueOf(environment), LocationUtils.getLocation(locationSection[1]));
             }catch(Exception ignored){}
         }
     }

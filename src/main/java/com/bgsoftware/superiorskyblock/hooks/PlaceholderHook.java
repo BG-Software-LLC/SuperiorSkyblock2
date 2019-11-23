@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -157,15 +158,15 @@ public abstract class PlaceholderHook {
 
                 else switch (subPlaceholder) {
                     case "center":
-                        return SBlockPosition.of(island.getCenter()).toString();
+                        return SBlockPosition.of(island.getCenter(World.Environment.NORMAL)).toString();
                     case "x":
-                        return String.valueOf(island.getCenter().getBlockX());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockX());
                     case "y":
-                        return String.valueOf(island.getCenter().getBlockY());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockY());
                     case "z":
-                        return String.valueOf(island.getCenter().getBlockZ());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockZ());
                     case "world":
-                        return String.valueOf(island.getCenter().getWorld().getName());
+                        return island.getCenter(World.Environment.NORMAL).getWorld().getName();
                     case "team_size":
                         return String.valueOf(island.getIslandMembers(true).size());
                     case "team_limit":

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public final class IslandPosition {
 
@@ -33,7 +34,7 @@ public final class IslandPosition {
     }
 
     public static IslandPosition of(Island island){
-        return of(island.getCenter());
+        return of(island.getCenter(World.Environment.NORMAL));
     }
 
     public static IslandPosition of(Location location){
