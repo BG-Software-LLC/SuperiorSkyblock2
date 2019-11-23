@@ -138,8 +138,20 @@ public final class ConfigComments {
     public static String BANK_WORTH_RATE = "bank-worth-rate";
 
     @Comment("")
+    @Comment("Settings related to the island worlds.")
+    public static String WORLDS = "worlds";
+
+    @Comment("")
     @Comment("Set the name of the islands world.")
-    public static String ISLAND_WORLD = "island-world";
+    public static String WORLDS_NORMAL_WORLD = "worlds.normal-world";
+
+    @Comment("")
+    @Comment("Should the nether world be enabled?")
+    public static String WORLDS_NETHER_WORLD = "worlds.nether-world";
+
+    @Comment("")
+    @Comment("Should the end world be enabled?")
+    public static String WORLDS_END_WORLD = "worlds.end-world";
 
     @Comment("")
     @Comment("All settings related to the spawn island.")

@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -61,7 +61,7 @@ public final class SpawnIsland extends SIsland {
     public Location getTeleportLocation() {
         Location center = getCenter();
         if(center.getWorld() == null)
-            center = this.center = new Location(plugin.getGrid().getIslandsWorld(), 0, 100, 0);
+            center = this.center = new Location(plugin.getGrid().getIslandsWorld(World.Environment.NORMAL), 0, 100, 0);
 
         return center;
     }

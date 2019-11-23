@@ -140,7 +140,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadWorld(){
-        String worldName = (settingsHandler = new SettingsHandler(this)).islandWorld;
+        String worldName = (settingsHandler = new SettingsHandler(this)).islandWorldName;
         WorldCreator.name(worldName).type(WorldType.FLAT).environment(World.Environment.NORMAL).generator(new WorldGenerator()).createWorld();
 
         if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core")){

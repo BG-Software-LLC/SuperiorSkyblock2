@@ -47,7 +47,9 @@ public final class SettingsHandler {
     public final List<String> signWarp;
     public final String welcomeWarpLine;
     public final int bankWorthRate;
-    public final String islandWorld;
+    public final String islandWorldName;
+    public final boolean netherWorldEnabled;
+    public final boolean endWorldEnabled;
     public final String spawnLocation;
     public final boolean spawnProtection;
     public final List<String> spawnSettings;
@@ -116,7 +118,9 @@ public final class SettingsHandler {
         signWarp = colorize(cfg.getStringList("sign-warp"));
         welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
-        islandWorld = cfg.getString("island-world", "SuperiorWorld");
+        islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
+        netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
+        endWorldEnabled = cfg.getBoolean("worlds.end-world", false);
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = cfg.getBoolean("spawn.protection", true);
         spawnSettings = cfg.getStringList("spawn.settings");
@@ -222,6 +226,8 @@ public final class SettingsHandler {
             cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
         if(cfg.getBoolean("spawn-pvp", false))
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
+        if(cfg.contains("island-world"))
+            cfg.set("worlds.normal-world", cfg.getString("island-world"));
     }
 
 }

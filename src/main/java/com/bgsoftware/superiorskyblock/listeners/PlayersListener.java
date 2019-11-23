@@ -255,7 +255,7 @@ public final class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island == null) {
-            if (!e.getPlayer().getWorld().equals(plugin.getGrid().getIslandsWorld()))
+            if(!plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld()))
                 return;
 
             island = plugin.getGrid().getSpawnIsland();

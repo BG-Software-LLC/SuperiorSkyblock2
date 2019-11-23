@@ -173,8 +173,14 @@ welcome-sign-line: '[Welcome]'
 # You can set it to 0 to disable island bank money to be calculated in island worth.
 bank-worth-rate: 1000
 
-# Set the name of the islands world.
-island-world: SuperiorWorld
+# Settings related to the island worlds.
+worlds:
+  # Set the name of the islands world.
+  normal-world: SuperiorWorld
+  # Should the nether world be enabled?
+  nether-world: false
+  # Should the end world be enabled?
+  end-world: false
 
 # All settings related to the spawn island.
 spawn:

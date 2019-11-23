@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
@@ -22,7 +21,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -58,7 +56,8 @@ public final class GridHandler implements GridManager {
     private SuperiorSkyblockPlugin plugin;
 
     private Queue<CreateIslandData> islandCreationsQueue = new Queue<>();
-    private boolean creationProgress = false;
+    private Queue<PasteSchematicData> pasteSchematicQueue = new Queue<>();
+    private boolean creationProgress = false, schematicProgress = false;
 
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
@@ -68,7 +67,7 @@ public final class GridHandler implements GridManager {
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorld, 0, 100, 0);
+        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
         updateSpawn();
     }
 
@@ -91,7 +90,7 @@ public final class GridHandler implements GridManager {
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName) {
         if(creationProgress) {
-            islandCreationsQueue.push(new CreateIslandData(superiorPlayer.getUniqueId(), schemName, bonus, biome, islandName));
+            islandCreationsQueue.push(new CreateIslandData(superiorPlayer, schemName, bonus, biome, islandName));
             return;
         }
 
@@ -113,14 +112,12 @@ public final class GridHandler implements GridManager {
                 setLastIsland(SBlockPosition.of(islandLocation));
 
                 if(!ServerVersion.isEquals(ServerVersion.v1_14)){
-                    for (Chunk chunk : island.getAllChunks(true)) {
+                    for (Chunk chunk : island.getAllChunks(true))
                         chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-                        plugin.getNMSAdapter().refreshChunk(chunk);
-                    }
                 }
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-                schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                pasteSchematic(schematic, island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                     island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
@@ -143,7 +140,25 @@ public final class GridHandler implements GridManager {
 
         if(islandCreationsQueue.size() != 0){
             CreateIslandData data = islandCreationsQueue.pop();
-            createIsland(SSuperiorPlayer.of(data.player), data.schemName, data.bonus, data.biome, data.islandName);
+            createIsland(data.player, data.schemName, data.bonus, data.biome, data.islandName);
+        }
+    }
+
+    public void pasteSchematic(Schematic schematic, Island island, Location location, Runnable runnable){
+        if(schematicProgress) {
+            pasteSchematicQueue.push(new PasteSchematicData(schematic, island, location, runnable));
+            return;
+        }
+
+        schematicProgress = true;
+
+        schematic.pasteSchematic(island, location, runnable);
+
+        schematicProgress = false;
+
+        if(pasteSchematicQueue.size() != 0){
+            PasteSchematicData data = pasteSchematicQueue.pop();
+            pasteSchematic(data.schematic, data.island, data.location, data.runnable);
         }
     }
 
@@ -195,9 +210,6 @@ public final class GridHandler implements GridManager {
         if(spawnIsland.isInside(location))
             return spawnIsland;
 
-        if(!location.getWorld().getName().equals(plugin.getSettings().islandWorld))
-            return null;
-
         return islands.get(location);
     }
 
@@ -208,7 +220,34 @@ public final class GridHandler implements GridManager {
 
     @Override
     public World getIslandsWorld() {
-        return Bukkit.getWorld(plugin.getSettings().islandWorld);
+        return getIslandsWorld(World.Environment.NORMAL);
+    }
+
+    @Override
+    public World getIslandsWorld(World.Environment environment) {
+        String worldName = "";
+
+        switch (environment){
+            case NORMAL:
+                worldName = plugin.getSettings().islandWorldName;
+                break;
+            case NETHER:
+                if(plugin.getSettings().netherWorldEnabled)
+                    worldName = plugin.getSettings().islandWorldName + "_nether";
+                break;
+            case THE_END:
+                if(plugin.getSettings().endWorldEnabled)
+                    worldName = plugin.getSettings().islandWorldName + "_the_end";
+                break;
+        }
+
+        return worldName.isEmpty() ? null : Bukkit.getWorld(worldName);
+    }
+
+    @Override
+    public boolean isIslandsWorld(World world) {
+        World islandsWorld = getIslandsWorld(world.getEnvironment());
+        return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
     }
 
     @Override
@@ -363,7 +402,7 @@ public final class GridHandler implements GridManager {
             plugin.getSettings().updateValue("max-island-size", maxIslandSize);
         }
 
-        if(!plugin.getSettings().islandWorld.equals(world)){
+        if(!plugin.getSettings().islandWorldName.equals(world)){
             SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
             SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
             plugin.getSettings().updateValue("island-world", world);
@@ -418,7 +457,7 @@ public final class GridHandler implements GridManager {
                 .setString(this.lastIsland.toString())
                 .setString("")
                 .setInt(plugin.getSettings().maxIslandSize)
-                .setString(plugin.getSettings().islandWorld)
+                .setString(plugin.getSettings().islandWorldName)
                 .execute(async);
     }
 
@@ -442,12 +481,12 @@ public final class GridHandler implements GridManager {
 
     private static class CreateIslandData {
 
-        public UUID player;
+        public SuperiorPlayer player;
         public String schemName, islandName;
         public BigDecimal bonus;
         public Biome biome;
 
-        public CreateIslandData(UUID player, String schemName, BigDecimal bonus, Biome biome, String islandName){
+        public CreateIslandData(SuperiorPlayer player, String schemName, BigDecimal bonus, Biome biome, String islandName){
             this.player = player;
             this.schemName = schemName;
             this.islandName = islandName;
@@ -455,6 +494,21 @@ public final class GridHandler implements GridManager {
             this.biome = biome;
         }
 
+    }
+
+    private static class PasteSchematicData {
+
+        public Schematic schematic;
+        public Island island;
+        public Location location;
+        public Runnable runnable;
+
+        public PasteSchematicData(Schematic schematic, Island island, Location location, Runnable runnable) {
+            this.schematic = schematic;
+            this.island = island;
+            this.location = location;
+            this.runnable = runnable;
+        }
     }
 
     private class StackedBlocksHandler {

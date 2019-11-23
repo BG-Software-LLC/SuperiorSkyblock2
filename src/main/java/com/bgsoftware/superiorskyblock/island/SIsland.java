@@ -489,7 +489,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isInside(Location location){
-        if(!getCenter().getWorld().equals(location.getWorld()))
+        if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();

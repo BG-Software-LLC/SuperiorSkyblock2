@@ -93,12 +93,22 @@ public final class SuperiorSkyblockAPI {
     }
 
     /**
-     * Get the islands world.
+     * Get the islands normal world.
      *
-     * @return the spawn island.
+     * @return the islands normal world.
      */
     public static World getIslandsWorld(){
-        return plugin.getGrid().getIslandsWorld();
+        return getIslandsWorld(World.Environment.NORMAL);
+    }
+
+    /**
+     * Get the islands world by world's environment.
+     * @param environment The environment.
+     *
+     * @return the islands world.
+     */
+    public static World getIslandsWorld(World.Environment environment){
+        return plugin.getGrid().getIslandsWorld(environment);
     }
 
     /**

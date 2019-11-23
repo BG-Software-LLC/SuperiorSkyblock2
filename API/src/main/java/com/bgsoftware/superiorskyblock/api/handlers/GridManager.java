@@ -113,8 +113,24 @@ public interface GridManager {
 
     /**
      * Get the islands world.
+     *
+     * @deprecated See getIslandsWorld(Environment)
      */
+    @Deprecated
     World getIslandsWorld();
+
+    /**
+     * Get the islands world by the environment.
+     * If the environment is not the normal and that environment is disabled in config, null will be returned.
+     * @param environment The world environment.
+     */
+    World getIslandsWorld(World.Environment environment);
+
+    /**
+     * Checks if the given world is an islands world.
+     * Can be the normal world, the nether world (if enabled in config) or the end world (if enabled in config)
+     */
+    boolean isIslandsWorld(World world);
 
     /**
      * Get the next location for a new island.
