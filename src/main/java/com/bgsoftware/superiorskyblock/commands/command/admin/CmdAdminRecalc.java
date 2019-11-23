@@ -57,7 +57,7 @@ public final class CmdAdminRecalc implements ICommand {
 
         if(args.length == 2){
             Locale.RECALC_ALL_ISLANDS.send(superiorPlayer);
-            plugin.getGrid().calcAllIslands();
+            plugin.getGrid().calcAllIslands(() -> Locale.RECALC_ALL_ISLANDS_DONE.send(superiorPlayer));
         }
 
         else {

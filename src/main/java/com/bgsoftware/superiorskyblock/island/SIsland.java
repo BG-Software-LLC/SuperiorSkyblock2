@@ -667,13 +667,18 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
+        calcIslandWorth(asker, null);
+    }
+
+    @Override
+    public void calcIslandWorth(SuperiorPlayer asker, Runnable callback) {
         if(!Bukkit.isPrimaryThread()){
-            Executor.sync(() -> calcIslandWorth(asker));
+            Executor.sync(() -> calcIslandWorth(asker, callback));
             return;
         }
 
         if(calcProcess) {
-            islandCalcsQueue.push(new CalcIslandData(this, asker));
+            islandCalcsQueue.push(new CalcIslandData(this, asker, callback));
             return;
         }
 
@@ -777,6 +782,9 @@ public class SIsland extends DatabaseObject implements Island {
                 if(asker != null)
                     Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
 
+                if(callback != null)
+                    callback.run();
+
                 for(Chunk chunk : chunks)
                     BlocksProvider_WildStacker.uncacheChunk(chunk);
 
@@ -786,7 +794,7 @@ public class SIsland extends DatabaseObject implements Island {
 
                 if(islandCalcsQueue.size() != 0){
                     CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                    calcIslandData.island.calcIslandWorth(calcIslandData.asker);
+                    calcIslandData.island.calcIslandWorth(calcIslandData.asker, calcIslandData.callback);
                 }
             });
         });
@@ -1769,12 +1777,14 @@ public class SIsland extends DatabaseObject implements Island {
 
     private static class CalcIslandData {
 
-        private Island island;
-        private SuperiorPlayer asker;
+        private final Island island;
+        private final SuperiorPlayer asker;
+        private final Runnable callback;
 
-        private CalcIslandData(Island island, SuperiorPlayer asker){
+        private CalcIslandData(Island island, SuperiorPlayer asker, Runnable callback){
             this.island = island;
             this.asker = asker;
+            this.callback = callback;
         }
 
     }

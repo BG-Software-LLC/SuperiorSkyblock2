@@ -43,6 +43,7 @@ import org.bukkit.entity.Entity;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -338,8 +339,15 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void calcAllIslands(){
-        for (Island island : islands)
-            island.calcIslandWorth(null);
+        calcAllIslands(null);
+    }
+
+    @Override
+    public void calcAllIslands(Runnable callback) {
+        Iterator<Island> islandIterator = islands.iterator();
+        while (islandIterator.hasNext()){
+            islandIterator.next().calcIslandWorth(null, islandIterator.hasNext() ? null : callback);
+        }
     }
 
     @Override
