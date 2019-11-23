@@ -5,11 +5,6 @@
 ##                                                  ##
 ######################################################
 
-# Here you can set the amount of time between auto saves.
-# If you want to disable this feature, set interval to 0
-# Disabling auto save is not recommended, as it's done async.
-save-interval: 6000
-
 # Here you can set the amount of time between auto calculations of all islands.
 # If you want to disable this feature, set interval to 0
 # It's recommended to set the task to a high interval, as it might cause lag.

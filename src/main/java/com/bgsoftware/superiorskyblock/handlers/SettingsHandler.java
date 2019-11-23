@@ -41,7 +41,6 @@ public final class SettingsHandler {
     public final String islandLevelFormula;
     public final String islandTopOrder;
     public final ConfigurationSection islandRolesSection;
-    public final long saveInterval;
     public final long calcInterval;
     public final String signWarpLine;
     public final List<String> signWarp;
@@ -74,8 +73,8 @@ public final class SettingsHandler {
     public final boolean rateOwnIsland;
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
-    public final Map<String, Integer> defaultGenerator;
     public final boolean disableRedstoneOffline;
+    public final Map<String, Integer> defaultGenerator;
     public final Map<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
 
@@ -89,7 +88,6 @@ public final class SettingsHandler {
         convertData(cfg);
         cfg.resetYamlFile(plugin, "config.yml");
 
-        saveInterval = cfg.getLong("save-interval", 6000);
         calcInterval = cfg.getLong("calc-interval", 6000);
         maxIslandSize = cfg.getInt("max-island-size", 200);
         defaultIslandSize = cfg.getInt("default-island-size", 20);

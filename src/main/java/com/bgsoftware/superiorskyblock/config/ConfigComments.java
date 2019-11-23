@@ -12,12 +12,6 @@ public final class ConfigComments {
     public static String HEADER = "";
 
     @Comment("")
-    @Comment("Here you can set the amount of time between auto saves.")
-    @Comment("If you want to disable this feature, set interval to 0")
-    @Comment("Disabling auto save is not recommended, as it's done async.")
-    public static String SAVE_INTERVAL = "save-interval";
-
-    @Comment("")
     @Comment("Here you can set the amount of time between auto calculations of all islands.")
     @Comment("If you want to disable this feature, set interval to 0")
     @Comment("It's recommended to set the task to a high interval, as it might cause lag.")
