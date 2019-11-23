@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -67,6 +68,10 @@ public final class FileUtils {
 
                 itemBuilder.withEnchant(enchantment, section.getInt("enchants." + _enchantment));
             }
+        }
+
+        if(section.getBoolean("glow", false)){
+            itemBuilder.withEnchant(EnchantsUtils.getGlowEnchant(), 1);
         }
 
         if(section.contains("flags")){
