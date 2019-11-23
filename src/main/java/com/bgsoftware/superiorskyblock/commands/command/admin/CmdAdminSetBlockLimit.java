@@ -92,8 +92,10 @@ public final class CmdAdminSetBlockLimit implements ICommand {
 
         islands.forEach(island -> island.setBlockLimit(key, limit));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), islands.size() == 1 ? islands.get(0).getName() : "all");
+        if(islands.size() > 1)
+            Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.toString().split(":")[0]));
+        else if(targetPlayer == null)
+            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), islands.get(0).getName());
         else
             Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.toString().split(":")[0]), targetPlayer.getName());
     }
