@@ -35,6 +35,7 @@ public enum Locale {
     CANNOT_SET_ROLE,
     CHANGED_BIOME,
     CHANGED_BLOCK_LIMIT,
+    CHANGED_BLOCK_LIMIT_ALL,
     CHANGED_BLOCK_LIMIT_NAME,
     CHANGED_CROP_GROWTH,
     CHANGED_CROP_GROWTH_ALL,
@@ -194,14 +195,11 @@ public enum Locale {
     IGNORED_ISLAND_NAME,
     INTERACT_OUTSIDE_ISLAND,
     INVALID_AMOUNT,
-    INVALID_BOOLEAN,
-    INVALID_BORDER_COLOR,
     INVALID_ISLAND,
     INVALID_ISLAND_LOCATION,
     INVALID_ISLAND_OTHER,
     INVALID_ISLAND_OTHER_NAME,
     INVALID_ISLAND_PERMISSION,
-    INVALID_ITEM_IN_HAND,
     INVALID_LEVEL,
     INVALID_LIMIT,
     INVALID_MATERIAL,
@@ -339,11 +337,9 @@ public enum Locale {
     NO_WITHDRAW_PERMISSION,
     PANEL_TOGGLE_OFF,
     PANEL_TOGGLE_ON,
-    PERMISSION_CHECK,
     PERMISSION_CHANGED,
     PERMISSION_CHANGED_ALL,
     PERMISSION_CHANGED_NAME,
-    PERMISSION_SPACER,
     PLAYER_ALREADY_BANNED,
     PLAYER_ALREADY_COOP,
     PLAYER_ALREADY_IN_ROLE,
@@ -415,7 +411,6 @@ public enum Locale {
     UNCOOP_LEFT_ANNOUNCEMENT,
     UNIGNORED_ISLAND,
     UNIGNORED_ISLAND_NAME,
-    UNKNOWN_COMMAND,
     UNSAFE_WARP,
     UPDATED_PERMISSION,
     UPDATED_SETTINGS,
@@ -471,6 +466,15 @@ public enum Locale {
 
         CommentedConfiguration cfg = new CommentedConfiguration(LangComments.class, file);
         cfg.resetYamlFile(plugin, "lang.yml");
+
+        SuperiorSkyblockPlugin.log("&9Unknown messages:");
+        for(String message : cfg.getConfigurationSection("").getKeys(false)){
+            try{
+                Locale.valueOf(message);
+            }catch(Exception ex){
+                SuperiorSkyblockPlugin.log("&9" + message);
+            }
+        }
 
         for(Locale locale : values()){
             locale.setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
