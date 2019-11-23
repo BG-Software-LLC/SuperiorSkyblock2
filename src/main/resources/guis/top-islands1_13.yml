@@ -97,3 +97,4 @@ top-islands:
 
   player-island-slot: 46
   slots: '13,21,23,28,29,30,31,32,33,34'
+  sort-glow-when-selected: true

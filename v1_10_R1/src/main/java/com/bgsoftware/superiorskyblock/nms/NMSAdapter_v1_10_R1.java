@@ -56,6 +56,8 @@ import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -320,6 +322,47 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
                 Arrays.fill(chunk.getBiomeIndex(), biomeBase);
             }
         }
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        int id = 100;
+
+        while(Enchantment.getById(id) != null){
+            id++;
+        }
+
+        return new Enchantment(id) {
+            @Override
+            public String getName() {
+                return "SuperiorSkyblockGlow";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+        };
     }
 
 }

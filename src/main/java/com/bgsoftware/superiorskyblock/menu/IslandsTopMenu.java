@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -36,6 +37,7 @@ public final class IslandsTopMenu extends SuperiorMenu {
     private static Integer[] slots;
     private static int playerIslandSlot, worthSortSlot = -1, levelSortSlot = -1, ratingSortSlot = -1, playersSortSlot = -1;
     private static ItemStack noIslandItem, islandItem;
+    private static boolean sortGlowWhenSelected;
 
     private SortingType sortingType = SortingTypes.DEFAULT;
 
@@ -280,33 +282,47 @@ public final class IslandsTopMenu extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
+        IslandsTopMenu.sortGlowWhenSelected = cfg.getBoolean("top-islands.sort-glow-when-selected", false);
+
         for(SortingType sortingType : SortingType.values()){
             Inventory inventory = FileUtils.loadGUI(islandsTopMenu, cfg.getConfigurationSection("top-islands"), 6, "&lTop Islands");
 
             if (cfg.contains("top-islands.worth-sort")) {
                 worthSortSlot = cfg.getInt("top-islands.worth-sort.slot");
-                inventory.setItem(worthSortSlot, FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.worth-sort")));
+                ItemStack sortItem = FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.worth-sort"));
+                if(sortGlowWhenSelected && sortingType == SortingTypes.BY_WORTH)
+                    sortItem.addEnchantment(EnchantsUtils.getGlowEnchant(), 1);
+                inventory.setItem(worthSortSlot, sortItem);
                 islandsTopMenu.addSound(worthSortSlot, FileUtils.getSound(cfg.getConfigurationSection("top-islands.worth-sort.sound")));
                 islandsTopMenu.addCommands(worthSortSlot, cfg.getStringList("top-islands.worth-sort.commands"));
             }
 
             if (cfg.contains("top-islands.level-sort")) {
                 levelSortSlot = cfg.getInt("top-islands.level-sort.slot");
-                inventory.setItem(levelSortSlot, FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.level-sort")));
+                ItemStack sortItem = FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.level-sort"));
+                if(sortGlowWhenSelected && sortingType == SortingTypes.BY_LEVEL)
+                    sortItem.addEnchantment(EnchantsUtils.getGlowEnchant(), 1);
+                inventory.setItem(levelSortSlot, sortItem);
                 islandsTopMenu.addSound(levelSortSlot, FileUtils.getSound(cfg.getConfigurationSection("top-islands.level-sort.sound")));
                 islandsTopMenu.addCommands(levelSortSlot, cfg.getStringList("top-islands.level-sort.commands"));
             }
 
             if (cfg.contains("top-islands.rating-sort")) {
                 ratingSortSlot = cfg.getInt("top-islands.rating-sort.slot");
-                inventory.setItem(ratingSortSlot, FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.rating-sort")));
+                ItemStack sortItem = FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.rating-sort"));
+                if(sortGlowWhenSelected && sortingType == SortingTypes.BY_RATING)
+                    sortItem.addEnchantment(EnchantsUtils.getGlowEnchant(), 1);
+                inventory.setItem(ratingSortSlot, sortItem);
                 islandsTopMenu.addSound(ratingSortSlot, FileUtils.getSound(cfg.getConfigurationSection("top-islands.rating-sort.sound")));
                 islandsTopMenu.addCommands(ratingSortSlot, cfg.getStringList("top-islands.rating-sort.commands"));
             }
 
             if (cfg.contains("top-islands.players-sort")) {
                 playersSortSlot = cfg.getInt("top-islands.players-sort.slot");
-                inventory.setItem(playersSortSlot, FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.players-sort")));
+                ItemStack sortItem = FileUtils.getItemStack(cfg.getConfigurationSection("top-islands.players-sort"));
+                if(sortGlowWhenSelected && sortingType == SortingTypes.BY_PLAYERS)
+                    sortItem.addEnchantment(EnchantsUtils.getGlowEnchant(), 1);
+                inventory.setItem(playersSortSlot, sortItem);
                 islandsTopMenu.addSound(playersSortSlot, FileUtils.getSound(cfg.getConfigurationSection("top-islands.players-sort.sound")));
                 islandsTopMenu.addCommands(playersSortSlot, cfg.getStringList("top-islands.players-sort.commands"));
             }

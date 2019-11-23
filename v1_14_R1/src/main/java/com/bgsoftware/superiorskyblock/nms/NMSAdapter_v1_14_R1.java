@@ -46,6 +46,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
@@ -57,6 +58,8 @@ import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -347,6 +350,52 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {
         return block.getBlockData();
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        //noinspection NullableProblems
+        return new Enchantment(NamespacedKey.minecraft("superior_glowing_enchant")) {
+            @Override
+            public String getName() {
+                return "SuperiorSkyblockGlow";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+
+            @Override
+            public boolean isTreasure() {
+                return false;
+            }
+
+            @Override
+            public boolean isCursed() {
+                return false;
+            }
+        };
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

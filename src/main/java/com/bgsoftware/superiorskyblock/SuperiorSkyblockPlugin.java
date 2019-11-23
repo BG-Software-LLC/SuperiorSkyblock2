@@ -31,6 +31,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -79,6 +80,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         loadNMSAdapter();
         loadAPI();
+
+        EnchantsUtils.registerGlowEnchantment();
 
         CommandsHandler commandsHandler = new CommandsHandler(this);
         getCommand("island").setExecutor(commandsHandler);
