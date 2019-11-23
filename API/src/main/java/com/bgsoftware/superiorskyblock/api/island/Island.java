@@ -385,6 +385,13 @@ public interface Island extends Comparable<Island> {
     void calcIslandWorth(SuperiorPlayer asker);
 
     /**
+     * Recalculate the island's worth value.
+     * @param asker The player who makes the operation, may be null.
+     * @param callback Runnable which will be ran when process is finished.
+     */
+    void calcIslandWorth(SuperiorPlayer asker, Runnable callback);
+
+    /**
      * Update the border of all the players inside the island.
      */
     void updateBorder();

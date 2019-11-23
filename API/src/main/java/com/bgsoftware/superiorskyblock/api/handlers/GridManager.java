@@ -197,6 +197,12 @@ public interface GridManager {
     void calcAllIslands();
 
     /**
+     * Calculate the worth of all the islands on the server.
+     * @param callback Runnable that will be ran when process is finished.
+     */
+    void calcAllIslands(Runnable callback);
+
+    /**
      * Checks whether or not the material is a spawner.
      * @param material The material to check.
      *

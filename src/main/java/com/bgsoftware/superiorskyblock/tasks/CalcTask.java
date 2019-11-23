@@ -12,8 +12,7 @@ public final class CalcTask extends BukkitRunnable {
     private static int id = -1;
 
     private CalcTask(){
-        if(id != -1)
-            id = runTaskTimerAsynchronously(plugin, plugin.getSettings().calcInterval, plugin.getSettings().calcInterval).getTaskId();
+        id = runTaskTimerAsynchronously(plugin, plugin.getSettings().calcInterval, plugin.getSettings().calcInterval).getTaskId();
     }
 
     @Override
