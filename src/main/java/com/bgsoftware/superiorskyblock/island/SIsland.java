@@ -353,6 +353,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void kickMember(SuperiorPlayer superiorPlayer){
         members.remove(superiorPlayer);
         superiorPlayer.setIslandLeader(superiorPlayer);
+        superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(owner.getUniqueId().toString())
