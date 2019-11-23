@@ -263,4 +263,13 @@ public final class ConfigComments {
     @Comment("Example: 'DIAMOND_BLOCK:50' will set 50% chance for diamond block.")
     public static String DEFAULT_GENERATOR = "default-generator";
 
+    @Comment("")
+    @Comment("A list of commands that should have cooldown.")
+    @Comment("Cooldowns are in milliseconds.")
+    @Comment("You can disable this section by using:")
+    @Comment("commands-cooldown:")
+    @Comment("  random:")
+    @Comment("    cooldown: 0")
+    public static String COMMANDS_COOLDOWN = "commands-cooldown";
+
 }

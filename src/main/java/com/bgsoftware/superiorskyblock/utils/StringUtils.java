@@ -11,7 +11,8 @@ import java.util.Arrays;
 public final class StringUtils {
 
     private static DecimalFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,###.##");
-    private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000, K = 1000D;
+    private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
+    private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
 
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();
@@ -85,6 +86,44 @@ public final class StringUtils {
         StringBuilder stringBuilder = new StringBuilder();
         Arrays.stream(IslandSettings.values()).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
         return stringBuilder.toString().substring(2);
+    }
+
+    public static String formatTime(long time){
+        StringBuilder timeBuilder = new StringBuilder();
+        long timeUnitValue;
+
+        if(time > D){
+            timeUnitValue = time / D;
+            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage() :
+                    Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage()).append(", ");
+            time %= D;
+        }
+
+        if(time > H){
+            timeUnitValue = time / H;
+            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage() :
+                    Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage()).append(", ");
+            time %= H;
+        }
+
+        if(time > MIN){
+            timeUnitValue = time / MIN;
+            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage() :
+                    Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage()).append(", ");
+            time %= MIN;
+        }
+
+        if(time > S){
+            timeUnitValue = time / S;
+            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage() :
+                    Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage()).append(", ");
+        }
+
+        if(timeBuilder.length() == 0){
+            timeBuilder.append("1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage()).append(", ");
+        }
+
+        return timeBuilder.substring(0, timeBuilder.length() - 2);
     }
 
 }

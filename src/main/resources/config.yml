@@ -455,3 +455,14 @@ disable-redstone-offline: true
 default-generator:
   - COBBLESTONE:95
   - COAL_ORE:5
+
+# A list of commands that should have cooldown.
+# Cooldowns are in milliseconds.
+# You can disable this section by using:
+# commands-cooldown:
+#   random:
+#     cooldown: 0
+commands-cooldown:
+  recalc:
+    cooldown: 30000
+    bypass-permission: superior.cooldown.bypass.recalc

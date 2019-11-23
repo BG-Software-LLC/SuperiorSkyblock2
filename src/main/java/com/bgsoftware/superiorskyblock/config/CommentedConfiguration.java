@@ -28,7 +28,7 @@ import java.util.Map;
 public final class CommentedConfiguration extends YamlConfiguration{
 
     private Class commentsClass;
-    private String[] ignoredSections = new String[] {"ladder"};
+    private String[] ignoredSections = new String[] {"ladder", "commands-cooldown"};
 
     public CommentedConfiguration(Class commentsClass, File file){
         this.commentsClass = commentsClass;

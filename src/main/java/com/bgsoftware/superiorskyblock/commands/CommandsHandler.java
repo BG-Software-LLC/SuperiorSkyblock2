@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.commands.command.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,7 +16,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class CommandsHandler implements CommandExecutor, TabCompleter {
 
@@ -23,6 +27,8 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
 
     private SuperiorSkyblockPlugin plugin;
     private List<ICommand> subCommands = new ArrayList<>();
+
+    private Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -97,6 +103,29 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
                     if(args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()){
                         Locale.COMMAND_USAGE.send(sender, subCommand.getUsage());
                         return false;
+                    }
+
+                    String commandLabel = subCommand.getAliases().get(0);
+
+                    if(sender instanceof Player && plugin.getSettings().commandsCooldown.containsKey(commandLabel)) {
+                        UUID uuid = ((Player) sender).getUniqueId();
+
+                        long timeToExecute = commandsCooldown.containsKey(uuid) && commandsCooldown.get(uuid).containsKey(commandLabel) ?
+                                commandsCooldown.get(uuid).get(commandLabel) : -1;
+
+                        long timeNow = System.currentTimeMillis();
+
+                        if(timeNow < timeToExecute){
+                            Locale.COMMAND_COOLDOWN_FORMAT.send(sender, StringUtils.formatTime(timeToExecute - timeNow));
+                            return false;
+                        }
+
+                        if(!commandsCooldown.containsKey(uuid)){
+                            commandsCooldown.put(uuid, new HashMap<>());
+                        }
+
+                        Map<String, Long> timedCommands = commandsCooldown.get(uuid);
+                        timedCommands.put(commandLabel, timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
                     }
 
                     subCommand.execute(plugin, sender, args);
