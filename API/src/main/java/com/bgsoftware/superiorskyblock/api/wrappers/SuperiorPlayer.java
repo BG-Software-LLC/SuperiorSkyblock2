@@ -229,6 +229,11 @@ public interface SuperiorPlayer {
     boolean hasPermission(String permission);
 
     /**
+     * Check whether or not the player has a permission without having op.
+     */
+    boolean hasPermissionWithoutOP(String permission);
+
+    /**
      * Check whether or not the player has a permission on his island.
      */
     boolean hasPermission(IslandPermission permission);

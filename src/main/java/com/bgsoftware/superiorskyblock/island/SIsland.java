@@ -540,7 +540,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
-        return superiorPlayer.hasBypassModeEnabled() || getPermissionNode(superiorPlayer).hasPermission(islandPermission);
+        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPermission) || getPermissionNode(superiorPlayer).hasPermission(islandPermission);
     }
 
     @Override

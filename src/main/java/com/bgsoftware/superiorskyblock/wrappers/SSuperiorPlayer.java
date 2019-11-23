@@ -516,6 +516,11 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     @Override
+    public boolean hasPermissionWithoutOP(String permission) {
+        return asPlayer().getEffectivePermissions().stream().anyMatch(permissionAttachmentInfo -> permissionAttachmentInfo.getPermission().equalsIgnoreCase(permission));
+    }
+
+    @Override
     public boolean hasPermission(IslandPermission permission){
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
