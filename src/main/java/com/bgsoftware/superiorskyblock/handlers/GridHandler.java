@@ -28,7 +28,6 @@ import com.google.common.collect.Maps;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -54,10 +53,6 @@ import java.util.stream.Collectors;
 public final class GridHandler implements GridManager {
 
     private SuperiorSkyblockPlugin plugin;
-
-    private Queue<CreateIslandData> islandCreationsQueue = new Queue<>();
-    private Queue<PasteSchematicData> pasteSchematicQueue = new Queue<>();
-    private boolean creationProgress = false, schematicProgress = false;
 
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
@@ -111,7 +106,7 @@ public final class GridHandler implements GridManager {
                 }
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-                pasteSchematic(schematic, island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                     island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
@@ -128,24 +123,6 @@ public final class GridHandler implements GridManager {
 
                 plugin.getDataHandler().insertIsland(island);
             }
-        }
-    }
-
-    public void pasteSchematic(Schematic schematic, Island island, Location location, Runnable runnable){
-        if(schematicProgress) {
-            pasteSchematicQueue.push(new PasteSchematicData(schematic, island, location, runnable));
-            return;
-        }
-
-        schematicProgress = true;
-
-        schematic.pasteSchematic(island, location, runnable);
-
-        schematicProgress = false;
-
-        if(pasteSchematicQueue.size() != 0){
-            PasteSchematicData data = pasteSchematicQueue.pop();
-            pasteSchematic(data.schematic, data.island, data.location, data.runnable);
         }
     }
 
@@ -464,38 +441,6 @@ public final class GridHandler implements GridManager {
         Query.GRID_UPDATE.getStatementHolder()
                 .setString(blockPosition.toString())
                 .execute(true);
-    }
-
-    private static class CreateIslandData {
-
-        public SuperiorPlayer player;
-        public String schemName, islandName;
-        public BigDecimal bonus;
-        public Biome biome;
-
-        public CreateIslandData(SuperiorPlayer player, String schemName, BigDecimal bonus, Biome biome, String islandName){
-            this.player = player;
-            this.schemName = schemName;
-            this.islandName = islandName;
-            this.bonus = bonus;
-            this.biome = biome;
-        }
-
-    }
-
-    private static class PasteSchematicData {
-
-        public Schematic schematic;
-        public Island island;
-        public Location location;
-        public Runnable runnable;
-
-        public PasteSchematicData(Schematic schematic, Island island, Location location, Runnable runnable) {
-            this.schematic = schematic;
-            this.island = island;
-            this.location = location;
-            this.runnable = runnable;
-        }
     }
 
     private class StackedBlocksHandler {

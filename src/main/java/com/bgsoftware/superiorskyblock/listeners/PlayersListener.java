@@ -304,7 +304,7 @@ public final class PlayersListener implements Listener {
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + (environment == World.Environment.NETHER ? "_nether" : "_the_end"));
                 if(schematic != null) {
-                    plugin.getGrid().pasteSchematic(schematic, island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                         superiorPlayer.teleport(toTeleport);
                         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
                     });

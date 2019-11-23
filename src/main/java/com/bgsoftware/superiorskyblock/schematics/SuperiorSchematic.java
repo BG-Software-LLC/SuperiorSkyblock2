@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 
 import org.bukkit.Location;
 
-public final class SuperiorSchematic implements Schematic {
+public final class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     private CompoundTag compoundTag;
 
@@ -26,6 +26,13 @@ public final class SuperiorSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback) {
+        if(schematicProgress) {
+            pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback));
+            return;
+        }
+
+        schematicProgress = true;
+
         byte xSize = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
         byte ySize = ((ByteTag) compoundTag.getValue().get("ySize")).getValue();
         byte zSize = ((ByteTag) compoundTag.getValue().get("zSize")).getValue();
@@ -44,6 +51,13 @@ public final class SuperiorSchematic implements Schematic {
                 }
 
                 callback.run();
+
+                schematicProgress = false;
+
+                if(pasteSchematicQueue.size() != 0){
+                    PasteSchematicData data = pasteSchematicQueue.pop();
+                    data.schematic.pasteSchematic(data.island, data.location, data.callback);
+                }
             });
         }
     }
@@ -51,10 +65,5 @@ public final class SuperiorSchematic implements Schematic {
     public CompoundTag getTag(){
         return compoundTag;
     }
-
-//    @Override
-//    public String toString() {
-//        return compoundTag.toString();
-//    }
 
 }

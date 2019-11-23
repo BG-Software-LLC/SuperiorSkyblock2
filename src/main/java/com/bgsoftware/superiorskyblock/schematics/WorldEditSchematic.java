@@ -10,7 +10,7 @@ import org.bukkit.Location;
 
 import java.lang.reflect.Method;
 
-public final class WorldEditSchematic implements Schematic {
+public final class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     private static Method blockVector3AtMethod = null;
     private static Method blockVector3PasteMethod = null;
@@ -18,6 +18,7 @@ public final class WorldEditSchematic implements Schematic {
     static {
         try{
             Class blockVector3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
+            //noinspection unchecked
             blockVector3AtMethod = blockVector3Class.getMethod("at", int.class, int.class, int.class);
             blockVector3PasteMethod = com.boydti.fawe.object.schematic.Schematic.class
                     .getMethod("paste", World.class, blockVector3Class, boolean.class, boolean.class, Transform.class);
@@ -38,6 +39,13 @@ public final class WorldEditSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback) {
+        if(schematicProgress) {
+            pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback));
+            return;
+        }
+
+        schematicProgress = true;
+
         EditSession editSession;
 
         try{
@@ -48,6 +56,15 @@ public final class WorldEditSchematic implements Schematic {
             editSession = schematic.paste(new BukkitWorld(location.getWorld()), point, false, true, null);
         }
 
-        editSession.addNotifyTask(callback);
+        editSession.addNotifyTask(() -> {
+            callback.run();
+
+            schematicProgress = false;
+
+            if(pasteSchematicQueue.size() != 0){
+                PasteSchematicData data = pasteSchematicQueue.pop();
+                data.schematic.pasteSchematic(data.island, data.location, data.callback);
+            }
+        });
     }
 }
