@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.config.ConfigComments;
 import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
@@ -74,6 +75,7 @@ public final class SettingsHandler {
     public final Map<String, Integer> defaultGenerator;
     public final boolean disableRedstoneOffline;
     public final Map<String, Pair<Integer, String>> commandsCooldown;
+    public final String numberFormat;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -156,6 +158,8 @@ public final class SettingsHandler {
             String permission = cfg.getString("commands-cooldown." + subCommand + ".bypass-permission");
             commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
         }
+        numberFormat = cfg.getString("number-format", "en-US");
+        StringUtils.setNumberFormatter(numberFormat);
     }
 
     public void updateValue(String path, Object value){

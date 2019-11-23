@@ -1,18 +1,39 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public final class StringUtils {
 
-    private static DecimalFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,###.##");
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
     private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
+    private static final char SPACE_ASCII = 160;
+
+    private static NumberFormat numberFormatter;
+
+    public static void setNumberFormatter(String numberFormat){
+        numberFormat = numberFormat.replace("_", "-");
+
+        if(!Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$").matcher(numberFormat).matches()){
+            SuperiorSkyblockPlugin.log("&cThe number format \"" + numberFormat + "\" is invalid. Using default one: en-US.");
+            numberFormat = "en-US";
+        }
+
+        String[] numberFormatSections = numberFormat.split("-");
+        numberFormatter = NumberFormat.getInstance(new java.util.Locale(numberFormatSections[0], numberFormatSections[1]));
+        numberFormatter.setGroupingUsed(true);
+        numberFormatter.setMinimumFractionDigits(2);
+        numberFormatter.setMaximumFractionDigits(2);
+        numberFormatter.setRoundingMode(RoundingMode.FLOOR);
+    }
 
     public static String format(String type){
         StringBuilder formattedKey = new StringBuilder();
@@ -39,6 +60,10 @@ public final class StringUtils {
     public static String format(BigDecimal bigDecimal){
         String s = numberFormatter.format(Double.parseDouble(bigDecimal instanceof BigDecimalFormatted ?
                 ((BigDecimalFormatted) bigDecimal).getAsString() : bigDecimal.toString()));
+
+        //Because of some issues with formatting, spaces are converted to ascii 160.
+        s = s.replace(SPACE_ASCII, ' ');
+
         return s.endsWith(".00") ? s.replace(".00", "") : s;
     }
 

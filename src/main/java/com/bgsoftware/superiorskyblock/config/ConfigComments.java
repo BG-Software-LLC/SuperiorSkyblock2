@@ -272,4 +272,10 @@ public final class ConfigComments {
     @Comment("    cooldown: 0")
     public static String COMMANDS_COOLDOWN = "commands-cooldown";
 
+    @Comment("")
+    @Comment("Set the number formatting to be used.")
+    @Comment("You can see a list of formats under the \"Language Tag\" column here:")
+    @Comment("https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html")
+    public static String NUMBER_FORMAT = "number-format";
+
 }

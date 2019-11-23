@@ -466,3 +466,8 @@ commands-cooldown:
   recalc:
     cooldown: 30000
     bypass-permission: superior.cooldown.bypass.recalc
+
+# Set the number formatting to be used.
+# You can see a list of formats under the "Language Tag" column here:
+# https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+number-format: "en-US"
