@@ -87,7 +87,9 @@ public final class DataHandler {
                 "missions VARCHAR," +
                 "settings VARCHAR," +
                 "ignored BOOLEAN," +
-                "generator VARCHAR" +
+                "generator VARCHAR," +
+                "generatedSchematics VARCHAR," +
+                "schemName VARCHAR" +
                 ");");
 
         //Creating default players table
@@ -143,6 +145,8 @@ public final class DataHandler {
         addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
         addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
         addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
+        addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "VARCHAR");
+        addColumnIfNotExists("schemName", "islands", "''", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

@@ -111,6 +111,8 @@ public class SIsland extends DatabaseObject implements Island {
     private final Set<String> completedMissions = new HashSet<>();
     private Biome biome;
     private boolean ignored = false;
+    private String generatedSchematics = "normal";
+    private String schemName = "";
 
     /*
      * SIsland multipliers & limits
@@ -155,6 +157,8 @@ public class SIsland extends DatabaseObject implements Island {
         this.islandName = resultSet.getString("name");
         this.description = resultSet.getString("description");
         this.ignored = resultSet.getBoolean("ignored");
+        this.generatedSchematics = resultSet.getString("generatedSchematics");
+        this.schemName = resultSet.getString("schemName");
 
         if(blockCounts.isEmpty())
             calcIslandWorth(null);
@@ -216,12 +220,12 @@ public class SIsland extends DatabaseObject implements Island {
         checkMembersDuplication();
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName){
-        this(superiorPlayer, SBlockPosition.of(location), islandName);
+    public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName, String schemName){
+        this(superiorPlayer, SBlockPosition.of(location), islandName, schemName);
     }
 
     @SuppressWarnings("WeakerAccess")
-    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName){
+    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName, String schemName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getIslandLeader();
             superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
@@ -230,6 +234,7 @@ public class SIsland extends DatabaseObject implements Island {
         }
         this.center = wrappedLocation;
         this.islandName = islandName;
+        this.schemName = schemName;
         assignPermissionNodes();
         assignSettings();
         assignGenerator();
@@ -415,7 +420,8 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getCenter(World.Environment environment){
-        return center.parse(plugin.getGrid().getIslandsWorld(environment)).add(0.5, 0, 0.5);
+        World world = plugin.getGrid().getIslandsWorld(environment);
+        return world == null ? null : center.parse(world).add(0.5, 0, 0.5);
     }
 
     @Override
@@ -435,7 +441,7 @@ public class SIsland extends DatabaseObject implements Island {
         if(teleportLocation == null)
             teleportLocation = getCenter(environment);
 
-        return teleportLocation.clone();
+        return teleportLocation == null ? null : teleportLocation.clone();
     }
 
     @Override
@@ -1545,6 +1551,29 @@ public class SIsland extends DatabaseObject implements Island {
     }
 
     /*
+     *  Schematic methods
+     */
+
+    @Override
+    public boolean wasSchematicGenerated(World.Environment environment) {
+        return generatedSchematics.contains(environment.name().toLowerCase());
+    }
+
+    @Override
+    public void setSchematicGenerate(World.Environment environment) {
+        generatedSchematics += environment.name().toLowerCase();
+        Query.ISLAND_SET_GENERATED_SCHEMATICS.getStatementHolder()
+                .setString(generatedSchematics)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
+    public String getSchematicName() {
+        return schemName == null ? "" : schemName;
+    }
+
+    /*
      *  Data related methods
      */
 
@@ -1578,6 +1607,8 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored)
                 .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
+                .setString(generatedSchematics)
+                .setString(schemName)
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -1621,6 +1652,8 @@ public class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored)
                 .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
+                .setString(generatedSchematics)
+                .setString(schemName)
                 .execute(async);
     }
 

@@ -28,7 +28,7 @@ public final class SpawnIsland extends SIsland {
     private Set<String> islandSettings = new HashSet<>();
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin){
-        super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "");
+        super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "", "");
         SpawnIsland.plugin = plugin;
 
         String[] loc = plugin.getSettings().spawnLocation.split(", ");

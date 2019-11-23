@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -24,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,7 +36,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -255,12 +259,8 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        if(island == null) {
-            if(!plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld()))
-                return;
-
-            island = plugin.getGrid().getSpawnIsland();
-        }
+        if(island == null)
+            return;
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
@@ -277,6 +277,46 @@ public final class PlayersListener implements Listener {
     public void onPlayerFall(EntityDamageEvent e){
         if(e.getEntity() instanceof Player && e.getCause() == EntityDamageEvent.DamageCause.FALL && noFallDamage.contains(e.getEntity().getUniqueId()))
             e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlayerPortal(PlayerPortalEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer == null)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getFrom());
+
+        if(island == null)
+            return;
+
+        World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+        Location toTeleport = island.getTeleportLocation(environment);
+
+        if(toTeleport != null) {
+            e.setCancelled(true);
+
+            if(!island.wasSchematicGenerated(environment)){
+                String schematicName = island.getSchematicName();
+                if(schematicName.isEmpty())
+                    schematicName = plugin.getSchematics().getDefaultSchematic(environment);
+
+                Schematic schematic = plugin.getSchematics().getSchematic(schematicName + (environment == World.Environment.NETHER ? "_nether" : "_the_end"));
+                if(schematic != null) {
+                    plugin.getGrid().pasteSchematic(schematic, island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                        superiorPlayer.teleport(toTeleport);
+                        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
+                    });
+                    island.setSchematicGenerate(environment);
+                }
+            }
+
+            else {
+                superiorPlayer.teleport(toTeleport);
+                plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
+            }
+        }
     }
 
 }

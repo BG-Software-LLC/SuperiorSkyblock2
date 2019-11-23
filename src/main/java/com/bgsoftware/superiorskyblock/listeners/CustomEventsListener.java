@@ -89,15 +89,24 @@ public final class CustomEventsListener implements Listener {
 
         Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+        boolean sameWorld = e.getFrom().getWorld().equals(e.getTo().getWorld());
 
-        if(fromIsland != null && fromIsland.equals(toIsland))
+        if(fromIsland != null && fromIsland.equals(toIsland)) {
+            //We want to update the border if player teleported between dimensions of his island.
+            if(!sameWorld){
+                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+            }
+
             return;
+        }
 
         if (fromIsland != null && !fromIsland.isSpawn()) {
             IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT);
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
-            if(islandLeaveEvent.isCancelled())
+            if(islandLeaveEvent.isCancelled()) {
                 e.setCancelled(true);
+                return;
+            }
         }
 
         if (toIsland != null && !toIsland.isSpawn()) {
@@ -151,24 +160,8 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onPlayerPortal(PlayerPortalEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(superiorPlayer == null)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getFrom());
-
-        if(island == null)
-            return;
-
-        e.setCancelled(true);
-
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerPortalMonitor(PlayerPortalEvent e){
+    public void onPlayerPortal(PlayerPortalEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         if(superiorPlayer == null)

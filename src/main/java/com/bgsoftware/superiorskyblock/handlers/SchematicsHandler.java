@@ -94,6 +94,16 @@ public final class SchematicsHandler implements SchematicManager {
         return Lists.newArrayList(schematics.keySet());
     }
 
+    public String getDefaultSchematic(World.Environment environment){
+        String suffix = environment == World.Environment.NETHER ? "_nether" : "_the_end";
+        for(Map.Entry<String, Schematic> entry : schematics.entrySet()){
+            if(getSchematic(entry.getKey() + suffix) != null)
+                return entry.getKey();
+        }
+
+        return "";
+    }
+
     @Override
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName){
         Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();

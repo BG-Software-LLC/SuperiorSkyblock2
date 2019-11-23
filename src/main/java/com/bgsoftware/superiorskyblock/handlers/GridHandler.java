@@ -89,20 +89,14 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName) {
-        if(creationProgress) {
-            islandCreationsQueue.push(new CreateIslandData(superiorPlayer, schemName, bonus, biome, islandName));
-            return;
-        }
-
         PreIslandCreateEvent preIslandCreateEvent = new PreIslandCreateEvent(superiorPlayer, islandName);
         Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
 
         if(!preIslandCreateEvent.isCancelled()) {
             long startTime = System.currentTimeMillis();
-            creationProgress = true;
 
             Location islandLocation = getNextLocation();
-            Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName);
+            Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
 
             IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island, schemName);
             Bukkit.getPluginManager().callEvent(islandCreateEvent);
@@ -134,13 +128,6 @@ public final class GridHandler implements GridManager {
 
                 plugin.getDataHandler().insertIsland(island);
             }
-
-            creationProgress = false;
-        }
-
-        if(islandCreationsQueue.size() != 0){
-            CreateIslandData data = islandCreationsQueue.pop();
-            createIsland(data.player, data.schemName, data.bonus, data.biome, data.islandName);
         }
     }
 

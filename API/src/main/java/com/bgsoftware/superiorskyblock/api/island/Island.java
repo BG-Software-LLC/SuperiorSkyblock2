@@ -878,4 +878,25 @@ public interface Island extends Comparable<Island> {
      */
     Map<String, Integer> getGeneratorPercentages();
 
+    /*
+     *  Schematic methods
+     */
+
+    /**
+     * Checks if a schematic was generated already.
+     * @param environment The environment to check.
+     */
+    boolean wasSchematicGenerated(World.Environment environment);
+
+    /**
+     * Set schematic generated flag to true.
+     * @param environment The environment to set.
+     */
+    void setSchematicGenerate(World.Environment environment);
+
+    /**
+     * Get the schematic that was used to create the island.
+     */
+    String getSchematicName();
+
 }

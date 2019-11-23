@@ -22,14 +22,16 @@ public final class WorldGenerator extends ChunkGenerator {
     public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes) {
         byte[][] blockSections = new byte[world.getMaxHeight() / 16][];
 
-        for(int x = 0; x < 16; x++){
-            for(int z = 0; z < 16; z++){
-                biomes.setBiome(x, z, Biome.PLAINS);
+        if(world.getEnvironment() == World.Environment.NORMAL) {
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    biomes.setBiome(x, z, Biome.PLAINS);
+                }
             }
-        }
 
-        if(chunkX == 0 && chunkZ == 0){
-            setBlock(blockSections, 0, 99, 0, 7);
+            if(chunkX == 0 && chunkZ == 0){
+                setBlock(blockSections, 0, 99, 0, 7);
+            }
         }
 
         return blockSections;
@@ -38,14 +40,16 @@ public final class WorldGenerator extends ChunkGenerator {
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes) {
         ChunkData chunkData = createChunkData(world);
 
-        for(int x = 0; x < 16; x++){
-            for(int z = 0; z < 16; z++){
-                biomes.setBiome(x, z, Biome.PLAINS);
+        if(world.getEnvironment() == World.Environment.NORMAL){
+            for(int x = 0; x < 16; x++){
+                for(int z = 0; z < 16; z++){
+                    biomes.setBiome(x, z, Biome.PLAINS);
+                }
             }
-        }
 
-        if(chunkX == 0 && chunkZ == 0){
-            chunkData.setBlock(0, 99, 0, Material.BEDROCK);
+            if(chunkX == 0 && chunkZ == 0){
+                chunkData.setBlock(0, 99, 0, Material.BEDROCK);
+            }
         }
 
         return chunkData;
