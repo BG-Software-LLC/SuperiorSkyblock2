@@ -138,6 +138,9 @@ public final class MissionsHandler implements MissionsManager {
             return;
         }
 
+        if(!hasAllRequiredMissions(mission, superiorPlayer))
+            return;
+
         if(missionData.islandMission && playerIsland == null) {
             mission.onCompleteFail(superiorPlayer);
             throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
@@ -251,6 +254,10 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
+    }
+
+    private boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
+        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, mission));
     }
 
     private static int currentIndex = 0;
