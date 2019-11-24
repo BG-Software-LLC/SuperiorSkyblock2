@@ -93,8 +93,12 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         Executor.sync(() -> {
             SuperiorMenu currentMenu = null;
-            if(superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder() instanceof SuperiorMenu)
-                currentMenu = (SuperiorMenu) superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
+
+            try {
+                InventoryHolder inventoryHolder = superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
+                if(inventoryHolder != null)
+                    currentMenu = (SuperiorMenu) inventoryHolder;
+            }catch(Exception ignored){ }
 
             superiorPlayer.asPlayer().openInventory(inventory);
 
