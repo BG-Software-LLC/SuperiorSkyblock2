@@ -467,15 +467,6 @@ public enum Locale {
         CommentedConfiguration cfg = new CommentedConfiguration(LangComments.class, file);
         cfg.resetYamlFile(plugin, "lang.yml");
 
-        SuperiorSkyblockPlugin.log("&9Unknown messages:");
-        for(String message : cfg.getConfigurationSection("").getKeys(false)){
-            try{
-                Locale.valueOf(message);
-            }catch(Exception ex){
-                SuperiorSkyblockPlugin.log("&9" + message);
-            }
-        }
-
         for(Locale locale : values()){
             locale.setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
             messagesAmount++;
