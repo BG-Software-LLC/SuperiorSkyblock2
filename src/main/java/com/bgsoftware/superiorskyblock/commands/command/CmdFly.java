@@ -57,18 +57,21 @@ public final class CmdFly implements ICommand {
         Player player = superiorPlayer.asPlayer();
 
         if(superiorPlayer.hasIslandFlyEnabled()){
+            player.setAllowFlight(false);
+            player.setFlying(false);
+
             Locale.TOGGLED_FLY_OFF.send(superiorPlayer);
-            if(island != null) {
-                player.setAllowFlight(false);
-                player.setFlying(false);
-            }
         }
         else{
-            Locale.TOGGLED_FLY_ON.send(superiorPlayer);
-            if(island != null) {
-                player.setAllowFlight(true);
-                player.setFlying(true);
+            if(island == null || !island.equals(superiorPlayer.getIsland())){
+                Locale.TOGGLE_FLY_OUTSIDE_ISLAND.send(superiorPlayer);
+                return;
             }
+
+            player.setAllowFlight(true);
+            player.setFlying(true);
+
+            Locale.TOGGLED_FLY_ON.send(superiorPlayer);
         }
 
         superiorPlayer.toggleIslandFly();
