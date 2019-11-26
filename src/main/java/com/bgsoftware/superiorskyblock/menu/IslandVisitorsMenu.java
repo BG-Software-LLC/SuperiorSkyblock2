@@ -114,12 +114,17 @@ public final class IslandVisitorsMenu extends SuperiorMenu {
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (page - 1))) < visitors.size(); i++){
             SuperiorPlayer _superiorPlayer = visitors.get(i + (slots.size() * (page - 1)));
+            Island island = _superiorPlayer.getIsland();
             String islandOwner = "None";
-            if(_superiorPlayer.getIsland() != null)
-                islandOwner = _superiorPlayer.getIsland().getOwner().getName();
+            String islandName = "None";
+            if(island != null) {
+                islandOwner = island.getOwner().getName();
+                islandName = island.getName().isEmpty() ? islandOwner : island.getName();
+            }
             inv.setItem(slots.get(i), new ItemBuilder(visitorItem)
                     .replaceAll("{0}", _superiorPlayer.getName())
                     .replaceAll("{1}", islandOwner)
+                    .replaceAll("{2}", islandName)
                     .asSkullOf(_superiorPlayer).build());
         }
 
