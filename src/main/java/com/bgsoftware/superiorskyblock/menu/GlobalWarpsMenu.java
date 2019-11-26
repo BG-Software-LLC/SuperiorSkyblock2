@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.config.GlobalSectionComments;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -197,8 +196,8 @@ public final class GlobalWarpsMenu extends SuperiorMenu {
     }
 
     private static void createGlobalSection(File file){
-        CommentedConfiguration cfg = new CommentedConfiguration(GlobalSectionComments.class, file);
-        cfg.resetYamlFile(plugin, "guis/warps-gui.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, plugin.getResource("guis/warps-gui.yml"));
     }
 
     private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer){

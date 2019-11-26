@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.config.LangComments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -465,8 +464,8 @@ public enum Locale {
         if(!file.exists())
             plugin.saveResource("lang.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(LangComments.class, file);
-        cfg.resetYamlFile(plugin, "lang.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, plugin.getResource("lang.yml"));
 
         for(Locale locale : values()){
             locale.setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));

@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
@@ -78,7 +78,7 @@ public final class IslandUpgradesMenu extends SuperiorMenu {
         if(!file.exists())
             FileUtils.saveResource("guis/upgrades-gui.yml");
 
-        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui");
 

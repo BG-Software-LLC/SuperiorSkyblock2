@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -98,14 +98,14 @@ public final class UpgradesHandler {
         if(!file.exists())
             plugin.saveResource("upgrades.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(null, file);
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         ConfigurationSection upgrades = cfg.getConfigurationSection("upgrades");
 
         for(String upgradeName : upgrades.getKeys(false)){
             UpgradeData upgradeData = new UpgradeData();
             for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
-                int level = Integer.valueOf(_level);
+                int level = Integer.parseInt(_level);
                 upgradeData.prices.put(level, upgrades.getDouble(upgradeName + "." + level + ".price"));
                 upgradeData.commands.put(level, upgrades.getStringList(upgradeName + "." + level + ".commands"));
             }
@@ -114,7 +114,7 @@ public final class UpgradesHandler {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public class UpgradeData{
+    public static class UpgradeData{
 
         public Map<Integer, Double> prices = new HashMap<>();
         public Map<Integer, List<String>> commands = new HashMap<>();

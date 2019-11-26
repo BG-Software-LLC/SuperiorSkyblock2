@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.config.ConfigComments;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -85,9 +84,10 @@ public final class SettingsHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         convertData(cfg);
-        cfg.resetYamlFile(plugin, "config.yml");
+
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown");
 
         calcInterval = cfg.getLong("calc-interval", 6000);
         maxIslandSize = cfg.getInt("max-island-size", 200);
@@ -182,9 +182,8 @@ public final class SettingsHandler {
         if(!file.exists())
             plugin.saveResource("config.yml", false);
 
-        CommentedConfiguration cfg = new CommentedConfiguration(ConfigComments.class, file);
-
-        cfg.resetYamlFile(plugin, "config.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown");
 
         cfg.set(path, value);
 
