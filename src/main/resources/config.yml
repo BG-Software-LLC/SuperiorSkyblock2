@@ -64,6 +64,10 @@ stacked-blocks:
   whitelisted:
   - 'DIAMOND_BLOCK'
 
+  # Set limits to stacked blocks.
+  limits:
+  - 'EXAMPLE_BLOCK:5'
+
 # Set a formula to calculate the island level by it's worth.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
 island-level-formula: '{} / 2'

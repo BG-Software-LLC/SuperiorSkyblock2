@@ -38,6 +38,7 @@ public final class SettingsHandler {
     public final KeySet whitelistedStackedBlocks;
     public final List<String> stackedBlocksDisabledWorlds;
     public final String stackedBlocksName;
+    public final KeyMap<Integer> stackedBlocksLimits;
     public final String islandLevelFormula;
     public final String islandTopOrder;
     public final ConfigurationSection islandRolesSection;
@@ -109,6 +110,16 @@ public final class SettingsHandler {
         stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = new KeySet(cfg.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = ChatColor.translateAlternateColorCodes('&', cfg.getString("stacked-blocks.custom-name"));
+        stackedBlocksLimits = new KeyMap<>();
+        cfg.getStringList("stacked-blocks.limits").forEach(line -> {
+            String[] sections = line.split(":");
+            try {
+                if (sections.length == 2)
+                    stackedBlocksLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                else if (sections.length == 3)
+                    stackedBlocksLimits.put(Key.of(sections[0] + ":" + sections[1]), Integer.parseInt(sections[2]));
+            }catch(Exception ignored){}
+        });
         islandLevelFormula = cfg.getString("island-level-formula", "{} / 2");
         islandTopOrder = cfg.getString("island-top-order", "WORTH");
         islandRolesSection = cfg.getConfigurationSection("island-roles");

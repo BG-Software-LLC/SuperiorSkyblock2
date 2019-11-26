@@ -179,12 +179,21 @@ public final class BlocksListener implements Listener {
                 e.getBlockReplacedState().getType() != Material.AIR)
             return;
 
-        e.setCancelled(true);
-
         // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
         int amount = !e.getPlayer().isSneaking() ? 1 : e.getItemInHand().getAmount();
+        int blockAmount = plugin.getGrid().getBlockAmount(e.getBlockAgainst());
+        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(Key.of(e.getBlockAgainst()), Integer.MAX_VALUE);
 
-        plugin.getGrid().setBlockAmount(e.getBlockAgainst(), plugin.getGrid().getBlockAmount(e.getBlockAgainst()) + amount);
+        if(amount + blockAmount > blockLimit){
+            amount = blockLimit - blockAmount;
+        }
+
+        if(amount <= 0)
+            return;
+
+        e.setCancelled(true);
+
+        plugin.getGrid().setBlockAmount(e.getBlockAgainst(), blockAmount + amount);
 
         Island island = plugin.getGrid().getIslandAt(e.getBlockAgainst().getLocation());
         if(island != null){
