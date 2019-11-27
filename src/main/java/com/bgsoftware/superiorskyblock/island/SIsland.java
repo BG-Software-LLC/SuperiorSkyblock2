@@ -1633,7 +1633,7 @@ public class SIsland extends DatabaseObject implements Island {
     public void executeInsertStatement(boolean async){
         Query.ISLAND_INSERT.getStatementHolder()
                 .setString(owner.getUniqueId().toString())
-                .setString(LocationUtils.getLocation(center.getBlock().getLocation()))
+                .setString(LocationUtils.getLocation(center.parse()))
                 .setString(IslandSerializer.serializeLocations(teleportLocations))
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(banned.isEmpty() ? "" : getPlayerCollectionString(banned))
