@@ -29,7 +29,9 @@ public final class CmdRate implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island rate [player-name/island-name]";
+        return "island rate [" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
     }
 
     @Override

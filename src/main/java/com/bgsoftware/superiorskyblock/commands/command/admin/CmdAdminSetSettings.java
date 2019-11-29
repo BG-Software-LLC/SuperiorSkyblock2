@@ -33,7 +33,12 @@ public final class CmdAdminSetSettings implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setsettings <player-name/island-name/*> <settings> <value>";
+        return "island admin setsettings <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_SETTINGS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_VALUE.getMessage() + ">";
     }
 
     @Override

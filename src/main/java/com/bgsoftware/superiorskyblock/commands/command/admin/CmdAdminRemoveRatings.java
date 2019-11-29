@@ -28,7 +28,7 @@ public final class CmdAdminRemoveRatings implements ICommand {
 
     @Override
     public String getUsage() {
-        return "is admin removeratings <player-name>";
+        return "island admin removeratings <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

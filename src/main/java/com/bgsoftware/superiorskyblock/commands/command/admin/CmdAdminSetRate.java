@@ -30,7 +30,11 @@ public final class CmdAdminSetRate implements ICommand {
 
     @Override
     public String getUsage() {
-        return "is admin setrate <player-name/island-name> <player-name> <rate>";
+        return "island admin setrate <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_RATING.getMessage() + ">";
     }
 
     @Override

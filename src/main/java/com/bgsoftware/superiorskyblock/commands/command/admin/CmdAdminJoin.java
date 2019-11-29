@@ -29,7 +29,9 @@ public final class CmdAdminJoin implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin join <player-name/island-name>";
+        return "island admin join <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

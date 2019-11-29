@@ -31,7 +31,9 @@ public final class CmdVisit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island visit <player-name/island-name>";
+        return "island visit <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

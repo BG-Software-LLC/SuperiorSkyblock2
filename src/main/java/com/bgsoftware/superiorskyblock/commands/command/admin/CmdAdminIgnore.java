@@ -28,7 +28,9 @@ public final class CmdAdminIgnore implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin ignore <player-name/island-name>";
+        return "island admin ignore <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

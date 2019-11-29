@@ -31,7 +31,13 @@ public final class CmdAdminSetBlockLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setblocklimit <player-name/island-name/*> <block> <limit>";
+        return "island admin setblocklimit <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_MATERIAL.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_LIMIT.getMessage() + ">";
     }
 
     @Override

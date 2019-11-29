@@ -29,7 +29,10 @@ public final class CmdAdminName implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin name <player-name/island-name> <name>";
+        return "island admin name <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

@@ -31,7 +31,9 @@ public final class CmdAccept implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island accept <player-name/island-name>";
+        return "island accept <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

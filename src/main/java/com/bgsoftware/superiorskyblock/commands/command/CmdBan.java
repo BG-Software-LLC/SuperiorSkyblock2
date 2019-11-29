@@ -12,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdBan implements ICommand {
 
@@ -28,7 +27,7 @@ public final class CmdBan implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island ban <player-name>";
+        return "island ban <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override
@@ -99,10 +98,8 @@ public final class CmdBan implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getAllMembers()){
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
                 if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());

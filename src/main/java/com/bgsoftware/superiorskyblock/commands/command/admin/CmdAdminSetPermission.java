@@ -33,7 +33,12 @@ public final class CmdAdminSetPermission implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setpermission <player-name/island-name/*> <permission> <role>";
+        return "island admin setpermission <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_PERMISSION.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage() + ">";
     }
 
     @Override

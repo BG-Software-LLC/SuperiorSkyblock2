@@ -29,7 +29,11 @@ public final class CmdAdminMsgAll implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin msgall <player-name/island-name/*> <msg...>";
+        return "island admin msgall <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + ">";
     }
 
     @Override

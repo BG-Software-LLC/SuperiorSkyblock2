@@ -30,7 +30,7 @@ public final class CmdName implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island name <island-name>";
+        return "island name <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

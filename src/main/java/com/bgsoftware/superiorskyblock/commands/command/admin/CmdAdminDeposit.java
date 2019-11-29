@@ -31,7 +31,11 @@ public final class CmdAdminDeposit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin deposit <player-name/island-name/*> <amount>";
+        return "island admin deposit <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
     }
 
     @Override

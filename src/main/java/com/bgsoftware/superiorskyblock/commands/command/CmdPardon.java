@@ -7,13 +7,11 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdPardon implements ICommand {
 
@@ -29,7 +27,7 @@ public final class CmdPardon implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island pardon <player-name>";
+        return "island pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override
@@ -94,10 +92,8 @@ public final class CmdPardon implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getAllBannedMembers()){
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer targetPlayer : island.getBannedPlayers()){
                 if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }

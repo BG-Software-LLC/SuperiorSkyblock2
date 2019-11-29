@@ -32,7 +32,7 @@ public final class CmdDelWarp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island delwarp <warp>";
+        return "island delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage() + ">";
     }
 
     @Override

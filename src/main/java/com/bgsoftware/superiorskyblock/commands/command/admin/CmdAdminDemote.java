@@ -28,7 +28,7 @@ public final class CmdAdminDemote implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin demote <player-name>";
+        return "island admin demote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

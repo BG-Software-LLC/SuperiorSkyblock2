@@ -31,7 +31,7 @@ public final class CmdValue implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island value [block-type]";
+        return "island value [" + Locale.COMMAND_ARGUMENT_MATERIAL.getMessage() + "]";
     }
 
     @Override

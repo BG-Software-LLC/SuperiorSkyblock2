@@ -29,7 +29,7 @@ public final class CmdCoop implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island coop <player-name>";
+        return "island coop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

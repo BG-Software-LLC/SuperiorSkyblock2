@@ -60,6 +60,31 @@ public enum Locale {
     CHANGED_WARPS_LIMIT_ALL,
     CHANGED_WARPS_LIMIT_NAME,
     CHANGE_PERMISSION_FOR_HIGHER_ROLE,
+    COMMAND_ARGUMENT_ALL_ISLANDS("*"),
+    COMMAND_ARGUMENT_AMOUNT("amount"),
+    COMMAND_ARGUMENT_DISCORD("discord..."),
+    COMMAND_ARGUMENT_EMAIL("email"),
+    COMMAND_ARGUMENT_ISLAND_NAME("island-name"),
+    COMMAND_ARGUMENT_ISLAND_ROLE("island-role"),
+    COMMAND_ARGUMENT_LEADER("leader"),
+    COMMAND_ARGUMENT_LEVEL("level"),
+    COMMAND_ARGUMENT_LIMIT("limit"),
+    COMMAND_ARGUMENT_MATERIAL("material"),
+    COMMAND_ARGUMENT_MESSAGE("message..."),
+    COMMAND_ARGUMENT_MISSION_NAME("mission-name"),
+    COMMAND_ARGUMENT_MULTIPLIER("multiplier"),
+    COMMAND_ARGUMENT_NEW_LEADER("new-leader"),
+    COMMAND_ARGUMENT_PAGE("page"),
+    COMMAND_ARGUMENT_PERMISSION("permission"),
+    COMMAND_ARGUMENT_PLAYER_NAME("player-name"),
+    COMMAND_ARGUMENT_PRIVATE("private"),
+    COMMAND_ARGUMENT_RATING("rating"),
+    COMMAND_ARGUMENT_SCHEMATIC_NAME("schematic-name"),
+    COMMAND_ARGUMENT_SETTINGS("settings"),
+    COMMAND_ARGUMENT_SIZE("size"),
+    COMMAND_ARGUMENT_UPGRADE_NAME("upgrade-name"),
+    COMMAND_ARGUMENT_VALUE("value"),
+    COMMAND_ARGUMENT_WARP_NAME("warp-name"),
     COMMAND_COOLDOWN_FORMAT,
     COMMAND_COOLDOWN_SECONDS_NAME,
     COMMAND_COOLDOWN_SECOND_NAME,
@@ -420,7 +445,15 @@ public enum Locale {
     WITHDRAW_ALL_MONEY,
     WITHDRAW_ANNOUNCEMENT;
 
-    private String message;
+    private String message, defaultMessage;
+
+    Locale(){
+        this(null);
+    }
+
+    Locale(String defaultMessage){
+        this.defaultMessage = defaultMessage;
+    }
 
     public boolean isEmpty(){
         return message == null || message.isEmpty();
@@ -436,7 +469,7 @@ public enum Locale {
             return msg;
         }
 
-        return null;
+        return defaultMessage;
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects){

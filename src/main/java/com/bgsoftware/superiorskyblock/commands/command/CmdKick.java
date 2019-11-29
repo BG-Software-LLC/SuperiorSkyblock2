@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdKick implements ICommand {
 
@@ -30,7 +29,7 @@ public final class CmdKick implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island kick <player-name>";
+        return "island kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override
@@ -98,10 +97,8 @@ public final class CmdKick implements ICommand {
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.KICK_MEMBER)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
-            for(UUID uuid : island.getMembers()){
-                targetPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
                 if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
                         targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());

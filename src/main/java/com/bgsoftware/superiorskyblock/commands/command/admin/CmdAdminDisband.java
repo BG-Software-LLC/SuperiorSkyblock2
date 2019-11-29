@@ -29,7 +29,9 @@ public final class CmdAdminDisband implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin disband <player-name/island-name>";
+        return "island admin disband <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

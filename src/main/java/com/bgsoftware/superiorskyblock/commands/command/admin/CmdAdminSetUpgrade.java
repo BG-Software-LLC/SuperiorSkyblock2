@@ -29,7 +29,11 @@ public final class CmdAdminSetUpgrade implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setupgrade <player-name/island-name> <upgrade-name> <level>";
+        return "island admin setupgrade <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_UPGRADE_NAME + "> <" +
+                Locale.COMMAND_ARGUMENT_LEVEL.getMessage() + ">";
     }
 
     @Override

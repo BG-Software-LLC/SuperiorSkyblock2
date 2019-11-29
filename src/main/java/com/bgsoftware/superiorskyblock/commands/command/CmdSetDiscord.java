@@ -27,7 +27,7 @@ public final class CmdSetDiscord implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setdiscord <discord...>";
+        return "island setdiscord <" + Locale.COMMAND_ARGUMENT_DISCORD.getMessage() + ">";
     }
 
     @Override

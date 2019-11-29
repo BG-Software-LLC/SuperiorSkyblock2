@@ -25,7 +25,7 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island help [page]";
+        return "island help [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class CmdHelp implements ICommand {
 
         if(args.length == 2){
             try{
-                page = Integer.valueOf(args[1]);
+                page = Integer.parseInt(args[1]);
             }catch(IllegalArgumentException ex){
                 Locale.INVALID_AMOUNT.send(sender, args[1]);
                 return;

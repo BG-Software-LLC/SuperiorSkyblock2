@@ -28,7 +28,9 @@ public final class CmdAdminOpen implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin open <player-name/island-name>";
+        return "island admin open <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }
 
     @Override

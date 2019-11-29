@@ -28,7 +28,10 @@ public final class CmdAdminSetSize implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setsize <player-name/island-name> <size>";
+        return "island admin setsize <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_SIZE.getMessage() + ">";
     }
 
     @Override

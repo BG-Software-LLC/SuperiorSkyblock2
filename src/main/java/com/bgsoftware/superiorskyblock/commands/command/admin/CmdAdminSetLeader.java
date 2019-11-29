@@ -27,7 +27,9 @@ public final class CmdAdminSetLeader implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setleader <leader> <new leader>";
+        return "island admin setleader <" +
+                Locale.COMMAND_ARGUMENT_LEADER.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_NEW_LEADER.getMessage() + ">";
     }
 
     @Override

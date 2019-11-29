@@ -29,7 +29,9 @@ public final class CmdCreate implements ICommand {
 
     @Override
     public String getUsage() {
-        return plugin.getSettings().islandNamesRequiredForCreation ? "island create <name>" : "island create";
+        return plugin.getSettings().islandNamesRequiredForCreation ?
+                "island create <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">" :
+                "island create";
     }
 
     @Override

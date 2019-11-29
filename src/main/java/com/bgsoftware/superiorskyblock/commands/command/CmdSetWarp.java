@@ -28,7 +28,9 @@ public final class CmdSetWarp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setwarp <warp> [private]";
+        return "island setwarp <" +
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage() + "> [" +
+                Locale.COMMAND_ARGUMENT_PRIVATE.getMessage() + "]";
     }
 
     @Override

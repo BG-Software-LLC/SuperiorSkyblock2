@@ -28,7 +28,12 @@ public final class CmdAdminSetHoppersLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin sethopperslimit <player-name/island-name/*> <limit>";
+        return "island admin sethopperslimit <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_LIMIT.getMessage() + ">";
     }
 
     @Override

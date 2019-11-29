@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdSetRole implements ICommand {
 
@@ -31,7 +30,9 @@ public final class CmdSetRole implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setrole <player-name> <island-role>";
+        return "island setrole <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage() +">";
     }
 
     @Override
@@ -141,11 +142,9 @@ public final class CmdSetRole implements ICommand {
 
         if(island != null && superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
             List<String> list = new ArrayList<>();
-            SuperiorPlayer targetPlayer;
 
             if(args.length == 2) {
-                for(UUID uuid : island.getAllMembers()){
-                    targetPlayer = SSuperiorPlayer.of(uuid);
+                for(SuperiorPlayer targetPlayer : island.getIslandMembers(true)){
                     if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(targetPlayer.getName());
                 }

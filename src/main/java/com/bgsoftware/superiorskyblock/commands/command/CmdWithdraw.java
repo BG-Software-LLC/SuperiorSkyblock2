@@ -30,7 +30,7 @@ public final class CmdWithdraw implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island withdraw <amount>";
+        return "island withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT + ">";
     }
 
     @Override

@@ -28,7 +28,11 @@ public final class CmdAdminSetTeamLimit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setteamlimit <player-name/island-name/*> <limit>";
+        return "island admin setteamlimit <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_LIMIT.getMessage() + ">";
     }
 
     @Override

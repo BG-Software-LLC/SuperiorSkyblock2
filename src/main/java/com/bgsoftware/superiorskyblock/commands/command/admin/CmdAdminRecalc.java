@@ -28,7 +28,9 @@ public final class CmdAdminRecalc implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin recalc [player-name/island-name]";
+        return "island admin recalc [" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
     }
 
     @Override

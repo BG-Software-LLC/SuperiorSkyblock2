@@ -33,7 +33,7 @@ public final class CmdInvite implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island invite <player-name>";
+        return "island invite <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class CmdInvite implements ICommand {
                 Locale.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         }
         else {
-            if(island.getTeamLimit() >= 0 && island.getAllMembers().size() >= island.getTeamLimit()){
+            if(island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()){
                 Locale.INVITE_TO_FULL_ISLAND.send(superiorPlayer);
                 return;
             }

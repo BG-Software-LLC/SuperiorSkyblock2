@@ -30,7 +30,11 @@ public final class CmdAdminBonus implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin bonus <player-name/island-name/*> <amount>";
+        return "island admin bonus <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
     }
 
     @Override

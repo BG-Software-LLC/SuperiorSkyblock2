@@ -69,7 +69,7 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin";
+        return "island admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
     }
 
     @Override

@@ -30,7 +30,7 @@ public final class CmdRankup implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island rankup <upgrade-name>";
+        return "island rankup <" + Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage() + ">";
     }
 
     @Override

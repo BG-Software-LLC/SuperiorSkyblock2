@@ -28,7 +28,7 @@ public final class CmdPromote implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island promote <player-name>";
+        return "island promote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override
