@@ -4,7 +4,6 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("WeakerAccess")
 public final class PlaceholderHook_PAPI extends PlaceholderHook {
 
     PlaceholderHook_PAPI(){
