@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Mission {
 
@@ -94,6 +95,22 @@ public abstract class Mission {
             return false;
 
         return getProgress(superiorPlayer) >= 1.0;
+    }
+
+    /**
+     * Save mission's progress.
+     * @param section The mission's section in the config.
+     */
+    public void saveProgress(ConfigurationSection section){
+
+    }
+
+    /**
+     * Load mission's progress.
+     * @param section The mission's section in the config.
+     */
+    public void loadProgress(ConfigurationSection section){
+
     }
 
     /**

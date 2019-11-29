@@ -115,6 +115,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public void onDisable() {
         try {
             dataHandler.saveDatabase(false);
+            missionsHandler.saveMissionsData();
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.closeInventory();

@@ -17,6 +17,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -33,11 +34,15 @@ import java.util.stream.Collectors;
 
 public final class MissionsHandler implements MissionsManager {
 
+    private final SuperiorSkyblockPlugin plugin;
+
     private static Map<String, Mission> missionMap = new HashMap<>();
     private static Map<Mission, MissionData> missionDataMap = new HashMap<>();
 
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
+        this.plugin = plugin;
+
         File missionsDict = new File(plugin.getDataFolder(), "missions");
         File file = new File(plugin.getDataFolder(), "missions/missions.yml");
 
@@ -85,6 +90,9 @@ public final class MissionsHandler implements MissionsManager {
                 new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
         }
+
+        Executor.sync(this::loadMissionsData, 10L);
+
     }
 
     @Override
@@ -190,6 +198,55 @@ public final class MissionsHandler implements MissionsManager {
         }
         else{
             superiorPlayer.completeMission(mission);
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void saveMissionsData() {
+        File file = new File(plugin.getDataFolder(), "missions/_data.yml");
+
+        if(!file.exists()){
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
+
+        YamlConfiguration data = new YamlConfiguration();
+
+        for(Mission mission : getAllMissions()){
+            mission.saveProgress(data.createSection(mission.getName()));
+        }
+
+        try{
+            data.save(file);
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void loadMissionsData() {
+        File file = new File(plugin.getDataFolder(), "missions/_data.yml");
+
+        if(!file.exists()){
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
+
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
+
+        for(Mission mission : getAllMissions()){
+            if(data.contains(mission.getName()))
+                mission.loadProgress(data.getConfigurationSection(mission.getName()));
         }
     }
 

@@ -45,4 +45,16 @@ public interface MissionsManager {
      */
     void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward);
 
+    /**
+     * Save all data related to missions.
+     * All the data is saved into a yaml file.
+     */
+    void saveMissionsData();
+
+    /**
+     * Load all data related to missions.
+     * All the data is loaded from a yaml file.
+     */
+    void loadMissionsData();
+
 }
