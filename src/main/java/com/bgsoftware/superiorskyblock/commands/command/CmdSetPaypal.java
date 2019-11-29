@@ -27,7 +27,7 @@ public final class CmdSetPaypal implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setpaypal <" + Locale.COMMAND_ARGUMENT_EMAIL.getMessage() + ">";
+        return "setpaypal <" + Locale.COMMAND_ARGUMENT_EMAIL.getMessage() + ">";
     }
 
     @Override

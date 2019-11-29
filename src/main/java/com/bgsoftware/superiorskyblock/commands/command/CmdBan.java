@@ -27,7 +27,7 @@ public final class CmdBan implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island ban <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "ban <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

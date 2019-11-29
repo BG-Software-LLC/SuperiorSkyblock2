@@ -9,10 +9,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -21,18 +19,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class CommandsHandler implements CommandExecutor, TabCompleter {
+public final class CommandsHandler extends BukkitCommand {
 
     private static CommandsHandler instance;
 
-    private SuperiorSkyblockPlugin plugin;
-    private List<ICommand> subCommands = new ArrayList<>();
+    private final SuperiorSkyblockPlugin plugin;
 
-    private Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
+    private final List<ICommand> subCommands = new ArrayList<>();
+    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
-    public CommandsHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
+    public CommandsHandler(SuperiorSkyblockPlugin plugin, String islandCommand){
+        super(islandCommand.split(",")[0]);
+        String[] commandSections = islandCommand.split(",");
+
+        if(commandSections.length > 1){
+            for(int i = 1; i < commandSections.length; i++){
+                super.getAliases().add(commandSections[i]);
+            }
+        }
+
         instance = this;
+        this.plugin = plugin;
+
         subCommands.add(new CmdAccept());
         subCommands.add(new CmdAdmin());
         subCommands.add(new CmdBan());
@@ -86,7 +94,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+    public boolean execute(CommandSender sender, String label, String[] args) {
         if(args.length > 0){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[0].toLowerCase())){
@@ -101,7 +109,7 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
                     }
 
                     if(args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()){
-                        Locale.COMMAND_USAGE.send(sender, subCommand.getUsage());
+                        Locale.COMMAND_USAGE.send(sender, getLabel() + " " + subCommand.getUsage());
                         return false;
                     }
 
@@ -129,7 +137,6 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
                     }
 
                     subCommand.execute(plugin, sender, args);
-                    subCommand.tabComplete(plugin, sender, args);
                     return false;
                 }
             }
@@ -142,16 +149,16 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
                 Island island = superiorPlayer.getIsland();
 
                 if(args.length != 0){
-                    Bukkit.dispatchCommand(sender, "is help");
+                    Bukkit.dispatchCommand(sender, label + " help");
                 }
                 else if(island == null){
-                    Bukkit.dispatchCommand(sender, "is create");
+                    Bukkit.dispatchCommand(sender, label + " create");
                 }
                 else if(superiorPlayer.hasToggledPanel()){
-                    Bukkit.dispatchCommand(sender, "is panel");
+                    Bukkit.dispatchCommand(sender, label + " panel");
                 }
                 else{
-                    Bukkit.dispatchCommand(sender, "is tp");
+                    Bukkit.dispatchCommand(sender, label + " tp");
                 }
 
                 return false;
@@ -163,8 +170,9 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
         return false;
     }
 
+
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
+    public List<String> tabComplete(CommandSender sender, String label, String[] args) {
         if(args.length > 0){
             for(ICommand subCommand : subCommands) {
                 if (subCommand.getAliases().contains(args[0].toLowerCase())){
@@ -194,6 +202,10 @@ public final class CommandsHandler implements CommandExecutor, TabCompleter {
 
     public static List<ICommand> getSubCommands(){
         return instance.subCommands;
+    }
+
+    public static String getCommandLabel(){
+        return instance.getLabel();
     }
 
 

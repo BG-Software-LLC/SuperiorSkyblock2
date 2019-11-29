@@ -30,7 +30,7 @@ public final class CmdDisband implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island disband";
+        return "disband";
     }
 
     @Override

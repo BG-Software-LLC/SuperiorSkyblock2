@@ -28,7 +28,7 @@ public final class CmdRatings implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island ratings";
+        return "ratings";
     }
 
     @Override

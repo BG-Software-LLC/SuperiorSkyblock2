@@ -26,7 +26,7 @@ public final class CmdTop implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island top";
+        return "top";
     }
 
     @Override

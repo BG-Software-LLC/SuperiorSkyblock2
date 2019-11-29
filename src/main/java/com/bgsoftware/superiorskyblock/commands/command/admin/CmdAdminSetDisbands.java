@@ -27,7 +27,7 @@ public class CmdAdminSetDisbands implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setdisbands <" +
+        return "admin setdisbands <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
                 Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
     }

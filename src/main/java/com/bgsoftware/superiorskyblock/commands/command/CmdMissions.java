@@ -29,7 +29,7 @@ public final class CmdMissions implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island missions [island/player]";
+        return "missions [island/player]";
     }
 
     @Override

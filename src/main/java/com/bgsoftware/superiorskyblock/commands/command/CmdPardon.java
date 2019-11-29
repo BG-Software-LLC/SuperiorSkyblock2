@@ -27,7 +27,7 @@ public final class CmdPardon implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

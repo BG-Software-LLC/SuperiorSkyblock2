@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
+import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -69,7 +70,7 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
+        return "admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
     }
 
     @Override
@@ -108,7 +109,7 @@ public final class CmdAdmin implements ICommand {
                     }
 
                     if(args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()){
-                        Locale.COMMAND_USAGE.send(sender, subCommand.getUsage());
+                        Locale.COMMAND_USAGE.send(sender, CommandsHandler.getCommandLabel() + " " + subCommand.getUsage());
                         return;
                     }
 
@@ -158,7 +159,7 @@ public final class CmdAdmin implements ICommand {
                 String description = _subCommand.getDescription();
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ADMIN_HELP_LINE.send(sender, _subCommand.getUsage(), description);
+                Locale.ADMIN_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(), description);
             }
         }
 

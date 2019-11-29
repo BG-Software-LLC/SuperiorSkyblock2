@@ -37,7 +37,7 @@ public final class CmdAdminShow implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin show <" +
+        return "admin show <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }

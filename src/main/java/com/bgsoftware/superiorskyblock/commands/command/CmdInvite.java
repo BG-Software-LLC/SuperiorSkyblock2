@@ -33,7 +33,7 @@ public final class CmdInvite implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island invite <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "invite <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

@@ -30,7 +30,7 @@ public final class CmdAdminMsg implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin msg <" +
+        return "admin msg <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
                 Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + ">";
     }

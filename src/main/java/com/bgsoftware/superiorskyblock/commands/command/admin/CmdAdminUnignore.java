@@ -28,7 +28,7 @@ public final class CmdAdminUnignore implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin unignore <" +
+        return "admin unignore <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
     }

@@ -10,6 +10,11 @@
 # It's recommended to set the task to a high interval, as it might cause lag.
 calc-interval: 6000
 
+# Set the main command of the plugin.
+# You can add aliases by adding "," after the command name, and split them using ",".
+# You must have a full restart in order to apply changes for the command.
+island-command: 'island,is,islands'
+
 # Set the maximum island size. Island distances is 3 times bigger than the max size.
 # Please, do not change it while you have a running islands world!
 max-island-size: 200

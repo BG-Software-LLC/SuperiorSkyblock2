@@ -5,10 +5,6 @@ description: Feature packed Skyblock core.
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 website: https://bg-software.com/
 api-version: 1.13
-commands:
-  island:
-    aliases: [is, islands]
-    description: Island commands
 permissions:
   superior.*:
     description: Permission for all admin & island commands

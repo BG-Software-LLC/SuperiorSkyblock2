@@ -33,7 +33,7 @@ public final class CmdAdminSetGenerator implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setgenerator <" +
+        return "admin setgenerator <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +

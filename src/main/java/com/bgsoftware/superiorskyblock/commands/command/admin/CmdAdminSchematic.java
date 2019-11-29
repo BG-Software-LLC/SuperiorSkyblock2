@@ -25,7 +25,7 @@ public final class CmdAdminSchematic implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin schematic [" + Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage() + "]";
+        return "admin schematic [" + Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage() + "]";
     }
 
     @Override

@@ -28,7 +28,7 @@ public final class CmdAdminSetSpawnerRates implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setspawnerrates <" +
+        return "admin setspawnerrates <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +

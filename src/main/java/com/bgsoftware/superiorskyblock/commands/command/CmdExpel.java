@@ -29,7 +29,7 @@ public final class CmdExpel implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island expel <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "expel <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

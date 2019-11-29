@@ -26,7 +26,7 @@ public final class CmdTeamChat implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island teamchat [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + "]";
+        return "teamchat [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + "]";
     }
 
     @Override

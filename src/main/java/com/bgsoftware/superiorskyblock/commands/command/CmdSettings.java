@@ -30,7 +30,7 @@ public final class CmdSettings implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island settings";
+        return "settings";
     }
 
     @Override

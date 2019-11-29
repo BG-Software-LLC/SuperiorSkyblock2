@@ -35,7 +35,7 @@ public final class CmdTeam implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island team [" +
+        return "team [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
     }

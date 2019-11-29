@@ -30,7 +30,7 @@ public final class CmdPanel implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island panel [members/visitors] [toggle]";
+        return "panel [members/visitors] [toggle]";
     }
 
     @Override

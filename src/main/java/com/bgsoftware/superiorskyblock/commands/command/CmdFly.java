@@ -27,7 +27,7 @@ public final class CmdFly implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island fly";
+        return "fly";
     }
 
     @Override

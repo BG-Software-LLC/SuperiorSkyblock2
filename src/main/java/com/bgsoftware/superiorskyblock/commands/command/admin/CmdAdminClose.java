@@ -28,7 +28,7 @@ public final class CmdAdminClose implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin close <" +
+        return "admin close <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
 

@@ -27,7 +27,7 @@ public final class CmdToggle implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island toggle <border/blocks>";
+        return "toggle <border/blocks>";
     }
 
     @Override

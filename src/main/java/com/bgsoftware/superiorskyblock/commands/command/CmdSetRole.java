@@ -30,7 +30,7 @@ public final class CmdSetRole implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setrole <" +
+        return "setrole <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
                 Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage() +">";
     }

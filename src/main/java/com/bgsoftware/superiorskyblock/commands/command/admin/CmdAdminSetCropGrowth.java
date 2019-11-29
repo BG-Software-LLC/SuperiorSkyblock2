@@ -28,8 +28,8 @@ public final class CmdAdminSetCropGrowth implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin setcropgrowth <" +
-        Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
+        return "admin setcropgrowth <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
                 Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage() + ">";

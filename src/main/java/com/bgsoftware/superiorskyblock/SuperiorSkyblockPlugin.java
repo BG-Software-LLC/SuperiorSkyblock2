@@ -83,14 +83,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         EnchantsUtils.registerGlowEnchantment();
 
-        CommandsHandler commandsHandler = new CommandsHandler(this);
-        getCommand("island").setExecutor(commandsHandler);
-        getCommand("island").setTabCompleter(commandsHandler);
-
         loadWorld();
 
         loadSortingTypes();
         reloadPlugin(true);
+
+        nmsAdapter.registerCommand(new CommandsHandler(this, settingsHandler.islandCommand));
 
         if (Updater.isOutdated()) {
             log("");

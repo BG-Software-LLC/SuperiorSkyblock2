@@ -27,7 +27,7 @@ public final class CmdClose implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island close";
+        return "close";
     }
 
     @Override

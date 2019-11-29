@@ -25,7 +25,7 @@ public final class CmdAdminSpy implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin spy";
+        return "admin spy";
     }
 
     @Override

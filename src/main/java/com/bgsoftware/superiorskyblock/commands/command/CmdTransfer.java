@@ -26,7 +26,7 @@ public final class CmdTransfer implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island transfer <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "transfer <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

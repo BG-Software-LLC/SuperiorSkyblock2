@@ -29,7 +29,7 @@ public final class CmdBiome implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island biome";
+        return "biome";
     }
 
     @Override

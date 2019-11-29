@@ -31,7 +31,7 @@ public final class CmdPermissions implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "]";
+        return "permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "]";
     }
 
     @Override

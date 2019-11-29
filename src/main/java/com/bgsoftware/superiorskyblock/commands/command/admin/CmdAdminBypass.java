@@ -25,7 +25,7 @@ public final class CmdAdminBypass implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin bypass";
+        return "admin bypass";
     }
 
     @Override

@@ -27,7 +27,7 @@ public final class CmdOpen implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island open";
+        return "open";
     }
 
     @Override

@@ -24,7 +24,7 @@ public final class CmdAdminReload implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin reload";
+        return "admin reload";
     }
 
     @Override

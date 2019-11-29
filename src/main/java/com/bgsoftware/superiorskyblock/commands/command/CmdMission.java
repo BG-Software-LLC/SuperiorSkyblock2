@@ -26,7 +26,7 @@ public final class CmdMission implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island mission complete <" + Locale.COMMAND_ARGUMENT_MISSION_NAME.getMessage() + ">";
+        return "mission complete <" + Locale.COMMAND_ARGUMENT_MISSION_NAME.getMessage() + ">";
     }
 
     @Override

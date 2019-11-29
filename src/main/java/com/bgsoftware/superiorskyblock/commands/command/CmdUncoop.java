@@ -29,7 +29,7 @@ public final class CmdUncoop implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island uncoop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "uncoop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

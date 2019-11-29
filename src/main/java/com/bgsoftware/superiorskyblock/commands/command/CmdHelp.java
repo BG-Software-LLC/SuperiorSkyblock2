@@ -25,7 +25,7 @@ public final class CmdHelp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island help [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
+        return "help [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
     }
 
     @Override
@@ -92,7 +92,7 @@ public final class CmdHelp implements ICommand {
                 String description = _subCommand.getDescription();
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ISLAND_HELP_LINE.send(sender, _subCommand.getUsage(), description == null ? "" : description);
+                Locale.ISLAND_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(), description == null ? "" : description);
             }
         }
 

@@ -46,6 +46,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
@@ -67,6 +68,11 @@ import java.util.Set;
 public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
     private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    @Override
+    public void registerCommand(BukkitCommand command) {
+        ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);
+    }
 
     @Override
     public int getCombinedId(Location location) {

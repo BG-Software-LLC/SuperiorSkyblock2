@@ -29,7 +29,7 @@ public final class CmdDeposit implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
+        return "deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
     }
 
     @Override

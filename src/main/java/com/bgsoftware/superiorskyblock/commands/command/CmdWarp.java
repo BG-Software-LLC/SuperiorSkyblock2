@@ -29,7 +29,7 @@ public final class CmdWarp implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island warp [" +
+        return "warp [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
     }

@@ -37,7 +37,7 @@ public final class CmdShow implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island show [" +
+        return "show [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
     }

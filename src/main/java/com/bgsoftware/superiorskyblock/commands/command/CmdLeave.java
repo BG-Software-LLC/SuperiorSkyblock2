@@ -28,7 +28,7 @@ public final class CmdLeave implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island leave";
+        return "leave";
     }
 
     @Override

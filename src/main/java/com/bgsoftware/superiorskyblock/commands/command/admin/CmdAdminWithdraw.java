@@ -31,7 +31,7 @@ public final class CmdAdminWithdraw implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island admin withdraw <" +
+        return "admin withdraw <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
                 Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";

@@ -29,7 +29,7 @@ public final class CmdKick implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+        return "kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
     }
 
     @Override

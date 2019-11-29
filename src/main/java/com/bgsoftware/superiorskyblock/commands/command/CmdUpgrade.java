@@ -26,7 +26,7 @@ public final class CmdUpgrade implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island upgrade";
+        return "upgrade";
     }
 
     @Override

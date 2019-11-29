@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public final class SettingsHandler {
 
     public final int maxIslandSize;
+    public final String islandCommand;
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
     public final int defaultWarpsLimit;
@@ -90,6 +91,7 @@ public final class SettingsHandler {
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown");
 
         calcInterval = cfg.getLong("calc-interval", 6000);
+        islandCommand = cfg.getString("island-command", "island,is,islands");
         maxIslandSize = cfg.getInt("max-island-size", 200);
         defaultIslandSize = cfg.getInt("default-island-size", 20);
         defaultBlockLimits = new KeyMap<>();

@@ -25,7 +25,7 @@ public final class CmdBorder implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island border";
+        return "border";
     }
 
     @Override

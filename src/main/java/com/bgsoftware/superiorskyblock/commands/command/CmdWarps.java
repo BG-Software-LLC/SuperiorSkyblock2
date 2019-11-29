@@ -26,7 +26,7 @@ public final class CmdWarps implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island warps";
+        return "warps";
     }
 
     @Override

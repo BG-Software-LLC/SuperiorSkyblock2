@@ -27,7 +27,7 @@ public final class CmdSetTeleport implements ICommand {
 
     @Override
     public String getUsage() {
-        return "island setteleport";
+        return "setteleport";
     }
 
     @Override

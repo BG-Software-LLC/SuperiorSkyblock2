@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.InventoryHolder;
@@ -20,6 +21,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Set;
 
 public interface NMSAdapter {
+
+    void registerCommand(BukkitCommand command);
 
     int getCombinedId(Location location);
 
