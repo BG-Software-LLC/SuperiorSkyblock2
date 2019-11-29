@@ -39,33 +39,9 @@ public final class IslandCreationMenu extends SuperiorMenu {
         for(String schematic : plugin.getSchematics().getSchematics()){
             if(schematicsData.containsKey(schematic + "-slot")) {
                 int slot = get(schematic + "-slot", Integer.class);
-                String permission = get(schematic + "-permission", String.class);
-
                 if(slot == e.getRawSlot()) {
-                    if (superiorPlayer.hasPermission(permission)) {
-                        BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
-                        Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
-                        superiorPlayer.asPlayer().closeInventory();
-                        SoundWrapper sound = get(schematic + "-has-access-item-sound", SoundWrapper.class);
-                        if(sound != null)
-                            sound.playSound(superiorPlayer.asPlayer());
-                        //noinspection unchecked
-                        List<String> commands = get(schematic + "-has-access-item-commands", List.class);
-                        if(commands != null)
-                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
-                        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-                        plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
-                        break;
-                    }
-                    else{
-                        SoundWrapper sound = get(schematic + "-no-access-item-sound", SoundWrapper.class);
-                        if(sound != null)
-                            sound.playSound(superiorPlayer.asPlayer());
-                        //noinspection unchecked
-                        List<String> commands = get(schematic + "-no-access-item-commands", List.class);
-                        if(commands != null)
-                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
-                    }
+                    clickSchematic(superiorPlayer, schematic);
+                    break;
                 }
             }
         }
@@ -93,6 +69,33 @@ public final class IslandCreationMenu extends SuperiorMenu {
         }
 
        return inv;
+    }
+
+    private void clickSchematic(SuperiorPlayer superiorPlayer, String schematic){
+        String permission = get(schematic + "-permission", String.class);
+        if (superiorPlayer.hasPermission(permission)) {
+            BigDecimal bonusWorth = new BigDecimal(get(schematic + "-bonus", Long.class));
+            Biome biome = Biome.valueOf(get(schematic + "-biome", String.class));
+            superiorPlayer.asPlayer().closeInventory();
+            SoundWrapper sound = get(schematic + "-has-access-item-sound", SoundWrapper.class);
+            if(sound != null)
+                sound.playSound(superiorPlayer.asPlayer());
+            //noinspection unchecked
+            List<String> commands = get(schematic + "-has-access-item-commands", List.class);
+            if(commands != null)
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+            Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
+            plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
+        }
+        else{
+            SoundWrapper sound = get(schematic + "-no-access-item-sound", SoundWrapper.class);
+            if(sound != null)
+                sound.playSound(superiorPlayer.asPlayer());
+            //noinspection unchecked
+            List<String> commands = get(schematic + "-no-access-item-commands", List.class);
+            if(commands != null)
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+        }
     }
 
     private static <T> T get(String key, Class<T> type){
@@ -136,7 +139,25 @@ public final class IslandCreationMenu extends SuperiorMenu {
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
-        new IslandCreationMenu(islandName).open(superiorPlayer, previousMenu);
+        IslandCreationMenu islandCreationMenu = new IslandCreationMenu(islandName);
+        if(plugin.getSettings().skipOneItemMenus && IslandCreationMenu.hasOnlyOneItem()){
+            islandCreationMenu.clickSchematic(superiorPlayer, IslandCreationMenu.getOnlyOneItem());
+        }
+        else {
+            islandCreationMenu.open(superiorPlayer, previousMenu);
+        }
+    }
+
+    private static boolean hasOnlyOneItem(){
+        return plugin.getSchematics().getSchematics().stream()
+                .filter(schematic ->  schematicsData.containsKey(schematic + "-has-access-item"))
+                .count() <= 1;
+    }
+
+    private static String getOnlyOneItem(){
+        return plugin.getSchematics().getSchematics().stream()
+                .filter(schematic ->  schematicsData.containsKey(schematic + "-has-access-item"))
+                .findFirst().orElse(null);
     }
 
 }

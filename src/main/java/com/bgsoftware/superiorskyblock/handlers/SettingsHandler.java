@@ -78,6 +78,7 @@ public final class SettingsHandler {
     public final Map<String, Integer> defaultGenerator;
     public final Map<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
+    public final boolean skipOneItemMenus;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -175,6 +176,7 @@ public final class SettingsHandler {
         }
         numberFormat = cfg.getString("number-format", "en-US");
         StringUtils.setNumberFormatter(numberFormat);
+        skipOneItemMenus = cfg.getBoolean("skip-one-item-menus", false);
     }
 
     public void updateValue(String path, Object value){

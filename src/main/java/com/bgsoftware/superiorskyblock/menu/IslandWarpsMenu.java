@@ -70,20 +70,7 @@ public final class IslandWarpsMenu extends SuperiorMenu {
                 return;
 
             String warpName = warps.get(indexOf);
-            Location location = island.getWarpLocation(warpName);
-
-            if(location != null) {
-                SoundWrapper sound = getSound(-1);
-                if(sound != null)
-                    sound.playSound(e.getWhoClicked());
-                List<String> commands = getCommands(-1);
-                if(commands != null)
-                    commands.forEach(command ->
-                            Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
-                                    command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
-                this.previousMenu = null;
-                island.warpPlayer(superiorPlayer, warpName);
-            }
+            clickWarp(warpName, superiorPlayer);
         }
     }
 
@@ -95,6 +82,23 @@ public final class IslandWarpsMenu extends SuperiorMenu {
     @Override
     public Inventory getInventory() {
         return null;
+    }
+
+    private void clickWarp(String warpName, SuperiorPlayer superiorPlayer){
+        Location location = island.getWarpLocation(warpName);
+
+        if(location != null) {
+            SoundWrapper sound = getSound(-1);
+            if(sound != null)
+                sound.playSound(superiorPlayer.asPlayer());
+            List<String> commands = getCommands(-1);
+            if(commands != null)
+                commands.forEach(command ->
+                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                                command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
+            this.previousMenu = null;
+            island.warpPlayer(superiorPlayer, warpName);
+        }
     }
 
     private void open(SuperiorPlayer superiorPlayer, int page, SuperiorMenu previousMenu) {
@@ -185,11 +189,29 @@ public final class IslandWarpsMenu extends SuperiorMenu {
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
-        new IslandWarpsMenu(island).open(superiorPlayer, previousMenu);
+        IslandWarpsMenu islandWarpsMenu = new IslandWarpsMenu(island);
+        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(island, superiorPlayer)){
+            islandWarpsMenu.clickWarp(getOnlyOneItem(island, superiorPlayer), superiorPlayer);
+        }
+        else {
+            islandWarpsMenu.open(superiorPlayer, previousMenu);
+        }
     }
 
     private String ensureNotNull(String check){
         return check == null ? "" : check;
+    }
+
+    private static boolean hasOnlyOneItem(Island island, SuperiorPlayer superiorPlayer){
+        return island.getAllWarps().stream()
+                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
+                .count() <= 1;
+    }
+
+    private static String getOnlyOneItem(Island island, SuperiorPlayer superiorPlayer){
+        return island.getAllWarps().stream()
+                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
+                .findFirst().orElse(null);
     }
 
 }

@@ -481,3 +481,7 @@ commands-cooldown:
 # You can see a list of formats under the "Language Tag" column here:
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 number-format: "en-US"
+
+# Should players skip menus with only one items inside them?
+# When enabled, creation and island-warps menus will be skipped if only one item is inside them.
+skip-one-item-menus: false
