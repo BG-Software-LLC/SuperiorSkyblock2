@@ -1491,28 +1491,35 @@ public class SIsland extends DatabaseObject implements Island {
         //Updating times / weather if necessary
         switch (settings){
             case ALWAYS_DAY:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(0, false));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(0, false));
                 disableTime = true;
                 break;
             case ALWAYS_MIDDLE_DAY:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(6000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(6000, false));
                 disableTime = true;
                 break;
             case ALWAYS_NIGHT:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(14000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(14000, false));
                 disableTime = true;
                 break;
             case ALWAYS_MIDDLE_NIGHT:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerTime(18000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(18000, false));
                 disableTime = true;
                 break;
             case ALWAYS_SHINY:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.CLEAR));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.CLEAR));
                 disableWeather = true;
                 break;
             case ALWAYS_RAIN:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).setPlayerWeather(WeatherType.DOWNFALL));
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.DOWNFALL));
                 disableWeather = true;
+                break;
+            case PVP:
+                if(plugin.getSettings().teleportOnPVPEnable)
+                    getIslandVisitors().forEach(superiorPlayer -> {
+                        superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                        Locale.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+                    });
                 break;
         }
 
