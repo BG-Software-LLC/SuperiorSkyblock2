@@ -73,7 +73,7 @@ public final class CmdTransfer implements ICommand {
         }
 
         if (!island.isMember(targetPlayer)) {
-            Locale.TRANSFER_NOT_A_MEMBER.send(sender);
+            Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
             return;
         }
 

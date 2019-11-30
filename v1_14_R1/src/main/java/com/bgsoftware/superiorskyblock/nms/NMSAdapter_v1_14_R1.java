@@ -63,6 +63,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
@@ -300,7 +301,7 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     }
 
     @Override
-    public Object getCustomHolder(InventoryHolder defaultHolder, String title) {
+    public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return new CustomTileEntityHopper(defaultHolder, title);
     }
 
