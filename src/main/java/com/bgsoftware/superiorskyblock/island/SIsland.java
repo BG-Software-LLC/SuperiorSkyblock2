@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
 import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.menu.MenuValues;
+import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -65,11 +66,8 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,7 +84,6 @@ public class SIsland extends DatabaseObject implements Island {
 
     private static boolean calcProcess = false;
     private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
-    private static NumberFormat numberFormatter = new DecimalFormat("###,###,###,###,###,###,###,###,###,##0.00");
 
     /*
      * SIsland identifiers
@@ -99,6 +96,7 @@ public class SIsland extends DatabaseObject implements Island {
      */
 
     private final PriorityQueue<SuperiorPlayer> members = new PriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
+    private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final Set<SuperiorPlayer> banned = new HashSet<>(), coop = new HashSet<>(), invitedPlayers = new HashSet<>();
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Map<String, Integer> cobbleGenerator = new HashMap<>();
@@ -303,7 +301,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors() {
-        return getAllPlayersInside().stream().filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList());
+        return playersInside.stream().filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList());
     }
 
     @Override
@@ -313,14 +311,7 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        List<SuperiorPlayer> visitors = new ArrayList<>();
-
-        for(Player player : Bukkit.getOnlinePlayers()){
-            if(isInside(player.getLocation()))
-                visitors.add(SSuperiorPlayer.of(player));
-        }
-
-        return visitors;
+        return new ArrayList<>(playersInside);
     }
 
     @Override
@@ -429,6 +420,16 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
         return coop.contains(superiorPlayer);
+    }
+
+    @Override
+    public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
+        if(inside)
+            playersInside.add(superiorPlayer);
+        else
+            playersInside.remove(superiorPlayer);
+
+        MenuVisitors.refreshMenus();
     }
 
     /*

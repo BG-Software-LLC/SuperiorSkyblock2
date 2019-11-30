@@ -174,6 +174,12 @@ public interface Island extends Comparable<Island> {
      */
     boolean isCoop(SuperiorPlayer superiorPlayer);
 
+    /**
+     * Update status of a player if he's inside the island or not.
+     * @param superiorPlayer The player to add.
+     */
+    void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside);
+
     /*
      *  Location related methods
      */

@@ -128,6 +128,8 @@ public final class PlayersListener implements Listener {
             Locale.ISLAND_FLY_ENABLED.send(player);
         }
 
+        e.getIsland().setPlayerInside(e.getPlayer(), true);
+
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
         Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
         if(islandEnterProtectedEvent.isCancelled()) {
@@ -156,6 +158,8 @@ public final class PlayersListener implements Listener {
             }
             Locale.ISLAND_FLY_DISABLED.send(player);
         }
+
+        e.getIsland().setPlayerInside(e.getPlayer(), false);
 
         IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
         Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);

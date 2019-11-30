@@ -132,6 +132,11 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
+
+    }
+
+    @Override
     public void setTeleportLocation(Location teleportLocation) {
 
     }

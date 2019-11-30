@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,14 +23,12 @@ public final class MenuVisitors extends SuperiorMenu {
     private static List<Integer> slots = new ArrayList<>();
 
     private List<SuperiorPlayer> visitors;
+    private Island island;
     private int currentPage = 1;
 
     private MenuVisitors(SuperiorPlayer superiorPlayer, Island island){
         super("menuVisitors", superiorPlayer);
-        if(island != null) {
-            this.visitors = island.getIslandVisitors();
-            visitors.sort(SortingComparators.PLAYER_NAMES_COMPARATOR);
-        }
+        this.island = island;
     }
 
     @Override
@@ -80,6 +77,8 @@ public final class MenuVisitors extends SuperiorMenu {
     @Override
     public Inventory getInventory() {
         Inventory inventory = super.getInventory();
+
+        this.visitors = island.getIslandVisitors();
 
         for(int i = 0; i < slots.size(); i++){
             int visitorsIndex = i + (slots.size() * (currentPage - 1));
@@ -138,6 +137,10 @@ public final class MenuVisitors extends SuperiorMenu {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
         new MenuVisitors(superiorPlayer, island).open(previousMenu);
+    }
+
+    public static void refreshMenus(){
+        refreshMenus(MenuVisitors.class);
     }
 
 }

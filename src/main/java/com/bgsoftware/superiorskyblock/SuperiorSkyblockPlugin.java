@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
@@ -101,10 +102,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
                 superiorPlayer.updateLastTimeStatus();
-                if(superiorPlayer.hasIslandFlyEnabled() && superiorPlayer.isInsideIsland()){
+
+                if(superiorPlayer.isInsideIsland() && superiorPlayer.hasIslandFlyEnabled()){
                     player.setAllowFlight(true);
                     player.setFlying(true);
                 }
+
+                Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
+                if(island != null)
+                    island.setPlayerInside(superiorPlayer, true);
             }
         }, 1L);
     }
