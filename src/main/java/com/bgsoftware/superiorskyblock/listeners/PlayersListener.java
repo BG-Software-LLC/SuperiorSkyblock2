@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -128,6 +129,14 @@ public final class PlayersListener implements Listener {
             Locale.ISLAND_FLY_ENABLED.send(player);
         }
 
+        if(!e.getIsland().isMember(e.getPlayer()) && e.getIsland().hasSettingsEnabled(IslandSettings.PVP)){
+            Locale.ENTER_PVP_ISLAND.send(e.getPlayer());
+            if(plugin.getSettings().immuneToPVPWhenTeleport) {
+                ((SSuperiorPlayer) e.getPlayer()).setImmunedToPvP(true);
+                Executor.sync(() -> ((SSuperiorPlayer) e.getPlayer()).setImmunedToPvP(false), 200L);
+            }
+        }
+
         e.getIsland().setPlayerInside(e.getPlayer(), true);
 
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
@@ -183,8 +192,11 @@ public final class PlayersListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(EntityUtils.isPlayerDamager(e))
+        if(EntityUtils.isPlayerDamager(e)){
+            if(((SSuperiorPlayer) superiorPlayer).isImmunedToPvP())
+                e.setCancelled(true);
             return;
+        }
 
         if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)
             e.setCancelled(true);

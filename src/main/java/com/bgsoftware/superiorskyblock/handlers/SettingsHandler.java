@@ -80,6 +80,7 @@ public final class SettingsHandler {
     public final String numberFormat;
     public final boolean skipOneItemMenus;
     public final boolean teleportOnPVPEnable;
+    public final boolean immuneToPVPWhenTeleport;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -179,6 +180,7 @@ public final class SettingsHandler {
         StringUtils.setNumberFormatter(numberFormat);
         skipOneItemMenus = cfg.getBoolean("skip-one-item-menus", false);
         teleportOnPVPEnable = cfg.getBoolean("teleport-on-pvp-enable", true);
+        immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);
     }
 
     public void updateValue(String path, Object value){

@@ -67,6 +67,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private BorderColor borderColor = BorderColor.BLUE;
     private long lastTimeStatus = -1;
 
+    private boolean immuneToPvP = false;
+
     public SSuperiorPlayer(CachedResultSet resultSet){
         player = UUID.fromString(resultSet.getString("player"));
         islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
@@ -223,7 +225,6 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                             Executor.sync(() -> {
                                 island.setTeleportLocation(islandLocation);
                                 teleport(islandLocation.add(0.5, 0.5, 0.5));
-
                                 if(result != null)
                                     result.accept(true);
                             });
@@ -524,6 +525,14 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public boolean hasPermission(IslandPermission permission){
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
+    }
+
+    public boolean isImmunedToPvP(){
+        return immuneToPvP;
+    }
+
+    public void setImmunedToPvP(boolean immunedToPvP){
+        this.immuneToPvP = immunedToPvP;
     }
 
     @Override

@@ -488,3 +488,7 @@ skip-one-item-menus: false
 
 # Should visitors get teleported to spawn when pvp is enabled in an island?
 teleport-on-pvp-enable: true
+
+# Should visitors get immuned to pvp for 10 seconds when they teleport to an island that has the settings enabled?
+# This doesn't apply to the spawn island!
+immune-to-pvp-when-teleport: true
