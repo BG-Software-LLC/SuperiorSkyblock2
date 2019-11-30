@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -10,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -82,6 +84,8 @@ public final class SettingsHandler {
     public final boolean teleportOnPVPEnable;
     public final boolean immuneToPVPWhenTeleport;
     public final List<String> blockedVisitorsCommands;
+    public final boolean starterChestEnabled;
+    public final Map<Integer, ItemStack> starterChestContents;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -183,6 +187,15 @@ public final class SettingsHandler {
         teleportOnPVPEnable = cfg.getBoolean("teleport-on-pvp-enable", true);
         immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);
         blockedVisitorsCommands = cfg.getStringList("blocked-visitors-commands");
+        starterChestEnabled = cfg.getBoolean("starter-chest.enabled", false);
+        starterChestContents = new HashMap<>();
+        for(String slot : cfg.getConfigurationSection("starter-chest.contents").getKeys(false)){
+            try {
+                ItemStack itemStack = FileUtils.getItemStack(cfg.getConfigurationSection("starter-chest.contents." + slot));
+                itemStack.setAmount(cfg.getInt("starter-chest.contents." + slot + ".amount", 1));
+                starterChestContents.put(Integer.parseInt(slot), itemStack);
+            }catch(Exception ignored){}
+        }
     }
 
     public void updateValue(String path, Object value){

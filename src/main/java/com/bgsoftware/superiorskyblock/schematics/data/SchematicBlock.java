@@ -10,10 +10,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public class SchematicBlock {
 
@@ -73,7 +76,16 @@ public class SchematicBlock {
         @Override
         public void applyBlock(Location location, Island island) {
             super.applyBlock(location, island);
-            ((InventoryHolder) location.getBlock().getState()).getInventory().setContents(contents);
+            Inventory inventory = ((InventoryHolder) location.getBlock().getState()).getInventory();
+
+            if(plugin.getSettings().starterChestEnabled && inventory.getType() == InventoryType.CHEST){
+                for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet()){
+                    inventory.setItem(entry.getKey(), entry.getValue());
+                }
+            }
+            else {
+                inventory.setContents(contents);
+            }
         }
     }
 
