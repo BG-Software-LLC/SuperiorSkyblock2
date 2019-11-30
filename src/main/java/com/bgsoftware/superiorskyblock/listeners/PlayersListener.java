@@ -34,6 +34,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -332,6 +333,18 @@ public final class PlayersListener implements Listener {
                 superiorPlayer.teleport(toTeleport);
                 plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerCommand(PlayerCommandPreprocessEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+
+        if(island != null && !island.isSpawn() && !island.isMember(superiorPlayer) &&
+                plugin.getSettings().blockedVisitorsCommands.stream().anyMatch(cmd -> e.getMessage().contains(cmd))){
+            e.setCancelled(true);
+            Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }
     }
 

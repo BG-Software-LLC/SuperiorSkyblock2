@@ -492,3 +492,6 @@ teleport-on-pvp-enable: true
 # Should visitors get immuned to pvp for 10 seconds when they teleport to an island that has the settings enabled?
 # This doesn't apply to the spawn island!
 immune-to-pvp-when-teleport: true
+
+# A list of commands that cannot be executed by visitors.
+blocked-visitors-commands: []
