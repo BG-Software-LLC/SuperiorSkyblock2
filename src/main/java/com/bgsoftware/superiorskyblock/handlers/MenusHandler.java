@@ -5,26 +5,27 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.BorderColorMenu;
-import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
-import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandBiomesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMainMissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandMissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandRateMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandRatingsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandSettingsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandUpgradesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandValuesMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandWarpsMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
-import com.bgsoftware.superiorskyblock.menu.MemberManageMenu;
-import com.bgsoftware.superiorskyblock.menu.MemberRoleMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuBiomes;
+import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
+import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
+import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
+import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandRate;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
+import com.bgsoftware.superiorskyblock.menu.MenuMemberManage;
+import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
+import com.bgsoftware.superiorskyblock.menu.MenuMembers;
+import com.bgsoftware.superiorskyblock.menu.MenuMissions;
+import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
+import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
+import com.bgsoftware.superiorskyblock.menu.MenuSettings;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
+import com.bgsoftware.superiorskyblock.menu.MenuValues;
+import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
+import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 public final class MenusHandler implements MenusManager {
@@ -32,26 +33,27 @@ public final class MenusHandler implements MenusManager {
     public MenusHandler() throws HandlerLoadException {
         try {
             //Reload all menus
-            BorderColorMenu.init();
-            ConfirmDisbandMenu.init();
-            GlobalWarpsMenu.init();
-            IslandBiomesMenu.init();
-            IslandCreationMenu.init();
-            IslandMainMissionsMenu.init();
-            IslandMembersMenu.init();
-            IslandMissionsMenu.init();
-            IslandPanelMenu.init();
-            IslandPermissionsMenu.init();
-            IslandRateMenu.init();
-            IslandRatingsMenu.init();
-            IslandSettingsMenu.init();
-            IslandsTopMenu.init();
-            IslandUpgradesMenu.init();
-            IslandValuesMenu.init();
-            IslandVisitorsMenu.init();
-            IslandWarpsMenu.init();
-            MemberManageMenu.init();
-            MemberRoleMenu.init();
+            MenuBiomes.init();
+            MenuBorderColor.init();
+            MenuConfirmDisband.init();
+            MenuControlPanel.init();
+            MenuGlobalWarps.init();
+            MenuIslandCreation.init();
+            MenuIslandMissions.init();
+            MenuIslandRate.init();
+            MenuIslandRatings.init();
+            MenuMemberManage.init();
+            MenuMemberRole.init();
+            MenuMembers.init();
+            MenuMissions.init();
+            MenuPermissions.init();
+            MenuPlayerMissions.init();
+            MenuSettings.init();
+            MenuTopIslands.init();
+            MenuUpgrades.init();
+            MenuValues.init();
+            MenuVisitors.init();
+            MenuWarps.init();
         }catch(Exception ex){
             throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
         }
@@ -59,107 +61,110 @@ public final class MenusHandler implements MenusManager {
 
     @Override
     public void openBorderColorMenu(SuperiorPlayer superiorPlayer) {
-        BorderColorMenu.openInventory(superiorPlayer, null);
+        MenuBorderColor.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openConfirmDisbandMenu(SuperiorPlayer superiorPlayer) {
-        ConfirmDisbandMenu.openInventory(superiorPlayer, null);
+        MenuConfirmDisband.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openGlobalWarpsMenu(SuperiorPlayer superiorPlayer) {
-        GlobalWarpsMenu.openInventory(superiorPlayer, null);
+        MenuGlobalWarps.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openIslandBiomesMenu(SuperiorPlayer superiorPlayer) {
-        IslandBiomesMenu.openInventory(superiorPlayer, null);
+        MenuBiomes.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openIslandCreationMenu(SuperiorPlayer superiorPlayer, String islandName) {
-        IslandCreationMenu.openInventory(superiorPlayer, null, islandName);
+        MenuIslandCreation.openInventory(superiorPlayer, null, islandName);
     }
 
     @Override
     public void openIslandMainMissionsMenu(SuperiorPlayer superiorPlayer) {
-        IslandMainMissionsMenu.openInventory(superiorPlayer, null);
+        MenuMissions.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openIslandMembersMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandMembersMenu.openInventory(superiorPlayer, null, island);
+        MenuMembers.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
-        IslandMissionsMenu.openInventory(superiorPlayer, null, islandMissions);
+        if(islandMissions)
+            MenuIslandMissions.openInventory(superiorPlayer, 1, null);
+        else
+            MenuPlayerMissions.openInventory(superiorPlayer, 1, null);
     }
 
     @Override
     public void openIslandPanelMenu(SuperiorPlayer superiorPlayer) {
-        IslandPanelMenu.openInventory(superiorPlayer, null);
+        MenuControlPanel.openInventory(superiorPlayer, null);
     }
 
     @Override
     public void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, PlayerRole playerRole) {
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, playerRole);
+        MenuPermissions.openInventory(superiorPlayer, null, island, playerRole);
     }
 
     @Override
     public void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, targetPlayer);
+        MenuPermissions.openInventory(superiorPlayer, null, island, targetPlayer);
     }
 
     @Override
     public void openIslandRateMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandRateMenu.openInventory(superiorPlayer, island, null);
+        MenuIslandRate.openInventory(superiorPlayer, island, null);
     }
 
     @Override
     public void openIslandRatingsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandRatingsMenu.openInventory(superiorPlayer, null, island);
+        MenuIslandRatings.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandSettingsMenu.openInventory(superiorPlayer, null, island);
+        MenuSettings.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandsTopMenu(SuperiorPlayer superiorPlayer, SortingType sortingType) {
-        IslandsTopMenu.openInventory(superiorPlayer, null, sortingType);
+        MenuTopIslands.openInventory(superiorPlayer, null, sortingType);
     }
 
     @Override
     public void openIslandUpgradeMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandUpgradesMenu.openInventory(superiorPlayer, null, island);
+        MenuUpgrades.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandValuesMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandValuesMenu.openInventory(superiorPlayer, null, island);
+        MenuValues.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandVisitorsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandVisitorsMenu.openInventory(superiorPlayer, null, island);
+        MenuVisitors.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openIslandWarpsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        IslandWarpsMenu.openInventory(superiorPlayer, null, island);
+        MenuWarps.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public void openMemberManageMenu(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
-        MemberManageMenu.openInventory(superiorPlayer, null, targetPlayer);
+        MenuMemberManage.openInventory(superiorPlayer, null, targetPlayer);
     }
 
     @Override
     public void openMemberRoleMenu(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
-        MemberRoleMenu.openInventory(superiorPlayer, null, targetPlayer);
+        MenuMemberRole.openInventory(superiorPlayer, null, targetPlayer);
     }
 
 }

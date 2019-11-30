@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.IslandMembersMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandPanelMenu;
-import com.bgsoftware.superiorskyblock.menu.IslandVisitorsMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
+import com.bgsoftware.superiorskyblock.menu.MenuMembers;
+import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -64,10 +64,10 @@ public final class CmdPanel implements ICommand {
 
         if(args.length > 1){
             if(args[1].equalsIgnoreCase("members")){
-                IslandMembersMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                MenuMembers.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
                 return;
             }else if(args[1].equalsIgnoreCase("visitors")){
-                IslandVisitorsMenu.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                MenuVisitors.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
                 return;
             }else if(args[1].equalsIgnoreCase("toggle")){
                 if(superiorPlayer.hasToggledPanel()){
@@ -81,7 +81,7 @@ public final class CmdPanel implements ICommand {
             }
         }
 
-        IslandPanelMenu.openInventory(superiorPlayer, null);
+        MenuControlPanel.openInventory(superiorPlayer, null);
     }
 
     @Override

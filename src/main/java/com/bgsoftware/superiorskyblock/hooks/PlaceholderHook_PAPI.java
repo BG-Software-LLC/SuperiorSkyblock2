@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -41,6 +42,10 @@ public final class PlaceholderHook_PAPI extends PlaceholderHook {
         public boolean persist() {
             return true;
         }
+    }
+
+    public static String parse(OfflinePlayer offlinePlayer, String str){
+        return PlaceholderAPI.setPlaceholders(offlinePlayer, str);
     }
 
 }

@@ -15,6 +15,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -74,7 +75,7 @@ public interface NMSAdapter {
 
     Object parseList(ListTag listTag);
 
-    default Object getCustomHolder(InventoryHolder defaultHolder, String title){
+    default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
         return defaultHolder;
     }
 

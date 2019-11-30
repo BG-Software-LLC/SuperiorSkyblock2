@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.menu.IslandPermissionsMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -87,7 +87,7 @@ public final class CmdPermissions implements ICommand {
             permissionHolder = targetPlayer;
         }
 
-        IslandPermissionsMenu.openInventory(superiorPlayer, null, island, permissionHolder);
+        MenuPermissions.openInventory(superiorPlayer, null, island, permissionHolder);
     }
 
     @Override

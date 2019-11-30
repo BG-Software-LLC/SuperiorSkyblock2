@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.IslandCreationMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -77,7 +77,7 @@ public final class CmdCreate implements ICommand {
             }
         }
 
-        IslandCreationMenu.openInventory(superiorPlayer, null, islandName);
+        MenuIslandCreation.openInventory(superiorPlayer, null, islandName);
     }
 
     @Override

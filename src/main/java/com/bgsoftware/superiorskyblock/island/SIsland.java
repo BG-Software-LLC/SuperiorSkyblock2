@@ -19,6 +19,17 @@ import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
+import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
+import com.bgsoftware.superiorskyblock.menu.MenuMemberManage;
+import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
+import com.bgsoftware.superiorskyblock.menu.MenuMembers;
+import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
+import com.bgsoftware.superiorskyblock.menu.MenuSettings;
+import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
+import com.bgsoftware.superiorskyblock.menu.MenuValues;
+import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -343,6 +354,9 @@ public class SIsland extends DatabaseObject implements Island {
         members.add(superiorPlayer);
         superiorPlayer.setIslandLeader(owner);
         superiorPlayer.setPlayerRole(playerRole);
+
+        MenuMembers.refreshMenus();
+
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(owner.getUniqueId().toString())
@@ -354,6 +368,11 @@ public class SIsland extends DatabaseObject implements Island {
         members.remove(superiorPlayer);
         superiorPlayer.setIslandLeader(superiorPlayer);
         superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+
+        MenuMemberManage.destroyMenus(superiorPlayer);
+        MenuMemberRole.destroyMenus(superiorPlayer);
+        MenuMembers.refreshMenus();
+
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(members.isEmpty() ? "" : getPlayerCollectionString(members))
                 .setString(owner.getUniqueId().toString())
@@ -566,6 +585,8 @@ public class SIsland extends DatabaseObject implements Island {
         permissionNode.setPermission(islandPermission, value);
 
         permissionNodes.put(superiorPlayer.getUniqueId(), permissionNode);
+
+        MenuPermissions.refreshMenus();
 
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                 .setString(IslandSerializer.serializePermissions(permissionNodes))
@@ -1025,6 +1046,8 @@ public class SIsland extends DatabaseObject implements Island {
                 blockCounts.put(key, currentAmount + amount);
             }
 
+            MenuValues.refreshMenus();
+
             if(save) saveBlockCounts();
         }
     }
@@ -1087,6 +1110,8 @@ public class SIsland extends DatabaseObject implements Island {
                     blockCounts.put(key, currentAmount - amount);
             }
 
+            MenuValues.refreshMenus();
+
             if(save) saveBlockCounts();
         }
     }
@@ -1147,6 +1172,8 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void setUpgradeLevel(String upgradeName, int level){
         upgrades.put(upgradeName, Math.min(plugin.getUpgrades().getMaxUpgradeLevel(upgradeName), level));
+
+        MenuUpgrades.refreshMenus();
 
         Query.ISLAND_SET_UPGRADES.getStatementHolder()
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
@@ -1290,6 +1317,9 @@ public class SIsland extends DatabaseObject implements Island {
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
         warps.put(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
 
+        MenuGlobalWarps.refreshMenus();
+        MenuWarps.refreshMenus();
+
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(IslandSerializer.serializeWarps(warps))
                 .setString(owner.getUniqueId().toString())
@@ -1331,6 +1361,9 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void deleteWarp(String name){
         warps.remove(name);
+
+        MenuGlobalWarps.refreshMenus();
+        MenuWarps.refreshMenus();
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(IslandSerializer.serializeWarps(warps))
@@ -1374,6 +1407,8 @@ public class SIsland extends DatabaseObject implements Island {
         else
             ratings.put(superiorPlayer.getUniqueId(), rating);
 
+        MenuIslandRatings.refreshMenus();
+
         Query.ISLAND_SET_RATINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeRatings(ratings))
                 .setString(owner.getUniqueId().toString())
@@ -1407,6 +1442,8 @@ public class SIsland extends DatabaseObject implements Island {
     @Override
     public void completeMission(Mission mission) {
         completedMissions.add(mission.getName());
+
+        MenuIslandMissions.refreshMenus();
 
         Query.ISLAND_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
@@ -1495,6 +1532,8 @@ public class SIsland extends DatabaseObject implements Island {
                 islandSettings.remove(IslandSettings.ALWAYS_SHINY);
         }
 
+        MenuSettings.refreshMenus();
+
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setString(owner.getUniqueId().toString())
@@ -1516,6 +1555,8 @@ public class SIsland extends DatabaseObject implements Island {
             case ALWAYS_SHINY:
                 allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).resetPlayerWeather());
         }
+
+        MenuSettings.refreshMenus();
 
         Query.ISLAND_SET_SETTINGS.getStatementHolder()
                 .setString(IslandSerializer.serializeSettings(islandSettings))

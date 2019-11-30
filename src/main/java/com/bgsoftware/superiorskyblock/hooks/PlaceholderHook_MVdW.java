@@ -12,7 +12,6 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 
-@SuppressWarnings("WeakerAccess")
 public final class PlaceholderHook_MVdW extends PlaceholderHook {
 
     PlaceholderHook_MVdW(){
@@ -147,6 +146,10 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static String parse(OfflinePlayer offlinePlayer, String str){
+        return PlaceholderAPI.replacePlaceholders(offlinePlayer, str);
     }
 
 }

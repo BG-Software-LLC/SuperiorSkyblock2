@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.menu.BorderColorMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -50,7 +50,8 @@ public final class CmdBorder implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        BorderColorMenu.openInventory(SSuperiorPlayer.of(sender), null);
+        //BorderColorMenu.openInventory(SSuperiorPlayer.of(sender), null);
+        MenuBorderColor.openInventory(SSuperiorPlayer.of(sender), null);
     }
 
     @Override

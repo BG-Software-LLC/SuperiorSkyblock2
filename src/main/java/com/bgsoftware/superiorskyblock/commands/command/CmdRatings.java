@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.menu.IslandRatingsMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -66,7 +66,7 @@ public final class CmdRatings implements ICommand {
             return;
         }
 
-        IslandRatingsMenu.openInventory(superiorPlayer, null, island);
+        MenuIslandRatings.openInventory(superiorPlayer, null, island);
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.ConfirmDisbandMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -74,7 +74,7 @@ public final class CmdDisband implements ICommand {
         }
 
         if(plugin.getSettings().disbandConfirm) {
-            ConfirmDisbandMenu.openInventory(superiorPlayer, null);
+            MenuConfirmDisband.openInventory(superiorPlayer, null);
         }
 
         else{

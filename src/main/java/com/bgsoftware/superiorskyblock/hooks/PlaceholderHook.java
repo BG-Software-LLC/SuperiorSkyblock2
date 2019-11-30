@@ -34,6 +34,19 @@ public abstract class PlaceholderHook {
             new PlaceholderHook_PAPI();
     }
 
+    public static String parse(SuperiorPlayer superiorPlayer, String str){
+        return parse(superiorPlayer.asOfflinePlayer(), str);
+    }
+
+    public static String parse(OfflinePlayer offlinePlayer, String str){
+        if(Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI"))
+            str = PlaceholderHook_MVdW.parse(offlinePlayer, str);
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+            str = PlaceholderHook_PAPI.parse(offlinePlayer, str);
+
+        return str;
+    }
+
     protected String parsePlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
         try {
             Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;

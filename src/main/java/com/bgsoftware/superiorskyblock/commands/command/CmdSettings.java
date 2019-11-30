@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.menu.IslandSettingsMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuSettings;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -68,7 +68,7 @@ public final class CmdSettings implements ICommand {
             return;
         }
 
-        IslandSettingsMenu.openInventory(superiorPlayer, null, island);
+        MenuSettings.openInventory(superiorPlayer, null, island);
     }
 
     @Override

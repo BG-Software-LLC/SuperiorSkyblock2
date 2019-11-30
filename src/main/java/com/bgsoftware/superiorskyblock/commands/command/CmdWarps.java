@@ -2,9 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.menu.GlobalWarpsMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -51,8 +50,7 @@ public final class CmdWarps implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        GlobalWarpsMenu.openInventory(superiorPlayer, null);
+        MenuGlobalWarps.openInventory( SSuperiorPlayer.of(sender), null);
     }
 
     @Override

@@ -11,23 +11,24 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class FileUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static ItemStack getItemStack(ConfigurationSection section){
-        if(section == null)
+        if(section == null || !section.contains("type"))
             return null;
 
         Material type;
@@ -86,48 +87,47 @@ public final class FileUtils {
         return itemBuilder.build();
     }
 
-    public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, InventoryType inventoryType, String defaultTitle){
-        String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
-        Inventory inventory = Bukkit.createInventory(menu, inventoryType, title);
+    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, YamlConfiguration cfg){
+        Map<Character, List<Integer>> charSlots = new HashMap<>();
 
-        if(inventory.getHolder() == null){
-            try{
-                Class craftInventoryClass = ReflectionUtils.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
-                //noinspection all
-                Field field = craftInventoryClass.getDeclaredField("inventory");
-                field.setAccessible(true);
-                field.set(inventory, plugin.getNMSAdapter().getCustomHolder(menu, title));
-                field.setAccessible(false);
-            }catch(Exception ignored){}
-        }
+        menu.resetData();
 
-        return loadGUI(menu, inventory, section);
-    }
+        menu.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menu.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
-    public static Inventory loadGUI(SuperiorMenu menu, ConfigurationSection section, int defaultSize, String defaultTitle){
-        String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", defaultTitle));
-        int size = section.getInt("size", defaultSize);
-        Inventory inventory = Bukkit.createInventory(menu, 9 * size, title);
-        return loadGUI(menu, inventory, section);
-    }
+        List<String> pattern = cfg.getStringList("pattern");
 
-    private static Inventory loadGUI(SuperiorMenu menu, Inventory inventory, ConfigurationSection section){
-        if(section.contains("fill-items")){
-            ConfigurationSection fillItems = section.getConfigurationSection("fill-items");
-            for(String _name : fillItems.getKeys(false)){
-                String[] slots = fillItems.getString(_name + ".slots").split(",");
-                ItemStack fillItem = getItemStack(fillItems.getConfigurationSection(_name));
-                List<String> commands = fillItems.getStringList(_name + ".commands");
-                for(String _slot : slots) {
-                    int slot = Integer.parseInt(_slot);
-                    inventory.setItem(slot, fillItem);
-                    if(!commands.isEmpty())
+        menu.setRowsSize(pattern.size());
+
+        for(int row = 0; row < pattern.size(); row++){
+            String patternLine = pattern.get(row);
+            int slot = row * 9;
+
+            for(int i = 0; i < patternLine.length(); i++){
+                char ch = patternLine.charAt(i);
+                if(ch != ' '){
+                    ItemStack itemStack = getItemStack(cfg.getConfigurationSection("items." + ch));
+
+                    if(itemStack != null) {
+                        List<String> commands = cfg.getStringList("commands." + ch);
+                        SoundWrapper sound = getSound(cfg.getConfigurationSection("sounds." + ch));
+
+                        menu.addFillItem(slot, itemStack);
                         menu.addCommands(slot, commands);
+                        menu.addSound(slot, sound);
+                    }
+
+                    if(!charSlots.containsKey(ch))
+                        charSlots.put(ch, new ArrayList<>());
+
+                    charSlots.get(ch).add(slot);
+
+                    slot++;
                 }
             }
         }
 
-        return inventory;
+        return charSlots;
     }
 
     public static String fromLocation(Location location){

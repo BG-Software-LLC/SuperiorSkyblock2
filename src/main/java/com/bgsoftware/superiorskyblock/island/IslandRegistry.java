@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -76,7 +78,7 @@ public final class IslandRegistry implements Iterable<Island> {
 
     public synchronized void sort(SortingType sortingType){
         ensureType(sortingType);
-        TreeSet<Island> sortedTree = sortedTrees.get(sortingType);
+        TreeSet<Island> sortedTree = sortedTrees.get(sortingType), originalSorted = new TreeSet<>(sortedTrees.get(sortingType));
         Iterator<Island> clonedTree = islands.values().iterator();
         sortedTree.clear();
         while(clonedTree.hasNext()) {
@@ -84,6 +86,7 @@ public final class IslandRegistry implements Iterable<Island> {
             if(!island.isIgnored())
                 sortedTree.add(island);
         }
+        Executor.sync(MenuTopIslands::refreshMenus);
     }
 
     public synchronized void transferIsland(UUID oldOwner, UUID newOwner){

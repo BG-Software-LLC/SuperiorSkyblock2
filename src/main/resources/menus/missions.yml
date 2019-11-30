@@ -1,0 +1,45 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lMissions'
+
+pattern:
+  - '$ $ $ $ $ $ $ $ $'
+  - '$ # # # # # # # $'
+  - '$ # # @ # ^ # # $'
+  - '$ # # # # # # # $'
+  - '$ $ $ $ $ $ $ $ $'
+
+player-missions: '@'
+island-missions: '^'
+
+items:
+  '$':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'
+  '@':
+    type: SKULL_ITEM
+    data: 3
+    name: '&ePlayer Missions'
+    lore:
+      - '&7Click to open your missions.'
+  '^':
+    type: GRASS
+    name: '&eIsland Missions'
+    lore:
+      - '&7Click to open your island''s missions.'
+
+sounds:
+  '@':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '^':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1

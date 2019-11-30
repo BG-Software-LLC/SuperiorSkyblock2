@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.menu.IslandsTopMenu;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -51,7 +51,7 @@ public final class CmdTop implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        IslandsTopMenu.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.DEFAULT);
+        MenuTopIslands.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.DEFAULT);
     }
 
     @Override

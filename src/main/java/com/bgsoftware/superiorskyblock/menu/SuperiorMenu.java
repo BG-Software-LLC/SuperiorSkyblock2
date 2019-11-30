@@ -2,107 +2,148 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private String identifier;
+    private static final Map<String, MenuData> dataMap = new HashMap<>();
+
+    private final String identifier;
+    protected final SuperiorPlayer superiorPlayer;
+
     protected SuperiorMenu previousMenu;
     protected boolean previousMove = true;
+    private boolean refreshing = false;
 
-    private static final Map<String, Map<Integer, SoundWrapper>> sounds = new HashMap<>();
-    private static final Map<String, Map<Integer, List<String>>> commands = new HashMap<>();
-
-    public SuperiorMenu(String identifier){
+    public SuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
         this.identifier = identifier;
+        this.superiorPlayer = superiorPlayer;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    void addSound(int slot, SoundWrapper sound) {
-        if(sound != null) {
-            Map<Integer, SoundWrapper> soundMap = sounds.getOrDefault(identifier, new HashMap<>());
-            soundMap.put(slot, sound);
-            sounds.put(identifier, soundMap);
-        }
+    public void addSound(int slot, SoundWrapper sound) {
+        if(sound != null)
+            getData().sounds.put(slot, sound);
     }
 
     public void addCommands(int slot, List<String> commands) {
-        if(commands != null && !commands.isEmpty()) {
-            Map<Integer, List<String>> commandMap = SuperiorMenu.commands.getOrDefault(identifier, new HashMap<>());
-            commandMap.put(slot, commands);
-            SuperiorMenu.commands.put(identifier, commandMap);
-        }
+        if(commands != null && !commands.isEmpty())
+            getData().commands.put(slot, commands);
+    }
+
+    public void addFillItem(int slot, ItemStack itemStack){
+        if(itemStack != null)
+            getData().fillItems.put(slot, itemStack);
     }
 
     public void resetData(){
-        sounds.clear();
-        commands.clear();
+        dataMap.put(identifier, new MenuData());
     }
 
-    SoundWrapper getSound(int slot){
-        return sounds.containsKey(identifier) ? sounds.get(identifier).get(slot) : null;
+    public void setTitle(String title){
+        getData().title = title;
     }
 
-    List<String> getCommands(int slot){
-        return SuperiorMenu.commands.containsKey(identifier) ? SuperiorMenu.commands.get(identifier).get(slot) : null;
+    public void setRowsSize(int rowsSize){
+        getData().rowsSize = rowsSize;
+    }
+
+    public void setInventoryType(InventoryType inventoryType){
+        getData().inventoryType = inventoryType;
+    }
+
+    public void addData(String key, Object value){
+        getData().data.put(key, value);
+    }
+
+    public Object getData(String key){
+        return getData().data.get(key);
+    }
+
+    public boolean containsData(String key){
+        return getData().data.containsKey(key);
     }
 
     @Override
-    public abstract Inventory getInventory();
-
-    public void onClick(InventoryClickEvent e){
-        if(!(e.getWhoClicked() instanceof Player))
-            return;
-
-        Player player = (Player) e.getWhoClicked();
-
-        SoundWrapper sound = getSound(e.getRawSlot());
-        if(sound != null)
-            sound.playSound(player);
-
-        List<String> commands = getCommands(e.getRawSlot());
-        if(commands != null)
-            commands.forEach(command ->
-                    Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
-                            command.replace("PLAYER:", "").replace("%player%", player.getName())));
+    public Inventory getInventory(){
+        return buildInventory(null);
     }
 
-    public void open(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+    public final void onClick(InventoryClickEvent e){
+        if(refreshing)
+            return;
+
+        Player player = superiorPlayer.asPlayer();
+
+        if(e.getCurrentItem() != null) {
+            SoundWrapper sound = getSound(e.getRawSlot());
+            if (sound != null)
+                sound.playSound(player);
+
+            List<String> commands = getCommands(e.getRawSlot());
+            if (commands != null)
+                commands.forEach(command ->
+                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
+                                command.replace("PLAYER:", "").replace("%player%", player.getName())));
+        }
+
+        onPlayerClick(e);
+    }
+
+    protected abstract void onPlayerClick(InventoryClickEvent e);
+
+    public void open(SuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> open(superiorPlayer, previousMenu));
+            Executor.async(() -> open(previousMenu));
             return;
         }
 
         Inventory inventory = getInventory();
 
         Executor.sync(() -> {
+            Player player = superiorPlayer.asPlayer();
+
+            if(player == null)
+                return;
+
             SuperiorMenu currentMenu = null;
+            InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
+            if(inventoryHolder instanceof SuperiorMenu)
+                currentMenu = (SuperiorMenu) inventoryHolder;
 
-            try {
-                InventoryHolder inventoryHolder = superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
-                if(inventoryHolder != null)
-                    currentMenu = (SuperiorMenu) inventoryHolder;
-            }catch(Exception ignored){ }
+            if(Arrays.equals( player.getOpenInventory().getTopInventory().getContents(), inventory.getContents()))
+                return;
 
-            superiorPlayer.asPlayer().openInventory(inventory);
+            player.openInventory(inventory);
 
-            this.previousMenu = previousMenu == null && currentMenu != null ? currentMenu : previousMenu;
+            refreshing = false;
+
+            this.previousMenu = previousMenu != null ? previousMenu : previousMove ? currentMenu : null;
         });
     }
 
@@ -110,11 +151,109 @@ public abstract class SuperiorMenu implements InventoryHolder {
         if(previousMenu != null) {
             Executor.sync(() -> {
                 if(previousMove)
-                    previousMenu.open(superiorPlayer, previousMenu.previousMenu);
+                    previousMenu.open(previousMenu.previousMenu);
                 else
                     previousMove = true;
             });
         }
+    }
+
+    protected Inventory buildInventory(Function<String, String> titleReplacer){
+        MenuData menuData = getData();
+        Inventory inventory;
+
+        String title = PlaceholderHook.parse(superiorPlayer, menuData.title);
+        if(titleReplacer != null)
+            title = titleReplacer.apply(title);
+
+        if(menuData.inventoryType != InventoryType.CHEST){
+            inventory = Bukkit.createInventory(this, menuData.inventoryType, title);
+        }
+
+        else{
+            inventory = Bukkit.createInventory(this, menuData.rowsSize * 9, title);
+        }
+
+        if(inventory.getHolder() == null){
+            try{
+                Class craftInventoryClass = ReflectionUtils.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
+                //noinspection all
+                Field field = craftInventoryClass.getDeclaredField("inventory");
+                field.setAccessible(true);
+                field.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
+                field.setAccessible(false);
+            }catch(Exception ignored){}
+        }
+
+        for(Map.Entry<Integer, ItemStack> itemStackEntry : menuData.fillItems.entrySet())
+            inventory.setItem(itemStackEntry.getKey(), new ItemBuilder(itemStackEntry.getValue()).build(superiorPlayer));
+
+        return inventory;
+    }
+
+    private SoundWrapper getSound(int slot){
+        return getData().sounds.get(slot);
+    }
+
+    private List<String> getCommands(int slot){
+        return getData().commands.get(slot);
+    }
+
+    private MenuData getData(){
+        if(!dataMap.containsKey(identifier)){
+            dataMap.put(identifier, new MenuData());
+        }
+
+        return dataMap.get(identifier);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SuperiorMenu && ((SuperiorMenu) obj).getIdentifier().equals(getIdentifier());
+    }
+
+    protected static <T extends SuperiorMenu> void refreshMenus(Class<T> menuClazz){
+        runActionOnMenus(menuClazz, superiorMenu -> true, ((player, superiorMenu) -> {
+            superiorMenu.previousMove = false;
+            superiorMenu.open(superiorMenu.previousMenu);
+        }));
+    }
+
+    protected static <T extends SuperiorMenu> void destroyMenus(Class<T> menuClazz){
+        destroyMenus(menuClazz, superiorMenu -> true);
+    }
+
+    protected static <T extends SuperiorMenu> void destroyMenus(Class<T> menuClazz, Predicate<T> predicate){
+        runActionOnMenus(menuClazz, predicate, ((player, superiorMenu) -> player.closeInventory()));
+    }
+
+    private static <T extends SuperiorMenu> void runActionOnMenus(Class<T> menuClazz, Predicate<T> predicate, MenuCallback callback){
+        for(Player player : Bukkit.getOnlinePlayers()){
+            InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
+            //noinspection unchecked
+            if(menuClazz.isInstance(inventoryHolder) && predicate.test((T) inventoryHolder)){
+                SuperiorMenu superiorMenu = (SuperiorMenu) inventoryHolder;
+                callback.run(player, superiorMenu);
+            }
+        }
+    }
+
+    private interface MenuCallback{
+
+        void run(Player player, SuperiorMenu superiorMenu);
+
+    }
+
+    protected static class MenuData{
+
+        private Map<Integer, SoundWrapper> sounds = new HashMap<>();
+        private Map<Integer, List<String>> commands = new HashMap<>();
+        private Map<Integer, ItemStack> fillItems = new HashMap<>();
+        private Map<String, Object> data = new HashMap<>();
+        private String title = "";
+        private InventoryType inventoryType = InventoryType.CHEST;
+        private int rowsSize = 6;
+
     }
 
 }

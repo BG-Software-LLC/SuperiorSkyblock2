@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +14,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public final class ItemBuilder {
 
     private ItemStack itemStack;
@@ -57,10 +60,6 @@ public final class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder withLore(String... lore){
-        return withLore(Arrays.asList(lore));
-    }
-
     public ItemBuilder withLore(List<String> lore){
         List<String> loreList = new ArrayList<>();
 
@@ -84,10 +83,6 @@ public final class ItemBuilder {
 
         withLore(loreList);
         return this;
-    }
-
-    public ItemBuilder replaceLoreWithLines(String regex, List<String> lines){
-        return replaceLoreWithLines(regex, lines.toArray(new String[0]));
     }
 
     public ItemBuilder replaceLoreWithLines(String regex, String... lines){
@@ -125,15 +120,23 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemStack build(SuperiorPlayer superiorPlayer){
+        OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
+
+        if(itemMeta.hasDisplayName()) {
+            withName(PlaceholderHook.parse(offlinePlayer, itemMeta.getDisplayName()));
+        }
+
+        if(itemMeta.hasLore()) {
+            withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
+        }
+
+        return build();
+    }
+
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
         return textureValue.isEmpty() ? itemStack : HeadUtils.getPlayerHead(itemStack, textureValue);
-    }
-
-    public ItemBuilder copy(){
-        ItemStack itemStack = this.itemStack.clone();
-        itemStack.setItemMeta(this.itemMeta.clone());
-        return new ItemBuilder(itemStack);
     }
 
 }
