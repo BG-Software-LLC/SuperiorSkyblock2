@@ -316,8 +316,10 @@ public final class CustomEventsListener implements Listener {
 
                     String[] typeSections = blockGenerateEvent.getNewStateKey().toString().split(":");
 
-                    if(typeSections[0].contains("COBBLESTONE"))
+                    if(typeSections[0].contains("COBBLESTONE")) {
+                        island.handleBlockPlace(blockGenerateEvent.getNewStateKey(), 1);
                         return;
+                    }
 
                     Executor.sync(() -> {
                         block.setType(Material.valueOf(typeSections[0]));
