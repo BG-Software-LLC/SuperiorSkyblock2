@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
 import java.util.Arrays;
 

@@ -1,0 +1,66 @@
+package com.bgsoftware.superiorskyblock.utils.reflections;
+
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import org.bukkit.Bukkit;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
+public final class ReflectionUtils {
+
+    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+
+    private static Map<Fields, Field> fieldsMap = new HashMap<>();
+
+    static {
+        Class chunkClass = getClass("net.minecraft.server.VERSION.Chunk"),
+                blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
+                craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
+
+        if(ServerVersion.isAtLeast(ServerVersion.v1_14)) {
+            fieldsMap.put(Fields.CHUNK_SECTIONS, getField(chunkClass, "sections"));
+            fieldsMap.put(Fields.CHUNK_PENDING_BLOCK_ENTITIES, getField(chunkClass, "e"));
+            fieldsMap.put(Fields.CHUNK_HEIGHT_MAP, getField(chunkClass, "heightMap"));
+            fieldsMap.put(Fields.CHUNK_TILE_ENTITIES, getField(chunkClass, "tileEntities"));
+            fieldsMap.put(Fields.CHUNK_STRUCTURE_STARTS, getField(chunkClass, "l"));
+            fieldsMap.put(Fields.CHUNK_STRUCTURE_REFENCES, getField(chunkClass, "m"));
+            fieldsMap.put(Fields.CHUNK_POST_PROCESSING, getField(chunkClass, "n"));
+            fieldsMap.put(Fields.CHUNK_ENTITY_SLICES, getField(chunkClass, "entitySlices"));
+        }
+
+        if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
+            fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
+            fieldsMap.put(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
+        }
+    }
+
+    public static Class getClass(String classPath){
+        try {
+            return Class.forName(classPath.replace("VERSION", version));
+        } catch(ClassNotFoundException ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    static Field getFromFields(Fields fields){
+        return fieldsMap.get(fields);
+    }
+
+    private static Field getField(Class clazz, String fieldName){
+        try{
+            Field field =  clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field;
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("&cCouldn't find the field " + fieldName + " - Please contact Ome_R!");
+            Executor.sync(() -> Bukkit.getPluginManager().disablePlugin(plugin));
+            return null;
+        }
+    }
+
+}

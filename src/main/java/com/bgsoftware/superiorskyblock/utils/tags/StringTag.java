@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
 /**
  * The <code>TAG_String</code> tag.

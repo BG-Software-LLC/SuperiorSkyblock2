@@ -19,6 +19,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Set;
 
 public interface NMSAdapter {
@@ -90,5 +91,9 @@ public interface NMSAdapter {
     }
 
     Enchantment getGlowEnchant();
+
+    default void regenerateChunks(List<Chunk> chunksList){
+        chunksList.forEach(chunk -> chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ()));
+    }
 
 }

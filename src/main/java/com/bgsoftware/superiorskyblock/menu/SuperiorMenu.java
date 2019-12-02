@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -15,7 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -174,16 +173,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
             inventory = Bukkit.createInventory(this, menuData.rowsSize * 9, title);
         }
 
-        if(inventory.getHolder() == null){
-            try{
-                Class craftInventoryClass = ReflectionUtils.getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
-                //noinspection all
-                Field field = craftInventoryClass.getDeclaredField("inventory");
-                field.setAccessible(true);
-                field.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
-                field.setAccessible(false);
-            }catch(Exception ignored){}
-        }
+        if(inventory.getHolder() == null)
+            Fields.CRAFT_INVENTORY_INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
 
         for(Map.Entry<Integer, ItemStack> itemStackEntry : menuData.fillItems.entrySet())
             inventory.setItem(itemStackEntry.getKey(), new ItemBuilder(itemStackEntry.getValue()).build(superiorPlayer));

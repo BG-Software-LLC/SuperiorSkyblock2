@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
 /**
  * Represents a single NBT tag.

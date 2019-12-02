@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
@@ -15,10 +16,13 @@ import net.minecraft.server.v1_14_R1.BlockFlowerPot;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.ChatMessage;
 import net.minecraft.server.v1_14_R1.Chunk;
+import net.minecraft.server.v1_14_R1.ChunkSection;
+import net.minecraft.server.v1_14_R1.ChunkStatus;
 import net.minecraft.server.v1_14_R1.DimensionManager;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EntityLiving;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
+import net.minecraft.server.v1_14_R1.HeightMap;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.MinecraftServer;
@@ -51,6 +55,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortList;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
@@ -59,6 +64,7 @@ import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_14_R1.util.UnsafeList;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.LivingEntity;
@@ -66,10 +72,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
@@ -101,16 +110,7 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
-        Block flower;
-        try{
-            Field flowerField = blockFlowerPot.getClass().getDeclaredField("c");
-            flowerField.setAccessible(true);
-            flower = (Block) flowerField.get(blockFlowerPot);
-            flowerField.setAccessible(false);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
+        Block flower = (Block) Fields.BLOCK_FLOWER_POT_CONTENT.get(blockFlowerPot);
         ItemStack itemStack = new ItemStack(flower.getItem(), 1);
         return CraftItemStack.asBukkitCopy(itemStack);
     }
@@ -121,14 +121,7 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
         ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
-        try{
-            Field flowerField = blockFlowerPot.getClass().getField("c");
-            flowerField.setAccessible(true);
-            flowerField.set(blockFlowerPot, Block.asBlock(flower.getItem()));
-            flowerField.setAccessible(false);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+        Fields.BLOCK_FLOWER_POT_CONTENT.set(blockFlowerPot, Block.asBlock(flower.getItem()));
         world.update(blockPosition, blockFlowerPot);
     }
 
@@ -403,6 +396,38 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
                 return false;
             }
         };
+    }
+
+    @Override
+    public void regenerateChunks(List<org.bukkit.Chunk> bukkitChunksList) {
+        List<Chunk> chunksList = bukkitChunksList.stream()
+                .map(bukkitChunk -> ((CraftWorld) bukkitChunk.getWorld()).getHandle().getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ()))
+                .collect(Collectors.toList());
+
+        for(Chunk chunk : chunksList){
+            Map<HeightMap.Type, HeightMap> heightMap = new HashMap<>();
+            List[] entitySlices = new List[16];
+
+            Fields.CHUNK_SECTIONS.set(chunk, new ChunkSection[16]);
+            Fields.CHUNK_PENDING_BLOCK_ENTITIES.set(chunk, new HashMap<>());
+            Fields.CHUNK_HEIGHT_MAP.set(chunk, heightMap);
+            Fields.CHUNK_TILE_ENTITIES.set(chunk, new HashMap<>());
+            Fields.CHUNK_STRUCTURE_STARTS.set(chunk, new HashMap<>());
+            Fields.CHUNK_STRUCTURE_REFENCES.set(chunk, new HashMap<>());
+            Fields.CHUNK_POST_PROCESSING.set(chunk, new ShortList[16]);
+            Fields.CHUNK_ENTITY_SLICES.set(chunk, entitySlices);
+
+            HeightMap.Type[] heightMapTypes = HeightMap.Type.values();
+
+            for (HeightMap.Type heightMapType : heightMapTypes) {
+                if (ChunkStatus.FULL.h().contains(heightMapType)) {
+                    heightMap.put(heightMapType, new HeightMap(chunk, heightMapType));
+                }
+            }
+
+            for(int i = 0; i < entitySlices.length; i++)
+                entitySlices[i] = new UnsafeList();
+        }
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

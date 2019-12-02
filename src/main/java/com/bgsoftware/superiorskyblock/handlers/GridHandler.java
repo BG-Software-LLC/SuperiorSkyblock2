@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
@@ -30,7 +29,6 @@ import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -101,10 +99,7 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                if(!ServerVersion.isEquals(ServerVersion.v1_14)){
-                    for (Chunk chunk : island.getAllChunks(true))
-                        chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-                }
+                plugin.getNMSAdapter().regenerateChunks(island.getAllChunks(true));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {

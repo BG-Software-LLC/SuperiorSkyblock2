@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.mojang.authlib.GameProfile;
@@ -69,7 +70,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -104,16 +104,7 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
-        Block flower;
-        try{
-            Field flowerField = blockFlowerPot.getClass().getField("c");
-            flowerField.setAccessible(true);
-            flower = (Block) flowerField.get(blockFlowerPot);
-            flowerField.setAccessible(false);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
+        Block flower = (Block) Fields.BLOCK_FLOWER_POT_CONTENT.get(blockFlowerPot);
         ItemStack itemStack = new ItemStack(flower.getItem(), 1);
         return CraftItemStack.asBukkitCopy(itemStack);
     }
@@ -124,14 +115,7 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
         ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
-        try{
-            Field flowerField = blockFlowerPot.getClass().getField("c");
-            flowerField.setAccessible(true);
-            flowerField.set(blockFlowerPot, Block.asBlock(flower.getItem()));
-            flowerField.setAccessible(false);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+        Fields.BLOCK_FLOWER_POT_CONTENT.set(blockFlowerPot, Block.asBlock(flower.getItem()));
         world.update(blockPosition, blockFlowerPot);
     }
 

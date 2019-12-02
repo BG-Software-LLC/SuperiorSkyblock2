@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -683,10 +682,8 @@ public class SIsland extends DatabaseObject implements Island {
         });
 
         plugin.getGrid().deleteIsland(this);
-        if(!ServerVersion.isEquals(ServerVersion.v1_14)) {
-            for (Chunk chunk : getAllChunks(true))
-                chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
-        }
+
+        plugin.getNMSAdapter().regenerateChunks(getAllChunks(true));
     }
 
     @Override
