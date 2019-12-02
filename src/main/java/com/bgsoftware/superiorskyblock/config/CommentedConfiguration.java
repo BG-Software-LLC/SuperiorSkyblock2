@@ -55,10 +55,15 @@ public final class CommentedConfiguration extends YamlConfiguration {
      *                        if they are already exist in the config. If they are not in the
      *                        config, they will be synced with the resource's config.
      */
-    public void syncWithConfig(File file, InputStream resource, String... ignoredSections) throws IOException{
+    public void syncWithConfig(File file, InputStream resource, String... ignoredSections){
         CommentedConfiguration cfg = loadConfiguration(resource);
-        if(syncConfigurationSection(cfg, cfg.getConfigurationSection(""), Arrays.asList(ignoredSections)) && file != null)
-            save(file);
+        if(syncConfigurationSection(cfg, cfg.getConfigurationSection(""), Arrays.asList(ignoredSections)) && file != null) {
+            try {
+                save(file);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -143,6 +148,15 @@ public final class CommentedConfiguration extends YamlConfiguration {
 
             //Skipping to the next line.
             currentIndex++;
+        }
+    }
+
+    @Override
+    public void save(File file){
+        try {
+            super.save(file);
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
     }
 
