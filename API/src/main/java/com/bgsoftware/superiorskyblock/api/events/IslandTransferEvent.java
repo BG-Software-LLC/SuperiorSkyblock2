@@ -3,18 +3,13 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 /**
  * IslandTransferEvent is called when the leadership of an island is transferred.
  */
-public class IslandTransferEvent extends Event implements Cancellable {
-
-    private static final HandlerList handlers = new HandlerList();
+public class IslandTransferEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer oldOwner, newOwner;
-    private final Island island;
     private boolean cancelled = false;
 
     /**
@@ -24,7 +19,7 @@ public class IslandTransferEvent extends Event implements Cancellable {
      * @param newOwner The new owner of the island.
      */
     public IslandTransferEvent(Island island, SuperiorPlayer oldOwner, SuperiorPlayer newOwner){
-        this.island = island;
+        super(island);
         this.oldOwner = oldOwner;
         this.newOwner = newOwner;
     }
@@ -43,13 +38,6 @@ public class IslandTransferEvent extends Event implements Cancellable {
         return newOwner;
     }
 
-    /**
-     * Get the island that the leadership of it is transferred.
-     */
-    public Island getIsland() {
-        return island;
-    }
-
     @Override
     public boolean isCancelled() {
         return cancelled;
@@ -58,15 +46,6 @@ public class IslandTransferEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 
 }

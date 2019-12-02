@@ -3,18 +3,13 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 /**
  * IslandCreateEvent is called when a new island is created.
  */
-public class IslandCreateEvent extends Event implements Cancellable {
-
-    private static final HandlerList handlers = new HandlerList();
+public class IslandCreateEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
-    private final Island island;
     private final String schematic;
     private boolean teleport = true;
     private boolean cancelled = false;
@@ -38,8 +33,8 @@ public class IslandCreateEvent extends Event implements Cancellable {
      * @param schematic The schematic that was used.
      */
     public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic){
+        super(island);
         this.superiorPlayer = superiorPlayer;
-        this.island = island;
         this.schematic = schematic;
     }
 
@@ -48,13 +43,6 @@ public class IslandCreateEvent extends Event implements Cancellable {
      */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
-    }
-
-    /**
-     * Get the island object that was created.
-     */
-    public Island getIsland() {
-        return island;
     }
 
     /**
@@ -86,15 +74,6 @@ public class IslandCreateEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 
 }

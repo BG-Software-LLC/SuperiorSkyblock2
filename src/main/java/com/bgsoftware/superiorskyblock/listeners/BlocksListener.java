@@ -55,8 +55,6 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());

@@ -1,7 +1,16 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.BlockGenerateEvent;
@@ -42,6 +51,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 public final class CustomEventsListener implements Listener {
@@ -321,6 +332,78 @@ public final class CustomEventsListener implements Listener {
                 });
             }
         }, 1L);
+    }
+
+    /*
+     *  This event is used for the event-commands feature!
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onIslandEvent(IslandEvent e){
+        List<String> commands = plugin.getSettings().eventCommands.get(e.getClass().getSimpleName().toLowerCase());
+
+        if(commands == null)
+            return;
+
+        String islandName = e.getIsland().getName(), playerName = "", schematicName = "", enterCause = "",
+                targetName = "", leaveCause = "", oldOwner = "", newOwner = "", worth = "", level = "";
+
+        switch (e.getClass().getSimpleName().toLowerCase()){
+            case "islandcreateevent":
+                playerName = ((IslandCreateEvent) e).getPlayer().getName();
+                schematicName = ((IslandCreateEvent) e).getSchematic();
+                break;
+            case "islanddisbandevent":
+                playerName = ((IslandDisbandEvent) e).getPlayer().getName();
+                break;
+            case "islandenterevent":
+            case "islandenterprotectedevent":
+                playerName = ((IslandEnterEvent) e).getPlayer().getName();
+                enterCause = ((IslandEnterEvent) e).getCause().name();
+                break;
+            case "islandinviteevent":
+                playerName = ((IslandInviteEvent) e).getPlayer().getName();
+                targetName = ((IslandInviteEvent) e).getTarget().getName();
+                break;
+            case "islandjoinevent":
+                playerName = ((IslandJoinEvent) e).getPlayer().getName();
+                break;
+            case "islandkickevent":
+                playerName = ((IslandKickEvent) e).getPlayer().getName();
+                targetName = ((IslandKickEvent) e).getTarget().getName();
+                break;
+            case "islandleaveevent":
+            case "islandleaveprotectedevent":
+                playerName = ((IslandLeaveEvent) e).getPlayer().getName();
+                leaveCause = ((IslandLeaveEvent) e).getCause().name();
+                break;
+            case "islandquitevent":
+                playerName = ((IslandQuitEvent) e).getPlayer().getName();
+                break;
+            case "islandtransferevent":
+                oldOwner = playerName = ((IslandTransferEvent) e).getOldOwner().getName();
+                newOwner = targetName = ((IslandTransferEvent) e).getNewOwner().getName();
+                break;
+            case "islandworthcalculatedevent":
+                playerName = ((IslandWorthCalculatedEvent) e).getPlayer().getName();
+                worth = ((IslandWorthCalculatedEvent) e).getWorth().toString();
+                level = ((IslandWorthCalculatedEvent) e).getLevel().toString();
+                break;
+        }
+
+        for(String command : commands){
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                    .replace("%island%", islandName)
+                    .replace("%player%", playerName)
+                    .replace("%schematic%", schematicName)
+                    .replace("%enter-cause%", enterCause)
+                    .replace("%target%", targetName)
+                    .replace("%leave-cause%", leaveCause)
+                    .replace("%old-owner%", oldOwner)
+                    .replace("%new-owner%", newOwner)
+                    .replace("%worth%", worth)
+                    .replace("%level%", level)
+            );
+        }
     }
 
 }

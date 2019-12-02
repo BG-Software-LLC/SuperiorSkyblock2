@@ -2,18 +2,13 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 /**
  * IslandKickEvent is called when a player is kicked from his island.
  */
-public class IslandKickEvent extends Event {
-
-    private static final HandlerList handlers = new HandlerList();
+public class IslandKickEvent extends IslandEvent {
 
     private final SuperiorPlayer superiorPlayer, targetPlayer;
-    private final Island island;
 
     /**
      * The constructor of the event.
@@ -22,9 +17,9 @@ public class IslandKickEvent extends Event {
      * @param island The island that the player was kicked from.
      */
     public IslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
+        super(island);
         this.superiorPlayer = superiorPlayer;
         this.targetPlayer = targetPlayer;
-        this.island = island;
     }
 
     /**
@@ -39,22 +34,6 @@ public class IslandKickEvent extends Event {
      */
     public SuperiorPlayer getTarget() {
         return targetPlayer;
-    }
-
-    /**
-     * Get the island that the player was kicked from.
-     */
-    public Island getIsland() {
-        return island;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 
 }

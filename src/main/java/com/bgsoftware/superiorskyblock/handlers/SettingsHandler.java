@@ -86,6 +86,7 @@ public final class SettingsHandler {
     public final List<String> blockedVisitorsCommands;
     public final boolean starterChestEnabled;
     public final Map<Integer, ItemStack> starterChestContents;
+    public final Map<String, List<String>> eventCommands;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -195,6 +196,10 @@ public final class SettingsHandler {
                 itemStack.setAmount(cfg.getInt("starter-chest.contents." + slot + ".amount", 1));
                 starterChestContents.put(Integer.parseInt(slot), itemStack);
             }catch(Exception ignored){}
+        }
+        eventCommands = new HashMap<>();
+        for(String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)){
+            eventCommands.put(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
         }
     }
 

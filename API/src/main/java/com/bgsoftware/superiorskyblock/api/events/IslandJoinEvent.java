@@ -3,18 +3,13 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 /**
  * IslandJoinEvent is called when a player is joining an island as a member of that island.
  */
-public class IslandJoinEvent extends Event implements Cancellable {
-
-    private static final HandlerList handlers = new HandlerList();
+public class IslandJoinEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
-    private final Island island;
     private boolean cancelled = false;
 
     /**
@@ -23,8 +18,8 @@ public class IslandJoinEvent extends Event implements Cancellable {
      * @param island The island that the player joined into.
      */
     public IslandJoinEvent(SuperiorPlayer superiorPlayer, Island island){
+        super(island);
         this.superiorPlayer = superiorPlayer;
-        this.island = island;
     }
 
     /**
@@ -32,13 +27,6 @@ public class IslandJoinEvent extends Event implements Cancellable {
      */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
-    }
-
-    /**
-     * Get the island that the player joined into.
-     */
-    public Island getIsland() {
-        return island;
     }
 
     @Override
@@ -49,15 +37,6 @@ public class IslandJoinEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 
 }

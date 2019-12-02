@@ -2,19 +2,14 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 
 import java.math.BigDecimal;
 
 /**
  * IslandWorthCalculatedEvent is called when the worth of an island is calculated.
  */
-public class IslandWorthCalculatedEvent extends Event {
+public class IslandWorthCalculatedEvent extends IslandEvent {
 
-    private static final HandlerList handlers = new HandlerList();
-
-    private final Island island;
     private final BigDecimal level, worth;
     private final SuperiorPlayer player;
 
@@ -39,17 +34,10 @@ public class IslandWorthCalculatedEvent extends Event {
      * @param worth The new worth value of the island.
      */
     public IslandWorthCalculatedEvent(Island island, SuperiorPlayer player, BigDecimal level, BigDecimal worth) {
-        this.island = island;
+        super(island);
         this.player = player;
         this.level = level;
         this.worth = worth;
-    }
-
-    /**
-     * Get the island that it's worth was calculated.
-     */
-    public Island getIsland() {
-        return island;
     }
 
     /**
@@ -72,14 +60,5 @@ public class IslandWorthCalculatedEvent extends Event {
      */
     public BigDecimal getWorth() {
         return worth;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 }
