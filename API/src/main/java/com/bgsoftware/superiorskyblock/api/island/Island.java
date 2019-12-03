@@ -32,34 +32,10 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
-     * Get the list of members of the island, excluding the owner.
-     *
-     * @deprecated See getIslandMembers
-     */
-    @Deprecated
-    List<UUID> getMembers();
-
-    /**
-     * Get the list of all members, including the owner.
-     *
-     * @deprecated See getIslandMembers
-     */
-    @Deprecated
-    List<UUID> getAllMembers();
-
-    /**
      * Get the list of members of the island.
      * @param includeOwner Whether or not the owner should be returned.
      */
     List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
-
-    /**
-     * Get the list of all banned players.
-     *
-     * @deprecated See getBannedPlayers
-     */
-    @Deprecated
-    List<UUID> getAllBannedMembers();
 
     /**
      * Get the list of all banned players.
@@ -68,24 +44,8 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the list of all visitors that are on the island.
-     *
-     * @deprecated See getIslandVisitors
-     */
-    @Deprecated
-    List<UUID> getVisitors();
-
-    /**
-     * Get the list of all visitors that are on the island.
      */
     List<SuperiorPlayer> getIslandVisitors();
-
-    /**
-     * Get the list of all the players that are on the island.
-     *
-     * @deprecated See getAllPlayersInside
-     */
-    @Deprecated
-    List<UUID> allPlayersInside();
 
     /**
      * Get the list of all the players that are on the island.
@@ -108,16 +68,6 @@ public interface Island extends Comparable<Island> {
      * Checks whether or not the player has been invited to the island.
      */
     boolean isInvited(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Add a player to the island.
-     * @param superiorPlayer The player to add.
-     * @param islandRole The role to give to the player.
-     *
-     * @deprecated See addMember(SuperiorPlayer, PlayerRole)
-     */
-    @Deprecated
-    void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole);
 
     /**
      * Add a player to the island.
@@ -282,17 +232,6 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Set a permission to a specific role.
-     * @param islandRole The role to set the permission to.
-     * @param islandPermission The permission to set.
-     * @param value The value to give the permission.
-     *
-     * @deprecated See setPermission(PlayerRole, IslandPermission, Boolean)
-     */
-    @Deprecated
-    void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value);
-
-    /**
-     * Set a permission to a specific role.
      * @param playerRole The role to set the permission to.
      * @param islandPermission The permission to set.
      * @param value The value to give the permission.
@@ -309,15 +248,6 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the permission-node of a role.
-     * @param islandRole The role to check.
-     *
-     * @deprecated See getPermissionNode(PlayerRole)
-     */
-    @Deprecated
-    PermissionNode getPermissionNode(IslandRole islandRole);
-
-    /**
-     * Get the permission-node of a role.
      * @param playerRole The role to check.
      */
     PermissionNode getPermissionNode(PlayerRole playerRole);
@@ -327,13 +257,6 @@ public interface Island extends Comparable<Island> {
      * @param superiorPlayer The player to check.
      */
     PermissionNode getPermissionNode(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Get the required role for a specific permission.
-     * @param islandPermission The permission to check.
-     */
-    @Deprecated
-    IslandRole getRequiredRole(IslandPermission islandPermission);
 
     /**
      * Get the required role for a specific permission.
@@ -776,29 +699,9 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the rating that a player has given the island.
-     * @param uuid The uuid of the player to check.
-     *
-     * @deprecated See getRating(SuperiorPlayer)
-     */
-    @Deprecated
-    Rating getRating(UUID uuid);
-
-    /**
-     * Get the rating that a player has given the island.
      * @param superiorPlayer The player to check.
-     *
-     * @deprecated See getRating(SuperiorPlayer)
      */
     Rating getRating(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Set a rating of a player.
-     * @param uuid The uuid of the player that sets the rating.
-     * @param rating The rating to set.
-     *
-     * @deprecated See setRating(SuperiorPlayer, Rating)
-     */
-    void setRating(UUID uuid, Rating rating);
 
     /**
      * Set a rating of a player.

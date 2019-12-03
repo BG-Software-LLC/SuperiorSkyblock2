@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -263,16 +262,6 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public List<UUID> getMembers() {
-        return getIslandMembers(false).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UUID> getAllMembers() {
-        return getIslandMembers(true).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
-
-    @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
         List<SuperiorPlayer> members = new ArrayList<>();
 
@@ -285,28 +274,13 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public List<UUID> getAllBannedMembers() {
-        return getBannedPlayers().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
-
-    @Override
     public List<SuperiorPlayer> getBannedPlayers() {
         return new ArrayList<>(banned);
     }
 
     @Override
-    public List<UUID> getVisitors(){
-        return getIslandVisitors().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
-
-    @Override
     public List<SuperiorPlayer> getIslandVisitors() {
         return playersInside.stream().filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<UUID> allPlayersInside(){
-        return getAllPlayersInside().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
     }
 
     @Override
@@ -332,12 +306,6 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer){
         return invitedPlayers.contains(superiorPlayer);
-    }
-
-    @Override
-    @Deprecated
-    public void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole){
-        addMember(superiorPlayer, SPlayerRole.of(islandRole.name()));
     }
 
     @Override
@@ -566,12 +534,6 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value){
-        setPermission(SPlayerRole.of(islandRole.name()), islandPermission, value);
-    }
-
-    @Override
     public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
         permissionNodes.get(playerRole).setPermission(islandPermission, value);
 
@@ -598,12 +560,6 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public SPermissionNode getPermissionNode(IslandRole islandRole){
-        return getPermissionNode(SPlayerRole.of(islandRole.name()));
-    }
-
-    @Override
     public SPermissionNode getPermissionNode(PlayerRole playerRole) {
         return permissionNodes.get(playerRole);
     }
@@ -612,12 +568,6 @@ public final class SIsland extends DatabaseObject implements Island {
     public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
         return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
-    }
-
-    @Override
-    @Deprecated
-    public IslandRole getRequiredRole(IslandPermission islandPermission){
-        return IslandRole.valueOf(getRequiredPlayerRole(islandPermission).toString().toUpperCase());
     }
 
     @Override
@@ -824,7 +774,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void updateBorder() {
-        allPlayersInside().forEach(uuid -> plugin.getNMSAdapter().setWorldBorder(SSuperiorPlayer.of(uuid), this));
+        getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
     }
 
     @Override
@@ -893,8 +843,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.locked = locked;
 
         if(locked){
-            for(UUID uuid : allPlayersInside()){
-                SuperiorPlayer victimPlayer = SSuperiorPlayer.of(uuid);
+            for(SuperiorPlayer victimPlayer : getAllPlayersInside()){
                 if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
                     victimPlayer.teleport(plugin.getGrid().getSpawnIsland());
                     Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
@@ -1399,18 +1348,8 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public Rating getRating(UUID uuid) {
-        return getRating(SSuperiorPlayer.of(uuid));
-    }
-
-    @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
         return ratings.getOrDefault(superiorPlayer.getUniqueId(), Rating.UNKNOWN);
-    }
-
-    @Override
-    public void setRating(UUID uuid, Rating rating) {
-        setRating(SSuperiorPlayer.of(uuid), rating);
     }
 
     @Override
@@ -1569,11 +1508,12 @@ public final class SIsland extends DatabaseObject implements Island {
             case ALWAYS_MIDDLE_DAY:
             case ALWAYS_NIGHT:
             case ALWAYS_MIDDLE_NIGHT:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).resetPlayerTime());
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerTime());
                 break;
             case ALWAYS_RAIN:
             case ALWAYS_SHINY:
-                allPlayersInside().forEach(uuid -> Bukkit.getPlayer(uuid).resetPlayerWeather());
+                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerWeather());
+                break;
         }
 
         MenuSettings.refreshMenus();

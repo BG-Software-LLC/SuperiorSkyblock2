@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -278,20 +277,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     @Override
-    @Deprecated
-    public IslandRole getIslandRole() {
-        return IslandRole.valueOf(getPlayerRole().toString().toUpperCase());
-    }
-
-    @Override
     public PlayerRole getPlayerRole() {
         return playerRole;
-    }
-
-    @Override
-    @Deprecated
-    public void setIslandRole(IslandRole islandRole) {
-        setPlayerRole(SPlayerRole.of(islandRole.name()));
     }
 
     @Override

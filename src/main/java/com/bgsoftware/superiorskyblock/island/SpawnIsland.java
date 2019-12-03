@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -63,22 +62,7 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public List<UUID> getMembers() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<UUID> getAllMembers() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<UUID> getAllBannedMembers() {
         return new ArrayList<>();
     }
 
@@ -88,18 +72,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public List<UUID> getVisitors() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public List<SuperiorPlayer> getIslandVisitors() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public List<UUID> allPlayersInside() {
-        return getAllPlayersInside().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
     }
 
     @Override
@@ -120,12 +94,6 @@ public final class SpawnIsland implements Island {
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer) {
         return false;
-    }
-
-    @Override
-    @Deprecated
-    public void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole) {
-
     }
 
     @Override
@@ -280,12 +248,6 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value) {
-
-    }
-
-    @Override
     public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
 
     }
@@ -293,12 +255,6 @@ public final class SpawnIsland implements Island {
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
 
-    }
-
-    @Override
-    @Deprecated
-    public SPermissionNode getPermissionNode(IslandRole islandRole){
-        return getPermissionNode(SPlayerRole.of(islandRole.name()));
     }
 
     @Override
@@ -310,12 +266,6 @@ public final class SpawnIsland implements Island {
     public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
         return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
-    }
-
-    @Override
-    @Deprecated
-    public IslandRole getRequiredRole(IslandPermission islandPermission){
-        return IslandRole.valueOf(getRequiredPlayerRole(islandPermission).toString().toUpperCase());
     }
 
     @Override
@@ -670,18 +620,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public Rating getRating(UUID uuid) {
-        return Rating.UNKNOWN;
-    }
-
-    @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
         return Rating.UNKNOWN;
-    }
-
-    @Override
-    public void setRating(UUID uuid, Rating rating) {
-
     }
 
     @Override

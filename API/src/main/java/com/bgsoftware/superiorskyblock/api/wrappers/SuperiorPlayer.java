@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.wrappers;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import org.bukkit.Location;
@@ -110,25 +109,8 @@ public interface SuperiorPlayer {
 
     /**
      * Get the role of the player.
-     *
-     * @deprecated See getPlayerRole()
-     */
-    @Deprecated
-    IslandRole getIslandRole();
-
-    /**
-     * Get the role of the player.
      */
     PlayerRole getPlayerRole();
-
-    /**
-     * Set the role of the player.
-     * @param islandRole The role to give the player.
-     *
-     * @deprecated see setPlayerRole(PlayerRole)
-     */
-    @Deprecated
-    void setIslandRole(IslandRole islandRole);
 
     /**
      * Set the role of the player.
