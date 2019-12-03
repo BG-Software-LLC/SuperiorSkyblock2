@@ -66,7 +66,7 @@ public final class CmdSetTeleport implements ICommand {
         }
 
         if (!island.isInsideRange(superiorPlayer.getLocation())) {
-            Locale.TELEPORT_LOCAITON_OUTSIDE_ISLAND.send(superiorPlayer);
+            Locale.TELEPORT_LOCATION_OUTSIDE_ISLAND.send(superiorPlayer);
             return;
         }
 
