@@ -1,74 +1,110 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandRole;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public final class SpawnIsland extends SIsland {
+public final class SpawnIsland implements Island {
 
     private static SuperiorSkyblockPlugin plugin;
 
-    private Location center;
-    private String world;
-    private int islandSize;
-    private Set<String> islandSettings = new HashSet<>();
+    private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
+    private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
+    private final SBlockPosition center;
+    private final int islandSize;
+    private final List<IslandSettings> islandSettings;
+    private Biome biome = Biome.PLAINS;
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin){
-        super(null, SBlockPosition.of(plugin.getSettings().spawnLocation), "", "");
         SpawnIsland.plugin = plugin;
 
-        String[] loc = plugin.getSettings().spawnLocation.split(", ");
+        center = SBlockPosition.of(plugin.getSettings().spawnLocation);
+        islandSize = plugin.getSettings().maxIslandSize;
+        islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandSettings::valueOf).collect(Collectors.toList());
 
-        this.world = loc[0];
-        double x = ((int) Double.parseDouble(loc[1])) + 0.5;
-        double y = Integer.parseInt(loc[2]);
-        double z = ((int) Double.parseDouble(loc[3])) + 0.5;
-        float yaw = loc.length == 6 ? Float.parseFloat(loc[4]) : 0;
-        float pitch = loc.length == 6 ? Float.parseFloat(loc[5]) : 0;
-        this.center = new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
+        assignPermissionNodes();
 
-        this.islandSize = plugin.getSettings().maxIslandSize;
-        this.islandSettings.addAll(plugin.getSettings().spawnSettings);
-    }
-
-    public String getWorldName(){
-        return world;
-    }
-
-    @Override
-    public Location getCenter(World.Environment environment) {
-        if(center.getWorld() == null)
-            center.setWorld(Bukkit.getWorld(world));
-
-        return center.clone();
-    }
-
-    @Override
-    public Location getTeleportLocation(World.Environment environment) {
-        Location center = getCenter(World.Environment.NORMAL);
-        if(center.getWorld() == null)
-            center = this.center = new Location(plugin.getGrid().getIslandsWorld(World.Environment.NORMAL), 0, 100, 0);
-
-        return center;
+        Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
     }
 
     @Override
     public SuperiorPlayer getOwner() {
         return null;
+    }
+
+    @Override
+    public List<UUID> getMembers() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<UUID> getAllMembers() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<UUID> getAllBannedMembers() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<SuperiorPlayer> getBannedPlayers() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<UUID> getVisitors() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<UUID> allPlayersInside() {
+        return getAllPlayersInside().stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SuperiorPlayer> getAllPlayersInside() {
+        return new ArrayList<>(playersInside);
     }
 
     @Override
@@ -84,6 +120,12 @@ public final class SpawnIsland extends SIsland {
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer) {
         return false;
+    }
+
+    @Override
+    @Deprecated
+    public void addMember(SuperiorPlayer superiorPlayer, IslandRole islandRole) {
+
     }
 
     @Override
@@ -133,7 +175,35 @@ public final class SpawnIsland extends SIsland {
 
     @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
+        if(inside)
+            playersInside.add(superiorPlayer);
+        else
+            playersInside.remove(superiorPlayer);
+    }
 
+    @Override
+    public Location getCenter() {
+        return getCenter(World.Environment.NORMAL);
+    }
+
+    @Override
+    public Location getCenter(World.Environment environment) {
+        return center.parse().add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public Location getTeleportLocation() {
+        return getCenter(World.Environment.NORMAL);
+    }
+
+    @Override
+    public Location getTeleportLocation(World.Environment environment) {
+        return getCenter(environment);
+    }
+
+    @Override
+    public Location getVisitorsLocation() {
+        return getCenter(World.Environment.NORMAL);
     }
 
     @Override
@@ -147,8 +217,72 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public Location getMinimum() {
+        int islandDistance = plugin.getSettings().maxIslandSize;
+        return getCenter(World.Environment.NORMAL).subtract(islandDistance, 0, islandDistance);
+    }
+
+    @Override
+    public Location getMaximum() {
+        int islandDistance = plugin.getSettings().maxIslandSize;
+        return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks() {
+        return getAllChunks(false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(boolean onlyProtected) {
+        int islandSize = getIslandSize();
+        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
+        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
+        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
+            for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
+                chunks.add(minChunk.getWorld().getChunkAt(x, z));
+            }
+        }
+
+
+        return chunks;
+    }
+
+    @Override
+    public boolean isInside(Location location) {
+        if(!location.getWorld().equals(getCenter(World.Environment.NORMAL).getWorld()))
+            return false;
+
+        Location min = getMinimum(), max = getMaximum();
+        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
+                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+    }
+
+    @Override
+    public boolean isInsideRange(Location location) {
+        return isInside(location);
+    }
+
+    @Override
+    public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
+        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
+    }
+
+    @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
-        return !plugin.getSettings().spawnProtection || super.hasPermission(superiorPlayer, islandPermission);
+        return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPermission) ||
+                getPermissionNode(superiorPlayer).hasPermission(islandPermission);
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(IslandRole islandRole, IslandPermission islandPermission, boolean value) {
+
     }
 
     @Override
@@ -162,13 +296,53 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    @Deprecated
+    public SPermissionNode getPermissionNode(IslandRole islandRole){
+        return getPermissionNode(SPlayerRole.of(islandRole.name()));
+    }
+
+    @Override
+    public SPermissionNode getPermissionNode(PlayerRole playerRole) {
+        return permissionNodes.get(playerRole);
+    }
+
+    @Override
+    public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
+        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
+    }
+
+    @Override
+    @Deprecated
+    public IslandRole getRequiredRole(IslandPermission islandPermission){
+        return IslandRole.valueOf(getRequiredPlayerRole(islandPermission).toString().toUpperCase());
+    }
+
+    @Override
+    public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
+        return plugin.getPlayers().getRoles().stream()
+                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPermission))
+                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
+    }
+
+    @Override
     public boolean isSpawn() {
         return true;
     }
 
     @Override
+    public String getName() {
+        return "";
+    }
+
+    @Override
     public void setName(String islandName) {
 
+    }
+
+    @Override
+    public String getDescription() {
+        return "";
     }
 
     @Override
@@ -192,6 +366,16 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void calcIslandWorth(SuperiorPlayer asker, Runnable callback) {
+
+    }
+
+    @Override
+    public void updateBorder() {
+        getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
+    }
+
+    @Override
     public int getIslandSize() {
         return islandSize;
     }
@@ -202,12 +386,32 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public String getDiscord() {
+        return "";
+    }
+
+    @Override
     public void setDiscord(String discord) {
 
     }
 
     @Override
+    public String getPaypal() {
+        return "";
+    }
+
+    @Override
     public void setPaypal(String paypal) {
+
+    }
+
+    @Override
+    public Biome getBiome() {
+        return biome;
+    }
+
+    @Override
+    public void setBiome(Biome biome) {
 
     }
 
@@ -232,6 +436,20 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void sendMessage(String message, UUID... ignoredMembers) {
+        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message));
+    }
+
+    @Override
+    public BigDecimal getMoneyInBankAsBigDecimal() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
     public void depositMoney(double amount) {
 
     }
@@ -242,7 +460,47 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public void handleBlockPlace(Block block) {
+
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, int amount) {
+
+    }
+
+    @Override
+    public void handleBlockPlace(Block block, int amount, boolean save) {
+
+    }
+
+    @Override
+    public void handleBlockPlace(Key key, int amount) {
+
+    }
+
+    @Override
     public void handleBlockPlace(Key key, int amount, boolean save) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(Block block) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, int amount) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(Block block, int amount, boolean save) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(Key key, int amount) {
 
     }
 
@@ -252,8 +510,38 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public int getBlockCount(Key key) {
+        return 0;
+    }
+
+    @Override
+    public int getExactBlockCount(Key key) {
+        return 0;
+    }
+
+    @Override
+    public BigDecimal getWorthAsBigDecimal() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public BigDecimal getRawWorthAsBigDecimal() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
     public void setBonusWorth(BigDecimal bonusWorth) {
 
+    }
+
+    @Override
+    public BigDecimal getIslandLevelAsBigDecimal() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public int getUpgradeLevel(String upgradeName) {
+        return 0;
     }
 
     @Override
@@ -262,8 +550,18 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public double getCropGrowthMultiplier() {
+        return 1;
+    }
+
+    @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
 
+    }
+
+    @Override
+    public double getSpawnerRatesMultiplier() {
+        return 1;
     }
 
     @Override
@@ -272,8 +570,28 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public double getMobDropsMultiplier() {
+        return 1;
+    }
+
+    @Override
     public void setMobDropsMultiplier(double mobDrops) {
 
+    }
+
+    @Override
+    public int getBlockLimit(Key key) {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int getExactBlockLimit(Key key) {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public Map<Key, Integer> getBlocksLimits() {
+        return new HashMap<>();
     }
 
     @Override
@@ -282,13 +600,43 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public boolean hasReachedBlockLimit(Key key) {
+        return false;
+    }
+
+    @Override
+    public boolean hasReachedBlockLimit(Key key, int amount) {
+        return false;
+    }
+
+    @Override
+    public int getTeamLimit() {
+        return 0;
+    }
+
+    @Override
     public void setTeamLimit(int teamLimit) {
 
     }
 
     @Override
+    public int getWarpsLimit() {
+        return 0;
+    }
+
+    @Override
     public void setWarpsLimit(int warpsLimit) {
 
+    }
+
+    @Override
+    public Location getWarpLocation(String name) {
+        return null;
+    }
+
+    @Override
+    public boolean isWarpPrivate(String name) {
+        return false;
     }
 
     @Override
@@ -312,6 +660,26 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public List<String> getAllWarps() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean hasMoreWarpSlots() {
+        return false;
+    }
+
+    @Override
+    public Rating getRating(UUID uuid) {
+        return Rating.UNKNOWN;
+    }
+
+    @Override
+    public Rating getRating(SuperiorPlayer superiorPlayer) {
+        return Rating.UNKNOWN;
+    }
+
+    @Override
     public void setRating(UUID uuid, Rating rating) {
 
     }
@@ -319,6 +687,21 @@ public final class SpawnIsland extends SIsland {
     @Override
     public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
 
+    }
+
+    @Override
+    public double getTotalRating() {
+        return 0;
+    }
+
+    @Override
+    public int getRatingAmount() {
+        return 0;
+    }
+
+    @Override
+    public Map<UUID, Rating> getRatings() {
+        return new HashMap<>();
     }
 
     @Override
@@ -337,8 +720,13 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
+    public List<Mission> getCompletedMissions() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public boolean hasSettingsEnabled(IslandSettings islandSettings) {
-        return this.islandSettings.contains(islandSettings.name());
+        return this.islandSettings.contains(islandSettings);
     }
 
     @Override
@@ -352,12 +740,48 @@ public final class SpawnIsland extends SIsland {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return obj instanceof SpawnIsland;
+    public void setGeneratorPercentage(Key key, int percentage) {
+
     }
 
     @Override
-    public int hashCode() {
+    public int getGeneratorPercentage(Key key) {
         return 0;
     }
+
+    @Override
+    public Map<String, Integer> getGeneratorPercentages() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public boolean wasSchematicGenerated(World.Environment environment) {
+        return true;
+    }
+
+    @Override
+    public void setSchematicGenerate(World.Environment environment) {
+
+    }
+
+    @Override
+    public String getSchematicName() {
+        return "";
+    }
+
+    @SuppressWarnings("NullableProblems")
+    @Override
+    public int compareTo(Island o) {
+        return 0;
+    }
+
+    private void assignPermissionNodes(){
+        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+            if(!permissionNodes.containsKey(playerRole)) {
+                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+                permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
+            }
+        }
+    }
+
 }

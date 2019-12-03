@@ -75,7 +75,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
-public class SIsland extends DatabaseObject implements Island {
+public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
     private static final int NO_BLOCK_LIMIT = -1;

@@ -206,7 +206,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         keysHandler = new KeysHandler(this);
 
         Executor.sync(() -> {
-            if(Bukkit.getWorld(gridHandler.getSpawnIsland().getWorldName()) == null) {
+            if(gridHandler.getSpawnIsland().getCenter(World.Environment.NORMAL).getWorld() == null){
                 new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
                 Bukkit.getPluginManager().disablePlugin(this);
                 return;
