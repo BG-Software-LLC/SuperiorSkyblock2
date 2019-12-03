@@ -400,8 +400,16 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the money in the bank of the island.
+     *
+     * @deprecated see getMoneyInBank()
      */
+    @Deprecated
     BigDecimal getMoneyInBankAsBigDecimal();
+
+    /**
+     * Get the money in the bank of the island.
+     */
+    BigDecimal getMoneyInBank();
 
     /**
      * Deposit money into the bank.
@@ -507,13 +515,29 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the worth value of the island, including the money in the bank.
+     *
+     * @deprecated See getWorth()
      */
+    @Deprecated
     BigDecimal getWorthAsBigDecimal();
+
+    /**
+     * Get the worth value of the island, including the money in the bank.
+     */
+    BigDecimal getWorth();
+
+    /**
+     * Get the worth value of the island, excluding the money in the bank.
+     *
+     * @deprecated getRawWorth()
+     */
+    @Deprecated
+    BigDecimal getRawWorthAsBigDecimal();
 
     /**
      * Get the worth value of the island, excluding the money in the bank.
      */
-    BigDecimal getRawWorthAsBigDecimal();
+    BigDecimal getRawWorth();
 
     /**
      * Set a bonus worth for the island.
@@ -523,8 +547,16 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the level of the island.
+     *
+     * @deprecated See getIslandLevel()
      */
+    @Deprecated
     BigDecimal getIslandLevelAsBigDecimal();
+
+    /**
+     * Get the level of the island.
+     */
+    BigDecimal getIslandLevel();
 
     /*
      *  Upgrades related methods

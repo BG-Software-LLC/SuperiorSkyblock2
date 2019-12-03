@@ -229,10 +229,10 @@ public final class PlayersListener implements Listener {
                 plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()
-                .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevelAsBigDecimal()))
-                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal())))
-                .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorthAsBigDecimal()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorthAsBigDecimal())))
+                .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
+                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel())))
+                .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
+                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth())))
                 .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
         );
     }

@@ -29,7 +29,7 @@ public final class LeaderHeadsHook {
 
         @Override
         public Double getValue(Island island) {
-            return island.getWorthAsBigDecimal().doubleValue();
+            return island.getWorth().doubleValue();
         }
     }
 
@@ -41,7 +41,7 @@ public final class LeaderHeadsHook {
 
         @Override
         public Double getValue(Island island) {
-            return island.getIslandLevelAsBigDecimal().doubleValue();
+            return island.getIslandLevel().doubleValue();
         }
     }
 

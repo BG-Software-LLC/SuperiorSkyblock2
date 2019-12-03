@@ -30,7 +30,7 @@ public final class MenuValues extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inventory = super.buildInventory(title -> title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorthAsBigDecimal().toString()));
+        Inventory inventory = super.buildInventory(title -> title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorth().toString()));
 
         for(int slot = 0; slot < inventory.getSize(); slot++){
             if(containsData(slot + "")){

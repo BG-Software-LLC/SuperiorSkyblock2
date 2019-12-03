@@ -16,12 +16,12 @@ public final class SortingComparators {
     public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
 
     public final static Comparator<Island> WORTH_COMPARATOR = (o1, o2) -> {
-        int compare = o2.getWorthAsBigDecimal().compareTo(o1.getWorthAsBigDecimal());
+        int compare = o2.getWorth().compareTo(o1.getWorth());
         return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 
     public final static Comparator<Island> LEVEL_COMPARATOR = (o1, o2) -> {
-        int compare = o2.getIslandLevelAsBigDecimal().compareTo(o1.getIslandLevelAsBigDecimal());
+        int compare = o2.getIslandLevel().compareTo(o1.getIslandLevel());
         return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
 

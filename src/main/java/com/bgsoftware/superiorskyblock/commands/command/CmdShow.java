@@ -109,9 +109,9 @@ public final class CmdShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(StringUtils.formatRating(rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
         }
         if(!Locale.ISLAND_INFO_BANK.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyInBankAsBigDecimal())).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(island.getMoneyInBank())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty())
-            infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(island.getWorthAsBigDecimal())).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(island.getWorth())).append("\n");
         if(!Locale.ISLAND_INFO_DISCORD.isEmpty() && island.hasPermission(sender, IslandPermission.DISCORD_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_DISCORD.getMessage(island.getDiscord())).append("\n");
         if(!Locale.ISLAND_INFO_PAYPAL.isEmpty() && island.hasPermission(sender, IslandPermission.PAYPAL_SHOW))

@@ -137,10 +137,10 @@ public abstract class PlaceholderHook {
 
                                 if(value){
                                     if(sortingType.equals(SortingTypes.BY_WORTH)){
-                                        return _island.getWorthAsBigDecimal().toString();
+                                        return _island.getWorth().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_LEVEL)){
-                                        return _island.getIslandLevelAsBigDecimal().toString();
+                                        return _island.getIslandLevel().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_RATING)){
                                         return StringUtils.format(_island.getTotalRating());
@@ -197,21 +197,21 @@ public abstract class PlaceholderHook {
                     case "biome":
                         return StringUtils.format(island.getBiome().name());
                     case "level":
-                        return island.getIslandLevelAsBigDecimal().toString();
+                        return island.getIslandLevel().toString();
                     case "level_format":
-                        return StringUtils.fancyFormat(island.getIslandLevelAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getIslandLevel());
                     case "worth":
-                        return island.getWorthAsBigDecimal().toString();
+                        return island.getWorth().toString();
                     case "worth_format":
-                        return StringUtils.fancyFormat(island.getWorthAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getWorth());
                     case "raw_worth":
-                        return island.getRawWorthAsBigDecimal().toString();
+                        return island.getRawWorth().toString();
                     case "raw_worth_format":
-                        return StringUtils.fancyFormat(island.getRawWorthAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getRawWorth());
                     case "bank":
-                        return island.getMoneyInBankAsBigDecimal().toString();
+                        return island.getMoneyInBank().toString();
                     case "bank_format":
-                        return StringUtils.fancyFormat(island.getMoneyInBankAsBigDecimal());
+                        return StringUtils.fancyFormat(island.getMoneyInBank());
                     case "hoppers_limit":
                         return String.valueOf(island.getBlockLimit(Key.of("HOPPER")));
                     case "crops_multiplier":

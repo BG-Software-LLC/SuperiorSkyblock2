@@ -405,6 +405,7 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
+    @Deprecated
     public Location getCenter(){
         return getCenter(World.Environment.NORMAL);
     }
@@ -425,6 +426,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public Location getTeleportLocation() {
         return getTeleportLocation(World.Environment.NORMAL);
     }
@@ -750,8 +752,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 }
                 spawnersToCheck.clear();
 
-                BigDecimal islandLevel = getIslandLevelAsBigDecimal();
-                BigDecimal islandWorth = getWorthAsBigDecimal();
+                BigDecimal islandLevel = getIslandLevel();
+                BigDecimal islandWorth = getWorth();
 
                 Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth));
 
@@ -925,8 +927,15 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
+    @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
-        if(islandBank.doubleValue() < 0) islandBank = BigDecimalFormatted.ZERO;
+        return getMoneyInBank();
+    }
+
+    @Override
+    public BigDecimal getMoneyInBank() {
+        if(islandBank.doubleValue() < 0)
+            islandBank = BigDecimalFormatted.ZERO;
         return islandBank;
     }
 
@@ -1081,15 +1090,27 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getWorthAsBigDecimal() {
+        return getWorth();
+    }
+
+    @Override
+    public BigDecimal getWorth() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
         //noinspection BigDecimalMethodWithoutRoundingCalled
-        BigDecimal islandWorth = bankWorthRate <= 0 ? getRawWorthAsBigDecimal() : this.islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
+        BigDecimal islandWorth = bankWorthRate <= 0 ? getRawWorth() : this.islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
         return islandWorth.add(bonusWorth);
     }
 
     @Override
+    @Deprecated
     public BigDecimal getRawWorthAsBigDecimal() {
+        return getRawWorth();
+    }
+
+    @Override
+    public BigDecimal getRawWorth() {
         return islandWorth;
     }
 
@@ -1103,7 +1124,13 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getIslandLevelAsBigDecimal() {
+        return getIslandLevel();
+    }
+
+    @Override
+    public BigDecimalFormatted getIslandLevel() {
         return plugin.getSettings().bonusAffectLevel ? islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth))) : islandLevel;
     }
 
@@ -1692,11 +1719,11 @@ public final class SIsland extends DatabaseObject implements Island {
             return -1;
 
         if(plugin.getSettings().islandTopOrder.equals("WORTH")){
-            int compare = getWorthAsBigDecimal().compareTo(other.getWorthAsBigDecimal());
+            int compare = getWorth().compareTo(other.getWorth());
             if(compare != 0) return compare;
         }
         else {
-            int compare = getIslandLevelAsBigDecimal().compareTo(other.getIslandLevelAsBigDecimal());
+            int compare = getIslandLevel().compareTo(other.getIslandLevel());
             if(compare != 0) return compare;
         }
 

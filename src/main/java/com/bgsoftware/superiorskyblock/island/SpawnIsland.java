@@ -150,6 +150,7 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Location getCenter() {
         return getCenter(World.Environment.NORMAL);
     }
@@ -160,6 +161,7 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Location getTeleportLocation() {
         return getCenter(World.Environment.NORMAL);
     }
@@ -395,7 +397,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
+        return getMoneyInBank();
+    }
+
+    @Override
+    public BigDecimal getMoneyInBank() {
         return BigDecimal.ZERO;
     }
 
@@ -470,12 +478,24 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getWorthAsBigDecimal() {
+        return getWorth();
+    }
+
+    @Override
+    public BigDecimal getWorth() {
         return BigDecimal.ZERO;
     }
 
     @Override
+    @Deprecated
     public BigDecimal getRawWorthAsBigDecimal() {
+        return getRawWorth();
+    }
+
+    @Override
+    public BigDecimal getRawWorth() {
         return BigDecimal.ZERO;
     }
 
@@ -485,7 +505,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getIslandLevelAsBigDecimal() {
+        return getIslandLevel();
+    }
+
+    @Override
+    public BigDecimal getIslandLevel() {
         return BigDecimal.ZERO;
     }
 

@@ -23,7 +23,7 @@ public class IslandWorthCalculatedEvent extends IslandEvent {
      */
     @Deprecated
     public IslandWorthCalculatedEvent(Island island, BigDecimal level, SuperiorPlayer player) {
-        this(island, player, level, island.getWorthAsBigDecimal());
+        this(island, player, level, island.getWorth());
     }
 
     /**
