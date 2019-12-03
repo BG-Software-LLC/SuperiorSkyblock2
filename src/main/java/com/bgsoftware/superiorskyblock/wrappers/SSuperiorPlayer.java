@@ -32,6 +32,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.List;
@@ -68,6 +69,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private long lastTimeStatus = -1;
 
     private boolean immuneToPvP = false;
+
+    private BukkitTask teleportTask = null;
 
     public SSuperiorPlayer(CachedResultSet resultSet){
         player = UUID.fromString(resultSet.getString("player"));
@@ -533,6 +536,14 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public void setImmunedToPvP(boolean immunedToPvP){
         this.immuneToPvP = immunedToPvP;
+    }
+
+    public void setTeleportTask(BukkitTask teleportTask){
+        this.teleportTask = teleportTask;
+    }
+
+    public BukkitTask getTeleportTask(){
+        return teleportTask;
     }
 
     @Override

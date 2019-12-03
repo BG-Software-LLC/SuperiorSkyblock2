@@ -41,6 +41,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -346,6 +347,24 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
             Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }
+    }
+
+    @EventHandler
+    public void onPlayerMoveWhileWarmup(PlayerMoveEvent e){
+        Location from = e.getFrom(), to = e.getTo();
+
+        if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        BukkitTask teleportTask = ((SSuperiorPlayer) superiorPlayer).getTeleportTask();
+
+        if(teleportTask != null){
+            teleportTask.cancel();
+            ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
+            Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
+        }
+
     }
 
 }

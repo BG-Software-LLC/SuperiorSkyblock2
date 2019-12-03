@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -1328,8 +1329,20 @@ public class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
+        if(plugin.getSettings().warpsWarmup > 0) {
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(plugin.getSettings().warpsWarmup));
+            ((SSuperiorPlayer) superiorPlayer).setTeleportTask(Executor.sync(() ->
+                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
+        }
+        else {
+            warpPlayerWithoutWarmup(superiorPlayer, warp);
+        }
+    }
+
+    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
         Location location = warps.get(warp.toLowerCase()).location.clone();
         Block warpBlock = location.getBlock();
+        ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
 
         if(!isInsideRange(location)){
             Locale.UNSAFE_WARP.send(superiorPlayer);

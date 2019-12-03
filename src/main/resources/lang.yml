@@ -426,6 +426,8 @@ SETTINGS_UPDATED_ALL: '&e&lIsland | &7Successfully updated the settings {0} to a
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCAITON_OUTSIDE_ISLAND: '&c&lError | &7You are not inside your island.'
+TELEPORT_WARMUP: '&7&oYou will be teleported in {0}... Do not move!'
+TELEPORT_WARMUP_CANCEL: '&7&oYou moved and so the telportation was cancelled.'
 TELEPORTED_FAILED: '&e&lIsland | &7It seems like this island has no safe blocks. Please contact a staff member.'
 TELEPORTED_SUCCESS: '&e&lIsland | &7You were teleported to your island.'
 TELEPORTED_TO_WARP: '&e&lIsland | &7Successfully teleported to this island warp.'

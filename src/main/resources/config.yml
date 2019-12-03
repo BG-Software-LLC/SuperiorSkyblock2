@@ -544,3 +544,7 @@ starter-chest:
 # %island% %player% %schematic% %enter-cause% %target% %leave-cause% %old-owner% %new-owner% %worth% %level%
 event-commands:
   IslandCreateEvent: []
+
+# A delay before getting teleported to a warp.
+# Players cannot move in that time, or the teleportation will be cancelled.
+warps-warmup: 0
