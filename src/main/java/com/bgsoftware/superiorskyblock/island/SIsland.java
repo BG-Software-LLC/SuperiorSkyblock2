@@ -173,7 +173,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
         assignPermissionNodes();
         assignSettings();
-        assignGenerator();
         checkMembersDuplication();
 
         Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
