@@ -13,7 +13,7 @@ public final class BlockGenerateEvent extends Event {
     private final Block block;
     private final Island island;
 
-    private Key newStateKey = null;
+    private Key newStateKey = Key.of("COBBLESTONE");
 
     public BlockGenerateEvent(Block block, Island island){
         super(true);
