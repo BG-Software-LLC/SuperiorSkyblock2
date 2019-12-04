@@ -98,11 +98,18 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setBlock(Location location, int combinedId) {
+    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        chunk.setType(blockPosition, Block.getByCombinedId(combinedId), true);
+        int indexY = location.getBlockY() >> 4;
+
+        ChunkSection chunkSection = chunk.getSections()[indexY];
+
+        if(chunkSection == null)
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
+
+        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId));
+        world.getChunkProvider().getLightEngine().a(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()), chunkSection.c());
     }
 
     @Override
@@ -187,6 +194,11 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(EntityHuman entityHuman : world.getPlayers())
             ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
+    }
+
+    @Override
+    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
+
     }
 
     @Override

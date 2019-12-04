@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.schematics.data;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
@@ -34,8 +35,12 @@ public class SchematicBlock {
         return combinedId;
     }
 
-    public void applyBlock(Location location, Island island){
-        plugin.getNMSAdapter().setBlock(location, combinedId);
+    public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island){
+        applyBlock(blockChangeTask, location, (Runnable) null);
+    }
+
+    protected void applyBlock(BlockChangeTask blockChangeTask, Location location, Runnable onFinish){
+        blockChangeTask.setBlock(location, combinedId, onFinish);
     }
 
     private static class SchematicBanner extends SchematicBlock{
@@ -50,17 +55,18 @@ public class SchematicBlock {
         }
 
         @Override
-        public void applyBlock(Location location, Island island) {
-            super.applyBlock(location, island);
-            Banner banner = (Banner) location.getBlock().getState();
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, () -> {
+                Banner banner = (Banner) location.getBlock().getState();
 
-            if(baseColor != null)
-                banner.setBaseColor(baseColor);
+                if(baseColor != null)
+                    banner.setBaseColor(baseColor);
 
-            if(!patterns.isEmpty())
-                banner.setPatterns(patterns);
+                if(!patterns.isEmpty())
+                    banner.setPatterns(patterns);
 
-            banner.update();
+                banner.update();
+            });
         }
     }
 
@@ -74,18 +80,19 @@ public class SchematicBlock {
         }
 
         @Override
-        public void applyBlock(Location location, Island island) {
-            super.applyBlock(location, island);
-            Inventory inventory = ((InventoryHolder) location.getBlock().getState()).getInventory();
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, () -> {
+                Inventory inventory = ((InventoryHolder) location.getBlock().getState()).getInventory();
 
-            if(plugin.getSettings().starterChestEnabled && inventory.getType() == InventoryType.CHEST){
-                for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet()){
-                    inventory.setItem(entry.getKey(), entry.getValue());
+                if(plugin.getSettings().starterChestEnabled && inventory.getType() == InventoryType.CHEST){
+                    for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet()){
+                        inventory.setItem(entry.getKey(), entry.getValue());
+                    }
                 }
-            }
-            else {
-                inventory.setContents(contents);
-            }
+                else {
+                    inventory.setContents(contents);
+                }
+            });
         }
     }
 
@@ -99,9 +106,9 @@ public class SchematicBlock {
         }
 
         @Override
-        public void applyBlock(Location location, Island island) {
-            super.applyBlock(location, island);
-            plugin.getNMSAdapter().setFlowerPot(location, flower);
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, () ->
+                    plugin.getNMSAdapter().setFlowerPot(location, flower));
         }
     }
 
@@ -119,24 +126,25 @@ public class SchematicBlock {
         }
 
         @Override
-        public void applyBlock(Location location, Island island) {
-            super.applyBlock(location, island);
-            Skull skull = (Skull) location.getBlock().getState();
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, () -> {
+                Skull skull = (Skull) location.getBlock().getState();
 
-            if(skullType != null) {
-                try {
-                    skull.setSkullType(skullType);
-                } catch (UnsupportedOperationException ignored) {
+                if(skullType != null) {
+                    try {
+                        skull.setSkullType(skullType);
+                    } catch (UnsupportedOperationException ignored) {
+                    }
                 }
-            }
 
-            if(rotation != null)
-                skull.setRotation(rotation);
+                if(rotation != null)
+                    skull.setRotation(rotation);
 
-            if(!owner.isEmpty())
-                skull.setOwner(owner);
+                if(!owner.isEmpty())
+                    skull.setOwner(owner);
 
-            skull.update();
+                skull.update();
+            });
         }
     }
 
@@ -150,15 +158,16 @@ public class SchematicBlock {
         }
 
         @Override
-        public void applyBlock(Location location, Island island) {
-            super.applyBlock(location, island);
-            Sign sign = (Sign) location.getBlock().getState();
-            for(int i = 0; i < 4; i++) {
-                sign.setLine(i, lines[i]
-                        .replace("{player}", island == null ? "" : island.getOwner().getName())
-                        .replace("{island}", island == null ? "" : island.getName()));
-            }
-            sign.update();
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, () -> {
+                Sign sign = (Sign) location.getBlock().getState();
+                for(int i = 0; i < 4; i++) {
+                    sign.setLine(i, lines[i]
+                            .replace("{player}", island == null ? "" : island.getOwner().getName())
+                            .replace("{island}", island == null ? "" : island.getName()));
+                }
+                sign.update();
+            });
         }
     }
 

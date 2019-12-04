@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
+import net.minecraft.server.v1_8_R3.ChunkSection;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityLiving;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -84,11 +85,18 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     }
 
     @Override
-    public void setBlock(Location location, int combinedId) {
+    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
+        int indexY = location.getBlockY() >> 4;
+
+        ChunkSection chunkSection = chunk.getSections()[indexY];
+
+        if(chunkSection == null)
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
+
+        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId));
+        chunkSection.a(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, 15);
     }
 
     @Override
@@ -178,6 +186,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for(EntityHuman entityHuman : world.players)
             ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
+    }
+
+    @Override
+    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
+        ((CraftChunk) bukkitChunk).getHandle().initLighting();
     }
 
     @Override

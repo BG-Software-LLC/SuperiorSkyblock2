@@ -28,7 +28,7 @@ public interface NMSAdapter {
 
     int getCombinedId(Location location);
 
-    void setBlock(Location location, int combinedId);
+    void setBlock(Chunk chunk, Location location, int combinedId);
 
     ItemStack getFlowerPot(Location location);
 
@@ -47,6 +47,8 @@ public interface NMSAdapter {
     int getSpawnerDelay(CreatureSpawner creatureSpawner);
 
     void refreshChunk(Chunk chunk);
+
+    void refreshLight(Chunk chunk);
 
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 

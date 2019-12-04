@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
@@ -29,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+@SuppressWarnings("rawtypes")
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     private final CompoundTag compoundTag;
@@ -143,28 +146,32 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
         Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 
+        BlockChangeTask blockChangeTask = new BlockChangeTask();
+
         for(int y = 0; y <= sizes[1]; y++){
             for(int x = 0; x <= sizes[0]; x++){
                 for(int z = 0; z <= sizes[2]; z++) {
                     if (blocks[x][y][z].getCombinedId() > 0)
-                        blocks[x][y][z].applyBlock(min.clone().add(x, y, z), island);
+                        blocks[x][y][z].applyBlock(blockChangeTask, min.clone().add(x, y, z), island);
                 }
             }
         }
 
-        for(SchematicEntity entity : entities)
-            entity.spawnEntity(location);
+        blockChangeTask.submitUpdate(() -> {
+            for(SchematicEntity entity : entities)
+                entity.spawnEntity(location);
 
-        callback.run();
+            callback.run();
 
-        Executor.sync(() -> {
-            schematicProgress = false;
+            Executor.sync(() -> {
+                schematicProgress = false;
 
-            if (pasteSchematicQueue.size() != 0) {
-                PasteSchematicData data = pasteSchematicQueue.pop();
-                data.schematic.pasteSchematic(data.island, data.location, data.callback);
-            }
-        }, 10L);
+                if (pasteSchematicQueue.size() != 0) {
+                    PasteSchematicData data = pasteSchematicQueue.pop();
+                    data.schematic.pasteSchematic(data.island, data.location, data.callback);
+                }
+            }, 10L);
+        });
     }
 
     public CompoundTag getTag(){
