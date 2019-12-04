@@ -58,8 +58,8 @@ public final class IntTag extends Tag<Integer> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(int.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -68,12 +68,12 @@ public final class IntTag extends Tag<Integer> {
     }
 
     public static IntTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
-            int value = plugin.getNMSAdapter().getNBTIntValue(tag);
+            int value = plugin.getNMSTags().getNBTIntValue(tag);
             return new IntTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

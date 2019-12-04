@@ -24,7 +24,7 @@ public class SchematicEntity {
     public void spawnEntity(Location center){
         Location location = this.location.parse(center.getWorld()).add(center.clone().add(0.5, 1, 0.5));
         LivingEntity livingEntity = (LivingEntity) center.getWorld().spawnEntity(location, entityType);
-        plugin.getNMSAdapter().getFromNBTTag(livingEntity, entityTag);
+        plugin.getNMSTags().getFromNBTTag(livingEntity, entityTag);
     }
 
     public static SchematicEntity of(EntityType entityType, CompoundTag entityTag, SBlockPosition location){

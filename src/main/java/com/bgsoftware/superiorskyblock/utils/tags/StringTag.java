@@ -58,8 +58,8 @@ public final class StringTag extends Tag<String> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(String.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -68,12 +68,12 @@ public final class StringTag extends Tag<String> {
     }
 
     public static StringTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to StringTag!");
 
         try {
-            String value = plugin.getNMSAdapter().getNBTStringValue(tag);
+            String value = plugin.getNMSTags().getNBTStringValue(tag);
             return new StringTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

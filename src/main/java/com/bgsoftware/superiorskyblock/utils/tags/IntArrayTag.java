@@ -105,8 +105,8 @@ public final class IntArrayTag extends Tag<int[]> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(int[].class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -115,12 +115,12 @@ public final class IntArrayTag extends Tag<int[]> {
     }
 
     public static IntArrayTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntArrayTag!");
 
         try {
-            int[] value = plugin.getNMSAdapter().getNBTIntArrayValue(tag);
+            int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
             return new IntArrayTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

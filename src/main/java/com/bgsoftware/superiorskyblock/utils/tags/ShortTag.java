@@ -58,8 +58,8 @@ public final class ShortTag extends Tag<Short> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(short.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -68,12 +68,12 @@ public final class ShortTag extends Tag<Short> {
     }
 
     public static ShortTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ShortTag!");
 
         try {
-            short value = plugin.getNMSAdapter().getNBTShortValue(tag);
+            short value = plugin.getNMSTags().getNBTShortValue(tag);
             return new ShortTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

@@ -7,9 +7,8 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
-
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Bukkit;
+
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Sign;
@@ -23,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({"UnusedReturnValue", "rawtypes"})
 public final class TagBuilder {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -74,7 +73,7 @@ public final class TagBuilder {
             SBlockPosition offset = SBlockPosition.of(livingEntity.getLocation().subtract(center));
             compoundValue.put("entityType", new StringTag(livingEntity.getType().name()));
             compoundValue.put("offset", new StringTag(offset.toString()));
-            compoundValue.put("NBT", plugin.getNMSAdapter().getNBTTag(livingEntity));
+            compoundValue.put("NBT", plugin.getNMSTags().getNBTTag(livingEntity));
         }
         return this;
     }

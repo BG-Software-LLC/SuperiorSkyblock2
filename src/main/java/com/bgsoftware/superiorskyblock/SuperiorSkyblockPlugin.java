@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
+import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
@@ -64,6 +65,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private KeysHandler keysHandler = null;
 
     private NMSAdapter nmsAdapter;
+    private NMSTags nmsTags;
 
     @Override
     public void onEnable() {
@@ -142,6 +144,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
+            nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -289,6 +292,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
+    }
+
+    public NMSTags getNMSTags(){
+        return nmsTags;
     }
 
     public static void log(String message){

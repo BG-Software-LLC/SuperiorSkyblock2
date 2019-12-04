@@ -58,8 +58,8 @@ public final class DoubleTag extends Tag<Double> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(double.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -68,12 +68,12 @@ public final class DoubleTag extends Tag<Double> {
     }
 
     public static DoubleTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to DoubleTag!");
 
         try {
-            double value = plugin.getNMSAdapter().getNBTDoubleValue(tag);
+            double value = plugin.getNMSTags().getNBTDoubleValue(tag);
             return new DoubleTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

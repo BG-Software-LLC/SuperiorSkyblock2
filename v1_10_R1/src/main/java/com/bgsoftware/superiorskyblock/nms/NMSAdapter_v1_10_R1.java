@@ -3,36 +3,20 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import net.minecraft.server.v1_10_R1.BiomeBase;
 import net.minecraft.server.v1_10_R1.Block;
 import net.minecraft.server.v1_10_R1.BlockPosition;
 import net.minecraft.server.v1_10_R1.Chunk;
 import net.minecraft.server.v1_10_R1.ChunkSection;
 import net.minecraft.server.v1_10_R1.EntityHuman;
-import net.minecraft.server.v1_10_R1.EntityLiving;
 import net.minecraft.server.v1_10_R1.EntityPlayer;
 import net.minecraft.server.v1_10_R1.EnumParticle;
 import net.minecraft.server.v1_10_R1.IBlockData;
 import net.minecraft.server.v1_10_R1.ItemStack;
 import net.minecraft.server.v1_10_R1.MinecraftServer;
-import net.minecraft.server.v1_10_R1.NBTBase;
-import net.minecraft.server.v1_10_R1.NBTTagByte;
-import net.minecraft.server.v1_10_R1.NBTTagByteArray;
-import net.minecraft.server.v1_10_R1.NBTTagCompound;
-import net.minecraft.server.v1_10_R1.NBTTagDouble;
-import net.minecraft.server.v1_10_R1.NBTTagFloat;
-import net.minecraft.server.v1_10_R1.NBTTagInt;
-import net.minecraft.server.v1_10_R1.NBTTagIntArray;
-import net.minecraft.server.v1_10_R1.NBTTagList;
-import net.minecraft.server.v1_10_R1.NBTTagLong;
-import net.minecraft.server.v1_10_R1.NBTTagShort;
-import net.minecraft.server.v1_10_R1.NBTTagString;
 import net.minecraft.server.v1_10_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_10_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_10_R1.PlayerInteractManager;
@@ -55,17 +39,14 @@ import org.bukkit.craftbukkit.v1_10_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_10_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_10_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
@@ -115,46 +96,6 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
         ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
         tileEntityFlowerPot.a(flower.getItem(), flower.getData());
         tileEntityFlowerPot.update();
-    }
-
-    @Override
-    public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
-        return CompoundTag.fromNBT(nbtTagCompound);
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        itemStack.setTag((NBTTagCompound) compoundTag.toNBT());
-        return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
-    public CompoundTag getNBTTag(LivingEntity livingEntity) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
-        NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        entityLiving.b(nbtTagCompound);
-        nbtTagCompound.set("Yaw", new NBTTagFloat(entityLiving.yaw));
-        nbtTagCompound.set("Pitch", new NBTTagFloat(entityLiving.pitch));
-        return CompoundTag.fromNBT(nbtTagCompound);
-    }
-
-    @Override
-    public void getFromNBTTag(LivingEntity livingEntity, CompoundTag compoundTag) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
-        NBTTagCompound nbtTagCompound = (NBTTagCompound) compoundTag.toNBT();
-        if(nbtTagCompound != null) {
-            entityLiving.a(nbtTagCompound);
-            if(nbtTagCompound.hasKey("Yaw") && nbtTagCompound.hasKey("Pitch")){
-                entityLiving.setLocation(
-                        entityLiving.locX, entityLiving.locY, entityLiving.locZ,
-                        nbtTagCompound.getFloat("Yaw"),
-                        nbtTagCompound.getFloat("Pitch")
-                );
-            }
-        }
     }
 
     @Override
@@ -226,71 +167,6 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     }
 
     @Override
-    public byte[] getNBTByteArrayValue(Object object) {
-        return ((NBTTagByteArray) object).c();
-    }
-
-    @Override
-    public byte getNBTByteValue(Object object) {
-        return ((NBTTagByte) object).g();
-    }
-
-    @Override
-    public Set<String> getNBTCompoundValue(Object object) {
-        return ((NBTTagCompound) object).c();
-    }
-
-    @Override
-    public double getNBTDoubleValue(Object object) {
-        return ((NBTTagDouble) object).h();
-    }
-
-    @Override
-    public float getNBTFloatValue(Object object) {
-        return ((NBTTagFloat) object).i();
-    }
-
-    @Override
-    public int[] getNBTIntArrayValue(Object object) {
-        return ((NBTTagIntArray) object).d();
-    }
-
-    @Override
-    public int getNBTIntValue(Object object) {
-        return ((NBTTagInt) object).e();
-    }
-
-    @Override
-    public Object getNBTListIndexValue(Object object, int index) {
-        return ((NBTTagList) object).h(index);
-    }
-
-    @Override
-    public long getNBTLongValue(Object object) {
-        return ((NBTTagLong) object).d();
-    }
-
-    @Override
-    public short getNBTShortValue(Object object) {
-        return ((NBTTagShort) object).f();
-    }
-
-    @Override
-    public String getNBTStringValue(Object object) {
-        return ((NBTTagString) object).c_();
-    }
-
-    @Override
-    public Object parseList(ListTag listTag) {
-        NBTTagList nbtTagList = new NBTTagList();
-
-        for(Tag tag : listTag.getValue())
-            nbtTagList.add((NBTBase) tag.toNBT());
-
-        return nbtTagList;
-    }
-
-    @Override
     public void clearInventory(OfflinePlayer offlinePlayer) {
         if(offlinePlayer.isOnline() || offlinePlayer instanceof Player){
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
@@ -346,9 +222,8 @@ public final class NMSAdapter_v1_10_R1 implements NMSAdapter {
     public Enchantment getGlowEnchant() {
         int id = 100;
 
-        while(Enchantment.getById(id) != null){
-            id++;
-        }
+        //noinspection StatementWithEmptyBody, deprecation
+        while(Enchantment.getById(id++) != null);
 
         return new Enchantment(id) {
             @Override

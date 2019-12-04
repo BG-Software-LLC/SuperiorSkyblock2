@@ -58,8 +58,8 @@ public final class ByteTag extends Tag<Byte> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(byte.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -68,12 +68,12 @@ public final class ByteTag extends Tag<Byte> {
     }
 
     public static ByteTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {
-            byte value = plugin.getNMSAdapter().getNBTByteValue(tag);
+            byte value = plugin.getNMSTags().getNBTByteValue(tag);
             return new ByteTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

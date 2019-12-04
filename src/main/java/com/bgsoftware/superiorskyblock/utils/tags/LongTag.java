@@ -59,8 +59,8 @@ public final class LongTag extends Tag<Long> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(long.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -69,12 +69,12 @@ public final class LongTag extends Tag<Long> {
     }
 
     public static LongTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
-            long value = plugin.getNMSAdapter().getNBTLongValue(tag);
+            long value = plugin.getNMSTags().getNBTLongValue(tag);
             return new LongTag(value);
         }catch(Exception ex){
             ex.printStackTrace();

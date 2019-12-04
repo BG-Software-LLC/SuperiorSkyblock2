@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -80,7 +81,7 @@ public final class HeadUtils {
     }
 
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture){
-        CompoundTag compoundTag = plugin.getNMSAdapter().getNBTTag(itemStack);
+        CompoundTag compoundTag = TagUtils.itemToCompound(itemStack);
 
         CompoundTag skullOwner = (CompoundTag) compoundTag.getValue().getOrDefault("SkullOwner", new CompoundTag(new HashMap<>()));
 
@@ -99,7 +100,7 @@ public final class HeadUtils {
 
         compoundTag.setTag("SkullOwner", skullOwner);
 
-        return plugin.getNMSAdapter().getFromNBTTag(itemStack, compoundTag);
+        return TagUtils.compoundToItem(compoundTag);
     }
 
     public static String getNullPlayerTexture(){

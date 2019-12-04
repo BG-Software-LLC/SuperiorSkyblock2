@@ -43,6 +43,7 @@ import java.util.List;
  *
  * @author Graham Edgecombe
  */
+@SuppressWarnings("rawtypes")
 public final class ListTag extends Tag<List<Tag>> {
 
     /**
@@ -92,22 +93,21 @@ public final class ListTag extends Tag<List<Tag>> {
 
     @Override
     public Object toNBT() {
-        return plugin.getNMSAdapter().parseList(this);
+        return plugin.getNMSTags().parseList(this);
     }
 
     public static ListTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ListTag!");
 
         List<Tag> list = new ArrayList<>();
 
         try {
-            //noinspection unchecked
             int size = (int) nbtTagClass.getMethod("size").invoke(tag);
 
             for(int i = 0; i < size; i++)
-                list.add(Tag.fromNBT(plugin.getNMSAdapter().getNBTListIndexValue(tag, i)));
+                list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));
 
             return new ListTag(size == 0 ? EndTag.class : list.get(0).getClass(), list);
         }catch(Exception ex){

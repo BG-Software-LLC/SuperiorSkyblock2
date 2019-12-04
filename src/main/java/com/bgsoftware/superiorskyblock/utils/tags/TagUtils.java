@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "rawtypes"})
 public final class TagUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -77,11 +77,11 @@ public final class TagUtils {
     }
 
     public static CompoundTag nbtTagToCompound(ItemStack itemStack){
-        return plugin.getNMSAdapter().getNBTTag(itemStack);
+        return plugin.getNMSTags().getNBTTag(itemStack);
     }
 
     public static ItemStack compoundToNBTTag(ItemStack itemStack, CompoundTag compoundTag){
-        return plugin.getNMSAdapter().getFromNBTTag(itemStack, compoundTag);
+        return plugin.getNMSTags().getFromNBTTag(itemStack, compoundTag);
     }
 
     public static List<Pattern> getPatternsFromTag(CompoundTag tag){

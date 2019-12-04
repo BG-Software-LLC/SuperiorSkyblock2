@@ -44,6 +44,7 @@ import java.util.Set;
  *
  * @author Graham Edgecombe
  */
+@SuppressWarnings("rawtypes")
 public final class CompoundTag extends Tag<Map<String, Tag>> {
 
     /**
@@ -82,13 +83,12 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
-            Class nbtBaseClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
+            Class<?> nbtBaseClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
             //noinspection ConstantConditions
             Object nbtTagCompound = nbtTagClass.newInstance();
 
             for(String key : value.keySet()){
-                //noinspection unchecked
                 nbtTagClass.getMethod("set", String.class, nbtBaseClass).invoke(nbtTagCompound, key, value.get(key).toNBT());
             }
 
@@ -100,17 +100,16 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     }
 
     public static CompoundTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to CompoundTag!");
 
         Map<String, Tag> map = new HashMap<>();
 
         try {
-            Set<String> keySet = plugin.getNMSAdapter().getNBTCompoundValue(tag);
+            Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
 
             for(String key : keySet) {
-                //noinspection unchecked
                 map.put(key, Tag.fromNBT(nbtTagClass.getMethod("get", String.class).invoke(tag, key)));
             }
 

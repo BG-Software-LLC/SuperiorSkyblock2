@@ -59,8 +59,8 @@ public final class FloatTag extends Tag<Float> {
     @Override
     public Object toNBT() {
         try {
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
-            //noinspection unchecked, ConstantConditions
+            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
+            //noinspection ConstantConditions
             return nbtTagClass.getConstructor(float.class).newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -69,12 +69,12 @@ public final class FloatTag extends Tag<Float> {
     }
 
     public static FloatTag fromNBT(Object tag){
-        Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
+        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
         if(!tag.getClass().equals(nbtTagClass))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
-            float value = plugin.getNMSAdapter().getNBTFloatValue(tag);
+            float value = plugin.getNMSTags().getNBTFloatValue(tag);
             return new FloatTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
