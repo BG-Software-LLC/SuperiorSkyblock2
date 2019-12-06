@@ -13,6 +13,7 @@ public enum IslandSettings {
     EGG_LAY,
     ENDERMAN_GRIEF,
     FIRE_SPREAD,
+    GHAST_FIREBALL,
     LAVA_FLOW,
     NATURAL_ANIMALS_SPAWN,
     NATURAL_MONSTER_SPAWN,

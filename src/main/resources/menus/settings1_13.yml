@@ -231,6 +231,24 @@ settings:
       volume: 0.2
       pitch: 0.2
 
+  ghast_fireball:
+    settings-enabled:
+      type: FIRE_CHARGE
+      name: '&6Ghast Fireball'
+      lore:
+        - '&7Allow fireballs to break blocks inside your island.'
+        - '&7Currently &aENABLED&7.'
+    settings-disabled:
+      type: FIRE_CHARGE
+      name: '&6Ghast Fireball'
+      lore:
+        - '&7Allow fireballs to break blocks inside your island.'
+        - '&7Currently &cDISABLED&7.'
+    sound:
+      type: ENTITY_EXPERIENCE_ORB_PICKUP
+      volume: 0.2
+      pitch: 0.2
+
   lava_flow:
     settings-enabled:
       type: LAVA_BUCKET
