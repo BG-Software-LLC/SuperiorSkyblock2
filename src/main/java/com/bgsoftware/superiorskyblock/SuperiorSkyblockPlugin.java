@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
+import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.GeneratorsListener;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
@@ -75,6 +76,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         new Metrics(this);
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
+        getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
         getServer().getPluginManager().registerEvents(new GeneratorsListener(), this);
         getServer().getPluginManager().registerEvents(new MenusListener(), this);

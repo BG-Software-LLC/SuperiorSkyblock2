@@ -56,17 +56,6 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    public void g(ChunkLoadEvent e){
-        if(plugin.getGrid() == null)
-            return;
-
-        Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
-        Island island = plugin.getGrid().getIslandAt(firstBlock);
-        if(island != null && island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
-            plugin.getNMSAdapter().setBiome(e.getChunk(), island.getBiome());
-    }
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
