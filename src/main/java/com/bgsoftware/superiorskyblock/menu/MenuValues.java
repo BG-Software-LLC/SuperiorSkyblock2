@@ -37,7 +37,7 @@ public final class MenuValues extends SuperiorMenu {
                 Key block = (Key) getData(slot + "");
                 int amount = island.getBlockCount(block);
                 ItemStack itemStack = new ItemBuilder(inventory.getItem(slot)).replaceAll("{0}", amount + "").build(superiorPlayer);
-                itemStack.setAmount(Math.max(1, Math.min(64, itemStack.getAmount())));
+                itemStack.setAmount(Math.max(1, Math.min(64, amount)));
                 inventory.setItem(slot, itemStack);
             }
         }
