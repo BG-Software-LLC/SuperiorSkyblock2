@@ -310,6 +310,7 @@ public final class PlayersListener implements Listener {
             return;
 
         World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+        String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
         Location toTeleport = island.getTeleportLocation(environment);
 
         if(toTeleport != null) {
@@ -320,13 +321,19 @@ public final class PlayersListener implements Listener {
                 if(schematicName.isEmpty())
                     schematicName = plugin.getSchematics().getDefaultSchematic(environment);
 
-                Schematic schematic = plugin.getSchematics().getSchematic(schematicName + (environment == World.Environment.NETHER ? "_nether" : "_the_end"));
+                Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
                     schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                         superiorPlayer.teleport(toTeleport);
                         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
                     });
                     island.setSchematicGenerate(environment);
+                }
+                else{
+                    String message = "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem." +
+                            "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".";
+                    Locale.sendMessage(superiorPlayer, message);
+                    Locale.sendMessage(Bukkit.getConsoleSender(), message);
                 }
             }
 
