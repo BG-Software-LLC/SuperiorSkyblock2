@@ -297,6 +297,8 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
     }
 
+    private Set<SuperiorPlayer> schematicMessages = new HashSet<>();
+
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
@@ -330,10 +332,14 @@ public final class PlayersListener implements Listener {
                     island.setSchematicGenerate(environment);
                 }
                 else{
-                    String message = "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem." +
-                            "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".";
-                    Locale.sendMessage(superiorPlayer, message);
-                    Locale.sendMessage(Bukkit.getConsoleSender(), message);
+                    if(!schematicMessages.contains(superiorPlayer)) {
+                        schematicMessages.add(superiorPlayer);
+                        String message = "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
+                                "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".";
+                        Locale.sendMessage(superiorPlayer, message);
+                        Locale.sendMessage(Bukkit.getConsoleSender(), message);
+                        Executor.sync(() -> schematicMessages.remove(superiorPlayer), 20L);
+                    }
                 }
             }
 
