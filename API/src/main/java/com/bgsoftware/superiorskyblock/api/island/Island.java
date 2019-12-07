@@ -190,15 +190,28 @@ public interface Island extends Comparable<Island> {
     Location getMaximum();
 
     /**
-     * Get all the chunks of the island.
+     * Get all the chunks of the island from all the environments.
      */
     List<Chunk> getAllChunks();
 
     /**
-     * Get all the chunks of the island.
+     * Get all the chunks of the island from all the environments.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      */
     List<Chunk> getAllChunks(boolean onlyProtected);
+
+    /**
+     * Get all the chunks of the island.
+     * @param environment The environment to get the chunks from.
+     */
+    List<Chunk> getAllChunks(World.Environment environment);
+
+    /**
+     * Get all the chunks of the island.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     */
+    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
 
     /**
      * Check if the location is inside the island's area.

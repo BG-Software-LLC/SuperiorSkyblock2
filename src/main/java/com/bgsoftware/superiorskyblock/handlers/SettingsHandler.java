@@ -97,6 +97,7 @@ public final class SettingsHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         convertData(cfg);
+        convertInteractables(plugin, cfg);
 
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown");
 
@@ -147,7 +148,7 @@ public final class SettingsHandler {
         spawnSettings = cfg.getStringList("spawn.settings");
         spawnWorldBorder = cfg.getBoolean("spawn.world-border", false);
         voidTeleport = cfg.getBoolean("void-teleport", true);
-        interactables = cfg.getStringList("interactables");
+        interactables = loadInteractables(plugin);
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
         disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
@@ -266,6 +267,33 @@ public final class SettingsHandler {
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
         if(cfg.contains("island-world"))
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
+    }
+
+    private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){
+        if(!cfg.contains("interactables"))
+            return;
+
+        File file = new File(plugin.getDataFolder(), "interactables.yml");
+
+        if(!file.exists())
+            plugin.saveResource("interactables.yml", false);
+
+        CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
+
+        commentedConfig.set("interactables", cfg.getStringList("interactables"));
+
+        commentedConfig.save(file);
+    }
+
+    private List<String> loadInteractables(SuperiorSkyblockPlugin plugin){
+        File file = new File(plugin.getDataFolder(), "interactables.yml");
+
+        if(!file.exists())
+            plugin.saveResource("interactables.yml", false);
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        return cfg.getStringList("interactables");
     }
 
 }
