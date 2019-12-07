@@ -431,8 +431,11 @@ public final class SIsland extends DatabaseObject implements Island {
     public List<Chunk> getAllChunks(boolean onlyProtected){
         List<Chunk> chunks = new ArrayList<>();
 
-        for(World.Environment environment : World.Environment.values())
-            chunks.addAll(getAllChunks(environment, onlyProtected));
+        for(World.Environment environment : World.Environment.values()) {
+            try {
+                chunks.addAll(getAllChunks(environment, onlyProtected));
+            }catch(NullPointerException ignored){}
+        }
 
         return chunks;
     }
