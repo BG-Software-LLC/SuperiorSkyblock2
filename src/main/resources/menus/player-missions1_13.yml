@@ -25,7 +25,7 @@ items:
     type: PAPER
     name: '{0}Previous Page'
   '*':
-    type: DOUBLE_PLANT
+    type: SUNFLOWER
     name: '&aCurrent Page'
     lore:
       - '&7Page {0}'

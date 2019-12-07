@@ -21,14 +21,13 @@ next-page: '^'
 
 items:
   '$':
-    type: STAINED_GLASS_PANE
-    data: 3
+    type: CYAN_STAINED_GLASS_PANE
     name: '&f'
   '%':
     type: PAPER
     name: '{0}Previous Page'
   '*':
-    type: DOUBLE_PLANT
+    type: SUNFLOWER
     name: '&aCurrent Page'
     lore:
       - '&7Page {0}'
@@ -413,13 +412,13 @@ settings:
 
   wither_explosion:
     settings-enabled:
-      type: WITHER_SKULL
+      type: WITHER_SKELETON_SKULL
       name: '&6Wither Explosion'
       lore:
         - '&7Allow withers to explode blocks inside your island.'
         - '&7Currently &aENABLED&7.'
     settings-disabled:
-      type: WITHER_SKULL
+      type: WITHER_SKELETON_SKULL
       name: '&6Wither Explosion'
       lore:
         - '&7Allow withers to explode blocks inside your island.'
