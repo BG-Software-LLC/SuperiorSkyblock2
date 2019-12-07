@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
@@ -18,7 +19,7 @@ public final class ChunksListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent e){
-        if(plugin.getGrid() == null)
+        if(plugin.getGrid() == null || e.getWorld().getEnvironment() != World.Environment.NORMAL)
             return;
 
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
