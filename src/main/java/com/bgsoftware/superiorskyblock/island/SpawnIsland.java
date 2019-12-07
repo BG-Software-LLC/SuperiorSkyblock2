@@ -205,6 +205,16 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(boolean onlyProtected) {
+        return getAllChunks(World.Environment.NORMAL, onlyProtected);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment) {
+        return getAllChunks(environment, false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
         int islandSize = getIslandSize();
         Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
         Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();

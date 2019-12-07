@@ -429,9 +429,25 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<Chunk> getAllChunks(boolean onlyProtected){
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(World.Environment environment : World.Environment.values())
+            chunks.addAll(getAllChunks(environment, onlyProtected));
+
+        return chunks;
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment) {
+        return getAllChunks(environment, false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
         int islandSize = getIslandSize();
-        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
-        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
+        Location center = getCenter(environment);
+        Location min = onlyProtected ? center.clone().subtract(islandSize, 0, islandSize) : getMinimum();
+        Location max = onlyProtected ? center.clone().add(islandSize, 0, islandSize) : getMaximum();
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
 
         List<Chunk> chunks = new ArrayList<>();
@@ -617,8 +633,6 @@ public final class SIsland extends DatabaseObject implements Island {
         islandWorth = BigDecimalFormatted.ZERO;
         islandLevel = BigDecimalFormatted.ZERO;
 
-        World world = Bukkit.getWorld(chunkSnapshots.get(0).getWorldName());
-
         Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
@@ -643,7 +657,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                 if(blockKey.toString().contains("AIR"))
                                     continue;
 
-                                Location location = new Location(world, (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
+                                Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                                 int blockCount = plugin.getGrid().getBlockAmount(location);
 
                                 if(blockKey.toString().contains("SPAWNER")){

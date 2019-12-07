@@ -85,12 +85,12 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                plugin.getNMSAdapter().regenerateChunks(island.getAllChunks(true));
+                plugin.getNMSAdapter().regenerateChunks(island.getAllChunks(World.Environment.NORMAL, true));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                    island.getAllChunks(true).forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
+                    island.getAllChunks(World.Environment.NORMAL, true).forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
                     if (superiorPlayer.isOnline()) {
