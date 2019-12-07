@@ -14,7 +14,6 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -22,21 +21,9 @@ public interface NMSAdapter {
 
     void registerCommand(BukkitCommand command);
 
-    int getCombinedId(Location location);
-
-    void setBlock(Chunk chunk, Location location, int combinedId);
-
-    ItemStack getFlowerPot(Location location);
-
-    void setFlowerPot(Location location, ItemStack itemStack);
-
     Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 
     int getSpawnerDelay(CreatureSpawner creatureSpawner);
-
-    void refreshChunk(Chunk chunk);
-
-    void refreshLight(Chunk chunk);
 
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
@@ -50,7 +37,7 @@ public interface NMSAdapter {
 
     void playGeneratorSound(Location location);
 
-    void setBiome(Location min, Location max, Biome biome);
+    void setBiome(Chunk chunk, Biome biome);
 
     default Object getBlockData(Block block){
         return null;

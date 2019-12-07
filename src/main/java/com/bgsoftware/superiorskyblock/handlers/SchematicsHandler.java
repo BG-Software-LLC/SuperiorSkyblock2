@@ -194,11 +194,11 @@ public final class SchematicsHandler implements SchematicManager {
     }
 
     private int getCombinedId(Block block) {
-        return plugin.getNMSAdapter().getCombinedId(block.getLocation());
+        return plugin.getNMSBlocks().getCombinedId(block.getLocation());
     }
 
     private ItemStack getFlower(Block block){
-        return plugin.getNMSAdapter().getFlowerPot(block.getLocation());
+        return plugin.getNMSBlocks().getFlowerPot(block.getLocation());
     }
 
     private Schematic loadFromFile(File file){

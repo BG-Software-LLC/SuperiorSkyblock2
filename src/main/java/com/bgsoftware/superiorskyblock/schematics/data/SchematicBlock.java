@@ -1,27 +1,17 @@
 package com.bgsoftware.superiorskyblock.schematics.data;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
-import org.bukkit.block.Banner;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Sign;
-import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.Map;
 
 public class SchematicBlock {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public final static SchematicBlock AIR = of(0);
 
@@ -36,11 +26,11 @@ public class SchematicBlock {
     }
 
     public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island){
-        applyBlock(blockChangeTask, location, (Runnable) null);
+        applyBlock(blockChangeTask, location, BlockType.BLOCK);
     }
 
-    protected void applyBlock(BlockChangeTask blockChangeTask, Location location, Runnable onFinish){
-        blockChangeTask.setBlock(location, combinedId, onFinish);
+    protected void applyBlock(BlockChangeTask blockChangeTask, Location location, BlockType blockType, Object... args){
+        blockChangeTask.setBlock(location, combinedId, blockType, args);
     }
 
     private static class SchematicBanner extends SchematicBlock{
@@ -56,17 +46,7 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, () -> {
-                Banner banner = (Banner) location.getBlock().getState();
-
-                if(baseColor != null)
-                    banner.setBaseColor(baseColor);
-
-                if(!patterns.isEmpty())
-                    banner.setPatterns(patterns);
-
-                banner.update();
-            });
+            super.applyBlock(blockChangeTask, location, BlockType.BANNER, baseColor, patterns);
         }
     }
 
@@ -81,18 +61,7 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, () -> {
-                Inventory inventory = ((InventoryHolder) location.getBlock().getState()).getInventory();
-
-                if(plugin.getSettings().starterChestEnabled && inventory.getType() == InventoryType.CHEST){
-                    for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet()){
-                        inventory.setItem(entry.getKey(), entry.getValue());
-                    }
-                }
-                else {
-                    inventory.setContents(contents);
-                }
-            });
+            super.applyBlock(blockChangeTask, location, BlockType.INVENTORY_HOLDER, (Object) contents);
         }
     }
 
@@ -107,8 +76,7 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, () ->
-                    plugin.getNMSAdapter().setFlowerPot(location, flower));
+            super.applyBlock(blockChangeTask, location, BlockType.FLOWER_POT, flower);
         }
     }
 
@@ -127,24 +95,7 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, () -> {
-                Skull skull = (Skull) location.getBlock().getState();
-
-                if(skullType != null) {
-                    try {
-                        skull.setSkullType(skullType);
-                    } catch (UnsupportedOperationException ignored) {
-                    }
-                }
-
-                if(rotation != null)
-                    skull.setRotation(rotation);
-
-                if(!owner.isEmpty())
-                    skull.setOwner(owner);
-
-                skull.update();
-            });
+            super.applyBlock(blockChangeTask, location, BlockType.SKULL, skullType, rotation, owner);
         }
     }
 
@@ -159,15 +110,13 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, () -> {
-                Sign sign = (Sign) location.getBlock().getState();
-                for(int i = 0; i < 4; i++) {
-                    sign.setLine(i, lines[i]
-                            .replace("{player}", island == null ? "" : island.getOwner().getName())
-                            .replace("{island}", island == null ? "" : island.getName()));
-                }
-                sign.update();
-            });
+            for(int i = 0; i < 4; i++) {
+                lines[i] = lines[i]
+                        .replace("{player}", island == null ? "" : island.getOwner().getName())
+                        .replace("{island}", island == null ? "" : island.getName());
+            }
+
+            super.applyBlock(blockChangeTask, location, BlockType.SIGN, (Object) lines);
         }
     }
 

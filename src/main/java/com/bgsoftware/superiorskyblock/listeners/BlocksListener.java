@@ -34,6 +34,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,6 +54,17 @@ public final class BlocksListener implements Listener {
 
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void g(ChunkLoadEvent e){
+        if(plugin.getGrid() == null)
+            return;
+
+        Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
+        Island island = plugin.getGrid().getIslandAt(firstBlock);
+        if(island != null && island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
+            plugin.getNMSAdapter().setBiome(e.getChunk(), island.getBiome());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

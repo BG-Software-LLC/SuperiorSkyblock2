@@ -115,7 +115,6 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
         List<Tag> entitiesList = new ArrayList<>();
 
-
         if(compoundTag.getValue().containsKey("entities"))
             entitiesList = ((ListTag) compoundTag.getValue().get("entities")).getValue();
 

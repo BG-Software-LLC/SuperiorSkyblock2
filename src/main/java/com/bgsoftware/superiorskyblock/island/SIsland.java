@@ -831,10 +831,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBiome(Biome biome){
-        //We need to load all chunks so the biome will get changed.
-        getAllChunks().forEach(Chunk::load);
-        //We use the nms method as it's much more optimized and better in general.
-        plugin.getNMSAdapter().setBiome(getMinimum(), getMaximum(), biome);
+        plugin.getNMSAdapter().setBiome(getCenter(World.Environment.NORMAL).getChunk(), biome);
         this.biome = biome;
     }
 

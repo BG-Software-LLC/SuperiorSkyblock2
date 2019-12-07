@@ -7,21 +7,14 @@ import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import net.minecraft.server.v1_8_R1.Chunk;
-import net.minecraft.server.v1_8_R1.ChunkSection;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.EnumParticle;
 import net.minecraft.server.v1_8_R1.EnumWorldBorderAction;
-import net.minecraft.server.v1_8_R1.IBlockData;
-import net.minecraft.server.v1_8_R1.ItemStack;
 import net.minecraft.server.v1_8_R1.MinecraftServer;
-import net.minecraft.server.v1_8_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_8_R1.PlayerInteractManager;
-import net.minecraft.server.v1_8_R1.TileEntityFlowerPot;
 import net.minecraft.server.v1_8_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R1.World;
-import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.Block;
 
 import net.minecraft.server.v1_8_R1.WorldBorder;
 import net.minecraft.server.v1_8_R1.WorldServer;
@@ -38,7 +31,6 @@ import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -57,46 +49,6 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     }
 
     @Override
-    public int getCombinedId(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        IBlockData blockData = world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        return Block.getCombinedId(blockData);
-    }
-
-    @Override
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        int indexY = location.getBlockY() >> 4;
-
-        ChunkSection chunkSection = chunk.getSections()[indexY];
-
-        if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
-
-        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId));
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getFlowerPot(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
-        ItemStack itemStack = new ItemStack(tileEntityFlowerPot.b(), 1, tileEntityFlowerPot.c());
-        return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
-    public void setFlowerPot(Location location, org.bukkit.inventory.ItemStack itemStack) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
-        ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
-        tileEntityFlowerPot.a(flower.getItem(), flower.getData());
-        tileEntityFlowerPot.update();
-    }
-
-    @Override
     @Deprecated
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
@@ -110,19 +62,6 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
         TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld())
                 .getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return mobSpawner.getSpawner().spawnDelay;
-    }
-
-    @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : world.players)
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
-    }
-
-    @Override
-    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
-        ((CraftChunk) bukkitChunk).getHandle().initLighting();
     }
 
     @Override
@@ -204,16 +143,10 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setBiome(Location min, Location max, Biome biome) {
+    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome) {
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
-        World world = ((CraftWorld) min.getWorld()).getHandle();
-
-        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
-            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                Chunk chunk = world.getChunkAt(x, z);
-                Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-            }
-        }
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        Arrays.fill(chunk.getBiomeIndex(), biomeBase);
     }
 
     @Override

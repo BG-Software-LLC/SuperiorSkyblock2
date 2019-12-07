@@ -87,8 +87,6 @@ public final class GridHandler implements GridManager {
         Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
 
         if(!preIslandCreateEvent.isCancelled()) {
-            long startTime = System.currentTimeMillis();
-
             Location islandLocation = getNextLocation();
             Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
 
@@ -102,11 +100,12 @@ public final class GridHandler implements GridManager {
                 plugin.getNMSAdapter().regenerateChunks(island.getAllChunks(true));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
+                long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                    island.getAllChunks(true).forEach(chunk -> plugin.getNMSAdapter().refreshChunk(chunk));
+                    island.getAllChunks(true).forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
-                    if (superiorPlayer.asOfflinePlayer().isOnline()) {
+                    if (superiorPlayer.isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                         if (islandCreateEvent.canTeleport()) {
                             superiorPlayer.asPlayer().teleport(islandLocation);

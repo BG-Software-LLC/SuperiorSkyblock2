@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -19,20 +19,17 @@ public final class BlockChangeTask {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Map<ChunkPosition,  List<Pair<Location, Integer>>> blocksCache = Maps.newConcurrentMap();
+    private final Map<ChunkPosition, List<BlockData>> blocksCache = Maps.newConcurrentMap();
     private final List<Chunk> chunksToUpdate = new ArrayList<>();
-    private final List<Runnable> runnablesOnFinish = new ArrayList<>();
 
     private boolean submitted = false;
 
-    public void setBlock(Location location, int combinedId, Runnable onFinish){
+    public void setBlock(Location location, int combinedId, BlockType blockType, Object... args){
         if(submitted)
             throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
 
         ChunkPosition chunkPosition = new ChunkPosition(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new Pair<>(location, combinedId));
-        if(onFinish != null)
-            runnablesOnFinish.add(onFinish);
+        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new BlockData(location, combinedId, blockType, args));
     }
 
     public void submitUpdate(Runnable onFinish){
@@ -42,10 +39,11 @@ public final class BlockChangeTask {
         submitted = true;
 
         ExecutorService executor = Executors.newCachedThreadPool();
-        for(Map.Entry<ChunkPosition, List<Pair<Location, Integer>>> entry : blocksCache.entrySet()){
+        for(Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()){
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
-            executor.execute(() -> entry.getValue().forEach(pair -> plugin.getNMSAdapter().setBlock(chunk, pair.getKey(), pair.getValue())));
+            executor.execute(() -> entry.getValue().forEach(blockData ->
+                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args)));
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -60,10 +58,8 @@ public final class BlockChangeTask {
            blocksCache.clear();
 
            Bukkit.getScheduler().runTask(plugin, () -> {
-               chunksToUpdate.forEach(plugin.getNMSAdapter()::refreshChunk);
-               runnablesOnFinish.forEach(Runnable::run);
+               chunksToUpdate.forEach(plugin.getNMSBlocks()::refreshChunk);
                chunksToUpdate.clear();
-               runnablesOnFinish.clear();
 
                if(onFinish != null)
                    onFinish.run();
@@ -97,6 +93,22 @@ public final class BlockChangeTask {
         public int hashCode() {
             return Objects.hash(world, x, z);
         }
+    }
+
+    private static class BlockData{
+
+        private final Location location;
+        private final int combinedId;
+        private final BlockType blockType;
+        private final Object[] args;
+
+        BlockData(Location location, int combinedId, BlockType blockType, Object... args){
+            this.location = location;
+            this.combinedId = combinedId;
+            this.blockType = blockType;
+            this.args = args;
+        }
+
     }
 
 }
