@@ -131,7 +131,7 @@ public final class MenuSettings extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
 
         previousSlot = charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0);
         currentSlot = charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0);
@@ -150,8 +150,8 @@ public final class MenuSettings extends SuperiorMenu {
                 ConfigurationSection section = settingsSection.getConfigurationSection(settings);
                 menuSettings.addData(settings + "-sound", FileUtils.getSound(section.getConfigurationSection("sound")));
                 menuSettings.addData(settings + "-commands", section.getStringList("commands"));
-                menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack(section.getConfigurationSection("settings-enabled")));
-                menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack(section.getConfigurationSection("settings-disabled")));
+                menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
+                menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
                 MenuSettings.islandSettings.add(islandSettings);
             }
         }

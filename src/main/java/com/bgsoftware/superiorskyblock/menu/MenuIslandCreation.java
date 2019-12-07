@@ -137,8 +137,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission"));
                         menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
                         menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", 0));
-                        menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack(itemSection.getConfigurationSection("access")));
-                        menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack(itemSection.getConfigurationSection("no-access")));
+                        menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("access")));
+                        menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("no-access")));
 
                         if(soundSection != null) {
                             menuIslandCreation.addData(schematic + "-has-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("access")));
@@ -151,7 +151,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                     }
 
                     else{
-                        menuIslandCreation.addFillItem(slot,  FileUtils.getItemStack(cfg.getConfigurationSection("items." + ch)));
+                        menuIslandCreation.addFillItem(slot,  FileUtils.getItemStack("island-creation.yml", cfg.getConfigurationSection("items." + ch)));
                         menuIslandCreation.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuIslandCreation.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
                     }

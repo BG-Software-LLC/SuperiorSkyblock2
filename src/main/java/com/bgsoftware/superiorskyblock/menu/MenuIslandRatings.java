@@ -99,7 +99,7 @@ public final class MenuIslandRatings extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRatings, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
 
         previousSlot = charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0);
         currentSlot = charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0);

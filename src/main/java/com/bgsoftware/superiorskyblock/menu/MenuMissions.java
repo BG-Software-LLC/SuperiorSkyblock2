@@ -40,7 +40,7 @@ public final class MenuMissions extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
 
         playerSlot = charSlots.getOrDefault(cfg.getString("player-missions", "@").charAt(0), Collections.singletonList(-1)).get(0);
         islandSlot = charSlots.getOrDefault(cfg.getString("island-missions", "^").charAt(0), Collections.singletonList(-1)).get(0);

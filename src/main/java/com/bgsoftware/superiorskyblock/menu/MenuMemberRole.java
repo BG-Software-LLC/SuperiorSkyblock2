@@ -81,7 +81,7 @@ public final class MenuMemberRole extends SuperiorMenu {
                     if(cfg.contains("items." + ch + ".role"))
                         roleSlots.put(slot, SPlayerRole.of(cfg.getString("items." + ch + ".role")));
 
-                    menuMemberRole.addFillItem(slot,  FileUtils.getItemStack(cfg.getConfigurationSection("items." + ch)));
+                    menuMemberRole.addFillItem(slot,  FileUtils.getItemStack("member-role.yml", cfg.getConfigurationSection("items." + ch)));
                     menuMemberRole.addCommands(slot, cfg.getStringList("commands." + ch));
                     menuMemberRole.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
 

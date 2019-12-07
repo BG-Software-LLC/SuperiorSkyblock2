@@ -57,7 +57,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
         confirmSlot = charSlots.getOrDefault(cfg.getString("confirm", "@").charAt(0), Collections.singletonList(-1)).get(0);
         cancelSlot = charSlots.getOrDefault(cfg.getString("cancel", "^").charAt(0), Collections.singletonList(-1)).get(0);

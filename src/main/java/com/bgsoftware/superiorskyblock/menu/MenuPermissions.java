@@ -216,7 +216,7 @@ public final class MenuPermissions extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
 
         previousSlot = charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0);
         currentSlot = charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0);
@@ -237,10 +237,10 @@ public final class MenuPermissions extends SuperiorMenu {
                 menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
                 menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
                 menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
-                menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack(permissionSection.getConfigurationSection("permission-enabled")));
-                menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack(permissionSection.getConfigurationSection("permission-disabled")));
+                menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
+                menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
                 if(permissionSection.contains("role-permission")) {
-                    menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack(permissionSection.getConfigurationSection("role-permission")));
+                    menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
                 }
                 islandPermissions.add(islandPermission);
             }

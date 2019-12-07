@@ -121,8 +121,8 @@ public final class MenuBiomes extends SuperiorMenu {
                         menuBiomes.addData(biome + "-slot", slot);
 
                         menuBiomes.addData(biome + "-permission", itemSection.getString("required-permission"));
-                        menuBiomes.addData(biome + "-has-access-item", FileUtils.getItemStack(itemSection.getConfigurationSection("access")));
-                        menuBiomes.addData(biome + "-no-access-item", FileUtils.getItemStack(itemSection.getConfigurationSection("no-access")));
+                        menuBiomes.addData(biome + "-has-access-item", FileUtils.getItemStack("biomes.yml", itemSection.getConfigurationSection("access")));
+                        menuBiomes.addData(biome + "-no-access-item", FileUtils.getItemStack("biomes.yml", itemSection.getConfigurationSection("no-access")));
 
                         if(soundSection != null) {
                             menuBiomes.addData(biome + "-has-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("access")));
@@ -135,7 +135,7 @@ public final class MenuBiomes extends SuperiorMenu {
                     }
 
                     else{
-                        menuBiomes.addFillItem(slot,  FileUtils.getItemStack(cfg.getConfigurationSection("items." + ch)));
+                        menuBiomes.addFillItem(slot,  FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
                         menuBiomes.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuBiomes.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
                     }

@@ -338,7 +338,7 @@ public final class MissionsHandler implements MissionsManager {
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                    ItemStack itemStack = FileUtils.getItemStack(section.getConfigurationSection("rewards.items." + key)).build();
+                    ItemStack itemStack = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("rewards.items." + key)).build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
                     this.itemRewards.add(itemStack);
                 }
@@ -346,9 +346,9 @@ public final class MissionsHandler implements MissionsManager {
 
             this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-            this.notCompleted = FileUtils.getItemStack(section.getConfigurationSection("icons.not-completed"));
-            this.canComplete = FileUtils.getItemStack(section.getConfigurationSection("icons.can-complete"));
-            this.completed = FileUtils.getItemStack(section.getConfigurationSection("icons.completed"));
+            this.notCompleted = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.not-completed"));
+            this.canComplete = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.can-complete"));
+            this.completed = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.completed"));
         }
 
     }

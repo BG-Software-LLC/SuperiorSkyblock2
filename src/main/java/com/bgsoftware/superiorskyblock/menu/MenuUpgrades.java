@@ -68,7 +68,7 @@ public final class MenuUpgrades extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
         if(cfg.contains("upgrades")){
             ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
@@ -83,8 +83,8 @@ public final class MenuUpgrades extends SuperiorMenu {
                     if(NumberUtils.isNumber(level)) {
                         int slot = charSlots.getOrDefault(upgradeSection.getString("item", "@").charAt(0), Collections.singletonList(-1)).get(0);
                         upgradeData.items.put(Integer.parseInt(level), new UpgradesHandler.ItemData(
-                                FileUtils.getItemStack(upgradeSection.getConfigurationSection(level + ".has-next-level")),
-                                FileUtils.getItemStack(upgradeSection.getConfigurationSection(level + ".no-next-level")),
+                                FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level")),
+                                FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level")),
                                 slot,
                                 FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound")),
                                 FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound")),

@@ -76,7 +76,7 @@ public final class MenuValues extends SuperiorMenu {
                     if(cfg.contains("items." + ch + ".block"))
                         menuValues.addData(slot + "", Key.of(cfg.getString("items." + ch + ".block")));
 
-                    menuValues.addFillItem(slot,  FileUtils.getItemStack(cfg.getConfigurationSection("items." + ch)));
+                    menuValues.addFillItem(slot,  FileUtils.getItemStack("values.yml", cfg.getConfigurationSection("items." + ch)));
                     menuValues.addCommands(slot, cfg.getStringList("commands." + ch));
                     menuValues.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
 

@@ -224,7 +224,7 @@ public final class MenuTopIslands extends SuperiorMenu {
 
         sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuTopIslands, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuTopIslands, "top-islands.yml", cfg);
 
         worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort", "%").charAt(0), Collections.singletonList(-1)).get(0);
         levelSortSlot = charSlots.getOrDefault(cfg.getString("level-sort", "*").charAt(0), Collections.singletonList(-1)).get(0);
@@ -237,8 +237,8 @@ public final class MenuTopIslands extends SuperiorMenu {
         slots = charSlots.getOrDefault(slotsChar, Collections.singletonList(-1));
         slots.sort(Integer::compareTo);
 
-        menuTopIslands.addData("island-item", FileUtils.getItemStack(cfg.getConfigurationSection("items." + slotsChar + ".island")));
-        menuTopIslands.addData("no-island-item", FileUtils.getItemStack(cfg.getConfigurationSection("items." + slotsChar + ".no-island")));
+        menuTopIslands.addData("island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".island")));
+        menuTopIslands.addData("no-island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".no-island")));
         menuTopIslands.addData("island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
         menuTopIslands.addData("no-island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
         menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));

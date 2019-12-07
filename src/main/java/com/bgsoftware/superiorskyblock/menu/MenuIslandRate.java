@@ -63,7 +63,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
         oneStarSlot = charSlots.getOrDefault(cfg.getString("one-star", "@").charAt(0), Collections.singletonList(-1)).get(0);
         twoStarsSlot = charSlots.getOrDefault(cfg.getString("two-stars", "%").charAt(0), Collections.singletonList(-1)).get(0);

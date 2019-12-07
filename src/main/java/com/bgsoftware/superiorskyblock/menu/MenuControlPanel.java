@@ -46,7 +46,7 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
         membersSlot = charSlots.getOrDefault(cfg.getString("members", "%").charAt(0), Collections.singletonList(-1)).get(0);
         settingsSlot = charSlots.getOrDefault(cfg.getString("settings", "*").charAt(0), Collections.singletonList(-1)).get(0);

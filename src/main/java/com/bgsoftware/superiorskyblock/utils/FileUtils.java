@@ -26,7 +26,7 @@ public final class FileUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static ItemBuilder getItemStack(ConfigurationSection section){
+    public static ItemBuilder getItemStack(String fileName, ConfigurationSection section){
         if(section == null || !section.contains("type"))
             return null;
 
@@ -37,7 +37,7 @@ public final class FileUtils {
             type = Material.valueOf(section.getString("type"));
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
-            SuperiorSkyblockPlugin.log("&cCouldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
+            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
             return null;
         }
 
@@ -62,7 +62,7 @@ public final class FileUtils {
                 try {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.log("&cCouldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
+                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
                     continue;
                 }
 
@@ -86,7 +86,7 @@ public final class FileUtils {
         return itemBuilder;
     }
 
-    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, YamlConfiguration cfg){
+    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
         Map<Character, List<Integer>> charSlots = new HashMap<>();
 
         menu.resetData();
@@ -105,7 +105,7 @@ public final class FileUtils {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    ItemBuilder itemBuilder = getItemStack(cfg.getConfigurationSection("items." + ch));
+                    ItemBuilder itemBuilder = getItemStack(fileName, cfg.getConfigurationSection("items." + ch));
 
                     if(itemBuilder != null) {
                         List<String> commands = cfg.getStringList("commands." + ch);
