@@ -136,9 +136,11 @@ public final class IslandDeserializer {
             location = "normal=" + location;
         }
 
+        System.out.println(location);
+
         for(String worldSection : location.split(";")){
             try {
-                String[] locationSection = worldSection.split(";");
+                String[] locationSection = worldSection.split("=");
                 String environment = locationSection[0].toUpperCase();
                 locations.put(World.Environment.valueOf(environment), LocationUtils.getLocation(locationSection[1]));
             }catch(Exception ignored){}
