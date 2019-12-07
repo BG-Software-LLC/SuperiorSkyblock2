@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
@@ -71,14 +70,14 @@ public final class MenuBiomes extends SuperiorMenu {
         for(Biome biome : Biome.values()){
             String biomeName = biome.name().toLowerCase();
             if(containsData(biomeName + "-has-access-item")) {
-                ItemStack biomeItem = (ItemStack) getData(biomeName + "-has-access-item");
+                ItemBuilder biomeItem = (ItemBuilder) getData(biomeName + "-has-access-item");
                 String permission = (String) getData(biomeName + "-permission");
                 int slot = (int) getData(biomeName + "-slot");
 
                 if(!superiorPlayer.hasPermission(permission))
-                    biomeItem = (ItemStack) getData(biomeName + "-no-access-item");
+                    biomeItem = (ItemBuilder) getData(biomeName + "-no-access-item");
 
-                inv.setItem(slot, new ItemBuilder(biomeItem).build(superiorPlayer));
+                inv.setItem(slot, biomeItem.clone().build(superiorPlayer));
             }
         }
 

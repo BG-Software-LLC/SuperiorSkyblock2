@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,9 +54,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
             getData().commands.put(slot, commands);
     }
 
-    public void addFillItem(int slot, ItemStack itemStack){
-        if(itemStack != null)
-            getData().fillItems.put(slot, itemStack);
+    public void addFillItem(int slot, ItemBuilder itemBuilder){
+        if(itemBuilder != null)
+            getData().fillItems.put(slot, itemBuilder);
     }
 
     public void resetData(){
@@ -176,8 +175,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
         if(inventory.getHolder() == null)
             Fields.CRAFT_INVENTORY_INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
 
-        for(Map.Entry<Integer, ItemStack> itemStackEntry : menuData.fillItems.entrySet())
-            inventory.setItem(itemStackEntry.getKey(), new ItemBuilder(itemStackEntry.getValue()).build(superiorPlayer));
+        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet())
+            inventory.setItem(itemStackEntry.getKey(), itemStackEntry.getValue().clone().build(superiorPlayer));
 
         return inventory;
     }
@@ -239,7 +238,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         private Map<Integer, SoundWrapper> sounds = new HashMap<>();
         private Map<Integer, List<String>> commands = new HashMap<>();
-        private Map<Integer, ItemStack> fillItems = new HashMap<>();
+        private Map<Integer, ItemBuilder> fillItems = new HashMap<>();
         private Map<String, Object> data = new HashMap<>();
         private String title = "";
         private InventoryType inventoryType = InventoryType.CHEST;

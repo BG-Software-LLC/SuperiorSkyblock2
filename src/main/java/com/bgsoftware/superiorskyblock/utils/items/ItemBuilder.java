@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-public final class ItemBuilder {
+public final class ItemBuilder implements Cloneable {
 
     private ItemStack itemStack;
     private ItemMeta itemMeta;
@@ -120,6 +121,10 @@ public final class ItemBuilder {
         return this;
     }
 
+    public ItemMeta getItemMeta(){
+        return itemMeta;
+    }
+
     public ItemStack build(SuperiorPlayer superiorPlayer){
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
@@ -137,6 +142,18 @@ public final class ItemBuilder {
     public ItemStack build(){
         itemStack.setItemMeta(itemMeta);
         return textureValue.isEmpty() ? itemStack : HeadUtils.getPlayerHead(itemStack, textureValue);
+    }
+
+    public ItemBuilder clone(){
+        try {
+            ItemBuilder itemBuilder = (ItemBuilder) super.clone();
+            itemBuilder.itemStack = itemStack.clone();
+            itemBuilder.itemMeta = itemMeta.clone();
+            itemBuilder.textureValue = textureValue;
+            return itemBuilder;
+        }catch(Exception ex){
+            throw new NullPointerException(ex.getMessage());
+        }
     }
 
 }

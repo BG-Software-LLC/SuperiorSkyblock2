@@ -15,7 +15,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public final class FileUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static ItemStack getItemStack(ConfigurationSection section){
+    public static ItemBuilder getItemStack(ConfigurationSection section){
         if(section == null || !section.contains("type"))
             return null;
 
@@ -84,7 +83,7 @@ public final class FileUtils {
             itemBuilder.asSkullOf(section.getString("skull"));
         }
 
-        return itemBuilder.build();
+        return itemBuilder;
     }
 
     public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, YamlConfiguration cfg){
@@ -106,13 +105,13 @@ public final class FileUtils {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    ItemStack itemStack = getItemStack(cfg.getConfigurationSection("items." + ch));
+                    ItemBuilder itemBuilder = getItemStack(cfg.getConfigurationSection("items." + ch));
 
-                    if(itemStack != null) {
+                    if(itemBuilder != null) {
                         List<String> commands = cfg.getStringList("commands." + ch);
                         SoundWrapper sound = getSound(cfg.getConfigurationSection("sounds." + ch));
 
-                        menu.addFillItem(slot, itemStack);
+                        menu.addFillItem(slot, itemBuilder);
                         menu.addCommands(slot, commands);
                         menu.addSound(slot, sound);
                     }

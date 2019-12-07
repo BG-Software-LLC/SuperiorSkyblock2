@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -51,8 +50,8 @@ public final class MenuUpgrades extends SuperiorMenu {
             if(upgradeData.items.containsKey(level)) {
                 UpgradesHandler.ItemData itemData = upgradeData.items.get(level);
 
-                inv.setItem(itemData.slot, new ItemBuilder(EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
-                        itemData.hasNextLevel : itemData.noNextLevel).build(superiorPlayer));
+                inv.setItem(itemData.slot, (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
+                        itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
             }
         }
 

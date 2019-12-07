@@ -18,7 +18,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -171,7 +170,7 @@ public final class MenuPermissions extends SuperiorMenu {
 
         for(int i = 0; i < slots.size() && (i + (slots.size() * (currentPage - 1))) < permissionsAmount; i++){
             IslandPermission permission = islandPermissions.get(i + (slots.size() * (currentPage - 1)));
-            inventory.setItem(slots.get(i), new ItemBuilder(getItem(permission)).build(superiorPlayer));
+            inventory.setItem(slots.get(i), getItem(permission).build(superiorPlayer));
         }
 
         inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
@@ -186,21 +185,21 @@ public final class MenuPermissions extends SuperiorMenu {
         return inventory;
     }
 
-    private ItemStack getItem(IslandPermission islandPermission){
-        ItemStack permissionItem = new ItemStack(Material.AIR);
+    private ItemBuilder getItem(IslandPermission islandPermission){
+        ItemBuilder permissionItem = new ItemBuilder(Material.AIR);
         String permissionName = islandPermission.name().toLowerCase();
 
         if(permissionHolder instanceof PlayerRole){
             if (containsData(permissionName + "-role-permission")) {
                 PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
-                permissionItem = new ItemBuilder((ItemStack) getData(permissionName + "-role-permission"))
-                        .replaceAll("{}", requiredRole.toString()).build();
+                permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).clone()
+                        .replaceAll("{}", requiredRole.toString());
             }
         }
         else{
             if (containsData(permissionName + "-permission-enabled")) {
                 boolean hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(islandPermission);
-                permissionItem = (ItemStack) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"));
+                permissionItem = ((ItemBuilder) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"))).clone();
             }
         }
 

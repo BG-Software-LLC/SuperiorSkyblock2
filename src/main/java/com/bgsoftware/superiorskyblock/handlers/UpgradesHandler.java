@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -125,12 +126,12 @@ public final class UpgradesHandler {
     @SuppressWarnings("WeakerAccess")
     public static class ItemData{
 
-        public ItemStack hasNextLevel, noNextLevel;
+        public ItemBuilder hasNextLevel, noNextLevel;
         public int slot;
         public SoundWrapper hasNextLevelSound, noNextLevelSound;
         public List<String> hasNextLevelCommands, noNextLevelCommands;
 
-        public ItemData(ItemStack hasNextLevel, ItemStack noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
+        public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.slot = slot;

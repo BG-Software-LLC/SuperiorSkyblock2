@@ -13,7 +13,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -49,9 +48,9 @@ public final class MenuIslandCreation extends SuperiorMenu {
             if(containsData(schematic + "-has-access-item")) {
                 String permission = (String) getData(schematic + "-permission");
                 String schematicItemKey = superiorPlayer.hasPermission(permission) ? schematic + "-has-access-item" : schematic + "-no-access-item";
-                ItemStack schematicItem = (ItemStack) getData(schematicItemKey);
+                ItemBuilder schematicItem = (ItemBuilder) getData(schematicItemKey);
                 int slot = (int) getData(schematic + "-slot");
-                inv.setItem(slot, new ItemBuilder(schematicItem).build(superiorPlayer));
+                inv.setItem(slot, schematicItem.clone().build(superiorPlayer));
             }
         }
 

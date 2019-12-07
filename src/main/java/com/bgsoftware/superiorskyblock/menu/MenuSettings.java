@@ -14,7 +14,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -101,13 +100,13 @@ public final class MenuSettings extends SuperiorMenu {
         for(int i = 0; i < slots.size() && (i + (slots.size() * (currentPage - 1))) < settingsAmount; i++){
             IslandSettings settings = islandSettings.get(i + (slots.size() * (currentPage - 1)));
 
-            ItemStack settingsItem = new ItemStack(Material.AIR);
+            ItemBuilder settingsItem = new ItemBuilder(Material.AIR);
             String settingsName = settings.name().toLowerCase();
 
             if (containsData(settingsName + "-settings-enabled"))
-                settingsItem = (ItemStack) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(settings) ? "enabled" : "disabled"));
+                settingsItem = (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(settings) ? "enabled" : "disabled"));
 
-            inventory.setItem(slots.get(i), new ItemBuilder(settingsItem).build(superiorPlayer));
+            inventory.setItem(slots.get(i), settingsItem.clone().build(superiorPlayer));
         }
 
         inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))

@@ -193,7 +193,7 @@ public final class SettingsHandler {
         starterChestContents = new HashMap<>();
         for(String slot : cfg.getConfigurationSection("starter-chest.contents").getKeys(false)){
             try {
-                ItemStack itemStack = FileUtils.getItemStack(cfg.getConfigurationSection("starter-chest.contents." + slot));
+                ItemStack itemStack = FileUtils.getItemStack(cfg.getConfigurationSection("starter-chest.contents." + slot)).build();
                 itemStack.setAmount(cfg.getInt("starter-chest.contents." + slot + ".amount", 1));
                 starterChestContents.put(Integer.parseInt(slot), itemStack);
             }catch(Exception ignored){}

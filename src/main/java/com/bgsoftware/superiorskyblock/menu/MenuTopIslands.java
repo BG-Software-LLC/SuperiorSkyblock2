@@ -16,7 +16,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -123,8 +122,7 @@ public final class MenuTopIslands extends SuperiorMenu {
 
         for(int i = 0; i < slots.size(); i++){
             Island island = i >= plugin.getGrid().getSize() ? null : plugin.getGrid().getIsland(i, sortingType);
-            ItemStack itemStack = getTopItem(island, i + 1);
-            inventory.setItem(slots.get(i), new ItemBuilder(itemStack).build(superiorPlayer));
+            inventory.setItem(slots.get(i), getTopItem(island, i + 1).build(superiorPlayer));
         }
 
         if(sortGlowWhenSelected){
@@ -151,18 +149,17 @@ public final class MenuTopIslands extends SuperiorMenu {
         if(playerIslandSlot != -1){
             Island island = superiorPlayer.getIsland();
             int i = island == null ? -1 : plugin.getGrid().getIslandPosition(island, sortingType) + 1;
-            inventory.setItem(playerIslandSlot, new ItemBuilder(getTopItem(island, i)).build(superiorPlayer));
+            inventory.setItem(playerIslandSlot, getTopItem(island, i).build(superiorPlayer));
         }
 
         return inventory;
     }
 
-    private ItemStack getTopItem(Island island, int place){
+    private ItemBuilder getTopItem(Island island, int place){
         SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
 
-        ItemStack itemStack = ((ItemStack) getData(islandOwner == null ? "no-island-item" : "island-item")).clone();
-
-        ItemBuilder itemBuilder = new ItemBuilder(itemStack).asSkullOf(islandOwner);
+        ItemBuilder itemBuilder = ((ItemBuilder) getData(islandOwner == null ? "no-island-item" : "island-item")).clone()
+                .asSkullOf(islandOwner);
 
         if(island != null && islandOwner != null) {
             String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
@@ -176,10 +173,10 @@ public final class MenuTopIslands extends SuperiorMenu {
                     .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel()))
                     .replaceName("{6}", StringUtils.fancyFormat(island.getWorth()));
 
-            if(itemStack.getItemMeta().hasLore()){
+            if(itemBuilder.getItemMeta().hasLore()){
                 List<String> lore = new ArrayList<>();
 
-                for(String line : itemStack.getItemMeta().getLore()){
+                for(String line : itemBuilder.getItemMeta().getLore()){
                     if(line.contains("{4}")){
                         List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().islandTopIncludeLeader);
                         String memberFormat = line.split("\\{4}:")[1];
@@ -212,7 +209,7 @@ public final class MenuTopIslands extends SuperiorMenu {
             }
         }
 
-        return itemBuilder.build();
+        return itemBuilder;
     }
 
     public static void init(){

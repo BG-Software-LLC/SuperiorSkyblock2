@@ -68,7 +68,7 @@ public final class MissionsHandler implements MissionsManager {
 
                 if(mission == null) {
                     File missionJar = new File(missionsDict, missionSection.getString("mission-file") + ".jar");
-                    Optional<Class> missionClass = getMissionClasses(missionJar.toURL()).stream().findFirst();
+                    Optional<Class<?>> missionClass = getMissionClasses(missionJar.toURL()).stream().findFirst();
 
                     if (!missionClass.isPresent())
                         throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
@@ -265,8 +265,8 @@ public final class MissionsHandler implements MissionsManager {
                 .collect(Collectors.toList());
     }
 
-    private List<Class> getMissionClasses(URL jar) {
-        List<Class> list = new ArrayList<>();
+    private List<Class<?>> getMissionClasses(URL jar) {
+        List<Class<?>> list = new ArrayList<>();
 
         try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, Mission.class.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
             JarEntry jarEntry;
@@ -280,7 +280,7 @@ public final class MissionsHandler implements MissionsManager {
                 name = name.replace("/", ".");
                 String clazzName = name.substring(0, name.lastIndexOf(".class"));
 
-                Class c = cl.loadClass(clazzName);
+                Class<?> c = cl.loadClass(clazzName);
 
                 if (Mission.class.isAssignableFrom(c)) {
                     list.add(c);
@@ -291,11 +291,11 @@ public final class MissionsHandler implements MissionsManager {
         return list;
     }
 
-    private Mission createInstance(Class clazz, String name, List<String> requiredMissions, boolean onlyShowIfRequiredCompleted) throws Exception{
+    private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, boolean onlyShowIfRequiredCompleted) throws Exception{
         if(!Mission.class.isAssignableFrom(clazz))
             throw new IllegalArgumentException("Class " + clazz + " is not a Mission.");
 
-        for(Constructor constructor : clazz.getConstructors()){
+        for(Constructor<?> constructor : clazz.getConstructors()){
             if(constructor.getParameterCount() == 0) {
                 if(!constructor.isAccessible())
                     constructor.setAccessible(true);
@@ -327,7 +327,7 @@ public final class MissionsHandler implements MissionsManager {
         private final List<String> commandRewards = new ArrayList<>();
         private final boolean autoReward, islandMission;
         public final boolean disbandReset;
-        public final ItemStack notCompleted, canComplete, completed;
+        public final ItemBuilder notCompleted, canComplete, completed;
 
         MissionData(Mission mission, ConfigurationSection section){
             this.index = currentIndex++;
@@ -338,7 +338,7 @@ public final class MissionsHandler implements MissionsManager {
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                    ItemStack itemStack = FileUtils.getItemStack(section.getConfigurationSection("rewards.items." + key));
+                    ItemStack itemStack = FileUtils.getItemStack(section.getConfigurationSection("rewards.items." + key)).build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
                     this.itemRewards.add(itemStack);
                 }

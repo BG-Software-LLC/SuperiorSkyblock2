@@ -93,13 +93,14 @@ public final class MenuPlayerMissions extends SuperiorMenu {
                     plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
             int percentage = getPercentage(mission.getProgress(superiorPlayer));
             int progressValue = mission.getProgressValue(superiorPlayer);
-            inventory.setItem(i, completed ? missionData.completed : mission.canComplete(superiorPlayer) && hasAllRequiredMissions ?
-                    new ItemBuilder(missionData.canComplete)
-                            .replaceAll("{0}", percentage + "")
-                            .replaceAll("{1}", progressValue + "").build(superiorPlayer) :
-                    new ItemBuilder(missionData.notCompleted)
-                            .replaceAll("{0}", percentage + "")
-                            .replaceAll("{1}", progressValue + "").build(superiorPlayer));
+            inventory.setItem(i, completed ? missionData.completed.build(superiorPlayer) :
+                    mission.canComplete(superiorPlayer) && hasAllRequiredMissions ?
+                        missionData.canComplete.clone()
+                                .replaceAll("{0}", percentage + "")
+                                .replaceAll("{1}", progressValue + "").build(superiorPlayer) :
+                        missionData.notCompleted.clone()
+                                .replaceAll("{0}", percentage + "")
+                                .replaceAll("{1}", progressValue + "").build(superiorPlayer));
         }
 
         inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
