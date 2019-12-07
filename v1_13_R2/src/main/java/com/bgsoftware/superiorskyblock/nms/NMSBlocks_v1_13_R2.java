@@ -48,7 +48,7 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.g());
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.g());
 
         chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId));
 
