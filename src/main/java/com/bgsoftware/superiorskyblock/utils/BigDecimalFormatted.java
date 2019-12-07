@@ -1,10 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.utils.tags.DoubleTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -75,17 +70,6 @@ public final class BigDecimalFormatted extends BigDecimal {
 
     public static BigDecimalFormatted of(BigInteger bigInteger){
         return new BigDecimalFormatted(bigInteger.toString());
-    }
-
-    public static BigDecimalFormatted of(Tag tag){
-        if(tag instanceof IntTag)
-            return of(((IntTag) tag).getValue());
-        else if(tag instanceof DoubleTag)
-            return of(((DoubleTag) tag).getValue());
-        else if(tag instanceof StringTag)
-            return of(((StringTag) tag).getValue().replace(",", ""));
-
-        throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " into BigDecimalFormatted");
     }
 
 }

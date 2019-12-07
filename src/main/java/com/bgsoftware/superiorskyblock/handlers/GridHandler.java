@@ -13,11 +13,6 @@ import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -72,13 +67,6 @@ public final class GridHandler implements GridManager {
     public void createIsland(CachedResultSet resultSet){
         UUID owner = UUID.fromString(resultSet.getString("owner"));
         islands.add(owner, new SIsland(resultSet));
-    }
-
-    public void createIsland(CompoundTag tag){
-        UUID owner = UUID.fromString(((StringTag) tag.getValue().get("owner")).getValue());
-        Island island = new SIsland(tag);
-        islands.add(owner, island);
-        Executor.sync(() -> plugin.getDataHandler().insertIsland(island));
     }
 
     @Override
@@ -395,27 +383,6 @@ public final class GridHandler implements GridManager {
                     .setInt(stackedBlocks.stackedBlocks.get(position))
                     .execute(async);
         }
-    }
-
-    public void loadGrid(CompoundTag tag){
-        Map<String, Tag> compoundValues = tag.getValue(), _compoundValues;
-
-        lastIsland = SBlockPosition.of(((StringTag) compoundValues.get("lastIsland")).getValue());
-
-        for(Tag _tag : ((ListTag) compoundValues.get("stackedBlocks")).getValue()){
-            _compoundValues = ((CompoundTag) _tag).getValue();
-            String location = ((StringTag) _compoundValues.get("location")).getValue();
-            int stackAmount = ((IntTag) _compoundValues.get("stackAmount")).getValue();
-            stackedBlocks.put(SBlockPosition.of(location), stackAmount);
-        }
-
-        int maxIslandSize = ((IntTag) compoundValues.getOrDefault("maxIslandSize", new IntTag(plugin.getSettings().maxIslandSize))).getValue();
-        if(plugin.getSettings().maxIslandSize != maxIslandSize){
-            SuperiorSkyblockPlugin.log("&cYou have changed the max-island-size value without deleting database.");
-            SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
-            plugin.getSettings().updateValue("max-island-size", maxIslandSize);
-        }
-
     }
 
     public void executeGridInsertStatement(boolean async) {

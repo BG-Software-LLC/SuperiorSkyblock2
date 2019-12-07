@@ -17,9 +17,6 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -35,7 +32,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -83,20 +79,6 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
         lastTimeStatus = resultSet.getLong("lastTimeStatus");
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), completedMissions);
-    }
-
-    public SSuperiorPlayer(CompoundTag tag){
-        Map<String, Tag> compoundValues = tag.getValue();
-
-        player = UUID.fromString(((StringTag) compoundValues.get("player")).getValue());
-        islandLeader = SSuperiorPlayer.of(UUID.fromString(((StringTag) compoundValues.get("teamLeader")).getValue()));
-        name = ((StringTag) compoundValues.get("name")).getValue();
-        playerRole = SPlayerRole.of(((StringTag) compoundValues.get("islandRole")).getValue());
-        textureValue = ((StringTag) compoundValues.get("textureValue")).getValue();
-        disbands = compoundValues.containsKey("disbands") ? (int) compoundValues.get("disbands").getValue() : plugin.getSettings().disbandCount;
-
-        if(islandLeader.getIsland() == null)
-            islandLeader = this;
     }
 
     public SSuperiorPlayer(UUID player){

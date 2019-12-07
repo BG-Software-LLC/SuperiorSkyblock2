@@ -6,8 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -108,12 +106,6 @@ public final class PlayersHandler implements PlayersManager {
         synchronized (this) {
             players.put(player, superiorPlayer);
         }
-    }
-
-
-    public void loadPlayer(CompoundTag tag){
-        UUID player = UUID.fromString(((StringTag) tag.getValue().get("player")).getValue());
-        players.put(player, new SSuperiorPlayer(tag));
     }
 
     private void loadRole(ConfigurationSection section, int type){

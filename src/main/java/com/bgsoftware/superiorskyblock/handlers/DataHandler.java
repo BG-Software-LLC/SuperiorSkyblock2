@@ -8,22 +8,18 @@ import com.bgsoftware.superiorskyblock.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.sql.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({"ResultOfMethodCallIgnored",  "WeakerAccess"})
+@SuppressWarnings("WeakerAccess")
 public final class DataHandler {
 
     public SuperiorSkyblockPlugin plugin;
@@ -33,7 +29,6 @@ public final class DataHandler {
 
         try {
             SQLHelper.init(new File(plugin.getDataFolder(), "database.db"));
-            loadOldDatabase();
             loadDatabase();
         }catch(Exception ex){
             throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
@@ -273,74 +268,6 @@ public final class DataHandler {
 
     private boolean containsGrid(){
         return SQLHelper.doesConditionExist("SELECT * FROM grid;");
-    }
-
-    @SuppressWarnings({"ConstantConditions", "WeakerAccess"})
-    public void loadOldDatabase(){
-        File dataDir = new File(plugin.getDataFolder(), "data/islands");
-        Tag tag;
-
-        if(dataDir.exists()){
-            for(File file : dataDir.listFiles()){
-                try {
-                    try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
-                        tag = stream.readTag();
-                        plugin.getGrid().createIsland((CompoundTag) tag);
-                    }
-                }catch(Exception ex){
-                    ex.printStackTrace();
-                    File copyFile = new File(plugin.getDataFolder(), "data/islands-backup/" + file.getName());
-                    copyFile.getParentFile().mkdirs();
-                    file.renameTo(copyFile);
-                }
-                File copyFile = new File(plugin.getDataFolder(), "database-backup/islands/" + file.getName());
-                copyFile.getParentFile().mkdirs();
-                file.renameTo(copyFile);
-            }
-            dataDir.delete();
-        }
-
-        dataDir = new File(plugin.getDataFolder(), "data/players");
-
-        if(dataDir.exists()){
-            for(File file : dataDir.listFiles()){
-                try {
-                    try(NBTInputStream stream = new NBTInputStream(new FileInputStream(file))){
-                        tag = stream.readTag();
-                        plugin.getPlayers().loadPlayer((CompoundTag) tag);
-                    }
-                }catch(Exception ex){
-                    ex.printStackTrace();
-                    File copyFile = new File(plugin.getDataFolder(), "data/players-backup/" + file.getName());
-                    copyFile.getParentFile().mkdirs();
-                    file.renameTo(copyFile);
-                }
-                File copyFile = new File(plugin.getDataFolder(), "database-backup/players/" + file.getName());
-                copyFile.getParentFile().mkdirs();
-                file.renameTo(copyFile);
-            }
-            dataDir.delete();
-        }
-
-        File gridFile = new File(plugin.getDataFolder(), "data/grid");
-
-        if(gridFile.exists()){
-            try{
-                try(NBTInputStream stream = new NBTInputStream(new FileInputStream(gridFile))){
-                    tag = stream.readTag();
-                    plugin.getGrid().loadGrid((CompoundTag) tag);
-                }
-            }catch(Exception ex){
-                ex.printStackTrace();
-                File copyFile = new File(plugin.getDataFolder(), "data/grid-backup");
-                copyFile.getParentFile().mkdirs();
-                gridFile.renameTo(copyFile);
-            }
-            File copyFile = new File(plugin.getDataFolder(), "database-backup/grid");
-            copyFile.getParentFile().mkdirs();
-            gridFile.renameTo(copyFile);
-        }
-
     }
 
     private void addColumnIfNotExists(String column, String table, String def, String type) {

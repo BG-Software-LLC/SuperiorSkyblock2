@@ -2,9 +2,6 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,14 +11,7 @@ import java.util.Set;
 public final class SPermissionNode implements PermissionNode {
 
     private Set<IslandPermission> nodes = new HashSet<>();
-    private SPermissionNode previousNode = null;
-
-    public SPermissionNode(ListTag tag){
-        List<Tag> list = tag.getValue();
-
-        for(Tag _tag : list)
-            nodes.add(IslandPermission.valueOf(((StringTag) _tag).getValue()));
-    }
+    private SPermissionNode previousNode;
 
     public SPermissionNode(List<String> permissions, SPermissionNode previousNode){
         this(parse(permissions), previousNode);

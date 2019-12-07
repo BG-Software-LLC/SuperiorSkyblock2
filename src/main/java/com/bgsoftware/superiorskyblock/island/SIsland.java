@@ -31,19 +31,12 @@ import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.DoubleTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -113,14 +106,14 @@ public final class SIsland extends DatabaseObject implements Island {
     private Map<World.Environment, Location> teleportLocations = new HashMap<>();
     private Location visitorsLocation;
     private boolean locked = false;
-    private String islandName = "";
+    private String islandName;
     private String description = "";
     private final Map<UUID, Rating> ratings = new HashMap<>();
     private final Set<String> completedMissions = new HashSet<>();
     private Biome biome;
     private boolean ignored = false;
     private String generatedSchematics = "normal";
-    private String schemName = "";
+    private String schemName;
 
     /*
      * SIsland multipliers & limits
@@ -176,55 +169,6 @@ public final class SIsland extends DatabaseObject implements Island {
         checkMembersDuplication();
 
         Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
-    }
-
-    public SIsland(CompoundTag tag){
-        Map<String, Tag> compoundValues = tag.getValue();
-        this.owner = SSuperiorPlayer.of(UUID.fromString(((StringTag) compoundValues.get("owner")).getValue()));
-        this.center = SBlockPosition.of(((StringTag) compoundValues.get("center")).getValue());
-
-        this.teleportLocations.put(World.Environment.NORMAL, compoundValues.containsKey("teleportLocation") ?
-                LocationUtils.getLocation(((StringTag) compoundValues.get("teleportLocation")).getValue()) : getCenter(World.Environment.NORMAL));
-
-        List<Tag> members = ((ListTag) compoundValues.get("members")).getValue();
-        for(Tag _tag : members)
-            this.members.add(SSuperiorPlayer.of(UUID.fromString(((StringTag) _tag).getValue())));
-
-        List<Tag> banned = ((ListTag) compoundValues.get("banned")).getValue();
-        for(Tag _tag : banned)
-            this.banned.add(SSuperiorPlayer.of(UUID.fromString(((StringTag) _tag).getValue())));
-
-        Map<String, Tag> permissionNodes = ((CompoundTag) compoundValues.get("permissionNodes")).getValue();
-        for(String playerRole : permissionNodes.keySet())
-            this.permissionNodes.put(SPlayerRole.of(playerRole), new SPermissionNode((ListTag) permissionNodes.get(playerRole)));
-
-        Map<String, Tag> upgrades = ((CompoundTag) compoundValues.get("upgrades")).getValue();
-        for(String upgrade : upgrades.keySet())
-            this.upgrades.put(upgrade, ((IntTag) upgrades.get(upgrade)).getValue());
-
-        Map<String, Tag> warps = ((CompoundTag) compoundValues.get("warps")).getValue();
-        for(String warp : warps.keySet())
-            this.warps.put(warp, new WarpData(FileUtils.toLocation(((StringTag) warps.get(warp)).getValue()), false));
-
-        this.islandBank = BigDecimalFormatted.of(compoundValues.get("islandBank"));
-        this.islandSize = ((IntTag) compoundValues.getOrDefault("islandSize", new IntTag(plugin.getSettings().defaultIslandSize))).getValue();
-
-        this.blockLimits.put(Key.of("HOPPER"), ((IntTag) compoundValues.get("hoppersLimit")).getValue());
-        this.teamLimit = ((IntTag) compoundValues.get("teamLimit")).getValue();
-        this.warpsLimit = compoundValues.containsKey("warpsLimit") ? ((IntTag) compoundValues.get("warpsLimit")).getValue() : plugin.getSettings().defaultWarpsLimit;
-        this.cropGrowth = ((DoubleTag) compoundValues.get("cropGrowth")).getValue();
-        this.spawnerRates = ((DoubleTag) compoundValues.get("spawnerRates")).getValue();
-        this.mobDrops = ((DoubleTag) compoundValues.get("mobDrops")).getValue();
-        this.discord = ((StringTag) compoundValues.get("discord")).getValue();
-        this.paypal = ((StringTag) compoundValues.get("paypal")).getValue();
-
-        if(blockCounts.isEmpty())
-            calcIslandWorth(null);
-
-        assignPermissionNodes();
-        assignSettings();
-        assignGenerator();
-        checkMembersDuplication();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName, String schemName){
