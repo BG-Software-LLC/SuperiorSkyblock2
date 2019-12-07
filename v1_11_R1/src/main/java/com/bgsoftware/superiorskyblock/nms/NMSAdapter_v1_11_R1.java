@@ -82,7 +82,13 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
             org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
 
             Location center = island == null ? superiorPlayer.getLocation() : island.getCenter(environment);
-            worldBorder.setCenter(center.getX(), center.getZ());
+
+            if(environment == org.bukkit.World.Environment.NETHER){
+                worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
+            }
+            else{
+                worldBorder.setCenter(center.getX(), center.getZ());
+            }
 
             switch (superiorPlayer.getBorderColor()){
                 case GREEN:
