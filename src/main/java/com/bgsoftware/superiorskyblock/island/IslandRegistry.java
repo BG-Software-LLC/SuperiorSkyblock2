@@ -78,7 +78,7 @@ public final class IslandRegistry implements Iterable<Island> {
 
     public synchronized void sort(SortingType sortingType){
         ensureType(sortingType);
-        TreeSet<Island> sortedTree = sortedTrees.get(sortingType), originalSorted = new TreeSet<>(sortedTrees.get(sortingType));
+        TreeSet<Island> sortedTree = sortedTrees.get(sortingType);
         Iterator<Island> clonedTree = islands.values().iterator();
         sortedTree.clear();
         while(clonedTree.hasNext()) {
