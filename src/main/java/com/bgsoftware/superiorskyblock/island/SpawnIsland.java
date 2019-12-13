@@ -248,6 +248,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isInsideRange(Chunk chunk) {
+        if(!chunk.getWorld().equals(getCenter(World.Environment.NORMAL).getWorld()))
+            return false;
+
+        Location min = getMinimum(), max = getMaximum();
+        return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
+                (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
+    }
+
+    @Override
     public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
         return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
     }

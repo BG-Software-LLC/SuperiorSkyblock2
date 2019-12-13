@@ -52,6 +52,7 @@ public final class SettingsHandler {
     public final String islandWorldName;
     public final boolean netherWorldEnabled;
     public final boolean endWorldEnabled;
+    public final boolean optimizeWorlds;
     public final String spawnLocation;
     public final boolean spawnProtection;
     public final List<String> spawnSettings;
@@ -143,6 +144,7 @@ public final class SettingsHandler {
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
         endWorldEnabled = cfg.getBoolean("worlds.end-world", false);
+        optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = cfg.getBoolean("spawn.protection", true);
         spawnSettings = cfg.getStringList("spawn.settings");

@@ -185,6 +185,9 @@ worlds:
   nether-world: false
   # Should the end world be enabled?
   end-world: false
+  # Should the plugin optimize the island worlds?
+  # When enabled, only chunks of islands will be saved from the island worlds.
+  optimize: false
 
 # All settings related to the spawn island.
 spawn:

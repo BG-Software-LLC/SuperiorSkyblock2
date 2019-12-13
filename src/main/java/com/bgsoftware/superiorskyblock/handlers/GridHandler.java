@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -158,6 +159,32 @@ public final class GridHandler implements GridManager {
             return spawnIsland;
 
         return islands.get(location);
+    }
+
+    @Override
+    public Island getIslandAt(Chunk chunk){
+        if(chunk == null)
+            return null;
+
+        Island island;
+
+        Location corner = chunk.getBlock(0, 100, 0).getLocation();
+        if((island = getIslandAt(corner)) != null)
+            return island;
+
+        corner = chunk.getBlock(15, 100, 0).getLocation();
+        if((island = getIslandAt(corner)) != null)
+            return island;
+
+        corner = chunk.getBlock(0, 100, 15).getLocation();
+        if((island = getIslandAt(corner)) != null)
+            return island;
+
+        corner = chunk.getBlock(15, 100, 15).getLocation();
+        if((island = getIslandAt(corner)) != null)
+            return island;
+
+        return null;
     }
 
     @Override

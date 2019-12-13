@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -87,6 +88,13 @@ public interface GridManager {
      * @return The island at that position. May be null.
      */
     Island getIslandAt(Location location);
+
+    /**
+     * Get an island from a chunk.
+     * @param chunk The chunk to check.
+     * @return The island at that position. May be null.
+     */
+    Island getIslandAt(Chunk chunk);
 
     /**
      * Transfer an island's leadership to another owner.

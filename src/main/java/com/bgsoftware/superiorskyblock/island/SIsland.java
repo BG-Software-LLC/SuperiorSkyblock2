@@ -487,6 +487,19 @@ public final class SIsland extends DatabaseObject implements Island {
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
 
+    @Override
+    public boolean isInsideRange(Chunk chunk) {
+        if(!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+            return false;
+
+        int islandSize = getIslandSize();
+        Location min = center.parse().subtract(islandSize, 0, islandSize);
+        Location max = center.parse().add(islandSize, 0, islandSize);
+
+        return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
+                (max.getBlockX() >> 4) >= chunk.getX() &&(max.getBlockZ() >> 4) >= chunk.getZ();
+    }
+
     /*
      *  Permissions related methods
      */

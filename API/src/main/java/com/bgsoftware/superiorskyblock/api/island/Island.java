@@ -225,6 +225,12 @@ public interface Island extends Comparable<Island> {
      */
     boolean isInsideRange(Location location);
 
+    /**
+     * Check if the chunk is inside the island's protected area.
+     * @param chunk The chunk to check.
+     */
+    boolean isInsideRange(Chunk chunk);
+
     /*
      *  Permissions related methods
      */
