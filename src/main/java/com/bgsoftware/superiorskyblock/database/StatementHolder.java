@@ -55,7 +55,7 @@ public class StatementHolder {
 
     public void execute(boolean async) {
         if(async){
-            Executor.async(() -> execute(false));
+            Executor.data(() -> execute(false));
             return;
         }
 

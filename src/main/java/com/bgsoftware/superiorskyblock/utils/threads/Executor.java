@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public final class Executor {
 
     private static final ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Thread %d").build());
+    private static final ExecutorService databaseExecutor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static BukkitTask sync(Runnable runnable){
@@ -20,6 +21,10 @@ public final class Executor {
 
     public static BukkitTask sync(Runnable runnable, long delay){
         return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
+    }
+
+    public static void data(Runnable runnable){
+        databaseExecutor.execute(runnable);
     }
 
     public static void async(Runnable runnable){
@@ -39,6 +44,8 @@ public final class Executor {
         try{
             executor.shutdown();
             executor.awaitTermination(1, TimeUnit.MINUTES);
+            databaseExecutor.shutdown();
+            databaseExecutor.awaitTermination(1, TimeUnit.MINUTES);
         }catch(Exception ex){
             ex.printStackTrace();
         }
