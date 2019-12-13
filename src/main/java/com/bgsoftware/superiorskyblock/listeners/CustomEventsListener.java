@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
@@ -12,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.BlockGenerateEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
@@ -207,6 +209,19 @@ public final class CustomEventsListener implements Listener {
 
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);
+
+        if(toIsland != null && toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)){
+            if(fromIsland != null && fromIsland.isLocked() && !fromIsland.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)){
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            }
+            else{
+                e.setCancelled(true);
+            }
+
+            Locale.NO_CLOSE_BYPASS.send(superiorPlayer);
+
+            return;
+        }
 
         if(fromIsland != null && fromIsland.equals(toIsland)){
             if(fromIsland.isInsideRange(e.getFrom()) && !fromIsland.isInsideRange(e.getTo())){
