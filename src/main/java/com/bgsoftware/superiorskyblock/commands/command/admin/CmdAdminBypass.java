@@ -24,13 +24,13 @@ public final class CmdAdminBypass implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin bypass";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_BYPASS.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_BYPASS.getMessage(locale);
     }
 
     @Override

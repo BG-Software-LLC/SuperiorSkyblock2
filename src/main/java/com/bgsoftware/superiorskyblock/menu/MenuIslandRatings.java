@@ -67,7 +67,7 @@ public final class MenuIslandRatings extends SuperiorMenu {
                 SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(uuids.next());
                 inventory.setItem(slots.get(currentIndex), new ItemBuilder(inventory.getItem(slots.get(currentIndex)))
                         .replaceAll("{0}", _superiorPlayer.getName())
-                        .replaceAll("{1}", StringUtils.formatRating(ratings.get(_superiorPlayer.getUniqueId()).getValue()))
+                        .replaceAll("{1}", StringUtils.formatRating(_superiorPlayer.getUserLocale(), ratings.get(_superiorPlayer.getUniqueId()).getValue()))
                         .asSkullOf(_superiorPlayer).build(superiorPlayer));
             }
             else{

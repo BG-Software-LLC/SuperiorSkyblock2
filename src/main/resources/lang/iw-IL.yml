@@ -1,0 +1,500 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# If you wish to create a new language file, please copy this one.
+# Make sure you give the name a correct language name.
+# https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+
+ADMIN_DEPOSIT_MONEY: '&e&lקנב | &7.{1} לש יאה לש קנבל ${0} תרבעה'
+ADMIN_DEPOSIT_MONEY_NAME: '&e&lקנב | &7.{1} יאה לש קנבל ${0} תרבעה'
+ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Ome_R י"ע תנכות'
+ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7ןימדא תודוקפ תמישר [{0}/{1}]:'
+ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7אבה דומעל רבעמל /is admin {0} ץרה.'
+ALREADY_IN_ISLAND: '&c&lהאיגש | &7רחא יא לא ךייתשמ רבכ התא.'
+ALREADY_IN_ISLAND_OTHER: '&c&lהאיגש | &7ךלש יאב אצמנ רבכ הזה ןקחשה.'
+BAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ קחרוה. {0}'
+BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7םכלשמ הכומנ הגרד ילעב םינקחש קר קיחרהל
+  םילוכי םתא.'
+BANNED_FROM_ISLAND: '&c&lהאיגש | &7יאהמ קחרומ התא.'
+BLOCK_LEVEL: '&e&lתודוקנ | &7{1} אוה {0} קולבה לש תודוקנה רפסמ.'
+BLOCK_VALUE: '&e&lיווש | &7{1} אוה {0} קולבה לש יוושה.'
+BLOCK_VALUE_WORTHLESS: '&e&lיווש | &7םולכ הווש אל {0} קולבה.'
+BONUS_SET_SUCCESS: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש סונובה.'
+BORDER_PLAYER_COLOR_UPDATED: '&e&lלובג | &7{0} ל החלצהב הנוש ךלש לובגה עבצ.'
+BUILD_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאל ץוחמ תונבל לוכי אל התא.'
+CANNOT_SET_ROLE: '&e&lהאיגש | &7{0} ל ןקחשה לש הגרדה תא תונשל לוכי אל התא.'
+CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&e&lהאיגש | &7םינקחשל ךלשמ תוכומנ רתוי תוגרד קר
+  תונשל לושכי התא.'
+CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
+  ל החלצהב הנוש יאה לש םויבה.'
+CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_CROP_GROWTH: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לש הלידגה סונוב.'
+CHANGED_CROP_GROWTH_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש הלידגה סונוב..'
+CHANGED_CROP_GROWTH_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש הלידגה סונוב.'
+CHANGED_DISCORD: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש דרוקסידה.'
+CHANGED_ISLAND_SIZE: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לדוג.'
+CHANGED_ISLAND_SIZE_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לדוג.'
+CHANGED_LANGUAGE: '&e&lהפש | &7תירבעל החלצהב התנוש ךלש הפשה.'
+CHANGED_MOB_DROPS: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לש םיבומ לש םיטירפה סונוב.'
+CHANGED_MOB_DROPS_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש םיבומ לש םיטירפה
+  סונוב.'
+CHANGED_MOB_DROPS_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש םיבומ לש םיטירפה
+  סונוב.'
+CHANGED_NAME: '&e&lיא | &7{0} ל ךלש יאה לש םשה תא תיניש.'
+CHANGED_NAME_OTHER: '&e&lיא | &7{1} ל {0} לש יאה לש םשה תא תיניש.'
+CHANGED_NAME_OTHER_NAME: '&e&lיא | &7{1} ל {0} יאה לש םשה תא תיניש.'
+CHANGED_PAYPAL: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש לאפייפה.'
+CHANGED_SPAWNER_RATES: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לש םירנואפסה לש רוגישה
+  סונוב.'
+CHANGED_SPAWNER_RATES_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש םירנואפסה לש
+  רוגישה סונוב.'
+CHANGED_SPAWNER_RATES_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש םירנואפסה לש
+  רוגישה סונוב.'
+CHANGED_TEAM_LIMIT: '&e&lםיגורדש | &7החלצהב הנכדוע {0} לש יאה לש הצובקה תלבגמ.'
+CHANGED_TEAM_LIMIT_ALL: '&e&lםיגורדש | &7החלצהב הנכדוע םייאה לכ לש הצובקה תלבגמ.'
+CHANGED_TEAM_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע רמוע יאה לש הצובקה תלבגמ.'
+CHANGED_TELEPORT_LOCATION: '&e&lיא | &7החלצהב ןכדוע יאה לש רוגישה םוקמ.'
+CHANGED_WARPS_LIMIT: '&e&lםיגורדש | &7החלצהב הנכדוע {0} לש יאה לש םימוקימה תלבגמ.'
+CHANGED_WARPS_LIMIT_ALL: '&e&lםיגורדש | &7החלצהב הנכדוע םייאה לכ לש םימוקימה תלבגמ.'
+CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} יאה לש םימוקימה תלבגמ.'
+COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_AMOUNT: תומכ
+COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
+COMMAND_ARGUMENT_EMAIL: ליימיא
+COMMAND_ARGUMENT_ISLAND_NAME: יאה םש
+COMMAND_ARGUMENT_ISLAND_ROLE: הגרד
+COMMAND_ARGUMENT_LEADER: גיהנמ
+COMMAND_ARGUMENT_LEVEL: המר
+COMMAND_ARGUMENT_LIMIT: הלבגמ
+COMMAND_ARGUMENT_MATERIAL: רמוח
+COMMAND_ARGUMENT_MESSAGE: '...העדוה'
+COMMAND_ARGUMENT_MISSION_NAME: המישמה םש
+COMMAND_ARGUMENT_MULTIPLIER: סונוב
+COMMAND_ARGUMENT_NAME: םש
+COMMAND_ARGUMENT_NEW_LEADER: שדח גיהנמ
+COMMAND_ARGUMENT_PAGE: דומע
+COMMAND_ARGUMENT_PERMISSION: תושר
+COMMAND_ARGUMENT_PLAYER_NAME: ןקחשה םש
+COMMAND_ARGUMENT_PRIVATE: יטרפ
+COMMAND_ARGUMENT_RATING: גוריד
+COMMAND_ARGUMENT_SCHEMATIC_NAME: הנבמה םש
+COMMAND_ARGUMENT_SETTINGS: תורדגה
+COMMAND_ARGUMENT_SIZE: לדוג
+COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
+COMMAND_ARGUMENT_VALUE: יווש
+COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
+COMMAND_COOLDOWN_FORMAT: '&e&lהאיגש | &7{0} ב הדוקפב בוש שמתשהל לוכי התא.'
+COMMAND_COOLDOWN_SECONDS_NAME: תוינש
+COMMAND_COOLDOWN_SECOND_NAME: היינש
+COMMAND_COOLDOWN_MINUTES_NAME: תוקד
+COMMAND_COOLDOWN_MINUTE_NAME: הקד
+COMMAND_COOLDOWN_HOURS_NAME: תועש
+COMMAND_COOLDOWN_HOUR_NAME: העש
+COMMAND_COOLDOWN_DAYS_NAME: םימי
+COMMAND_COOLDOWN_DAY_NAME: םוי
+COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
+COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
+COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
+COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
+COMMAND_DESCRIPTION_ADMIN_DEMOTE: רחא יאב ןקחש הגרדב דירוהל.
+COMMAND_DESCRIPTION_ADMIN_DEPOSIT: רחא יא לש קנב לא ףסכ ריבעהל.
+COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.
+COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: ןקחשל םייא תוקיחמ תתל.
+COMMAND_DESCRIPTION_ADMIN_IGNORE: רתויב םיבוטה םייאה תמישרמ יא דירוהל.
+COMMAND_DESCRIPTION_ADMIN_JOIN: הנמזה אלל יאל סנכיהל.
+COMMAND_DESCRIPTION_ADMIN_MSG: העדוה ןקחשל חולשל.
+COMMAND_DESCRIPTION_ADMIN_MSG_ALL: העדוה יא לש םינקחשה לכל חולשל.
+COMMAND_DESCRIPTION_ADMIN_NAME: יא לש םשה תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_OPEN: רוביצל יא חותפל.
+COMMAND_DESCRIPTION_ADMIN_PROMOTE: רחא יאב ןקחש הגרדב תולעהל.
+COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
+COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
+COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_HOPPERS_LIMIT: Set hoppers limit for another player's
+  island.
+COMMAND_DESCRIPTION_ADMIN_SET_LEADER: רחא ןקחשל יא לע תוגיהנמה תא ריבעהל.
+COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: רחא ןקחש לש יא לש םיבומ לש םיטירפה סונוב
+  תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: םייאה לכל תמייוסמ תושרל תרתומה הגרדה תא
+  תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_RATE: יאל ןתנ ןקחשש גוריד תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: יאל הרדגה ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: רוטרנ'גמ והשלכ רמוח לש זוחא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_SIZE: ןקחש לש יא לש לדוג תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: רחא ןקחש לש יא לש םירנואפסה סונוב תא
+  תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: רחא ןקחש לש יא לש םינקחש תלבגה תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: רחא ןקחש לש יא לש גורדש לש המרה תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: רחא ןקחש לש יא לש םימוקימה תלבגה תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
+COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
+COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.
+COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
+COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
+COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
+COMMAND_DESCRIPTION_CLOSE: רוביצל יאה תא רוגסל.
+COMMAND_DESCRIPTION_COOP: יאה לש הלועפ ףתשמכ ןקחש ףיסוהל.
+COMMAND_DESCRIPTION_CREATE: שדח יא רוציל.
+COMMAND_DESCRIPTION_DEL_WARP: יאב םוקימ קוחמל.
+COMMAND_DESCRIPTION_DEMOTE: יאב ןקחש הגרדב דירוהל.
+COMMAND_DESCRIPTION_DEPOSIT: יאה לש קנבל ךלש ןובשחהמ ףסכ דיקפהל.
+COMMAND_DESCRIPTION_DISBAND: תותימצל יאה תא קוחמל.
+COMMAND_DESCRIPTION_EXPEL: יאהמ רקבמ שרגל.
+COMMAND_DESCRIPTION_FLY: יאב הפועת בצמ ףילחהל.
+COMMAND_DESCRIPTION_HELP: תודוקפה לכ תמישר.
+COMMAND_DESCRIPTION_INVITE: ךלש יאה לא ןקחש ןימזהל.
+COMMAND_DESCRIPTION_KICK: יאהמ ןקחש ףיעהל.
+COMMAND_DESCRIPTION_LEAVE: יאה תא בוזעל.
+COMMAND_DESCRIPTION_MISSION: המישמ םילשהל.
+COMMAND_DESCRIPTION_MISSIONS: תומישמה טירפת תא חותפל.
+COMMAND_DESCRIPTION_NAME: יאה םש תא תונשל.
+COMMAND_DESCRIPTION_OPEN: רוביצל יאה תא חותפל.
+COMMAND_DESCRIPTION_PANEL: יאה לש ישארה טירפתה תא חותפל.
+COMMAND_DESCRIPTION_PARDON: יאהמ ןקחש לש הקחרה דירוהל.
+COMMAND_DESCRIPTION_PERMISSIONS: יאב הגרד לש תואשרהב תופצל.
+COMMAND_DESCRIPTION_PROMOTE: יאב ןקחש הגרדב תולעהל.
+COMMAND_DESCRIPTION_RANKUP: גורדש המרב תולעהל.
+COMMAND_DESCRIPTION_RATE: יא גרדל.
+COMMAND_DESCRIPTION_RATINGS: יאה לש םיגורידה לכב תופצל.
+COMMAND_DESCRIPTION_SETTINGS: יאה לש תורדגהה טירפת תא חותפל.
+COMMAND_DESCRIPTION_RECALC: יאה יווש תא שדחמ בשחל.
+COMMAND_DESCRIPTION_SET_DISCORD: יאה לש דרוקסידה תא תונשל.
+COMMAND_DESCRIPTION_SET_PAYPAL: יאה לש לאפייפה תא תונשל.
+COMMAND_DESCRIPTION_SET_ROLE: יאב ןקחש לש הגרד תונשל.
+COMMAND_DESCRIPTION_SET_TELEPORT: יאה לש רוגישה םוקמ תא תונשל.
+COMMAND_DESCRIPTION_SET_WARP: יאב שדח םוקימ רוציל.
+COMMAND_DESCRIPTION_SHOW: יאה לע עדימ גיצהל.
+COMMAND_DESCRIPTION_TEAM: יאה לש םינקחשה לש עדימ גיצהל.
+COMMAND_DESCRIPTION_TEAM_CHAT: יתצובק טא'צ בצמ ףילחהל.
+COMMAND_DESCRIPTION_TELEPORT: יאה לא רגתשהל.
+COMMAND_DESCRIPTION_TOGGLE: םייא תולובגו םיקולב גוזימ יבצמ ףילחהל.
+COMMAND_DESCRIPTION_TOP: םיבוטה םייאה תמישר טירפת תא חותפל.
+COMMAND_DESCRIPTION_TRANSFER: יאה תוגיהנמ תא ריבעהל.
+COMMAND_DESCRIPTION_UNCOOP: יאה לש הלועפ ףתשמ תויהלמ ןקחש דירוהל.
+COMMAND_DESCRIPTION_UPGRADE: םיגורדשה טירפת תא חותפל.
+COMMAND_DESCRIPTION_VALUE: קולב לש יווש גיצהל.
+COMMAND_DESCRIPTION_VISIT: יאה לש םירקבמה תדוקנל רגתשהל.
+COMMAND_DESCRIPTION_WARP: יאב םוקימל רגתשהל.
+COMMAND_DESCRIPTION_WARPS: םימוקימה טירפת תא חותפל.
+COMMAND_DESCRIPTION_WITHDRAW: ךלש יטרפה ןובשחל יאה קנבמ ףסכ ךושמל.
+COMMAND_USAGE: '&cשומיש: /{0}'
+COOP_ANNOUNCEMENT: '&e&lיא | &7יאה לש הלועפ ףתשמכ {1} תא ףיסוה {0}.'
+COOP_BANNED_PLAYER: '&e&lהאיגש | &7הלועפ ףתשמכ ףסוותהל לוכי אלו יאהמ קחרומ הזה ןקחשה.'
+CREATE_ISLAND: '&e&lיא | &7היינשה תופילא {1} ךות {0} ב שדח יא תרצי.'
+DELETE_WARP: '&e&lיא | &7{0} םוקימה תא תקחמ.'
+DELETE_WARP_SIGN_BROKE: '&7&o...רבשנ אוה ,טלש הזה םוקימל היה.'
+DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&e&lהאיגש | &7ךלשמ הכומנ הגרד ילעב םינקחש קר הגרדב
+  דירוהל לוכי התא.'
+DEMOTED_MEMBER: '&e&lיא | &7ולש יאב {1} הגרדל {0} תא הגרדב תדרוה.'
+DEPOSIT_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבה לא ${0} דיקפה רמוע!'
+DESTROY_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאל ץוחמ סורהל לוכי אל התא.'
+DISBAND_ANNOUNCEMENT: '&e&lיא | &7{0} ידי לע קחמנ ךלש יאה.'
+DISBAND_GIVE: '&e&lיא | &7תורתומ תוקיחמ {0} דוע תלביק.'
+DISBAND_GIVE_OTHER: '&e&lיא | &7{1} ל תורתומ תוקיחמ {0} דוע תתנ.'
+DISBAND_SET: '&e&lיא | &7{0} ל התנוש ךלש תורתומה תוקיחמה תומכ.'
+DISBAND_SET_OTHER: '&e&lיא | &7{1} ל {0} לש תורתומה תוקיחמה תומכ תא תיניש.'
+DISBANDED_ISLAND: '&e&lיא | &7ךלש יאה תא תקחמ.'
+DISBANDED_ISLAND_OTHER: '&e&lיא | &7{0} לש יאה תא תקחמ.'
+DISBANDED_ISLAND_OTHER_NAME: '&e&lיא | &7{0} יאה תא תקחמ.'
+ENTER_PVP_ISLAND: '&7&oתוינש 10 כ ךשמב תוכמ לבקת אל התא .תוכמ וב תתל ןתינש יא לא תרגוש...'
+EXPELLED_PLAYER: '&e&lיא | &7יאה ןמ שרוג {0}.'
+GENERATOR_UPDATED: '&e&lיא | &7החלצהב ןכדוע {1} לש יאה לש רוטארנגב {0} רמוחה לש
+  זוחאה.'
+GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש רוטארנגב {0} רמוחה
+  לש זוחאה.'
+GENERATOR_UPDATED_ALL: '&e&lיא | &7החלצהב ןכדוע םייאה לכ לש רוטארנגב {0} רמוחה
+  לש זוחאה.'
+GLOBAL_MESSAGE_SENT: '&e&lיא | &7{0} לש יאה לש םינקחשל החלצהב החלשנ העדוהה!'
+GLOBAL_MESSAGE_SENT_NAME: '&e&lיא | &7{0} יאה לש םינקחשל החלצהב החלשנ העדוהה!'
+GOT_BANNED: '&e&lיא | &7רמוע לש יאה ןמ תקחרוה.'
+GOT_DEMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תדרי.'
+GOT_EXPELLED: '&e&lיא | &7{0} ידי לע יאה ןמ תשרוג.'
+GOT_INVITE: '&e&lיא | &7ולש יאה לא ךתוא ןימזה {0}.'
+GOT_INVITE_TOOLTIP: '&7הנמזהה תא רשאל תנמ לע העדוהה לע ץחל.'
+GOT_KICKED: '&e&lיא | &7{0} ידי לע ךלש יאה ןמ תפעוה.'
+GOT_PROMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תלעוה.'
+GOT_REVOKED: '&e&lיא | &7ולש יאל ךלש הנמזהה תא לטיב {0}.'
+GOT_UNBANNED: '&e&lיא | &7הדרי {0} לש יאהמ ךלש הקחרהה.'
+HIT_PLAYER_IN_ISLAND: '&e&lהאיגש | &7םייא ךותב םינקחשל תוכמ תתל לוכי אל התא.'
+IGNORED_ISLAND: '&e&lיא | &7םיבוטה םייאה תמישר ןמ דרי {0} לש יאה.'
+IGNORED_ISLAND_NAME: '&e&lיא | &7םיבוטה םייאה תמישר ןמ דרי {0} יאה.'
+INTERACT_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאל ץוחמ םירבד םע היצקרטניא עצבל לוכי
+  אל התא.'
+INVALID_AMOUNT: '&e&lהאיגש | &7{0} תיקוח אל תומכ.'
+INVALID_ISLAND: '&e&lהאיגש | &7יא ךל ןיא.'
+INVALID_ISLAND_LOCATION: '&e&lהאיגש | &7ךלש םוקימב יא ןיא.'
+INVALID_ISLAND_OTHER: '&e&lהאיגש | &7יא ןיא {0} ל.'
+INVALID_ISLAND_OTHER_NAME: '&e&lהאיגש | &7{0} םשה םע יא ןיא.'
+INVALID_ISLAND_PERMISSION: |
+  &e&lהאיגש | &7{0} האשרהה תא אוצמל היה ןתינ אל.
+  &e&lהאיגש | &7{1} :יאה תואשרה
+INVALID_LEVEL: '&e&lהאיגש | &7{0} תיקוח אל המר.'
+INVALID_LIMIT: '&e&lהאיגש | &7{0} תיקוח אל הלבגמ.'
+INVALID_MATERIAL: '&e&lהאיגש | &7{0} תיקוח אל רמוח.'
+INVALID_MISSION: '&e&lהאיגש | &7{0} תיקוח אל המישמ.'
+INVALID_MULTIPLIER: '&e&lהאיגש | &7{0} יקוח אל סונוב.'
+INVALID_PERCENTAGE: '&e&lהאיגש | &7100 ל 0 ןיב תויהל בייח זוחא.'
+INVALID_PLAYER: '&e&lהאיגש | &7{0} םשה םע ןקחש אוצמל ןתינ אל.'
+INVALID_RATE: |
+  &e&lהאיגש | &7{0} םשה םע גוריד אוצמל ןתינ אל.
+  &e&lהאיגש | &7{0} :םיגוריד
+INVALID_ROLE: |
+  &e&lהאיגש | &7{0} הגרדה תא אוצמל היה ןתינ אל.
+  &e&lהאיגש | &7{1} :תוגרד
+INVALID_SETTINGS: |
+  &e&lהאיגש | &7{0} םשה םע תורדגה אוצמל ןתינ אל.
+  &e&lהאיגש | &7{1} :תורדגה
+INVALID_SIZE: '&e&lהאיגש | &7{0} יקוח אל לדוג.'
+INVALID_TOGGLE_MODE: '&e&lהאיגש | &7{0} בצמ ףילחהל ןתינ אל.'
+INVALID_UPGRADE: |
+  &e&lהאיגש | &7{0} םשה םע גורדש אוצמל היה ןתינ אל.
+  &e&lהאיגש | &7{1} :םיגורדש
+INVALID_VISIT_LOCATION: '&e&lהאיגש | &7םירקבמ םוקמ ןיא הזה יאל.'
+INVALID_VISIT_LOCATION_BYPASS: '&7&oתאז לכב יאה לא ךתוא רגשמ ,לעפומ הפיקע בצמ...'
+INVALID_WARP: '&e&lהאיגש | &7{0} יקוח אל םוקימ.'
+INVITE_ANNOUNCEMENT: '&e&lיא | &7יאה לא {1} תא ןימזה {0}.'
+INVITE_BANNED_PLAYER: '&e&lהאיגש | &7הנמזה לבקל לוכי אל ןכלו יאה ןמ קחרומ הזה ןקחשה.'
+INVITE_TO_FULL_ISLAND: '&e&lהאיגש | &7ךלש יאל םישנא דוע ןימזהל לוכי אל התא.'
+ISLAND_ALREADY_EXIST: '&e&lהאיגש | &7םייק רבכ {0} םשה םע יא.'
+ISLAND_BANK_EMPTY: '&e&lקנב | &7קיר יאה קנב.'
+ISLAND_CALC_ANNOUNCEMENT: '&e&lSuperiorSkyblock &7שדחמ ובשוח םייאה לכ!'
+ISLAND_CLOSED: '&e&lיא | &7החלצהב רוביצל רגסנ יאה.'
+ISLAND_CREATE_PROCCESS_REQUEST: '&e&lיא | &7ךתשקב תא דבעמ...'
+ISLAND_FLY_DISABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &cקספוה&7.'
+ISLAND_FLY_ENABLED: '&e&lהפועת | &7יטמוטוא הפועת בצמ &aלעפוה&7.'
+ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&lיא | &7&oןואפסה לא תרגוש ןכל ,קחמנש יא ךותב
+  תייה...'
+ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&lיא | &7&oןואפסל תרגוש ןכל ,םינקחש ןיב
+  תוכמ ליעפהש יאב תייה...'
+ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7ידי לע רצונ Ome_R'
+ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7תודוקפ תמישר [{0}/{1}]:'
+ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
+ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7אבה דומעל רבעמל /is help {0} ץרה.'
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+  &e&lיא | &7םיקולב תלבגה:
+  {0}
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lיא | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lיא | &7הלידג סונוב: {0}'
+ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סונוב: {0}'
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+  &e&lיא | &7רוטארנג:
+  {0}
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}%'
+ISLAND_INFO_ADMIN_SIZE: '&e&lיא | &7לובגה לדוג: {0}'
+ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lיא | &7םירנואפס סונוב: {0}'
+ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lיא | &7הצובק תלבגה: {0}'
+ISLAND_INFO_ADMIN_UPGRADES: |
+  &e&lיא | &7םיגורדש:
+  {0}
+ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lיא | &7  {0}: {1}'
+ISLAND_INFO_BANK: '&e&lיא | &7קנב: {0}'
+ISLAND_INFO_DISCORD: '&e&lיא | &7דרוקסיד: {0}'
+ISLAND_INFO_FOOTER: ''
+ISLAND_INFO_HEADER: ''
+ISLAND_INFO_LOCATION: '&e&lיא | &7תיב: {0}'
+ISLAND_INFO_NAME: '&e&lיא | &7םש: {0}'
+ISLAND_INFO_OWNER: '&e&lיא | &7גיהנמ: {0}'
+ISLAND_INFO_PAYPAL: '&e&lיא | &7לאפייפ: {0}'
+ISLAND_INFO_PLAYER_LINE: '&e&lיא | &7 - {0}'
+ISLAND_INFO_RATE: '&e&lיא | &7גוריד: {0} &7({1}/5) - םינוש םיגוריד {2}.'
+ISLAND_INFO_RATE_EMPTY_SYMBOL: '&f✧'
+ISLAND_INFO_RATE_SYMBOL: ✦
+ISLAND_INFO_RATE_ONE_COLOR: '&4'
+ISLAND_INFO_RATE_TWO_COLOR: '&6'
+ISLAND_INFO_RATE_THREE_COLOR: '&e'
+ISLAND_INFO_RATE_FOUR_COLOR: '&a'
+ISLAND_INFO_RATE_FIVE_COLOR: '&2'
+ISLAND_INFO_ROLES: |
+  &e&lיא | &7{0}s:
+  {1}
+ISLAND_INFO_WORTH: '&e&lיא | &7יווש: {0}'
+ISLAND_OPENED: '&e&lיא | &7החלצהב רוביצל חתפנ יאה.'
+ISLAND_PROTECTED: '&e&lהאיגש | &7ןגומ הזה יאה.'
+ISLAND_TEAM_STATUS_FOOTER: ''
+ISLAND_TEAM_STATUS_HEADER: '&e&lיא | &7 לש יאה לש םינקחשה {0} &8[&e{1}&8/&e{2}&8]&7:'
+ISLAND_TEAM_STATUS_OFFLINE: '&c(קתונמ)'
+ISLAND_TEAM_STATUS_ONLINE: '&a(רבוחמ)'
+ISLAND_TEAM_STATUS_ROLES: '&e&lיא | &7 * [{0}] {1} {2} &7({3})'
+ISLAND_TOP_STATUS_OFFLINE: '&c(קתונמ)'
+ISLAND_TOP_STATUS_ONLINE: '&a(רבוחמ)'
+ISLAND_WARP_PUBLIC: ''
+ISLAND_WARP_PRIVATE: '&c[יטרפ]'
+ISLAND_WAS_CLOSED: '&e&lיא | &7&oןואפסל תרגוש ןכלו ,רוביצל רגסנ וב תייהש יאה...'
+ISLAND_WORTH_RESULT: '&e&lיא | &7אוה ךלש יאה יווש {0} [המר {1}]'
+JOIN_ANNOUNCEMENT: '&e&lיא | &7ךלש יאה לא סנכנ {0}.'
+JOIN_FULL_ISLAND: '&e&lהאיגש | &7תרתומה םינקחשה תומכ תלבגמל עיגה יאה.'
+JOIN_WHILE_IN_ISLAND: '&e&lהאיגש | &7יאב אצמנ רבכ התא.'
+JOINED_ISLAND: '&e&lיא | &7{0} לש יאה לא תסנכנ.'
+JOINED_ISLAND_NAME: '&e&lיא | &7{0} יאה לא תסנכנ.'
+JOINED_ISLAND_AS_COOP: '&e&lיא | &7{0} לש יאל הלועפ ףתשמכ תסנכנ.'
+JOINED_ISLAND_AS_COOP_NAME: '&e&lיא | &7{0} יאל הלועפ ףתשמכ תסנכנ.'
+KICK_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ ףעוה {0}.'
+KICK_PLAYERS_WITH_LOWER_ROLE: '&e&lהאיגש | &7ךלשמ הכומנ רתוי הגרד ילעב קר םינקחש ףיעהל
+  לוכי התא.'
+LACK_CHANGE_PERMISSION: '&e&lהאיגש | &7תורחא תוגרדל התוא תונשל תנמ לע האשרהה תא ךל
+  היהיש בייח התא.'
+LAST_ROLE_DEMOTE: '&e&lהאיגש | &7הזה ןקחשה תא הגרדב דירוהל דוע לוכי אל התא.'
+LAST_ROLE_PROMOTE: '&e&lהאיגש | &7הזה ןקחשה תא הגרדב תולעהל דוע לוכי אל התא.'
+LEAVE_ANNOUNCEMENT: '&e&lיא | &7יאה תא בזע {0}.'
+LEAVE_ISLAND_AS_LEADER: |-
+  &e&lהאיגש | &7ותוא גיהנמ התא רשאכ יאה תא בוזעל לוכי אל התא.
+  &e&lהאיגש | &7/is transfer ידי לע יאה לע תוגיהנמה תא ריבעהל לוכי התא.
+LEFT_ISLAND: '&e&lיא | &7ךלש יאה תא תבזע.'
+LEFT_ISLAND_COOP: '&e&lיא | &7{0} לש יאה לש הלועפ ףתשמ אל התא.'
+LEFT_ISLAND_COOP_NAME: '&e&lיא | &7רמוע יאה לש הלועפ ףתשמ אל התא.'
+MATERIAL_NOT_SOLID: '&e&lהאיגש | &7חישק רמוח סינכהל ביוחמ התא.'
+MAXIMUM_LEVEL: '&e&lהאיגש | &7{0} איה גורדשה לש תילמיסקמה המרה.'
+MESSAGE_SENT: '&e&lיא | &7החלצהב {0} לא החלשנ העדוהה!'
+MISSION_CANNOT_COMPLETE: '&e&lהאיגש | &7ןיידע המישמה תא םילשהל לוכי אל התא.'
+MISSION_NO_AUTO_REWARD: '&e&lתומישמ | &7התוא םילשהל תנמ לע /is mission complete ץרה
+  - {0} המישמה תא םילשהל תנמ לע םיכרצמה לכ תא ךל שי!'
+MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&e&lהאיגש | &7וזה המישמה תא םילשמ התאש ינפל
+  {0} המישמה תא םילשהל בייח התא.'
+NAME_ANNOUNCEMENT: '&e&lיא | &7{1} ל ולש יאה םש תא הניש {0}.'
+NAME_BLACKLISTED: '&e&lהאיגש | &7הזה םשב שמתשהל לוכי אל התא.'
+NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
+NAME_TOO_LONG: '&e&lהאיגש | &7םיוות 16 מ לעמ תויהל םילוכי אל םייא לש תומש.'
+NAME_TOO_SHORT: '&e&lהאיגש | &7םיוות 3 מ תוחפ תויהל םילוכי אל םייא לש תומש.'
+NO_BAN_PERMISSION: '&e&lהאיגש | &7םינקחש קיחרהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_CLOSE_BYPASS: '&e&lהאיגש | &7רוביצל חותפ אל הזה יאה.'
+NO_CLOSE_PERMISSION: '&e&lהאיגש | &7רוביצל יאה תא רוגסל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_COMMAND_PERMISSION: '&fUnknown command. Type "/help" for help.'
+NO_COOP_PERMISSION: '&e&lהאיגש | &7הלועפ יפתשמכ םינקחש ףיסוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_DELETE_WARP_PERMISSION: '&e&lהאיגש | &7םימוקימ קוחמל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_DEMOTE_PERMISSION: '&e&lהאיגש | &7המרב םינקחש דירוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_DEPOSIT_PERMISSION: '&e&lהאיגש | &7יאה לש קנבב ףסכ דיקפהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_DISBAND_PERMISSION: '&e&lהאיגש | &7יאה תא קוחמל תנמ לע ןימדא תגרדב תוחפל תויהל בייח התא.'
+NO_EXPEL_PERMISSION: '&e&lהאיגש | &7יאהמ םירקבמ שרגל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_INVITE_PERMISSION: '&e&lהאיגש | &7םינקחש ןימזהל תנמ לע ןימדא תגרדב תוחפל תויהל בייח התא.'
+NO_ISLAND_INVITE: '&e&lהאיגש | &7הזה יאהמ תונמזה אוצמל ןתינ היה אל.'
+NO_KICK_PERMISSION: '&e&lהאיגש | &7םינקחש ףיעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_MORE_DISBANDS: '&e&lהאיגש | &7םייא דוע קוחמל לוכי אל התא.'
+NO_MORE_WARPS: '&e&lהאיגש | &7ךלש יאל םימוקימ דוע רוציל ןתינ אל.'
+NO_NAME_PERMISSION: '&e&lהאיגש | &7ךלש יאה לש םשה תא תונשל לוכי אל התא.'
+NO_OPEN_PERMISSION: '&e&lהאיגש | &7רוביצל יאה תא חותפל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_PERMISSION_CHECK_PERMISSION: '&e&lהאיגש | &7תואשרה רובע עדימ לבקל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_PROMOTE_PERMISSION: '&e&lהאיגש | &7םינקחש הגרדב תולעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_RANKUP_PERMISSION: '&e&lהאיגש | &7םיגורדש המרב תולעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_RATINGS_PERMISSION: '&e&lהאיגש | &7םיגוריד קודבל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_BIOME_PERMISSION: '&e&lהאיגש | &7יאה לש םויבה תא תונשל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_DISCORD_PERMISSION: '&e&lהאיגש | &7יאה לש דרוקסידה תא תונשל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_HOME_PERMISSION: '&e&lהאיגש | &7יאל רוגישה םוקימ תא תונשל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_PAYPAL_PERMISSION: '&e&lהאיגש | &7יאה לש לאפייפה תא תונשל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_ROLE_PERMISSION: '&e&lהאיגש | &7םינקחשל תוגרד תתל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_SETTINGS_PERMISSION: '&e&lהאיגש | &7יאה לש תורדגהה תא תונשל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_SET_WARP_PERMISSION: '&e&lהאיגש | &7יאב םימוקימ רוציל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_TRANSFER_PERMISSION: '&e&lהאיגש | &7רחא ןקחשל תוגיהנמה תא ריבעהל תנמ לע יאה גיהנמ תויהל בייח התא.'
+NO_UNCOOP_PERMISSION: '&e&lהאיגש | &7יאה לש הלועפ יפתשמ תויהלמ םישנא דירוהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_WITHDRAW_PERMISSION: '&e&lהאיגש | &7יאה לש קנבהמ ףסכ ךושמל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NOT_ENOUGH_MONEY_TO_DEPOSIT: '&e&lהאיגש | &7יאה לש קנבל רלוד {0} ריבעהל תנמ לע ףסכ קיפסמ ךל ןיא.'
+NOT_ENOUGH_MONEY_TO_UPGRADE: '&e&lהאיגש | &7ףסכ קיפסמ ךל ןיא.'
+PANEL_TOGGLE_OFF: |-
+  &e&lטירפת | &cתיביכ &יטמוטואה יאה טירפת בצמ תא7.
+  &e&lטירפת | &7יאה לא םכתא חלשת /is תצרה.
+PANEL_TOGGLE_ON: |-
+  &e&lטירפת | &aתקלדה &יטמוטואה יאה טירפת בצמ תא7.
+  &e&lטירפת | &7יאה טירפת תא חתפת /is תצרה.
+PERMISSION_CHANGED: '&e&lיא | &7החלצהב {1} לש יאב {0} האשרהה תא תיניש.'
+PERMISSION_CHANGED_NAME: '&e&lיא | &7החלצהב {1} יאב {0} האשרהה תא תיניש.'
+PERMISSION_CHANGED_ALL: '&e&lיא | &7החלצהב םייאה לכב {0} האשרהה תא תיניש.'
+PLAYER_ALREADY_BANNED: '&e&lהאיגש | &7יאהמ קחרומ רבכ הזה ןקחשה.'
+PLAYER_ALREADY_COOP: '&e&lהאיגש | &7יאה לש הלועפ ףתשמ רבכ הזה ןקחשה.'
+PLAYER_ALREADY_IN_ROLE: '&e&lהאיגש | &7{1} הגרדב אצמנ רבכ {0}.'
+PLAYER_EXPEL_BYPASS: '&e&lהאיגש | &7יאהמ שרוגמ תויהל לוכי אל הזה ןקחשה.'
+PLAYER_JOIN_ANNOUNCEMENT: '&e&lיא | &7תרשה לא רבחתה {0}.'
+PLAYER_NOT_BANNED: '&e&lהאיגש | &7יאהמ קחרומ וניא הזה ןקחשה.'
+PLAYER_NOT_COOP: '&e&lהאיגש | &7יאה לש הלועפ ףתשמ וניא הזה ןקחשה.'
+PLAYER_NOT_INSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאה ךותב אצמנ אל הזה ןקחשה.'
+PLAYER_NOT_ONLINE: '&e&lהאיגש | &7רבוחמ אל הזה ןקחשה.'
+PLAYER_QUIT_ANNOUNCEMENT: '&e&lיא | &7תרשה תא בזע {0}.'
+PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&e&lהאיגש | &7ךלשמ הכומנ הגרד ילעב םינקחש הגרד תולעהל קר לוכי התא.'
+PROMOTED_MEMBER: '&e&lיא | &7ולש יאב {1} תגרדל {0} תא הגרדב תלעה.'
+RATE_ANNOUNCEMENT: '&e&lיא | &75 ךותמ {1} ךלש יאה תא גריד {0}!'
+RATE_CHANGE_OTHER: '&e&lיא | &7{1} ל {0} לש גורידה תא תיניש.'
+RATE_OWN_ISLAND: '&e&lהאיגש | &7ךלש יאה תא גרדל לוכי אל התא.'
+RATE_REMOVE_ALL: '&e&lיא | &7החלצהב {0} לש םיגורידה לכ תא תקחמ.'
+RATE_SUCCESS: '&e&lיא | &7םיבכוכ {0} םע הזה יאה תא תגריד!'
+REACHED_BLOCK_LIMIT: '&e&lםיגורדש | &7{0} קולבה לש יאב םיקולבה תלבגמל תעגה.'
+RECALC_ALL_ISLANDS: '&e&lיא | &7םייאה לכ לש יוושה תא שדחמ בשחמ...'
+RECALC_ALL_ISLANDS_DONE: '&e&lיא | &7החלצהב שדחמ ובשוח םייאה לכ.'
+RECALC_PROCCESS_REQUEST: '&e&lיא | &7ךתשקב תא דבעמ...'
+RELOAD_COMPLETED: '&e&lSuperiorSkyblock | &7החלצהב העצוב שדחמ הניעט!'
+RELOAD_PROCCESS_REQUEST: '&e&lSuperiorSkyblock | &7םיצבקה לכ תא שדחמ ןעוט...'
+REVOKE_INVITE_ANNOUNCEMENT: '&e&lיא | &7יאה לא {1} לש הנמזהה תא לטיב {0}.'
+SAME_NAME_CHANGE: '&e&lהאיגש | &7ךלש יאה לש יוושכעה םשהמ רחא םש סינכהל ךירצ התא.'
+SCHEMATIC_LEFT_SELECT: '&e&lםינבמ רצוי | &7היינש הדוקנ תנמיס ({0})'
+SCHEMATIC_NOT_READY: '&e&lהאיגש | &7You haven''t selected two positions.'
+SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7Processing your request...'
+SCHEMATIC_READY_TO_CREATE: |
+  &e&lםינבמ רצוי | &7You have selected two positions. Run /is admin schematic <name> to create a new schematic.
+  &e&lםינבמ רצוי | &7Make sure you stand at the teleportion location when executing the command.
+SCHEMATIC_RIGHT_SELECT: '&e&lםינבמ רצוי | &7הנושאר הדוקנ תנמיס ({0})'
+SCHEMATIC_SAVED: '&e&lםינבמ רצוי | &7החלצהב רמשנ הנבמה!'
+SELF_ROLE_CHANGE: '&e&lהאיגש | &7ךמצע לש הגרדה תא תונשל לוכי אל התא.'
+SET_UPGRADE_LEVEL: '&e&lםיגורדש | &7החלצהב התנוש {1} לש יאב {0} גורדשה לש המרה.'
+SET_UPGRADE_LEVEL_NAME: '&e&lםיגורדש | &7החלצהב התנוש {1} יאב {0} גורדשה לש המרה.'
+SET_WARP: '&e&lיא | &7{0} ב החלצהב שדח םוקימ תרצי.'
+SET_WARP_OUTSIDE: '&e&lהאיגש | &7ךלש יאל ץוחמ םימוקימ רוציל לוכי אל התא.'
+SETTINGS_UPDATED: '&e&lיא | &7{1} לש יאב החלצהב הנכדוע {0} הרדגהה.'
+SETTINGS_UPDATED_NAME: '&e&lיא | &7{1} יאב החלצהב הנכדוע {0} הרדגהה.'
+SETTINGS_UPDATED_ALL: '&e&lיא | &7םייאה לכב החלצהב הנכדוע {0} הרדגהה.'
+SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
+TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
+TELEPORT_LOCATION_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאב אצמנ אל התא.'
+TELEPORT_WARMUP: '&7&oזוזת לא {0}... ב רגושת התא!'
+TELEPORT_WARMUP_CANCEL: '&7&oלטוב רוגישה ןכלו תזז.'
+TELEPORTED_FAILED: '&e&lיא | &7תרשה תווצל הנפת אנא .יאב חוטב םוקמ ןיא יכ הארנ.'
+TELEPORTED_SUCCESS: '&e&lיא | &7ךלש יאל תרגוש.'
+TELEPORTED_TO_WARP: '&e&lיא | &7החלצהב יאה םוקימל תרגוש.'
+TOGGLE_FLY_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאל ץוחמ יטמוטואה הפועתה בצמ תא ףילחהל לוכי אל התא.'
+TOGGLED_BYPASS_OFF: '&e&lהפיקע | &7הפיקעה בצמ תא &cתיביכ&7.'
+TOGGLED_BYPASS_ON: '&e&lהפיקע | &7הפיקעה בצמ תא &aתקלדה&7.'
+TOGGLED_FLY_OFF: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &cתיביכ&7.'
+TOGGLED_FLY_ON: '&e&lהפועת | &7תיטמוטואה הפועתה בצמ תא &aתקלדה&7.'
+TOGGLED_SCHEMATIC_OFF: '&e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &cתיביכ&7.'
+TOGGLED_SCHEMATIC_ON: |-
+  &e&lםינבמ רצוי | &7םינבמה תריצי בצמ תא &aתקלדה&7.
+  &e&lםינבמ רצוי | בהז ןזרג תרזעב רוזא ןמס.
+TOGGLED_SPY_OFF: '&e&lיומס | &7יומסה טא''צה בצמ תא &cתיביכ&7.'
+TOGGLED_SPY_ON: '&e&lיומס | &7יומסה טא''צה בצמ תא &aתקלדה&7.'
+TOGGLED_STACKED_BLOCKS_OFF: '&e&lםיקולב גוזימ | &7םיקולב גוזימה בצמ תא &cתיביכ&7.'
+TOGGLED_STACKED_BLOCKS_ON: '&e&lםיקולב גוזימ | &7םיקולב גוזימה בצמ תא &aתקלדה&7.'
+TOGGLED_TEAM_CHAT_OFF: '&e&lטא''צ | &7Toggling team chat &cOFF&7.'
+TOGGLED_TEAM_CHAT_ON: '&e&lטא''צ | &7Toggling team chat &aON&7.'
+TOGGLED_WORLD_BORDER_OFF: '&e&lלובג | &7יתצובקה טא''צה בצמ תא &cתיביכ&7.'
+TOGGLED_WORLD_BORDER_ON: '&e&lלובג | &7יתצובקה טא''צה בצמ תא &aתקלדה&7.'
+TRANSFER_ADMIN: '&e&lיא | &7{1} לא {0} לש יאה תגהנה תא תרבעה.'
+TRANSFER_ADMIN_ALREADY_LEADER: '&e&lהאיגש | &7ולש יאה לש גיהנמה רבכ {0}.'
+TRANSFER_ADMIN_DIFFERENT_ISLAND: '&e&lהאיגש | &7יאה ותואב אל הלאה םינקחשה.'
+TRANSFER_ADMIN_NOT_LEADER: '&e&lהאיגש | &7יא ףא גיהנמ אל הזה ןקחשה.'
+TRANSFER_ALREADY_LEADER: '&e&lהאיגש | &7הזה יאה לש גיהנמה רבכ התא.'
+TRANSFER_BROADCAST: '&e&lיא | &7{0} לא הרבע יאה תוגיהנמ.'
+UNBAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע הלטוב {0} לש הקחרהה.'
+UNCOOP_ANNOUNCEMENT: '&e&lיא | &7יאה לש הלועפ ףתשמכ {1} תא דירוה {0}.'
+UNCOOP_LEFT_ANNOUNCEMENT: '&e&lיא | &7דוע יאה לש הלועפ ףתשמ וניא ןכלו תרשה תא בזע {0}.'
+UNIGNORED_ISLAND: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} לש יאה.'
+UNIGNORED_ISLAND_NAME: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} יאה.'
+UNSAFE_WARP: '&e&lיא | &7&oרחא םוקימ הסנ אנא .חוטב וניא םוקימה יכ הארנ.'
+UPDATED_PERMISSION: '&e&lיא | &7{0} ל תואשרהה ונכדוע.'
+UPDATED_SETTINGS: '&e&lיא | &7{0} תורדגהה ונכדוע.'
+VISITOR_BLOCK_COMMAND: '&e&lהאיגש | &7םירחא םייאב וזה הדוקפב שמתשהל לוכי אל התא.'
+WARP_ALREADY_EXIST: '&e&lהאיגש | &7הזה םשה םע םוקימ םייק רבכ.'
+WITHDRAW_ALL_MONEY: |-
+  &e&lקנב | &7וכותב םירלוד {0} קר שי יאה לש קנבב.
+  &e&lקנב | &7&oףסכה לכ תא ךשומ...
+WITHDRAW_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבהמ ${1} ךשמ {0}!'
+WITHDRAWN_MONEY: '&e&lקנב | &7{1} לש יאה לש קנבהמ ${0} תכשמ!'
+WITHDRAWN_MONEY_NAME: '&e&lקנב | &7{1} יאה לש קנבהמ ${0} תכשמ!'

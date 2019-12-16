@@ -185,7 +185,9 @@ public final class MenuTopIslands extends SuperiorMenu {
                         }
                         else {
                             members.forEach(member -> {
-                                String onlineMessage = member.isOnline() ? Locale.ISLAND_TOP_STATUS_ONLINE.getMessage() : Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage();
+                                String onlineMessage = member.isOnline() ?
+                                        Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
+                                        Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
 
                                 lore.add(memberFormat
                                         .replace("{}", member.getName())

@@ -5,6 +5,10 @@
 ##                                                  ##
 ######################################################
 
+# If you wish to create a new language file, please copy this one.
+# Make sure you give the name a correct language name.
+# https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+
 ADMIN_DEPOSIT_MONEY: '&e&lBank | &7You deposited ${0} into {1}''s island bank.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBank | &7You deposited ${0} into the bank of the island {1}.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
@@ -34,6 +38,7 @@ CHANGED_CROP_GROWTH_NAME: '&e&lUpgrades | &7Successfully updated the crop growth
 CHANGED_DISCORD: '&e&lIsland | &7Successfully changed island discord to {0}.'
 CHANGED_ISLAND_SIZE: '&e&lUpgrades | &7Successfully updated the island size of {0}''s island.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lUpgrades | &7Successfully updated the island size of {0}.'
+CHANGED_LANGUAGE: '&e&lLanguage | &7Successfully changed your language to English.'
 CHANGED_MOB_DROPS: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of {0}''s island.'
 CHANGED_MOB_DROPS_ALL: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of all the islands.'
 CHANGED_MOB_DROPS_NAME: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of {0}.'
@@ -200,7 +205,7 @@ GLOBAL_MESSAGE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members 
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the message!'
 GOT_BANNED: '&e&lIsland | &7You were BANNED from {0}''s island.'
 GOT_DEMOTED: '&e&lIsland | &7You were demoted to a {0} in your island.'
-GOT_EXPELLED: '&e&lIsland | &7&oYou have been expelled from the island by {0}...'
+GOT_EXPELLED: '&e&lIsland | &7&oYou were expelled from the island by {0}.'
 GOT_INVITE: '&e&lIsland | &7{0} invited you to his island.'
 GOT_INVITE_TOOLTIP: '&7Click the message in order to accept the invite.'
 GOT_KICKED: '&e&lIsland | &7You were kicked from your island by {0}.'

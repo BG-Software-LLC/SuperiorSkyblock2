@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -28,13 +29,13 @@ public final class CmdDeposit implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_DEPOSIT.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_DEPOSIT.getMessage(locale);
     }
 
     @Override
@@ -91,8 +92,7 @@ public final class CmdDeposit implements ICommand {
         island.depositMoney(amount);
         EconomyHook.withdrawMoney(superiorPlayer.asPlayer(), amount);
 
-        if(!Locale.DEPOSIT_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.DEPOSIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtils.format(amount)));
+        ((SIsland) island).sendMessage(Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
     }
 
     @Override

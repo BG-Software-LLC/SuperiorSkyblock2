@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,15 +27,15 @@ public final class CmdAdminSetLeader implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setleader <" +
-                Locale.COMMAND_ARGUMENT_LEADER.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_NEW_LEADER.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_LEADER.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_NEW_LEADER.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_LEADER.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_LEADER.getMessage(locale);
     }
 
     @Override
@@ -56,7 +57,6 @@ public final class CmdAdminSetLeader implements ICommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer leader = SSuperiorPlayer.of(args[2]);
         SuperiorPlayer newLeader = SSuperiorPlayer.of(args[3]);
-
 
         if (leader == null) {
             Locale.INVALID_PLAYER.send(sender, args[2]);
@@ -86,7 +86,7 @@ public final class CmdAdminSetLeader implements ICommand {
 
         if(island.transferIsland(newLeader)) {
             Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-            island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(newLeader.getName()));
+            ((SIsland) island).sendMessage(Locale.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
         }
     }
 

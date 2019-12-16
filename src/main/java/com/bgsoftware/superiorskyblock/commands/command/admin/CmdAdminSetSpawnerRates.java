@@ -27,17 +27,17 @@ public final class CmdAdminSetSpawnerRates implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setspawnerrates <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage(locale);
     }
 
     @Override

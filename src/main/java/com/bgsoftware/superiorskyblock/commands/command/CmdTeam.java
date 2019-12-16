@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -34,15 +35,15 @@ public final class CmdTeam implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "team [" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "]";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_TEAM.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_TEAM.getMessage(locale);
     }
 
     @Override
@@ -89,27 +90,28 @@ public final class CmdTeam implements ICommand {
         }
 
         Executor.async(() -> {
+            java.util.Locale locale = LocaleUtils.getLocale(sender);
             StringBuilder infoMessage = new StringBuilder();
 
-            if(!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty())
-                infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(island.getOwner().getName(),
+            if(!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty(locale))
+                infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(locale, island.getOwner().getName(),
                         island.getIslandMembers(true).size(), island.getTeamLimit())).append("\n");
 
             List<SuperiorPlayer> members = island.getIslandMembers(true);
             members.sort(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
 
-            if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty()){
+            if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)){
                 Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
                 plugin.getPlayers().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
-                String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(),
-                        offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage();
+                String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(locale),
+                        offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage(locale);
 
                 members.forEach(islandMember -> {
                     PlayerRole playerRole = islandMember.getPlayerRole();
                     long time = islandMember.getLastTimeStatus() == -1 ? -1 : (System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus();
-                    rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(playerRole,
+                    rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
                             islandMember.getName(), islandMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
                 });
 
@@ -118,8 +120,8 @@ public final class CmdTeam implements ICommand {
                         .forEach(playerRole -> infoMessage.append(rolesStrings.get(playerRole)));
             }
 
-            if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty())
-                infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage());
+            if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
+                infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage(locale));
 
             Locale.sendMessage(sender, infoMessage.toString());
         });

@@ -24,13 +24,13 @@ public final class CmdAdminSpy implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin spy";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage(locale);
     }
 
     @Override

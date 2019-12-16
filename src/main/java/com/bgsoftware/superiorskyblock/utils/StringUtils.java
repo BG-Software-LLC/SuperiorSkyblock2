@@ -83,20 +83,20 @@ public final class StringUtils {
             return format(d);
     }
 
-    public static String formatRating(double rating){
+    public static String formatRating(java.util.Locale locale, double rating){
         StringBuilder starsString = new StringBuilder();
         if(rating >= 1)
-            starsString.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if(rating >= 2)
-            starsString.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if(rating >= 3)
-            starsString.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if(rating >= 4)
-            starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if(rating >= 5)
-            starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage()).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         for(int i = 5; i > rating; i--)
-            starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage());
+            starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage(locale));
 
         return starsString.toString();
     }
@@ -113,42 +113,72 @@ public final class StringUtils {
         return stringBuilder.toString().substring(2);
     }
 
-    public static String formatTime(long time){
+    public static String formatTime(java.util.Locale locale, long time){
         StringBuilder timeBuilder = new StringBuilder();
         long timeUnitValue;
+        boolean RTL = LocaleUtils.isRightToLeft(locale);
 
         if(time > D){
             timeUnitValue = time / D;
-            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage() :
-                    Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage()).append(", ");
+            if(RTL){
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+            }
+            else {
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage(locale)).append(", ");
+            }
             time %= D;
         }
 
         if(time > H){
             timeUnitValue = time / H;
-            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage() :
-                    Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage()).append(", ");
+            if(RTL){
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+            }
+            else {
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage(locale)).append(", ");
+            }
             time %= H;
         }
 
         if(time > MIN){
             timeUnitValue = time / MIN;
-            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage() :
-                    Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage()).append(", ");
+            if(RTL){
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+            }
+            else {
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage(locale)).append(", ");
+            }
             time %= MIN;
         }
 
         if(time > S){
             timeUnitValue = time / S;
-            timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage() :
-                    Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage()).append(", ");
+            if(RTL){
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
+            }
+            else {
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale) :
+                        Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage(locale)).append(", ");
+            }
         }
 
         if(timeBuilder.length() == 0){
-            timeBuilder.append("1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage()).append(", ");
+            if(RTL){
+                timeBuilder.insert(0, "1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale)).insert(0, " ,");
+            }
+            else {
+                timeBuilder.append("1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale)).append(", ");
+            }
         }
 
-        return timeBuilder.substring(0, timeBuilder.length() - 2);
+        return RTL ? timeBuilder.substring(2) : timeBuilder.substring(0, timeBuilder.length() - 2);
     }
 
 }

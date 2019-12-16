@@ -26,13 +26,13 @@ public final class CmdSetTeleport implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "setteleport";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_SET_TELEPORT.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_SET_TELEPORT.getMessage(locale);
     }
 
     @Override

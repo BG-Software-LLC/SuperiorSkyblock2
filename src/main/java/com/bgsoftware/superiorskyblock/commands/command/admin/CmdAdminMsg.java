@@ -29,15 +29,15 @@ public final class CmdAdminMsg implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin msg <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage(locale);
     }
 
     @Override

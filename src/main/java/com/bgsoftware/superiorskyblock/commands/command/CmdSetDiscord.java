@@ -26,13 +26,13 @@ public final class CmdSetDiscord implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "setdiscord <" + Locale.COMMAND_ARGUMENT_DISCORD.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "setdiscord <" + Locale.COMMAND_ARGUMENT_DISCORD.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_SET_DISCORD.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_SET_DISCORD.getMessage(locale);
     }
 
     @Override

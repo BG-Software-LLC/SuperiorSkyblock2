@@ -28,16 +28,16 @@ public final class CmdAdminName implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin name <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_NAME.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_NAME.getMessage(locale);
     }
 
     @Override

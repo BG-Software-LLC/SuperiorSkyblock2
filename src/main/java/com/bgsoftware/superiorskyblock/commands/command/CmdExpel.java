@@ -28,13 +28,13 @@ public final class CmdExpel implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "expel <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "expel <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_EXPEL.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_EXPEL.getMessage(locale);
     }
 
     @Override

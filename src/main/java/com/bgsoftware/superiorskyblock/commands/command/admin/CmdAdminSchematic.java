@@ -24,13 +24,13 @@ public final class CmdAdminSchematic implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "admin schematic [" + Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "admin schematic [" + Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SCHEMATIC.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SCHEMATIC.getMessage(locale);
     }
 
     @Override

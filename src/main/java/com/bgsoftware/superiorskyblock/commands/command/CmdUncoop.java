@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -28,13 +29,13 @@ public final class CmdUncoop implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "uncoop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "uncoop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_UNCOOP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_UNCOOP.getMessage(locale);
     }
 
     @Override
@@ -81,8 +82,7 @@ public final class CmdUncoop implements ICommand {
 
         island.removeCoop(targetPlayer);
 
-        if(!Locale.UNCOOP_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.UNCOOP_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
         if(island.getName().isEmpty())
             Locale.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());

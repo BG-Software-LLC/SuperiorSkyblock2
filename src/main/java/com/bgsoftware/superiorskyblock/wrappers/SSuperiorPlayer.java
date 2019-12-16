@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
@@ -49,6 +51,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private SuperiorPlayer islandLeader;
     private String name, textureValue = "";
     private PlayerRole playerRole;
+    private java.util.Locale userLocale;
 
     private boolean worldBorderEnabled = true;
     private boolean blocksStackerEnabled = true;
@@ -79,6 +82,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
         lastTimeStatus = resultSet.getLong("lastTimeStatus");
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), completedMissions);
+        userLocale = LocaleUtils.getLocale(resultSet.getString("language"));
     }
 
     public SSuperiorPlayer(UUID player){
@@ -88,6 +92,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         this.islandLeader = this;
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
+        this.userLocale = LocaleUtils.DEFAULT;
     }
 
     @Override
@@ -119,6 +124,24 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         this.name = asPlayer().getName();
         Query.PLAYER_SET_NAME.getStatementHolder()
                 .setString(name)
+                .setString(player.toString())
+                .execute(true);
+    }
+
+    @Override
+    public java.util.Locale getUserLocale() {
+        return userLocale;
+    }
+
+    @Override
+    public void setUserLocale(java.util.Locale userLocale) {
+        if(!Locale.isValidLocale(userLocale))
+            throw new IllegalArgumentException("Locale " + userLocale + " is not a valid locale.");
+
+        this.userLocale = userLocale;
+
+        Query.PLAYER_SET_LANGUAGE.getStatementHolder()
+                .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
                 .setString(player.toString())
                 .execute(true);
     }

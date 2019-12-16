@@ -29,13 +29,13 @@ public final class CmdName implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "name <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "name <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_NAME.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_NAME.getMessage(locale);
     }
 
     @Override

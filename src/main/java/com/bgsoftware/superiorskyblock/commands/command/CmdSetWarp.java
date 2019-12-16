@@ -27,15 +27,15 @@ public final class CmdSetWarp implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "setwarp <" +
-                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage() + "> [" +
-                Locale.COMMAND_ARGUMENT_PRIVATE.getMessage() + "]";
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "> [" +
+                Locale.COMMAND_ARGUMENT_PRIVATE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_SET_WARP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_SET_WARP.getMessage(locale);
     }
 
     @Override

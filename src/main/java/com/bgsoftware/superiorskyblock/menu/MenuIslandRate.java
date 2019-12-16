@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +48,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Locale.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
 
-        if(!Locale.RATE_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.RATE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), rating.getValue()));
+        ((SIsland) island).sendMessage(Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
 
         previousMove = false;
         e.getWhoClicked().closeInventory();

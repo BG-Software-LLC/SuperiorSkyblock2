@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -28,15 +29,15 @@ public final class CmdAdminDisband implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin disband <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_DISBAND.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_DISBAND.getMessage(locale);
     }
 
     @Override
@@ -73,8 +74,7 @@ public final class CmdAdminDisband implements ICommand {
         Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
         if(!islandDisbandEvent.isCancelled()) {
-            if(!Locale.DISBAND_ANNOUNCEMENT.isEmpty())
-                island.sendMessage(Locale.DISBAND_ANNOUNCEMENT.getMessage(sender.getName()));
+            ((SIsland) island).sendMessage(Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
 
             if(targetPlayer == null)
                 Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());

@@ -2,13 +2,17 @@ package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,6 +46,7 @@ public enum Locale {
     CHANGED_DISCORD,
     CHANGED_ISLAND_SIZE,
     CHANGED_ISLAND_SIZE_NAME,
+    CHANGED_LANGUAGE,
     CHANGED_MOB_DROPS,
     CHANGED_MOB_DROPS_ALL,
     CHANGED_MOB_DROPS_NAME,
@@ -148,6 +153,7 @@ public enum Locale {
     COMMAND_DESCRIPTION_HELP,
     COMMAND_DESCRIPTION_INVITE,
     COMMAND_DESCRIPTION_KICK,
+    COMMAND_DESCRIPTION_LANG,
     COMMAND_DESCRIPTION_LEAVE,
     COMMAND_DESCRIPTION_MISSION,
     COMMAND_DESCRIPTION_MISSIONS,
@@ -449,7 +455,10 @@ public enum Locale {
     WITHDRAW_ALL_MONEY,
     WITHDRAW_ANNOUNCEMENT;
 
-    private String message, defaultMessage;
+    private static Set<java.util.Locale> locales = new HashSet<>();
+
+    private String defaultMessage;
+    private Map<java.util.Locale, String> messages = new HashMap<>();
 
     Locale(){
         this(null);
@@ -459,13 +468,13 @@ public enum Locale {
         this.defaultMessage = defaultMessage;
     }
 
-    public boolean isEmpty(){
-        return message == null || message.isEmpty();
+    public boolean isEmpty(java.util.Locale locale){
+        return messages.getOrDefault(locale, "").isEmpty();
     }
 
-    public String getMessage(Object... objects){
-        if(!isEmpty()) {
-            String msg = message;
+    public String getMessage(java.util.Locale locale, Object... objects){
+        if(!isEmpty(locale)) {
+            String msg = messages.get(locale);
 
             for (int i = 0; i < objects.length; i++)
                 msg = msg.replace("{" + i + "}", objects[i].toString());
@@ -477,17 +486,23 @@ public enum Locale {
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects){
-        send(superiorPlayer.asPlayer(), objects);
+        send(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale(), objects);
     }
 
     public void send(CommandSender sender, Object... objects){
-        String message = getMessage(objects);
+        send(sender, LocaleUtils.getLocale(sender), objects);
+    }
+
+    public void send(CommandSender sender, java.util.Locale locale, Object... objects){
+        String message = getMessage(locale, objects);
         if(message != null && sender != null)
             sender.sendMessage(message);
     }
 
-    private void setMessage(String message){
-        this.message = message;
+    private void setMessage(java.util.Locale locale, String message){
+        if(message == null)
+            message = "";
+        messages.put(locale, message);
     }
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -495,21 +510,47 @@ public enum Locale {
     public static void reload(){
         SuperiorSkyblockPlugin.log("Loading messages started...");
         long startTime = System.currentTimeMillis();
-        int messagesAmount = 0;
-        File file = new File(plugin.getDataFolder(), "lang.yml");
 
-        if(!file.exists())
-            plugin.saveResource("lang.yml", false);
+        convertOldFile();
+        locales = new HashSet<>();
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        cfg.syncWithConfig(file, plugin.getResource("lang.yml"));
+        File langFolder = new File(plugin.getDataFolder(), "lang");
 
-        for(Locale locale : values()){
-            locale.setMessage(ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
-            messagesAmount++;
+        if(!langFolder.exists()){
+            plugin.saveResource("lang/en-US.yml", false);
+            plugin.saveResource("lang/iw-IL.yml", false);
         }
 
-        SuperiorSkyblockPlugin.log(" - Found " + messagesAmount + " messages in lang.yml.");
+        int messagesAmount = 0;
+        boolean countMessages = true;
+
+        for(File langFile : Objects.requireNonNull(langFolder.listFiles())){
+            String fileName = langFile.getName().split("\\.")[0];
+            java.util.Locale fileLocale;
+
+            try{
+                fileLocale = LocaleUtils.getLocale(fileName);
+            }catch(IllegalArgumentException ex){
+                SuperiorSkyblockPlugin.log("&cThe language \"" + fileName + "\" is invalid. Please correct the file name.");
+                continue;
+            }
+
+            locales.add(fileLocale);
+
+            CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
+            cfg.syncWithConfig(langFile, plugin.getResource("lang/en-US.yml"));
+
+            for(Locale locale : values()){
+                locale.setMessage(fileLocale, ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
+
+                if(countMessages)
+                    messagesAmount++;
+            }
+
+            countMessages = false;
+        }
+
+        SuperiorSkyblockPlugin.log(" - Found " + messagesAmount + " messages in the language files.");
         SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
@@ -524,15 +565,40 @@ public enum Locale {
     private static Set<UUID> noInteractMessages = new HashSet<>();
 
     public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
-        sendProtectionMessage(superiorPlayer.asPlayer());
+        sendProtectionMessage(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale());
     }
 
     public static void sendProtectionMessage(Player player){
+        sendProtectionMessage(player, LocaleUtils.getLocale(player));
+    }
+
+    public static void sendProtectionMessage(Player player, java.util.Locale locale){
         if(!noInteractMessages.contains(player.getUniqueId())){
             noInteractMessages.add(player.getUniqueId());
-            ISLAND_PROTECTED.send(player);
+            ISLAND_PROTECTED.send(player, locale);
             Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), 60L);
         }
+    }
+
+    public static boolean isValidLocale(java.util.Locale locale){
+        return locales.contains(locale);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void convertOldFile(){
+        File file = new File(plugin.getDataFolder(), "lang/en-US.yml");
+        if(file.exists()){
+            File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
+            dest.getParentFile().mkdirs();
+            file.renameTo(dest);
+        }
+    }
+
+    public static java.util.Locale getDefaultLocale(){
+        for(java.util.Locale locale : locales)
+            return locale;
+
+        return null;
     }
 
 }

@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -43,6 +45,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -68,16 +72,17 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null && !Locale.PLAYER_JOIN_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
+        if(island != null)
+            ((SIsland) island).sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
 
         Executor.async(() -> {
-            if(!Locale.GOT_INVITE.isEmpty()){
+            java.util.Locale locale = superiorPlayer.getUserLocale();
+            if(!Locale.GOT_INVITE.isEmpty(locale)){
                 for(Island _island : plugin.getGrid().getIslands()){
                     if(_island.isInvited(superiorPlayer)){
-                        TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(_island.getOwner().getName()));
-                        if(!Locale.GOT_INVITE_TOOLTIP.isEmpty())
-                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage())}));
+                        TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(locale, _island.getOwner().getName()));
+                        if(!Locale.GOT_INVITE_TOOLTIP.isEmpty(locale))
+                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(locale))}));
                         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + _island.getOwner().getName()));
                         superiorPlayer.asPlayer().spigot().sendMessage(textComponent);
                     }
@@ -94,14 +99,13 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null && !Locale.PLAYER_QUIT_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()), superiorPlayer.getUniqueId());
+        if(island != null)
+            ((SIsland) island).sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
                 _island.removeCoop(superiorPlayer);
-                if(!Locale.UNCOOP_LEFT_ANNOUNCEMENT.isEmpty())
-                    _island.sendMessage(Locale.UNCOOP_LEFT_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
+                ((SIsland) _island).sendMessage(Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
             }
         }
     }
@@ -214,7 +218,7 @@ public final class PlayersListener implements Listener {
                 superiorPlayer.toggleTeamChat();
             else {
                 e.setCancelled(true);
-                island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage()));
+                ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
                 Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
                 for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
                     SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
@@ -225,7 +229,7 @@ public final class PlayersListener implements Listener {
             }
         }
 
-        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(island == null ? "" :
+        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.DEFAULT, island == null ? "" :
                 plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()

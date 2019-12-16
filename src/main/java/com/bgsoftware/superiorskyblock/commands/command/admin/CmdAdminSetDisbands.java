@@ -26,15 +26,15 @@ public class CmdAdminSetDisbands implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setdisbands <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS.getMessage(locale);
     }
 
     @Override

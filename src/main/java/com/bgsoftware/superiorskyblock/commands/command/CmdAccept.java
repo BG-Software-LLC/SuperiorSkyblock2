@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.google.common.collect.Lists;
@@ -13,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -30,15 +32,15 @@ public final class CmdAccept implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "accept <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ACCEPT.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ACCEPT.getMessage(locale);
     }
 
     @Override
@@ -92,8 +94,7 @@ public final class CmdAccept implements ICommand {
         if(islandJoinEvent.isCancelled())
             return;
 
-        if(!Locale.JOIN_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.JOIN_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -26,13 +27,13 @@ public final class CmdBan implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "ban <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "ban <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_BAN.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_BAN.getMessage(locale);
     }
 
     @Override
@@ -85,8 +86,7 @@ public final class CmdBan implements ICommand {
 
         island.banMember(targetPlayer);
 
-        if(!Locale.BAN_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.BAN_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
 
         Locale.GOT_BANNED.send(targetPlayer, island.getOwner().getName());
     }

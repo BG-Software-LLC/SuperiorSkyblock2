@@ -99,7 +99,8 @@ public final class DataHandler {
                 "islandFly BOOLEAN," +
                 "borderColor VARCHAR," +
                 "lastTimeStatus VARCHAR," +
-                "missions VARCHAR" +
+                "missions VARCHAR," +
+                "language VARCHAR" +
                 ");");
 
         //Creating default grid table
@@ -142,6 +143,7 @@ public final class DataHandler {
         addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
         addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "VARCHAR");
         addColumnIfNotExists("schemName", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("language", "players", "'en-US'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

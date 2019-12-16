@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -42,6 +43,17 @@ public interface SuperiorPlayer {
      * Update the cached name with the current player's name.
      */
     void updateName();
+
+    /**
+     * Get the locale of the player.
+     */
+    Locale getUserLocale();
+
+    /**
+     * Set the locale of the player.
+     * @param locale The locale to set.
+     */
+    void setUserLocale(Locale locale);
 
     /**
      * Get the world that the player is inside.

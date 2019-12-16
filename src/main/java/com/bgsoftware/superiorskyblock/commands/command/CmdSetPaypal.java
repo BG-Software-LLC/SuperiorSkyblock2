@@ -26,13 +26,13 @@ public final class CmdSetPaypal implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "setpaypal <" + Locale.COMMAND_ARGUMENT_EMAIL.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "setpaypal <" + Locale.COMMAND_ARGUMENT_EMAIL.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_SET_PAYPAL.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_SET_PAYPAL.getMessage(locale);
     }
 
     @Override

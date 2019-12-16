@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -29,13 +30,13 @@ public final class CmdWithdraw implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_WITHDRAW.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_WITHDRAW.getMessage(locale);
     }
 
     @Override
@@ -97,8 +98,7 @@ public final class CmdWithdraw implements ICommand {
         island.withdrawMoney(amount);
         EconomyHook.depositMoney(superiorPlayer.asPlayer(), amount);
 
-        if(!Locale.WITHDRAW_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.WITHDRAW_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), StringUtils.format(amount)));
+        ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
+import java.util.Locale;
 
 public interface ICommand {
 
@@ -11,9 +12,9 @@ public interface ICommand {
 
     String getPermission();
 
-    String getUsage();
+    String getUsage(Locale locale);
 
-    String getDescription();
+    String getDescription(Locale locale);
 
     int getMinArgs();
 

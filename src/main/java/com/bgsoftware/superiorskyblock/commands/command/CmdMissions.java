@@ -29,13 +29,13 @@ public final class CmdMissions implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "missions [island/player]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_MISSIONS.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_MISSIONS.getMessage(locale);
     }
 
     @Override

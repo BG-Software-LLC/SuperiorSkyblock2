@@ -85,7 +85,8 @@ public final class MenuWarps extends SuperiorMenu {
                         .replaceAll("{0}", warpName)
                         .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString())
                         .replaceAll("{2}", island.isWarpPrivate(warpName) ?
-                                ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage()) : ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage()))
+                                ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
+                                ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
                         .build(superiorPlayer));
             }
             else{

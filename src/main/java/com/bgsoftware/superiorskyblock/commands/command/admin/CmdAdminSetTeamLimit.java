@@ -27,17 +27,17 @@ public final class CmdAdminSetTeamLimit implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setteamlimit <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_LIMIT.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT.getMessage(locale);
     }
 
     @Override

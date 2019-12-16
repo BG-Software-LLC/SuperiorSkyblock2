@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -28,13 +29,13 @@ public final class CmdKick implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_KICK.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_KICK.getMessage(locale);
     }
 
     @Override
@@ -84,8 +85,7 @@ public final class CmdKick implements ICommand {
 
         island.kickMember(targetPlayer);
 
-        if(!Locale.KICK_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.KICK_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
 
         Locale.GOT_KICKED.send(targetPlayer, superiorPlayer.getName());
     }

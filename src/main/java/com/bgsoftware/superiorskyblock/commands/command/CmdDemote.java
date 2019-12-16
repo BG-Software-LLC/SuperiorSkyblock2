@@ -27,13 +27,13 @@ public final class CmdDemote implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "demote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "demote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_DEMOTE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_DEMOTE.getMessage(locale);
     }
 
     @Override

@@ -27,13 +27,13 @@ public final class CmdAdminRemoveRatings implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "admin removeratings <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "admin removeratings <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS.getMessage(locale);
     }
 
     @Override

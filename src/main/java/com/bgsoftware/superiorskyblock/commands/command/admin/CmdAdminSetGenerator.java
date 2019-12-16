@@ -32,19 +32,19 @@ public final class CmdAdminSetGenerator implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setgenerator <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_MATERIAL.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_VALUE.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_VALUE.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR.getMessage(locale);
     }
 
     @Override

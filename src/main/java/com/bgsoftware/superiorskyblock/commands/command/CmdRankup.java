@@ -29,13 +29,13 @@ public final class CmdRankup implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "rankup <" + Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "rankup <" + Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_RANKUP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_RANKUP.getMessage(locale);
     }
 
     @Override

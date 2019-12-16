@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -25,13 +26,13 @@ public final class CmdTransfer implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "transfer <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "transfer <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_TRANSFER.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_TRANSFER.getMessage(locale);
     }
 
     @Override
@@ -83,7 +84,7 @@ public final class CmdTransfer implements ICommand {
         }
 
         if(island.transferIsland(targetPlayer))
-            island.sendMessage(Locale.TRANSFER_BROADCAST.getMessage(targetPlayer.getName()));
+            ((SIsland) island).sendMessage(Locale.TRANSFER_BROADCAST, new ArrayList<>(), targetPlayer.getName());
     }
 
     @Override

@@ -27,13 +27,13 @@ public final class CmdAdminPromote implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "admin promote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "admin promote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage(locale);
     }
 
     @Override

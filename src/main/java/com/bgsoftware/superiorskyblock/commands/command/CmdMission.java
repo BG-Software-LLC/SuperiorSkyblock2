@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -25,13 +26,13 @@ public final class CmdMission implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "mission complete <" + Locale.COMMAND_ARGUMENT_MISSION_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "mission complete <" + Locale.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_MISSION.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_MISSION.getMessage(locale);
     }
 
     @Override
@@ -54,7 +55,7 @@ public final class CmdMission implements ICommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
         if(!args[1].equalsIgnoreCase("complete")){
-            String description = getDescription();
+            String description = getDescription(LocaleUtils.getLocale(sender));
             if(description == null)
                 new NullPointerException("The description of the command " + getAliases().get(0) + " is null.").printStackTrace();
             Locale.sendMessage(sender, description);

@@ -30,13 +30,13 @@ public final class CmdValue implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "value [" + Locale.COMMAND_ARGUMENT_MATERIAL.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "value [" + Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_VALUE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_VALUE.getMessage(locale);
     }
 
     @Override
@@ -83,21 +83,23 @@ public final class CmdValue implements ICommand {
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck),
                 blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
 
+        java.util.Locale locale = superiorPlayer.getUserLocale();
+
         StringBuilder stringBuilder = new StringBuilder();
 
         if(blockWorth.doubleValue() <= 0) {
-            if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty())
-                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(keyName));
+            if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
+                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName));
         }
         else{
-            if(!Locale.BLOCK_VALUE.isEmpty())
-                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(keyName, StringUtils.format(blockWorth)));
+            if(!Locale.BLOCK_VALUE.isEmpty(locale))
+                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(locale, keyName, StringUtils.format(blockWorth)));
         }
 
-        if(!Locale.BLOCK_LEVEL.isEmpty()){
+        if(!Locale.BLOCK_LEVEL.isEmpty(locale)){
             if(stringBuilder.length() != 0)
                 stringBuilder.append("\n");
-            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(keyName, StringUtils.format(blockLevel)));
+            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel)));
         }
 
         Locale.sendMessage(superiorPlayer, stringBuilder.toString());

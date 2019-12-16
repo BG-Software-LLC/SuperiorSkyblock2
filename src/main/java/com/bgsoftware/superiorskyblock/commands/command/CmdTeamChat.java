@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -25,13 +26,13 @@ public final class CmdTeamChat implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "teamchat [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "teamchat [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_TEAM_CHAT.getMessage(locale);
     }
 
     @Override
@@ -74,8 +75,8 @@ public final class CmdTeamChat implements ICommand {
             for(int i = 1; i < args.length; i++)
                 message.append(" ").append(args[i]);
 
-            island.sendMessage(Locale.TEAM_CHAT_FORMAT.getMessage(superiorPlayer.getPlayerRole(), superiorPlayer.getName(),
-                    message.toString().substring(1)));
+            ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
+                    superiorPlayer.getName(), message.toString().substring(1));
         }
 
     }

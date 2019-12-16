@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
 import com.bgsoftware.superiorskyblock.menu.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
+import com.bgsoftware.superiorskyblock.menu.MenuPlayerLanguage;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
@@ -47,6 +48,7 @@ public final class MenusHandler implements MenusManager {
             MenuMembers.init();
             MenuMissions.init();
             MenuPermissions.init();
+            MenuPlayerLanguage.init();
             MenuPlayerMissions.init();
             MenuSettings.init();
             MenuTopIslands.init();
@@ -115,6 +117,11 @@ public final class MenusHandler implements MenusManager {
     @Override
     public void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         MenuPermissions.openInventory(superiorPlayer, null, island, targetPlayer);
+    }
+
+    @Override
+    public void openPlayerLanguageMenu(SuperiorPlayer superiorPlayer) {
+        MenuPlayerLanguage.openInventory(superiorPlayer, null);
     }
 
     @Override

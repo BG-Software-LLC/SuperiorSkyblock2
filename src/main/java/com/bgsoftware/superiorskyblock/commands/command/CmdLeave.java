@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -27,13 +28,13 @@ public final class CmdLeave implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "leave";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_LEAVE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_LEAVE.getMessage(locale);
     }
 
     @Override
@@ -74,8 +75,7 @@ public final class CmdLeave implements ICommand {
 
         island.kickMember(superiorPlayer);
 
-        if(!Locale.LEAVE_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.LEAVE_ANNOUNCEMENT.getMessage(superiorPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.LEAVE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         Locale.LEFT_ISLAND.send(superiorPlayer);
     }

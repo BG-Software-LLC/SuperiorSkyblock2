@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -69,13 +70,13 @@ public final class CmdAdmin implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN.getMessage(locale);
     }
 
     @Override
@@ -95,6 +96,8 @@ public final class CmdAdmin implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        java.util.Locale locale = LocaleUtils.getLocale(sender);
+
         if(args.length > 1 && !isNumber(args[1])){
             for(ICommand subCommand : subCommands){
                 if(subCommand.getAliases().contains(args[1].toLowerCase())){
@@ -104,12 +107,12 @@ public final class CmdAdmin implements ICommand {
                     }
 
                     if(!subCommand.getPermission().isEmpty() && !sender.hasPermission(subCommand.getPermission())) {
-                        Locale.NO_COMMAND_PERMISSION.send(sender);
+                        Locale.NO_COMMAND_PERMISSION.send(sender, locale);
                         return;
                     }
 
                     if(args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()){
-                        Locale.COMMAND_USAGE.send(sender, CommandsHandler.getCommandLabel() + " " + subCommand.getUsage());
+                        Locale.COMMAND_USAGE.send(sender, locale, CommandsHandler.getCommandLabel() + " " + subCommand.getUsage(locale));
                         return;
                     }
 
@@ -129,7 +132,7 @@ public final class CmdAdmin implements ICommand {
         }
 
         if(page <= 0){
-            Locale.INVALID_AMOUNT.send(sender, page);
+            Locale.INVALID_AMOUNT.send(sender, locale, page);
             return;
         }
 
@@ -138,7 +141,7 @@ public final class CmdAdmin implements ICommand {
                 .collect(Collectors.toList());
 
         if(subCommands.isEmpty()){
-            Locale.NO_COMMAND_PERMISSION.send(sender);
+            Locale.NO_COMMAND_PERMISSION.send(sender, locale);
             return;
         }
 
@@ -146,27 +149,27 @@ public final class CmdAdmin implements ICommand {
         if(subCommands.size() % 7 != 0) lastPage++;
 
         if(page > lastPage){
-            Locale.INVALID_AMOUNT.send(sender, page);
+            Locale.INVALID_AMOUNT.send(sender, locale, page);
             return;
         }
 
         subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
 
-        Locale.ADMIN_HELP_HEADER.send(sender, page, lastPage);
+        Locale.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
 
         for(ICommand _subCommand : subCommands) {
             if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                String description = _subCommand.getDescription();
+                String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ADMIN_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(), description);
+                Locale.ADMIN_HELP_LINE.send(sender, locale, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(locale), description);
             }
         }
 
         if(page != lastPage)
-            Locale.ADMIN_HELP_NEXT_PAGE.send(sender, page + 1);
+            Locale.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1);
         else
-            Locale.ADMIN_HELP_FOOTER.send(sender);
+            Locale.ADMIN_HELP_FOOTER.send(sender, locale);
     }
 
     @Override

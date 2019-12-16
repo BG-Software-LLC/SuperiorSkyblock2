@@ -30,13 +30,13 @@ public final class CmdPermissions implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_PERMISSIONS.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_PERMISSIONS.getMessage(locale);
     }
 
     @Override

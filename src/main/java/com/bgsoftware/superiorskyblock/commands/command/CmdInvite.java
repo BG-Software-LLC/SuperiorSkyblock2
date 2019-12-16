@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -32,13 +33,13 @@ public final class CmdInvite implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "invite <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "invite <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_INVITE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_INVITE.getMessage(locale);
     }
 
     @Override
@@ -88,11 +89,12 @@ public final class CmdInvite implements ICommand {
             return;
         }
 
+        java.util.Locale locale = LocaleUtils.getLocale(sender);
         String message;
 
         if(island.isInvited(targetPlayer)){
             island.revokeInvite(targetPlayer);
-            message = Locale.REVOKE_INVITE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName());
+            message = Locale.REVOKE_INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
             if(targetPlayer.asOfflinePlayer().isOnline())
                 Locale.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         }
@@ -109,11 +111,14 @@ public final class CmdInvite implements ICommand {
                 return;
 
             island.inviteMember(targetPlayer);
-            message = Locale.INVITE_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName());
-            if(targetPlayer.asOfflinePlayer().isOnline() && !Locale.GOT_INVITE.isEmpty()) {
-                TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(superiorPlayer.getName()));
-                if(!Locale.GOT_INVITE_TOOLTIP.isEmpty())
-                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage())}));
+            message = Locale.INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
+
+            java.util.Locale targetLocal = LocaleUtils.getLocale(targetPlayer);
+
+            if(targetPlayer.asOfflinePlayer().isOnline() && !Locale.GOT_INVITE.isEmpty(targetLocal)) {
+                TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(targetLocal, superiorPlayer.getName()));
+                if(!Locale.GOT_INVITE_TOOLTIP.isEmpty(targetLocal))
+                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(targetLocal))}));
                 textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + superiorPlayer.getName()));
                 targetPlayer.asPlayer().spigot().sendMessage(textComponent);
             }

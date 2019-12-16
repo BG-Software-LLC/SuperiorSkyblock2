@@ -241,7 +241,7 @@ public abstract class PlaceholderHook {
                     case "rating":
                         return StringUtils.format(island.getTotalRating());
                     case "rating_stars":
-                        return StringUtils.formatRating(island.getTotalRating());
+                        return StringUtils.formatRating(superiorPlayer.getUserLocale(), island.getTotalRating());
                 }
 
             }

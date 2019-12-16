@@ -28,14 +28,14 @@ public final class CmdCreate implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return plugin.getSettings().islandNamesRequiredForCreation ?
-                "create <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + ">" : "create";
+                "create <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">" : "create";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_CREATE.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_CREATE.getMessage(locale);
     }
 
     @Override

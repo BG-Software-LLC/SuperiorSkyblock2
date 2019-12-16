@@ -31,13 +31,13 @@ public final class CmdDelWarp implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_DEL_WARP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_DEL_WARP.getMessage(locale);
     }
 
     @Override

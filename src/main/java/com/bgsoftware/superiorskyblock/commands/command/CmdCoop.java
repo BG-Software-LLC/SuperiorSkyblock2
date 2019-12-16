@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -28,13 +29,13 @@ public final class CmdCoop implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "coop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "coop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_COOP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_COOP.getMessage(locale);
     }
 
     @Override
@@ -91,8 +92,7 @@ public final class CmdCoop implements ICommand {
 
         island.addCoop(targetPlayer);
 
-        if(!Locale.COOP_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.COOP_ANNOUNCEMENT.getMessage(superiorPlayer.getName(), targetPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.COOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
         if(island.getName().isEmpty())
             Locale.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -26,13 +27,13 @@ public final class CmdPardon implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + ">";
+    public String getUsage(java.util.Locale locale) {
+        return "pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_PARDON.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_PARDON.getMessage(locale);
     }
 
     @Override
@@ -79,8 +80,7 @@ public final class CmdPardon implements ICommand {
 
         island.unbanMember(targetPlayer);
 
-        if(!Locale.UNBAN_ANNOUNCEMENT.isEmpty())
-            island.sendMessage(Locale.UNBAN_ANNOUNCEMENT.getMessage(targetPlayer.getName(), superiorPlayer.getName()));
+        ((SIsland) island).sendMessage(Locale.UNBAN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
 
         Locale.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
     }

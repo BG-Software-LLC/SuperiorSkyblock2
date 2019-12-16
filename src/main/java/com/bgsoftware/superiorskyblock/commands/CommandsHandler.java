@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.commands.command.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -61,6 +62,7 @@ public final class CommandsHandler extends BukkitCommand {
         register(new CmdHelp());
         register(new CmdInvite());
         register(new CmdKick());
+        register(new CmdLang());
         register(new CmdLeave());
         register(new CmdMission());
         register(new CmdMissions());
@@ -98,6 +100,8 @@ public final class CommandsHandler extends BukkitCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+        java.util.Locale locale = LocaleUtils.getLocale(sender);
+
         if(args.length > 0){
             ICommand command = getCommand(args[0]);
             if(command != null){
@@ -107,12 +111,12 @@ public final class CommandsHandler extends BukkitCommand {
                 }
 
                 if(!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                    Locale.NO_COMMAND_PERMISSION.send(sender);
+                    Locale.NO_COMMAND_PERMISSION.send(sender, locale);
                     return false;
                 }
 
                 if(args.length < command.getMinArgs() || args.length > command.getMaxArgs()){
-                    Locale.COMMAND_USAGE.send(sender, getLabel() + " " + command.getUsage());
+                    Locale.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
                     return false;
                 }
 
@@ -127,7 +131,7 @@ public final class CommandsHandler extends BukkitCommand {
                     long timeNow = System.currentTimeMillis();
 
                     if(timeNow < timeToExecute){
-                        Locale.COMMAND_COOLDOWN_FORMAT.send(sender, StringUtils.formatTime(timeToExecute - timeNow));
+                        Locale.COMMAND_COOLDOWN_FORMAT.send(sender, locale, StringUtils.formatTime(locale, timeToExecute - timeNow));
                         return false;
                     }
 
@@ -167,7 +171,7 @@ public final class CommandsHandler extends BukkitCommand {
             }
         }
 
-        Locale.NO_COMMAND_PERMISSION.send(sender);
+        Locale.NO_COMMAND_PERMISSION.send(sender, locale);
 
         return false;
     }

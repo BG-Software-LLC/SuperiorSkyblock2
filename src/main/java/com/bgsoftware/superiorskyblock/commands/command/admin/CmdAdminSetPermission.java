@@ -32,18 +32,18 @@ public final class CmdAdminSetPermission implements ICommand {
     }
 
     @Override
-    public String getUsage() {
+    public String getUsage(java.util.Locale locale) {
         return "admin setpermission <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage() + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_PERMISSION.getMessage() + "> <" +
-                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage() + ">";
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_PERMISSION.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + ">";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION.getMessage(locale);
     }
 
     @Override

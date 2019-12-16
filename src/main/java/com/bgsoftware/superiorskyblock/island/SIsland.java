@@ -892,6 +892,12 @@ public final class SIsland extends DatabaseObject implements Island {
                 .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message));
     }
 
+    public void sendMessage(Locale message, List<UUID> ignoredMembers, Object... args){
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> message.send(superiorPlayer, args));
+    }
+
     /*
      *  Bank related methods
      */
@@ -1280,7 +1286,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
         if(plugin.getSettings().warpsWarmup > 0) {
-            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(plugin.getSettings().warpsWarmup));
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().warpsWarmup));
             ((SSuperiorPlayer) superiorPlayer).setTeleportTask(Executor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
         }

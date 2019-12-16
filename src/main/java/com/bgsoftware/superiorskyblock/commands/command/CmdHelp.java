@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -24,13 +25,13 @@ public final class CmdHelp implements ICommand {
     }
 
     @Override
-    public String getUsage() {
-        return "help [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage() + "]";
+    public String getUsage(java.util.Locale locale) {
+        return "help [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
-    public String getDescription() {
-        return Locale.COMMAND_DESCRIPTION_HELP.getMessage();
+    public String getDescription(java.util.Locale locale) {
+        return Locale.COMMAND_DESCRIPTION_HELP.getMessage(locale);
     }
 
     @Override
@@ -87,12 +88,14 @@ public final class CmdHelp implements ICommand {
 
         Locale.ISLAND_HELP_HEADER.send(sender, page, lastPage);
 
+        java.util.Locale locale = LocaleUtils.getLocale(sender);
+
         for(ICommand _subCommand : subCommands) {
             if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
-                String description = _subCommand.getDescription();
+                String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ISLAND_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(), description == null ? "" : description);
+                Locale.ISLAND_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
             }
         }
 

@@ -81,6 +81,12 @@ public interface MenusManager {
     void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer);
 
     /**
+     * Open the language menu for a player.
+     * @param superiorPlayer The player to open the menu for.
+     */
+    void openPlayerLanguageMenu(SuperiorPlayer superiorPlayer);
+
+    /**
      * Open the island rate menu for a player.
      * @param superiorPlayer The player to open the menu for.
      * @param island The target island to give the rating.
