@@ -133,6 +133,11 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
+        rewardMission(mission, superiorPlayer, checkAutoReward, false);
+    }
+
+    @Override
+    public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
         if(!Bukkit.isPrimaryThread()){
             Executor.sync(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
             return;
@@ -141,23 +146,25 @@ public final class MissionsHandler implements MissionsManager {
         MissionData missionData = getMissionData(mission);
         Island playerIsland = superiorPlayer.getIsland();
 
-        if(hasCompleted(superiorPlayer, mission)) {
-            mission.onCompleteFail(superiorPlayer);
-            return;
-        }
-
-        if(!hasAllRequiredMissions(mission, superiorPlayer))
-            return;
-
-        if(missionData.islandMission && playerIsland == null) {
-            mission.onCompleteFail(superiorPlayer);
-            throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
-        }
-
-        if(checkAutoReward && !isAutoReward(mission)){
-            if(!hasCompleted(superiorPlayer, mission)){
-                Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+        if(!forceReward) {
+            if (hasCompleted(superiorPlayer, mission)) {
+                mission.onCompleteFail(superiorPlayer);
                 return;
+            }
+
+            if (!hasAllRequiredMissions(mission, superiorPlayer))
+                return;
+
+            if (missionData.islandMission && playerIsland == null) {
+                mission.onCompleteFail(superiorPlayer);
+                throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
+            }
+
+            if (checkAutoReward && !isAutoReward(mission)) {
+                if (!hasCompleted(superiorPlayer, mission)) {
+                    Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                    return;
+                }
             }
         }
 
@@ -169,11 +176,13 @@ public final class MissionsHandler implements MissionsManager {
         Bukkit.getPluginManager().callEvent(missionCompleteEvent);
 
         if(missionCompleteEvent.isCancelled()){
-            mission.onCompleteFail(superiorPlayer);
+            if(!forceReward)
+                mission.onCompleteFail(superiorPlayer);
             return;
         }
 
-        mission.onComplete(superiorPlayer);
+        if(!forceReward)
+            mission.onComplete(superiorPlayer);
 
         for(ItemStack itemStack : missionCompleteEvent.getItemRewards()){
             ItemStack toGive = new ItemBuilder(itemStack)
@@ -194,6 +203,7 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         if(missionData.islandMission){
+            assert playerIsland != null;
             playerIsland.completeMission(mission);
         }
         else{

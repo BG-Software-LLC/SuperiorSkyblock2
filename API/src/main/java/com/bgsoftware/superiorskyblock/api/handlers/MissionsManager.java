@@ -46,6 +46,15 @@ public interface MissionsManager {
     void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward);
 
     /**
+     * Reward a player for completing a specific mission.
+     * @param mission The mission that was completed.
+     * @param superiorPlayer The player to reward.
+     * @param checkAutoReward Whether or not the auto reward flag should be checked.
+     * @param forceReward Should the plugin force the reward to the player (no checks will be ran)
+     */
+    void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward);
+
+    /**
      * Save all data related to missions.
      * All the data is saved into a yaml file.
      */
