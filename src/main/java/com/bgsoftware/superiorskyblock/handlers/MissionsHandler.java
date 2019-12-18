@@ -184,6 +184,14 @@ public final class MissionsHandler implements MissionsManager {
         if(!forceReward)
             mission.onComplete(superiorPlayer);
 
+        if(missionData.islandMission){
+            assert playerIsland != null;
+            playerIsland.completeMission(mission);
+        }
+        else{
+            superiorPlayer.completeMission(mission);
+        }
+
         for(ItemStack itemStack : missionCompleteEvent.getItemRewards()){
             ItemStack toGive = new ItemBuilder(itemStack)
                     .replaceAll("{0}", mission.getName())
@@ -200,14 +208,6 @@ public final class MissionsHandler implements MissionsManager {
                     .replace("%player%", superiorPlayer.getName())
                     .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
             );
-        }
-
-        if(missionData.islandMission){
-            assert playerIsland != null;
-            playerIsland.completeMission(mission);
-        }
-        else{
-            superiorPlayer.completeMission(mission);
         }
     }
 

@@ -38,7 +38,7 @@ public final class CmdAdminMission implements ICommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_DEMOTE.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_MISSION.getMessage(locale);
     }
 
     @Override
@@ -74,12 +74,12 @@ public final class CmdAdminMission implements ICommand {
 
         if(args[3].equalsIgnoreCase("complete")){
             plugin.getMissions().rewardMission(mission, targetPlayer, false, true);
-            Locale.sendMessage(sender, "&eCompleted mission " + mission.getName() + " to " + targetPlayer.getName());
+            Locale.MISSION_STATUS_COMPLETE.send(sender, mission.getName(), targetPlayer.getName());
             return;
         }
         else if(args[3].equalsIgnoreCase("reset")){
             targetPlayer.resetMission(mission);
-            Locale.sendMessage(sender, "&eReset mission " + mission.getName() + " for " + targetPlayer.getName());
+            Locale.MISSION_STATUS_RESET.send(sender, mission.getName(), targetPlayer.getName());
             return;
         }
 

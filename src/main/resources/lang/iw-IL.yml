@@ -110,6 +110,7 @@ COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: ןקחשל םייא תוקיחמ תתל.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: רתויב םיבוטה םייאה תמישרמ יא דירוהל.
 COMMAND_DESCRIPTION_ADMIN_JOIN: הנמזה אלל יאל סנכיהל.
+COMMAND_DESCRIPTION_ADMIN_MISSION: ןקחש רובע המישמ לש סוטטס תונשל.
 COMMAND_DESCRIPTION_ADMIN_MSG: העדוה ןקחשל חולשל.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: העדוה יא לש םינקחשה לכל חולשל.
 COMMAND_DESCRIPTION_ADMIN_NAME: יא לש םשה תא תונשל.
@@ -363,6 +364,8 @@ MISSION_NO_AUTO_REWARD: '&e&lתומישמ | &7התוא םילשהל תנמ לע 
   - {0} המישמה תא םילשהל תנמ לע םיכרצמה לכ תא ךל שי!'
 MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&e&lהאיגש | &7וזה המישמה תא םילשמ התאש ינפל
   {0} המישמה תא םילשהל בייח התא.'
+MISSION_STATUS_COMPLETE: '&e&lתומישמ | &7{1} ןקחשל העצובל התנוש {0} המישמה לש סוטטסה.'
+MISSION_STATUS_RESET: '&e&lתומישמ | &7{1} ןקחשל הלחתוא {0} המישמה לש סוטטסה.'
 NAME_ANNOUNCEMENT: '&e&lיא | &7{1} ל ולש יאה םש תא הניש {0}.'
 NAME_BLACKLISTED: '&e&lהאיגש | &7הזה םשב שמתשהל לוכי אל התא.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
