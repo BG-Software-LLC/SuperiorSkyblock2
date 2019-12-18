@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -541,7 +542,8 @@ public enum Locale {
             locales.add(fileLocale);
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
-            cfg.syncWithConfig(langFile, plugin.getResource("lang/en-US.yml"));
+            InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
+            cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream);
 
             for(Locale locale : values()){
                 locale.setMessage(fileLocale, ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
