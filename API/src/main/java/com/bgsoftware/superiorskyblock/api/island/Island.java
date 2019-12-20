@@ -70,6 +70,11 @@ public interface Island extends Comparable<Island> {
     boolean isInvited(SuperiorPlayer superiorPlayer);
 
     /**
+     * Get all the invited players of the island.
+     */
+    List<SuperiorPlayer> getInvitedPlayers();
+
+    /**
      * Add a player to the island.
      * @param superiorPlayer The player to add.
      * @param playerRole The role to give to the player.

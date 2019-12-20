@@ -252,6 +252,11 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public List<SuperiorPlayer> getInvitedPlayers() {
+        return Collections.unmodifiableList(new ArrayList<>(invitedPlayers));
+    }
+
+    @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
         members.add(superiorPlayer);
         superiorPlayer.setIslandLeader(owner);
