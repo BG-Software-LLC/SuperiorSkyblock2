@@ -122,7 +122,7 @@ public final class BlocksListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
 
             if (island != null) {
-                Executor.sync(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1), 1L);
+                Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1), 1L);
             }
         }
     }
