@@ -97,6 +97,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public List<SuperiorPlayer> getInvitedPlayers() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
 
     }
