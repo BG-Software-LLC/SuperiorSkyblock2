@@ -383,6 +383,9 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public boolean hasIslandFlyEnabled(){
+        if(islandFly && isOnline() && !asPlayer().hasPermission("superior.island.fly"))
+            toggleIslandFly();
+
         return islandFly;
     }
 
