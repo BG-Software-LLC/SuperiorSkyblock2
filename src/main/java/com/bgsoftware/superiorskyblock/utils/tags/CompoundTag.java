@@ -34,6 +34,8 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,15 +46,25 @@ import java.util.Set;
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("rawtypes")
-public final class CompoundTag extends Tag<Map<String, Tag>> {
+public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
+
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+    static final Method COMPOUND_SET, COMPOUND_GET;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
+        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS);
+        COMPOUND_SET = ReflectionUtils.getMethod(CLASS, "set", String.class, Tag.CLASS);
+        COMPOUND_GET = ReflectionUtils.getMethod(CLASS, "get", String.class);
+    }
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public CompoundTag(Map<String, Tag> value) {
+    public CompoundTag(Map<String, Tag<?>> value) {
         super(new HashMap<>(value));
     }
 
@@ -60,12 +72,12 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
         this.value.put(key, new StringTag(value));
     }
 
-    public void setTag(String key, Tag value){
+    public void setTag(String key, Tag<?> value){
         this.value.put(key, value);
     }
 
     @Override
-    public Map<String, Tag> getValue() {
+    public Map<String, Tag<?>> getValue() {
         return Collections.unmodifiableMap(value);
     }
 
@@ -73,7 +85,7 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     public String toString() {
         StringBuilder bldr = new StringBuilder();
         bldr.append("TAG_Compound: ").append(value.size()).append(" entries\r\n{\r\n");
-        for (Map.Entry<String, Tag> entry : value.entrySet()) {
+        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
             bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }
         bldr.append("}");
@@ -83,13 +95,10 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     @Override
     public Object toNBT() {
         try {
-            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
-            Class<?> nbtBaseClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
-            //noinspection ConstantConditions
-            Object nbtTagCompound = nbtTagClass.newInstance();
+            Object nbtTagCompound = CONSTRUCTOR.newInstance();
 
             for(String key : value.keySet()){
-                nbtTagClass.getMethod("set", String.class, nbtBaseClass).invoke(nbtTagCompound, key, value.get(key).toNBT());
+                COMPOUND_SET.invoke(nbtTagCompound, key, value.get(key).toNBT());
             }
 
             return nbtTagCompound;
@@ -100,17 +109,16 @@ public final class CompoundTag extends Tag<Map<String, Tag>> {
     }
 
     public static CompoundTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to CompoundTag!");
 
-        Map<String, Tag> map = new HashMap<>();
+        Map<String, Tag<?>> map = new HashMap<>();
 
         try {
             Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
 
             for(String key : keySet) {
-                map.put(key, Tag.fromNBT(nbtTagClass.getMethod("get", String.class).invoke(tag, key)));
+                map.put(key, Tag.fromNBT(COMPOUND_GET.invoke(tag, key)));
             }
 
             return new CompoundTag(map);

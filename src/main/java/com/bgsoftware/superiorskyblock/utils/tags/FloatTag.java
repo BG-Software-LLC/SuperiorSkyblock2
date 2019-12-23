@@ -34,6 +34,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 /**
  * The <code>TAG_Float</code> tag.
  *
@@ -41,6 +44,16 @@ import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
  */
 @SuppressWarnings("WeakerAccess")
 public final class FloatTag extends Tag<Float> {
+
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+    static final Method CONSTRUCTOR_METHOD;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
+        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, float.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", float.class);
+    }
 
     /**
      * Creates the tag.
@@ -59,9 +72,11 @@ public final class FloatTag extends Tag<Float> {
     @Override
     public Object toNBT() {
         try {
-            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
-            //noinspection ConstantConditions
-            return nbtTagClass.getConstructor(float.class).newInstance((Object) value);
+            if(CONSTRUCTOR_METHOD != null) {
+                return CONSTRUCTOR_METHOD.invoke(null, value);
+            }else{
+                return CONSTRUCTOR.newInstance(value);
+            }
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
@@ -69,8 +84,7 @@ public final class FloatTag extends Tag<Float> {
     }
 
     public static FloatTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {

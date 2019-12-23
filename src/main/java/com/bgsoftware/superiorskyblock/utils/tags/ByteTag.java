@@ -34,12 +34,25 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 /**
  * The <code>TAG_Byte</code> tag.
  *
  * @author Graham Edgecombe
  */
 public final class ByteTag extends Tag<Byte> {
+
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+    static final Method CONSTRUCTOR_METHOD;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
+        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, byte.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", byte.class);
+    }
 
     /**
      * Creates the tag.
@@ -58,9 +71,12 @@ public final class ByteTag extends Tag<Byte> {
     @Override
     public Object toNBT() {
         try {
-            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
-            //noinspection ConstantConditions
-            return nbtTagClass.getConstructor(byte.class).newInstance((Object) value);
+            if(CONSTRUCTOR_METHOD != null){
+                return CONSTRUCTOR_METHOD.invoke(null, value);
+            }
+            else{
+                return CONSTRUCTOR.newInstance(value);
+            }
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
@@ -68,8 +84,7 @@ public final class ByteTag extends Tag<Byte> {
     }
 
     public static ByteTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {

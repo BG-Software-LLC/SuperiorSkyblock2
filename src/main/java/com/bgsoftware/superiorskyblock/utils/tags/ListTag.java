@@ -34,6 +34,7 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +45,15 @@ import java.util.List;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("rawtypes")
-public final class ListTag extends Tag<List<Tag>> {
+public final class ListTag extends Tag<List<Tag<?>>> {
+
+    static final Class<?> CLASS;
+    static final Method LIST_SIZE;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
+        LIST_SIZE = ReflectionUtils.getMethod(CLASS, "size");
+    }
 
     /**
      * The type.
@@ -57,7 +66,7 @@ public final class ListTag extends Tag<List<Tag>> {
      * @param type  The type of item in the list.
      * @param value The value.
      */
-    public ListTag(Class<? extends Tag> type, List<Tag> value) {
+    public ListTag(Class<? extends Tag> type, List<Tag<?>> value) {
         super(new ArrayList<>(value));
         this.type = type;
     }
@@ -71,12 +80,12 @@ public final class ListTag extends Tag<List<Tag>> {
         return type;
     }
 
-    public void addTag(Tag tag){
+    public void addTag(Tag<?> tag){
         value.add(tag);
     }
 
     @Override
-    public List<Tag> getValue() {
+    public List<Tag<?>> getValue() {
         return Collections.unmodifiableList(value);
     }
 
@@ -97,14 +106,13 @@ public final class ListTag extends Tag<List<Tag>> {
     }
 
     public static ListTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ListTag!");
 
-        List<Tag> list = new ArrayList<>();
+        List<Tag<?>> list = new ArrayList<>();
 
         try {
-            int size = (int) nbtTagClass.getMethod("size").invoke(tag);
+            int size = (int) LIST_SIZE.invoke(tag);
 
             for(int i = 0; i < size; i++)
                 list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));

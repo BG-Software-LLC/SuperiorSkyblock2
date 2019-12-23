@@ -85,7 +85,7 @@ public final class NBTInputStream implements Closeable {
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
-	public Tag readTag() throws IOException {
+	public Tag<?> readTag() throws IOException {
 		return readTag(0);
 	}
 
@@ -98,7 +98,7 @@ public final class NBTInputStream implements Closeable {
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
-	private Tag readTag(int depth) throws IOException {
+	private Tag<?> readTag(int depth) throws IOException {
 		int type = is.readByte() & 0xFF;
 		return readTagPayload(type, depth);
 	}
@@ -114,7 +114,7 @@ public final class NBTInputStream implements Closeable {
 	 * @throws IOException
 	 *             if an I/O error occurs.
 	 */
-	private Tag readTagPayload(int type, int depth) throws IOException {
+	private Tag<?> readTagPayload(int type, int depth) throws IOException {
 		switch (type) {
 			case NBTConstants.TYPE_END:
 				if (depth == 0) {
@@ -148,9 +148,9 @@ public final class NBTInputStream implements Closeable {
 				int childType = is.readByte();
 				length = is.readInt();
 
-				List<Tag> tagList = new ArrayList<>();
+				List<Tag<?>> tagList = new ArrayList<>();
 				for (int i = 0; i < length; i++) {
-					Tag tag = readTagPayload(childType, depth + 1);
+					Tag<?> tag = readTagPayload(childType, depth + 1);
 					if (tag instanceof EndTag) {
 						throw new IOException("TAG_End not permitted in a list.");
 					}
@@ -159,9 +159,9 @@ public final class NBTInputStream implements Closeable {
 
 				return new ListTag(NBTUtils.getTypeClass(childType), tagList);
 			case NBTConstants.TYPE_COMPOUND:
-				Map<String, Tag> tagMap = new HashMap<>();
+				Map<String, Tag<?>> tagMap = new HashMap<>();
 				while (true) {
-					Tag tag = readTag(depth + 1);
+					Tag<?> tag = readTag(depth + 1);
 					if (tag instanceof EndTag) {
 						break;
 					} else {

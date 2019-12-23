@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +19,7 @@ public final class ReflectionUtils {
     private static Map<Fields, Field> fieldsMap = new HashMap<>();
 
     static {
-        Class chunkClass = getClass("net.minecraft.server.VERSION.Chunk"),
+        Class<?> chunkClass = getClass("net.minecraft.server.VERSION.Chunk"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
 
@@ -38,11 +40,36 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Class getClass(String classPath){
+    public static Class<?> getClass(String classPath){
         try {
             return Class.forName(classPath.replace("VERSION", version));
         } catch(ClassNotFoundException ex){
-            ex.printStackTrace();
+            throw new NullPointerException(ex.getMessage());
+        }
+    }
+
+    public static Constructor<?> getConstructor(Class<?> clazz, Class<?>... parameterTypes){
+        try{
+            return clazz.getConstructor(parameterTypes);
+        }catch(NoSuchMethodException ex){
+            return null;
+        }
+    }
+
+    public static Constructor<?> getDeclaredConstructor(Class<?> clazz, Class<?>... parameterTypes){
+        try{
+            Constructor<?> constructor = clazz.getDeclaredConstructor(parameterTypes);
+            constructor.setAccessible(true);
+            return constructor;
+        }catch(NoSuchMethodException ex){
+            return null;
+        }
+    }
+
+    public static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes){
+        try{
+            return clazz.getMethod(name, parameterTypes);
+        }catch(NoSuchMethodException ex){
             return null;
         }
     }
@@ -51,7 +78,7 @@ public final class ReflectionUtils {
         return fieldsMap.get(fields);
     }
 
-    private static Field getField(Class clazz, String fieldName){
+    private static Field getField(Class<?> clazz, String fieldName){
         try{
             Field field =  clazz.getDeclaredField(fieldName);
             field.setAccessible(true);

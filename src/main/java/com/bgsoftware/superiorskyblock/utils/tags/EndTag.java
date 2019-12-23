@@ -44,6 +44,14 @@ import java.lang.reflect.Constructor;
 @SuppressWarnings("WeakerAccess")
 public final class EndTag extends Tag<Object> {
 
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagEnd");
+        CONSTRUCTOR = ReflectionUtils.getDeclaredConstructor(CLASS);
+    }
+
     /**
      * Creates the tag.
      */
@@ -60,13 +68,7 @@ public final class EndTag extends Tag<Object> {
     @Override
     public Object toNBT() {
         try{
-            Class nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagEnd");
-            //noinspection unchecked, ConstantConditions
-            Constructor constructor = nbtTagClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            Object nbtTagEnd = nbtTagClass.newInstance();
-            constructor.setAccessible(false);
-            return nbtTagEnd;
+            return CONSTRUCTOR.newInstance();
         }catch(Exception ex){
             ex.printStackTrace();
             return null;

@@ -35,6 +35,8 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
+
 /**
  * The <code>TAG_Byte_Array</code> tag.
  *
@@ -42,6 +44,14 @@ import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
  */
 @SuppressWarnings("WeakerAccess")
 public final class ByteArrayTag extends Tag<byte[]> {
+
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
+        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, byte[].class);
+    }
 
     /**
      * Creates the tag.
@@ -68,9 +78,7 @@ public final class ByteArrayTag extends Tag<byte[]> {
     @Override
     public Object toNBT() {
         try {
-            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
-            //noinspection ConstantConditions
-            return nbtTagClass.getConstructor(byte[].class).newInstance((Object) value);
+            return CONSTRUCTOR.newInstance((Object) value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
@@ -78,8 +86,7 @@ public final class ByteArrayTag extends Tag<byte[]> {
     }
 
     public static ByteArrayTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteArrayTag!");
 
         try {

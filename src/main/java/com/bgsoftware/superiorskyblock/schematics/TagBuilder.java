@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"UnusedReturnValue", "rawtypes"})
+@SuppressWarnings("UnusedReturnValue")
 public final class TagBuilder {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private Map<String, Tag> compoundValue = new HashMap<>();
+    private Map<String, Tag<?>> compoundValue = new HashMap<>();
 
     public TagBuilder withBlockPosition(SchematicPosition blockPosition){
         compoundValue.put("blockPosition", new StringTag(blockPosition.toString()));
@@ -79,7 +79,7 @@ public final class TagBuilder {
     }
 
     public CompoundTag build(){
-        Map<String, Tag> compoundValue = new HashMap<>();
+        Map<String, Tag<?>> compoundValue = new HashMap<>();
 
         for(String key : this.compoundValue.keySet()){
             if(this.compoundValue.get(key) != null)
@@ -90,9 +90,9 @@ public final class TagBuilder {
     }
 
     private CompoundTag getTagFromPatterns(List<Pattern> patterns){
-        Map<String, Tag> compoundValue = new HashMap<>();
+        Map<String, Tag<?>> compoundValue = new HashMap<>();
 
-        Map<String, Tag> _compoundValue;
+        Map<String, Tag<?>> _compoundValue;
         Pattern pattern;
         for(int i = 0; i < patterns.size(); i++){
             pattern = patterns.get(i);

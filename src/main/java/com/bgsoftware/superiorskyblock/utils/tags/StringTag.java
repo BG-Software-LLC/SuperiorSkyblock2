@@ -34,12 +34,25 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 /**
  * The <code>TAG_String</code> tag.
  *
  * @author Graham Edgecombe
  */
 public final class StringTag extends Tag<String> {
+
+    static final Class<?> CLASS;
+    static final Constructor<?> CONSTRUCTOR;
+    static final Method CONSTRUCTOR_METHOD;
+
+    static {
+        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
+        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, String.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", String.class);
+    }
 
     /**
      * Creates the tag.
@@ -58,9 +71,12 @@ public final class StringTag extends Tag<String> {
     @Override
     public Object toNBT() {
         try {
-            Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
-            //noinspection ConstantConditions
-            return nbtTagClass.getConstructor(String.class).newInstance((Object) value);
+            if(CONSTRUCTOR_METHOD != null){
+                return CONSTRUCTOR_METHOD.invoke(null, value);
+            }
+            else{
+                return CONSTRUCTOR.newInstance(value);
+            }
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
@@ -68,8 +84,7 @@ public final class StringTag extends Tag<String> {
     }
 
     public static StringTag fromNBT(Object tag){
-        Class<?> nbtTagClass = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
-        if(!tag.getClass().equals(nbtTagClass))
+        if(!tag.getClass().equals(CLASS))
             throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to StringTag!");
 
         try {

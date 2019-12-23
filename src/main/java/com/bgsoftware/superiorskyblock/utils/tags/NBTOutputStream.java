@@ -54,7 +54,7 @@ import java.util.zip.GZIPOutputStream;
  * @author Graham Edgecombe
  *
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "rawtypes"})
 public final class NBTOutputStream implements Closeable {
 
 	/**
@@ -214,12 +214,12 @@ public final class NBTOutputStream implements Closeable {
 	 */
 	private void writeListTagPayload(ListTag tag) throws IOException {
 		Class<? extends Tag> clazz = tag.getType();
-		List<Tag> tags = tag.getValue();
+		List<Tag<?>> tags = tag.getValue();
 		int size = tags.size();
 
 		os.writeByte(NBTUtils.getTypeCode(clazz));
 		os.writeInt(size);
-		for (Tag _tag : tags)
+		for (Tag<?> _tag : tags)
 			writeTagPayload(_tag);
 	}
 

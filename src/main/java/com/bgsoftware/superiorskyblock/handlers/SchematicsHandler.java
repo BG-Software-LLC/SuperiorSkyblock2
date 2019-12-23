@@ -124,7 +124,7 @@ public final class SchematicsHandler implements SchematicManager {
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
-        if(Bukkit.isPrimaryThread() && !ServerVersion.isEquals(ServerVersion.v1_14)){
+        if(Bukkit.isPrimaryThread() && ServerVersion.isLessThan(ServerVersion.v1_14)){
             Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable));
             return;
         }
@@ -137,7 +137,7 @@ public final class SchematicsHandler implements SchematicManager {
         int ySize = max.getBlockY() - min.getBlockY();
         int zSize = max.getBlockZ() - min.getBlockZ();
 
-        List<Tag> blocks = new ArrayList<>(), entities = new ArrayList<>();
+        List<Tag<?>> blocks = new ArrayList<>(), entities = new ArrayList<>();
 
         for(int x = 0; x <= xSize; x++){
             for(int z = 0; z <= zSize; z++){
@@ -169,12 +169,13 @@ public final class SchematicsHandler implements SchematicManager {
             }
         }
 
+        //noinspection IntegerDivisionInFloatingPointContext
         Location center = new Location(world, xSize / 2, ySize / 2, zSize / 2).add(min);
         for(LivingEntity livingEntity : getEntities(min, max)){
             entities.add(new TagBuilder().applyEntity(livingEntity, center).build());
         }
 
-        Map<String, Tag> compoundValue = new HashMap<>();
+        Map<String, Tag<?>> compoundValue = new HashMap<>();
         compoundValue.put("xSize", new ByteTag((byte) xSize));
         compoundValue.put("ySize", new ByteTag((byte) ySize));
         compoundValue.put("zSize", new ByteTag((byte) zSize));

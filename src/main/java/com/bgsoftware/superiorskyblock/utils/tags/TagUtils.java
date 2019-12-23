@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings({"WeakerAccess", "rawtypes"})
+@SuppressWarnings("WeakerAccess")
 public final class TagUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static CompoundTag inventoryToCompound(ItemStack[] itemStacks){
-        Map<String, Tag> compoundValues = new HashMap<>();
+        Map<String, Tag<?>> compoundValues = new HashMap<>();
 
         for(int i = 0; i < itemStacks.length; i++){
             if(itemStacks[i] != null && itemStacks[i].getType() != Material.AIR){
@@ -31,7 +31,7 @@ public final class TagUtils {
     }
 
     public static ItemStack[] compoundToInventory(CompoundTag compoundTag){
-        Map<String, Tag> compoundValue = compoundTag.getValue();
+        Map<String, Tag<?>> compoundValue = compoundTag.getValue();
 
         int size = 0;
 
@@ -54,7 +54,7 @@ public final class TagUtils {
     }
 
     public static CompoundTag itemToCompound(ItemStack itemStack){
-        Map<String, Tag> compoundValues = new HashMap<>();
+        Map<String, Tag<?>> compoundValues = new HashMap<>();
 
         compoundValues.put("type", new StringTag(itemStack.getType().name()));
         compoundValues.put("amount", new IntTag(itemStack.getAmount()));
@@ -65,7 +65,7 @@ public final class TagUtils {
     }
 
     public static ItemStack compoundToItem(CompoundTag compoundTag) {
-        Map<String, Tag> compoundValues = compoundTag.getValue();
+        Map<String, Tag<?>> compoundValues = compoundTag.getValue();
 
         Material type = Material.valueOf(((StringTag) compoundValues.get("type")).getValue());
         int amount = ((IntTag) compoundValues.get("amount")).getValue();
@@ -86,11 +86,11 @@ public final class TagUtils {
 
     public static List<Pattern> getPatternsFromTag(CompoundTag tag){
         List<Pattern> patterns = new ArrayList<>();
-        Map<String, Tag> compoundValues = tag.getValue();
+        Map<String, Tag<?>> compoundValues = tag.getValue();
         int counter = 0;
 
         while(compoundValues.containsKey(counter + "")){
-            Map<String, Tag> patternValues = ((CompoundTag) compoundValues.get(counter + "")).getValue();
+            Map<String, Tag<?>> patternValues = ((CompoundTag) compoundValues.get(counter + "")).getValue();
 
             DyeColor dyeColor = DyeColor.valueOf(((StringTag) patternValues.get("color")).getValue());
             PatternType patternType = PatternType.valueOf(((StringTag) patternValues.get("type")).getValue());

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 
-@SuppressWarnings("rawtypes")
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     private final CompoundTag compoundTag;
@@ -59,8 +58,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 Arrays.fill(_blocksSection, SchematicBlock.AIR);
 
         if(compoundTag.getValue().containsKey("blocks")) {
-            for(Tag tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()){
-                Map<String, Tag> compoundValue = ((CompoundTag) tag).getValue();
+            for(Tag<?> tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()){
+                Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
                 SchematicPosition schematicPosition = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue());
                 int x = schematicPosition.getX(), y = schematicPosition.getY(), z = schematicPosition.getZ();
                 int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
@@ -113,7 +112,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             }
         }
 
-        List<Tag> entitiesList = new ArrayList<>();
+        List<Tag<?>> entitiesList = new ArrayList<>();
 
         if(compoundTag.getValue().containsKey("entities"))
             entitiesList = ((ListTag) compoundTag.getValue().get("entities")).getValue();
@@ -121,7 +120,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         entities = new SchematicEntity[entitiesList.size()];
 
         for(int i = 0; i < entitiesList.size(); i++){
-            Map<String, Tag> compoundValue = ((CompoundTag) entitiesList.get(i)).getValue();
+            Map<String, Tag<?>> compoundValue = ((CompoundTag) entitiesList.get(i)).getValue();
             EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
             CompoundTag entityTag = (CompoundTag) compoundValue.get("NBT");
             SBlockPosition location = SBlockPosition.of(((StringTag) compoundValue.get("offset")).getValue());

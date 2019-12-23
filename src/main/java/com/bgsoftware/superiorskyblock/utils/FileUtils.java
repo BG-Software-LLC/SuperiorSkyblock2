@@ -144,7 +144,10 @@ public final class FileUtils {
         try {
             String destination = resourcePath;
 
-            if(ServerVersion.isEquals(ServerVersion.v1_14))
+            if(ServerVersion.isEquals(ServerVersion.v1_15))
+                resourcePath = resourcePath.replace(".yml", "1_15.yml")
+                        .replace(".schematic", "1_15.schematic");
+            else if(ServerVersion.isEquals(ServerVersion.v1_14))
                 resourcePath = resourcePath.replace(".yml", "1_13.yml")
                         .replace(".schematic", "1_14.schematic");
             else if(!ServerVersion.isLegacy())
