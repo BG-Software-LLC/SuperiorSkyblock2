@@ -2,40 +2,20 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+
 import net.minecraft.server.v1_8_R2.Chunk;
-import net.minecraft.server.v1_8_R2.EntityLiving;
 import net.minecraft.server.v1_8_R2.EntityPlayer;
 import net.minecraft.server.v1_8_R2.EnumParticle;
-import net.minecraft.server.v1_8_R2.IBlockData;
-import net.minecraft.server.v1_8_R2.ItemStack;
 import net.minecraft.server.v1_8_R2.MinecraftServer;
-import net.minecraft.server.v1_8_R2.NBTBase;
-import net.minecraft.server.v1_8_R2.NBTTagByte;
-import net.minecraft.server.v1_8_R2.NBTTagByteArray;
-import net.minecraft.server.v1_8_R2.NBTTagCompound;
-import net.minecraft.server.v1_8_R2.NBTTagDouble;
-import net.minecraft.server.v1_8_R2.NBTTagFloat;
-import net.minecraft.server.v1_8_R2.NBTTagInt;
-import net.minecraft.server.v1_8_R2.NBTTagIntArray;
-import net.minecraft.server.v1_8_R2.NBTTagList;
-import net.minecraft.server.v1_8_R2.NBTTagLong;
-import net.minecraft.server.v1_8_R2.NBTTagShort;
-import net.minecraft.server.v1_8_R2.NBTTagString;
-import net.minecraft.server.v1_8_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R2.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_8_R2.PlayerInteractManager;
-import net.minecraft.server.v1_8_R2.TileEntityFlowerPot;
 import net.minecraft.server.v1_8_R2.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R2.World;
+
 import net.minecraft.server.v1_8_R2.WorldBorder;
 import net.minecraft.server.v1_8_R2.WorldServer;
 import org.bukkit.Bukkit;
@@ -43,18 +23,20 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
 
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
@@ -62,77 +44,8 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
-    public int getCombinedId(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        IBlockData blockData = world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        return Block.getCombinedId(blockData);
-    }
-
-    @Override
-    public void setBlock(Location location, int combinedId) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getFlowerPot(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
-        ItemStack itemStack = new ItemStack(tileEntityFlowerPot.b(), 1, tileEntityFlowerPot.c());
-        return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
-    public void setFlowerPot(Location location, org.bukkit.inventory.ItemStack itemStack) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) world.getTileEntity(blockPosition);
-        ItemStack flower = CraftItemStack.asNMSCopy(itemStack);
-        tileEntityFlowerPot.a(flower.getItem(), flower.getData());
-        tileEntityFlowerPot.update();
-    }
-
-    @Override
-    public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
-        return CompoundTag.fromNBT(nbtTagCompound);
-    }
-
-    @Override
-    public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        itemStack.setTag((NBTTagCompound) compoundTag.toNBT());
-        return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
-    public CompoundTag getNBTTag(LivingEntity livingEntity) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
-        NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        entityLiving.b(nbtTagCompound);
-        nbtTagCompound.set("Yaw", new NBTTagFloat(entityLiving.yaw));
-        nbtTagCompound.set("Pitch", new NBTTagFloat(entityLiving.pitch));
-        return CompoundTag.fromNBT(nbtTagCompound);
-    }
-
-    @Override
-    public void getFromNBTTag(LivingEntity livingEntity, CompoundTag compoundTag) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
-        NBTTagCompound nbtTagCompound = (NBTTagCompound) compoundTag.toNBT();
-        if(nbtTagCompound != null) {
-            entityLiving.a(nbtTagCompound);
-            if(nbtTagCompound.hasKey("Yaw") && nbtTagCompound.hasKey("Pitch")){
-                entityLiving.setLocation(
-                        entityLiving.locX, entityLiving.locY, entityLiving.locZ,
-                        nbtTagCompound.getFloat("Yaw"),
-                        nbtTagCompound.getFloat("Pitch")
-                );
-            }
-        }
+    public void registerCommand(BukkitCommand command) {
+        ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);
     }
 
     @Override
@@ -152,14 +65,6 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : world.players)
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
-    }
-
-    @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         try {
             if(!plugin.getSettings().worldBordersEnabled)
@@ -172,11 +77,14 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
             worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
             worldBorder.setSize(disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn()) ? Integer.MAX_VALUE : (island.getIslandSize() * 2) + 1);
 
-            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter();
+            org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
 
-            if (superiorPlayer.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter(environment);
+
+            if(environment == org.bukkit.World.Environment.NETHER){
                 worldBorder.setCenter(center.getX() * 8, center.getZ() * 8);
-            } else {
+            }
+            else{
                 worldBorder.setCenter(center.getX(), center.getZ());
             }
 
@@ -202,71 +110,6 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     }
 
     @Override
-    public byte[] getNBTByteArrayValue(Object object) {
-        return ((NBTTagByteArray) object).c();
-    }
-
-    @Override
-    public byte getNBTByteValue(Object object) {
-        return ((NBTTagByte) object).f();
-    }
-
-    @Override
-    public Set<String> getNBTCompoundValue(Object object) {
-        return ((NBTTagCompound) object).c();
-    }
-
-    @Override
-    public double getNBTDoubleValue(Object object) {
-        return ((NBTTagDouble) object).g();
-    }
-
-    @Override
-    public float getNBTFloatValue(Object object) {
-        return ((NBTTagFloat) object).h();
-    }
-
-    @Override
-    public int[] getNBTIntArrayValue(Object object) {
-        return ((NBTTagIntArray) object).c();
-    }
-
-    @Override
-    public int getNBTIntValue(Object object) {
-        return ((NBTTagInt) object).d();
-    }
-
-    @Override
-    public Object getNBTListIndexValue(Object object, int index) {
-        return ((NBTTagList) object).g(index);
-    }
-
-    @Override
-    public long getNBTLongValue(Object object) {
-        return ((NBTTagLong) object).c();
-    }
-
-    @Override
-    public short getNBTShortValue(Object object) {
-        return ((NBTTagShort) object).e();
-    }
-
-    @Override
-    public String getNBTStringValue(Object object) {
-        return ((NBTTagString) object).a_();
-    }
-
-    @Override
-    public Object parseList(ListTag listTag) {
-        NBTTagList nbtTagList = new NBTTagList();
-
-        for(Tag tag : listTag.getValue())
-            nbtTagList.add((NBTBase) tag.toNBT());
-
-        return nbtTagList;
-    }
-
-    @Override
     public void clearInventory(OfflinePlayer offlinePlayer) {
         if(offlinePlayer.isOnline() || offlinePlayer instanceof Player){
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
@@ -287,7 +130,7 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
         clearInventory(targetPlayer);
 
         //Setting the entity to the spawn location
-        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter();
+        Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(org.bukkit.World.Environment.NORMAL);
         entity.world = ((CraftWorld) spawnLocation.getWorld()).getHandle();
         entity.setPositionRotation(spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), spawnLocation.getYaw(), spawnLocation.getPitch());
 
@@ -303,4 +146,52 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
         for(int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
     }
+
+    @Override
+    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome) {
+        byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+    }
+
+    @Override
+    public Enchantment getGlowEnchant() {
+        int id = 100;
+
+        //noinspection StatementWithEmptyBody, deprecation
+        while(Enchantment.getById(id++) != null);
+
+        return new Enchantment(id) {
+            @Override
+            public String getName() {
+                return "SuperiorSkyblockGlow";
+            }
+
+            @Override
+            public int getMaxLevel() {
+                return 1;
+            }
+
+            @Override
+            public int getStartLevel() {
+                return 0;
+            }
+
+            @Override
+            public EnchantmentTarget getItemTarget() {
+                return null;
+            }
+
+            @Override
+            public boolean conflictsWith(Enchantment enchantment) {
+                return false;
+            }
+
+            @Override
+            public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+                return true;
+            }
+        };
+    }
+
 }
