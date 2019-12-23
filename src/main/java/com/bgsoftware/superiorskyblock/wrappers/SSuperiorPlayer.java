@@ -92,7 +92,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         this.islandLeader = this;
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = SuperiorSkyblockPlugin.getPlugin().getSettings().disbandCount;
-        this.userLocale = LocaleUtils.DEFAULT;
+        this.userLocale = LocaleUtils.getDefault();
     }
 
     @Override
@@ -130,6 +130,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public java.util.Locale getUserLocale() {
+        if(userLocale == null)
+            userLocale = LocaleUtils.getDefault();
         return userLocale;
     }
 

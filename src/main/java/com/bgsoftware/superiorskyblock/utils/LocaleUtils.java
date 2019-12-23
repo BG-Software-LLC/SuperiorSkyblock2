@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 
 public final class LocaleUtils {
 
-    public static final Locale DEFAULT = com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
-
     private static final Locale englishLocale = new Locale("en", "US");
     private static final Pattern RTLLocalePattern = Pattern.compile(
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
@@ -37,6 +35,10 @@ public final class LocaleUtils {
 
     public static boolean isRightToLeft(Locale locale){
         return RTLLocalePattern.matcher(locale.getLanguage()).matches();
+    }
+
+    public static Locale getDefault(){
+        return com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
     }
 
 }

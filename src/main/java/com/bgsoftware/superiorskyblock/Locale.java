@@ -460,6 +460,7 @@ public enum Locale {
     WITHDRAW_ANNOUNCEMENT;
 
     private static Set<java.util.Locale> locales = new HashSet<>();
+    private static java.util.Locale defaultLocale = null;
 
     private String defaultMessage;
     private Map<java.util.Locale, String> messages = new HashMap<>();
@@ -541,6 +542,9 @@ public enum Locale {
 
             locales.add(fileLocale);
 
+            if(fileLocale.getLanguage().equals("en"))
+                defaultLocale = fileLocale;
+
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
             InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
             cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream);
@@ -554,6 +558,10 @@ public enum Locale {
 
             countMessages = false;
         }
+
+        if(defaultLocale == null)
+            //noinspection OptionalGetWithoutIsPresent
+            defaultLocale = locales.stream().findFirst().get();
 
         SuperiorSkyblockPlugin.log(" - Found " + messagesAmount + " messages in the language files.");
         SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
@@ -600,10 +608,7 @@ public enum Locale {
     }
 
     public static java.util.Locale getDefaultLocale(){
-        for(java.util.Locale locale : locales)
-            return locale;
-
-        return null;
+        return defaultLocale;
     }
 
 }

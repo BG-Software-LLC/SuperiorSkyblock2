@@ -229,7 +229,7 @@ public final class PlayersListener implements Listener {
             }
         }
 
-        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.DEFAULT, island == null ? "" :
+        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
                 plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()
