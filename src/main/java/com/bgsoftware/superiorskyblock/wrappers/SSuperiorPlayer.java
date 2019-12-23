@@ -554,6 +554,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(borderColor.name())
                 .setString(lastTimeStatus + "")
                 .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
                 .setString(player.toString())
                 .execute(async);
     }
@@ -572,6 +573,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(borderColor.name())
                 .setString(lastTimeStatus + "")
                 .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
                 .execute(async);
     }
 
