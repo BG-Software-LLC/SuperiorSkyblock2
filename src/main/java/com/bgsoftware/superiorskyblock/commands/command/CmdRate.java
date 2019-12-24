@@ -67,7 +67,7 @@ public final class CmdRate implements ICommand {
             island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
         }
 
-        if(island == null){
+        if(island == null || island.isSpawn()){
             Locale.INVALID_ISLAND_LOCATION.send(superiorPlayer);
             return;
         }
