@@ -172,6 +172,9 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
         try{
             Field field = BiomeStorage.class.getDeclaredField("f");
+            if(!field.getType().equals(BiomeBase[].class)){
+                field = BiomeStorage.class.getDeclaredField("g");
+            }
             field.setAccessible(true);
             biomeBases = (BiomeBase[]) field.get(chunk.getBiomeIndex());
         }catch(Exception ex){
