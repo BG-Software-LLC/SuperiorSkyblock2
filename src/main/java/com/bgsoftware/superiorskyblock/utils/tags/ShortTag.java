@@ -51,7 +51,7 @@ public final class ShortTag extends Tag<Short> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, short.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", short.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, short.class);
     }
 
     /**

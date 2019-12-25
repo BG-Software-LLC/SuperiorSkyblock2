@@ -51,7 +51,7 @@ public final class DoubleTag extends Tag<Double> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, double.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", double.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, double.class);
     }
 
     /**

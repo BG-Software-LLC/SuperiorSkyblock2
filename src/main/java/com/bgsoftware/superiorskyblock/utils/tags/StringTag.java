@@ -51,7 +51,7 @@ public final class StringTag extends Tag<String> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, String.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", String.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, String.class);
     }
 
     /**

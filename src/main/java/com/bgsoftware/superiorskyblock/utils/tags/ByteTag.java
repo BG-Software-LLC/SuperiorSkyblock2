@@ -51,7 +51,7 @@ public final class ByteTag extends Tag<Byte> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, byte.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", byte.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, byte.class);
     }
 
     /**

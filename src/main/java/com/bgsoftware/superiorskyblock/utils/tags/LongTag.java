@@ -52,7 +52,7 @@ public final class LongTag extends Tag<Long> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, long.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", long.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, long.class);
     }
 
     /**

@@ -55,8 +55,8 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS);
-        COMPOUND_SET = ReflectionUtils.getMethod(CLASS, "set", String.class, Tag.CLASS);
-        COMPOUND_GET = ReflectionUtils.getMethod(CLASS, "get", String.class);
+        COMPOUND_SET = ReflectionUtils.getMethod(CLASS, "set", null, String.class, Tag.CLASS);
+        COMPOUND_GET = ReflectionUtils.getMethod(CLASS, "get", null, String.class);
     }
 
     /**

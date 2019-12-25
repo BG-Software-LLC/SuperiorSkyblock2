@@ -52,7 +52,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
 
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
-        LIST_SIZE = ReflectionUtils.getMethod(CLASS, "size");
+        LIST_SIZE = ReflectionUtils.getMethod(CLASS, "size", int.class);
     }
 
     /**

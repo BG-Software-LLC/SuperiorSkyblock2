@@ -51,7 +51,7 @@ public final class IntTag extends Tag<Integer> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagInt");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, int.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", int.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, int.class);
     }
 
     /**

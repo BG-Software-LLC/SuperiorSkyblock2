@@ -66,9 +66,10 @@ public final class ReflectionUtils {
         }
     }
 
-    public static Method getMethod(Class<?> clazz, String name, Class<?>... parameterTypes){
+    public static Method getMethod(Class<?> clazz, String name, Class<?> returnType, Class<?>... parameterTypes){
         try{
-            return clazz.getMethod(name, parameterTypes);
+            Method method = clazz.getMethod(name, parameterTypes);
+            return returnType == null || method.getReturnType().equals(returnType) ? method : null;
         }catch(NoSuchMethodException ex){
             return null;
         }

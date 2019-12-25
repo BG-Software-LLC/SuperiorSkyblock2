@@ -52,7 +52,7 @@ public final class FloatTag extends Tag<Float> {
     static {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
         CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, float.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", float.class);
+        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, float.class);
     }
 
     /**
