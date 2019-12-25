@@ -6,8 +6,6 @@ import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkSection;
-import net.minecraft.server.v1_12_R1.EntityHuman;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.EnumColor;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
@@ -30,7 +28,10 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -77,10 +78,16 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(EntityHuman entityHuman : world.players)
-            ((EntityPlayer) entityHuman).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, 65535));
+
+        PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, 65535);
+
+        Location location = new Location(bukkitChunk.getWorld(), bukkitChunk.getX() << 4, 128, bukkitChunk.getZ() << 4);
+
+        for(Entity player : bukkitChunk.getWorld().getNearbyEntities(location, 60, 128, 60)) {
+            if(player instanceof Player)
+                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutMapChunk);
+        }
     }
 
     @Override

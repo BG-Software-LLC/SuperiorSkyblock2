@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R1.AxisAlignedBB;
 import net.minecraft.server.v1_8_R1.Block;
 import net.minecraft.server.v1_8_R1.BlockPosition;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.ChunkSection;
+import net.minecraft.server.v1_8_R1.Entity;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.IBlockData;
 import net.minecraft.server.v1_8_R1.IChatBaseComponent;
@@ -78,8 +80,17 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for(Object object : world.players)
-            ((EntityPlayer) object).playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, 65535));
+
+        PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, true, 65535);
+
+        AxisAlignedBB bb = new AxisAlignedBB((bukkitChunk.getX() << 4) - 60, 0, (bukkitChunk.getZ() << 4) - 60,
+                (bukkitChunk.getX() << 4) + 60, 256, (bukkitChunk.getZ() << 4) + 60);
+
+        //noinspection unchecked
+        for(Entity entity : (List<Entity>) ((CraftWorld) bukkitChunk.getWorld()).getHandle().getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
+        }
     }
 
     @Override
