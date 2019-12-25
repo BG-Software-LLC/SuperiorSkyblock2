@@ -17,6 +17,8 @@ public interface NMSBlocks {
 
     void refreshChunk(Chunk chunk);
 
+    void refreshLight(Chunk chunk);
+
     ItemStack getFlowerPot(Location location);
 
     int getCombinedId(Location location);

@@ -58,7 +58,10 @@ public final class BlockChangeTask {
            blocksCache.clear();
 
            Bukkit.getScheduler().runTask(plugin, () -> {
-               chunksToUpdate.forEach(plugin.getNMSBlocks()::refreshChunk);
+               chunksToUpdate.forEach(chunk -> {
+                   plugin.getNMSBlocks().refreshLight(chunk);
+                   plugin.getNMSBlocks().refreshChunk(chunk);
+               });
                chunksToUpdate.clear();
 
                if(onFinish != null)

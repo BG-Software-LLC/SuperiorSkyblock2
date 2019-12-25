@@ -83,6 +83,11 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
     }
 
     @Override
+    public void refreshLight(org.bukkit.Chunk chunk) {
+        ((CraftChunk) chunk).getHandle().initLighting();
+    }
+
+    @Override
     public org.bukkit.inventory.ItemStack getFlowerPot(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
