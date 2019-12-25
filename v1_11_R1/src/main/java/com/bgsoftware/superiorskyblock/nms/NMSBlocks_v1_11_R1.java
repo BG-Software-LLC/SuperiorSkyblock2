@@ -139,9 +139,11 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
         TileEntitySkull tileEntitySkull = (TileEntitySkull) objectTileEntitySkull;
 
         if (skullType == SkullType.PLAYER) {
-            GameProfile gameProfile = MinecraftServer.getServer().getUserCache().getProfile(owner);
-            if(gameProfile != null)
-                tileEntitySkull.setGameProfile(gameProfile);
+            if(owner != null) {
+                GameProfile gameProfile = MinecraftServer.getServer().getUserCache().getProfile(owner);
+                if (gameProfile != null)
+                    tileEntitySkull.setGameProfile(gameProfile);
+            }
         } else {
             tileEntitySkull.setSkullType(skullType.ordinal() - 1);
         }
