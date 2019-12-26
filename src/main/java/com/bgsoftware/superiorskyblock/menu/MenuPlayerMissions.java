@@ -40,6 +40,9 @@ public final class MenuPlayerMissions extends SuperiorMenu {
         int clickedSlot = e.getRawSlot();
 
         if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
+            if(clickedSlot == currentSlot)
+                return;
+
             boolean nextPage = slots.size() * currentPage < slots.size();
 
             if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))

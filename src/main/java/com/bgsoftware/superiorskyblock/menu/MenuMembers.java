@@ -39,6 +39,9 @@ public final class MenuMembers extends SuperiorMenu {
         int clickedSlot = e.getRawSlot();
 
         if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
+            if(clickedSlot == currentSlot)
+                return;
+
             boolean nextPage = slots.size() * currentPage < members.size();
 
             if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
