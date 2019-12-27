@@ -26,6 +26,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         }
 
         registerPlaceholder("superior_panel_toggle");
+
         registerPlaceholder("superior_island_center");
         registerPlaceholder("superior_island_x");
         registerPlaceholder("superior_island_y");
@@ -34,6 +35,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_team_size");
         registerPlaceholder("superior_island_team_limit");
         registerPlaceholder("superior_island_leader");
+        registerPlaceholder("superior_island_size_format");
         registerPlaceholder("superior_island_size");
         registerPlaceholder("superior_island_radius");
         registerPlaceholder("superior_island_biome");
@@ -56,6 +58,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_exists");
         registerPlaceholder("superior_island_locked");
         registerPlaceholder("superior_island_name");
+        registerPlaceholder("superior_island_name_leader");
         registerPlaceholder("superior_island_is_leader");
         registerPlaceholder("superior_island_rating");
         registerPlaceholder("superior_island_rating_stars");
@@ -68,6 +71,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_team_size");
         registerPlaceholder("superior_island_location_team_limit");
         registerPlaceholder("superior_island_location_leader");
+        registerPlaceholder("superior_island_location_size_format");
         registerPlaceholder("superior_island_location_size");
         registerPlaceholder("superior_island_location_radius");
         registerPlaceholder("superior_island_location_biome");
@@ -90,6 +94,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_exists");
         registerPlaceholder("superior_island_location_locked");
         registerPlaceholder("superior_island_location_name");
+        registerPlaceholder("superior_island_location_name_leader");
         registerPlaceholder("superior_island_location_is_leader");
         registerPlaceholder("superior_island_location_rating");
         registerPlaceholder("superior_island_location_rating_stars");
