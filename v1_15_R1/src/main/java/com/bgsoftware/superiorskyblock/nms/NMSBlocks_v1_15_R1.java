@@ -7,6 +7,7 @@ import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockFlowerPot;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.Chunk;
+import net.minecraft.server.v1_15_R1.ChunkProviderServer;
 import net.minecraft.server.v1_15_R1.ChunkSection;
 import net.minecraft.server.v1_15_R1.EnumColor;
 import net.minecraft.server.v1_15_R1.IBlockData;
@@ -52,6 +53,11 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
         chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId), false);
+
+        BlockPosition pos = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getChunkProvider();
+        chunkProviderServer.getLightEngine().a(pos);
+        chunkProviderServer.flagDirty(pos);
 
         if(blockType != BlockType.BLOCK && blockType != BlockType.FLOWER_POT) {
             TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));

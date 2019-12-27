@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -48,6 +47,51 @@ public final class ItemUtils {
 
     private static boolean isValidAndSpawnEgg(ItemStack itemStack){
         return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
+    }
+
+    public static int getLightLevel(Material material){
+        switch (material.name()){
+            case "BEACON":
+            case "ENDER_PORTAL":
+            case "END_PORTAL":
+            case "END_GATEWAY":
+            case "FIRE":
+            case "LAVA":
+            case "STATIONARY_LAVA":
+            case "GLOWSTONE":
+            case "JACK_O_LANTERN":
+            case "REDSTONE_LAMP":
+            case "REDSTONE_LAMP_ON":
+            case "SEA_LANTERN":
+            case "CONDUIT":
+            case "LANTERN":
+            case "CAMPFIRE":
+                return 15;
+            case "END_ROD":
+            case "TORCH":
+                return 14;
+            case "FURNACE":
+            case "BLAST_FURNACE":
+            case "SMOKER":
+                return 13;
+            case "NETHER_PORTAL":
+                return 11;
+            case "ENDER_CHEST":
+            case "REDSTONE_TORCH":
+            case "REDSTONE_WALL_TORCH":
+            case "REDSTONE_TORCH_ON":
+                return 7;
+            case "MAGMA_BLOCK":
+                return 3;
+            case "BREWING_STAND":
+            case "BROWN_MUSHROOM":
+            case "DRAGON_EGG":
+            case "ENDER_PORTAL_FRAME":
+            case "END_PORTAL_FRAME":
+                return 1;
+            default:
+                return 0;
+        }
     }
 
 }
