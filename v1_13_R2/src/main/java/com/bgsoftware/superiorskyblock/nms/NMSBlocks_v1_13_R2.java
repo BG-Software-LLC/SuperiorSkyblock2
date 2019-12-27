@@ -13,10 +13,10 @@ import net.minecraft.server.v1_13_R2.EnumColor;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.ItemStack;
-import net.minecraft.server.v1_13_R2.Material;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.NBTTagList;
+import net.minecraft.server.v1_13_R2.NonNullList;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntityBanner;
@@ -34,7 +34,6 @@ import org.bukkit.craftbukkit.v1_13_R2.block.CraftSign;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftLegacy;
-import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -142,11 +141,14 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         try{
             Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
             field.setAccessible(true);
-            ItemStack[] items = (ItemStack[]) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.length && i < contents.length; i++){
-                items[i] = CraftItemStack.asNMSCopy(contents[i]);
+            //noinspection unchecked
+            NonNullList<ItemStack> items = (NonNullList<ItemStack>) field.get(tileEntityInventoryHolder);
+            for(int i = 0; i < items.size() && i < contents.length; i++){
+                items.set(i, CraftItemStack.asNMSCopy(contents[i]));
             }
-        }catch(Exception ignored){ }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override

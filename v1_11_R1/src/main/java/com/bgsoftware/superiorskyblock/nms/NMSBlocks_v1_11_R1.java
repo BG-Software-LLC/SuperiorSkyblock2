@@ -14,9 +14,11 @@ import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 import net.minecraft.server.v1_11_R1.NBTTagCompound;
 import net.minecraft.server.v1_11_R1.NBTTagList;
+import net.minecraft.server.v1_11_R1.NonNullList;
 import net.minecraft.server.v1_11_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_11_R1.TileEntity;
 import net.minecraft.server.v1_11_R1.TileEntityBanner;
+import net.minecraft.server.v1_11_R1.TileEntityChest;
 import net.minecraft.server.v1_11_R1.TileEntityFlowerPot;
 import net.minecraft.server.v1_11_R1.TileEntitySign;
 import net.minecraft.server.v1_11_R1.TileEntitySkull;
@@ -142,11 +144,14 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
         try{
             Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
             field.setAccessible(true);
-            ItemStack[] items = (ItemStack[]) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.length && i < contents.length; i++){
-                items[i] = CraftItemStack.asNMSCopy(contents[i]);
+            //noinspection unchecked
+            NonNullList<ItemStack> items = (NonNullList<ItemStack>) field.get(tileEntityInventoryHolder);
+            for(int i = 0; i < items.size() && i < contents.length; i++){
+                items.set(i, CraftItemStack.asNMSCopy(contents[i]));
             }
-        }catch(Exception ignored){ }
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
