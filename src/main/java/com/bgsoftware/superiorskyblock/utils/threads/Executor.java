@@ -27,6 +27,10 @@ public final class Executor {
         databaseExecutor.execute(runnable);
     }
 
+    public static boolean isDataThread(){
+        return Thread.currentThread().getName().contains("SuperiorSkyblock Database Thread");
+    }
+
     public static void async(Runnable runnable){
         if(Bukkit.isPrimaryThread()){
             executor.execute(runnable);

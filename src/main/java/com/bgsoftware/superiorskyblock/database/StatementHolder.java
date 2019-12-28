@@ -54,7 +54,7 @@ public class StatementHolder {
     }
 
     public void execute(boolean async) {
-        if(async){
+        if(async && !Executor.isDataThread()){
             Executor.data(() -> execute(false));
             return;
         }

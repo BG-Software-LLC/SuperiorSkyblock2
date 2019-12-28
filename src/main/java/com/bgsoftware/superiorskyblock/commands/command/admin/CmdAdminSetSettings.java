@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public final class CmdAdminSetSettings implements ICommand {
         List<Island> islands = new ArrayList<>();
 
         if(args[2].equalsIgnoreCase("*")){
-            islands = plugin.getGrid().getIslands();
+            islands.addAll(plugin.getGrid().getIslands());
         }
 
         else {
@@ -97,12 +98,12 @@ public final class CmdAdminSetSettings implements ICommand {
 
         boolean value = args[4].equalsIgnoreCase("true");
 
-        islands.forEach(island -> {
+        Executor.data(() -> islands.forEach(island -> {
             if(value)
                 island.enableSettings(islandSettings);
             else
                 island.disableSettings(islandSettings);
-        });
+        }));
 
         if(islands.size() != 1)
             Locale.SETTINGS_UPDATED_ALL.send(sender, StringUtils.format(islandSettings.name()));

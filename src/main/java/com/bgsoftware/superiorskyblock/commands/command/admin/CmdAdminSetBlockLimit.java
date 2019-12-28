@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -66,7 +67,7 @@ public final class CmdAdminSetBlockLimit implements ICommand {
         List<Island> islands = new ArrayList<>();
 
         if(args[2].equalsIgnoreCase("*")) {
-            islands = plugin.getGrid().getIslands();
+            islands.addAll(plugin.getGrid().getIslands());
         }
 
         else{
@@ -96,7 +97,7 @@ public final class CmdAdminSetBlockLimit implements ICommand {
             return;
         }
 
-        islands.forEach(island -> island.setBlockLimit(key, limit));
+        Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, limit)));
 
         if(islands.size() > 1)
             Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.toString().split(":")[0]));

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -67,7 +68,7 @@ public final class CmdAdminSetPermission implements ICommand {
         List<Island> islands = new ArrayList<>();
 
         if(args[2].equalsIgnoreCase("*")){
-            islands = plugin.getGrid().getIslands();
+            islands.addAll(plugin.getGrid().getIslands());
         }
 
         else {
@@ -104,7 +105,7 @@ public final class CmdAdminSetPermission implements ICommand {
             return;
         }
 
-        islands.forEach(island -> island.setPermission(playerRole, islandPermission, true));
+        Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPermission, true)));
 
         if(islands.size() > 1)
             Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPermission.name()));

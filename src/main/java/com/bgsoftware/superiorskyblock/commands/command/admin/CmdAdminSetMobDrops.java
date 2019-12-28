@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -61,7 +62,7 @@ public final class CmdAdminSetMobDrops implements ICommand {
         List<Island> islands = new ArrayList<>();
 
         if(args[2].equalsIgnoreCase("*")){
-            islands = plugin.getGrid().getIslands();
+            islands.addAll(plugin.getGrid().getIslands());
         }
 
         else {
@@ -89,7 +90,7 @@ public final class CmdAdminSetMobDrops implements ICommand {
             return;
         }
 
-        islands.forEach(island -> island.setMobDropsMultiplier(multiplier));
+        Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(multiplier)));
 
         if(islands.size() > 1)
             Locale.CHANGED_MOB_DROPS_ALL.send(sender);

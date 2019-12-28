@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -69,7 +70,7 @@ public final class CmdAdminDeposit implements ICommand {
         List<Island> islands = new ArrayList<>();
 
         if(args[2].equalsIgnoreCase("*")){
-            islands = plugin.getGrid().getIslands();
+            islands.addAll(plugin.getGrid().getIslands());
         }
 
         else {
@@ -97,7 +98,7 @@ public final class CmdAdminDeposit implements ICommand {
             return;
         }
 
-        islands.forEach(island -> island.depositMoney(amount));
+        Executor.data(() -> islands.forEach(island -> island.depositMoney(amount)));
 
         if(targetPlayer == null)
             Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
