@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_9_R2.Block;
 import net.minecraft.server.v1_9_R2.BlockPosition;
@@ -22,7 +21,6 @@ import net.minecraft.server.v1_9_R2.TileEntitySkull;
 import net.minecraft.server.v1_9_R2.World;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
@@ -31,7 +29,6 @@ import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R2.block.CraftSign;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_9_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -54,12 +51,7 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
 
         int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
 
-        IBlockData blockData = Block.getByCombinedId(combinedId);
-
-        chunkSection.setType(blockX, blockY, blockZ, blockData);
-        chunkSection.a(blockX, blockY, blockZ, 15);
-        //noinspection deprecation
-        chunkSection.b(blockX, blockY, blockZ, ItemUtils.getLightLevel(Material.getMaterial(CraftMagicNumbers.getId(blockData.getBlock()))));
+        chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(combinedId));
 
         if(blockType != BlockType.BLOCK) {
             TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
@@ -161,6 +153,7 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
 
         if (skullType == SkullType.PLAYER) {
             if(owner != null) {
+                //noinspection deprecation
                 GameProfile gameProfile = MinecraftServer.getServer().getUserCache().getProfile(owner);
                 if (gameProfile != null)
                     tileEntitySkull.setGameProfile(gameProfile);

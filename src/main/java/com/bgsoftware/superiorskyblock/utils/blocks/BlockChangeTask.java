@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public final class BlockChangeTask {
 
@@ -38,34 +35,20 @@ public final class BlockChangeTask {
 
         submitted = true;
 
-        ExecutorService executor = Executors.newCachedThreadPool();
         for(Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()){
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
-            executor.execute(() -> entry.getValue().forEach(blockData ->
-                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args)));
+            entry.getValue().forEach(blockData ->
+                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args));
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-           try{
-               executor.shutdown();
-               executor.awaitTermination(1, TimeUnit.MINUTES);
-           }catch(Exception ex){
-               ex.printStackTrace();
-               return;
-           }
+        blocksCache.clear();
 
-           blocksCache.clear();
+        chunksToUpdate.forEach(plugin.getNMSBlocks()::refreshChunk);
+        chunksToUpdate.clear();
 
-           Bukkit.getScheduler().runTask(plugin, () -> {
-               chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
-               chunksToUpdate.clear();
-
-               if(onFinish != null)
-                   onFinish.run();
-           });
-        });
-
+        if(onFinish != null)
+            onFinish.run();
     }
 
     private static class ChunkPosition{
