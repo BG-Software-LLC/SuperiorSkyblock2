@@ -123,8 +123,6 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
-COMMAND_DESCRIPTION_ADMIN_SET_HOPPERS_LIMIT: Set hoppers limit for another player's
-  island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: רחא ןקחשל יא לע תוגיהנמה תא ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: רחא ןקחש לש יא לש םיבומ לש םיטירפה סונוב
   תא תונשל.
