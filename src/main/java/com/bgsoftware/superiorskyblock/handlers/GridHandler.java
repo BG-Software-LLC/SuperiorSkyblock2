@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -94,10 +95,11 @@ public final class GridHandler implements GridManager {
                     island.getAllChunks(World.Environment.NORMAL, true).forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
+                    island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
                     if (superiorPlayer.isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                         if (islandCreateEvent.canTeleport()) {
-                            superiorPlayer.asPlayer().teleport(islandLocation);
+                            superiorPlayer.teleport(island);
                             if (island.isInside(superiorPlayer.getLocation()))
                                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
                         }

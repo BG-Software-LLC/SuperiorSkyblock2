@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
@@ -7,6 +8,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
@@ -36,6 +38,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     private final CompoundTag compoundTag;
 
     private final int[] offsets = new int[3];
+    private final float yaw, pitch;
     private final byte[] sizes = new byte[3];
     private final SchematicBlock[][][] blocks;
     private final SchematicEntity[] entities;
@@ -50,6 +53,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         offsets[0] = ((IntTag) compoundTag.getValue().getOrDefault("offsetX", new IntTag(sizes[0] / 2))).getValue();
         offsets[1] = ((IntTag) compoundTag.getValue().getOrDefault("offsetY", new IntTag(sizes[1] / 2))).getValue();
         offsets[2] = ((IntTag) compoundTag.getValue().getOrDefault("offsetZ", new IntTag(sizes[2] / 2))).getValue();
+        yaw = ((FloatTag) compoundTag.getValue().getOrDefault("yaw", new FloatTag(0))).getValue();
+        pitch = ((FloatTag) compoundTag.getValue().getOrDefault("pitch", new FloatTag(0))).getValue();
 
         blocks = new SchematicBlock[sizes[0] + 1][sizes[1] + 1][sizes[2] + 1];
 
@@ -62,7 +67,20 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
                 SchematicPosition schematicPosition = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue());
                 int x = schematicPosition.getX(), y = schematicPosition.getY(), z = schematicPosition.getZ();
-                int combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
+                int combinedId;
+
+                if(compoundValue.containsKey("combinedId")){
+                    combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
+                }
+                else if(compoundValue.containsKey("id") && compoundValue.containsKey("data")){
+                    int id = ((IntTag) compoundValue.get("id")).getValue();
+                    int data = ((IntTag) compoundValue.get("data")).getValue();
+                    combinedId = id + (data << 12);
+                }
+                else{
+                    SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + x + ", " + y + ", " + z + " - skipping...");
+                    continue;
+                }
 
                 if(compoundValue.containsKey("baseColor") || compoundValue.containsKey("patterns")) {
                     blocks[x][y][z] = SchematicBlock.of(
@@ -81,7 +99,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
                 else if(compoundValue.containsKey("flower")){
                     String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, new ItemStack(Material.valueOf(sections[0]), 1, Short.parseShort(sections[1])));
+                    blocks[x][y][z] = SchematicBlock.of(combinedId,
+                            new ItemStack(Material.valueOf(sections[0]), 1, Short.parseShort(sections[1])));
                 }
 
                 else if(compoundValue.containsKey("skullType") || compoundValue.containsKey("rotation") || compoundValue.containsKey("owner")){
@@ -170,6 +189,13 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
             }, 10L);
         });
+    }
+
+    @Override
+    public Location getTeleportLocation(Location location) {
+        location.setYaw(yaw);
+        location.setPitch(pitch);
+        return location;
     }
 
     public CompoundTag getTag(){

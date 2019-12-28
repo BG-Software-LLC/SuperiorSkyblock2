@@ -26,4 +26,8 @@ public abstract class BaseSchematic implements Schematic {
         }
     }
 
+    public Location getTeleportLocation(Location location){
+        return location;
+    }
+
 }

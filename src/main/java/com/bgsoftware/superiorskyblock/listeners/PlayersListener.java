@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -330,7 +331,7 @@ public final class PlayersListener implements Listener {
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
                     schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                        superiorPlayer.teleport(toTeleport);
+                        superiorPlayer.teleport(((BaseSchematic) schematic).getTeleportLocation(toTeleport));
                         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
                     });
                     island.setSchematicGenerate(environment);
