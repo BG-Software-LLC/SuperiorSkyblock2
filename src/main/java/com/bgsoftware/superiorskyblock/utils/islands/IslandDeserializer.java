@@ -136,8 +136,6 @@ public final class IslandDeserializer {
             location = "normal=" + location;
         }
 
-        System.out.println(location);
-
         for(String worldSection : location.split(";")){
             try {
                 String[] locationSection = worldSection.split("=");
