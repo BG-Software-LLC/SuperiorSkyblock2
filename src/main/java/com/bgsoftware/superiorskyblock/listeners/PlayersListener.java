@@ -318,7 +318,7 @@ public final class PlayersListener implements Listener {
 
         World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
         String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
-        Location toTeleport = island.getTeleportLocation(environment);
+        Location toTeleport = getLocationNoException(island, environment);
 
         if(toTeleport != null) {
             e.setCancelled(true);
@@ -352,6 +352,14 @@ public final class PlayersListener implements Listener {
                 superiorPlayer.teleport(toTeleport);
                 plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
             }
+        }
+    }
+
+    private Location getLocationNoException(Island island, World.Environment environment){
+        try{
+            return island.getTeleportLocation(environment);
+        }catch(Exception ex){
+            return null;
         }
     }
 
