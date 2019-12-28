@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -64,9 +65,15 @@ public final class SchematicsHandler implements SchematicManager {
 
             if(!schematicsFolder.exists()) {
                 schematicsFolder.mkdirs();
-                FileUtils.saveResource("schematics/normal.schematic");
-                FileUtils.saveResource("schematics/mycel.schematic");
                 FileUtils.saveResource("schematics/desert.schematic");
+                FileUtils.saveResource("schematics/desert_nether.schematic", "schematics/normal_nether.schematic");
+                FileUtils.saveResource("schematics/desert_the_end.schematic", "schematics/normal_the_end.schematic");
+                FileUtils.saveResource("schematics/mycel.schematic");
+                FileUtils.saveResource("schematics/mycel_nether.schematic", "schematics/normal_nether.schematic");
+                FileUtils.saveResource("schematics/mycel_the_end.schematic", "schematics/normal_the_end.schematic");
+                FileUtils.saveResource("schematics/normal.schematic");
+                FileUtils.saveResource("schematics/normal_nether.schematic");
+                FileUtils.saveResource("schematics/normal_the_end.schematic");
             }
 
             //noinspection ConstantConditions
@@ -111,7 +118,7 @@ public final class SchematicsHandler implements SchematicManager {
                 Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
         Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
         saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
-                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), schematicName, () ->
+                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), offset.getYaw(), offset.getPitch(), schematicName, () ->
                 Locale.SCHEMATIC_SAVED.send(superiorPlayer));
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
@@ -119,13 +126,23 @@ public final class SchematicsHandler implements SchematicManager {
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName){
-        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, null);
+        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, 0, 0, schematicName);
     }
 
     @Override
-    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable runnable){
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName) {
+        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName, null);
+    }
+
+    @Override
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable callable) {
+        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, 0, 0, schematicName, null);
+    }
+
+    @Override
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, Runnable runnable){
         if(Bukkit.isPrimaryThread() && ServerVersion.isLessThan(ServerVersion.v1_14)){
-            Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, schematicName, runnable));
+            Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName, runnable));
             return;
         }
 
@@ -184,6 +201,8 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("offsetX", new IntTag(offsetX));
         compoundValue.put("offsetY", new IntTag(offsetY));
         compoundValue.put("offsetZ", new IntTag(offsetZ));
+        compoundValue.put("yaw", new FloatTag(yaw));
+        compoundValue.put("pitch", new FloatTag(pitch));
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
         SuperiorSchematic schematic = new SuperiorSchematic(new CompoundTag(compoundValue));

@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import org.bukkit.Bukkit;
 
+import java.util.Arrays;
+
 public enum ServerVersion {
 
     v1_8(18),
@@ -50,6 +52,18 @@ public enum ServerVersion {
 
     public static String getBukkitVersion(){
         return bukkitVersion;
+    }
+
+    public static ServerVersion[] getByOrder(){
+        ServerVersion[] versions = Arrays.copyOfRange(values(), 0, currentVersion.ordinal() + 1);
+
+        for(int i = 0; i < versions.length / 2; i++){
+            ServerVersion temp = versions[i];
+            versions[i] = versions[versions.length - i - 1];
+            versions[versions.length - i - 1] = temp;
+        }
+
+        return versions;
     }
 
 }

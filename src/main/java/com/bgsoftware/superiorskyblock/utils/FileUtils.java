@@ -141,18 +141,23 @@ public final class FileUtils {
     }
 
     public static void saveResource(String resourcePath){
-        try {
-            String destination = resourcePath;
+        saveResource(resourcePath, resourcePath);
+    }
 
-            if(ServerVersion.isEquals(ServerVersion.v1_15))
-                resourcePath = resourcePath.replace(".yml", "1_13.yml")
-                        .replace(".schematic", "1_15.schematic");
-            else if(ServerVersion.isEquals(ServerVersion.v1_14))
-                resourcePath = resourcePath.replace(".yml", "1_13.yml")
-                        .replace(".schematic", "1_14.schematic");
-            else if(!ServerVersion.isLegacy())
-                resourcePath = resourcePath.replace(".yml", "1_13.yml")
-                    .replace(".schematic", "1_13.schematic");
+    public static void saveResource(String destination, String resourcePath){
+        try {
+            for(ServerVersion serverVersion : ServerVersion.getByOrder()){
+                String version = serverVersion.name().substring(1);
+                if(resourcePath.endsWith(".yml") && plugin.getResource(resourcePath.replace(".yml", version + ".yml")) != null) {
+                    resourcePath = resourcePath.replace(".yml", version + ".yml");
+                    break;
+                }
+
+                else if(resourcePath.endsWith(".schematic") && plugin.getResource(resourcePath.replace(".schematic", version + ".schematic")) != null) {
+                    resourcePath = resourcePath.replace(".schematic", version + ".schematic");
+                    break;
+                }
+            }
 
             File file = new File(plugin.getDataFolder(), resourcePath);
             plugin.saveResource(resourcePath, true);
