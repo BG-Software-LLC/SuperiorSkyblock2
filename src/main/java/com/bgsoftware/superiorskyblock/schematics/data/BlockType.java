@@ -7,6 +7,7 @@ public enum BlockType {
     INVENTORY_HOLDER,
     FLOWER_POT,
     SKULL,
-    SIGN
+    SIGN,
+    SPAWNER
 
 }

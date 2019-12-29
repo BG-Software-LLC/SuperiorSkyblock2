@@ -12,12 +12,14 @@ import net.minecraft.server.v1_9_R1.IBlockData;
 import net.minecraft.server.v1_9_R1.IChatBaseComponent;
 import net.minecraft.server.v1_9_R1.ItemStack;
 import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.MobSpawnerAbstract;
 import net.minecraft.server.v1_9_R1.NBTTagCompound;
 import net.minecraft.server.v1_9_R1.NBTTagList;
 import net.minecraft.server.v1_9_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_9_R1.TileEntity;
 import net.minecraft.server.v1_9_R1.TileEntityBanner;
 import net.minecraft.server.v1_9_R1.TileEntityFlowerPot;
+import net.minecraft.server.v1_9_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_9_R1.TileEntitySign;
 import net.minecraft.server.v1_9_R1.TileEntitySkull;
 import net.minecraft.server.v1_9_R1.World;
@@ -30,6 +32,7 @@ import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
+import org.bukkit.entity.EntityType;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -71,6 +74,9 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
                     break;
                 case SIGN:
                     setTileEntitySign(tileEntity, (String[]) args[0]);
+                    break;
+                case SPAWNER:
+                    setTileEntityMobSpawner(tileEntity, (EntityType) args[0]);
                     break;
             }
         }
@@ -212,6 +218,12 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
         TileEntitySign tileEntitySign = (TileEntitySign) objectTileEntitySign;
         IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+    }
+
+    @Override
+    public void setTileEntityMobSpawner(Object objectTileEntityMobSpawner, EntityType spawnedType) {
+        MobSpawnerAbstract mobSpawner = ((TileEntityMobSpawner) objectTileEntityMobSpawner).getSpawner();
+        mobSpawner.setMobName(spawnedType.name());
     }
 
 }

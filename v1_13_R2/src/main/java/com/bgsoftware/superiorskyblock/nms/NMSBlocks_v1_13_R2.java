@@ -8,17 +8,20 @@ import net.minecraft.server.v1_13_R2.BlockFlowerPot;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkSection;
+import net.minecraft.server.v1_13_R2.EntityTypes;
 import net.minecraft.server.v1_13_R2.EnumColor;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
+import net.minecraft.server.v1_13_R2.MobSpawnerAbstract;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.NBTTagList;
 import net.minecraft.server.v1_13_R2.NonNullList;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntityBanner;
+import net.minecraft.server.v1_13_R2.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R2.TileEntitySign;
 import net.minecraft.server.v1_13_R2.TileEntitySkull;
 import net.minecraft.server.v1_13_R2.World;
@@ -33,6 +36,7 @@ import org.bukkit.craftbukkit.v1_13_R2.block.CraftSign;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -72,6 +76,9 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
                     break;
                 case SIGN:
                     setTileEntitySign(tileEntity, (String[]) args[0]);
+                    break;
+                case SPAWNER:
+                    setTileEntityMobSpawner(tileEntity, (EntityType) args[0]);
                     break;
             }
         }
@@ -166,6 +173,13 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         TileEntitySign tileEntitySign = (TileEntitySign) objectTileEntitySign;
         IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+    }
+
+    @Override
+    public void setTileEntityMobSpawner(Object objectTileEntityMobSpawner, EntityType spawnedType) {
+        MobSpawnerAbstract mobSpawner = ((TileEntityMobSpawner) objectTileEntityMobSpawner).getSpawner();
+        //noinspection deprecation
+        mobSpawner.setMobName(EntityTypes.a(spawnedType.getName()));
     }
 
 }

@@ -10,12 +10,14 @@ import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.ItemStack;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.TileEntityBanner;
 import net.minecraft.server.v1_8_R3.TileEntityFlowerPot;
+import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R3.TileEntitySign;
 import net.minecraft.server.v1_8_R3.TileEntitySkull;
 import net.minecraft.server.v1_8_R3.World;
@@ -30,6 +32,7 @@ import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
@@ -72,6 +75,9 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
                     break;
                 case SIGN:
                     setTileEntitySign(tileEntity, (String[]) args[0]);
+                    break;
+                case SPAWNER:
+                    setTileEntityMobSpawner(tileEntity, (EntityType) args[0]);
                     break;
             }
         }
@@ -220,4 +226,11 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
     }
+
+    @Override
+    public void setTileEntityMobSpawner(Object objectTileEntityMobSpawner, EntityType spawnedType) {
+        MobSpawnerAbstract mobSpawner = ((TileEntityMobSpawner) objectTileEntityMobSpawner).getSpawner();
+        mobSpawner.setMobName(spawnedType.name());
+    }
+
 }

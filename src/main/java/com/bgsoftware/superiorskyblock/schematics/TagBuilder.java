@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
@@ -66,6 +67,10 @@ public final class TagBuilder {
     public void applySign(Sign sign) {
         for(int i = 0; i < 4; i++)
             compoundValue.put("signLine" + i, new StringTag(sign.getLine(i)));
+    }
+
+    public void applySpawner(CreatureSpawner creatureSpawner) {
+        compoundValue.put("spawnedType", new StringTag(creatureSpawner.getSpawnedType().name()));
     }
 
     public TagBuilder applyEntity(LivingEntity livingEntity, Location center){

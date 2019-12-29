@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -120,6 +121,21 @@ public class SchematicBlock {
         }
     }
 
+    private static class SchematicSpawner extends SchematicBlock{
+
+        private final EntityType spawnedType;
+
+        private SchematicSpawner(int combinedId, EntityType spawnedType){
+            super(combinedId);
+            this.spawnedType = spawnedType;
+        }
+
+        @Override
+        public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            super.applyBlock(blockChangeTask, location, BlockType.SPAWNER, spawnedType);
+        }
+    }
+
     public static SchematicBlock of(int combinedId){
         return new SchematicBlock(combinedId);
     }
@@ -142,6 +158,10 @@ public class SchematicBlock {
 
     public static SchematicSign of(int combinedId, String[] lines){
         return new SchematicSign(combinedId, lines);
+    }
+
+    public static SchematicSpawner of(int combinedId, EntityType entityType){
+        return new SchematicSpawner(combinedId, entityType);
     }
 
 }

@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -32,5 +33,7 @@ public interface NMSBlocks {
     void setTileEntitySkull(Object tileEntitySkull, SkullType skullType, BlockFace rotation, String owner);
 
     void setTileEntitySign(Object tileEntitySign, String[] lines);
+
+    void setTileEntityMobSpawner(Object tileEntityMobSpawner, EntityType spawnedType);
 
 }

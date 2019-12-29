@@ -32,6 +32,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
@@ -176,8 +177,12 @@ public final class SchematicsHandler implements SchematicManager {
                         }
                         else if(block.getState() instanceof Skull){
                             tagBuilder.applySkull((Skull) block.getState());
-                        }else if(block.getState() instanceof Sign){
+                        }
+                        else if(block.getState() instanceof Sign){
                             tagBuilder.applySign((Sign) block.getState());
+                        }
+                        else if(block.getState() instanceof CreatureSpawner){
+                            tagBuilder.applySpawner((CreatureSpawner) block.getState());
                         }
 
                         blocks.add(tagBuilder.build());

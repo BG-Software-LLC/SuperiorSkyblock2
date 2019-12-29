@@ -124,6 +124,13 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     );
                 }
 
+                else if(compoundValue.containsKey("spawnedType")){
+                    blocks[x][y][z] = SchematicBlock.of(
+                            combinedId,
+                            getOrValue(EntityType.class, ((StringTag) compoundValue.get("spawnedType")).getValue(), EntityType.PIG)
+                    );
+                }
+
                 else{
                     blocks[x][y][z] = SchematicBlock.of(combinedId);
                 }
@@ -203,10 +210,14 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     private <T extends Enum<T>> T getOrNull(Class<T> enumType, String name){
+        return getOrValue(enumType, name, null);
+    }
+
+    private <T extends Enum<T>> T getOrValue(Class<T> enumType, String name, T value){
         try {
             return Enum.valueOf(enumType, name);
         }catch(IllegalArgumentException ex){
-            return null;
+            return value;
         }
     }
 
