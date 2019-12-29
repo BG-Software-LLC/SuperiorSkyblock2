@@ -8,6 +8,8 @@ import org.bukkit.command.ConsoleCommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("all")
 public class HandlerLoadException extends Exception {
@@ -45,6 +47,8 @@ public class HandlerLoadException extends Exception {
         StringWriter stackTrace = new StringWriter();
         super.printStackTrace(new PrintWriter(stackTrace));
 
+        List<String> messageLines = Arrays.asList(getMessage().split("\n"));
+
         ConsoleCommandSender sender = Bukkit.getConsoleSender();
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "##                                            ##");
@@ -53,19 +57,24 @@ public class HandlerLoadException extends Exception {
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
         sender.sendMessage("[SuperiorSkyblock2] ");
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "Error:");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + getMessage());
+        messageLines.forEach(line -> sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + line));
         sender.sendMessage("[SuperiorSkyblock2] ");
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "StackTrace:");
 
-        boolean firstLine = true;
+        int linesCounter = 0;
 
         for(String stackTraceLine : stackTrace.toString().split("\n")) {
-            if(!firstLine) {
-                sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + stackTraceLine);
-            }else{
-                firstLine = false;
+            if(linesCounter > messageLines.size()) {
+                if(!messageLines.contains(stackTraceLine)) {
+                    sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + stackTraceLine);
+                }
+            }else {
+                linesCounter++;
             }
         }
+
+        sender.sendMessage("[SuperiorSkyblock2] ");
+        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
     }
 
     public static boolean handle(HandlerLoadException ex){

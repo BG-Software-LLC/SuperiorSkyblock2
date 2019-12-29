@@ -22,17 +22,36 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler {
 
-    public SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
+    private final DatabaseType database;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public DataHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
+        this.database = DatabaseType.fromName(plugin.getSettings().databaseType);
 
-        try {
-            SQLHelper.init(new File(plugin.getDataFolder(), "database.db"));
-            loadDatabase();
-        }catch(Exception ex){
-            throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        if(database == DatabaseType.SQLite){
+            try {
+                File file = new File(plugin.getDataFolder(), "database.db");
+                if (!file.exists()) {
+                    try {
+                        file.getParentFile().mkdirs();
+                        file.createNewFile();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        return;
+                    }
+                }
+            }catch(Exception ex){
+                throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+            }
         }
+
+        if(!SQLHelper.createConnection(plugin)){
+            throw new HandlerLoadException("Couldn't connect to the database.\nMake sure all information is correct.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
+
+        loadDatabase();
     }
 
     public void saveDatabase(boolean async) {
@@ -54,61 +73,61 @@ public final class DataHandler {
     public void loadDatabase(){
         //Creating default islands table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS islands (" +
-                "owner VARCHAR PRIMARY KEY, " +
-                "center VARCHAR, " +
-                "teleportLocation VARCHAR, " +
-                "members VARCHAR, " +
-                "banned VARCHAR, " +
-                "permissionNodes VARCHAR, " +
-                "upgrades VARCHAR, " +
-                "warps VARCHAR, " +
-                "islandBank VARCHAR, " +
-                "islandSize INTEGER, " +
-                "blockLimits VARCHAR, " +
-                "teamLimit INTEGER, " +
-                "cropGrowth DECIMAL, " +
-                "spawnerRates DECIMAL," +
-                "mobDrops DECIMAL, " +
-                "discord VARCHAR, " +
-                "paypal VARCHAR, " +
-                "warpsLimit INTEGER, " +
-                "bonusWorth VARCHAR, " +
+                "owner VARCHAR(36) PRIMARY KEY, " +
+                "center TEXT, " +
+                "teleportLocation TEXT, " +
+                "members TEXT, " +
+                "banned TEXT, " +
+                "permissionNodes TEXT, " +
+                "upgrades TEXT, " +
+                "warps TEXT, " +
+                "islandBank TEXT, " +
+                "islandSize INTEGER(5), " +
+                "blockLimits TEXT, " +
+                "teamLimit INTEGER(5), " +
+                "cropGrowth DECIMAL(65), " +
+                "spawnerRates DECIMAL(65)," +
+                "mobDrops DECIMAL(65), " +
+                "discord TEXT, " +
+                "paypal TEXT, " +
+                "warpsLimit INTEGER(5), " +
+                "bonusWorth TEXT, " +
                 "locked BOOLEAN, " +
-                "blockCounts VARCHAR, " +
-                "name VARCHAR, " +
-                "visitorsLocation VARCHAR," +
-                "description VARCHAR," +
-                "ratings VARCHAR," +
-                "missions VARCHAR," +
-                "settings VARCHAR," +
-                "ignored BOOLEAN," +
-                "generator VARCHAR," +
-                "generatedSchematics VARCHAR," +
-                "schemName VARCHAR" +
+                "blockCounts TEXT, " +
+                "name TEXT, " +
+                "visitorsLocation TEXT, " +
+                "description TEXT, " +
+                "ratings TEXT, " +
+                "missions TEXT, " +
+                "settings TEXT, " +
+                "ignored BOOLEAN, " +
+                "generator TEXT, " +
+                "generatedSchematics TEXT, " +
+                "schemName TEXT" +
                 ");");
 
         //Creating default players table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS players (" +
-                "player VARCHAR PRIMARY KEY, " +
-                "teamLeader VARCHAR, " +
-                "name VARCHAR, " +
-                "islandRole VARCHAR, " +
-                "textureValue VARCHAR, " +
-                "disbands INTEGER," +
+                "player VARCHAR(36) PRIMARY KEY, " +
+                "teamLeader VARCHAR(36), " +
+                "name TEXT, " +
+                "islandRole TEXT, " +
+                "textureValue TEXT, " +
+                "disbands INTEGER(5), " +
                 "toggledPanel BOOLEAN," +
                 "islandFly BOOLEAN," +
-                "borderColor VARCHAR," +
-                "lastTimeStatus VARCHAR," +
-                "missions VARCHAR," +
-                "language VARCHAR" +
+                "borderColor TEXT," +
+                "lastTimeStatus TEXT," +
+                "missions TEXT," +
+                "language TEXT" +
                 ");");
 
         //Creating default grid table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS grid (" +
-                "lastIsland VARCHAR, " +
-                "stackedBlocks VARCHAR, " +
-                "maxIslandSize INTEGER, " +
-                "world VARCHAR" +
+                "lastIsland TEXT, " +
+                "stackedBlocks TEXT, " +
+                "maxIslandSize INTEGER(5), " +
+                "world TEXT" +
                 ");");
 
         if(!containsGrid())
@@ -116,34 +135,34 @@ public final class DataHandler {
 
         //Creating default stacked-blocks table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS stackedBlocks (" +
-                "world VARCHAR, " +
-                "x INTEGER, " +
-                "y INTEGER, " +
-                "z INTEGER, " +
-                "amount INTEGER" +
+                "world TEXT, " +
+                "x INTEGER(10), " +
+                "y INTEGER(3), " +
+                "z INTEGER(10), " +
+                "amount TEXT" +
                 ");");
 
-        addColumnIfNotExists("bonusWorth", "islands", "'0'", "VARCHAR");
-        addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
-        addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
-        addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("blockCounts", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("name", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("borderColor", "players", "'BLUE'", "VARCHAR");
-        addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "VARCHAR");
-        addColumnIfNotExists("visitorsLocation", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("description", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("ratings", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("missions", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("missions", "players", "''", "VARCHAR");
-        addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
-        addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
-        addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "VARCHAR");
-        addColumnIfNotExists("schemName", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("language", "players", "'en-US'", "VARCHAR");
+        addColumnIfNotExists("bonusWorth", "warpsLimit", "islands", "'0'", "VARCHAR");
+        addColumnIfNotExists("warpsLimit", "paypal", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
+        addColumnIfNotExists("disbands", "textureValue", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
+        addColumnIfNotExists("locked", "bonusWorth", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("blockCounts", "locked", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("toggledPanel", "disbands", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("islandFly", "toggledPanel", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("name", "blockCounts", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("borderColor", "islandFly", "players", "'BLUE'", "VARCHAR");
+        addColumnIfNotExists("lastTimeStatus", "borderColor", "players", "'-1'", "VARCHAR");
+        addColumnIfNotExists("visitorsLocation", "name", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("description", "visitorsLocation", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("ratings", "description", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("missions", "ratings", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("missions", "lastTimeStatus", "players", "''", "VARCHAR");
+        addColumnIfNotExists("settings", "missions", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
+        addColumnIfNotExists("ignored", "ignored", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("generator", "ignored", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
+        addColumnIfNotExists("generatedSchematics", "generator", "islands", "'normal'", "VARCHAR");
+        addColumnIfNotExists("schemName", "generatedSchematics", "islands", "''", "VARCHAR");
+        addColumnIfNotExists("language", "missions", "players", "'en-US'", "VARCHAR");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -272,13 +291,27 @@ public final class DataHandler {
         return SQLHelper.doesConditionExist("SELECT * FROM grid;");
     }
 
-    private void addColumnIfNotExists(String column, String table, String def, String type) {
+    private void addColumnIfNotExists(String column, String columnBefore, String table, String def, String type) {
+        if(database == DatabaseType.MySQL)
+            type = type + " AFTER " + columnBefore;
+
         try(PreparedStatement statement = SQLHelper.buildStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT " + def + ";")){
             statement.executeUpdate();
         }catch(SQLException ex){
             if(!ex.getMessage().contains("duplicate"))
                 ex.printStackTrace();
         }
+    }
+
+    private enum DatabaseType{
+
+        MySQL,
+        SQLite;
+
+        private static DatabaseType fromName(String name){
+            return name.equalsIgnoreCase("MySQL") ? MySQL : SQLite;
+        }
+
     }
 
 }

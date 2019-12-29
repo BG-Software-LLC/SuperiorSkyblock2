@@ -25,6 +25,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public final class SettingsHandler {
 
+    public final String databaseType;
+    public final String databaseMySQLAddress;
+    public final int databaseMySQLPort;
+    public final String databaseMySQLDBName;
+    public final String databaseMySQLUsername;
+    public final String databaseMySQLPassword;
     public final int maxIslandSize;
     public final String islandCommand;
     public final int defaultIslandSize;
@@ -101,6 +107,13 @@ public final class SettingsHandler {
         convertInteractables(plugin, cfg);
 
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown");
+
+        databaseType = cfg.getString("database.type");
+        databaseMySQLAddress = cfg.getString("database.address");
+        databaseMySQLPort = cfg.getInt("database.port");
+        databaseMySQLDBName = cfg.getString("database.db-name");
+        databaseMySQLUsername = cfg.getString("database.user-name");
+        databaseMySQLPassword = cfg.getString("database.password");
 
         calcInterval = cfg.getLong("calc-interval", 6000);
         islandCommand = cfg.getString("island-command", "island,is,islands");

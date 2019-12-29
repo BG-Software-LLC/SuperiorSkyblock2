@@ -10,6 +10,17 @@
 # It's recommended to set the task to a high interval, as it might cause lag.
 calc-interval: 6000
 
+# All settings related to the database of the plugin.
+database:
+  # Choose between SQLite (localhost database) and MySQL (remote database)
+  type: SQLite
+  # MySQL database information
+  address: 'localhost'
+  port: 3306
+  db-name: 'SuperiorSkyblock'
+  user-name: 'root'
+  password: 'root'
+
 # Set the main command of the plugin.
 # You can add aliases by adding "," after the command name, and split them using ",".
 # You must have a full restart in order to apply changes for the command.
