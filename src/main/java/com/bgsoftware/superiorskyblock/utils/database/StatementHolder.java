@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.database;
+package com.bgsoftware.superiorskyblock.utils.database;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StatementHolder {
+public final class StatementHolder {
 
     private final String query;
     private final Map<Integer, Object> values = new HashMap<>();

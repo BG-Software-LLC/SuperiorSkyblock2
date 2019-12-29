@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.database;
+package com.bgsoftware.superiorskyblock.utils.database;
 
 public abstract class DatabaseObject {
 

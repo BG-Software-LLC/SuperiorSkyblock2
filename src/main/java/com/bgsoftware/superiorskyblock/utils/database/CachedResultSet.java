@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.database;
+package com.bgsoftware.superiorskyblock.utils.database;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

@@ -11,9 +11,9 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
-import com.bgsoftware.superiorskyblock.database.CachedResultSet;
-import com.bgsoftware.superiorskyblock.database.DatabaseObject;
-import com.bgsoftware.superiorskyblock.database.Query;
+import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
+import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
+import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.database;
+package com.bgsoftware.superiorskyblock.utils.database;
 
 import java.io.File;
 import java.sql.Connection;
@@ -7,7 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SQLHelper {
+public final class SQLHelper {
 
     private static Connection conn;
 
