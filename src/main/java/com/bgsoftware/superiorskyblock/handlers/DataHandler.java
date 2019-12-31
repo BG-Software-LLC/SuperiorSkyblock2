@@ -82,15 +82,15 @@ public final class DataHandler {
                 "upgrades TEXT, " +
                 "warps TEXT, " +
                 "islandBank TEXT, " +
-                "islandSize INTEGER(5), " +
+                "islandSize INTEGER, " +
                 "blockLimits TEXT, " +
-                "teamLimit INTEGER(5), " +
-                "cropGrowth DECIMAL(65), " +
-                "spawnerRates DECIMAL(65)," +
-                "mobDrops DECIMAL(65), " +
+                "teamLimit INTEGER, " +
+                "cropGrowth DECIMAL, " +
+                "spawnerRates DECIMAL," +
+                "mobDrops DECIMAL, " +
                 "discord TEXT, " +
                 "paypal TEXT, " +
-                "warpsLimit INTEGER(5), " +
+                "warpsLimit INTEGER, " +
                 "bonusWorth TEXT, " +
                 "locked BOOLEAN, " +
                 "blockCounts TEXT, " +
@@ -113,7 +113,7 @@ public final class DataHandler {
                 "name TEXT, " +
                 "islandRole TEXT, " +
                 "textureValue TEXT, " +
-                "disbands INTEGER(5), " +
+                "disbands INTEGER, " +
                 "toggledPanel BOOLEAN," +
                 "islandFly BOOLEAN," +
                 "borderColor TEXT," +
@@ -126,7 +126,7 @@ public final class DataHandler {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS grid (" +
                 "lastIsland TEXT, " +
                 "stackedBlocks TEXT, " +
-                "maxIslandSize INTEGER(5), " +
+                "maxIslandSize INTEGER, " +
                 "world TEXT" +
                 ");");
 
@@ -136,33 +136,33 @@ public final class DataHandler {
         //Creating default stacked-blocks table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS stackedBlocks (" +
                 "world TEXT, " +
-                "x INTEGER(10), " +
-                "y INTEGER(3), " +
-                "z INTEGER(10), " +
+                "x INTEGER, " +
+                "y INTEGER, " +
+                "z INTEGER, " +
                 "amount TEXT" +
                 ");");
 
-        addColumnIfNotExists("bonusWorth", "warpsLimit", "islands", "'0'", "VARCHAR");
-        addColumnIfNotExists("warpsLimit", "paypal", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
-        addColumnIfNotExists("disbands", "textureValue", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
-        addColumnIfNotExists("locked", "bonusWorth", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("blockCounts", "locked", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("toggledPanel", "disbands", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("islandFly", "toggledPanel", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("name", "blockCounts", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("borderColor", "islandFly", "players", "'BLUE'", "VARCHAR");
-        addColumnIfNotExists("lastTimeStatus", "borderColor", "players", "'-1'", "VARCHAR");
-        addColumnIfNotExists("visitorsLocation", "name", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("description", "visitorsLocation", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("ratings", "description", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("missions", "ratings", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("missions", "lastTimeStatus", "players", "''", "VARCHAR");
-        addColumnIfNotExists("settings", "missions", "islands", "'" + getDefaultSettings() + "'", "VARCHAR");
-        addColumnIfNotExists("ignored", "ignored", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("generator", "ignored", "islands", "'" + getDefaultGenerator() + "'", "VARCHAR");
-        addColumnIfNotExists("generatedSchematics", "generator", "islands", "'normal'", "VARCHAR");
-        addColumnIfNotExists("schemName", "generatedSchematics", "islands", "''", "VARCHAR");
-        addColumnIfNotExists("language", "missions", "players", "'en-US'", "VARCHAR");
+        addColumnIfNotExists("bonusWorth", "islands", "'0'", "TEXT");
+        addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
+        addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
+        addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("blockCounts", "islands", "''", "TEXT");
+        addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("name", "islands", "''", "TEXT");
+        addColumnIfNotExists("borderColor", "players", "'BLUE'", "TEXT");
+        addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "TEXT");
+        addColumnIfNotExists("visitorsLocation", "islands", "''", "TEXT");
+        addColumnIfNotExists("description", "islands", "''", "TEXT");
+        addColumnIfNotExists("ratings", "islands", "''", "TEXT");
+        addColumnIfNotExists("missions", "islands", "''", "TEXT");
+        addColumnIfNotExists("missions", "players", "''", "TEXT");
+        addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "TEXT");
+        addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
+        addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "TEXT");
+        addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "TEXT");
+        addColumnIfNotExists("schemName", "islands", "''", "TEXT");
+        addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -291,15 +291,24 @@ public final class DataHandler {
         return SQLHelper.doesConditionExist("SELECT * FROM grid;");
     }
 
-    private void addColumnIfNotExists(String column, String columnBefore, String table, String def, String type) {
-        if(database == DatabaseType.MySQL)
-            type = type + " AFTER " + columnBefore;
+    private void addColumnIfNotExists(String column, String table, String def, String type) {
+        String defaultSection = " DEFAULT " + def;
 
-        try(PreparedStatement statement = SQLHelper.buildStatement("ALTER TABLE " + table + " ADD " + column + " " + type + " DEFAULT " + def + ";")){
+        if(database == DatabaseType.MySQL) {
+            column = "COLUMN " + column;
+            if(type.equals("TEXT"))
+                defaultSection = "";
+        }
+
+        String statementStr = "ALTER TABLE " + table + " ADD " + column + " " + type + defaultSection + ";";
+
+        try(PreparedStatement statement = SQLHelper.buildStatement(statementStr)){
             statement.executeUpdate();
         }catch(SQLException ex){
-            if(!ex.getMessage().contains("duplicate"))
+            if(!ex.getMessage().toLowerCase().contains("duplicate")) {
+                System.out.println("Statement: " + statementStr);
                 ex.printStackTrace();
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.database;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -18,14 +19,33 @@ public final class CachedResultSet {
     }
 
     public int getInt(String key){
-        return (int) cache.get(key);
+        Object object = cache.get(key);
+
+        if(object instanceof String)
+            return Integer.parseInt((String) object);
+        else if(object instanceof Integer)
+            return (int) object;
+        else if(object instanceof Boolean)
+            return (Boolean) object ? 1 : 0;
+        else if(object instanceof BigDecimal)
+            return ((BigDecimal) object).intValue();
+
+        throw new IllegalArgumentException("Invalid type " + object.getClass());
     }
 
     public long getLong(String key){
-        if(cache.get(key) instanceof String)
-            return Long.parseLong((String) cache.get(key));
-        else
-            return (long) cache.get(key);
+        Object object = cache.get(key);
+
+        if(object instanceof String)
+            return Long.parseLong((String) object);
+        else if(object instanceof Integer)
+            return (long) (int) object;
+        else if(object instanceof Boolean)
+            return (Boolean) object ? 1L : 0L;
+        else if(object instanceof BigDecimal)
+            return ((BigDecimal) object).longValue();
+
+        throw new IllegalArgumentException("Invalid type " + object.getClass());
     }
 
     public String getString(String key){
@@ -33,11 +53,22 @@ public final class CachedResultSet {
     }
 
     public double getDouble(String key){
-        return cache.get(key) instanceof Integer ? getInt(key) : cache.get(key) instanceof Long ? getLong(key) : (double) cache.get(key);
+        Object object = cache.get(key);
+
+        if(object instanceof String)
+            return Double.parseDouble((String) object);
+        else if(object instanceof Integer)
+            return (double) (int) object;
+        else if(object instanceof Boolean)
+            return (Boolean) object ? 1D : 0D;
+        else if(object instanceof BigDecimal)
+            return ((BigDecimal) object).doubleValue();
+
+        throw new IllegalArgumentException("Invalid type " + object.getClass());
     }
 
     public boolean getBoolean(String key){
-        return getInt(key) != 0;
+        return cache.get(key) instanceof Boolean ? Boolean.parseBoolean(cache.get(key).toString()) : getInt(key) != 0;
     }
 
 }
