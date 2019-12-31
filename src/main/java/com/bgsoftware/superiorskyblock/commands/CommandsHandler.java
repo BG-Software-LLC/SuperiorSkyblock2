@@ -64,6 +64,7 @@ public final class CommandsHandler extends BukkitCommand {
         register(new CmdKick());
         register(new CmdLang());
         register(new CmdLeave());
+        register(new CmdMembers());
         register(new CmdMission());
         register(new CmdMissions());
         register(new CmdName());
@@ -93,6 +94,7 @@ public final class CommandsHandler extends BukkitCommand {
         register(new CmdUpgrade());
         register(new CmdValue());
         register(new CmdVisit());
+        register(new CmdVisitors());
         register(new CmdWarp());
         register(new CmdWarps());
         register(new CmdWithdraw());

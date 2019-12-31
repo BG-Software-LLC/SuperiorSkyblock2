@@ -158,6 +158,7 @@ COMMAND_DESCRIPTION_INVITE: ךלש יאה לא ןקחש ןימזהל.
 COMMAND_DESCRIPTION_KICK: יאהמ ןקחש ףיעהל.
 COMMAND_DESCRIPTION_LANG: ךלש הפשה תא ףילחהל.
 COMMAND_DESCRIPTION_LEAVE: יאה תא בוזעל.
+COMMAND_DESCRIPTION_MEMBERS: םינקחשה טירפת תא חותפל.
 COMMAND_DESCRIPTION_MISSION: המישמ םילשהל.
 COMMAND_DESCRIPTION_MISSIONS: תומישמה טירפת תא חותפל.
 COMMAND_DESCRIPTION_NAME: יאה םש תא תונשל.
@@ -187,6 +188,7 @@ COMMAND_DESCRIPTION_UNCOOP: יאה לש הלועפ ףתשמ תויהלמ ןקח�
 COMMAND_DESCRIPTION_UPGRADE: םיגורדשה טירפת תא חותפל.
 COMMAND_DESCRIPTION_VALUE: קולב לש יווש גיצהל.
 COMMAND_DESCRIPTION_VISIT: יאה לש םירקבמה תדוקנל רגתשהל.
+COMMAND_DESCRIPTION_VISITORS: םירקבמה טירפת תא חותפל.
 COMMAND_DESCRIPTION_WARP: יאב םוקימל רגתשהל.
 COMMAND_DESCRIPTION_WARPS: םימוקימה טירפת תא חותפל.
 COMMAND_DESCRIPTION_WITHDRAW: ךלש יטרפה ןובשחל יאה קנבמ ףסכ ךושמל.
