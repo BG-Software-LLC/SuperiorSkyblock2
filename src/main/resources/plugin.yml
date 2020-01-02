@@ -12,7 +12,6 @@ permissions:
     children:
       superior.island.*:
         description: Permission for all island commands
-        default: true
         children:
           superior.island.accept:
             description: Accept an invitation from a player.
