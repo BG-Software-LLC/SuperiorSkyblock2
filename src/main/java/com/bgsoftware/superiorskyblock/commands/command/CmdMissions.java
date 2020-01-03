@@ -59,10 +59,10 @@ public final class CmdMissions implements ICommand {
 
         if(args.length == 2){
             if(args[1].equalsIgnoreCase("island")){
-                MenuIslandMissions.openInventory(superiorPlayer, 1, null);
+                MenuIslandMissions.openInventory(superiorPlayer, null);
             }
             else if(args[1].equalsIgnoreCase("player")){
-                MenuPlayerMissions.openInventory(superiorPlayer, 1, null);
+                MenuPlayerMissions.openInventory(superiorPlayer, null);
             }
         }
 

@@ -22,11 +22,11 @@ public final class MenuMissions extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         if(e.getRawSlot() == playerSlot){
             previousMove = false;
-            MenuPlayerMissions.openInventory(superiorPlayer, 1, this);
+            MenuPlayerMissions.openInventory(superiorPlayer, this);
         }
         else if(e.getRawSlot() == islandSlot){
             previousMove = false;
-            MenuIslandMissions.openInventory(superiorPlayer, 1, this);
+            MenuIslandMissions.openInventory(superiorPlayer, this);
         }
     }
 

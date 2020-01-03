@@ -101,9 +101,9 @@ public final class MenusHandler implements MenusManager {
     @Override
     public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
         if(islandMissions)
-            MenuIslandMissions.openInventory(superiorPlayer, 1, null);
+            MenuIslandMissions.openInventory(superiorPlayer, null);
         else
-            MenuPlayerMissions.openInventory(superiorPlayer, 1, null);
+            MenuPlayerMissions.openInventory(superiorPlayer, null);
     }
 
     @Override

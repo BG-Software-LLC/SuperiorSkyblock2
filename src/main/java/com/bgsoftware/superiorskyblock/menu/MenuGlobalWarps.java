@@ -6,10 +6,8 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -19,99 +17,41 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class MenuGlobalWarps extends SuperiorMenu {
+public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
-    private static int previousSlot, currentSlot, nextSlot;
-    private static List<Integer> slots;
     private static boolean visitorWarps;
 
-    private int currentPage;
-
-    private MenuGlobalWarps(SuperiorPlayer superiorPlayer, int currentPage){
+    private MenuGlobalWarps(SuperiorPlayer superiorPlayer){
         super("menuGlobalWarps", superiorPlayer);
-        this.currentPage = currentPage;
     }
 
     @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
-            if(e.getRawSlot() == currentSlot)
-                return;
-
-            int islandsSize = (int) plugin.getGrid().getIslands().stream()
-                    .filter(island -> !island.getAllWarps().isEmpty()).count();
-
-            boolean nextPage = slots.size() * currentPage < islandsSize;
-
-            if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
-                return;
-
-            currentPage = e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1;
-
-            previousMove = false;
-            open(previousMenu);
+    protected void onPlayerClick(InventoryClickEvent event, Island island) {
+        if(visitorWarps){
+            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "is visit " + island.getOwner().getName());
         }
-
         else{
-            if(e.getCurrentItem() == null)
-                return;
-
-            List<Island> islands = getFilteredIslands(superiorPlayer)
-                    .sorted(SortingComparators.WORTH_COMPARATOR)
-                    .collect(Collectors.toList());
-
-            int indexOf = slots.indexOf(e.getRawSlot());
-
-            if(indexOf >= islands.size() || indexOf == -1)
-                return;
-
-            Island island = islands.get(indexOf);
-
-            if(visitorWarps){
-                Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "is visit " + island.getOwner().getName());
-            }
-            else{
-                MenuWarps.openInventory(superiorPlayer, this, island);
-            }
+            MenuWarps.openInventory(superiorPlayer, this, island);
         }
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inventory = super.getInventory();
+    protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
+        return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
+                .replaceAll("{0}", island.getOwner().getName())
+                .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
+                .replaceAll("{2}", island.getAllWarps().size() + "").build(superiorPlayer);
+    }
 
-        List<Island> islands = getFilteredIslands(superiorPlayer)
+    @Override
+    protected List<Island> requestObjects() {
+        return getFilteredIslands(superiorPlayer)
                 .sorted(SortingComparators.WORTH_COMPARATOR)
                 .collect(Collectors.toList());
-
-        for(int i = 0; i < slots.size(); i++){
-            int islandIndex = i + (slots.size() * (currentPage - 1));
-            if(islandIndex < islands.size()) {
-                Island island = islands.get(islandIndex);
-                inventory.setItem(slots.get(i), new ItemBuilder(inventory.getItem(slots.get(i))).asSkullOf(island.getOwner())
-                        .replaceAll("{0}", island.getOwner().getName())
-                        .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                        .replaceAll("{2}", island.getAllWarps().size() + "").build(superiorPlayer));
-            }
-            else{
-                inventory.setItem(slots.get(i), new ItemStack(Material.AIR));
-            }
-        }
-
-        inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
-                .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
-
-        inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
-                .replaceAll("{0}", currentPage + "").build(superiorPlayer));
-
-        inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
-                .replaceAll("{0}", (islands.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
-
-        return inventory;
     }
 
     public static void init(){
-        MenuGlobalWarps menuGlobalWarps = new MenuGlobalWarps(null, 1);
+        MenuGlobalWarps menuGlobalWarps = new MenuGlobalWarps(null);
 
         File file = new File(plugin.getDataFolder(), "menus/global-warps.yml");
 
@@ -122,21 +62,16 @@ public final class MenuGlobalWarps extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
 
-        previousSlot = charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0);
-        currentSlot = charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0);
-        nextSlot = charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0);
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        slots = charSlots.getOrDefault(cfg.getString("warps", "@").charAt(0), Collections.singletonList(-1));
-        slots.sort(Integer::compareTo);
+        menuGlobalWarps.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setSlots(charSlots.getOrDefault(cfg.getString("warps", "@").charAt(0), Collections.singletonList(-1)));
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
-        openInventory(superiorPlayer, 1, previousMenu);
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, int currentPage, SuperiorMenu previousMenu){
-        new MenuGlobalWarps(superiorPlayer, currentPage).open(previousMenu);
+        new MenuGlobalWarps(superiorPlayer).open(previousMenu);
     }
 
     public static void refreshMenus(){
