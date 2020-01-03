@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -92,6 +93,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private final SyncedObject<PriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new PriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
     private final SyncedObject<PriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final SyncedObject<PriorityQueue<SuperiorPlayer>> uniqueVisitors = SyncedObject.of(new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
     private final SyncedObject<Set<SuperiorPlayer>> banned = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
@@ -138,8 +140,8 @@ public final class SIsland extends DatabaseObject implements Island {
         this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
 
         IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
-        IslandDeserializer.deserializeMembers(resultSet.getString("members"), this.members);
-        IslandDeserializer.deserializeBanned(resultSet.getString("banned"), this.banned);
+        IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
+        IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
         IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.permissionNodes);
         IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
         IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
@@ -149,6 +151,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
         IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGenerator);
+        IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -237,6 +240,11 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
         return playersInside.run((Function<PriorityQueue<SuperiorPlayer>, ArrayList<SuperiorPlayer>>) ArrayList::new);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getUniqueVisitors() {
+        return uniqueVisitors.run((Function<PriorityQueue<SuperiorPlayer>, ArrayList<SuperiorPlayer>>) ArrayList::new);
     }
 
     @Override
@@ -381,6 +389,26 @@ public final class SIsland extends DatabaseObject implements Island {
             else
                 playersInside.remove(superiorPlayer);
         });
+
+        if(inside && !isMember(superiorPlayer)){
+            boolean newVisitor = uniqueVisitors.run(uniqueVisitors -> {
+                if(!uniqueVisitors.contains(superiorPlayer)){
+                    uniqueVisitors.add(superiorPlayer);
+                    return true;
+                }
+
+                return false;
+            });
+
+            if(newVisitor){
+                Query.ISLAND_SET_VISITORS.getStatementHolder()
+                        .setString(IslandSerializer.serializePlayers(uniqueVisitors))
+                        .setString(owner.getUniqueId().toString())
+                        .execute(true);
+
+                MenuUniqueVisitors.refreshMenus();
+            }
+        }
 
         MenuVisitors.refreshMenus();
     }
@@ -1827,6 +1855,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .setString(generatedSchematics.get())
                 .setString(schemName.get())
+                .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -1872,6 +1901,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
                 .setString(generatedSchematics.get())
                 .setString(schemName.get())
+                .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .execute(async);
     }
 

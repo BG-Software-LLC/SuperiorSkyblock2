@@ -364,6 +364,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lNâng cấp | &7{0}s:
   {1}
+ISLAND_INFO_VISITORS_COUNT: '&e&lIsland | &7Visitors Count: {0}'
 ISLAND_INFO_WORTH: '&e&lĐảo Thần | &7Đáng giá: {0}'
 ISLAND_OPENED: '&e&lĐảo Thần | &7Mở đảo thành công cho công cộng.'
 ISLAND_PROTECTED: '&c&lLỗi | &7Hòn đảo này được bảo vệ.'

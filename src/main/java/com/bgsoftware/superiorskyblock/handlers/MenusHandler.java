@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuPlayerLanguage;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
@@ -52,6 +53,7 @@ public final class MenusHandler implements MenusManager {
             MenuPlayerMissions.init();
             MenuSettings.init();
             MenuTopIslands.init();
+            MenuUniqueVisitors.init();
             MenuUpgrades.init();
             MenuValues.init();
             MenuVisitors.init();

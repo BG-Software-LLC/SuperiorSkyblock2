@@ -322,6 +322,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lיא | &7{0}s:
   {1}
+ISLAND_INFO_VISITORS_COUNT: '&e&lיא | &7םירקבמ רפסמ: {0}'
 ISLAND_INFO_WORTH: '&e&lיא | &7יווש: {0}'
 ISLAND_OPENED: '&e&lיא | &7החלצהב רוביצל חתפנ יאה.'
 ISLAND_PROTECTED: '&e&lהאיגש | &7ןגומ הזה יאה.'

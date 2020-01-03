@@ -5,25 +5,25 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Visitors'
+title: '&lIsland Visitors ({0})'
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
-  - '$ $ $ $ ~ $ $ $ $'
+  - '$ $ $ $ $ $ $ $ $'
   - '# # % # * # ^ # #'
 
 slots: '@'
 previous-page: '%'
 current-page: '*'
 next-page: '^'
-unique-visitors: '~'
 
 items:
   '@':
-    type: PLAYER_HEAD
+    type: SKULL_ITEM
+    data: 3
     name: '&e{0}'
     lore:
       - '&7Island Owner: {1}'
@@ -31,20 +31,16 @@ items:
     type: PAPER
     name: '{0}Previous Page'
   '*':
-    type: SUNFLOWER
+    type: DOUBLE_PLANT
     name: '&aCurrent Page'
     lore:
       - '&7Page {0}'
   '^':
     type: PAPER
     name: '{0}Next Page'
-  '~':
-    type: SKELETON_SKULL
-    name: '&eUnique Visitors'
-    lore:
-      - '&7Click to open all-time visitors menu.'
   '$':
-    type: BLACK_STAINED_GLASS_PANE
+    type: STAINED_GLASS_PANE
+    data: 15
     name: '&f'
 
 sounds:

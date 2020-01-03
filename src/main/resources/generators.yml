@@ -1,0 +1,13 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# A list of interactable blocks.
+# Only interactable blocks & stacked blocks will be blocked from being interacted.
+generators:
+  default_generator:
+    '1':
+      -

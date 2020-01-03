@@ -30,8 +30,9 @@ public enum Query {
     ISLAND_SET_IGNORED("UPDATE islands SET ignored=? WHERE owner=?;"),
     ISLAND_SET_GENERATOR("UPDATE islands SET generator=? WHERE owner=?;"),
     ISLAND_SET_GENERATED_SCHEMATICS("UPDATE islands SET generatedSchematics=? WHERE owner=?;"),
-    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,settings=?,ignored=?generator=?,generatedSchematics=?,schemName=? WHERE owner=?;"),
-    ISLAND_INSERT("INSERT INTO islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored,generator,generatedSchematics,schemName) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_SET_VISITORS("UPDATE islands SET uniqueVisitors=? WHERE owner=?;"),
+    ISLAND_UPDATE("UPDATE islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,settings=?,ignored=?generator=?,generatedSchematics=?,schemName=?,uniqueVisitors=? WHERE owner=?;"),
+    ISLAND_INSERT("INSERT INTO islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored,generator,generatedSchematics,schemName,uniqueVisitors) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE players SET teamLeader=? WHERE player=?;"),

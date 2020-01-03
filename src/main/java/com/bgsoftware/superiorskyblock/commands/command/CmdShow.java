@@ -119,6 +119,8 @@ public final class CmdShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
         if(!Locale.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPermission.PAYPAL_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
+        if(!Locale.ISLAND_INFO_VISITORS_COUNT.isEmpty(locale))
+            infoMessage.append(Locale.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitors().size())).append("\n");
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();

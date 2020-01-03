@@ -17,17 +17,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public final class MenuVisitors extends SuperiorMenu {
+public final class MenuUniqueVisitors extends SuperiorMenu {
 
-    private static int previousSlot, currentSlot, nextSlot, uniqueVisitorsSlot;
+    private static int previousSlot, currentSlot, nextSlot;
     private static List<Integer> slots = new ArrayList<>();
 
     private List<SuperiorPlayer> visitors;
     private Island island;
     private int currentPage = 1;
 
-    private MenuVisitors(SuperiorPlayer superiorPlayer, Island island){
-        super("menuVisitors", superiorPlayer);
+    private MenuUniqueVisitors(SuperiorPlayer superiorPlayer, Island island){
+        super("menuUniqueVisitors", superiorPlayer);
         this.island = island;
     }
 
@@ -35,12 +35,7 @@ public final class MenuVisitors extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         int clickedSlot = e.getRawSlot();
 
-        if(clickedSlot == uniqueVisitorsSlot){
-            previousMove = false;
-            MenuUniqueVisitors.openInventory(superiorPlayer, this, island);
-        }
-
-        else if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
+        if(clickedSlot == previousSlot || clickedSlot == nextSlot || clickedSlot == currentSlot){
             int nextPage;
 
             if(clickedSlot == previousSlot){
@@ -81,9 +76,9 @@ public final class MenuVisitors extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        Inventory inventory = super.getInventory();
+        this.visitors = island.getUniqueVisitors();
 
-        this.visitors = island.getIslandVisitors();
+        Inventory inventory = super.buildInventory(title -> title.replace("{0}", String.valueOf(visitors.size())));
 
         for(int i = 0; i < slots.size(); i++){
             int visitorsIndex = i + (slots.size() * (currentPage - 1));
@@ -121,32 +116,31 @@ public final class MenuVisitors extends SuperiorMenu {
     }
 
     public static void init(){
-        MenuVisitors menuVisitors = new MenuVisitors(null, null);
+        MenuUniqueVisitors menuUniqueVisitors = new MenuUniqueVisitors(null, null);
 
-        File file = new File(plugin.getDataFolder(), "menus/visitors.yml");
+        File file = new File(plugin.getDataFolder(), "menus/unique-visitors.yml");
 
         if(!file.exists())
-            FileUtils.saveResource("menus/visitors.yml");
+            FileUtils.saveResource("menus/unique-visitors.yml");
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUniqueVisitors, "unique-visitors.yml", cfg);
 
         previousSlot = charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0);
         currentSlot = charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0);
         nextSlot = charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0);
-        uniqueVisitorsSlot = charSlots.getOrDefault(cfg.getString("unique-visitors", "~").charAt(0), Collections.singletonList(-1)).get(0);
 
         slots = charSlots.getOrDefault(cfg.getString("slots", "@").charAt(0), Collections.singletonList(-1));
         slots.sort(Integer::compareTo);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
-        new MenuVisitors(superiorPlayer, island).open(previousMenu);
+        new MenuUniqueVisitors(superiorPlayer, island).open(previousMenu);
     }
 
     public static void refreshMenus(){
-        refreshMenus(MenuVisitors.class);
+        refreshMenus(MenuUniqueVisitors.class);
     }
 
 }

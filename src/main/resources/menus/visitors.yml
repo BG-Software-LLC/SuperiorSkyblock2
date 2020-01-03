@@ -12,13 +12,14 @@ pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
-  - '$ $ $ $ $ $ $ $ $'
+  - '$ $ $ $ ~ $ $ $ $'
   - '# # % # * # ^ # #'
 
 slots: '@'
 previous-page: '%'
 current-page: '*'
 next-page: '^'
+unique-visitors: '~'
 
 items:
   '@':
@@ -38,6 +39,11 @@ items:
   '^':
     type: PAPER
     name: '{0}Next Page'
+  '~':
+    type: SKULL_ITEM
+    name: '&eUnique Visitors'
+    lore:
+      - '&7Click to open all-time visitors menu.'
   '$':
     type: STAINED_GLASS_PANE
     data: 15

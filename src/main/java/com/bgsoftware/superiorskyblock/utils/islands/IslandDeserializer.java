@@ -30,7 +30,7 @@ public final class IslandDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public static void deserializeMembers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync){
+    public static void deserializePlayers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync){
         membersSetSync.run(membersSet -> {
             for(String uuid : members.split(",")) {
                 try {
@@ -38,10 +38,6 @@ public final class IslandDeserializer {
                 }catch(Exception ignored){}
             }
         });
-    }
-
-    public static void deserializeBanned(String banned, SyncedObject<? extends Collection<SuperiorPlayer>> bannedSet){
-        deserializeMembers(banned, bannedSet);
     }
 
     public static void deserializePermissions(String permissions, SyncedObject<Map<Object, SPermissionNode>> permissionNodesSync){

@@ -5,21 +5,20 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Visitors'
+title: '&lIsland Visitors ({0})'
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
-  - '$ $ $ $ ~ $ $ $ $'
+  - '$ $ $ $ $ $ $ $ $'
   - '# # % # * # ^ # #'
 
 slots: '@'
 previous-page: '%'
 current-page: '*'
 next-page: '^'
-unique-visitors: '~'
 
 items:
   '@':
@@ -38,11 +37,6 @@ items:
   '^':
     type: PAPER
     name: '{0}Next Page'
-  '~':
-    type: SKELETON_SKULL
-    name: '&eUnique Visitors'
-    lore:
-      - '&7Click to open all-time visitors menu.'
   '$':
     type: BLACK_STAINED_GLASS_PANE
     name: '&f'

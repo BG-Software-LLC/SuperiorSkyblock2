@@ -53,6 +53,11 @@ public interface Island extends Comparable<Island> {
     List<SuperiorPlayer> getAllPlayersInside();
 
     /**
+     * Get all the visitors that visited the island until now.
+     */
+    List<SuperiorPlayer> getUniqueVisitors();
+
+    /**
      * Invite a player to the island.
      * @param superiorPlayer The player to invite.
      */

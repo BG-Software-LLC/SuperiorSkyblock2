@@ -103,7 +103,8 @@ public final class DataHandler {
                 "ignored BOOLEAN, " +
                 "generator TEXT, " +
                 "generatedSchematics TEXT, " +
-                "schemName TEXT" +
+                "schemName TEXT, " +
+                "uniqueVisitors TEXT" +
                 ");");
 
         //Creating default players table
@@ -163,6 +164,7 @@ public final class DataHandler {
         addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "TEXT");
         addColumnIfNotExists("schemName", "islands", "''", "TEXT");
         addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
+        addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
