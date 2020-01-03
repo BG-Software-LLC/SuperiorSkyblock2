@@ -837,11 +837,20 @@ public interface Island extends Comparable<Island> {
     /**
      * Set a percentage for a specific key.
      * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     *
+     * This function sets the amount of the key using the following formula:
+     * amount = (percentage * total_amount) / (1 - percentage)
+     *
+     * If the percentage is 100, the rest of the amounts will be cleared and
+     * the material's amount will be set to 1.
+     *
+     * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
      */
     void setGeneratorPercentage(Key key, int percentage);
 
     /**
      * Get the percentage for a specific key.
+     * The formula is (amount * 100) / total_amount.
      */
     int getGeneratorPercentage(Key key);
 
@@ -849,6 +858,26 @@ public interface Island extends Comparable<Island> {
      * Get the percentages of the materials for the cobblestone generator in the island.
      */
     Map<String, Integer> getGeneratorPercentages();
+
+    /**
+     * Set an amount for a specific key.
+     */
+    void setGeneratorAmount(Key key, int amount);
+
+    /**
+     * Get the amount of a specific key.
+     */
+    int getGeneratorAmount(Key key);
+
+    /**
+     * Get the total amount of all the generator keys together.
+     */
+    int getGeneratorTotalAmount();
+
+    /**
+     * Get the amounts of the materials for the cobblestone generator in the island.
+     */
+    Map<String, Integer> getGeneratorAmounts();
 
     /*
      *  Schematic methods

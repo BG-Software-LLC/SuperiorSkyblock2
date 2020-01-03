@@ -336,7 +336,7 @@ ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lNâng cấp | &7Drops đa cấp: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lNâng cấp | &7Tỉ Lệ Máy Tạo Quặng:
   {0}
-ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng cấp | &7  {0}: {1}%'
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng cấp | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lNâng cấp | &7Kích thước bo: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lNâng cấp | &7Spawners đa cấp: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lNâng cấp | &7Giới hạn đội: {0}'

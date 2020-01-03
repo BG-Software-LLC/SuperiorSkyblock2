@@ -6,7 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -15,24 +14,38 @@ public final class GeneratorsListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockGenerate(BlockGenerateEvent e){
-        Map<String, Integer> percentageMap = e.getIsland().getGeneratorPercentages();
+        Map<String, Integer> amountMap = e.getIsland().getGeneratorAmounts();
 
-        if(percentageMap.isEmpty())
+        if(amountMap.isEmpty())
             return;
 
-        String[] cachedMaterials = new String[100];
-        Arrays.fill(cachedMaterials, "COBBLESTONE");
+        int size = e.getIsland().getGeneratorTotalAmount();
 
-        int slot = 0;
+        boolean onlyOneMaterial = amountMap.values().stream().anyMatch(i -> i == size);
 
-        for(Map.Entry<String, Integer> entry : percentageMap.entrySet()){
+        String[] cachedMaterials = new String[onlyOneMaterial ? 1 : size];
+
+        int slot;
+
+        for(Map.Entry<String, Integer> entry : amountMap.entrySet()){
             int amount = entry.getValue();
-            for(int i = 0; i < amount && slot < 100; i++){
-                cachedMaterials[slot++] = entry.getKey();
+
+            if(onlyOneMaterial){
+                cachedMaterials[0] = entry.getKey();
+            }
+            else {
+                for (slot = 0; slot < amount && slot < size; slot++) {
+                    cachedMaterials[slot] = entry.getKey();
+                }
             }
         }
 
-        e.setNewStateKey(Key.of(shuffleArray(cachedMaterials)[0]));
+        if(cachedMaterials.length == 1){
+            e.setNewStateKey(Key.of(cachedMaterials[0]));
+        }
+        else {
+            e.setNewStateKey(Key.of(shuffleArray(cachedMaterials)[0]));
+        }
     }
 
     private String[] shuffleArray(String[] array) {

@@ -214,11 +214,11 @@ DISBANDED_ISLAND_OTHER_NAME: '&e&lיא | &7{0} יאה תא תקחמ.'
 ENTER_PVP_ISLAND: '&7&oתוינש 10 כ ךשמב תוכמ לבקת אל התא .תוכמ וב תתל ןתינש יא לא תרגוש...'
 EXPELLED_PLAYER: '&e&lיא | &7יאה ןמ שרוג {0}.'
 GENERATOR_UPDATED: '&e&lיא | &7החלצהב ןכדוע {1} לש יאה לש רוטארנגב {0} רמוחה לש
-  זוחאה.'
+  תומכה.'
 GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש רוטארנגב {0} רמוחה
-  לש זוחאה.'
+  לש תומכה.'
 GENERATOR_UPDATED_ALL: '&e&lיא | &7החלצהב ןכדוע םייאה לכ לש רוטארנגב {0} רמוחה
-  לש זוחאה.'
+  לש תומכה.'
 GLOBAL_MESSAGE_SENT: '&e&lיא | &7{0} לש יאה לש םינקחשל החלצהב החלשנ העדוהה!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lיא | &7{0} יאה לש םינקחשל החלצהב החלשנ העדוהה!'
 GOT_BANNED: '&e&lיא | &7רמוע לש יאה ןמ תקחרוה.'
@@ -294,7 +294,7 @@ ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סו
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lיא | &7רוטארנג:
   {0}
-ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}%'
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lיא | &7לובגה לדוג: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lיא | &7םירנואפס סונוב: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lיא | &7הצובק תלבגה: {0}'

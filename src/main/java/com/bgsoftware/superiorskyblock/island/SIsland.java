@@ -1681,14 +1681,61 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setGeneratorPercentage(Key key, int percentage) {
-        if(percentage < 0 || percentage > 100)
-            throw new IllegalArgumentException("Percentage must be between 0 and 100.");
+        if(percentage < 0 || percentage > 100){
+            throw new IllegalArgumentException("Percentage must be between 0 and 100 - got " + percentage + ".");
+        }
+        else if(percentage == 0){
+            setGeneratorAmount(key, 0);
+        }
+        else if(percentage == 100){
+            cobbleGenerator.run(cobbleGenerator -> {
+                cobbleGenerator.clear();
+                cobbleGenerator.put(key.toString(), 1);
+            });
+        }
+        else {
+            //Removing the key from the generator
+            setGeneratorAmount(key, 0);
+            int totalAmount = getGeneratorTotalAmount();
+            double realPercentage = percentage / 100D;
+            double amount = (realPercentage * totalAmount) / (1 - realPercentage);
+            if(amount < 1){
+                cobbleGenerator.run(cobbleGenerator -> {
+                    cobbleGenerator.keySet().forEach(mat -> cobbleGenerator.put(mat, cobbleGenerator.get(mat) * 10));
+                });
+                amount *= 10;
+            }
+            setGeneratorAmount(key, (int) Math.round(amount));
+        }
+    }
 
+    @Override
+    public int getGeneratorPercentage(Key key) {
+        int totalAmount = getGeneratorTotalAmount();
+        return totalAmount == 0 ? 0 : (getGeneratorAmount(key) * 100) / totalAmount;
+    }
+
+    public double getGeneratorPercentageDecimal(Key key){
+        int totalAmount = getGeneratorTotalAmount();
+        return totalAmount == 0 ? 0 : (getGeneratorAmount(key) * 100D) / totalAmount;
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorPercentages() {
+        Map<String, Integer> generatorPercentages = new HashMap<>();
         cobbleGenerator.run(cobbleGenerator -> {
-            if(percentage == 0)
+            cobbleGenerator.keySet().forEach(key -> generatorPercentages.put(key, getGeneratorPercentage(Key.of(key))));
+        });
+        return generatorPercentages;
+    }
+
+    @Override
+    public void setGeneratorAmount(Key key, int amount) {
+        cobbleGenerator.run(cobbleGenerator -> {
+            if(amount <= 0)
                 cobbleGenerator.remove(key.toString());
             else
-                cobbleGenerator.put(key.toString(), percentage);
+                cobbleGenerator.put(key.toString(), amount);
 
             Query.ISLAND_SET_GENERATOR.getStatementHolder()
                     .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
@@ -1698,22 +1745,24 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public int getGeneratorPercentage(Key key) {
-        String keyStr = key.toString();
-        int percentage = cobbleGenerator.run(cobbleGenerator -> {
-            return cobbleGenerator.getOrDefault(keyStr, 0);
+    public int getGeneratorAmount(Key key) {
+        return cobbleGenerator.run(cobbleGenerator -> {
+            return cobbleGenerator.getOrDefault(key.toString(), 0);
         });
-
-        if(percentage < 0 || percentage > 100) {
-            percentage = 0;
-            setGeneratorPercentage(key, percentage);
-        }
-
-        return percentage;
     }
 
     @Override
-    public Map<String, Integer> getGeneratorPercentages() {
+    public int getGeneratorTotalAmount() {
+        return cobbleGenerator.run(cobbleGenerator -> {
+            int totalAmount = 0;
+            for(int amn : cobbleGenerator.values())
+                totalAmount += amn;
+            return totalAmount;
+        });
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorAmounts() {
         return cobbleGenerator.run((Function<Map<String, Integer>, HashMap<String, Integer>>) HashMap::new);
     }
 

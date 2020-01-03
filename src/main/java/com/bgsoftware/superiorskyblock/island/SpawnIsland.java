@@ -742,7 +742,27 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorPercentages() {
-        return new HashMap<>();
+        return null;
+    }
+
+    @Override
+    public void setGeneratorAmount(Key key, int amount) {
+
+    }
+
+    @Override
+    public int getGeneratorAmount(Key key) {
+        return 0;
+    }
+
+    @Override
+    public int getGeneratorTotalAmount() {
+        return 0;
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorAmounts() {
+        return null;
     }
 
     @Override

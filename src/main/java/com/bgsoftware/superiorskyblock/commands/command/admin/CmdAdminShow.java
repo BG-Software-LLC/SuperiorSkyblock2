@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -132,7 +133,8 @@ public final class CmdAdminShow implements ICommand {
         if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)){
             StringBuilder generatorString = new StringBuilder();
             for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
-                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale, StringUtils.format(entry.getKey()), entry.getValue())).append("\n");
+                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale, StringUtils.format(entry.getKey()),
+                        ((SIsland) island).getGeneratorPercentageDecimal(Key.of(entry.getKey())), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString));
         }

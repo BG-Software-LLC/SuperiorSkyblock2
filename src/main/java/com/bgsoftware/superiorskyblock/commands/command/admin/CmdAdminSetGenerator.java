@@ -100,21 +100,32 @@ public final class CmdAdminSetGenerator implements ICommand {
         }
 
         Key material = Key.of(args[3].toUpperCase());
-        int percentage;
+        int amount;
+        boolean percentage = args[4].endsWith("%");
+
+        if(percentage)
+            args[4] = args[4].substring(0, args[4].length() - 1);
 
         try{
-            percentage = Integer.parseInt(args[4]);
+            amount = Integer.parseInt(args[4]);
         }catch(IllegalArgumentException ex){
             Locale.INVALID_AMOUNT.send(sender, args[4]);
             return;
         }
 
-        if(percentage < 0 || percentage > 100){
+        if(percentage && (amount < 0 || amount > 100)){
             Locale.INVALID_PERCENTAGE.send(sender);
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setGeneratorPercentage(material, percentage)));
+        Executor.data(() -> islands.forEach(island -> {
+            if(percentage){
+                island.setGeneratorPercentage(material, amount);
+            }
+            else{
+                island.setGeneratorAmount(material, amount);
+            }
+        }));
 
         if(islands.size() != 1)
             Locale.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.toString().split(":")[0]));
