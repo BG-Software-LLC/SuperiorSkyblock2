@@ -115,6 +115,13 @@ public interface MenusManager {
     void openIslandsTopMenu(SuperiorPlayer superiorPlayer, SortingType sortingType);
 
     /**
+     * Open the unique island visitors menu for a player.
+     * @param superiorPlayer The player to open the menu for.
+     * @param island The island to get the visitors from.
+     */
+    void openUniqueVisitorsMenu(SuperiorPlayer superiorPlayer, Island island);
+
+    /**
      * Open the island upgrade menu for a player.
      * @param superiorPlayer The player to open the menu for.
      * @param island The island to get the upgrades from.
