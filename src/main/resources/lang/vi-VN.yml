@@ -249,12 +249,9 @@ DISBANDED_ISLAND_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đ�
 ENTER_PVP_ISLAND: '&7&oBạn đã được dịch chuyển đến một hòn đảo có bật PVP. Bạn được
   miễn dịch với PVP trong 10 giây tiếp theo...'
 EXPELLED_PLAYER: '&e&lĐảo Thần | &7{0} đã bị trục xuất khỏi đảo.'
-GENERATOR_UPDATED: '&e&lNâng cấp | &7Thành công nâng cấp tỉ lệ ra quặng của {0} đến
-  đảo của {1}.'
-GENERATOR_UPDATED_NAME: '&e&lNâng cấp | &7Thành công nâng cấp tỉ lệ ra quặng của {0}
-  cho đảo {1}.'
-GENERATOR_UPDATED_ALL: '&e&lNâng cấp | &7Thành công nâng cấp tỉ lệ ra quặng của {0}
-  cho tất cả các đảo.'
+GENERATOR_UPDATED: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
+GENERATOR_UPDATED_NAME: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
+GENERATOR_UPDATED_ALL: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'
 GLOBAL_MESSAGE_SENT: '&e&lĐảo Thần | &7Gửi thành công đến tin nhắn của thành viên
   đảo của {0}!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lĐảo Thần | &7Gửi thành công đến tin nhắn của thành
@@ -364,7 +361,7 @@ ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
   &e&lNâng cấp | &7{0}s:
   {1}
-ISLAND_INFO_VISITORS_COUNT: '&e&lIsland | &7Visitors Count: {0}'
+ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo Thần | &7Số lượt khách: {0}'
 ISLAND_INFO_WORTH: '&e&lĐảo Thần | &7Đáng giá: {0}'
 ISLAND_OPENED: '&e&lĐảo Thần | &7Mở đảo thành công cho công cộng.'
 ISLAND_PROTECTED: '&c&lLỗi | &7Hòn đảo này được bảo vệ.'
