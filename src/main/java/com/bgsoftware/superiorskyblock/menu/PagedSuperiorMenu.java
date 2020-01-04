@@ -92,7 +92,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
                 return;
             }
 
-            onPlayerClick(e, objects.get(indexOf));
+            onPlayerClick(e, objects.get(indexOf + (slots.size() * (currentPage - 1))));
         }
     }
 
