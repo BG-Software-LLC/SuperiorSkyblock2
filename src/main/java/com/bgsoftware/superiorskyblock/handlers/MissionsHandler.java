@@ -42,7 +42,7 @@ public final class MissionsHandler implements MissionsManager {
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final static Map<String, Mission> missionMap = new HashMap<>();
-    private final static Map<String, MissionData> missionDataMap = new HashMap<>();
+    private final static Map<Mission, MissionData> missionDataMap = new HashMap<>();
 
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
@@ -89,7 +89,7 @@ public final class MissionsHandler implements MissionsManager {
                     missionMap.put(missionName.toLowerCase(), mission);
                 }
 
-                missionDataMap.put(mission.getName(), new MissionData(mission, missionSection));
+                missionDataMap.put(mission, new MissionData(mission, missionSection));
 
                 SuperiorSkyblockPlugin.log("Registered mission " + missionName);
             }catch(Exception ex){
@@ -97,8 +97,6 @@ public final class MissionsHandler implements MissionsManager {
                 new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
         }
-
-        System.out.println(missionDataMap);
 
         Executor.sync(this::loadMissionsData, 10L);
 
@@ -276,7 +274,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     public MissionData getMissionData(Mission mission){
-        return missionDataMap.get(mission.getName());
+        return missionDataMap.get(mission);
     }
 
     private boolean isAutoReward(Mission mission){
