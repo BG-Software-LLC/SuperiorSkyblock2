@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -198,10 +199,14 @@ public abstract class PlaceholderHook {
                         return StringUtils.format(island.getBiome().name());
                     case "level":
                         return island.getIslandLevel().toString();
+                    case "level_raw":
+                        return ((BigDecimalFormatted) island.getIslandLevel()).getAsString();
                     case "level_format":
                         return StringUtils.fancyFormat(island.getIslandLevel());
                     case "worth":
                         return island.getWorth().toString();
+                    case "worth_raw":
+                        return ((BigDecimalFormatted) island.getWorth()).getAsString();
                     case "worth_format":
                         return StringUtils.fancyFormat(island.getWorth());
                     case "raw_worth":
