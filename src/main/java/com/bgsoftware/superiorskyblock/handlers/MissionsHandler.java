@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -16,6 +17,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -36,8 +39,10 @@ public final class MissionsHandler implements MissionsManager {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    private static Map<String, Mission> missionMap = new HashMap<>();
-    private static Map<Mission, MissionData> missionDataMap = new HashMap<>();
+    private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+
+    private final static Map<String, Mission> missionMap = new HashMap<>();
+    private final static Map<String, MissionData> missionDataMap = new HashMap<>();
 
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
@@ -74,15 +79,17 @@ public final class MissionsHandler implements MissionsManager {
                         throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
 
                     List<String> requiredMissions = missionSection.getStringList("required-missions");
+                    List<String> requiredChecks = missionSection.getStringList("required-checks");
+
                     boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
                             missionSection.getBoolean("only-show-if-required-completed");
 
-                    mission = createInstance(missionClass.get(), missionName, requiredMissions, onlyShowIfRequiredCompleted);
+                    mission = createInstance(missionClass.get(), missionName, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                     mission.load(plugin, missionSection);
                     missionMap.put(missionName.toLowerCase(), mission);
                 }
 
-                missionDataMap.put(mission, new MissionData(mission, missionSection));
+                missionDataMap.put(mission.getName(), new MissionData(mission, missionSection));
 
                 SuperiorSkyblockPlugin.log("Registered mission " + missionName);
             }catch(Exception ex){
@@ -90,6 +97,8 @@ public final class MissionsHandler implements MissionsManager {
                 new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
         }
+
+        System.out.println(missionDataMap);
 
         Executor.sync(this::loadMissionsData, 10L);
 
@@ -132,6 +141,12 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
+    public boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission) {
+        return !hasCompleted(superiorPlayer, mission) && mission.canComplete(superiorPlayer) &&
+                hasAllRequiredMissions(mission, superiorPlayer) && canPassAllChecks(mission, superiorPlayer);
+    }
+
+    @Override
     public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
         rewardMission(mission, superiorPlayer, checkAutoReward, false);
     }
@@ -152,7 +167,7 @@ public final class MissionsHandler implements MissionsManager {
                 return;
             }
 
-            if (!hasAllRequiredMissions(mission, superiorPlayer))
+            if (!canComplete(superiorPlayer, mission))
                 return;
 
             if (missionData.islandMission && playerIsland == null) {
@@ -261,7 +276,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     public MissionData getMissionData(Mission mission){
-        return missionDataMap.get(mission);
+        return missionDataMap.get(mission.getName());
     }
 
     private boolean isAutoReward(Mission mission){
@@ -301,7 +316,7 @@ public final class MissionsHandler implements MissionsManager {
         return list;
     }
 
-    private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, boolean onlyShowIfRequiredCompleted) throws Exception{
+    private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{
         if(!Mission.class.isAssignableFrom(clazz))
             throw new IllegalArgumentException("Class " + clazz + " is not a Mission.");
 
@@ -313,6 +328,7 @@ public final class MissionsHandler implements MissionsManager {
                 Mission mission = (Mission) constructor.newInstance();
                 mission.setName(name);
                 mission.addRequiredMission(requiredMissions.toArray(new String[0]));
+                mission.addRequiredCheck(requiredChecks.toArray(new String[0]));
                 if(onlyShowIfRequiredCompleted)
                     mission.toggleOnlyShowIfRequiredCompleted();
 
@@ -325,6 +341,17 @@ public final class MissionsHandler implements MissionsManager {
 
     private boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
         return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, mission));
+    }
+
+    private boolean canPassAllChecks(Mission mission, SuperiorPlayer superiorPlayer){
+        return mission.getRequiredChecks().stream().allMatch(check -> {
+            check = PlaceholderHook.parse(superiorPlayer, check);
+            try {
+                return Boolean.parseBoolean(engine.eval(check) + "");
+            }catch(Throwable ex){
+                return false;
+            }
+        });
     }
 
     private static int currentIndex = 0;
@@ -361,6 +388,10 @@ public final class MissionsHandler implements MissionsManager {
             this.completed = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.completed"));
         }
 
+        @Override
+        public String toString() {
+            return "MissionData{name=" + mission.getName() + "}";
+        }
     }
 
 }

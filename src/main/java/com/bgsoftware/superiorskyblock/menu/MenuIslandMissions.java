@@ -53,12 +53,10 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         Island island = superiorPlayer.getIsland();
         MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
         boolean completed = island.hasCompletedMission(mission);
-        boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
-                plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
         int percentage = getPercentage(mission.getProgress(superiorPlayer));
         int progressValue = mission.getProgressValue(superiorPlayer);
         return completed ? missionData.completed.clone().build(superiorPlayer) :
-                mission.canComplete(superiorPlayer) && hasAllRequiredMissions ?
+                plugin.getMissions().canComplete(superiorPlayer, mission) ?
                         missionData.canComplete.clone()
                                 .replaceAll("{0}", percentage + "")
                                 .replaceAll("{1}", progressValue + "").build(superiorPlayer) :

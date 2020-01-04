@@ -38,6 +38,14 @@ public interface MissionsManager {
     boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission mission);
 
     /**
+     * Check whether or not a player can complete a mission.
+     * @param superiorPlayer The player to check.
+     * @param mission The mission to check.
+     * @return True if player can complete, otherwise false.
+     */
+    boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission);
+
+    /**
      * Reward a player for completing a specific mission.
      * @param mission The mission that was completed.
      * @param superiorPlayer The player to reward.

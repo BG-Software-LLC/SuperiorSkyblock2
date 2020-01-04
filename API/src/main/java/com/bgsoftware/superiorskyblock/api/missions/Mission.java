@@ -8,12 +8,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public abstract class Mission {
 
     private String name = null;
     private List<String> requiredMissions = new ArrayList<>();
+    private List<String> requiredChecks = new ArrayList<>();
     private boolean onlyShowIfRequiredCompleted = false;
 
     /**
@@ -41,10 +41,23 @@ public abstract class Mission {
     }
 
     /**
+     * Add required check for completing this mission.
+     * These checks have placeholders support.
+     * @param checks The array of required missions.
+     */
+    public void addRequiredCheck(String... checks){
+        requiredChecks.addAll(Arrays.asList(checks));
+    }
+
+    /**
      * Get the required missions for completing this mission.
      */
     public List<String> getRequiredMissions(){
         return new ArrayList<>(requiredMissions);
+    }
+
+    public List<String> getRequiredChecks() {
+        return new ArrayList<>(requiredChecks);
     }
 
     /**
@@ -125,4 +138,8 @@ public abstract class Mission {
      */
     public abstract void onCompleteFail(SuperiorPlayer superiorPlayer);
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }
