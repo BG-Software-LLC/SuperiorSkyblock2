@@ -157,6 +157,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 75 blocks!'
     '3':
       price: 150000.0
+      permission: 'upgrade.size.donor'
       commands:
         - 'island admin setupgrade %player% border-size 4'
         - 'island admin setteamlimit %player% 125'
@@ -186,6 +187,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 3!'
     '3':
       price: 150000.0
+      permission: 'upgrade.gen.donor'
       commands:
         - 'island admin setupgrade %player% generator-rates 4'
         - 'island admin setgenerator %player% stone 65'

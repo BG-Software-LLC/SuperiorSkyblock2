@@ -76,8 +76,15 @@ public final class CmdRankup implements ICommand {
             return;
         }
 
-
         int level = island.getUpgradeLevel(upgradeName);
+
+        String permission = plugin.getUpgrades().getUpgradePermission(upgradeName, level + 1);
+
+        if(!permission.isEmpty() && !superiorPlayer.hasPermission(permission)){
+            Locale.NO_UPGRADE_PERMISSION.send(superiorPlayer);
+            return;
+        }
+
         boolean hasNextLevel;
 
         List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);

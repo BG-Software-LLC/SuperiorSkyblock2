@@ -460,6 +460,7 @@ NO_TRANSFER_PERMISSION: '&cBạn phải là người lãnh đạo của hòn đ�
   lãnh đạo.'
 NO_UNCOOP_PERMISSION: '&c&lLỗi | &7Bạn cần có ít nhất {0} để loại bỏ người chơi từ
   thành viên co-op.'
+NO_UPGRADE_PERMISSION: '&c&lLỗi | &7Bạn đang thiếu sự cho phép nâng cấp lên một cấp độ khác.'
 NO_WITHDRAW_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để rút tiền từ ngân hàng
   của đảo.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để gửi {0}$ vào ngân

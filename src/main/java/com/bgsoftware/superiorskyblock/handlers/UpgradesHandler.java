@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,6 +59,10 @@ public final class UpgradesHandler {
         return new ArrayList<>();
     }
 
+    public String getUpgradePermission(String upgradeName, int level){
+        return isUpgrade(upgradeName) ? upgrades.get(upgradeName).permissions.getOrDefault(level, "") : "";
+    }
+
     public int getMaxUpgradeLevel(String upgradeName){
         if(!isUpgrade(upgradeName))
             return -1;
@@ -109,6 +112,7 @@ public final class UpgradesHandler {
                 int level = Integer.parseInt(_level);
                 upgradeData.prices.put(level, upgrades.getDouble(upgradeName + "." + level + ".price"));
                 upgradeData.commands.put(level, upgrades.getStringList(upgradeName + "." + level + ".commands"));
+                upgradeData.permissions.put(level, upgrades.getString(upgradeName + "." + level + ".permission", ""));
             }
             this.upgrades.put(upgradeName, upgradeData);
         }
@@ -119,6 +123,7 @@ public final class UpgradesHandler {
 
         public Map<Integer, Double> prices = new HashMap<>();
         public Map<Integer, List<String>> commands = new HashMap<>();
+        public Map<Integer, String> permissions = new HashMap<>();
         public Map<Integer, ItemData> items = new HashMap<>();
 
     }
