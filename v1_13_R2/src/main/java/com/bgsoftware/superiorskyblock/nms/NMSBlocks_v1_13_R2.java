@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
@@ -45,10 +46,21 @@ import java.util.List;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if(blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+            world.setTypeAndData(blockPosition, blockData, 3);
+            return;
+        }
+
         int indexY = location.getBlockY() >> 4;
 
         ChunkSection chunkSection = chunk.getSections()[indexY];
@@ -58,10 +70,10 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
         int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
 
-        chunkSection.setType(blockX, blockY, blockZ, Block.getByCombinedId(combinedId));
+        chunkSection.setType(blockX, blockY, blockZ, blockData);
 
         if(blockType != BlockType.BLOCK && blockType != BlockType.FLOWER_POT) {
-            TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+            TileEntity tileEntity = world.getTileEntity(blockPosition);
 
             switch (blockType) {
                 case BANNER:

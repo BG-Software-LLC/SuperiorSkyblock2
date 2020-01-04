@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
@@ -46,10 +47,21 @@ import java.util.List;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if(blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+            world.setTypeAndData(blockPosition, blockData, 3);
+            return;
+        }
+
         int indexY = location.getBlockY() >> 4;
 
         ChunkSection chunkSection = chunk.getSections()[indexY];
@@ -57,15 +69,14 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         if(chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
-        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, Block.getByCombinedId(combinedId), false);
+        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, blockData, false);
 
-        BlockPosition pos = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getChunkProvider();
-        chunkProviderServer.getLightEngine().a(pos);
-        chunkProviderServer.flagDirty(pos);
+        chunkProviderServer.getLightEngine().a(blockPosition);
+        chunkProviderServer.flagDirty(blockPosition);
 
         if(blockType != BlockType.BLOCK && blockType != BlockType.FLOWER_POT) {
-            TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+            TileEntity tileEntity = world.getTileEntity(blockPosition);
 
             switch (blockType) {
                 case BANNER:

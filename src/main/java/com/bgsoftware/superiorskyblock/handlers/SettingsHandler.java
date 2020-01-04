@@ -95,6 +95,7 @@ public final class SettingsHandler {
     public final Map<Integer, ItemStack> starterChestContents;
     public final Map<String, List<String>> eventCommands;
     public final long warpsWarmup;
+    public final boolean liquidUpdate;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -219,6 +220,7 @@ public final class SettingsHandler {
             eventCommands.put(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
+        liquidUpdate = cfg.getBoolean("liquid-update", false);
     }
 
     public void updateValue(String path, Object value){

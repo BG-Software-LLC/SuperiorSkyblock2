@@ -397,3 +397,6 @@ event-commands:
 # A delay before getting teleported to a warp.
 # Players cannot move in that time, or the teleportation will be cancelled.
 warps-warmup: 0
+
+# Should liquids get updated when pasting schematics?
+liquid-update: false
