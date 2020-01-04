@@ -77,7 +77,7 @@ public final class CmdAdminJoin implements ICommand {
             return;
         }
 
-        ((SIsland) island).sendMessage(Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+        ((SIsland) island).sendMessage(Locale.JOIN_ADMIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
