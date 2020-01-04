@@ -41,7 +41,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
                 inventory.setItem(slots.get(i), getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex)));
             }
             else{
-                inventory.setItem(slots.get(i), new ItemStack(Material.AIR));
+                inventory.setItem(slots.get(i), getNullItem());
             }
         }
 
@@ -99,6 +99,10 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     protected abstract void onPlayerClick(InventoryClickEvent event, T clickedObject);
 
     protected abstract ItemStack getObjectItem(ItemStack clickedItem, T value);
+
+    protected ItemStack getNullItem(){
+        return new ItemStack(Material.AIR);
+    }
 
     protected abstract List<T> requestObjects();
 

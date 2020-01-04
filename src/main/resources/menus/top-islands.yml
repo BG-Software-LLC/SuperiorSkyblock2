@@ -8,14 +8,18 @@
 title: '&lTop Islands'
 
 pattern:
-  - '~ ~ ~ # # # ~ ~ ~'
-  - '~ ~ # ! @ ! # ~ ~'
-  - '~ # ! @ ! @ ! # ~'
-  - '# @ @ @ @ @ @ @ #'
-  - '# ! ! ! ! ! ! ! #'
-  - '- $ + # % * ^ & #'
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
+  - '@ % @ @ @ # @ @ @'
+  - '@ * @ @ # # # @ @'
+  - '@ ^ @ # # # # # @'
+  - '@ & @ @ @ $ @ @ @'
+  - '~ ~ ! ~ - ~ + ~ ~'
 
-slots: '@'
+slots: '#'
+previous-page: '!'
+current-page: '-'
+next-page: '+'
+
 worth-sort: '%'
 level-sort: '*'
 rating-sort: '^'
@@ -24,7 +28,7 @@ player-island: '$'
 sort-glow-when-selected: true
 
 items:
-  '@':
+  '#':
     island:
       type: SKULL_ITEM
       data: 3
@@ -58,26 +62,25 @@ items:
     type: SKULL_ITEM
     data: 3
     name: '&6Sort by Players'
+  '!':
+    type: PAPER
+    name: '{0}Previous Page'
+  '-':
+    type: DOUBLE_PLANT
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '+':
+    type: PAPER
+    name: '{0}Next Page'
   '~':
     type: STAINED_GLASS_PANE
     data: 11
-    name: '&f'
-  '#':
-    type: STAINED_GLASS_PANE
-    data: 9
-    name: '&f'
-  '!':
+    name: '&f '
+  '@':
     type: STAINED_GLASS_PANE
     data: 3
-    name: '&f'
-  '-':
-    type: STAINED_GLASS_PANE
-    data: 9
-    name: '&9&lYour Island >>'
-  '+':
-    type: STAINED_GLASS_PANE
-    data: 9
-    name: '&9&l<< Your Island'
+    name: '&f '
 
 sounds:
   '@':

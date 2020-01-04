@@ -8,14 +8,18 @@
 title: '&lTop Islands'
 
 pattern:
-  - '~ ~ ~ # # # ~ ~ ~'
-  - '~ ~ # ! @ ! # ~ ~'
-  - '~ # ! @ ! @ ! # ~'
-  - '# @ @ @ @ @ @ @ #'
-  - '# ! ! ! ! ! ! ! #'
-  - '- $ + # % * ^ & #'
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
+  - '@ % @ @ @ # @ @ @'
+  - '@ * @ @ # # # @ @'
+  - '@ ^ @ # # # # # @'
+  - '@ & @ @ @ $ @ @ @'
+  - '~ ~ ! ~ - ~ + ~ ~'
 
-slots: '@'
+slots: '#'
+previous-page: '!'
+current-page: '-'
+next-page: '+'
+
 worth-sort: '%'
 level-sort: '*'
 rating-sort: '^'
@@ -24,7 +28,7 @@ player-island: '$'
 sort-glow-when-selected: true
 
 items:
-  '@':
+  '#':
     island:
       type: PLAYER_HEAD
       name: '&e&l[!] Island: &6&n{0}&7 (#{1})'
@@ -55,21 +59,23 @@ items:
   '&':
     type: PLAYER_HEAD
     name: '&6Sort by Players'
-  '~':
-    type: LIGHT_BLUE_STAINED_GLASS_PANE
-    name: '&f'
-  '#':
-    type: BLUE_STAINED_GLASS_PANE
-    name: '&f'
   '!':
-    type: CYAN_STAINED_GLASS_PANE
-    name: '&f'
+    type: PAPER
+    name: '{0}Previous Page'
   '-':
-    type: BLUE_STAINED_GLASS_PANE
-    name: '&9&lYour Island >>'
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
   '+':
+    type: PAPER
+    name: '{0}Next Page'
+  '~':
     type: BLUE_STAINED_GLASS_PANE
-    name: '&9&l<< Your Island'
+    name: '&f '
+  '@':
+    type: LIGHT_BLUE_STAINED_GLASS_PANE
+    name: '&f '
 
 sounds:
   '@':
