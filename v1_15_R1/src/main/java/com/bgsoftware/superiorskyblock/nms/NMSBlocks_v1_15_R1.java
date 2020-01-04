@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockFlowerPot;
+import net.minecraft.server.v1_15_R1.BlockLeaves;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkProviderServer;
@@ -27,11 +28,13 @@ import net.minecraft.server.v1_15_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_15_R1.TileEntitySign;
 import net.minecraft.server.v1_15_R1.TileEntitySkull;
 import net.minecraft.server.v1_15_R1.World;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.data.type.Leaves;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftSign;
@@ -56,6 +59,9 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if(blockData.getBlock() instanceof BlockLeaves)
+            blockData = blockData.set(BlockLeaves.PERSISTENT, true);
 
         if(blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
             world.setTypeAndData(blockPosition, blockData, 3);

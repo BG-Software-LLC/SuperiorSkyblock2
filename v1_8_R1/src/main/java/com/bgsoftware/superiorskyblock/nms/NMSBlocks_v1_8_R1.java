@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_8_R1.AxisAlignedBB;
 import net.minecraft.server.v1_8_R1.Block;
+import net.minecraft.server.v1_8_R1.BlockLeaves;
 import net.minecraft.server.v1_8_R1.BlockPosition;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.ChunkSection;
@@ -51,6 +52,9 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
 
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if(blockData.getBlock() instanceof BlockLeaves)
+            blockData = blockData.set(BlockLeaves.DECAYABLE, false);
 
         if(blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
             world.setTypeAndData(blockPosition, blockData, 3);
