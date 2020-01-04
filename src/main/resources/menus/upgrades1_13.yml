@@ -28,7 +28,6 @@ upgrades:
   hoppers-limit:
     item: '@'
     '1':
-      slot: 11
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -68,7 +67,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 11
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -108,7 +106,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 11
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -148,7 +145,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 11
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -172,7 +168,6 @@ upgrades:
   crop-growth:
     item: '#'
     '1':
-      slot: 13
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -212,7 +207,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 13
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -252,7 +246,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 13
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -292,7 +285,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 13
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -316,7 +308,6 @@ upgrades:
   spawner-rates:
     item: '^'
     '1':
-      slot: 15
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -356,7 +347,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 15
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -396,7 +386,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 15
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -436,7 +425,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 15
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -460,7 +448,6 @@ upgrades:
   mob-drops:
     item: '*'
     '1':
-      slot: 19
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -500,7 +487,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 19
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -540,7 +526,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 19
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -580,7 +565,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 19
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -604,7 +588,6 @@ upgrades:
   members-limit:
     item: '~'
     '1':
-      slot: 21
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -644,7 +627,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 21
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -684,7 +666,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 21
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -724,7 +705,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 21
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -748,7 +728,6 @@ upgrades:
   border-size:
     item: '!'
     '1':
-      slot: 23
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -788,7 +767,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 23
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -828,7 +806,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 23
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -868,7 +845,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 23
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
@@ -892,7 +868,6 @@ upgrades:
   generator-rates:
     item: '+'
     '1':
-      slot: 25
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -940,7 +915,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '2':
-      slot: 25
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -992,7 +966,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '3':
-      slot: 25
       has-next-level:
         sound:
           type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1050,7 +1023,6 @@ upgrades:
           - '&7'
           - '&aLeft-click to purchase upgrade.'
     '4':
-      slot: 25
       has-next-level:
         sound:
           type: BLOCK_ANVIL_PLACE
