@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -33,31 +34,37 @@ public final class MenuBiomes extends SuperiorMenu {
 
                 if(slot == e.getRawSlot()){
                     if (superiorPlayer.hasPermission(permission)) {
-                        SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
-                        if(soundWrapper != null)
-                            soundWrapper.playSound(superiorPlayer.asPlayer());
-                        //noinspection unchecked
-                        List<String> commands = (List<String>) getData(biomeName + "-has-access-item-commands");
-                        if(commands != null)
-                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                        IslandBiomeChangeEvent islandBiomeChangeEvent = new IslandBiomeChangeEvent(superiorPlayer, superiorPlayer.getIsland(), biome);
+                        Bukkit.getPluginManager().callEvent(islandBiomeChangeEvent);
 
-                        superiorPlayer.getIsland().setBiome(biome);
-                        Locale.CHANGED_BIOME.send(superiorPlayer, biomeName);
+                        if(!islandBiomeChangeEvent.isCancelled()) {
+                            SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
+                            if (soundWrapper != null)
+                                soundWrapper.playSound(superiorPlayer.asPlayer());
+                            //noinspection unchecked
+                            List<String> commands = (List<String>) getData(biomeName + "-has-access-item-commands");
+                            if (commands != null)
+                                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
-                        previousMove = false;
-                        superiorPlayer.asPlayer().closeInventory();
+                            superiorPlayer.getIsland().setBiome(islandBiomeChangeEvent.getBiome());
+                            Locale.CHANGED_BIOME.send(superiorPlayer, islandBiomeChangeEvent.getBiome().name().toLowerCase());
 
-                        break;
+                            previousMove = false;
+                            superiorPlayer.asPlayer().closeInventory();
+
+                            break;
+                        }
                     }
-                    else{
-                        SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-no-access-item-sound");
-                        if(soundWrapper != null)
-                            soundWrapper.playSound(superiorPlayer.asPlayer());
-                        //noinspection unchecked
-                        List<String> commands = (List<String>) getData(biomeName + "-no-access-item-commands");
-                        if(commands != null)
-                            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
-                    }
+
+                    SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-no-access-item-sound");
+                    if(soundWrapper != null)
+                        soundWrapper.playSound(superiorPlayer.asPlayer());
+                    //noinspection unchecked
+                    List<String> commands = (List<String>) getData(biomeName + "-no-access-item-commands");
+                    if(commands != null)
+                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+
+                    break;
                 }
             }
         }
