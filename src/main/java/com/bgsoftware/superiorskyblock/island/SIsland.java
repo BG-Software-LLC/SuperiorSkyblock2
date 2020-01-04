@@ -1910,6 +1910,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(generatedSchematics.get())
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
+                .setString(unlockedWorlds.get())
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -1956,6 +1957,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(generatedSchematics.get())
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
+                .setString(unlockedWorlds.get())
                 .execute(async);
     }
 
