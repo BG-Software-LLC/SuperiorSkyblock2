@@ -266,6 +266,7 @@ GOT_KICKED: '&e&lĐảo Thần | &7Bạn đã bị kick từ đảo của bạn 
 GOT_PROMOTED: '&e&lĐảo Thần | &7Bạn đã được thăng chức {0} trong đảo của bạn.'
 GOT_REVOKED: '&e&lĐảo Thần | &7{0} đã thu hồi lời mời bạn đến đảo của họ.'
 GOT_UNBANNED: '&e&lĐảo Thần | &7Bạn đã được unban từ đảo của {0}.'
+HIT_ISLAND_MEMBER: '&c&lError | &7You cannot hit your island members.'
 HIT_PLAYER_IN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh người chơi trong đảo.'
 IGNORED_ISLAND: '&e&lNâng cấp | &7Đảo của {0} bây giờ bị bỏ qua trong các đảo hàng
   đầu.'

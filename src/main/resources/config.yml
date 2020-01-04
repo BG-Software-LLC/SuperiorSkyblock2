@@ -405,3 +405,7 @@ warps-warmup: 0
 
 # Should liquids get updated when pasting schematics?
 liquid-update: false
+
+# A list of worlds that PvP will be enabled between island members.
+pvp-worlds:
+- 'PvP'

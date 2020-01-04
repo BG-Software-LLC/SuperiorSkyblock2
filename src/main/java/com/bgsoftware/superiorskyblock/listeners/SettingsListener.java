@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
+
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Animals;
@@ -205,9 +205,6 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) || island.hasSettingsEnabled(IslandSettings.PVP))
-            return;
-
         SuperiorPlayer damagerPlayer;
 
         if(e.getDamager() instanceof Player){
@@ -223,7 +220,15 @@ public final class SettingsListener implements Listener {
 
         else return;
 
-        if(damagerPlayer.equals(targetPlayer))
+        if(damagerPlayer.getIslandLeader().equals(targetPlayer.getIslandLeader()) &&
+                !plugin.getSettings().pvpWorlds.contains(targetPlayer.getWorld().getName())){
+            e.setCancelled(true);
+            Locale.HIT_ISLAND_MEMBER.send(damagerPlayer);
+            return;
+        }
+
+        if (damagerPlayer.equals(targetPlayer) || island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) ||
+                island.hasSettingsEnabled(IslandSettings.PVP))
             return;
 
         e.setCancelled(true);

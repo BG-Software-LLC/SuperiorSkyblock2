@@ -98,6 +98,7 @@ public final class SettingsHandler {
     public final Map<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final boolean liquidUpdate;
+    public final List<String> pvpWorlds;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -225,6 +226,7 @@ public final class SettingsHandler {
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
         liquidUpdate = cfg.getBoolean("liquid-update", false);
+        pvpWorlds = cfg.getStringList("pvp-worlds");
     }
 
     public void updateValue(String path, Object value){
