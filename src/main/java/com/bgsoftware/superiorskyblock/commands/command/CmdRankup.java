@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -77,18 +78,29 @@ public final class CmdRankup implements ICommand {
 
 
         int level = island.getUpgradeLevel(upgradeName);
-        double nextUpgradePrice = plugin.getUpgrades().getUpgradePrice(upgradeName, level);
         boolean hasNextLevel;
 
-        if(EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice){
+        List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);
+
+        IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands,
+                plugin.getUpgrades().getUpgradePrice(upgradeName, level));
+        Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
+
+        double nextUpgradePrice = islandUpgradeEvent.getAmountToWithdraw();
+
+        if(islandUpgradeEvent.isCancelled()){
+            hasNextLevel = false;
+        }
+
+        else if(EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice){
             Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
             hasNextLevel = false;
         }
 
-        else{
-            List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);
+        else {
+            if (nextUpgradePrice > 0)
+                EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
 
-            EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
             for (String command : commands) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName()));
             }
