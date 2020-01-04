@@ -268,6 +268,26 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isNetherEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setNetherEnabled(boolean enabled) {
+
+    }
+
+    @Override
+    public boolean isEndEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setEndEnabled(boolean enabled) {
+
+    }
+
+    @Override
     public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
         return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
     }

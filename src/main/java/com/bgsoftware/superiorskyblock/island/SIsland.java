@@ -122,6 +122,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
     private final SyncedObject<String> generatedSchematics = SyncedObject.of("normal");
     private final SyncedObject<String> schemName = SyncedObject.of("");
+    private final SyncedObject<String> unlockedWorlds = SyncedObject.of("");
 
     /*
      * Island multipliers & limits
@@ -169,6 +170,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.ignored.set(resultSet.getBoolean("ignored"));
         this.generatedSchematics.set(resultSet.getString("generatedSchematics"));
         this.schemName.set(resultSet.getString("schemName"));
+        this.unlockedWorlds.set(resultSet.getString("unlockedWorlds"));
 
         if(blockCounts.get().isEmpty())
             calcIslandWorth(null);
@@ -573,6 +575,58 @@ public final class SIsland extends DatabaseObject implements Island {
 
         return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
                 (max.getBlockX() >> 4) >= chunk.getX() &&(max.getBlockZ() >> 4) >= chunk.getZ();
+    }
+
+    @Override
+    public boolean isNetherEnabled() {
+        return plugin.getSettings().netherWorldUnlocked || unlockedWorlds.run(unlockedWorlds -> {
+            return unlockedWorlds.contains("nether");
+        });
+    }
+
+    @Override
+    public void setNetherEnabled(boolean enabled) {
+        String unlockedWorlds = this.unlockedWorlds.run(_unlockedWorlds -> {
+            if(enabled){
+                return _unlockedWorlds.replace("nether", "") + "nether";
+            }
+            else{
+                return _unlockedWorlds.replace("nether", "");
+            }
+        });
+
+        this.unlockedWorlds.set(unlockedWorlds);
+
+        Query.ISLAND_SET_UNLOCK_WORLDS.getStatementHolder()
+                .setString(unlockedWorlds)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
+    public boolean isEndEnabled() {
+        return plugin.getSettings().endWorldUnlocked || unlockedWorlds.run(unlockedWorlds -> {
+            return unlockedWorlds.contains("the_end");
+        });
+    }
+
+    @Override
+    public void setEndEnabled(boolean enabled) {
+        String unlockedWorlds = this.unlockedWorlds.run(_unlockedWorlds -> {
+            if(enabled){
+                return _unlockedWorlds.replace("the_end", "") + "the_end";
+            }
+            else{
+                return _unlockedWorlds.replace("the_end", "");
+            }
+        });
+
+        this.unlockedWorlds.set(unlockedWorlds);
+
+        Query.ISLAND_SET_UNLOCK_WORLDS.getStatementHolder()
+                .setString(unlockedWorlds)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*

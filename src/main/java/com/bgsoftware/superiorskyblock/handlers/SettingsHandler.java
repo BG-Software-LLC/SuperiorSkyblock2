@@ -57,7 +57,9 @@ public final class SettingsHandler {
     public final int bankWorthRate;
     public final String islandWorldName;
     public final boolean netherWorldEnabled;
+    public final boolean netherWorldUnlocked;
     public final boolean endWorldEnabled;
+    public final boolean endWorldUnlocked;
     public final boolean optimizeWorlds;
     public final String spawnLocation;
     public final boolean spawnProtection;
@@ -157,7 +159,9 @@ public final class SettingsHandler {
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
+        netherWorldUnlocked = cfg.getBoolean("worlds.nether-unlock", true);
         endWorldEnabled = cfg.getBoolean("worlds.end-world", false);
+        endWorldUnlocked = cfg.getBoolean("worlds.end-unlock", false);
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = cfg.getBoolean("spawn.protection", true);

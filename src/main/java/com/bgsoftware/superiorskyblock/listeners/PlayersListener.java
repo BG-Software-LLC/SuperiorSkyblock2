@@ -302,8 +302,6 @@ public final class PlayersListener implements Listener {
             e.setCancelled(true);
     }
 
-    private Set<SuperiorPlayer> schematicMessages = new HashSet<>();
-
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
@@ -316,13 +314,21 @@ public final class PlayersListener implements Listener {
         if(island == null)
             return;
 
+        e.setCancelled(true);
+
         World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+
+        if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
+                (environment == World.Environment.THE_END && !island.isEndEnabled())){
+            if(!Locale.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
+                Locale.sendSchematicMessage(superiorPlayer, Locale.WORLD_NOT_UNLOCKED.getMessage(superiorPlayer.getUserLocale(), StringUtils.format(environment.name())));
+            return;
+        }
+
         String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
         Location toTeleport = getLocationNoException(island, environment);
 
         if(toTeleport != null) {
-            e.setCancelled(true);
-
             if(!island.wasSchematicGenerated(environment)){
                 String schematicName = island.getSchematicName();
                 if(schematicName.isEmpty())
@@ -337,14 +343,8 @@ public final class PlayersListener implements Listener {
                     island.setSchematicGenerate(environment);
                 }
                 else{
-                    if(!schematicMessages.contains(superiorPlayer)) {
-                        schematicMessages.add(superiorPlayer);
-                        String message = "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
-                                "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".";
-                        Locale.sendMessage(superiorPlayer, message);
-                        Locale.sendMessage(Bukkit.getConsoleSender(), message);
-                        Executor.sync(() -> schematicMessages.remove(superiorPlayer), 20L);
-                    }
+                    Locale.sendSchematicMessage(superiorPlayer, "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
+                            "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".");
                 }
             }
 

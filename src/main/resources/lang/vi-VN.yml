@@ -167,6 +167,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
   đầu.
+COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 'Unlock a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Rút tiền từ ngân hàng đảo của người chơi khác.
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
@@ -273,6 +274,7 @@ IGNORED_ISLAND_NAME: '&e&lNâng cấp | &7Đảo {0} bây giờ bị bỏ qua tr
 INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài sự bảo vệ phạm
   vi   đảo của bạn.'
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
+INVALID_ENVIRONMENT: '&c&lError | &7Invalid world {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
 INVALID_ISLAND_OTHER: '&c&lLỗi | &7{0} không có đảo.'
@@ -571,6 +573,7 @@ UNIGNORED_ISLAND: '&e&lĐiều Chỉnh | &7Đảo của {0} bây giờ không đ
   đảo hàng đầu.'
 UNIGNORED_ISLAND_NAME: '&e&lĐiều Chỉnh | &7Đảo {0} bây giờ không được bỏ qua từ các
   đảo hàng đầu.'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lWorlds | &7Your {0} world is now unlocked!'
 UNSAFE_WARP: '&e&lĐảo Thần | &7&oCó vẻ như khu vực này không an toàn. Vui lòng thử
   khu vực khác.'
 UPDATED_PERMISSION: '&e&lĐảo Thần | &7Cập nhập quyền cho {0}.'
@@ -583,3 +586,4 @@ WITHDRAW_ALL_MONEY: |-
 WITHDRAW_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} rút {1}$ từ ngân hàng của đảo!'
 WITHDRAWN_MONEY: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo của {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo {1}!'
+WORLD_NOT_UNLOCKED: '&e&lWorlds | &7The {0} world is not unlocked yet!'

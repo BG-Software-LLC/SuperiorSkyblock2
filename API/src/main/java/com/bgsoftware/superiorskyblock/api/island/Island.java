@@ -241,6 +241,26 @@ public interface Island extends Comparable<Island> {
      */
     boolean isInsideRange(Chunk chunk);
 
+    /**
+     * Is the nether world enabled for the island?
+     */
+    boolean isNetherEnabled();
+
+    /**
+     * Enable/disable the nether world for the island.
+     */
+    void setNetherEnabled(boolean enabled);
+
+    /**
+     * Is the end world enabled for the island?
+     */
+    boolean isEndEnabled();
+
+    /**
+     * Enable/disable the end world for the island.
+     */
+    void setEndEnabled(boolean enabled);
+
     /*
      *  Permissions related methods
      */

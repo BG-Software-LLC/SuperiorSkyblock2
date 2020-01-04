@@ -104,7 +104,8 @@ public final class DataHandler {
                 "generator TEXT, " +
                 "generatedSchematics TEXT, " +
                 "schemName TEXT, " +
-                "uniqueVisitors TEXT" +
+                "uniqueVisitors TEXT, " +
+                "unlockedWorlds TEXT" +
                 ");");
 
         //Creating default players table
@@ -165,6 +166,7 @@ public final class DataHandler {
         addColumnIfNotExists("schemName", "islands", "''", "TEXT");
         addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
         addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
+        addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

@@ -138,6 +138,7 @@ public enum Locale {
     COMMAND_DESCRIPTION_ADMIN_SHOW,
     COMMAND_DESCRIPTION_ADMIN_SPY,
     COMMAND_DESCRIPTION_ADMIN_UNIGNORE,
+    COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD,
     COMMAND_DESCRIPTION_ADMIN_WITHDRAW,
     COMMAND_DESCRIPTION_BAN,
     COMMAND_DESCRIPTION_BIOME,
@@ -229,6 +230,7 @@ public enum Locale {
     IGNORED_ISLAND_NAME,
     INTERACT_OUTSIDE_ISLAND,
     INVALID_AMOUNT,
+    INVALID_ENVIRONMENT,
     INVALID_ISLAND,
     INVALID_ISLAND_LOCATION,
     INVALID_ISLAND_OTHER,
@@ -453,6 +455,7 @@ public enum Locale {
     UNCOOP_LEFT_ANNOUNCEMENT,
     UNIGNORED_ISLAND,
     UNIGNORED_ISLAND_NAME,
+    UNLOCK_WORLD_ANNOUNCEMENT,
     UNSAFE_WARP,
     UPDATED_PERMISSION,
     UPDATED_SETTINGS,
@@ -461,7 +464,8 @@ public enum Locale {
     WITHDRAWN_MONEY,
     WITHDRAWN_MONEY_NAME,
     WITHDRAW_ALL_MONEY,
-    WITHDRAW_ANNOUNCEMENT;
+    WITHDRAW_ANNOUNCEMENT,
+    WORLD_NOT_UNLOCKED;
 
     private static Set<java.util.Locale> locales = new HashSet<>();
     private static java.util.Locale defaultLocale = null;
@@ -581,6 +585,7 @@ public enum Locale {
     }
 
     private static Set<UUID> noInteractMessages = new HashSet<>();
+    private static Set<UUID> noSchematicMessages = new HashSet<>();
 
     public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
         sendProtectionMessage(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale());
@@ -595,6 +600,14 @@ public enum Locale {
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player, locale);
             Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), 60L);
+        }
+    }
+
+    public static void sendSchematicMessage(SuperiorPlayer superiorPlayer, String message){
+        if(!noSchematicMessages.contains(superiorPlayer.getUniqueId())){
+            noSchematicMessages.add(superiorPlayer.getUniqueId());
+            Locale.sendMessage(superiorPlayer, message);
+            Executor.sync(() -> noSchematicMessages.remove(superiorPlayer.getUniqueId()), 60L);
         }
     }
 

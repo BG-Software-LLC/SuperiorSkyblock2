@@ -140,6 +140,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: רחא ןקחש לש יא לש םימ
 COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
 COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
+COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
@@ -236,6 +237,7 @@ IGNORED_ISLAND_NAME: '&e&lיא | &7םיבוטה םייאה תמישר ןמ דר�
 INTERACT_OUTSIDE_ISLAND: '&e&lהאיגש | &7ךלש יאל ץוחמ םירבד םע היצקרטניא עצבל לוכי
   אל התא.'
 INVALID_AMOUNT: '&e&lהאיגש | &7{0} תיקוח אל תומכ.'
+INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
 INVALID_ISLAND: '&e&lהאיגש | &7יא ךל ןיא.'
 INVALID_ISLAND_LOCATION: '&e&lהאיגש | &7ךלש םוקימב יא ןיא.'
 INVALID_ISLAND_OTHER: '&e&lהאיגש | &7יא ןיא {0} ל.'
@@ -494,6 +496,7 @@ UNCOOP_ANNOUNCEMENT: '&e&lיא | &7יאה לש הלועפ ףתשמכ {1} תא ד
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lיא | &7דוע יאה לש הלועפ ףתשמ וניא ןכלו תרשה תא בזע {0}.'
 UNIGNORED_ISLAND: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} לש יאה.'
 UNIGNORED_ISLAND_NAME: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} יאה.'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&lתומלוע | &7יאב וישכעמ חותפ {0} םלועה!'
 UNSAFE_WARP: '&e&lיא | &7&oרחא םוקימ הסנ אנא .חוטב וניא םוקימה יכ הארנ.'
 UPDATED_PERMISSION: '&e&lיא | &7{0} ל תואשרהה ונכדוע.'
 UPDATED_SETTINGS: '&e&lיא | &7{0} תורדגהה ונכדוע.'
@@ -505,3 +508,4 @@ WITHDRAW_ALL_MONEY: |-
 WITHDRAW_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבהמ ${1} ךשמ {0}!'
 WITHDRAWN_MONEY: '&e&lקנב | &7{1} לש יאה לש קנבהמ ${0} תכשמ!'
 WITHDRAWN_MONEY_NAME: '&e&lקנב | &7{1} יאה לש קנבהמ ${0} תכשמ!'
+WORLD_NOT_UNLOCKED: '&e&lתומלוע | &7הזה יאב חותפ אל ןיידע {0} םלועה.'
