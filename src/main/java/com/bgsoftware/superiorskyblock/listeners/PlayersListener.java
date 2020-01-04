@@ -129,7 +129,7 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(e.getIsland().equals(e.getPlayer().getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getIsland().hasPermission(e.getPlayer(), IslandPermission.FLY) && e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -166,7 +166,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onIslandLeave(IslandLeaveEvent e){
-        if(e.getIsland().equals(e.getPlayer().getIsland()) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             if(player.getGameMode() != GameMode.CREATIVE) {
                 player.setAllowFlight(false);

@@ -134,6 +134,7 @@ island-roles:
       - CHEST_ACCESS
       - DEPOSIT_MONEY
       - EXPEL_BYPASS
+      - FLY
       - MONSTER_SPAWN
       - RANKUP
     mod:

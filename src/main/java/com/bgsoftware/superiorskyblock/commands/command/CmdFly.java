@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -63,7 +64,7 @@ public final class CmdFly implements ICommand {
             Locale.TOGGLED_FLY_OFF.send(superiorPlayer);
         }
         else{
-            if(island == null || !island.equals(superiorPlayer.getIsland())){
+            if(island == null || !island.hasPermission(superiorPlayer, IslandPermission.FLY)){
                 Locale.TOGGLE_FLY_OUTSIDE_ISLAND.send(superiorPlayer);
                 return;
             }
