@@ -443,6 +443,11 @@ public interface Island extends Comparable<Island> {
      */
     void sendMessage(String message, UUID... ignoredMembers);
 
+    /**
+     * Checks whether or not the island is being recalculated currently.
+     */
+    boolean isBeingRecalculated();
+
     /*
      *  Bank related methods
      */

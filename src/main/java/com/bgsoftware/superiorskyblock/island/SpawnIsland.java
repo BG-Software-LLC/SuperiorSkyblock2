@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -14,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -24,7 +24,6 @@ import org.bukkit.command.ConsoleCommandSender;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -439,11 +438,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
-        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
 
-        getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message));
+    }
+
+    @Override
+    public boolean isBeingRecalculated() {
+        return false;
     }
 
     @Override

@@ -82,10 +82,16 @@ public final class SIsland extends DatabaseObject implements Island {
     private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
 
     /*
-     * SIsland identifiers
+     * Island identifiers
      */
     private SuperiorPlayer owner;
     private final BlockPosition center;
+
+    /*
+     * Island flags
+     */
+
+    private final SyncedObject<Boolean> beingRecalculated = SyncedObject.of(false);
 
     /*
      * Island data
@@ -770,6 +776,7 @@ public final class SIsland extends DatabaseObject implements Island {
         }
 
         calcProcess = true;
+        beingRecalculated.set(true);
 
         List<Chunk> chunks = getAllChunks(true);
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
@@ -876,6 +883,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 saveBlockCounts();
 
                 calcProcess = false;
+                beingRecalculated.set(false);
 
                 if(islandCalcsQueue.size() != 0){
                     CalcIslandData calcIslandData = islandCalcsQueue.pop();
@@ -1035,6 +1043,11 @@ public final class SIsland extends DatabaseObject implements Island {
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
+    }
+
+    @Override
+    public boolean isBeingRecalculated() {
+        return beingRecalculated.get();
     }
 
     /*
