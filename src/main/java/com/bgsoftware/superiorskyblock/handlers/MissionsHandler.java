@@ -167,8 +167,8 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
-        if(!Bukkit.isPrimaryThread()){
-            Executor.sync(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
+        if(Bukkit.isPrimaryThread()){
+            Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
             return;
         }
 
@@ -198,8 +198,13 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         List<ItemStack> itemRewards = new ArrayList<>();
-        missionData.itemRewards.forEach(itemStack -> itemRewards.add(itemStack.clone()));
-        List<String> commandRewards = new ArrayList<>(missionData.commandRewards);
+        List<String> commandRewards;
+
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (missionData) {
+            missionData.itemRewards.forEach(itemStack -> itemRewards.add(itemStack.clone()));
+            commandRewards = new ArrayList<>(missionData.commandRewards);
+        }
 
         MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
         Bukkit.getPluginManager().callEvent(missionCompleteEvent);
@@ -231,13 +236,15 @@ public final class MissionsHandler implements MissionsManager {
             superiorPlayer.asPlayer().getInventory().addItem(toGive);
         }
 
-        for(String command : missionCompleteEvent.getCommandRewards()){
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
-                    .replace("%mission%", mission.getName())
-                    .replace("%player%", superiorPlayer.getName())
-                    .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
-            );
-        }
+        Executor.sync(() -> {
+            for(String command : missionCompleteEvent.getCommandRewards()){
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                        .replace("%mission%", mission.getName())
+                        .replace("%player%", superiorPlayer.getName())
+                        .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
+                );
+            }
+        });
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

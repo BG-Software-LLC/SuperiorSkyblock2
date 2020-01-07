@@ -33,6 +33,7 @@ public class MissionCompleteEvent extends Event implements Cancellable {
      * @param commandRewards The list of commands that will be ran as a reward.
      */
     public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
+        super(true);
         this.superiorPlayer = superiorPlayer;
         this.mission = mission;
         this.islandMission = islandMission;
