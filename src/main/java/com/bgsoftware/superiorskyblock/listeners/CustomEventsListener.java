@@ -276,7 +276,13 @@ public final class CustomEventsListener implements Listener {
                         isSign = ((org.bukkit.material.Sign) faceBlock.getState().getData()).getAttachedFace().getOppositeFace() == blockFace;
                     }
                     else {
-                        isSign = ((org.bukkit.block.data.Directional) plugin.getNMSAdapter().getBlockData(faceBlock)).getFacing().getOppositeFace() == blockFace;
+                        Object blockData = plugin.getNMSAdapter().getBlockData(faceBlock);
+                        if(blockData instanceof org.bukkit.block.data.type.Sign){
+                            isSign = ((org.bukkit.block.data.type.Sign) blockData).getRotation().getOppositeFace() == blockFace;
+                        }
+                        else {
+                            isSign = ((org.bukkit.block.data.Directional) blockData).getFacing().getOppositeFace() == blockFace;
+                        }
                     }
 
                     if(isSign) {
