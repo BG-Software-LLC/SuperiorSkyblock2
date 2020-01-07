@@ -9,7 +9,7 @@ title: '&lSelect Language...'
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
-  - '@ # @ @ % @ @ ^ @'
+  - '@ # @ % @ * @ ^ @'
   - '@ @ @ @ @ @ @ @ @'
 
 items:
@@ -27,13 +27,20 @@ items:
     name: '&eHebrew'
     lore:
       - '&7Change language to hebrew.'
-  '^':
+  '*':
     language: 'vi-VN'
     type: PLAYER_HEAD
     skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGE1N2I5ZDdkZDA0MTY5NDc4Y2ZkYjhkMGI2ZmQwYjhjODJiNjU2NmJiMjgzNzFlZTlhN2M3YzE2NzFhZDBiYiJ9fX0='
     name: '&eVietnamese'
     lore:
       - '&7Change language to vietnamese.'
+  '^':
+    language: 'it-IT'
+    type: PLAYER_HEAD
+    skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODVjZTg5MjIzZmE0MmZlMDZhZDY1ZDhkNDRjYTQxMmFlODk5YzgzMTMwOWQ2ODkyNGRmZTBkMTQyZmRiZWVhNCJ9fX0='
+    name: '&eItalian'
+    lore:
+      - '&7Change language to italian.'
 
 sounds:
   '#':
