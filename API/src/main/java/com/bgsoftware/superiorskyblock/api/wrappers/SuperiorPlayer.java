@@ -316,10 +316,22 @@ public interface SuperiorPlayer {
     void resetMission(Mission mission);
 
     /**
-     * Check whether the island has completed the mission before.
+     * Check whether the player has completed the mission before.
      * @param mission The mission to check.
      */
     boolean hasCompletedMission(Mission mission);
+
+    /**
+     * Check whether the player can complete a mission again.
+     * @param mission The mission to check.
+     */
+    boolean canCompleteMissionAgain(Mission mission);
+
+    /**
+     * Get the amount of times mission was completed.
+     * @param mission The mission to check.
+     */
+    int getAmountMissionCompleted(Mission mission);
 
     /**
      * Get the list of the completed missions of the player.

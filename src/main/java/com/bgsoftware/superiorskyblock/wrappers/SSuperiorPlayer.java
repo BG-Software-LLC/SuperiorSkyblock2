@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-
+import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -32,9 +33,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -43,7 +45,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Set<String> completedMissions = new HashSet<>();
+    private final Map<Mission, Integer> completedMissions = new HashMap<>();
     private final UUID player;
 
     private UUID islandLeaderFromCache;
@@ -447,7 +449,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void completeMission(Mission mission) {
-        completedMissions.add(mission.getName());
+        completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
 
         Query.PLAYER_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
@@ -457,7 +459,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void resetMission(Mission mission) {
-        completedMissions.remove(mission.getName());
+        completedMissions.remove(mission);
 
         Query.PLAYER_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
@@ -467,12 +469,23 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public boolean hasCompletedMission(Mission mission) {
-        return completedMissions.contains(mission.getName());
+        return completedMissions.containsKey(mission);
+    }
+
+    @Override
+    public boolean canCompleteMissionAgain(Mission mission) {
+        MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
+        return getAmountMissionCompleted(mission) < missionData.resetAmount;
+    }
+
+    @Override
+    public int getAmountMissionCompleted(Mission mission) {
+        return completedMissions.getOrDefault(mission, 0);
     }
 
     @Override
     public List<Mission> getCompletedMissions() {
-        return completedMissions.stream().map(plugin.getMissions()::getMission).collect(Collectors.toList());
+        return new ArrayList<>(completedMissions.keySet());
     }
 
     @Override

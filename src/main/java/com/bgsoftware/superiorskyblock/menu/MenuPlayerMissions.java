@@ -23,23 +23,21 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         super("menuPlayerMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getPlayerMissions().stream()
-                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || mission.getRequiredMissions().stream().allMatch(_mission ->
-                            plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)))).collect(Collectors.toList());
+                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer))
+                    .collect(Collectors.toList());
         }
     }
 
     @Override
     protected void onPlayerClick(InventoryClickEvent event, Mission mission) {
-        boolean completed = superiorPlayer.hasCompletedMission(mission);
+        boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
         boolean canComplete = mission.canComplete(superiorPlayer);
-        boolean hasAllRequiredMissions = mission.getRequiredMissions().stream().allMatch(_mission ->
-                plugin.getMissions().hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
 
         SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
         if(sound != null)
             sound.playSound(superiorPlayer.asPlayer());
 
-        if(canComplete && hasAllRequiredMissions){
+        if(canComplete && plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer)){
             plugin.getMissions().rewardMission(mission, superiorPlayer, false);
             previousMove = false;
             open(previousMenu);
@@ -49,17 +47,20 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
         MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
-        boolean completed = superiorPlayer.hasCompletedMission(mission);
+        boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
         int percentage = getPercentage(mission.getProgress(superiorPlayer));
         int progressValue = mission.getProgressValue(superiorPlayer);
+        int amountCompleted = superiorPlayer.getAmountMissionCompleted(mission);
         return completed ? missionData.completed.build(superiorPlayer) :
                 plugin.getMissions().canComplete(superiorPlayer, mission) ?
                         missionData.canComplete.clone()
                                 .replaceAll("{0}", percentage + "")
-                                .replaceAll("{1}", progressValue + "").build(superiorPlayer) :
+                                .replaceAll("{1}", progressValue + "")
+                                .replaceAll("{2}", amountCompleted + "").build(superiorPlayer) :
                         missionData.notCompleted.clone()
                                 .replaceAll("{0}", percentage + "")
-                                .replaceAll("{1}", progressValue + "").build(superiorPlayer);
+                                .replaceAll("{1}", progressValue + "")
+                                .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);
     }
 
     @Override

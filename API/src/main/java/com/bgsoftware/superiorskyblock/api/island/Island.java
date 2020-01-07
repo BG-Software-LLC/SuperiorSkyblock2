@@ -829,6 +829,18 @@ public interface Island extends Comparable<Island> {
     boolean hasCompletedMission(Mission mission);
 
     /**
+     * Check whether the island can complete a mission again.
+     * @param mission The mission to check.
+     */
+    boolean canCompleteMissionAgain(Mission mission);
+
+    /**
+     * Get the amount of times mission was completed.
+     * @param mission The mission to check.
+     */
+    int getAmountMissionCompleted(Mission mission);
+
+    /**
      * Get the list of the completed missions of the player.
      */
     List<Mission> getCompletedMissions();

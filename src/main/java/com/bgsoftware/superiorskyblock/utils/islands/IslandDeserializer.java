@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
@@ -116,14 +117,18 @@ public final class IslandDeserializer {
         });
     }
 
-    public static void deserializeMissions(String missions, SyncedObject<Set<String>> completedMissionsSync){
+    public static void deserializeMissions(String missions, SyncedObject<Map<Mission, Integer>> completedMissionsSync){
         completedMissionsSync.run(completedMissions -> {
             deserializeMissions(missions, completedMissions);
         });
     }
 
-    public static void deserializeMissions(String missions, Set<String> completedMissions){
-        completedMissions.addAll(Arrays.asList(missions.split(";")));
+    public static void deserializeMissions(String missions, Map<Mission, Integer> completedMissions){
+        for(String mission : missions.split(";")){
+            String[] missionSections = mission.split("=");
+            int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
+            completedMissions.put(plugin.getMissions().getMission(missionSections[0]), completeAmount);
+        }
     }
 
     public static void deserializeSettings(String settings, SyncedObject<Set<IslandSettings>> islandSettingsSync){

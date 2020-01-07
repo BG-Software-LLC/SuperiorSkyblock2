@@ -117,7 +117,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<String> islandName = SyncedObject.of("");
     private final SyncedObject<String> description = SyncedObject.of("");
     private final SyncedObject<Map<UUID, Rating>> ratings = SyncedObject.of(new HashMap<>());
-    private final SyncedObject<Set<String>> completedMissions = SyncedObject.of(new HashSet<>());
+    private final SyncedObject<Map<Mission, Integer>> completedMissions = SyncedObject.of(new HashMap<>());
     private final SyncedObject<Biome> biome = SyncedObject.of(null);
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
     private final SyncedObject<String> generatedSchematics = SyncedObject.of("normal");
@@ -1609,7 +1609,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void completeMission(Mission mission) {
         completedMissions.run(completedMissions -> {
-            completedMissions.add(mission.getName());
+            completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
             Query.ISLAND_SET_MISSIONS.getStatementHolder()
                     .setString(IslandSerializer.serializeMissions(completedMissions))
                     .setString(owner.getUniqueId().toString())
@@ -1622,7 +1622,13 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void resetMission(Mission mission) {
         completedMissions.run(completedMissions -> {
-            completedMissions.remove(mission.getName());
+            if(completedMissions.getOrDefault(mission, 0) > 0) {
+                completedMissions.put(mission, completedMissions.get(mission) - 1);
+            }
+            else {
+                completedMissions.remove(mission);
+            }
+
             Query.ISLAND_SET_MISSIONS.getStatementHolder()
                     .setString(IslandSerializer.serializeMissions(completedMissions))
                     .setString(owner.getUniqueId().toString())
@@ -1635,14 +1641,27 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public boolean hasCompletedMission(Mission mission) {
         return completedMissions.run(completedMissions -> {
-            return completedMissions.contains(mission.getName());
+            return completedMissions.containsKey(mission);
+        });
+    }
+
+    @Override
+    public boolean canCompleteMissionAgain(Mission mission) {
+        MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
+        return getAmountMissionCompleted(mission) < missionData.resetAmount;
+    }
+
+    @Override
+    public int getAmountMissionCompleted(Mission mission) {
+        return completedMissions.run(completedMissions -> {
+            return completedMissions.getOrDefault(mission, 0);
         });
     }
 
     @Override
     public List<Mission> getCompletedMissions() {
         return completedMissions.run(completedMissions -> {
-            return completedMissions.stream().map(plugin.getMissions()::getMission).collect(Collectors.toList());
+            return new ArrayList<>(completedMissions.keySet());
         });
     }
 

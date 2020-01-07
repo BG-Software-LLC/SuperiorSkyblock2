@@ -736,6 +736,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean canCompleteMissionAgain(Mission mission) {
+        return false;
+    }
+
+    @Override
+    public int getAmountMissionCompleted(Mission mission) {
+        return 0;
+    }
+
+    @Override
     public List<Mission> getCompletedMissions() {
         return new ArrayList<>();
     }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
@@ -99,14 +100,14 @@ public final class IslandSerializer {
         return ratingsBuilder.length() == 0 ? "" : ratingsBuilder.toString().substring(1);
     }
 
-    public static String serializeMissions(SyncedObject<Set<String>> missions){
-        return missions.run((Function<Set<String>, String>) IslandSerializer::serializeMissions);
+    public static String serializeMissions(SyncedObject<Map<Mission, Integer>> missions){
+        return missions.run((Function<Map<Mission, Integer>, String>) IslandSerializer::serializeMissions);
     }
 
-    public static String serializeMissions(Set<String> missions){
+    public static String serializeMissions(Map<Mission, Integer> missions){
         StringBuilder missionsBuilder = new StringBuilder();
-        missions.forEach(mission ->
-                missionsBuilder.append(";").append(mission));
+        missions.forEach((mission, amount) ->
+                missionsBuilder.append(";").append(mission).append("=").append(amount));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 

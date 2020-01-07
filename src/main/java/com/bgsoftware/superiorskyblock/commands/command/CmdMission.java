@@ -75,7 +75,7 @@ public final class CmdMission implements ICommand {
             StringBuilder stringBuilder = new StringBuilder();
             requiredMissions.forEach(requiredMission -> {
                 Mission _mission = plugin.getMissions().getMission(requiredMission);
-                if(!plugin.getMissions().hasCompleted(superiorPlayer, _mission))
+                if(plugin.getMissions().canCompleteAgain(superiorPlayer, _mission))
                     stringBuilder.append(_mission.getName()).append(", ");
             });
             if(stringBuilder.length() != 0) {

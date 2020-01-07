@@ -139,8 +139,24 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
+    public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission mission) {
+        MissionData missionData = getMissionData(mission);
+        Island playerIsland = superiorPlayer.getIsland();
+
+        if(missionData.islandMission){
+            if(playerIsland != null)
+                return playerIsland.canCompleteMissionAgain(mission);
+        }
+        else{
+            return superiorPlayer.canCompleteMissionAgain(mission);
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission) {
-        return !hasCompleted(superiorPlayer, mission) && mission.canComplete(superiorPlayer) &&
+        return canCompleteAgain(superiorPlayer, mission) && mission.canComplete(superiorPlayer) &&
                 hasAllRequiredMissions(mission, superiorPlayer) && canPassAllChecks(mission, superiorPlayer);
     }
 
@@ -160,7 +176,7 @@ public final class MissionsHandler implements MissionsManager {
         Island playerIsland = superiorPlayer.getIsland();
 
         if(!forceReward) {
-            if (hasCompleted(superiorPlayer, mission)) {
+            if (!canCompleteAgain(superiorPlayer, mission)) {
                 mission.onCompleteFail(superiorPlayer);
                 return;
             }
@@ -174,7 +190,7 @@ public final class MissionsHandler implements MissionsManager {
             }
 
             if (checkAutoReward && !isAutoReward(mission)) {
-                if (!hasCompleted(superiorPlayer, mission)) {
+                if (canCompleteAgain(superiorPlayer, mission)) {
                     Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
                     return;
                 }
@@ -337,7 +353,7 @@ public final class MissionsHandler implements MissionsManager {
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
     }
 
-    private boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
+    public boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
         return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, mission));
     }
 
@@ -363,6 +379,7 @@ public final class MissionsHandler implements MissionsManager {
         private final boolean autoReward, islandMission;
         public final boolean disbandReset;
         public final ItemBuilder notCompleted, canComplete, completed;
+        public final int resetAmount;
 
         MissionData(Mission mission, ConfigurationSection section){
             this.index = currentIndex++;
@@ -370,6 +387,7 @@ public final class MissionsHandler implements MissionsManager {
             this.islandMission = section.getBoolean("island", false);
             this.autoReward = section.getBoolean("auto-reward", true);
             this.disbandReset = section.getBoolean("disband-reset", false);
+            this.resetAmount = section.getInt("reset-amount", 1);
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
