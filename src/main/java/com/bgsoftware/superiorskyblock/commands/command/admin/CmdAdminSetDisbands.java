@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,8 @@ public class CmdAdminSetDisbands implements ICommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setdisbands <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_PLAYERS.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
@@ -54,11 +56,21 @@ public class CmdAdminSetDisbands implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        List<SuperiorPlayer> superiorPlayers = new ArrayList<>();
 
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            superiorPlayers.addAll(plugin.getPlayers().getAllPlayers());
+        }
+
+        else {
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+
+            if (targetPlayer == null) {
+                Locale.INVALID_PLAYER.send(sender, args[2]);
+                return;
+            }
+
+            superiorPlayers.add(targetPlayer);
         }
 
         int amount;
@@ -69,11 +81,19 @@ public class CmdAdminSetDisbands implements ICommand {
             return;
         }
 
-        targetPlayer.setDisbands(amount);
+        Executor.data(() -> superiorPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(amount)));
 
-        if (!sender.equals(targetPlayer.asPlayer()))
-            Locale.DISBAND_SET_OTHER.send(sender, targetPlayer.getName(), targetPlayer.getDisbands());
-        Locale.DISBAND_SET.send(targetPlayer, amount);
+        if(superiorPlayers.size() > 1){
+            Locale.DISBAND_SET_ALL.send(sender, amount);
+        }
+        else if (!sender.equals(superiorPlayers.get(0).asPlayer()))
+            Locale.DISBAND_SET_OTHER.send(sender, superiorPlayers.get(0).getName(), amount);
+
+        superiorPlayers.forEach(superiorPlayer -> {
+            if(superiorPlayer.isOnline()){
+                Locale.DISBAND_SET.send(superiorPlayer, amount);
+            }
+        });
     }
 
     @Override

@@ -65,6 +65,7 @@ CHANGED_WARPS_LIMIT: '&e&lםיגורדש | &7החלצהב הנכדוע {0} לש 
 CHANGED_WARPS_LIMIT_ALL: '&e&lםיגורדש | &7החלצהב הנכדוע םייאה לכ לש םימוקימה תלבגמ.'
 CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} יאה לש םימוקימה תלבגמ.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EMAIL: ליימיא
@@ -206,8 +207,10 @@ DEPOSIT_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבה לא ${0} דיקפה 
 DESTROY_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ סורהל לוכי אל התא.'
 DISBAND_ANNOUNCEMENT: '&e&lיא | &7{0} ידי לע קחמנ ךלש יאה.'
 DISBAND_GIVE: '&e&lיא | &7תורתומ תוקיחמ {0} דוע תלביק.'
+DISBAND_GIVE_ALL: '&e&lיא | &7םינקחשה לכל תורתומ תוקיחמ {0} דוע תתנ.'
 DISBAND_GIVE_OTHER: '&e&lיא | &7{1} ל תורתומ תוקיחמ {0} דוע תתנ.'
 DISBAND_SET: '&e&lיא | &7{0} ל התנוש ךלש תורתומה תוקיחמה תומכ.'
+DISBAND_SET_ALL: '&e&lיא | &7{0} ל םינקחשה לכ לש תורתומה תוקיחמה תומכ תא תיניש.'
 DISBAND_SET_OTHER: '&e&lיא | &7{1} ל {0} לש תורתומה תוקיחמה תומכ תא תיניש.'
 DISBANDED_ISLAND: '&e&lיא | &7ךלש יאה תא תקחמ.'
 DISBANDED_ISLAND_OTHER: '&e&lיא | &7{0} לש יאה תא תקחמ.'

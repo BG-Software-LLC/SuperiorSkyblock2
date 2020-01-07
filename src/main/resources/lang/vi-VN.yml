@@ -83,6 +83,7 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lĐiều Chỉnh | &7Cập nhật thành công gi�
 CHANGED_WARPS_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công giới hạn khu vực
   của đảo {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
@@ -241,8 +242,10 @@ DESTROY_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể phá hủy bên ngoài
   của bạn.'
 DISBAND_ANNOUNCEMENT: '&e&lĐảo Thần | &7Đảo của bạn đã bị giải tán bởi {0}.'
 DISBAND_GIVE: '&e&lĐảo Thần | &7Bạn đã nhận được {0} giải tán.'
+DISBAND_GIVE_ALL: '&e&lIsland | &7You gave {0} disbands to all players.'
 DISBAND_GIVE_OTHER: '&e&lĐảo Thần | &7Bạn đã cho {0} giải tán đến {1}.'
 DISBAND_SET: '&e&lĐảo Thần | &7Số lượng giải tán của bạn đã được đặt thành {0}.'
+DISBAND_SET_ALL: '&e&lIsland | &7You set the disband count of all players to {0}.'
 DISBAND_SET_OTHER: '&e&lĐảo Thần | &7Bạn đã đặt số lần giải tán của {0} thành {1}.'
 DISBANDED_ISLAND: '&e&lĐảo Thần | &7Bạn đã giải tán hòn đảo của bạn.'
 DISBANDED_ISLAND_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo của {0}.'

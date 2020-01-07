@@ -86,6 +86,7 @@ CHANGED_WARPS_LIMIT_ALL: '&e&lAggiornamenti | &7Aggioranto con successo il limit
 CHANGED_WARPS_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il mite di
   warps dell''isola {0}.'
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
@@ -252,8 +253,10 @@ DESTROY_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi distruggere al di fuori del tuo
   di protezione.'
 DISBAND_ANNOUNCEMENT: '&e&lIsola | &7La tua isola è stata sciolta da {0}.'
 DISBAND_GIVE: '&e&lIsola | &7Hai ricevuto {0} reset da poter usare.'
+DISBAND_GIVE_ALL: '&e&lIsola | &7Hai dato {0} reset in più a tutti i giocatori.'
 DISBAND_GIVE_OTHER: '&e&lIsola | &7Hai dato {0} reset a {1}.'
 DISBAND_SET: '&e&lIsola | &7Il tuo limite di reset è stato impostato a {0}.'
+DISBAND_SET_ALL: '&e&lIsola | &7Hai impostato il limite di reset a {0} per tutte le isole.'
 DISBAND_SET_OTHER: '&e&lIsola | &7Hai impostato i reset dell''isola di {0} a {1}.'
 DISBANDED_ISLAND: '&e&lIsola | &7Hai sciolto la tua isola.'
 DISBANDED_ISLAND_OTHER: '&e&lIsola | &7Hai sciolto l''isola di {0}.'

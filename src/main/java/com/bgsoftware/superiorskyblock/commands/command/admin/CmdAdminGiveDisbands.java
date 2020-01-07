@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -54,11 +55,21 @@ public final class CmdAdminGiveDisbands implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        List<SuperiorPlayer> superiorPlayers = new ArrayList<>();
 
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            superiorPlayers.addAll(plugin.getPlayers().getAllPlayers());
+        }
+
+        else {
+            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+
+            if (targetPlayer == null) {
+                Locale.INVALID_PLAYER.send(sender, args[2]);
+                return;
+            }
+
+            superiorPlayers.add(targetPlayer);
         }
 
         int amount;
@@ -69,11 +80,19 @@ public final class CmdAdminGiveDisbands implements ICommand {
             return;
         }
 
-        targetPlayer.setDisbands(targetPlayer.getDisbands() + amount);
+        Executor.data(() -> superiorPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(superiorPlayer.getDisbands() + amount)));
 
-        if (!sender.equals(targetPlayer.asPlayer()))
-            Locale.DISBAND_GIVE_OTHER.send(sender, targetPlayer.getName(), targetPlayer.getDisbands());
-        Locale.DISBAND_GIVE.send(targetPlayer, amount);
+        if(superiorPlayers.size() > 1){
+            Locale.DISBAND_GIVE_ALL.send(sender, amount);
+        }
+        else if (!sender.equals(superiorPlayers.get(0).asPlayer()))
+            Locale.DISBAND_GIVE_OTHER.send(sender, superiorPlayers.get(0).getName(), amount);
+
+        superiorPlayers.forEach(superiorPlayer -> {
+            if(superiorPlayer.isOnline()){
+                Locale.DISBAND_GIVE.send(superiorPlayer, amount);
+            }
+        });
     }
 
     @Override
