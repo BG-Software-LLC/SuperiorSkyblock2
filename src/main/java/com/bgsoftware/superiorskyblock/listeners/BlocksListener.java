@@ -62,6 +62,7 @@ public final class BlocksListener implements Listener {
         if(island != null) {
             if(island.isBeingRecalculated()){
                 e.setCancelled(true);
+                Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
                 return;
             }
 
@@ -76,6 +77,7 @@ public final class BlocksListener implements Listener {
         if(island != null) {
             if(island.isBeingRecalculated()){
                 e.setCancelled(true);
+                Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
                 return;
             }
 
