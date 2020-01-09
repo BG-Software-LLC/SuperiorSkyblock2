@@ -47,9 +47,9 @@ public final class ProvidersHandler {
                     (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto")))
                 this.spawnersProvider = new BlocksProvider_EpicSpawners();
             else this.spawnersProvider = new BlocksProvider_Default();
-
-            PlaceholderHook.register(plugin);
         });
+
+        PlaceholderHook.register(plugin);
     }
 
     public Pair<Integer, EntityType> getSpawner(Location location){
