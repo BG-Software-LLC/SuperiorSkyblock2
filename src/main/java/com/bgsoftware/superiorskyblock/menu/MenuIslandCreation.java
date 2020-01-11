@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 public final class MenuIslandCreation extends SuperiorMenu {
@@ -107,7 +110,11 @@ public final class MenuIslandCreation extends SuperiorMenu {
         if(!file.exists())
             FileUtils.saveResource("menus/island-creation.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(convertOldGUI(cfg)){
+            cfg.save(file);
+        }
 
         /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
 
@@ -170,6 +177,47 @@ public final class MenuIslandCreation extends SuperiorMenu {
         else {
             menuIslandCreation.open(previousMenu);
         }
+    }
+
+    private static boolean convertOldGUI(YamlConfiguration newMenu){
+        File oldFile = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
+
+        if(!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("creation-gui.title"));
+
+        int size = cfg.getInt("creation-gui.size");
+
+        char[] patternChars = new char[size * 9];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if(cfg.contains("creation-gui.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("creation-gui.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        if(cfg.contains("creation-gui.schematics")) {
+            for (String schemName : cfg.getConfigurationSection("creation-gui.schematics").getKeys(false)){
+                ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics." + schemName);
+                char itemChar = itemChars[charCounter++];
+                section.set("schematic", schemName);
+                MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
+            }
+        }
+
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+
+        return true;
     }
 
 }

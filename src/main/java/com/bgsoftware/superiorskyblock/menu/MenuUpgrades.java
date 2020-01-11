@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,6 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +69,11 @@ public final class MenuUpgrades extends SuperiorMenu {
         if(!file.exists())
             FileUtils.saveResource("menus/upgrades.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(convertOldGUI(cfg)){
+            cfg.save(file);
+        }
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
@@ -103,6 +110,54 @@ public final class MenuUpgrades extends SuperiorMenu {
 
     public static void refreshMenus(){
         refreshMenus(MenuUpgrades.class);
+    }
+
+    private static boolean convertOldGUI(YamlConfiguration newMenu){
+        File oldFile = new File(plugin.getDataFolder(), "guis/upgrades-gui.yml");
+
+        if(!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("upgrades-gui.title"));
+
+        int size = cfg.getInt("upgrades-gui.size");
+
+        char[] patternChars = new char[size * 9];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if(cfg.contains("upgrades-gui.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("upgrades-gui.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        if(cfg.contains("upgrades-gui.upgrades")) {
+            for (String upgradeName : cfg.getConfigurationSection("upgrades-gui.upgrades").getKeys(false)){
+                ConfigurationSection section = cfg.getConfigurationSection("upgrades-gui.upgrades." + upgradeName);
+                char itemChar = itemChars[charCounter++];
+                section.set("item", itemChar + "");
+                patternChars[section.getInt("1.slot")] = itemChar;
+                for(String upgradeLevel : section.getKeys(false)){
+                    section.set(upgradeLevel + ".slot", null);
+                }
+            }
+        }
+
+        newMenu.set("upgrades", cfg.getConfigurationSection("upgrades-gui.upgrades"));
+        newMenu.set("sounds", null);
+        newMenu.set("commands", null);
+
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+
+        return true;
     }
 
 }

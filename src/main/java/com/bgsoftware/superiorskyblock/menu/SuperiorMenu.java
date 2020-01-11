@@ -26,6 +26,14 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    public static final char[] itemChars = new char[] {
+            '!', '@', '#', '$', '%', '^', '&', '*', '-', '_', '+', '=',
+            '~', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '>',
+            '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+            'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
+            'X', 'Y', 'Z'
+    };
+
     private static final Map<String, MenuData> dataMap = new HashMap<>();
 
     private final String identifier;

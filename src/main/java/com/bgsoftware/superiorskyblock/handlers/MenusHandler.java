@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -30,9 +31,11 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
+import java.io.File;
+
 public final class MenusHandler implements MenusManager {
 
-    public MenusHandler() throws HandlerLoadException {
+    public MenusHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         try {
             //Reload all menus
             MenuBiomes.init();
@@ -58,6 +61,14 @@ public final class MenusHandler implements MenusManager {
             MenuValues.init();
             MenuVisitors.init();
             MenuWarps.init();
+
+            File guiFolder = new File(plugin.getDataFolder(), "guis");
+            if(guiFolder.exists()){
+                File oldGuisFolder = new File(plugin.getDataFolder(), "old-guis");
+                //noinspection ResultOfMethodCallIgnored
+                guiFolder.renameTo(oldGuisFolder);
+            }
+
         }catch(Exception ex){
             throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
         }

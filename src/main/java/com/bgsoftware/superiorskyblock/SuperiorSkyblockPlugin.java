@@ -210,7 +210,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         providersHandler = new ProvidersHandler(this);
 
         try {
-            menusHandler = new MenusHandler();
+            menusHandler = new MenusHandler(this);
         }catch(HandlerLoadException ex){
             if(!HandlerLoadException.handle(ex))
                 return;

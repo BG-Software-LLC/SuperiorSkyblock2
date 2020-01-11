@@ -4,14 +4,18 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +60,11 @@ public final class MenuConfirmDisband extends SuperiorMenu {
         if(!file.exists())
             FileUtils.saveResource("menus/confirm-disband.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(convertOldGUI(cfg)){
+            cfg.save(file);
+        }
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
@@ -66,6 +74,47 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
         new MenuConfirmDisband(superiorPlayer).open(previousMenu);
+    }
+
+    private static boolean convertOldGUI(YamlConfiguration newMenu){
+        File oldFile = new File(plugin.getDataFolder(), "guis/confirm-disband.yml");
+
+        if(!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("disband-gui.title"));
+        newMenu.set("type", "HOPPER");
+
+        char[] patternChars = new char[5];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if(cfg.contains("disband-gui.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("disband-gui.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        char confirmChar = itemChars[charCounter++], cancelChar = itemChars[charCounter++];
+
+        MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
+                itemsSection, commandsSection, soundsSection);
+        MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.cancel"), patternChars, cancelChar,
+                itemsSection, commandsSection, soundsSection);
+
+        newMenu.set("confirm", confirmChar + "");
+        newMenu.set("cancel", cancelChar + "");
+
+        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars, itemChars[charCounter]));
+
+        return true;
     }
 
 }

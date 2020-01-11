@@ -45,14 +45,17 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             }
         }
 
-        inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
-                .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
+        if(previousSlot >= 0)
+            inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
+                    .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
 
-        inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
-                .replaceAll("{0}", currentPage + "").build(superiorPlayer));
+        if(currentSlot >= 0)
+            inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
+                    .replaceAll("{0}", currentPage + "").build(superiorPlayer));
 
-        inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
-                .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
+        if(nextSlot >= 0)
+            inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
+                    .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
 
         return inventory;
     }

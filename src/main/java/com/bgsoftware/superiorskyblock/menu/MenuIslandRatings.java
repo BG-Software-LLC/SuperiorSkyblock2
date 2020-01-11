@@ -3,15 +3,19 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +57,11 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
         if(!file.exists())
             FileUtils.saveResource("menus/island-ratings.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(convertOldGUI(cfg)){
+            cfg.save(file);
+        }
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
 
@@ -69,6 +77,45 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
 
     public static void refreshMenus(){
         SuperiorMenu.refreshMenus(MenuIslandRatings.class);
+    }
+
+    private static boolean convertOldGUI(YamlConfiguration newMenu){
+        File oldFile = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
+
+        if(!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("ratings-gui.title"));
+
+        int size = cfg.getInt("ratings-gui.size");
+
+        char[] patternChars = new char[size * 9];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if(cfg.contains("ratings-gui.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("ratings-gui.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        char slotsChar = itemChars[charCounter++];
+
+        MenuConverter.convertPagedButtons(cfg.getConfigurationSection("ratings-gui"),
+                cfg.getConfigurationSection("ratings-gui.rate-item"), newMenu, patternChars,
+                slotsChar, itemChars[charCounter++], itemChars[charCounter++], itemChars[charCounter++],
+                itemsSection, commandsSection, soundsSection);
+
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+
+        return true;
     }
 
 }

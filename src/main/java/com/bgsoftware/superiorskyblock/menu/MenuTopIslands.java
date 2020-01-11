@@ -4,14 +4,17 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -220,7 +224,11 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         if(!file.exists())
             FileUtils.saveResource("menus/top-islands.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        if(convertOldGUI(cfg)){
+            cfg.save(file);
+        }
 
         sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
@@ -254,6 +262,80 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
     public static void refreshMenus(){
         SuperiorMenu.refreshMenus(MenuTopIslands.class);
+    }
+
+    private static boolean convertOldGUI(YamlConfiguration newMenu){
+        File oldFile = new File(plugin.getDataFolder(), "guis/top-islands.yml");
+
+        if(!oldFile.exists())
+            return false;
+
+        //We want to reset the items of newMenu.
+        ConfigurationSection itemsSection = newMenu.createSection("items");
+        ConfigurationSection soundsSection = newMenu.createSection("sounds");
+        ConfigurationSection commandsSection = newMenu.createSection("commands");
+
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(oldFile);
+
+        newMenu.set("title", cfg.getString("top-islands.title"));
+
+        int size = cfg.getInt("top-islands.size");
+
+        char[] patternChars = new char[size * 9];
+        Arrays.fill(patternChars, '\n');
+
+        int charCounter = 0;
+
+        if(cfg.contains("top-islands.fill-items")) {
+            charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("top-islands.fill-items"),
+                    charCounter, patternChars, itemsSection, commandsSection, soundsSection);
+        }
+
+        char slotsChar = itemChars[charCounter++], worthChar = itemChars[charCounter++],
+                levelChar = itemChars[charCounter++], ratingChar = itemChars[charCounter++],
+                playersChar = itemChars[charCounter++], playerIslandChar = itemChars[charCounter++];
+
+        for(String slot : cfg.getString("top-islands.slots").split(","))
+            patternChars[Integer.parseInt(slot)] = slotsChar;
+
+        ConfigurationSection islandItemSection = cfg.getConfigurationSection("top-islands.island-item");
+        newMenu.set("items."+ slotsChar + ".island", islandItemSection);
+        newMenu.set("sounds."+ slotsChar + ".island", islandItemSection.getConfigurationSection("sound"));
+        islandItemSection.set("sound", null);
+
+        ConfigurationSection noIslandItemSection = cfg.getConfigurationSection("top-islands.no-island-item");
+        newMenu.set("items."+ slotsChar + ".no-island", noIslandItemSection);
+        newMenu.set("sounds."+ slotsChar + ".no-island", noIslandItemSection.getConfigurationSection("sound"));
+        noIslandItemSection.set("sound", null);
+
+        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.worth-sort"), patternChars, worthChar,
+                itemsSection, commandsSection, soundsSection);
+        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.level-sort"), patternChars, levelChar,
+                itemsSection, commandsSection, soundsSection);
+        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.rating-sort"), patternChars, ratingChar,
+                itemsSection, commandsSection, soundsSection);
+        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.players-sort"), patternChars, playersChar,
+                itemsSection, commandsSection, soundsSection);
+
+        patternChars[cfg.getInt("player-island-slot")] = playerIslandChar;
+
+        newMenu.set("worth-sort", worthChar);
+        newMenu.set("level-sort", levelChar);
+        newMenu.set("rating-sort", ratingChar);
+        newMenu.set("players-sort", playersChar);
+        newMenu.set("player-island", playerIslandChar);
+        newMenu.set("sort-glow-when-selected", false);
+
+        char invalidChar = itemChars[charCounter++];
+
+        newMenu.set("slots", slotsChar);
+        newMenu.set("previous-page", invalidChar);
+        newMenu.set("current-page", invalidChar);
+        newMenu.set("next-page", invalidChar);
+
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+
+        return true;
     }
 
 }
