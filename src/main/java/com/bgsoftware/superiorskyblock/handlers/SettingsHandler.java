@@ -99,6 +99,7 @@ public final class SettingsHandler {
     public final long warpsWarmup;
     public final boolean liquidUpdate;
     public final List<String> pvpWorlds;
+    public final boolean stopLeaving;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -227,6 +228,7 @@ public final class SettingsHandler {
         warpsWarmup = cfg.getLong("warps-warmup", 0);
         liquidUpdate = cfg.getBoolean("liquid-update", false);
         pvpWorlds = cfg.getStringList("pvp-worlds");
+        stopLeaving = cfg.getBoolean("stop-leaving", false);
     }
 
     public void updateValue(String path, Object value){

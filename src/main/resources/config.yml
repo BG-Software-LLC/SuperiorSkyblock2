@@ -409,3 +409,6 @@ liquid-update: false
 # A list of worlds that PvP will be enabled between island members.
 pvp-worlds:
 - 'PvP'
+
+# Stop players from leaving their island by walking through the border.
+stop-leaving: false

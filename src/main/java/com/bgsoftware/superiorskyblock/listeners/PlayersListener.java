@@ -38,12 +38,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -177,7 +179,7 @@ public final class PlayersListener implements Listener {
 
         e.getIsland().setPlayerInside(e.getPlayer(), false);
 
-        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
+        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause(), e.getTo());
         Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
         if(islandLeaveProtectedEvent.isCancelled())
             e.setCancelled(true);
@@ -185,10 +187,47 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
+        if(plugin.getSettings().stopLeaving) {
+            Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+
+            if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) && (toIsland == null || toIsland.equals(e.getIsland()))) {
+                e.setCancelled(true);
+                return;
+            }
+        }
+
         Executor.sync(() -> {
             if(e.getPlayer().isOnline())
                 plugin.getNMSAdapter().setWorldBorder(e.getPlayer(), plugin.getGrid().getIslandAt(e.getPlayer().getLocation()));
         }, 5L);
+    }
+
+    @EventHandler
+    public void onMinecartRightClick(PlayerInteractAtEntityEvent e){
+        if(!plugin.getSettings().stopLeaving)
+            return;
+
+        Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+        Island entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+
+        if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
+                !playerIsland.isInsideRange(e.getRightClicked().getLocation())) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onMinecartRightClick(VehicleEnterEvent e){
+        if(!plugin.getSettings().stopLeaving)
+            return;
+
+        Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
+        Island entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+
+        if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
+                !playerIsland.isInsideRange(e.getVehicle().getLocation())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler

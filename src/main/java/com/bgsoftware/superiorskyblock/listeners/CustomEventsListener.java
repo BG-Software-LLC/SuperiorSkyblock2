@@ -93,7 +93,7 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
@@ -109,12 +109,18 @@ public final class CustomEventsListener implements Listener {
             if(!sameWorld){
                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
             }
+            else{
+                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT, e.getTo());
+                Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
+                if(islandLeaveProtectedEvent.isCancelled())
+                    e.setCancelled(true);
+            }
 
             return;
         }
 
         if (fromIsland != null && !fromIsland.isSpawn()) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT);
+            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT, e.getTo());
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
             if(islandLeaveEvent.isCancelled()) {
                 e.setCancelled(true);
@@ -168,7 +174,7 @@ public final class CustomEventsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island != null && !(island instanceof SpawnIsland)){
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, island, IslandLeaveEvent.LeaveCause.PLAYER_QUIT);
+            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, island, IslandLeaveEvent.LeaveCause.PLAYER_QUIT, null);
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
         }
     }
@@ -225,7 +231,7 @@ public final class CustomEventsListener implements Listener {
 
         if(fromIsland != null && fromIsland.equals(toIsland)){
             if(fromIsland.isInsideRange(e.getFrom()) && !fromIsland.isInsideRange(e.getTo())){
-                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, toIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
+                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, toIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE, e.getTo());
                 Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
                 if(islandLeaveProtectedEvent.isCancelled())
                     e.setCancelled(true);
@@ -243,7 +249,7 @@ public final class CustomEventsListener implements Listener {
         }
 
         if (fromIsland != null && !(fromIsland instanceof SpawnIsland)) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE);
+            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE, e.getTo());
             Bukkit.getPluginManager().callEvent(islandLeaveEvent);
             if(islandLeaveEvent.isCancelled())
                 e.setCancelled(true);

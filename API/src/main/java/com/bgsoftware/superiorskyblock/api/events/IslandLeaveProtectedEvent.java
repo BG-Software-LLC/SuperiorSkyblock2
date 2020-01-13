@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Location;
 import org.bukkit.event.HandlerList;
 
 /**
@@ -23,7 +24,7 @@ public class IslandLeaveProtectedEvent extends IslandLeaveEvent {
      */
     @Deprecated
     public IslandLeaveProtectedEvent(SuperiorPlayer superiorPlayer, Island island){
-        super(superiorPlayer, island, LeaveCause.INVALID);
+        this(superiorPlayer, island, LeaveCause.INVALID);
     }
 
     /**
@@ -31,9 +32,23 @@ public class IslandLeaveProtectedEvent extends IslandLeaveEvent {
      * @param superiorPlayer The player who left the island's protected area.
      * @param island The island that the player left.
      * @param leaveCause The cause of leaving the island.
+     *
+     * @deprecated See IslandLeaveProtectedEvent(SuperiorPlayer, Island, LeaveCause, Location)
      */
+    @Deprecated
     public IslandLeaveProtectedEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause){
-        super(superiorPlayer, island, leaveCause);
+        this(superiorPlayer, island, leaveCause, superiorPlayer.getLocation());
+    }
+
+    /**
+     * The constructor of the event.
+     * @param superiorPlayer The player who left the island's protected area.
+     * @param island The island that the player left.
+     * @param leaveCause The cause of leaving the island.
+     * @param toLocation The location the player will be at after leaving.
+     */
+    public IslandLeaveProtectedEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause, Location toLocation){
+        super(superiorPlayer, island, leaveCause, toLocation);
     }
 
     @Override
