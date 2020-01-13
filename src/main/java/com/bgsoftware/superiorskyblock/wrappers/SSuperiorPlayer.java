@@ -85,6 +85,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         lastTimeStatus = resultSet.getLong("lastTimeStatus");
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), completedMissions);
         userLocale = LocaleUtils.getLocale(resultSet.getString("language"));
+        worldBorderEnabled = resultSet.getBoolean("toggledBorder");
     }
 
     public SSuperiorPlayer(UUID player){
@@ -307,6 +308,10 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
+        Query.PLAYER_SET_TOGGLED_BORDER.getStatementHolder()
+                .setBoolean(worldBorderEnabled)
+                .setString(player.toString())
+                .execute(true);
     }
 
     @Override
@@ -570,6 +575,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(lastTimeStatus + "")
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
+                .setBoolean(worldBorderEnabled)
                 .setString(player.toString())
                 .execute(async);
     }
@@ -589,6 +595,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(lastTimeStatus + "")
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
+                .setBoolean(worldBorderEnabled)
                 .execute(async);
     }
 

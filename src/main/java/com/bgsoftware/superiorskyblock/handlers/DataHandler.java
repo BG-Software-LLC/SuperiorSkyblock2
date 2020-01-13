@@ -121,7 +121,8 @@ public final class DataHandler {
                 "borderColor TEXT," +
                 "lastTimeStatus TEXT," +
                 "missions TEXT," +
-                "language TEXT" +
+                "language TEXT," +
+                "toggledBorder BOOLEAN" +
                 ");");
 
         //Creating default grid table
@@ -167,6 +168,7 @@ public final class DataHandler {
         addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
         addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
         addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
+        addColumnIfNotExists("toggledBorder", "players", "0", "BOOLEAN");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

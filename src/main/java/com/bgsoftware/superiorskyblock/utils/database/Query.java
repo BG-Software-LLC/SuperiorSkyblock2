@@ -47,8 +47,9 @@ public enum Query {
     PLAYER_SET_LAST_STATUS("UPDATE players SET lastTimeStatus=? WHERE player=?;"),
     PLAYER_SET_MISSIONS("UPDATE players SET missions=? WHERE player=?;"),
     PLAYER_SET_LANGUAGE("UPDATE players SET language=? WHERE player=?;"),
-    PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=?,missions=?,language=? WHERE player=?;"),
-    PLAYER_INSERT("INSERT INTO players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions,language) VALUES(?,?,?,?,?,?,?,?,?,?,?,?);"),
+    PLAYER_SET_TOGGLED_BORDER("UPDATE players SET toggledBorder=? WHERE player=?;"),
+    PLAYER_UPDATE("UPDATE players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=?,missions=?,language=?,toggledBorder=? WHERE player=?;"),
+    PLAYER_INSERT("INSERT INTO players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions,language,toggledBorder) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);"),
 
     STACKED_BLOCKS_UPDATE("UPDATE stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
     STACKED_BLOCKS_INSERT("INSERT INTO stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),
