@@ -61,7 +61,11 @@ public abstract class PlaceholderHook {
                 return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
             }
 
-            if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
+            else if(placeholder.equals("superior_player_texture")){
+                return superiorPlayer.getTextureValue();
+            }
+
+            else if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
                 if (subPlaceholder.startsWith("location_")) {
