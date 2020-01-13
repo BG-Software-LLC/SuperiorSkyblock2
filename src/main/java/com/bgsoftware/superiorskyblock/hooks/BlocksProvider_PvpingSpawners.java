@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;

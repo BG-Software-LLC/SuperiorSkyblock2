@@ -264,6 +264,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return missionsHandler;
     }
 
+    @Override
     public ProvidersHandler getProviders() {
         return providersHandler;
     }

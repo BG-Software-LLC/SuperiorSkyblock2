@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.utils.Pair;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
+import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -144,6 +145,14 @@ public final class SuperiorSkyblockAPI {
      */
     public static Schematic getSchematic(String name){
         return plugin.getSchematics().getSchematic(name);
+    }
+
+    /*
+     *  Providers Methods
+     */
+
+    public static void setSpawnersProvider(SpawnersProvider spawnersProvider){
+        plugin.getProviders().setSpawnersProvider(spawnersProvider);
     }
 
     /*

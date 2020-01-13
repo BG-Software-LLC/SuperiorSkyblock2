@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils;
+package com.bgsoftware.superiorskyblock.api.objects;
 
 import java.util.Map;
 
