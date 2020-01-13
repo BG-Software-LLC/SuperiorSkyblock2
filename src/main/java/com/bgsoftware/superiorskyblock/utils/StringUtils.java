@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
@@ -64,7 +65,17 @@ public final class StringUtils {
         //Because of some issues with formatting, spaces are converted to ascii 160.
         s = s.replace(SPACE_ASCII, ' ');
 
-        return s.endsWith(".00") ? s.replace(".00", "") : s;
+        Matcher matcher;
+
+        if(s.endsWith(".00")){
+            return s.replace(".00", "");
+        }
+
+        else if((matcher = Pattern.compile("(.*)\\.(\\d)0").matcher(s)).matches()){
+            return s.replaceAll("\\.(\\d)0", "." + matcher.group(2));
+        }
+
+        return s;
     }
 
     public static String fancyFormat(BigDecimal bigDecimal){
