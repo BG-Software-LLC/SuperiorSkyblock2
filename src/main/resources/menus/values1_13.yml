@@ -37,6 +37,8 @@ items:
     name: '&e&l[!] &7Iron Golem Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'B':
     block: SPAWNER:BLAZE
     type: PLAYER_HEAD
@@ -44,6 +46,8 @@ items:
     name: '&e&l[!] &7Blaze Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'C':
     block: SPAWNER:SPIDER
     type: PLAYER_HEAD
@@ -51,6 +55,8 @@ items:
     name: '&e&l[!] &7Spider Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'D':
     block: SPAWNER:COW
     type: PLAYER_HEAD
@@ -58,6 +64,8 @@ items:
     name: '&e&l[!] &7Cow Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'E':
     block: SPAWNER:ZOMBIE
     type: PLAYER_HEAD
@@ -65,6 +73,8 @@ items:
     name: '&e&l[!] &7Zombie Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'F':
     block: SPAWNER:SKELETON
     type: PLAYER_HEAD
@@ -72,6 +82,8 @@ items:
     name: '&e&l[!] &7Skeleton Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'G':
     block: SPAWNER:CREEPER
     type: PLAYER_HEAD
@@ -79,6 +91,8 @@ items:
     name: '&e&l[!] &7Creeper Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'H':
     block: SPAWNER:PIG_ZOMBIE
     type: PLAYER_HEAD
@@ -86,6 +100,8 @@ items:
     name: '&e&l[!] &7Zombie Pigman Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'I':
     block: SPAWNER:GHAST
     type: PLAYER_HEAD
@@ -93,6 +109,8 @@ items:
     name: '&e&l[!] &7Ghast Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'J':
     block: SPAWNER:SLIME
     type: PLAYER_HEAD
@@ -100,6 +118,8 @@ items:
     name: '&e&l[!] &7Slime Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'K':
     block: SPAWNER:GUARDIAN
     type: PLAYER_HEAD
@@ -107,6 +127,8 @@ items:
     name: '&e&l[!] &7Guardian Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'L':
     block: SPAWNER:SQUID
     type: PLAYER_HEAD
@@ -114,75 +136,101 @@ items:
     name: '&e&l[!] &7Squid Spawner'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'M':
     block: HOPPER
     type: HOPPER
     name: '&e&l[!] &7Hopper'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'N':
     block: BEACON
     type: BEACON
     name: '&e&l[!] &7Beacon'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'O':
     block: IRON_BLOCK
     type: IRON_BLOCK
     name: '&e&l[!] &7Iron Block'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'P':
     block: GOLD_BLOCK
     type: GOLD_BLOCK
     name: '&e&l[!] &7Gold Block'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'Q':
     block: DIAMOND_BLOCK
     type: DIAMOND_BLOCK
     name: '&e&l[!] &7Diamond Block'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'R':
     block: EMERALD_BLOCK
     type: EMERALD_BLOCK
     name: '&e&l[!] &7Emerald Block'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'S':
     block: BEDROCK
     type: BEDROCK
     name: '&e&l[!] &7Bedrock'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'T':
     block: ENDER_CHEST
     type: ENDER_CHEST
     name: '&e&l[!] &7Ender Chest'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'U':
     block: DRAGON_EGG
     type: DRAGON_EGG
     name: '&e&l[!] &7Dragon Egg'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'V':
     block: CHEST
     type: CHEST
     name: '&e&l[!] &7Chest'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'W':
     block: TRAPPED_CHEST
     type: TRAPPED_CHEST
     name: '&e&l[!] &7Trapped Chest'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'
   'X':
     block: ENCHANTING_TABLE
     type: ENCHANTING_TABLE
     name: '&e&l[!] &7Enchantment Table'
     lore:
       - '&6&l* &e&lQuantity &fx{0}'
+      - '&6&l* &e&lWorth: &f${1}'
+      - '&6&l* &e&lLevel: &f${2}'

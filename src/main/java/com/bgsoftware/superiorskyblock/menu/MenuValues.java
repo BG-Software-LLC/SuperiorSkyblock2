@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,13 @@ public final class MenuValues extends SuperiorMenu {
                 Key block = (Key) getData(slot + "");
                 int amount = island.getBlockCount(block);
                 if(inventory.getItem(slot) != null) {
-                    ItemStack itemStack = new ItemBuilder(inventory.getItem(slot)).replaceAll("{0}", amount + "").build(superiorPlayer);
+                    ItemStack itemStack = new ItemBuilder(inventory.getItem(slot))
+                            .replaceAll("{0}", amount + "")
+                            .replaceAll("{1}", StringUtils.format(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount))))
+                            .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount))))
+                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount))))
+                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount))))
+                            .build(superiorPlayer);
                     itemStack.setAmount(Math.max(1, Math.min(64, amount)));
                     inventory.setItem(slot, itemStack);
                 }
