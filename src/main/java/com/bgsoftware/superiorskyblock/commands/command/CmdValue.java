@@ -89,17 +89,21 @@ public final class CmdValue implements ICommand {
 
         if(blockWorth.doubleValue() <= 0) {
             if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
-                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName));
+                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
         }
         else{
             if(!Locale.BLOCK_VALUE.isEmpty(locale))
-                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(locale, keyName, StringUtils.format(blockWorth)));
+                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(locale, keyName, StringUtils.format(blockWorth))).append("\n");
         }
 
-        if(!Locale.BLOCK_LEVEL.isEmpty(locale)){
-            if(stringBuilder.length() != 0)
-                stringBuilder.append("\n");
-            stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel)));
+        if(blockLevel.doubleValue() <= 0) {
+            if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale) && blockWorth.doubleValue() > 0) {
+                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
+            }
+        }
+        else{
+            if(!Locale.BLOCK_LEVEL.isEmpty(locale))
+                stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel))).append("\n");
         }
 
         Locale.sendMessage(superiorPlayer, stringBuilder.toString());
