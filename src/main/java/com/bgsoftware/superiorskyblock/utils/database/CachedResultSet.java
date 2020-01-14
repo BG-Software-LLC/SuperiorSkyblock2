@@ -25,6 +25,8 @@ public final class CachedResultSet {
             return Integer.parseInt((String) object);
         else if(object instanceof Integer)
             return (int) object;
+        else if(object instanceof Double)
+            return (int) (double) object;
         else if(object instanceof Boolean)
             return (Boolean) object ? 1 : 0;
         else if(object instanceof BigDecimal)
@@ -40,6 +42,8 @@ public final class CachedResultSet {
             return Long.parseLong((String) object);
         else if(object instanceof Integer)
             return (long) (int) object;
+        else if(object instanceof Double)
+            return (long) (double) object;
         else if(object instanceof Boolean)
             return (Boolean) object ? 1L : 0L;
         else if(object instanceof BigDecimal)
@@ -59,6 +63,8 @@ public final class CachedResultSet {
             return Double.parseDouble((String) object);
         else if(object instanceof Integer)
             return (double) (int) object;
+        else if(object instanceof Double)
+            return (Double) object;
         else if(object instanceof Boolean)
             return (Boolean) object ? 1D : 0D;
         else if(object instanceof BigDecimal)
