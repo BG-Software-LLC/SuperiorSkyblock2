@@ -15,6 +15,15 @@ public final class Executor {
     private static final ExecutorService databaseExecutor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    public static void ensureMain(Runnable runnable){
+        if(!Bukkit.isPrimaryThread()){
+            sync(runnable);
+        }
+        else{
+            runnable.run();
+        }
+    }
+
     public static BukkitTask sync(Runnable runnable){
         return sync(runnable, 0);
     }

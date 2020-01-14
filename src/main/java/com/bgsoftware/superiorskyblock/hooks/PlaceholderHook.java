@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -29,10 +30,12 @@ public abstract class PlaceholderHook {
     public static void register(SuperiorSkyblockPlugin plugin){
         PlaceholderHook.plugin = plugin;
 
-        if(Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI"))
-            new PlaceholderHook_MVdW();
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-            new PlaceholderHook_PAPI();
+        Executor.ensureMain(() -> {
+            if(Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI"))
+                new PlaceholderHook_MVdW();
+            if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
+                new PlaceholderHook_PAPI();
+        });
     }
 
     public static String parse(SuperiorPlayer superiorPlayer, String str){
