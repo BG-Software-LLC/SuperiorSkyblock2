@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -175,6 +176,13 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void teleport(Island island, Consumer<Boolean> result) {
         Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
         Location islandCenterLocation = island.getCenter(World.Environment.NORMAL);
+
+        if(island instanceof SpawnIsland){
+            teleport(islandTeleportLocation.add(0, 0.5, 0));
+            if(result != null)
+                result.accept(true);
+            return;
+        }
 
         Location toTeleport = null;
 
