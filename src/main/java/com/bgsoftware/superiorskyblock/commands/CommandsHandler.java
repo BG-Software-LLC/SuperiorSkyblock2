@@ -15,6 +15,7 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,12 +35,11 @@ public final class CommandsHandler extends BukkitCommand {
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin, String islandCommand){
         super(islandCommand.split(",")[0]);
+
         String[] commandSections = islandCommand.split(",");
 
         if(commandSections.length > 1){
-            for(int i = 1; i < commandSections.length; i++){
-                super.getAliases().add(commandSections[i]);
-            }
+            super.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
         }
 
         instance = this;
