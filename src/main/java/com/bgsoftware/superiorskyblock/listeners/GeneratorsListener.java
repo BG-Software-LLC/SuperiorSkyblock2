@@ -44,7 +44,8 @@ public final class GeneratorsListener implements Listener {
             e.setNewStateKey(Key.of(cachedMaterials[0]));
         }
         else {
-            e.setNewStateKey(Key.of(shuffleArray(cachedMaterials)[0]));
+            String key = shuffleArray(cachedMaterials)[0];
+            e.setNewStateKey(Key.of(key == null ? "COBBLESTONE" : key));
         }
     }
 
