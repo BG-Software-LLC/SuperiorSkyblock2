@@ -388,7 +388,7 @@ public final class GridHandler implements GridManager {
         if(!plugin.getSettings().islandWorldName.equals(world)){
             SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
             SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
-            plugin.getSettings().updateValue("island-world", world);
+            plugin.getSettings().updateValue("worlds.normal-world", world);
         }
     }
 

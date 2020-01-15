@@ -6,7 +6,7 @@ main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 website: https://bg-software.com/
 api-version: 1.13
 softdepend: [MVdWPlaceholderAPI, PlaceholderAPI]
-loadbefore: [MultiverseCore]
+loadbefore: [Multiverse-Core]
 permissions:
   superior.*:
     description: Permission for all admin & island commands
