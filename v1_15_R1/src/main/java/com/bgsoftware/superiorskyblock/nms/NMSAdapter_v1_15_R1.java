@@ -48,6 +48,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.reflect.Field;
@@ -186,6 +187,33 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
         Arrays.fill(biomeBases, biomeBase);
         chunk.markDirty();
+    }
+
+    @Override
+    public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
+        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
+
+        BiomeBase[] biomeBases = null;
+
+        try{
+            Field biomeStorageField = biomeGrid.getClass().getDeclaredField("biome");
+            biomeStorageField.setAccessible(true);
+            Object biomeStorage = biomeStorageField.get(biomeGrid);
+
+            Field field = BiomeStorage.class.getDeclaredField("f");
+            if(!field.getType().equals(BiomeBase[].class)){
+                field = BiomeStorage.class.getDeclaredField("g");
+            }
+            field.setAccessible(true);
+            biomeBases = (BiomeBase[]) field.get(biomeStorage);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+
+        if(biomeBases == null)
+            return;
+
+        Arrays.fill(biomeBases, biomeBase);
     }
 
     @Override

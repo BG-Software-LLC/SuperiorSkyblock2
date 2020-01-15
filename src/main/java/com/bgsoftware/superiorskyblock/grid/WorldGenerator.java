@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.grid;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,6 +14,8 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public final class WorldGenerator extends ChunkGenerator {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
@@ -41,11 +44,7 @@ public final class WorldGenerator extends ChunkGenerator {
         ChunkData chunkData = createChunkData(world);
 
         if(world.getEnvironment() == World.Environment.NORMAL){
-            for(int x = 0; x < 16; x++){
-                for(int z = 0; z < 16; z++){
-                    biomes.setBiome(x, z, Biome.PLAINS);
-                }
-            }
+            plugin.getNMSAdapter().setBiome(biomes, Biome.PLAINS);
 
             if(chunkX == 0 && chunkZ == 0){
                 chunkData.setBlock(0, 99, 0, Material.BEDROCK);
