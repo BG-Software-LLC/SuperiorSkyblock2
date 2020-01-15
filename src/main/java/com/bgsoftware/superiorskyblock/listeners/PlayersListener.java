@@ -65,6 +65,9 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
+        if(e.getPlayer().hasMetadata("NPC"))
+            return;
+
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         superiorPlayer.updateLastTimeStatus();
 
@@ -97,6 +100,9 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
+        if(e.getPlayer().hasMetadata("NPC"))
+            return;
+
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         superiorPlayer.updateLastTimeStatus();
 
@@ -232,7 +238,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onVisitorDamage(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof Player))
+        if(!(e.getEntity() instanceof Player) || e.getEntity().hasMetadata("NPC"))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
@@ -319,6 +325,9 @@ public final class PlayersListener implements Listener {
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
             return;
 
+        if(e.getPlayer().hasMetadata("NPC"))
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island == null)
@@ -343,10 +352,10 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(superiorPlayer == null)
+        if(e.getPlayer().hasMetadata("NPC"))
             return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
         Island island = plugin.getGrid().getIslandAt(e.getFrom());
 
@@ -419,6 +428,9 @@ public final class PlayersListener implements Listener {
         Location from = e.getFrom(), to = e.getTo();
 
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+            return;
+
+        if(e.getPlayer().hasMetadata("NPC"))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());

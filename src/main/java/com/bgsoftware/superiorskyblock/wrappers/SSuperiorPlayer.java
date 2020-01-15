@@ -641,6 +641,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public static SuperiorPlayer of(Player player){
         if(player == null)
             throw new NullPointerException("Player cannot be null.");
+        if(player.hasMetadata("NPC"))
+            throw new IllegalArgumentException("Cannot get SuperiorPlayer from an NPC.");
 
         return of(player.getUniqueId());
     }

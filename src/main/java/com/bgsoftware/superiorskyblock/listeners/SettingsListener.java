@@ -199,7 +199,7 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerAttack(EntityDamageByEntityEvent e){
-        if(!(e.getEntity() instanceof Player))
+        if(!(e.getEntity() instanceof Player) || e.getEntity().hasMetadata("NPC"))
             return;
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
