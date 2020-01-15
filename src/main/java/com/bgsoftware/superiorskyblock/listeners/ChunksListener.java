@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -42,9 +44,18 @@ public final class ChunksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(chunk);
 
         if(island == null || !island.isInsideRange(chunk)){
-            e.setCancelled(true);
-            alreadyUnloadedChunks.add(hashedChunk);
-            chunk.unload(false);
+            if(ServerVersion.isLessThan(ServerVersion.v1_14)){
+                e.setCancelled(true);
+                alreadyUnloadedChunks.add(hashedChunk);
+                chunk.unload(false);
+            }
+            else try{
+                //noinspection JavaReflectionMemberAccess
+                Method setSaveChunkMethod = ChunkUnloadEvent.class.getMethod("setSaveChunk", boolean.class);
+                setSaveChunkMethod.invoke(e, false);
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
