@@ -10,6 +10,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SchematicBlock {
@@ -111,6 +112,8 @@ public class SchematicBlock {
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
+            String[] lines = Arrays.copyOf(this.lines, this.lines.length);
+            
             for(int i = 0; i < 4; i++) {
                 lines[i] = lines[i]
                         .replace("{player}", island == null ? "" : island.getOwner().getName())
