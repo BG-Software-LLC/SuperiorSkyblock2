@@ -190,7 +190,7 @@ public final class PlayersListener implements Listener {
         if(plugin.getSettings().stopLeaving && e.getTo() != null) {
             Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
 
-            if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) && (toIsland == null || toIsland.equals(e.getIsland()))) {
+            if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) && (toIsland == null || toIsland.equals(e.getIsland())) && !e.getIsland().isInsideRange(e.getTo())) {
                 e.setCancelled(true);
                 return;
             }
