@@ -755,7 +755,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().deleteIsland(this);
 
-        plugin.getNMSAdapter().regenerateChunks(getAllChunks(true));
+        List<Chunk> chunks = getAllChunks(World.Environment.NORMAL, true);
+
+        if(wasSchematicGenerated(World.Environment.NETHER))
+            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
+
+        if(wasSchematicGenerated(World.Environment.THE_END))
+            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
+
+        plugin.getNMSAdapter().regenerateChunks(chunks);
     }
 
     @Override
@@ -1128,7 +1136,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public synchronized void handleBlockPlace(Key key, int amount, boolean save) {
+    public void handleBlockPlace(Key key, int amount, boolean save) {
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
@@ -1194,7 +1202,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public synchronized void handleBlockBreak(Key key, int amount, boolean save) {
+    public void handleBlockBreak(Key key, int amount, boolean save) {
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
