@@ -113,7 +113,7 @@ public class SchematicBlock {
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
             String[] lines = Arrays.copyOf(this.lines, this.lines.length);
-            
+
             for(int i = 0; i < 4; i++) {
                 lines[i] = lines[i]
                         .replace("{player}", island == null ? "" : island.getOwner().getName())
