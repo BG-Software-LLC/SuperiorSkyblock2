@@ -25,7 +25,7 @@ public final class EntityUtils {
             return ((Pig) livingEntity).hasSaddle() && itemStack.getType() == Material.SADDLE;
         }
         else if(livingEntity instanceof Horse){
-            HorseInventory horseInventory = (HorseInventory) livingEntity;
+            HorseInventory horseInventory = ((Horse) livingEntity).getInventory();
             List<ItemStack> itemStacks = Arrays.stream(horseInventory.getContents()).filter(Objects::nonNull).collect(Collectors.toList());
             if(horseInventory.getSaddle() != null)
                 itemStacks.add(horseInventory.getSaddle());
