@@ -69,7 +69,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandSettings> {
         return (containsData(settingsName + "-settings-enabled") ?
                 (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(settings) ? "enabled" : "disabled")) :
                 new ItemBuilder(Material.AIR)
-        ).build(superiorPlayer);
+        ).clone().build(superiorPlayer);
     }
 
     @Override
