@@ -36,7 +36,7 @@ public final class CalcTask extends BukkitRunnable {
 
     private void announceToPlayers(){
         for(Player player : Bukkit.getOnlinePlayers())
-            Locale.ISLAND_CALC_ANNOUNCEMENT.send(player);
+            Locale.RECALC_ALL_ISLANDS_DONE.send(player);
     }
 
     public static void startTask(){
