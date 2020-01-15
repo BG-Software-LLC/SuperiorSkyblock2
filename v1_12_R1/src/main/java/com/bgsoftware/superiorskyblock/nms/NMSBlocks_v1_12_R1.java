@@ -9,6 +9,7 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.EnumColor;
+import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.ItemStack;
@@ -74,6 +75,9 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
         int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
 
         chunkSection.setType(blockX, blockY, blockZ, blockData);
+
+        if(bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
+            world.c(EnumSkyBlock.SKY, blockPosition);
 
         if(blockType != BlockType.BLOCK) {
             TileEntity tileEntity = world.getTileEntity(blockPosition);
