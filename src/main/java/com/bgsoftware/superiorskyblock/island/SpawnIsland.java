@@ -797,7 +797,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        return null;
+        return new HashMap<>();
     }
 
     @Override
