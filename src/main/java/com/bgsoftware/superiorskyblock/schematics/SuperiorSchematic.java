@@ -32,8 +32,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final CompoundTag compoundTag;
 
@@ -91,10 +92,16 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
 
                 else if(compoundValue.containsKey("contents")){
-                    blocks[x][y][z] = SchematicBlock.of(
-                            combinedId,
-                            TagUtils.compoundToInventory((CompoundTag) compoundValue.get("contents"))
-                    );
+                    ItemStack[] contents = TagUtils.compoundToInventory((CompoundTag) compoundValue.get("contents"));
+
+                    if(plugin.getSettings().starterChestEnabled){
+                        contents = new ItemStack[27];
+
+                        for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet())
+                            contents[entry.getKey()] = entry.getValue().clone();
+                    }
+
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, contents);
                 }
 
                 else if(compoundValue.containsKey("flower")){
