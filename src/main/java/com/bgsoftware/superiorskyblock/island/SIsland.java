@@ -778,7 +778,14 @@ public final class SIsland extends DatabaseObject implements Island {
         calcProcess = true;
         beingRecalculated.set(true);
 
-        List<Chunk> chunks = getAllChunks(true);
+        List<Chunk> chunks = getAllChunks(World.Environment.NORMAL, true);
+
+        if(wasSchematicGenerated(World.Environment.NETHER))
+            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
+
+        if(wasSchematicGenerated(World.Environment.THE_END))
+            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
+
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
 
         for (Chunk chunk : chunks) {
