@@ -86,8 +86,9 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             objects = requestObjects();
 
             int indexOf = getSlots().indexOf(e.getRawSlot());
+            int objectIndex = indexOf + (slots.size() * (currentPage - 1));
 
-            if(indexOf >= objects.size() || indexOf == -1){
+            if(objectIndex >= objects.size() || indexOf == -1){
                 if(acceptNull){
                     onPlayerClick(e, null);
                 }
@@ -95,7 +96,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
                 return;
             }
 
-            onPlayerClick(e, objects.get(indexOf + (slots.size() * (currentPage - 1))));
+            onPlayerClick(e, objects.get(objectIndex));
         }
     }
 
