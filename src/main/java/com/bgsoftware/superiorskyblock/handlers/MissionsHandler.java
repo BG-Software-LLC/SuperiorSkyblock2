@@ -361,7 +361,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     public boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
-        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, mission));
+        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
     }
 
     private boolean canPassAllChecks(Mission mission, SuperiorPlayer superiorPlayer){
