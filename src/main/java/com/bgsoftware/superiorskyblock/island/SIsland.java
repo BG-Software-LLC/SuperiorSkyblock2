@@ -897,6 +897,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
                 saveBlockCounts();
 
+                MenuValues.refreshMenus();
+
                 calcProcess = false;
                 beingRecalculated.set(false);
 
@@ -1175,9 +1177,10 @@ public final class SIsland extends DatabaseObject implements Island {
                 });
             });
 
-            MenuValues.refreshMenus();
-
-            if(save) saveBlockCounts();
+            if(save){
+                MenuValues.refreshMenus();
+                saveBlockCounts();
+            }
         }
     }
 
