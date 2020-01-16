@@ -46,7 +46,7 @@ public final class CmdAdminUnlockWorld implements ICommand {
 
     @Override
     public int getMinArgs() {
-        return 4;
+        return 5;
     }
 
     @Override
