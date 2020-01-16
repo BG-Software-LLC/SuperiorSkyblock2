@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -184,8 +185,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
         if(inventory.getHolder() == null)
             Fields.CRAFT_INVENTORY_INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
 
-        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet())
-            inventory.setItem(itemStackEntry.getKey(), itemStackEntry.getValue().clone().build(superiorPlayer));
+        //noinspection all
+        List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();
+
+        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
+            ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
+            inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ? itemBuilder.build() : itemBuilder.build(superiorPlayer));
+        }
 
         return inventory;
     }
