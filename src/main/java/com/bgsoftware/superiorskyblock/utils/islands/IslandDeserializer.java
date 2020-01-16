@@ -127,7 +127,9 @@ public final class IslandDeserializer {
         for(String mission : missions.split(";")){
             String[] missionSections = mission.split("=");
             int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
-            completedMissions.put(plugin.getMissions().getMission(missionSections[0]), completeAmount);
+            Mission _mission = plugin.getMissions().getMission(missionSections[0]);
+            if(_mission != null)
+                completedMissions.put(_mission, completeAmount);
         }
     }
 

@@ -104,7 +104,7 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public Mission getMission(String name) {
-        return missionMap.get(name);
+        return missionMap.get(name.toLowerCase());
     }
 
     @Override
