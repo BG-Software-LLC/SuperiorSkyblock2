@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
 
@@ -41,8 +42,8 @@ public final class MenuUpgrades extends SuperiorMenu {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inv = super.getInventory();
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inv = super.buildInventory(titleReplacer);
 
         Map<String, UpgradesHandler.UpgradeData> upgrades = plugin.getUpgrades().getUpgrades();
 

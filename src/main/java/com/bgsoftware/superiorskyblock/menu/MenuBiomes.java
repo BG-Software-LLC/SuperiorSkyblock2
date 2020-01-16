@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 public final class MenuBiomes extends SuperiorMenu {
 
@@ -74,8 +75,8 @@ public final class MenuBiomes extends SuperiorMenu {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inv = super.getInventory();
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inv = super.buildInventory(titleReplacer);
 
         for(Biome biome : Biome.values()){
             String biomeName = biome.name().toLowerCase();

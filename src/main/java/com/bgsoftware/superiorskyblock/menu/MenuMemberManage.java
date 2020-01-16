@@ -46,7 +46,7 @@ public final class MenuMemberManage extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        return super.buildInventory(title -> title.replace("{}", targetPlayer.getName()));
+        return buildInventory(title -> title.replace("{}", targetPlayer.getName()));
     }
 
     public static void init(){

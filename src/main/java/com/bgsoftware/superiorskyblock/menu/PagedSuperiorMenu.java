@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.function.Function;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
@@ -26,8 +27,8 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inventory = super.getInventory();
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inventory = super.buildInventory(titleReplacer);
 
         objects = requestObjects();
 

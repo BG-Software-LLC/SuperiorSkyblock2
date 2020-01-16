@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -21,6 +22,11 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
     private MenuUniqueVisitors(SuperiorPlayer superiorPlayer, Island island){
         super("menuUniqueVisitors", superiorPlayer);
         this.island = island;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return buildInventory(title -> title.replace("{0}", island.getUniqueVisitors().size() + ""));
     }
 
     @Override

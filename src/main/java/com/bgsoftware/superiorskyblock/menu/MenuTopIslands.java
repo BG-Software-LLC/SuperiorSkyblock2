@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
@@ -125,8 +126,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inventory = super.getInventory();
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inventory = super.buildInventory(titleReplacer);
 
         if(sortGlowWhenSelected){
             int glowSlot = -1;

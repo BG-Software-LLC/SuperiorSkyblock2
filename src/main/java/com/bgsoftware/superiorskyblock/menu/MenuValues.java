@@ -41,8 +41,8 @@ public final class MenuValues extends SuperiorMenu {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inventory = super.buildInventory(title -> title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorth().toString()));
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inventory = super.buildInventory(titleReplacer);
 
         for(int slot = 0; slot < inventory.getSize(); slot++){
             if(containsData(slot + "")){
@@ -63,6 +63,11 @@ public final class MenuValues extends SuperiorMenu {
         }
 
         return inventory;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return buildInventory(title -> title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorth().toString()));
     }
 
     public static void init(){

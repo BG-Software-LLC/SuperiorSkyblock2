@@ -20,6 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 public final class MenuIslandCreation extends SuperiorMenu {
 
@@ -44,8 +45,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
     }
 
     @Override
-    public Inventory getInventory() {
-        Inventory inv = super.getInventory();
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inv = super.buildInventory(titleReplacer);
 
         for(String schematic : plugin.getSchematics().getSchematics()){
             if(containsData(schematic + "-has-access-item")) {
