@@ -25,7 +25,7 @@ public final class GeneratorsListener implements Listener {
 
         String[] cachedMaterials = new String[onlyOneMaterial ? 1 : size];
 
-        int slot;
+        int slot = 0;
 
         for(Map.Entry<String, Integer> entry : amountMap.entrySet()){
             int amount = entry.getValue();
@@ -34,8 +34,8 @@ public final class GeneratorsListener implements Listener {
                 cachedMaterials[0] = entry.getKey();
             }
             else {
-                for (slot = 0; slot < amount && slot < size; slot++) {
-                    cachedMaterials[slot] = entry.getKey();
+                for (int i = 0; i < amount && slot < size; i++) {
+                    cachedMaterials[slot++] = entry.getKey();
                 }
             }
         }
