@@ -47,14 +47,15 @@ public final class MenusListener implements Listener {
 
     @EventHandler
     public void onMenuClick(InventoryClickEvent e){
-        InventoryHolder inventoryHolder = e.getClickedInventory() == null ? null : e.getClickedInventory().getHolder();
+        InventoryHolder inventoryHolder = e.getClickedInventory() == null || e.getView().getTopInventory() == null ? null : e.getView().getTopInventory().getHolder();
 
         if(!(inventoryHolder instanceof SuperiorMenu) || !(e.getWhoClicked() instanceof Player))
             return;
 
         e.setCancelled(true);
 
-        ((SuperiorMenu) inventoryHolder).onClick(e);
+        if(e.getClickedInventory().equals(e.getView().getTopInventory()))
+            ((SuperiorMenu) inventoryHolder).onClick(e);
     }
 
     @EventHandler
