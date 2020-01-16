@@ -18,9 +18,10 @@ public final class CalcTask extends BukkitRunnable {
     @Override
     public void run() {
         if(Bukkit.getOnlinePlayers().size() > 0){
+            announceToPlayers(false);
             announceToOps("&7&o[SuperiorSkyblock] Calculating islands...");
             plugin.getGrid().calcAllIslands(() -> {
-                announceToPlayers();
+                announceToPlayers(true);
                 announceToOps("&7&o[SuperiorSkyblock] Calculating islands done!");
             });
         }
@@ -34,9 +35,15 @@ public final class CalcTask extends BukkitRunnable {
         Locale.sendMessage(Bukkit.getConsoleSender(), message);
     }
 
-    private void announceToPlayers(){
-        for(Player player : Bukkit.getOnlinePlayers())
-            Locale.RECALC_ALL_ISLANDS_DONE.send(player);
+    private void announceToPlayers(boolean done){
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(done) {
+                Locale.RECALC_ALL_ISLANDS_DONE.send(player);
+            }
+            else{
+                Locale.RECALC_ALL_ISLANDS.send(player);
+            }
+        }
     }
 
     public static void startTask(){
