@@ -621,7 +621,7 @@ public enum Locale {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static void convertOldFile(){
-        File file = new File(plugin.getDataFolder(), "lang/en-US.yml");
+        File file = new File(plugin.getDataFolder(), "lang.yml");
         if(file.exists()){
             File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
             dest.getParentFile().mkdirs();
