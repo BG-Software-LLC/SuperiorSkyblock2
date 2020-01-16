@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -225,21 +226,17 @@ public abstract class SuperiorMenu implements InventoryHolder {
         runActionOnMenus(menuClazz, predicate, ((player, superiorMenu) -> player.closeInventory()));
     }
 
-    private static <T extends SuperiorMenu> void runActionOnMenus(Class<T> menuClazz, Predicate<T> predicate, MenuCallback callback){
+    private static <T extends SuperiorMenu> void runActionOnMenus(Class<T> menuClazz, Predicate<T> predicate, BiConsumer<Player, SuperiorMenu> callback){
         for(Player player : Bukkit.getOnlinePlayers()){
-            InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
-            //noinspection unchecked
-            if(menuClazz.isInstance(inventoryHolder) && predicate.test((T) inventoryHolder)){
-                SuperiorMenu superiorMenu = (SuperiorMenu) inventoryHolder;
-                callback.run(player, superiorMenu);
-            }
+            try {
+                InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
+                //noinspection unchecked
+                if (menuClazz.isInstance(inventoryHolder) && predicate.test((T) inventoryHolder)) {
+                    SuperiorMenu superiorMenu = (SuperiorMenu) inventoryHolder;
+                    callback.accept(player, superiorMenu);
+                }
+            }catch(Exception ignored){}
         }
-    }
-
-    private interface MenuCallback{
-
-        void run(Player player, SuperiorMenu superiorMenu);
-
     }
 
     protected static class MenuData{
