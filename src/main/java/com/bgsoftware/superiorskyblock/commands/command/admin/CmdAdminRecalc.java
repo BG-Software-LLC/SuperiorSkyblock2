@@ -50,16 +50,14 @@ public final class CmdAdminRecalc implements ICommand {
 
     @Override
     public boolean canBeExecutedByConsole() {
-        return false;
+        return true;
     }
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-
         if(args.length == 2){
-            Locale.RECALC_ALL_ISLANDS.send(superiorPlayer);
-            plugin.getGrid().calcAllIslands(() -> Locale.RECALC_ALL_ISLANDS_DONE.send(superiorPlayer));
+            Locale.RECALC_ALL_ISLANDS.send(sender);
+            plugin.getGrid().calcAllIslands(() -> Locale.RECALC_ALL_ISLANDS_DONE.send(sender));
         }
 
         else {
@@ -76,8 +74,8 @@ public final class CmdAdminRecalc implements ICommand {
                 return;
             }
 
-            Locale.RECALC_PROCCESS_REQUEST.send(superiorPlayer);
-            island.calcIslandWorth(superiorPlayer);
+            Locale.RECALC_PROCCESS_REQUEST.send(sender);
+            island.calcIslandWorth(sender instanceof Player ? SSuperiorPlayer.of(sender) : null);
         }
     }
 
