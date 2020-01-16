@@ -84,7 +84,7 @@ public final class CmdMission implements ICommand {
             }
         }
 
-        if(!mission.canComplete(superiorPlayer)){
+        if(!plugin.getMissions().canComplete(superiorPlayer, mission)){
             Locale.MISSION_CANNOT_COMPLETE.send(superiorPlayer);
             return;
         }

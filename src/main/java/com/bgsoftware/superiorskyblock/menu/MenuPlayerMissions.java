@@ -35,13 +35,13 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     @Override
     protected void onPlayerClick(InventoryClickEvent event, Mission mission) {
         boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
-        boolean canComplete = mission.canComplete(superiorPlayer);
+        boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
 
         SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
         if(sound != null)
             sound.playSound(superiorPlayer.asPlayer());
 
-        if(canComplete && plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer)){
+        if(canComplete){
             plugin.getMissions().rewardMission(mission, superiorPlayer, false);
             previousMove = false;
             open(previousMenu);
