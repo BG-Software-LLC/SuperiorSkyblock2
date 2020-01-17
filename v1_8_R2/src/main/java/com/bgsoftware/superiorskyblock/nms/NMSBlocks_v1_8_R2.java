@@ -118,9 +118,10 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
     @Override
     public void refreshLight(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+
         for(int i = 0; i < 16; i++) {
             ChunkSection chunkSection = chunk.getSections()[i];
-            if (chunkSection == null) {
+            if(chunkSection == null) {
                 chunkSection = new ChunkSection(i << 4, !chunk.world.worldProvider.o());
                 chunk.getSections()[i] = chunkSection;
             }
@@ -128,6 +129,8 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
             if (!chunk.world.worldProvider.o())
                 Arrays.fill(chunkSection.getSkyLightArray().a(), (byte) 15);
         }
+
+        chunk.initLighting();
     }
 
     @Override
