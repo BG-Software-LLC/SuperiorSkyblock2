@@ -55,33 +55,37 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island != null) {
-            if(island.isBeingRecalculated()){
-                e.setCancelled(true);
-                Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
-                return;
-            }
-
+        if(island != null)
             island.handleBlockPlace(e.getBlockPlaced());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlaceWhileRecalculated(BlockPlaceEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null && island.isBeingRecalculated()){
+            e.setCancelled(true);
+            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakMonitor(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island != null) {
-            if(island.isBeingRecalculated()){
-                e.setCancelled(true);
-                Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
-                return;
-            }
-
+        if(island != null)
             island.handleBlockBreak(e.getBlock());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreakWhileRecalculated(BlockBreakEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null && island.isBeingRecalculated()){
+            e.setCancelled(true);
+            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 
