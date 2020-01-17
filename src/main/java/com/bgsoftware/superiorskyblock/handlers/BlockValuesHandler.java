@@ -31,6 +31,10 @@ public final class BlockValuesHandler implements BlockValuesManager {
         return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
+    public void setBlockWorth(Key key, BigDecimal worth){
+        blockValues.put(key, worth.toString());
+    }
+
     @Override
     public BigDecimal getBlockLevel(Key key) {
         return BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));

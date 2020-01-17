@@ -102,8 +102,12 @@ public final class MenuValues extends SuperiorMenu {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    if(cfg.contains("items." + ch + ".block"))
-                        menuValues.addData(slot + "", Key.of(cfg.getString("items." + ch + ".block")));
+                    if(cfg.contains("items." + ch + ".block")) {
+                        Key key = Key.of(cfg.getString("items." + ch + ".block"));
+                        menuValues.addData(slot + "", key);
+                        if(plugin.getBlockValues().getBlockWorth(key).doubleValue() == -1)
+                            plugin.getBlockValues().setBlockWorth(key, BigDecimal.ZERO);
+                    }
 
                     menuValues.addFillItem(slot, FileUtils.getItemStack("values.yml", cfg.getConfigurationSection("items." + ch)));
                     menuValues.addCommands(slot, cfg.getStringList("commands." + ch));
