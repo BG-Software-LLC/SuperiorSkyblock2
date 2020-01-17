@@ -140,6 +140,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: רחא ןקחש לש יא לש גורדש
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: רחא ןקחש לש יא לש םימוקימה תלבגה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
 COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_TELEPORT: רחא יא לא רגתשהל.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.

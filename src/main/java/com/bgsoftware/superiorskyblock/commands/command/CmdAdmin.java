@@ -55,6 +55,7 @@ public final class CmdAdmin implements ICommand {
         subCommands.add(new CmdAdminSetWarpsLimit());
         subCommands.add(new CmdAdminShow());
         subCommands.add(new CmdAdminSpy());
+        subCommands.add(new CmdAdminTeleport());
         subCommands.add(new CmdAdminUnignore());
         subCommands.add(new CmdAdminUnlockWorld());
         subCommands.add(new CmdAdminWithdraw());

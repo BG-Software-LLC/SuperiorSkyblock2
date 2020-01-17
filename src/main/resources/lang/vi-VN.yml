@@ -166,6 +166,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Đặt mức nâng cấp cho đảo của
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Đặt giới hạn hu vực của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
+COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teleport to other islands.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
   đầu.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Mở khóa một thế giới cho một hòn đảo.

@@ -129,6 +129,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: 'Set the level of an upgrade for another 
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: 'Set the warps limit of an island.'
 COMMAND_DESCRIPTION_ADMIN_SHOW: 'Get information about an island.'
 COMMAND_DESCRIPTION_ADMIN_SPY: 'Toggle chat spy mode'
+COMMAND_DESCRIPTION_ADMIN_TELEPORT: 'Teleport to other islands.'
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: 'Unignore an island from top islands.'
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 'Unlock a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 'Withdraw money from another player''s island bank.'
