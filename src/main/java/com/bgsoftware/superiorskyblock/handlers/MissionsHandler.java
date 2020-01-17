@@ -156,7 +156,7 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission) {
-        return canCompleteAgain(superiorPlayer, mission) && mission.canComplete(superiorPlayer) &&
+        return canCompleteAgain(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0 &&
                 hasAllRequiredMissions(mission, superiorPlayer) && canPassAllChecks(mission, superiorPlayer);
     }
 
