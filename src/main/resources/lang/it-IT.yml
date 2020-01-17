@@ -176,7 +176,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Imposta il livello di un potenziamento pe
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Imposta il limite delle warp di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Ottieni informazioni su un'isola.
 COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
-COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teleport to other islands.
+COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle migliori
   isole .
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Sblocca un mondo per un'isola.
