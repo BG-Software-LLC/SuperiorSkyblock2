@@ -154,20 +154,8 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
     }
 
     public static String parse(OfflinePlayer offlinePlayer, String str){
-        //First, because of some placeholders of MdVW - we need to edit our placeholders.
-        int counter = 0;
-        do {
-            str = str.replace("{" + (counter) + "}", "{%" + (counter) + "}");
-        }while(++counter <= 10);
-
-        String result = PlaceholderAPI.replacePlaceholders(offlinePlayer, str);
-
-        counter = 0;
-        do {
-            result = result.replace("{%" + (counter) + "}", "{" + (counter) + "}");
-        }while(++counter <= 10);
-
-        return result;
+        str = PlaceholderAPI.replacePlaceholders(offlinePlayer, str.replaceAll("\\{(\\d)}", "{%$1}"));
+        return str.replace("{%", "{");
     }
 
 }
