@@ -121,11 +121,11 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         for(int i = 0; i < 16; i++) {
             ChunkSection chunkSection = chunk.getSections()[i];
             if (chunkSection == null) {
-                chunkSection = new ChunkSection(i << 4, chunk.world.worldProvider.o());
+                chunkSection = new ChunkSection(i << 4, !chunk.world.worldProvider.o());
                 chunk.getSections()[i] = chunkSection;
             }
 
-            if (chunk.world.worldProvider.o())
+            if (!chunk.world.worldProvider.o())
                 Arrays.fill(chunkSection.getSkyLightArray().a(), (byte) 15);
         }
     }
