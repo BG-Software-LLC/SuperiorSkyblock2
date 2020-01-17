@@ -104,7 +104,7 @@ public abstract class Mission {
      * @param superiorPlayer The player to check.
      */
     public boolean canComplete(SuperiorPlayer superiorPlayer){
-        if(!superiorPlayer.getWorld().getName().equals(SuperiorSkyblockAPI.getIslandsWorld().getName()))
+        if(!SuperiorSkyblockAPI.getSuperiorSkyblock().getGrid().isIslandsWorld(superiorPlayer.getWorld()))
             return false;
 
         return getProgress(superiorPlayer) >= 1.0;
