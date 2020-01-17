@@ -28,7 +28,7 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         super("menuIslandMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getIslandMissions().stream()
-                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer))
+                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission))
                     .collect(Collectors.toList());
         }
     }
@@ -43,7 +43,7 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         if(sound != null)
             sound.playSound(superiorPlayer.asPlayer());
 
-        if(canComplete && plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer)){
+        if(canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)){
             plugin.getMissions().rewardMission(mission, superiorPlayer, false);
             previousMove = false;
             open(previousMenu);

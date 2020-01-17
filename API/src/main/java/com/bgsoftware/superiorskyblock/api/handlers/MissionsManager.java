@@ -38,6 +38,22 @@ public interface MissionsManager {
     boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission mission);
 
     /**
+     * Check whether or not a player can complete a mission.
+     * @param superiorPlayer The player to check.
+     * @param mission The mission to check.
+     * @return True if player can complete, otherwise false.
+     */
+    boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission);
+
+    /**
+     * Check whether or not a player can complete a mission, without considering progress.
+     * @param superiorPlayer The player to check.
+     * @param mission The mission to check.
+     * @return True if player can complete, otherwise false.
+     */
+    boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission mission);
+
+    /**
      * Check whether or not the player can complete the mission again.
      * @param superiorPlayer The player to check.
      * @param mission The mission to check.
@@ -46,12 +62,20 @@ public interface MissionsManager {
     boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission mission);
 
     /**
-     * Check whether or not a player can complete a mission.
+     * Check whether or not a player has all the required missions to complete a mission.
      * @param superiorPlayer The player to check.
      * @param mission The mission to check.
-     * @return True if player can complete, otherwise false.
+     * @return True if player has all required missions, otherwise false.
      */
-    boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission);
+    boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission mission);
+
+    /**
+     * Check whether or not a player can pass all the checks to complete a mission.
+     * @param superiorPlayer The player to check.
+     * @param mission The mission to check.
+     * @return True if player can pass all checks, otherwise false.
+     */
+    boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission mission);
 
     /**
      * Reward a player for completing a specific mission.

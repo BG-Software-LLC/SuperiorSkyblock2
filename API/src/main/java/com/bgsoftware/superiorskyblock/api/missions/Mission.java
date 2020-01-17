@@ -56,6 +56,9 @@ public abstract class Mission {
         return new ArrayList<>(requiredMissions);
     }
 
+    /**
+     * Get the required checks for completing this mission.
+     */
     public List<String> getRequiredChecks() {
         return new ArrayList<>(requiredChecks);
     }

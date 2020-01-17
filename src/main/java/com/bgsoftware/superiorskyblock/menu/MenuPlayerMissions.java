@@ -27,7 +27,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         super("menuPlayerMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getPlayerMissions().stream()
-                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(mission, superiorPlayer))
+                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission))
                     .collect(Collectors.toList());
         }
     }

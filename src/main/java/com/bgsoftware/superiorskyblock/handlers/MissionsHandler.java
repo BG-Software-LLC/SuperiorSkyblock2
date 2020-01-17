@@ -156,8 +156,30 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission) {
-        return canCompleteAgain(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0 &&
-                hasAllRequiredMissions(mission, superiorPlayer) && canPassAllChecks(mission, superiorPlayer);
+        return canCompleteNoProgress(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0;
+    }
+
+    @Override
+    public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission mission) {
+        return canCompleteAgain(superiorPlayer, mission) && hasAllRequiredMissions(superiorPlayer, mission) &&
+                canPassAllChecks(superiorPlayer, mission);
+    }
+
+    @Override
+    public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission mission){
+        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
+    }
+
+    @Override
+    public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission mission){
+        return mission.getRequiredChecks().stream().allMatch(check -> {
+            check = PlaceholderHook.parse(superiorPlayer, check);
+            try {
+                return Boolean.parseBoolean(engine.eval(check) + "");
+            }catch(Throwable ex){
+                return false;
+            }
+        });
     }
 
     @Override
@@ -358,21 +380,6 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
-    }
-
-    public boolean hasAllRequiredMissions(Mission mission, SuperiorPlayer superiorPlayer){
-        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
-    }
-
-    private boolean canPassAllChecks(Mission mission, SuperiorPlayer superiorPlayer){
-        return mission.getRequiredChecks().stream().allMatch(check -> {
-            check = PlaceholderHook.parse(superiorPlayer, check);
-            try {
-                return Boolean.parseBoolean(engine.eval(check) + "");
-            }catch(Throwable ex){
-                return false;
-            }
-        });
     }
 
     private static int currentIndex = 0;
