@@ -38,13 +38,17 @@ public final class BlockChangeTask {
         for(Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()){
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
+            plugin.getNMSBlocks().refreshLight(chunk);
             entry.getValue().forEach(blockData ->
                     plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args));
         }
 
         blocksCache.clear();
 
-        chunksToUpdate.forEach(plugin.getNMSBlocks()::refreshChunk);
+        chunksToUpdate.forEach(chunk -> {
+            plugin.getNMSBlocks().refreshChunk(chunk);
+        });
+
         chunksToUpdate.clear();
 
         if(onFinish != null)

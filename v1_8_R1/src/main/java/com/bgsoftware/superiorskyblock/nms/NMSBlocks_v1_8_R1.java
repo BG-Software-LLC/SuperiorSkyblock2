@@ -38,6 +38,7 @@ import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -118,8 +119,18 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
     }
 
     @Override
-    public void refreshLight(org.bukkit.Chunk chunk) {
-        ((CraftChunk) chunk).getHandle().initLighting();
+    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for(int i = 0; i < 16; i++) {
+            ChunkSection chunkSection = chunk.getSections()[i];
+            if (chunkSection == null) {
+                chunkSection = new ChunkSection(i << 4, chunk.world.worldProvider.o());
+                chunk.getSections()[i] = chunkSection;
+            }
+
+            if (chunk.world.worldProvider.o())
+                Arrays.fill(chunkSection.getSkyLightArray().a(), (byte) 15);
+        }
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -115,8 +116,19 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     }
 
     @Override
-    public void refreshLight(org.bukkit.Chunk chunk) {
-        ((CraftChunk) chunk).getHandle().initLighting();
+    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for(int i = 0; i < 16; i++) {
+            ChunkSection chunkSection = chunk.getSections()[i];
+            if (chunkSection == null) {
+                chunkSection = new ChunkSection(i << 4, chunk.world.worldProvider.g());
+                chunk.getSections()[i] = chunkSection;
+                chunk.initLighting();
+            }
+
+            if (chunk.world.worldProvider.g())
+                Arrays.fill(chunkSection.getSkyLightArray().asBytes(), (byte) 15);
+        }
     }
 
     @Override

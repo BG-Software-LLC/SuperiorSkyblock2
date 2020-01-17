@@ -9,7 +9,6 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.EnumColor;
-import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.ItemStack;
@@ -42,6 +41,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -75,9 +75,6 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
         int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
 
         chunkSection.setType(blockX, blockY, blockZ, blockData);
-
-        if(bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
-            world.c(EnumSkyBlock.SKY, blockPosition);
 
         if(blockType != BlockType.BLOCK) {
             TileEntity tileEntity = world.getTileEntity(blockPosition);
@@ -122,7 +119,17 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     @Override
     public void refreshLight(org.bukkit.Chunk bukkitChunk) {
-        ((CraftChunk) bukkitChunk).getHandle().initLighting();
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for(int i = 0; i < 16; i++) {
+            ChunkSection chunkSection = chunk.getSections()[i];
+            if (chunkSection == null) {
+                chunkSection = new ChunkSection(i << 4, chunk.world.worldProvider.m());
+                chunk.getSections()[i] = chunkSection;
+            }
+
+            if (chunk.world.worldProvider.m())
+                Arrays.fill(chunkSection.getSkyLightArray().asBytes(), (byte) 15);
+        }
     }
 
     @Override
