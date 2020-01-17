@@ -81,7 +81,7 @@ public final class SchematicsHandler implements SchematicManager {
             for(File schemFile : schematicsFolder.listFiles()){
                 Schematic schematic = loadFromFile(schemFile);
                 if(schematic != null) {
-                    schematics.put(schemFile.getName().replace(".schematic", "").replace(".schem", ""), schematic);
+                    schematics.put(schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(), schematic);
                     SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
                             (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
                 }
@@ -94,7 +94,7 @@ public final class SchematicsHandler implements SchematicManager {
 
     @Override
     public Schematic getSchematic(String name) {
-        return schematics.get(name);
+        return schematics.get(name.toLowerCase());
     }
 
     @Override
