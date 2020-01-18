@@ -30,6 +30,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,6 +47,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -193,7 +195,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onIslandLeaveProtected(IslandLeaveProtectedEvent e){
-        if(plugin.getSettings().stopLeaving && e.getTo() != null) {
+        if(plugin.getSettings().stopLeaving && e.getTo() != null && !e.getPlayer().hasBypassModeEnabled()) {
             Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
 
             if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) && (toIsland == null || toIsland.equals(e.getIsland())) && !e.getIsland().isInsideRange(e.getTo())) {
@@ -208,7 +210,7 @@ public final class PlayersListener implements Listener {
         }, 5L);
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onMinecartRightClick(PlayerInteractAtEntityEvent e){
         if(!plugin.getSettings().stopLeaving)
             return;
@@ -216,13 +218,16 @@ public final class PlayersListener implements Listener {
         Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
         Island entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
+        if(SSuperiorPlayer.of(e.getPlayer()).hasBypassModeEnabled())
+            return;
+
         if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
                 !playerIsland.isInsideRange(e.getRightClicked().getLocation())) {
             e.setCancelled(true);
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onMinecartRightClick(VehicleEnterEvent e){
         if(!plugin.getSettings().stopLeaving)
             return;
@@ -230,9 +235,53 @@ public final class PlayersListener implements Listener {
         Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
         Island entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
 
+        if(e.getEntered() instanceof Player && SSuperiorPlayer.of(e.getEntered()).hasBypassModeEnabled())
+            return;
+
         if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
                 !playerIsland.isInsideRange(e.getVehicle().getLocation())) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onVehicleRide(VehicleMoveEvent e){
+        if(plugin.getSettings().stopLeaving && e.getTo() != null) {
+            Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+            Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
+
+            if (fromIsland != null && e.getVehicle().getWorld().equals(e.getTo().getWorld()) &&
+                    (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
+                Entity passenger = e.getVehicle().getPassenger();
+                if(passenger != null && (!(passenger instanceof Player) || !SSuperiorPlayer.of(passenger).hasBypassModeEnabled())) {
+                    e.getVehicle().setPassenger(null);
+                    passenger.teleport(e.getFrom());
+                }
+            }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerMoveOutside(PlayerMoveEvent e){
+        if(!plugin.getSettings().stopLeaving)
+            return;
+
+        Location from = e.getFrom(), to = e.getTo();
+
+        if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+            return;
+
+        SIsland fromIsland = (SIsland) plugin.getGrid().getIslandAt(e.getFrom());
+        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer.hasBypassModeEnabled())
+            return;
+
+        if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) &&
+                (fromIsland == null || toIsland == null || toIsland.equals(fromIsland)) &&
+                (fromIsland == null || !fromIsland.isInsideRange(e.getTo(), 1))) {
+            superiorPlayer.teleport(fromIsland == null ? plugin.getGrid().getSpawnIsland() : fromIsland);
         }
     }
 

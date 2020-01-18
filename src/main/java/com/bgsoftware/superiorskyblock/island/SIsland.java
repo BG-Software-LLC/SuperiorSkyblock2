@@ -560,12 +560,16 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isInsideRange(Location location){
+        return isInsideRange(location, 0);
+    }
+
+    public boolean isInsideRange(Location location, int extra){
         if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
         int islandSize = getIslandSize();
-        Location min = center.parse().subtract(islandSize, 0, islandSize);
-        Location max = center.parse().add(islandSize, 0, islandSize);
+        Location min = center.parse().subtract(islandSize + extra, 0, islandSize + extra);
+        Location max = center.parse().add(islandSize + extra, 0, islandSize + extra);
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
