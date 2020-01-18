@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 public abstract class PlaceholderHook {
 
     protected static SuperiorSkyblockPlugin plugin;
-    private static boolean MVdWPlaceholderAPI = false, PlaceholderAPI = false;
+    private static boolean PlaceholderAPI = false;
 
     public static void register(SuperiorSkyblockPlugin plugin){
         PlaceholderHook.plugin = plugin;
@@ -34,7 +34,6 @@ public abstract class PlaceholderHook {
         Executor.ensureMain(() -> {
             if(Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
                 new PlaceholderHook_MVdW();
-                MVdWPlaceholderAPI = true;
             }
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 new PlaceholderHook_PAPI();
@@ -48,8 +47,8 @@ public abstract class PlaceholderHook {
     }
 
     public static String parse(OfflinePlayer offlinePlayer, String str){
-        if(MVdWPlaceholderAPI && str.contains("{"))
-            str = PlaceholderHook_MVdW.parse(offlinePlayer, str);
+//        if(MVdWPlaceholderAPI && str.contains("{"))
+//            str = PlaceholderHook_MVdW.parse(offlinePlayer, str);
         if (PlaceholderAPI && str.contains("%"))
             str = PlaceholderHook_PAPI.parse(offlinePlayer, str);
 
