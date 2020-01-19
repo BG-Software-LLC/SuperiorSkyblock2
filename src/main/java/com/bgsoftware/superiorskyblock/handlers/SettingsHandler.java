@@ -127,7 +127,7 @@ public final class SettingsHandler {
         defaultBlockLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-limits")){
             String[] sections = line.split(":");
-            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
         }
