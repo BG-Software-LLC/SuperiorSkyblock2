@@ -30,31 +30,28 @@ public final class ProvidersHandler implements ProvidersManager {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 LeaderHeadsHook.register();
 
-            String spawnersProvider = plugin.getSettings().spawnersProvider;
+            if(this.spawnersProvider == null) {
+                String spawnersProvider = plugin.getSettings().spawnersProvider;
 
-            if(Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
-                    (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                setSpawnersProvider(new BlocksProvider_MergedSpawner());
-            }
-            else if(Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                    (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                setSpawnersProvider(new BlocksProvider_WildStacker());
-            }
-            else if(Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
-                    Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
-                    (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                setSpawnersProvider(new BlocksProvider_SilkSpawners());
-            }
-            else if(Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
-                    (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                setSpawnersProvider(new BlocksProvider_PvpingSpawners());
-            }
-            else if(Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
-                    (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                setSpawnersProvider(new BlocksProvider_EpicSpawners());
-            }
-            else {
-                setSpawnersProvider(new BlocksProvider_Default());
+                if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
+                        (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_MergedSpawner());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
+                        (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_WildStacker());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
+                        Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
+                        (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_SilkSpawners());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
+                        (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_PvpingSpawners());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
+                        (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_EpicSpawners());
+                } else {
+                    setSpawnersProvider(new BlocksProvider_Default());
+                }
             }
         });
 
