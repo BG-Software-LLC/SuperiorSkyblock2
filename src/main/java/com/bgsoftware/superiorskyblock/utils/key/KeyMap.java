@@ -33,16 +33,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public boolean containsKey(Object o) {
-        if(o instanceof Key) {
-            String key = o.toString();
-            if(map.containsKey(key))
-                return true;
-            else if(key.contains(":") && map.containsKey(key.split(":")[0]))
-                return true;
-            else if(key.contains(";") && map.containsKey(key.split(";")[0]))
-                return true;
-        }
-        return super.containsKey(o);
+        return get(o) != null;
     }
 
     public V put(String key, V value) {
@@ -94,6 +85,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     public V get(Object o) {
         if(map.containsKey("all"))
             return map.get("all");
+
         if(o instanceof Key) {
             String key = o.toString();
             if(map.containsKey(key))
@@ -102,10 +94,9 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
                 return map.get(key.split(":")[0]);
             else if(key.contains(";") && map.containsKey(key.split(";")[0]))
                 return map.get(key.split(";")[0]);
-            else
-                return super.get(o.toString());
         }
-        return super.get(o);
+
+        return map.get(o.toString());
     }
 
     public V getRaw(Key key, V defaultValue){
@@ -119,7 +110,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : super.getOrDefault(key, defaultValue);
+        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : map.getOrDefault(key, defaultValue);
     }
 
     @Override
