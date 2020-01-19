@@ -300,6 +300,7 @@ INVALID_RATE: |
 INVALID_ROLE: |
   &c&lLỗi | &7Không thể tìm thấy vai trò đảo {0}.
   &c&lLỗi | &7Các vai trò của đảo : {1}
+INVAILD_SCHEMATIC: '&c&lLỗi | &7Không thể tìm thấy schematic với tên {0}.'
 INVALID_SETTINGS: |
   &c&lLỗi | &7Không thể tìm thấy cài đặt đảo {0}.
   &c&lLỗi | &7Các điều chỉnh đảo: {1}

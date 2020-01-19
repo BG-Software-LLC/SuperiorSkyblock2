@@ -247,6 +247,7 @@ INVALID_RATE: |
 INVALID_ROLE: |
   &c&lError | &7Couldn't find the island role {0}.
   &c&lError | &7Island Roles: {1}
+INVALID_SCHEMATIC: '&c&lError | &7Couldn''t find a schematic with the name {0}.'
 INVALID_SETTINGS: |
   &c&lError | &7Couldn't find the island settings {0}.
   &c&lError | &7Island Settings: {1}

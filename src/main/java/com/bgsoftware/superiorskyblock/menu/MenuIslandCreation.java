@@ -37,7 +37,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             if(containsData(schematic + "-slot")) {
                 int slot = (int) getData(schematic + "-slot");
                 if(slot == e.getRawSlot()) {
-                    clickSchematic(superiorPlayer, schematic);
+                    clickSchematic(schematic, this, true);
                     break;
                 }
             }
@@ -61,33 +61,38 @@ public final class MenuIslandCreation extends SuperiorMenu {
        return inv;
     }
 
-    private void clickSchematic(SuperiorPlayer superiorPlayer, String schematic){
-        String permission = (String) getData(schematic + "-permission");
-        if (superiorPlayer.hasPermission(permission)) {
-            BigDecimal bonusWorth = new BigDecimal((long) getData(schematic + "-bonus"));
-            Biome biome = Biome.valueOf((String) getData(schematic + "-biome"));
-            SoundWrapper sound = (SoundWrapper) getData(schematic + "-has-access-item-sound");
-            if(sound != null)
-                sound.playSound(superiorPlayer.asPlayer());
+    private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean fromInventory){
+        String permission = (String) menu.getData(schematic + "-permission");
+        if (menu.superiorPlayer.hasPermission(permission)) {
+            BigDecimal bonusWorth = new BigDecimal((long) menu.getData(schematic + "-bonus"));
+            Biome biome = Biome.valueOf((String) menu.getData(schematic + "-biome"));
+
+            SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-has-access-item-sound");
+            if (sound != null)
+                sound.playSound(menu.superiorPlayer.asPlayer());
             //noinspection unchecked
-            List<String> commands = (List<String>) getData(schematic + "-has-access-item-commands");
-            if(commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+            List<String> commands = (List<String>) menu.getData(schematic + "-has-access-item-commands");
+            if (commands != null)
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replace("%player%", menu.superiorPlayer.getName())));
 
-            previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            if(fromInventory) {
+                menu.previousMove = false;
+                menu.superiorPlayer.asPlayer().closeInventory();
+            }
 
-            Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(superiorPlayer);
-            plugin.getGrid().createIsland(superiorPlayer, schematic, bonusWorth, biome, islandName);
+            Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
+            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, biome, menu.islandName);
         }
         else{
-            SoundWrapper sound = (SoundWrapper) getData(schematic + "-no-access-item-sound");
+            SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-no-access-item-sound");
             if(sound != null)
-                sound.playSound(superiorPlayer.asPlayer());
+                sound.playSound(menu.superiorPlayer.asPlayer());
             //noinspection unchecked
-            List<String> commands = (List<String>) getData(schematic + "-no-access-item-commands");
+            List<String> commands = (List<String>) menu.getData(schematic + "-no-access-item-commands");
             if(commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        command.replace("%player%", menu.superiorPlayer.getName())));
         }
     }
 
@@ -173,11 +178,15 @@ public final class MenuIslandCreation extends SuperiorMenu {
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
         MenuIslandCreation menuIslandCreation = new MenuIslandCreation(superiorPlayer, islandName);
         if(plugin.getSettings().skipOneItemMenus && menuIslandCreation.hasOnlyOneItem()){
-            menuIslandCreation.clickSchematic(superiorPlayer, menuIslandCreation.getOnlyOneItem());
+            clickSchematic(menuIslandCreation.getOnlyOneItem(), menuIslandCreation, false);
         }
         else {
             menuIslandCreation.open(previousMenu);
         }
+    }
+
+    public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic){
+        clickSchematic(schematic, new MenuIslandCreation(superiorPlayer, islandName), false);
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

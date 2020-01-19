@@ -295,9 +295,6 @@ INTERACT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi interagire al di fuori del tuo
   di protezione.'
 INVALID_AMOUNT: '&c&lErrore | &7Importo non valido {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Mondo non valido {0}.'
-                                                    
-                                                                                            
-                                                         
 INVALID_ISLAND: '&c&lErrore | &7Non hai un''isola.'
 INVALID_ISLAND_LOCATION: '&c&lErrore | &7Non c''è un isola nella tua posizione.'
 INVALID_ISLAND_OTHER: '&c&lErrore | &7{0} non ha un isola.'
@@ -318,6 +315,7 @@ INVALID_RATE: |
 INVALID_ROLE: |
   &c&lErrore | &7Impossibile trovare il ruolo dell''isola {0}.
   &c&lErrore | &7Ruoli dell'isola: {1}
+INVALID_SCHEMATIC: '&c&lError | &7Couldn''t find a schematic with the name {0}.'
 INVALID_SETTINGS: |
   &c&lErrore | &7Impossibile trovare le impostazioni dell''isola {0}.
   &c&lErrore | &7Impostazioni dell'isola: {1}
