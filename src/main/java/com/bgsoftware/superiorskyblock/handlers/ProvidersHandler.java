@@ -30,7 +30,7 @@ public final class ProvidersHandler implements ProvidersManager {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 LeaderHeadsHook.register();
 
-            if(this.spawnersProvider == null) {
+            if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
 
                 if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
