@@ -315,7 +315,7 @@ INVALID_RATE: |
 INVALID_ROLE: |
   &c&lErrore | &7Impossibile trovare il ruolo dell''isola {0}.
   &c&lErrore | &7Ruoli dell'isola: {1}
-INVALID_SCHEMATIC: '&c&lError | &7Couldn''t find a schematic with the name {0}.'
+INVALID_SCHEMATIC: '&c&lErrore | &7Non ho trovato la schematica di nome {0}.'
 INVALID_SETTINGS: |
   &c&lErrore | &7Impossibile trovare le impostazioni dell''isola {0}.
   &c&lErrore | &7Impostazioni dell'isola: {1}
