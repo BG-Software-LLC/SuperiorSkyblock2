@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -53,6 +54,10 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
         Island island = superiorPlayer.getIsland();
+
+        if(island == null)
+            return new ItemStack(Material.AIR);
+
         MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
         boolean completed = !island.canCompleteMissionAgain(mission);
         int percentage = getPercentage(mission.getProgress(superiorPlayer));
