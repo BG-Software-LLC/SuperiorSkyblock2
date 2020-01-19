@@ -160,7 +160,7 @@ upgrades:
       permission: 'upgrade.size.donor'
       commands:
         - 'island admin setupgrade %player% border-size 4'
-        - 'island admin setteamlimit %player% 125'
+        - 'island admin setsize %player% 125'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 125 blocks!'
     '4':
       price: 0.0
