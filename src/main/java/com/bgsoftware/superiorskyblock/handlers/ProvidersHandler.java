@@ -71,11 +71,11 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     public Key getSpawnerKey(ItemStack itemStack){
-        return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getSpawnerKey(itemStack) : Key.of(itemStack);
+        return spawnersProvider != null ? ((BlocksProvider) spawnersProvider).getSpawnerKey(itemStack) : Key.of(itemStack);
     }
 
     public Pair<Integer, Material> getBlock(Location location){
-        return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
+        return spawnersProvider != null ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
     }
 
 }
