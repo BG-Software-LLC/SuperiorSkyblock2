@@ -2,9 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
@@ -33,8 +31,8 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
     }
 
     @Override
-    public Key getSpawnerKey(ItemStack itemStack) {
-        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + MergedSpawnerAPI.getInstance().getEntityType(itemStack));
+    public EntityType getSpawnerType(ItemStack itemStack) {
+        return MergedSpawnerAPI.getInstance().getEntityType(itemStack);
     }
 
     @SuppressWarnings("unused")

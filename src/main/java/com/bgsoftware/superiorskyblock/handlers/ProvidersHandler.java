@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -71,11 +72,11 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     public Key getSpawnerKey(ItemStack itemStack){
-        return spawnersProvider != null ? ((BlocksProvider) spawnersProvider).getSpawnerKey(itemStack) : Key.of(itemStack);
+        return spawnersProvider != null ? Key.of(Materials.SPAWNER.toBukkitType() + ":" + spawnersProvider.getSpawnerType(itemStack)) : Key.of(itemStack);
     }
 
     public Pair<Integer, Material> getBlock(Location location){
-        return spawnersProvider != null ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
+        return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
     }
 
 }

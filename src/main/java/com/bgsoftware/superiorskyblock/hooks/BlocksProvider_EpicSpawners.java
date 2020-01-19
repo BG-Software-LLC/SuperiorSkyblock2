@@ -38,8 +38,8 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
     }
 
     @Override
-    public Key getSpawnerKey(ItemStack itemStack) {
-        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0));
+    public EntityType getSpawnerType(ItemStack itemStack) {
+        return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0);
     }
 
     @SuppressWarnings("unused")

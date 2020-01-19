@@ -27,9 +27,9 @@ public final class BlocksProvider_SilkSpawners implements BlocksProvider {
     }
 
     @Override
-    public Key getSpawnerKey(ItemStack itemStack) {
+    public EntityType getSpawnerType(ItemStack itemStack) {
         String name = itemStack.getItemMeta().getLore().get(0).replaceAll("§e", "");
-        return Key.of(Materials.SPAWNER.toBukkitType() + ":" + EntityType.fromName(name));
+        return EntityType.fromName(name);
     }
 
     @SuppressWarnings("unused")

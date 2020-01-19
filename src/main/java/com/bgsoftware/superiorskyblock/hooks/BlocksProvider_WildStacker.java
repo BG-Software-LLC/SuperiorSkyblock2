@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -130,9 +131,24 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e){
+//            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+//            if(island != null)
+//                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType()), e.getTarget().getStackAmount());
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType()), e.getTarget().getStackAmount());
+
+            if(island == null)
+                return;
+
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType());
+            int increaseAmount = e.getTarget().getStackAmount();
+
+            if(increaseAmount < 0){
+                island.handleBlockBreak(blockKey, -increaseAmount);
+            }
+
+            else if(!island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                island.handleBlockPlace(blockKey, increaseAmount);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
