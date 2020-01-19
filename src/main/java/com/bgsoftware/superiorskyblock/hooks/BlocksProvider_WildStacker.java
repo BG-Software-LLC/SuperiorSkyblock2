@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -109,8 +111,21 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType()), e.getSpawner().getStackAmount() - 1);
+
+            if(island == null)
+                return;
+
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType());
+            int increaseAmount = e.getSpawner().getStackAmount();
+
+            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                e.setCancelled(true);
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+            }
+
+            else{
+                island.handleBlockPlace(blockKey, increaseAmount - 1);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
