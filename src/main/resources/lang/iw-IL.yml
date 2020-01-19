@@ -451,11 +451,11 @@ RELOAD_PROCCESS_REQUEST: '&e&lSuperiorSkyblock | &7םיצבקה לכ תא שדח
 REVOKE_INVITE_ANNOUNCEMENT: '&e&lיא | &7יאה לא {1} לש הנמזהה תא לטיב {0}.'
 SAME_NAME_CHANGE: '&c&lהאיגש | &7ךלש יאה לש יוושכעה םשהמ רחא םש סינכהל ךירצ התא.'
 SCHEMATIC_LEFT_SELECT: '&e&lםינבמ רצוי | &7היינש הדוקנ תנמיס ({0})'
-SCHEMATIC_NOT_READY: '&c&lהאיגש | &7You haven''t selected two positions.'
-SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7Processing your request...'
+SCHEMATIC_NOT_READY: '&c&lהאיגש | &7תודוקנ ינש תרחב אל.'
+SCHEMATIC_PROCCESS_REQUEST: '&e&lםינבמ רצוי | &7ךתשקב תא דבעמ...'
 SCHEMATIC_READY_TO_CREATE: |
-  &e&lםינבמ רצוי | &7You have selected two positions. Run /is admin schematic <name> to create a new schematic.
-  &e&lםינבמ רצוי | &7Make sure you stand at the teleportion location when executing the command.
+  &e&lםינבמ רצוי | &7שדח הנבמ רוציל תנמ לע Run /is admin schematic <name> ץרה .תודוקנ יתש תרחב.
+  &e&lםינבמ רצוי | &7הדוקפה תא ץירמ התא רשאכ רגתשהל םירומא וילא רוזאב דמוע התאש בל םיש.
 SCHEMATIC_RIGHT_SELECT: '&e&lםינבמ רצוי | &7הנושאר הדוקנ תנמיס ({0})'
 SCHEMATIC_SAVED: '&e&lםינבמ רצוי | &7החלצהב רמשנ הנבמה!'
 SELF_ROLE_CHANGE: '&c&lהאיגש | &7ךמצע לש הגרדה תא תונשל לוכי אל התא.'
