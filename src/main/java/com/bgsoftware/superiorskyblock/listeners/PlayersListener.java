@@ -278,7 +278,8 @@ public final class PlayersListener implements Listener {
         if(superiorPlayer.hasBypassModeEnabled())
             return;
 
-        if (e.getPlayer().getWorld().equals(e.getTo().getWorld()) &&
+        if (plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld()) &&
+                e.getPlayer().getWorld().equals(e.getTo().getWorld()) &&
                 (fromIsland == null || toIsland == null || toIsland.equals(fromIsland)) &&
                 (fromIsland == null || !fromIsland.isInsideRange(e.getTo(), 1))) {
             superiorPlayer.teleport(fromIsland == null ? plugin.getGrid().getSpawnIsland() : fromIsland);
