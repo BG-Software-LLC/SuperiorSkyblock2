@@ -253,6 +253,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location) {
+        return isInsideRange(location, 0);
+    }
+
+    @Override
+    public boolean isInsideRange(Location location, int extraRadius) {
         return isInside(location);
     }
 

@@ -271,7 +271,7 @@ public final class PlayersListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        SIsland fromIsland = (SIsland) plugin.getGrid().getIslandAt(e.getFrom());
+        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
