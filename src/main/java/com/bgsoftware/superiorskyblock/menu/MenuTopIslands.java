@@ -309,16 +309,25 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         newMenu.set("sounds."+ slotsChar + ".no-island", noIslandItemSection.getConfigurationSection("sound"));
         noIslandItemSection.set("sound", null);
 
-        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.worth-sort"), patternChars, worthChar,
-                itemsSection, commandsSection, soundsSection);
-        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.level-sort"), patternChars, levelChar,
-                itemsSection, commandsSection, soundsSection);
-        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.rating-sort"), patternChars, ratingChar,
-                itemsSection, commandsSection, soundsSection);
-        MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.players-sort"), patternChars, playersChar,
-                itemsSection, commandsSection, soundsSection);
+        if(cfg.contains("top-islands.worth-sort")) {
+            MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.worth-sort"), patternChars, worthChar,
+                    itemsSection, commandsSection, soundsSection);
+        }
+        if(cfg.contains("top-islands.level-sort")) {
+            MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.level-sort"), patternChars, levelChar,
+                    itemsSection, commandsSection, soundsSection);
+        }
+        if(cfg.contains("top-islands.rating-sort")) {
+            MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.rating-sort"), patternChars, ratingChar,
+                    itemsSection, commandsSection, soundsSection);
+        }
+        if(cfg.contains("top-islands.players-sort")) {
+            MenuConverter.convertItem(cfg.getConfigurationSection("top-islands.players-sort"), patternChars, playersChar,
+                    itemsSection, commandsSection, soundsSection);
+        }
 
-        patternChars[cfg.getInt("player-island-slot")] = playerIslandChar;
+        if(cfg.contains("player-island-slot"))
+            patternChars[cfg.getInt("player-island-slot")] = playerIslandChar;
 
         newMenu.set("worth-sort", worthChar);
         newMenu.set("level-sort", levelChar);
