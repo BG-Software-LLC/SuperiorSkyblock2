@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -790,26 +791,20 @@ public final class SIsland extends DatabaseObject implements Island {
         calcProcess = true;
         beingRecalculated.set(true);
 
-        List<Chunk> chunks = getAllChunks(World.Environment.NORMAL, true);
-
-        if(wasSchematicGenerated(World.Environment.NETHER))
-            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
-
-        if(wasSchematicGenerated(World.Environment.THE_END))
-            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
-
+        List<Chunk> chunks = new ArrayList<>();
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
 
-        for (Chunk chunk : chunks) {
-            chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
-            BlocksProvider_WildStacker.cacheChunk(chunk);
-        }
+        if(!PaperHook.isUsingPaper())
+            loadCalculateChunks(chunks, chunkSnapshots);
 
         blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
         islandWorth.set(BigDecimalFormatted.ZERO);
         islandLevel.set(BigDecimalFormatted.ZERO);
 
         Executor.async(() -> {
+            if(PaperHook.isUsingPaper())
+                loadCalculateChunks(chunks, chunkSnapshots);
+
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
             ExecutorService scanService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
@@ -2050,6 +2045,21 @@ public final class SIsland extends DatabaseObject implements Island {
     /*
      *  Private methods
      */
+
+    private void loadCalculateChunks(List<Chunk> chunks, List<ChunkSnapshot> chunkSnapshots){
+        chunks.addAll(getAllChunks(World.Environment.NORMAL, true));
+
+        if(wasSchematicGenerated(World.Environment.NETHER))
+            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
+
+        if(wasSchematicGenerated(World.Environment.THE_END))
+            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
+
+        for (Chunk chunk : chunks) {
+            chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
+            BlocksProvider_WildStacker.cacheChunk(chunk);
+        }
+    }
 
     private void assignPermissionNodes(){
         permissionNodes.run(permissionNodes -> {
