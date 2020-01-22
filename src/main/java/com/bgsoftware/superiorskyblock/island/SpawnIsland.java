@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Chunk;
@@ -38,7 +38,7 @@ public final class SpawnIsland implements Island {
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
-    private final SBlockPosition center;
+    private final Location center;
     private final int islandSize;
     private final List<IslandSettings> islandSettings;
     private Biome biome = Biome.PLAINS;
@@ -46,7 +46,7 @@ public final class SpawnIsland implements Island {
     public SpawnIsland(SuperiorSkyblockPlugin plugin){
         SpawnIsland.plugin = plugin;
 
-        center = SBlockPosition.of(plugin.getSettings().spawnLocation);
+        center = LocationUtils.getLocation(plugin.getSettings().spawnLocation.replace(" ", "")).add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().maxIslandSize;
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandSettings::valueOf).collect(Collectors.toList());
 
@@ -166,7 +166,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getCenter(World.Environment environment) {
-        return center.parse().add(0.5, 0, 0.5);
+        return center.clone();
     }
 
     @Override
@@ -225,8 +225,8 @@ public final class SpawnIsland implements Island {
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
         int islandSize = getIslandSize();
-        Location min = onlyProtected ? center.parse().subtract(islandSize, 0, islandSize) : getMinimum();
-        Location max = onlyProtected ? center.parse().add(islandSize, 0, islandSize) : getMaximum();
+        Location min = onlyProtected ? center.clone().subtract(islandSize, 0, islandSize) : getMinimum();
+        Location max = onlyProtected ? center.clone().add(islandSize, 0, islandSize) : getMaximum();
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
 
         List<Chunk> chunks = new ArrayList<>();

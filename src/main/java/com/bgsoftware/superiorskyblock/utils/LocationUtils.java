@@ -15,8 +15,8 @@ public final class LocationUtils {
     }
 
     public static Location getLocation(String location){
-        if(location.isEmpty())
-            return null;
+        if(location == null || location.isEmpty())
+            throw new NullPointerException("Cannot parse empty location.");
 
         String[] sections = location.split(",");
 
