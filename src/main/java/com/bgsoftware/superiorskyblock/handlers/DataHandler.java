@@ -168,7 +168,7 @@ public final class DataHandler {
         addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
         addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
         addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
-        addColumnIfNotExists("toggledBorder", "players", "0", "BOOLEAN");
+        addColumnIfNotExists("toggledBorder", "players", "1", "BOOLEAN");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
