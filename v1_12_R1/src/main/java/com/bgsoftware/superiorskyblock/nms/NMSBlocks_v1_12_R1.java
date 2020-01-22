@@ -170,7 +170,14 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
     @Override
     public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
         try{
-            Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
+            Field field;
+
+            try{
+                field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
+            }catch(Throwable ex){
+                field = tileEntityInventoryHolder.getClass().getSuperclass().getDeclaredField("items");
+            }
+
             field.setAccessible(true);
             //noinspection unchecked
             NonNullList<ItemStack> items = (NonNullList<ItemStack>) field.get(tileEntityInventoryHolder);

@@ -191,10 +191,8 @@ public final class SchematicsHandler implements SchematicManager {
             }
         }
 
-        //noinspection IntegerDivisionInFloatingPointContext
-        Location center = new Location(world, xSize / 2, ySize / 2, zSize / 2).add(min);
         for(LivingEntity livingEntity : getEntities(min, max)){
-            entities.add(new TagBuilder().applyEntity(livingEntity, center).build());
+            entities.add(new TagBuilder().applyEntity(livingEntity, min).build());
         }
 
         Map<String, Tag<?>> compoundValue = new HashMap<>();

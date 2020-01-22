@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -15,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.DyeColor;
@@ -156,8 +156,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             Map<String, Tag<?>> compoundValue = ((CompoundTag) entitiesList.get(i)).getValue();
             EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
             CompoundTag entityTag = (CompoundTag) compoundValue.get("NBT");
-            SBlockPosition location = SBlockPosition.of(((StringTag) compoundValue.get("offset")).getValue());
-            entities[i] = SchematicEntity.of(entityType, entityTag, location);
+            Location offset = LocationUtils.getLocation(((StringTag) compoundValue.get("offset")).getValue());
+            entities[i] = SchematicEntity.of(entityType, entityTag, offset);
         }
     }
 
@@ -189,12 +189,14 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         blockChangeTask.submitUpdate(() -> {
-            for(SchematicEntity entity : entities)
-                entity.spawnEntity(location);
+            for(SchematicEntity entity : entities) {
+                entity.spawnEntity(min);
+            }
 
             callback.run();
 
             Executor.sync(() -> {
+
                 schematicProgress = false;
 
                 if (pasteSchematicQueue.size() != 0) {

@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
@@ -73,11 +73,11 @@ public final class TagBuilder {
         compoundValue.put("spawnedType", new StringTag(creatureSpawner.getSpawnedType().name()));
     }
 
-    public TagBuilder applyEntity(LivingEntity livingEntity, Location center){
+    public TagBuilder applyEntity(LivingEntity livingEntity, Location min){
         if(!(livingEntity instanceof Player)) {
-            SBlockPosition offset = SBlockPosition.of(livingEntity.getLocation().subtract(center));
+            Location offset = livingEntity.getLocation().subtract(min);
             compoundValue.put("entityType", new StringTag(livingEntity.getType().name()));
-            compoundValue.put("offset", new StringTag(offset.toString()));
+            compoundValue.put("offset", new StringTag(LocationUtils.getLocation(offset)));
             compoundValue.put("NBT", plugin.getNMSTags().getNBTTag(livingEntity));
         }
         return this;

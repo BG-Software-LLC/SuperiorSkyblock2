@@ -3,8 +3,11 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_14_R1.EntityTypes;
 import net.minecraft.server.v1_14_R1.ItemStack;
+import net.minecraft.server.v1_14_R1.MinecraftKey;
 import net.minecraft.server.v1_14_R1.NBTBase;
 import net.minecraft.server.v1_14_R1.NBTTagByte;
 import net.minecraft.server.v1_14_R1.NBTTagByteArray;
@@ -17,8 +20,11 @@ import net.minecraft.server.v1_14_R1.NBTTagList;
 import net.minecraft.server.v1_14_R1.NBTTagLong;
 import net.minecraft.server.v1_14_R1.NBTTagShort;
 import net.minecraft.server.v1_14_R1.NBTTagString;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Set;
@@ -44,26 +50,29 @@ public final class NMSTags_v1_14_R1 implements NMSTags {
     public CompoundTag getNBTTag(LivingEntity livingEntity) {
         EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
         NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        entityLiving.b(nbtTagCompound);
+        entityLiving.c(nbtTagCompound);
         nbtTagCompound.set("Yaw", new NBTTagFloat(entityLiving.yaw));
         nbtTagCompound.set("Pitch", new NBTTagFloat(entityLiving.pitch));
         return CompoundTag.fromNBT(nbtTagCompound);
     }
 
     @Override
-    public void getFromNBTTag(LivingEntity livingEntity, CompoundTag compoundTag) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
+    @SuppressWarnings("ConstantConditions")
+    public void spawnEntity(EntityType entityType, Location location, CompoundTag compoundTag) {
+        CraftWorld craftWorld = (CraftWorld) location.getWorld();
         NBTTagCompound nbtTagCompound = (NBTTagCompound) compoundTag.toNBT();
-        if(nbtTagCompound != null) {
-            entityLiving.a(nbtTagCompound);
-            if(nbtTagCompound.hasKey("Yaw") && nbtTagCompound.hasKey("Pitch")){
-                entityLiving.setLocation(
-                        entityLiving.locX, entityLiving.locY, entityLiving.locZ,
-                        nbtTagCompound.getFloat("Yaw"),
-                        nbtTagCompound.getFloat("Pitch")
-                );
-            }
-        }
+
+        if(nbtTagCompound == null)
+            nbtTagCompound = new NBTTagCompound();
+
+        if(!nbtTagCompound.hasKey("id"))
+            //noinspection deprecation
+            nbtTagCompound.setString("id", new MinecraftKey(entityType.getName()).getKey());
+
+        Entity entity = EntityTypes.a(nbtTagCompound, craftWorld.getHandle(), (_entity) -> {
+            _entity.setPositionRotation(location.getX(), location.getY(), location.getZ(), _entity.yaw, _entity.pitch);
+            return !craftWorld.getHandle().addEntitySerialized(_entity) ? null : _entity;
+        });
     }
 
     @Override
