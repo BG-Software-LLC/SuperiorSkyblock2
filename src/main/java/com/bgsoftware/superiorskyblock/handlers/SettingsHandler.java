@@ -68,6 +68,7 @@ public final class SettingsHandler {
     public final boolean voidTeleport;
     public final List<String> interactables;
     public final boolean visitorsDamage;
+    public final boolean coopDamage;
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
     public final Map<String, String> defaultPlaceholders;
@@ -172,6 +173,7 @@ public final class SettingsHandler {
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = loadInteractables(plugin);
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
+        coopDamage = cfg.getBoolean("coop-damage", true);
         disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(

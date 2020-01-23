@@ -422,6 +422,11 @@ public final class SIsland extends DatabaseObject implements Island {
         MenuVisitors.refreshMenus();
     }
 
+    @Override
+    public boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus) {
+        return !isMember(superiorPlayer) && (!includeCoopStatus || !isCoop(superiorPlayer));
+    }
+
     /*
      *  Location related methods
      */

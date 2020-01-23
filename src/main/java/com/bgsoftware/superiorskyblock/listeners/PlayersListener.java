@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -300,8 +301,12 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(island != null && !island.isMember(superiorPlayer) && !plugin.getSettings().visitorsDamage)
+
+
+        if(island != null && (!(island instanceof SpawnIsland) || plugin.getSettings().spawnProtection) &&
+                island.isVisitor(superiorPlayer, !plugin.getSettings().coopDamage) && !plugin.getSettings().visitorsDamage) {
             e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

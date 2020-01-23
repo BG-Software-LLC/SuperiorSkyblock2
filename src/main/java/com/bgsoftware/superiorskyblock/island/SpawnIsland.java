@@ -159,6 +159,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus) {
+        return true;
+    }
+
+    @Override
     @Deprecated
     public Location getCenter() {
         return getCenter(World.Environment.NORMAL);
