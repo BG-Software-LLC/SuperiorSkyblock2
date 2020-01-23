@@ -235,6 +235,9 @@ void-teleport: true
 # When disabled, visitors won't get damaged in other islands.
 visitors-damage: false
 
+# When disabled, coop won't get damaged in islands they are coop with.
+coop-damage: true
+
 # The amount of times a player can disband an island.
 # If you want to disable this feature, set it to 0.
 disband-count: 5
