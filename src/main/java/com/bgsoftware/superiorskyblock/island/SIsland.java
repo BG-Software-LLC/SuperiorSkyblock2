@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksLoadingTask;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -40,7 +40,6 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
@@ -60,13 +59,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.entity.EntityType;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,9 +80,6 @@ public final class SIsland extends DatabaseObject implements Island {
     private static final int NO_BLOCK_LIMIT = -1;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private static boolean calcProcess = false;
-    private static Queue<CalcIslandData> islandCalcsQueue = new Queue<>();
 
     /*
      * Island identifiers
@@ -506,9 +505,21 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public Location getMinimumProtected() {
+        int islandSize = this.islandSize.get();
+        return getCenter(World.Environment.NORMAL).subtract(islandSize, 0, islandSize);
+    }
+
+    @Override
     public Location getMaximum(){
         int islandDistance = plugin.getSettings().maxIslandSize;
         return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
+    }
+
+    @Override
+    public Location getMaximumProtected() {
+        int islandSize = this.islandSize.get();
+        return getCenter(World.Environment.NORMAL).add(islandSize, 0, islandSize);
     }
 
     @Override
@@ -536,10 +547,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        int islandSize = getIslandSize();
         Location center = getCenter(environment);
-        Location min = onlyProtected ? center.clone().subtract(islandSize, 0, islandSize) : getMinimum();
-        Location max = onlyProtected ? center.clone().add(islandSize, 0, islandSize) : getMaximum();
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
 
         List<Chunk> chunks = new ArrayList<>();
@@ -550,6 +560,30 @@ public final class SIsland extends DatabaseObject implements Island {
             }
         }
 
+        return chunks;
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
+        Location center = getCenter(environment);
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+        World world = center.getWorld();
+
+        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                CompletableFuture<Chunk> completableFuture;
+                if(world.isChunkLoaded(x, z)){
+                    completableFuture = CompletableFuture.completedFuture(world.getChunkAt(x, z));
+                }
+                else {
+                    completableFuture = ChunksLoadingTask.loadChunk(world, x, z);
+                }
+                chunks.add(whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete));
+            }
+        }
 
         return chunks;
     }
@@ -573,9 +607,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
-        int islandSize = getIslandSize();
-        Location min = center.parse().subtract(islandSize + extra, 0, islandSize + extra);
-        Location max = center.parse().add(islandSize + extra, 0, islandSize + extra);
+        Location min = getMinimumProtected(), max = getMaximumProtected();
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
@@ -585,10 +617,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return false;
 
-        int islandSize = getIslandSize();
-        Location min = center.parse().subtract(islandSize, 0, islandSize);
-        Location max = center.parse().add(islandSize, 0, islandSize);
-
+        Location min = getMinimumProtected(), max = getMaximumProtected();
         return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
                 (max.getBlockX() >> 4) >= chunk.getX() &&(max.getBlockZ() >> 4) >= chunk.getZ();
     }
@@ -765,15 +794,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().deleteIsland(this);
 
-        List<Chunk> chunks = getAllChunks(World.Environment.NORMAL, true);
+        getAllChunksAsync(World.Environment.NORMAL, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.NETHER))
-            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
+            getAllChunksAsync(World.Environment.NETHER, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.THE_END))
-            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
-
-        plugin.getNMSAdapter().regenerateChunks(chunks);
+            getAllChunksAsync(World.Environment.THE_END, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
     }
 
     @Override
@@ -788,31 +815,42 @@ public final class SIsland extends DatabaseObject implements Island {
             return;
         }
 
-        if(calcProcess) {
-            islandCalcsQueue.push(new CalcIslandData(this, asker, callback));
-            return;
-        }
-
-        calcProcess = true;
         beingRecalculated.set(true);
 
         List<Chunk> chunks = new ArrayList<>();
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
+        List<CompletableFuture<Chunk>> chunksToLoad = new ArrayList<>();
 
-        if(!PaperHook.isUsingPaper())
-            loadCalculateChunks(chunks, chunkSnapshots);
+        BiConsumer<Chunk, Throwable> whenComplete = (chunk, throwable) -> {
+            chunks.add(chunk);
+            chunkSnapshots.add(chunk.getChunkSnapshot());
+            BlocksProvider_WildStacker.cacheChunk(chunk);
+        };
+
+        //noinspection all
+        chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, whenComplete));
+        if(wasSchematicGenerated(World.Environment.NETHER))
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, whenComplete));
+        if(wasSchematicGenerated(World.Environment.THE_END))
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, whenComplete));
 
         blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
         islandWorth.set(BigDecimalFormatted.ZERO);
         islandLevel.set(BigDecimalFormatted.ZERO);
 
         Executor.async(() -> {
-            if(PaperHook.isUsingPaper())
-                loadCalculateChunks(chunks, chunkSnapshots);
+            for(CompletableFuture<Chunk> chunkToLoad : chunksToLoad){
+                try {
+                    chunkToLoad.get();
+                }catch(Exception ex){
+                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                }
+            }
 
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
 
-            ExecutorService scanService = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
+            ExecutorService scanService = Executors.newFixedThreadPool(chunkSnapshots.size(),
+                    new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
 
             for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 scanService.execute(() -> {
@@ -903,13 +941,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
                 MenuValues.refreshMenus();
 
-                calcProcess = false;
                 beingRecalculated.set(false);
-
-                if(islandCalcsQueue.size() != 0){
-                    CalcIslandData calcIslandData = islandCalcsQueue.pop();
-                    calcIslandData.island.calcIslandWorth(calcIslandData.asker, calcIslandData.callback);
-                }
             });
         });
     }
@@ -968,7 +1000,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBiome(Biome biome){
-        plugin.getNMSAdapter().setBiome(getCenter(World.Environment.NORMAL).getChunk(), biome);
+        getAllChunksAsync(World.Environment.NORMAL, false, ((chunk, throwable) -> plugin.getNMSAdapter().setBiome(chunk, biome)));
         this.biome.set(biome);
     }
 
@@ -2051,18 +2083,22 @@ public final class SIsland extends DatabaseObject implements Island {
      *  Private methods
      */
 
-    private void loadCalculateChunks(List<Chunk> chunks, List<ChunkSnapshot> chunkSnapshots){
-        chunks.addAll(getAllChunks(World.Environment.NORMAL, true));
+    private void loadChunkSnapshots(@Nullable World world, int x, int z, List<Chunk> chunks, List<ChunkSnapshot> chunkSnapshots, List<CompletableFuture<Chunk>> chunkToLoad){
+        if(world == null)
+            return;
 
-        if(wasSchematicGenerated(World.Environment.NETHER))
-            chunks.addAll(getAllChunks(World.Environment.NETHER, true));
-
-        if(wasSchematicGenerated(World.Environment.THE_END))
-            chunks.addAll(getAllChunks(World.Environment.THE_END, true));
-
-        for (Chunk chunk : chunks) {
-            chunkSnapshots.add(chunk.getChunkSnapshot(true, false, false));
+        if(world.isChunkLoaded(x, z)){
+            Chunk chunk = world.getChunkAt(x, z);
+            chunks.add(chunk);
+            chunkSnapshots.add(chunk.getChunkSnapshot());
             BlocksProvider_WildStacker.cacheChunk(chunk);
+        }
+        else{
+            chunkToLoad.add(ChunksLoadingTask.loadChunk(world, x, z).whenComplete(((chunk, throwable) -> {
+                chunks.add(chunk);
+                chunkSnapshots.add(chunk.getChunkSnapshot());
+                BlocksProvider_WildStacker.cacheChunk(chunk);
+            })));
         }
     }
 
@@ -2139,20 +2175,6 @@ public final class SIsland extends DatabaseObject implements Island {
                         .execute(true);
             }
         });
-    }
-
-    private static class CalcIslandData {
-
-        private final Island island;
-        private final SuperiorPlayer asker;
-        private final Runnable callback;
-
-        private CalcIslandData(Island island, SuperiorPlayer asker, Runnable callback){
-            this.island = island;
-            this.asker = asker;
-            this.callback = callback;
-        }
-
     }
 
     public static class WarpData{

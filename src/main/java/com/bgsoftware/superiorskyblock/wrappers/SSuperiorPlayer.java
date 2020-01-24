@@ -39,8 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
@@ -215,10 +215,23 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
          *   Finding a new block to teleport the player to.
          */
 
-        List<ChunkSnapshot> chunkSnapshots = island.getAllChunks(World.Environment.NORMAL, true).stream()
-                .map(Chunk::getChunkSnapshot).collect(Collectors.toList());
+        List<CompletableFuture<Chunk>> chunksToLoad = new ArrayList<>();
+        List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
+
+        //noinspection all
+        chunksToLoad.addAll(island.getAllChunksAsync(World.Environment.NORMAL, true, (chunk, throwable) -> {
+            chunkSnapshots.add(chunk.getChunkSnapshot());
+        }));
 
         Executor.async(() -> {
+            for(CompletableFuture<Chunk> chunkToLoad : chunksToLoad){
+                try {
+                    chunkToLoad.get();
+                }catch(Exception ex){
+                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                }
+            }
+
             for(ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 if (LocationUtils.isChunkEmpty(chunkSnapshot))
                     continue;

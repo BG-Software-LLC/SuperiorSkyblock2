@@ -15,6 +15,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 public interface Island extends Comparable<Island> {
 
@@ -201,9 +203,19 @@ public interface Island extends Comparable<Island> {
     Location getMinimum();
 
     /**
+     * Get the minimum protected location of the island.
+     */
+    Location getMinimumProtected();
+
+    /**
      * Get the maximum location of the island.
      */
     Location getMaximum();
+
+    /**
+     * Get the minimum protected location of the island.
+     */
+    Location getMaximumProtected();
 
     /**
      * Get all the chunks of the island from all the environments.
@@ -228,6 +240,14 @@ public interface Island extends Comparable<Island> {
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      */
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
+
+    /**
+     * Get all the chunks of the island asynchronized.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete);
 
     /**
      * Check if the location is inside the island's area.

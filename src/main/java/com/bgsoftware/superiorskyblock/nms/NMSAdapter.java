@@ -54,8 +54,8 @@ public interface NMSAdapter {
 
     Enchantment getGlowEnchant();
 
-    default void regenerateChunks(List<Chunk> chunksList){
-        chunksList.forEach(chunk -> chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ()));
+    default void regenerateChunk(Chunk chunk){
+        chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
 
 }

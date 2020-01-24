@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksLoadingTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
@@ -143,6 +144,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 }
             }
 
+            ChunksLoadingTask.stop();
             CalcTask.cancelTask();
             Executor.close();
             dataHandler.closeConnection();
