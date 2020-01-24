@@ -129,6 +129,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onDisable() {
+        ChunksLoadingTask.stop();
         try {
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();
@@ -144,7 +145,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 }
             }
 
-            ChunksLoadingTask.stop();
             CalcTask.cancelTask();
             Executor.close();
             dataHandler.closeConnection();
