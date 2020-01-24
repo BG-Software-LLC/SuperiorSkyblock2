@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -72,20 +71,6 @@ public final class CmdBiome implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.SET_BIOME)){
-            List<String> list = new ArrayList<>();
-
-            for(Biome biome : Biome.values()){
-                if(biome.name().toLowerCase().startsWith(args[1].toLowerCase()))
-                    list.add(biome.name().toLowerCase());
-            }
-
-            return list;
-        }
-
         return new ArrayList<>();
     }
 
