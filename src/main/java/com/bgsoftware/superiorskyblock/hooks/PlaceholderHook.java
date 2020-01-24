@@ -170,13 +170,13 @@ public abstract class PlaceholderHook {
                     }
                 }
 
-                else if ((matcher = Pattern.compile("island_member_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = Pattern.compile("member_(.+)").matcher(subPlaceholder)).matches()) {
                     try{
-                        int index = Integer.parseInt(matcher.group(1));
-                        if(index > 0) {
+                        int index = Integer.parseInt(matcher.group(1)) - 1;
+                        if(index >= 0) {
                             List<SuperiorPlayer> members = island.getIslandMembers(false);
                             if(index < members.size())
-                                return members.get(index - 1).getName();
+                                return members.get(index).getName();
                         }
                     }catch(IllegalArgumentException ignored){}
                 }
