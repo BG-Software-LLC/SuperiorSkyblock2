@@ -38,11 +38,14 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
         for(int i = 0; i < slots.size(); i++){
             int objectIndex = i + (slots.size() * (currentPage - 1));
 
-            if(objectIndex < objects.size()) {
-                inventory.setItem(slots.get(i), getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex)));
-            }
-            else{
-                inventory.setItem(slots.get(i), getNullItem());
+            int slot = slots.get(i);
+
+            if(slot >= 0) {
+                if (objectIndex < objects.size()) {
+                    inventory.setItem(slot, getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex)));
+                } else {
+                    inventory.setItem(slot, getNullItem());
+                }
             }
         }
 

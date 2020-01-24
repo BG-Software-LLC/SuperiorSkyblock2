@@ -190,7 +190,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
             ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
-            inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ? itemBuilder.build() : itemBuilder.build(superiorPlayer));
+            if(itemStackEntry.getKey() >= 0)
+                inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ? itemBuilder.build() : itemBuilder.build(superiorPlayer));
         }
 
         return inventory;

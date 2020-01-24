@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -90,6 +91,12 @@ public final class MenuUpgrades extends SuperiorMenu {
                 for(String level : upgradeSection.getKeys(false)) {
                     if(NumberUtils.isNumber(level)) {
                         int slot = charSlots.getOrDefault(upgradeSection.getString("item", "@").charAt(0), Collections.singletonList(-1)).get(0);
+
+                        if(slot == -1){
+                            SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgradeName + " (level " + level + ") is not inside the pattern, skipping...");
+                            continue;
+                        }
+
                         upgradeData.items.put(Integer.parseInt(level), new UpgradesHandler.ItemData(
                                 FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level")),
                                 FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level")),
