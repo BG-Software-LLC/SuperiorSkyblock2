@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,8 +35,10 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
     public void onPlayerClick(InventoryClickEvent event, String warpName) {
         Location location = island.getWarpLocation(warpName);
         if(location != null) {
-            this.previousMenu = null;
-            superiorPlayer.asPlayer().closeInventory();
+            Executor.sync(() -> {
+                this.previousMenu = null;
+                superiorPlayer.asPlayer().closeInventory();
+            }, 1L);
             island.warpPlayer(superiorPlayer, warpName);
         }
     }

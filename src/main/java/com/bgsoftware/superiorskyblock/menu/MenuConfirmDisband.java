@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -48,8 +49,10 @@ public final class MenuConfirmDisband extends SuperiorMenu {
         else if(e.getRawSlot() != cancelSlot)
             return;
 
-        previousMove = false;
-        superiorPlayer.asPlayer().closeInventory();
+        Executor.sync(() -> {
+            previousMove = false;
+            superiorPlayer.asPlayer().closeInventory();
+        }, 1L);
     }
 
     public static void init(){

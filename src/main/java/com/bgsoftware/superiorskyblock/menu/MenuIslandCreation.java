@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -77,8 +78,10 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         command.replace("%player%", menu.superiorPlayer.getName())));
 
             if(fromInventory) {
-                menu.previousMove = false;
-                menu.superiorPlayer.asPlayer().closeInventory();
+                Executor.sync(() -> {
+                    menu.previousMove = false;
+                    menu.superiorPlayer.asPlayer().closeInventory();
+                }, 1L);
             }
 
             Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);

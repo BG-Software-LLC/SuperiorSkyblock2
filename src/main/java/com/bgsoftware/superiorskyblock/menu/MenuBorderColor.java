@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -42,8 +43,10 @@ public final class MenuBorderColor extends SuperiorMenu {
 
         Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer, StringUtils.format(borderColor.name()));
 
-        previousMove = false;
-        e.getWhoClicked().closeInventory();
+        Executor.sync(() -> {
+            previousMove = false;
+            superiorPlayer.asPlayer().closeInventory();
+        }, 1L);
     }
 
     public static void init(){

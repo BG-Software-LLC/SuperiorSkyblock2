@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -53,8 +54,10 @@ public final class MenuBiomes extends SuperiorMenu {
                             superiorPlayer.getIsland().setBiome(islandBiomeChangeEvent.getBiome());
                             Locale.CHANGED_BIOME.send(superiorPlayer, islandBiomeChangeEvent.getBiome().name().toLowerCase());
 
-                            previousMove = false;
-                            superiorPlayer.asPlayer().closeInventory();
+                            Executor.sync(() -> {
+                                previousMove = false;
+                                superiorPlayer.asPlayer().closeInventory();
+                            }, 1L);
 
                             break;
                         }

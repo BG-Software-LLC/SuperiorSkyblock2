@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -27,7 +28,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
         superiorPlayer.setUserLocale(locale);
         Locale.CHANGED_LANGUAGE.send(superiorPlayer);
 
-        superiorPlayer.asPlayer().closeInventory();
+        Executor.sync(() -> superiorPlayer.asPlayer().closeInventory(), 1L);
     }
 
     public static void init(){

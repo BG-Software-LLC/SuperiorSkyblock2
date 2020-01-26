@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -54,8 +55,10 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         ((SIsland) island).sendMessage(Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
 
-        previousMove = false;
-        e.getWhoClicked().closeInventory();
+        Executor.sync(() -> {
+            previousMove = false;
+            superiorPlayer.asPlayer().closeInventory();
+        }, 1L);
     }
 
     public static void init(){
