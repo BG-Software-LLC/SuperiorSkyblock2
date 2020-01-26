@@ -92,6 +92,9 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(SpawnerSpawnEvent e) {
+        if(e.getSpawner() == null || e.getSpawner().getLocation() == null)
+            return;
+        
         Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
 
         if(island == null)
