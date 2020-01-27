@@ -152,7 +152,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         menuIslandCreation.addData(schematic + "-slot", slot);
                         menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission"));
                         menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
-                        menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", 0));
+                        menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", itemSection.getLong("bonus-worth", 0)));
                         menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("access")));
                         menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("no-access")));
 
