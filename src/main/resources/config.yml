@@ -415,6 +415,3 @@ pvp-worlds:
 
 # Stop players from leaving their island by walking through the border.
 stop-leaving: false
-
-# How many chunks should be loaded in one tick?
-chunks-per-tick: 20

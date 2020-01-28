@@ -221,31 +221,33 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void regenerateChunk(org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+    public void regenerateChunks(List<org.bukkit.Chunk> bukkitChunks) {
+        for(org.bukkit.Chunk bukkitChunk : bukkitChunks) {
+            Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        Map<HeightMap.Type, HeightMap> heightMap = new HashMap<>();
-        List[] entitySlices = new List[16];
+            Map<HeightMap.Type, HeightMap> heightMap = new HashMap<>();
+            List[] entitySlices = new List[16];
 
-        Fields.CHUNK_SECTIONS.set(chunk, new ChunkSection[16]);
-        Fields.CHUNK_PENDING_BLOCK_ENTITIES.set(chunk, new HashMap<>());
-        Fields.CHUNK_HEIGHT_MAP.set(chunk, heightMap);
-        Fields.CHUNK_TILE_ENTITIES.set(chunk, new HashMap<>());
-        Fields.CHUNK_STRUCTURE_STARTS.set(chunk, new HashMap<>());
-        Fields.CHUNK_STRUCTURE_REFENCES.set(chunk, new HashMap<>());
-        Fields.CHUNK_POST_PROCESSING.set(chunk, new ShortList[16]);
-        Fields.CHUNK_ENTITY_SLICES.set(chunk, entitySlices);
+            Fields.CHUNK_SECTIONS.set(chunk, new ChunkSection[16]);
+            Fields.CHUNK_PENDING_BLOCK_ENTITIES.set(chunk, new HashMap<>());
+            Fields.CHUNK_HEIGHT_MAP.set(chunk, heightMap);
+            Fields.CHUNK_TILE_ENTITIES.set(chunk, new HashMap<>());
+            Fields.CHUNK_STRUCTURE_STARTS.set(chunk, new HashMap<>());
+            Fields.CHUNK_STRUCTURE_REFENCES.set(chunk, new HashMap<>());
+            Fields.CHUNK_POST_PROCESSING.set(chunk, new ShortList[16]);
+            Fields.CHUNK_ENTITY_SLICES.set(chunk, entitySlices);
 
-        HeightMap.Type[] heightMapTypes = HeightMap.Type.values();
+            HeightMap.Type[] heightMapTypes = HeightMap.Type.values();
 
-        for (HeightMap.Type heightMapType : heightMapTypes) {
-            if (ChunkStatus.FULL.h().contains(heightMapType)) {
-                heightMap.put(heightMapType, new HeightMap(chunk, heightMapType));
+            for (HeightMap.Type heightMapType : heightMapTypes) {
+                if (ChunkStatus.FULL.h().contains(heightMapType)) {
+                    heightMap.put(heightMapType, new HeightMap(chunk, heightMapType));
+                }
             }
-        }
 
-        for(int i = 0; i < entitySlices.length; i++)
-            entitySlices[i] = new UnsafeList();
+            for (int i = 0; i < entitySlices.length; i++)
+                entitySlices[i] = new UnsafeList();
+        }
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

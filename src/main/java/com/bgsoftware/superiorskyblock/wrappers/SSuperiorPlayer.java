@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
@@ -215,16 +216,14 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
          *   Finding a new block to teleport the player to.
          */
 
-        List<CompletableFuture<Chunk>> chunksToLoad = new ArrayList<>();
+        List<CompletableFuture<List<Chunk>>> chunksToLoad = new ArrayList<>();
         List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
 
-        //noinspection all
-        chunksToLoad.addAll(island.getAllChunksAsync(World.Environment.NORMAL, true, (chunk, throwable) -> {
-            chunkSnapshots.add(chunk.getChunkSnapshot());
-        }));
+        chunksToLoad.add(island.getAllChunksAsync(World.Environment.NORMAL, true, (chunks, throwable) ->
+                chunkSnapshots.addAll(chunks.stream().map(Chunk::getChunkSnapshot).collect(Collectors.toList()))));
 
         Executor.async(() -> {
-            for(CompletableFuture<Chunk> chunkToLoad : chunksToLoad){
+            for(CompletableFuture<List<Chunk>> chunkToLoad : chunksToLoad){
                 try {
                     chunkToLoad.get();
                 }catch(Exception ex){

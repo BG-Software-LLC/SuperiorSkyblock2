@@ -260,28 +260,9 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
-        Location center = getCenter(environment);
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-        World world = center.getWorld();
-
-        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
-
-        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
-            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                CompletableFuture<Chunk> completableFuture;
-                if(world.isChunkLoaded(x, z)){
-                    completableFuture = CompletableFuture.completedFuture(world.getChunkAt(x, z));
-                }
-                else {
-                    completableFuture = ChunksLoadingTask.loadChunk(world, x, z);
-                }
-                chunks.add(whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete));
-            }
-        }
-
-        return chunks;
+    public CompletableFuture<List<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<List<Chunk>, Throwable> whenComplete) {
+        CompletableFuture<List<Chunk>> completableFuture =  ChunksLoadingTask.loadIslandChunks(this, environment, onlyProtected);
+        return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
     }
 
     @Override
