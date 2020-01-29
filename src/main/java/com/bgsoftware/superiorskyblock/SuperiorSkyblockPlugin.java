@@ -106,6 +106,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             log("");
         }
 
+        ChunksLoadingTask.init();
+
         Executor.sync(() -> {
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
