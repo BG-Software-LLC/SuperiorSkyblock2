@@ -1122,8 +1122,8 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void withdrawMoney(double amount){
         islandBank.run(islandBank -> {
-            islandBank = this.islandBank.get();
-            this.islandBank.set(islandBank.subtract(BigDecimalFormatted.of(amount)));
+            islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
+            this.islandBank.set(islandBank);
             Query.ISLAND_SET_BANK.getStatementHolder()
                     .setString(islandBank.getAsString())
                     .setString(owner.getUniqueId().toString())
