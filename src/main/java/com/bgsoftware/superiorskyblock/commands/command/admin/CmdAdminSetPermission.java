@@ -90,18 +90,18 @@ public final class CmdAdminSetPermission implements ICommand {
         IslandPermission islandPermission;
 
         try{
-            islandPermission = IslandPermission.valueOf(args[2].toUpperCase());
+            islandPermission = IslandPermission.valueOf(args[3].toUpperCase());
         }catch(IllegalArgumentException ex){
-            Locale.INVALID_ISLAND_PERMISSION.send(sender, args[2], StringUtils.getPermissionsString());
+            Locale.INVALID_ISLAND_PERMISSION.send(sender, args[3], StringUtils.getPermissionsString());
             return;
         }
 
         PlayerRole playerRole;
 
         try{
-            playerRole = SPlayerRole.of(args[3]);
+            playerRole = SPlayerRole.of(args[4]);
         }catch(IllegalArgumentException ex){
-            Locale.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
+            Locale.INVALID_ROLE.send(sender, args[4], SPlayerRole.getValuesString());
             return;
         }
 
