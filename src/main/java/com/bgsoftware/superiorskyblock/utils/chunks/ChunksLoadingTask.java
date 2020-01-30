@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -20,11 +21,7 @@ public final class ChunksLoadingTask {
     private static final ConcurrentLinkedQueue<Pair<ChunksLoadMethod, CompletableFuture<List<Chunk>>>>
             chunksToLoad = new ConcurrentLinkedQueue<>();
 
-    private static int chunksLoaderId;
-
-    static {
-        chunksLoaderId = runChunksLoader();
-    }
+    private static BukkitTask chunksLoaderId;
 
     public static CompletableFuture<List<Chunk>> loadIslandChunks(Island island, World.Environment environment, boolean onlyProtected){
         CompletableFuture<List<Chunk>> completableFuture = new CompletableFuture<>();
@@ -33,10 +30,15 @@ public final class ChunksLoadingTask {
     }
 
     public static void stop(){
-        Bukkit.getScheduler().cancelTask(chunksLoaderId);
+        if(chunksLoaderId != null)
+            chunksLoaderId.cancel();
     }
 
-    private static int runChunksLoader(){
+    public static void init(){
+        chunksLoaderId = runChunksLoader();
+    }
+
+    private static BukkitTask runChunksLoader(){
         Runnable loadChunks = () -> {
             Pair<ChunksLoadMethod, CompletableFuture<List<Chunk>>> pair = chunksToLoad.poll();
 
@@ -49,11 +51,11 @@ public final class ChunksLoadingTask {
         };
 
         if(PaperHook.isUsingPaper() && ServerVersion.isAtLeast(ServerVersion.v1_13)) {
-            return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, loadChunks, 5L, 5L).getTaskId();
+            return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, loadChunks, 5L, 5L);
         }
 
         else{
-            return Bukkit.getScheduler().runTaskTimer(plugin, loadChunks, 5L, 5L).getTaskId();
+            return Bukkit.getScheduler().runTaskTimer(plugin, loadChunks, 5L, 5L);
         }
     }
 
