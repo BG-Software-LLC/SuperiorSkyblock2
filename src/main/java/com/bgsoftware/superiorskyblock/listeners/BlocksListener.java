@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -317,7 +318,12 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
+        int chunkX = e.getBlock().getX() >> 4, chunkZ = e.getBlock().getZ() >> 4;
+        World world = e.getBlock().getWorld();
         Executor.async(() -> {
+            if(!world.isChunkLoaded(chunkX, chunkZ))
+                return;
+
             Map<Location, Integer> blocksToChange = new HashMap<>();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             for(Block block : e.getBlocks()){
