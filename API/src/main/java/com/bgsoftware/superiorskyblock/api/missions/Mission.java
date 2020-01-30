@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Mission {
 
@@ -140,6 +141,19 @@ public abstract class Mission {
      * @param superiorPlayer The player that tried to complete the mission.
      */
     public abstract void onCompleteFail(SuperiorPlayer superiorPlayer);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Mission mission = (Mission) o;
+        return Objects.equals(name, mission.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 
     @Override
     public String toString() {
