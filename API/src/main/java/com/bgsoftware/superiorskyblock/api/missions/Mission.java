@@ -144,6 +144,14 @@ public abstract class Mission {
     public abstract void onCompleteFail(SuperiorPlayer superiorPlayer);
 
     /**
+     * A function that is called in order to clear progress of a player.
+     * @param superiorPlayer The player to clear the data of.
+     */
+    public void clearData(SuperiorPlayer superiorPlayer){
+
+    }
+
+    /**
      * A function that is called on every item of the menu.
      * This is used to inject custom placeholders into items.
      * The method is called async.
