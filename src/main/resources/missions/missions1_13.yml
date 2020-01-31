@@ -345,6 +345,8 @@ enchanter:
     commands:
       - 'eco give %player% 1500'
       - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Enchanter!'
+  enchanted-placeholder: '&a✔'
+  not-enchanted-placeholder: '&c✘'
   required-enchants:
     '1':
       types:
@@ -392,8 +394,10 @@ enchanter:
         - '&6Rewards:'
         - '&8 - &7$1500'
         - ''
-        - '&6Enchanted Items: &7{1}/4'
-        - '&6Progress: &7{0}%'
+        - '&6Helmet: {enchanted_diamond_helmet}'
+        - '&6Chestplate: {enchanted_diamond_chestplate}'
+        - '&6Leggings: {enchanted_diamond_leggings}'
+        - '&6Boots: {enchanted_diamond_boots}'
         - '&c&l ✘ &7Not Completed'
     can-complete:
       type: PAPER
@@ -404,8 +408,10 @@ enchanter:
         - '&6Rewards:'
         - '&8 - &7$1500'
         - ''
-        - '&6Enchanted Items: &74/4'
-        - '&6Progress: &7100%'
+        - '&6Helmet: &a✔'
+        - '&6Chestplate: &a✔'
+        - '&6Leggings: &a✔'
+        - '&6Boots: &a✔'
         - '&a&l ✔ &7Click to redeem your reward.'
       enchants:
         DURABILITY: 1
@@ -417,8 +423,10 @@ enchanter:
       lore:
         - '&7Enchant a Protection IV armor!'
         - ''
-        - '&6Enchanted Items: &74/4'
-        - '&6Progress: &7100%'
+        - '&6Helmet: &a✔'
+        - '&6Chestplate: &a✔'
+        - '&6Leggings: &a✔'
+        - '&6Boots: &a✔'
         - '&a&l ✔ &7Already Claimed.'
 
 add-member:

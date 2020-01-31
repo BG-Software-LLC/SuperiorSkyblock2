@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Charsets;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,10 +21,15 @@ import org.bukkit.inventory.ItemStack;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,7 +70,14 @@ public final class MissionsHandler implements MissionsManager {
         if(!file.exists())
             FileUtils.saveResource("missions/missions.yml");
 
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+        YamlConfiguration cfg = new YamlConfiguration();
+
+        try {
+            FileInputStream stream = new FileInputStream(file);
+            cfg.load((new InputStreamReader(stream, Charsets.UTF_8)));
+        }catch(Exception ex){
+            cfg = YamlConfiguration.loadConfiguration(file);
+        }
 
         for(String missionName : cfg.getConfigurationSection("").getKeys(false)){
             ConfigurationSection missionSection = cfg.getConfigurationSection(missionName);

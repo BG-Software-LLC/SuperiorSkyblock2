@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.missions;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -141,6 +142,17 @@ public abstract class Mission {
      * @param superiorPlayer The player that tried to complete the mission.
      */
     public abstract void onCompleteFail(SuperiorPlayer superiorPlayer);
+
+    /**
+     * A function that is called on every item of the menu.
+     * This is used to inject custom placeholders into items.
+     * The method is called async.
+     * @param superiorPlayer The player that opens the menu.
+     * @param itemStack The item of the mission.
+     */
+    public void formatItem(SuperiorPlayer superiorPlayer, ItemStack itemStack){
+
+    }
 
     @Override
     public boolean equals(Object o) {

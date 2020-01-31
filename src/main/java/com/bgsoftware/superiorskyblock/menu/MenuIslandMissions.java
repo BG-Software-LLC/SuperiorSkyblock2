@@ -63,7 +63,8 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         int percentage = getPercentage(mission.getProgress(superiorPlayer));
         int progressValue = mission.getProgressValue(superiorPlayer);
         int amountCompleted = island.getAmountMissionCompleted(mission);
-        return completed ? missionData.completed.clone().build(superiorPlayer) :
+
+        ItemStack itemStack = completed ? missionData.completed.clone().build(superiorPlayer) :
                 plugin.getMissions().canComplete(superiorPlayer, mission) ?
                         missionData.canComplete.clone()
                                 .replaceAll("{0}", percentage + "")
@@ -73,6 +74,10 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
                                 .replaceAll("{0}", percentage + "")
                                 .replaceAll("{1}", progressValue + "")
                                 .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);
+
+        mission.formatItem(superiorPlayer, itemStack);
+
+        return itemStack;
     }
 
     @Override
