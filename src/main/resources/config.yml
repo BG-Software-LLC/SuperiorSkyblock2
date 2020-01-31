@@ -406,6 +406,10 @@ event-commands:
 # Players cannot move in that time, or the teleportation will be cancelled.
 warps-warmup: 0
 
+# A delay before getting teleported to your island.
+# Players cannot move in that time, or the teleportation will be cancelled.
+home-warmup: 0
+
 # Should liquids get updated when pasting schematics?
 liquid-update: false
 

@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
@@ -59,16 +61,29 @@ public final class CmdTeleport implements ICommand {
             return;
         }
 
-        superiorPlayer.teleport(island, result -> {
-           if(result)
-               Locale.TELEPORTED_SUCCESS.send(superiorPlayer);
-           else
-               Locale.TELEPORTED_FAILED.send(superiorPlayer);
-        });
+        if(plugin.getSettings().homeWarmup > 0) {
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().homeWarmup));
+            ((SSuperiorPlayer) superiorPlayer).setTeleportTask(Executor.sync(() ->
+                    teleportToIsland(superiorPlayer, island), plugin.getSettings().homeWarmup / 50));
+        }
+        else {
+            teleportToIsland(superiorPlayer, island);
+        }
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
+    private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island){
+        ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
+        superiorPlayer.teleport(island, result -> {
+            if(result)
+                Locale.TELEPORTED_SUCCESS.send(superiorPlayer);
+            else
+                Locale.TELEPORTED_FAILED.send(superiorPlayer);
+        });
+    }
+
 }

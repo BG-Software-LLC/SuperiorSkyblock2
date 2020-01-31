@@ -98,6 +98,7 @@ public final class SettingsHandler {
     public final Map<Integer, ItemStack> starterChestContents;
     public final Map<String, List<String>> eventCommands;
     public final long warpsWarmup;
+    public final long homeWarmup;
     public final boolean liquidUpdate;
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
@@ -228,6 +229,7 @@ public final class SettingsHandler {
             eventCommands.put(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
+        homeWarmup = cfg.getLong("home-warmup", 0);
         liquidUpdate = cfg.getBoolean("liquid-update", false);
         pvpWorlds = cfg.getStringList("pvp-worlds");
         stopLeaving = cfg.getBoolean("stop-leaving", false);
