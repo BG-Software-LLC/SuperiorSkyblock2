@@ -136,6 +136,9 @@ public final class ItemBuilder implements Cloneable {
             withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
         }
 
+        if(textureValue.equals("%superior_player_texture%"))
+            textureValue = superiorPlayer.getTextureValue();
+
         return build();
     }
 
