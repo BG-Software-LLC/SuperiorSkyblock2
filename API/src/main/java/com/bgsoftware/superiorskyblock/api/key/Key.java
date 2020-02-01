@@ -61,7 +61,7 @@ public final class Key {
      */
     public static Key of(BlockState blockState){
         KeysManager keysManager = SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys();
-        return keysManager.isSpawner(blockState.getType()) ? keysManager.getSpawnerKey(blockState) : of(blockState.getData().toItemStack());
+        return keysManager.isSpawner(blockState.getType()) ? keysManager.getSpawnerKey(blockState) : of(blockState.getType(), blockState.getRawData());
     }
 
     /**
