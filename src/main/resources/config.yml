@@ -419,3 +419,6 @@ pvp-worlds:
 
 # Stop players from leaving their island by walking through the border.
 stop-leaving: false
+
+# Should the values menu be enabled?
+values-menu: true

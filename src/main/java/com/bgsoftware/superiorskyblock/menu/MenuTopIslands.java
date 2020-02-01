@@ -197,9 +197,9 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
             previousMove = false;
 
-            if(inventoryAction == InventoryAction.PICKUP_HALF){
+            if(inventoryAction == InventoryAction.PICKUP_HALF) {
                 MenuWarps.openInventory(superiorPlayer, this, island);
-            } else {
+            } else if(plugin.getSettings().valuesMenu) {
                 MenuValues.openInventory(superiorPlayer, this, island);
             }
 

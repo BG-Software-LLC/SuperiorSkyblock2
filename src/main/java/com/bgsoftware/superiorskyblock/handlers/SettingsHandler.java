@@ -102,6 +102,7 @@ public final class SettingsHandler {
     public final boolean liquidUpdate;
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
+    public final boolean valuesMenu;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -233,6 +234,7 @@ public final class SettingsHandler {
         liquidUpdate = cfg.getBoolean("liquid-update", false);
         pvpWorlds = cfg.getStringList("pvp-worlds");
         stopLeaving = cfg.getBoolean("stop-leaving", false);
+        valuesMenu = cfg.getBoolean("values-menu", true);
     }
 
     public void updateValue(String path, Object value){
