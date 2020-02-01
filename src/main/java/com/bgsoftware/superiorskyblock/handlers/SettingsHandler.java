@@ -103,6 +103,7 @@ public final class SettingsHandler {
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
     public final boolean valuesMenu;
+    public final int chunksPerTick;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -235,6 +236,7 @@ public final class SettingsHandler {
         pvpWorlds = cfg.getStringList("pvp-worlds");
         stopLeaving = cfg.getBoolean("stop-leaving", false);
         valuesMenu = cfg.getBoolean("values-menu", true);
+        chunksPerTick = cfg.getInt("chunks-per-tick", 10);
     }
 
     public void updateValue(String path, Object value){

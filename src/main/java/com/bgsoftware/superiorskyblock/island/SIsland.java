@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksLoadingTask;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -563,9 +563,23 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public CompletableFuture<List<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<List<Chunk>, Throwable> whenComplete) {
-        CompletableFuture<List<Chunk>> completableFuture =  ChunksLoadingTask.loadIslandChunks(this, environment, onlyProtected);
-        return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
+        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+        World world = min.getWorld();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                if(whenComplete != null)
+                    chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                else
+                    chunks.add(ChunksProvider.loadChunk(world, x, z));
+            }
+        }
+
+        return chunks;
     }
 
     @Override
@@ -774,13 +788,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().deleteIsland(this);
 
-        getAllChunksAsync(World.Environment.NORMAL, true, ((chunks, throwable) -> plugin.getNMSAdapter().regenerateChunks(chunks)));
+        getAllChunksAsync(World.Environment.NORMAL, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.NETHER))
-            getAllChunksAsync(World.Environment.NETHER, true, ((chunks, throwable) -> plugin.getNMSAdapter().regenerateChunks(chunks)));
+            getAllChunksAsync(World.Environment.NETHER, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.THE_END))
-            getAllChunksAsync(World.Environment.THE_END, true, ((chunks, throwable) -> plugin.getNMSAdapter().regenerateChunks(chunks)));
+            getAllChunksAsync(World.Environment.THE_END, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
     }
 
     @Override
@@ -798,42 +812,43 @@ public final class SIsland extends DatabaseObject implements Island {
         beingRecalculated.set(true);
 
         List<Chunk> chunks = new ArrayList<>();
-        List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
-        List<CompletableFuture<List<Chunk>>> chunksToLoad = new ArrayList<>();
+        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
 
-        BiConsumer<List<Chunk>, Throwable> whenComplete = (_chunks, throwable) -> {
-            chunks.addAll(_chunks);
-            _chunks.forEach(chunk -> {
-                chunkSnapshots.add(chunk.getChunkSnapshot());
-                BlocksProvider_WildStacker.cacheChunk(chunk);
-            });
+        BiConsumer<Chunk, Throwable> whenComplete = (chunk, throwable) -> {
+            chunks.add(chunk);
+            BlocksProvider_WildStacker.cacheChunk(chunk);
         };
 
-        chunksToLoad.add(getAllChunksAsync(World.Environment.NORMAL, true, whenComplete));
+        //noinspection all
+        chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, whenComplete).stream()
+                .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
         if(wasSchematicGenerated(World.Environment.NETHER))
-            chunksToLoad.add(getAllChunksAsync(World.Environment.NETHER, true, whenComplete));
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, whenComplete).stream()
+                    .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
         if(wasSchematicGenerated(World.Environment.THE_END))
-            chunksToLoad.add(getAllChunksAsync(World.Environment.THE_END, true, whenComplete));
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, whenComplete).stream()
+                    .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
 
         blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
         islandWorth.set(BigDecimalFormatted.ZERO);
         islandLevel.set(BigDecimalFormatted.ZERO);
 
         Executor.async(() -> {
-            for(CompletableFuture<List<Chunk>> chunkToLoad : chunksToLoad){
-                try {
-                    chunkToLoad.get();
-                }catch(Exception ex){
-                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                }
-            }
-
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
-
-            ExecutorService scanService = Executors.newFixedThreadPool(chunkSnapshots.size(),
+            ExecutorService scanService = Executors.newFixedThreadPool(chunksToLoad.size(),
                     new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
 
-            for (ChunkSnapshot chunkSnapshot : chunkSnapshots) {
+            for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
+                ChunkSnapshot chunkSnapshot;
+
+                try {
+                    chunkSnapshot = chunkToLoad.get();
+                }catch(Exception ex){
+                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                    ex.printStackTrace();
+                    continue;
+                }
+
                 scanService.execute(() -> {
                     if(LocationUtils.isChunkEmpty(chunkSnapshot))
                         return;
@@ -981,8 +996,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBiome(Biome biome){
-        getAllChunksAsync(World.Environment.NORMAL, false,
-                ((chunks, throwable) -> chunks.forEach(chunk -> plugin.getNMSAdapter().setBiome(chunk, biome))));
+        getAllChunksAsync(World.Environment.NORMAL, false, ((chunk, throwable) -> plugin.getNMSAdapter().setBiome(chunk, biome)));
         this.biome.set(biome);
     }
 

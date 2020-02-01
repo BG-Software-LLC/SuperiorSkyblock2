@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksLoadingTask;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -242,9 +242,8 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        int islandSize = getIslandSize();
-        Location min = onlyProtected ? center.clone().subtract(islandSize, 0, islandSize) : getMinimum();
-        Location max = onlyProtected ? center.clone().add(islandSize, 0, islandSize) : getMaximum();
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
 
         List<Chunk> chunks = new ArrayList<>();
@@ -260,9 +259,23 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public CompletableFuture<List<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<List<Chunk>, Throwable> whenComplete) {
-        CompletableFuture<List<Chunk>> completableFuture =  ChunksLoadingTask.loadIslandChunks(this, environment, onlyProtected);
-        return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
+        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+        World world = min.getWorld();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                if(whenComplete != null)
+                    chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                else
+                    chunks.add(ChunksProvider.loadChunk(world, x, z));
+            }
+        }
+
+        return chunks;
     }
 
     @Override

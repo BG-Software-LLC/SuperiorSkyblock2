@@ -16,8 +16,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.InventoryHolder;
 
-import java.util.List;
-
 public interface NMSAdapter {
 
     void registerCommand(BukkitCommand command);
@@ -54,8 +52,8 @@ public interface NMSAdapter {
 
     Enchantment getGlowEnchant();
 
-    default void regenerateChunks(List<Chunk> chunks){
-        chunks.forEach(chunk -> chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ()));
+    default void regenerateChunk(Chunk chunk){
+        chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
 
 }

@@ -18,10 +18,6 @@ public interface NMSBlocks {
 
     void refreshChunk(Chunk chunk);
 
-    default void refreshChunks(List<Chunk> chunks){
-        chunks.forEach(this::refreshChunk);
-    }
-
     void refreshLight(Chunk chunk);
 
     ItemStack getFlowerPot(Location location);

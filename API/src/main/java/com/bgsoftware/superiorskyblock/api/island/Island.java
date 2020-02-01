@@ -247,7 +247,7 @@ public interface Island extends Comparable<Island> {
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
      */
-    CompletableFuture<List<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<List<Chunk>, Throwable> whenComplete);
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete);
 
     /**
      * Check if the location is inside the island's area.

@@ -216,22 +216,20 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
          *   Finding a new block to teleport the player to.
          */
 
-        List<CompletableFuture<List<Chunk>>> chunksToLoad = new ArrayList<>();
-        List<ChunkSnapshot> chunkSnapshots = new ArrayList<>();
-
-        chunksToLoad.add(island.getAllChunksAsync(World.Environment.NORMAL, true, (chunks, throwable) ->
-                chunkSnapshots.addAll(chunks.stream().map(Chunk::getChunkSnapshot).collect(Collectors.toList()))));
+        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, null)
+                .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
         Executor.async(() -> {
-            for(CompletableFuture<List<Chunk>> chunkToLoad : chunksToLoad){
+            for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
+                ChunkSnapshot chunkSnapshot;
+
                 try {
-                    chunkToLoad.get();
+                    chunkSnapshot = chunkToLoad.get();
                 }catch(Exception ex){
                     SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                    continue;
                 }
-            }
 
-            for(ChunkSnapshot chunkSnapshot : chunkSnapshots) {
                 if (LocationUtils.isChunkEmpty(chunkSnapshot))
                     continue;
 
