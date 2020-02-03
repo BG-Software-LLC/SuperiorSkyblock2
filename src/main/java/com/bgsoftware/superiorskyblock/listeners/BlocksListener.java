@@ -243,7 +243,12 @@ public final class BlocksListener implements Listener {
         }
 
         // Dropping the item
-        e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), blockItem);
+        if(plugin.getSettings().stackedBlocksAutoPickup){
+            ItemUtils.addItem(blockItem, e.getPlayer().getInventory(), e.getBlock().getLocation());
+        }
+        else {
+            e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), blockItem);
+        }
     }
 
     private Set<UUID> recentlyClicked = new HashSet<>();
@@ -285,7 +290,12 @@ public final class BlocksListener implements Listener {
         }
 
         // Dropping the item
-        e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), blockItem);
+        if(plugin.getSettings().stackedBlocksAutoPickup){
+            ItemUtils.addItem(blockItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
+        }
+        else {
+            e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), blockItem);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

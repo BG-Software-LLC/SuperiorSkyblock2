@@ -84,6 +84,9 @@ stacked-blocks:
   limits:
   - 'EXAMPLE_BLOCK:5'
 
+  # Should blocks get added directly into the player's inventory?
+  auto-collect: false
+
 # Set a formula to calculate the island level by it's worth.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
 island-level-formula: '{} / 2'

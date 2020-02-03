@@ -47,6 +47,7 @@ public final class SettingsHandler {
     public final List<String> stackedBlocksDisabledWorlds;
     public final String stackedBlocksName;
     public final KeyMap<Integer> stackedBlocksLimits;
+    public final boolean stackedBlocksAutoPickup;
     public final String islandLevelFormula;
     public final String islandTopOrder;
     public final ConfigurationSection islandRolesSection;
@@ -156,6 +157,7 @@ public final class SettingsHandler {
                     stackedBlocksLimits.put(Key.of(sections[0] + ":" + sections[1]), Integer.parseInt(sections[2]));
             }catch(Exception ignored){}
         });
+        stackedBlocksAutoPickup = cfg.getBoolean("stacked-blocks.auto-collect", false);
         islandLevelFormula = cfg.getString("island-level-formula", "{} / 2");
         islandTopOrder = cfg.getString("island-top-order", "WORTH");
         islandRolesSection = cfg.getConfigurationSection("island-roles");
