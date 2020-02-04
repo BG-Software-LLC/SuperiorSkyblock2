@@ -954,6 +954,11 @@ public interface Island extends Comparable<Island> {
      */
     Map<String, Integer> getGeneratorAmounts();
 
+    /**
+     * Get an array of materials for the cobblestone generator.
+     */
+    String[] getGeneratorArray();
+
     /*
      *  Schematic methods
      */

@@ -1,65 +1,83 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.listeners.events.BlockGenerateEvent;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFromToEvent;
 
-import java.util.Map;
+import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
 public final class GeneratorsListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockGenerate(BlockGenerateEvent e){
-        Map<String, Integer> amountMap = e.getIsland().getGeneratorAmounts();
+    private SuperiorSkyblockPlugin plugin;
 
-        if(amountMap.isEmpty())
-            return;
-
-        int size = e.getIsland().getGeneratorTotalAmount();
-
-        boolean onlyOneMaterial = amountMap.values().stream().anyMatch(i -> i == size);
-
-        String[] cachedMaterials = new String[onlyOneMaterial ? 1 : size];
-
-        int slot = 0;
-
-        for(Map.Entry<String, Integer> entry : amountMap.entrySet()){
-            int amount = entry.getValue();
-
-            if(onlyOneMaterial){
-                cachedMaterials[0] = entry.getKey();
-            }
-            else {
-                for (int i = 0; i < amount && slot < size; i++) {
-                    cachedMaterials[slot++] = entry.getKey();
-                }
-            }
-        }
-
-        if(cachedMaterials.length == 1){
-            e.setNewStateKey(Key.of(cachedMaterials[0]));
-        }
-        else {
-            String key = shuffleArray(cachedMaterials)[0];
-            e.setNewStateKey(Key.of(key == null ? "COBBLESTONE" : key));
-        }
+    public GeneratorsListener(SuperiorSkyblockPlugin plugin){
+        this.plugin = plugin;
     }
 
-    private String[] shuffleArray(String[] array) {
-        ThreadLocalRandom random = ThreadLocalRandom.current();
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBlockFormEvent(BlockFromToEvent e){
+        Block block = e.getToBlock();
 
-        for (int i = 0; i < array.length; i++) {
-            int randomPosition = random.nextInt(array.length);
-            String temp = array[i];
-            array[i] = array[randomPosition];
-            array[randomPosition] = temp;
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
+
+        if(island == null)
+            return;
+
+        if(!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
+            return;
+
+        String[] cachedMaterials = island.getGeneratorArray();
+
+        if(cachedMaterials.length == 0)
+            return;
+
+        boolean onlyOneMaterial = Arrays.stream(cachedMaterials).allMatch(s -> cachedMaterials[0].equals(s));
+
+        String newState;
+
+        if(cachedMaterials.length == 1){
+            newState = cachedMaterials[0];
+        }
+        else {
+            newState = cachedMaterials[ThreadLocalRandom.current().nextInt(cachedMaterials.length)];
         }
 
-        return array;
+        String[] typeSections = newState.split(":");
+
+        island.handleBlockPlace(Key.of(newState), 1);
+
+        if(typeSections[0].contains("COBBLESTONE"))
+            return;
+
+        block.setType(Material.valueOf(typeSections[0]));
+
+        if(typeSections.length == 2)
+            //noinspection deprecation
+            block.setData(Byte.parseByte(typeSections[1]));
+
+        plugin.getNMSAdapter().playGeneratorSound(block.getLocation());
+    }
+
+    private boolean hasWaterNearby(Block block){
+        if(block.getRelative(BlockFace.WEST).getType().name().contains("WATER"))
+            return true;
+        if(block.getRelative(BlockFace.EAST).getType().name().contains("WATER"))
+            return true;
+        if(block.getRelative(BlockFace.NORTH).getType().name().contains("WATER"))
+            return true;
+        if(block.getRelative(BlockFace.SOUTH).getType().name().contains("WATER"))
+            return true;
+
+        return false;
     }
 
 

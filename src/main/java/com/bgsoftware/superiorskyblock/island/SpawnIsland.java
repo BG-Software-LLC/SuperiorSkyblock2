@@ -843,6 +843,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public String[] getGeneratorArray() {
+        return new String[0];
+    }
+
+    @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         return true;
     }
