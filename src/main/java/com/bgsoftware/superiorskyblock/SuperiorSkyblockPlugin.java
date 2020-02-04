@@ -197,6 +197,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
+        Locale.reload();
+        CalcTask.startTask();
+
         blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
@@ -241,9 +244,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Player player : Bukkit.getOnlinePlayers())
                 nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
         });
-
-        Locale.reload();
-        CalcTask.startTask();
     }
 
     private void loadSortingTypes(){

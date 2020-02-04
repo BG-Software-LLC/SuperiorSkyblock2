@@ -49,8 +49,9 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
                 for(int slot : charSlots.get(ch)) {
                     try {
                         java.util.Locale locale = LocaleUtils.getLocale(language);
-                        if(!Locale.isValidLocale(locale))
-                        menuPlayerLanguage.addData(slot + "", locale);
+                        if(Locale.isValidLocale(locale))
+                            menuPlayerLanguage.addData(slot + "", locale);
+                        else throw new IllegalArgumentException();
                     }catch(IllegalArgumentException ex){
                         SuperiorSkyblockPlugin.log("&c[player-language.yml] The language " + language + " is not valid.");
                     }
