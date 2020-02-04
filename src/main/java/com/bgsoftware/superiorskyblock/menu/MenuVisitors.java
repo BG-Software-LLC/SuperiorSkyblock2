@@ -25,7 +25,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
     private Island island;
 
     private MenuVisitors(SuperiorPlayer superiorPlayer, Island island){
-        super("menuVisitors", superiorPlayer, true);
+        super("menuVisitors", superiorPlayer, false);
         this.island = island;
     }
 
