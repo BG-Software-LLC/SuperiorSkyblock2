@@ -148,7 +148,7 @@ public final class CustomEventsListener implements Listener {
         Executor.sync(() -> {
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-            if(superiorPlayer == null)
+            if(superiorPlayer == null || superiorPlayer.asPlayer() == null)
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
