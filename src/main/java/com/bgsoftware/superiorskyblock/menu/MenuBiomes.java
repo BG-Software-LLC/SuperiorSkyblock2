@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -49,7 +50,7 @@ public final class MenuBiomes extends SuperiorMenu {
                             //noinspection unchecked
                             List<String> commands = (List<String>) getData(biomeName + "-has-access-item-commands");
                             if (commands != null)
-                                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                                commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
                             superiorPlayer.getIsland().setBiome(islandBiomeChangeEvent.getBiome());
                             Locale.CHANGED_BIOME.send(superiorPlayer, islandBiomeChangeEvent.getBiome().name().toLowerCase());
@@ -69,7 +70,7 @@ public final class MenuBiomes extends SuperiorMenu {
                     //noinspection unchecked
                     List<String> commands = (List<String>) getData(biomeName + "-no-access-item-commands");
                     if(commands != null)
-                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                        commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
                     break;
                 }

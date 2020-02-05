@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -74,7 +75,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             //noinspection unchecked
             List<String> commands = (List<String>) menu.getData(schematic + "-has-access-item-commands");
             if (commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(),
                         command.replace("%player%", menu.superiorPlayer.getName())));
 
             if(fromInventory) {
@@ -94,7 +95,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             //noinspection unchecked
             List<String> commands = (List<String>) menu.getData(schematic + "-no-access-item-commands");
             if(commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(),
                         command.replace("%player%", menu.superiorPlayer.getName())));
         }
     }

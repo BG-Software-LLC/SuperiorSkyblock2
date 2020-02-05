@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,9 +33,9 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
     @Override
     protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
         if (event.getClick().name().contains("RIGHT")) {
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
+            CommandUtils.dispatchCommand(superiorPlayer.asPlayer(), "island invite " + targetPlayer.getName());
         } else if (event.getClick().name().contains("LEFT")) {
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island expel " + targetPlayer.getName());
+            CommandUtils.dispatchCommand(superiorPlayer.asPlayer(), "island expel " + targetPlayer.getName());
         }
     }
 

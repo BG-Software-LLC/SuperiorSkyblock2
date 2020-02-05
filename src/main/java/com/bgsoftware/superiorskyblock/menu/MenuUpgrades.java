@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -36,7 +37,7 @@ public final class MenuUpgrades extends SuperiorMenu {
         String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
         if(!upgradeName.isEmpty()){
-            Bukkit.dispatchCommand(e.getWhoClicked(), "is rankup " + upgradeName);
+            CommandUtils.dispatchCommand(e.getWhoClicked(), "is rankup " + upgradeName);
             previousMove = false;
             open(previousMenu);
         }
