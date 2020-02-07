@@ -17,11 +17,16 @@ import skyblock.hassan.plugin.spawners.StackedSpawner;
 
 public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
 
+    private static boolean registered = false;
+
     private Main main;
 
     public BlocksProvider_PvpingSpawners(){
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+        if(!registered) {
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            registered = true;
+        }
     }
 
     @Override

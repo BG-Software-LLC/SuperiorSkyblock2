@@ -22,10 +22,15 @@ import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
+    private static boolean registered = false;
+
     private final EpicSpawners instance = EpicSpawners.getInstance();
 
     public BlocksProvider_EpicSpawners(){
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+        if(!registered) {
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            registered = true;
+        }
     }
 
     @Override

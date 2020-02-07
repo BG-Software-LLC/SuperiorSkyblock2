@@ -17,8 +17,13 @@ import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_SilkSpawners implements BlocksProvider {
 
+    private static boolean registered = false;
+
     public BlocksProvider_SilkSpawners(){
-        Bukkit.getPluginManager().registerEvents(new BlocksProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+        if(!registered) {
+            Bukkit.getPluginManager().registerEvents(new BlocksProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            registered = true;
+        }
     }
 
     @Override

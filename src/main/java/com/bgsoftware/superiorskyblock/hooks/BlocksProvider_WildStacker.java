@@ -32,9 +32,13 @@ import java.util.Map;
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     private static final Map<String, StackedSnapshot> chunkSnapshots = new HashMap<>();
+    private static boolean registered = false;
 
     public BlocksProvider_WildStacker(){
-        Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+        if(!registered) {
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            registered = true;
+        }
     }
 
     public static void cacheChunk(Chunk chunk){

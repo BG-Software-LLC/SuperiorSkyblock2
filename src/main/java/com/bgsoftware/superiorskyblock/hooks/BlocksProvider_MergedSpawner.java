@@ -16,8 +16,13 @@ import org.bukkit.inventory.ItemStack;
 
 public final class BlocksProvider_MergedSpawner implements BlocksProvider {
 
+    private static boolean registered = false;
+
     public BlocksProvider_MergedSpawner(){
-        Bukkit.getPluginManager().registerEvents(new BlocksProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+        if(!registered) {
+            Bukkit.getPluginManager().registerEvents(new BlocksProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            registered = true;
+        }
     }
 
     @Override
