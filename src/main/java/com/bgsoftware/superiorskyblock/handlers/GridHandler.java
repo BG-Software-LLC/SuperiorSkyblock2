@@ -59,7 +59,7 @@ public final class GridHandler implements GridManager {
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
-        updateSpawn();
+        Executor.sync(this::updateSpawn);
     }
 
     public void updateSpawn(){
@@ -157,7 +157,7 @@ public final class GridHandler implements GridManager {
         if(location == null)
             return null;
 
-        if(spawnIsland.isInside(location))
+        if(spawnIsland != null && spawnIsland.isInside(location))
             return spawnIsland;
 
         return islands.get(location);
