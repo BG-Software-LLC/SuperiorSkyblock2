@@ -105,7 +105,8 @@ public final class DataHandler {
                 "generatedSchematics TEXT, " +
                 "schemName TEXT, " +
                 "uniqueVisitors TEXT, " +
-                "unlockedWorlds TEXT" +
+                "unlockedWorlds TEXT," +
+                "lastTimeUpdate INTEGER" +
                 ");");
 
         //Creating default players table
@@ -169,6 +170,7 @@ public final class DataHandler {
         addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
         addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
         addColumnIfNotExists("toggledBorder", "players", "1", "BOOLEAN");
+        addColumnIfNotExists("lastTimeUpdate", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

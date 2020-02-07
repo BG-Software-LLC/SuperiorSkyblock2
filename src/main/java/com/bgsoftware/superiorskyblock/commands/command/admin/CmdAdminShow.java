@@ -80,6 +80,8 @@ public final class CmdAdminShow implements ICommand {
             return;
         }
 
+        long lastTime = island.getLastTimeUpdate();
+
         StringBuilder infoMessage = new StringBuilder();
 
         if(!Locale.ISLAND_INFO_HEADER.isEmpty(locale))
@@ -90,6 +92,16 @@ public final class CmdAdminShow implements ICommand {
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(locale, SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
+        if(lastTime != -1){
+            if(!Locale.ISLAND_INFO_LAST_TIME_UPDATED.isEmpty(locale)){
+                infoMessage.append(Locale.ISLAND_INFO_LAST_TIME_UPDATED.getMessage(locale, StringUtils.formatTime(locale, System.currentTimeMillis() - (lastTime * 1000)))).append("\n");
+            }
+        }
+        else{
+            if(!Locale.ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE.isEmpty(locale)){
+                infoMessage.append(Locale.ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE.getMessage(locale)).append("\n");
+            }
+        }
         if(!Locale.ISLAND_INFO_RATE.isEmpty(locale)) {
             double rating = island.getTotalRating();
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");

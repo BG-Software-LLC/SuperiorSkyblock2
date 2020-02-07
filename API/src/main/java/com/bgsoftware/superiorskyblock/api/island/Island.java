@@ -481,6 +481,16 @@ public interface Island extends Comparable<Island> {
      */
     boolean isBeingRecalculated();
 
+    /**
+     * Update the last time the island was used.
+     */
+    void updateLastTime();
+
+    /**
+     * Get the last time the island was updated.
+     */
+    long getLastTimeUpdate();
+
     /*
      *  Bank related methods
      */

@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -113,6 +114,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
                 superiorPlayer.updateLastTimeStatus();
                 Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
+                Island playerIsland = superiorPlayer.getIsland();
 
                 if(superiorPlayer.hasIslandFlyEnabled()){
                     if(island != null && island.hasPermission(superiorPlayer, IslandPermission.FLY)){
@@ -121,6 +123,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     }else{
                         superiorPlayer.toggleIslandFly();
                     }
+                }
+
+                if(playerIsland != null){
+                    ((SIsland) playerIsland).setLastTimeUpdate(-1);
                 }
 
                 if(island != null)
@@ -140,6 +146,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 player.closeInventory();
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
                 superiorPlayer.updateLastTimeStatus();
+                Island playerIsland = superiorPlayer.getIsland();
+                if(playerIsland != null){
+                    playerIsland.updateLastTime();
+                }
                 nmsAdapter.setWorldBorder(superiorPlayer, null);
                 if (superiorPlayer.hasIslandFlyEnabled()) {
                     player.setAllowFlight(false);

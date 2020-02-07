@@ -489,6 +489,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void updateLastTime() {
+
+    }
+
+    @Override
+    public long getLastTimeUpdate() {
+        return -1;
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
         return getMoneyInBank();

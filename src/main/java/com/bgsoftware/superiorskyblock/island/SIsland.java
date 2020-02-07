@@ -129,6 +129,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<String> generatedSchematics = SyncedObject.of("normal");
     private final SyncedObject<String> schemName = SyncedObject.of("");
     private final SyncedObject<String> unlockedWorlds = SyncedObject.of("");
+    private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
 
     /*
      * Island multipliers & limits
@@ -186,6 +187,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.generatedSchematics.set(resultSet.getString("generatedSchematics"));
         this.schemName.set(resultSet.getString("schemName"));
         this.unlockedWorlds.set(resultSet.getString("unlockedWorlds"));
+        this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
 
         if(blockCounts.get().isEmpty())
             calcIslandWorth(null);
@@ -426,6 +428,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 MenuUniqueVisitors.refreshMenus();
             }
         }
+
+        updateLastTime();
 
         MenuVisitors.refreshMenus();
     }
@@ -819,6 +823,13 @@ public final class SIsland extends DatabaseObject implements Island {
             return;
         }
 
+        long lastUpdateTime =  getLastTimeUpdate();
+
+        if(lastUpdateTime == -1 || (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600){
+            finishCalcIsland(asker, callback, getIslandLevel(), getWorth());
+            return;
+        }
+
         beingRecalculated.set(true);
 
         List<Chunk> chunks = new ArrayList<>();
@@ -932,20 +943,14 @@ public final class SIsland extends DatabaseObject implements Island {
                 BigDecimal islandLevel = getIslandLevel();
                 BigDecimal islandWorth = getWorth();
 
-                Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth));
-
-                if(asker != null)
-                    Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
-
-                if(callback != null)
-                    callback.run();
+                finishCalcIsland(asker, callback, islandLevel, islandWorth);
 
                 for(Chunk chunk : chunks)
                     BlocksProvider_WildStacker.uncacheChunk(chunk);
 
-                saveBlockCounts();
-
                 MenuValues.refreshMenus();
+
+                saveBlockCounts();
 
                 beingRecalculated.set(false);
             });
@@ -1109,6 +1114,29 @@ public final class SIsland extends DatabaseObject implements Island {
         return beingRecalculated.get();
     }
 
+    @Override
+    public void updateLastTime() {
+        this.lastTimeUpdate.run(lastTimeUpdate -> {
+            if(lastTimeUpdate != -1)
+                setLastTimeUpdate(System.currentTimeMillis() / 1000);
+        });
+    }
+
+    @Override
+    public long getLastTimeUpdate() {
+        return lastTimeUpdate.get();
+    }
+
+    public void setLastTimeUpdate(long lastTimeUpdate){
+        this.lastTimeUpdate.set(lastTimeUpdate);
+        if(lastTimeUpdate != -1){
+            Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder()
+                    .setLong(lastTimeUpdate)
+                    .setString(owner.getUniqueId() + "")
+                    .execute(true);
+        }
+    }
+
     /*
      *  Bank related methods
      */
@@ -1219,6 +1247,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 });
             });
 
+            updateLastTime();
+
             if(save){
                 MenuValues.refreshMenus();
                 saveBlockCounts();
@@ -1293,6 +1323,8 @@ public final class SIsland extends DatabaseObject implements Island {
                     }
                 });
             });
+
+            updateLastTime();
 
             MenuValues.refreshMenus();
 
@@ -2019,6 +2051,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get())
+                .setLong(lastTimeUpdate.get())
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2066,6 +2099,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get())
+                .setLong(lastTimeUpdate.get())
                 .execute(async);
     }
 
@@ -2178,6 +2212,16 @@ public final class SIsland extends DatabaseObject implements Island {
                         .execute(true);
             }
         });
+    }
+
+    private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){
+        Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth));
+
+        if(asker != null)
+            Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
+
+        if(callback != null)
+            callback.run();
     }
 
     public static class WarpData{

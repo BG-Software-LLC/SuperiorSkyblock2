@@ -81,8 +81,11 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null)
+        if(island != null) {
             ((SIsland) island).sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            island.updateLastTime();
+            ((SIsland) island).setLastTimeUpdate(-1);
+        }
 
         Executor.async(() -> {
             java.util.Locale locale = superiorPlayer.getUserLocale();
@@ -111,8 +114,13 @@ public final class PlayersListener implements Listener {
 
         Island island = superiorPlayer.getIsland();
 
-        if(island != null)
+        if(island != null) {
             ((SIsland) island).sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
+                    !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) &&  _superiorPlayer.isOnline());
+            if(!anyOnline)
+                ((SIsland) island).setLastTimeUpdate(System.currentTimeMillis() / 1000);
+        }
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
