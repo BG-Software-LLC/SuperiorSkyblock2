@@ -912,19 +912,19 @@ permissions:
       type: REDSTONE_TORCH
       name: '&6Open Island'
       lore:
-        - '&7Access to kick members from the island.'
+        - '&7Access to open the island to the public.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
       type: REDSTONE_TORCH
       name: '&6Open Island'
       lore:
-        - '&7Access to kick members from the island.'
+        - '&7Access to open the island to the public.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
       type: REDSTONE_TORCH
       name: '&6Open Island'
       lore:
-        - '&7Access to kick members from the island.'
+        - '&7Access to open the island to the public.'
         - '&7Role: &e{}&7.'
     has-access:
       sound:
