@@ -85,7 +85,6 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công gi�
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
-COMMAND_ARGUMENT_CANCEL: 'cancel'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ISLAND_NAME: ten-dao
@@ -356,8 +355,8 @@ ISLAND_INFO_BANK: '&e&lĐảo Thần| &7Ngân Hàng: {0}'
 ISLAND_INFO_DISCORD: '&e&lĐảo Thần | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
-ISLAND_INFO_LAST_TIME_UPDATED: '&e&lIsland | &7Last Time Updated: {0} ago'
-ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lIsland | &7Last Time Updated: &aCurrently Active'
+ISLAND_INFO_LAST_TIME_UPDATED: '&e&lĐảo Thần | Cập nhật lần cuối: {0} trước'
+ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lĐảo Thần | &7Cập nhật lần cuối: &aHiện đang hoạt động'
 ISLAND_INFO_LOCATION: '&e&lĐảo Thần | &7Nhà: {0}'
 ISLAND_INFO_NAME: '&e&lNâng cấp | &7Tên: {0}'
 ISLAND_INFO_OWNER: '&e&lĐảo Thần | &7Lãnh đạo: {0}'

@@ -26,7 +26,7 @@ public final class CmdAdminPurge implements ICommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin purge <" + Locale.COMMAND_ARGUMENT_CANCEL.getMessage(locale) + "/" + Locale.COMMAND_ARGUMENT_TIME.getMessage(locale) + ">";
+        return "admin purge <cancel/" + Locale.COMMAND_ARGUMENT_TIME.getMessage(locale) + ">";
     }
 
     @Override

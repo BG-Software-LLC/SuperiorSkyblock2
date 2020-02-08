@@ -69,7 +69,6 @@ public enum Locale {
     COMMAND_ARGUMENT_ALL_ISLANDS("*"),
     COMMAND_ARGUMENT_ALL_PLAYERS("*"),
     COMMAND_ARGUMENT_AMOUNT("amount"),
-    COMMAND_ARGUMENT_CANCEL("cancel"),
     COMMAND_ARGUMENT_DISCORD("discord..."),
     COMMAND_ARGUMENT_EMAIL("email"),
     COMMAND_ARGUMENT_ISLAND_NAME("island-name"),

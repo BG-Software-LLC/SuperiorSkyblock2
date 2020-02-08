@@ -88,7 +88,6 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il mite
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
-COMMAND_ARGUMENT_CANCEL: 'cancel'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ISLAND_NAME: nome-isola
@@ -375,8 +374,8 @@ ISLAND_INFO_BANK: '&e&lIsola | &7Banca: {0}'
 ISLAND_INFO_DISCORD: '&e&lIsola | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
-ISLAND_INFO_LAST_TIME_UPDATED: '&e&lIsland | &7Last Time Updated: {0} ago'
-ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lIsland | &7Last Time Updated: &aCurrently Active'
+ISLAND_INFO_LAST_TIME_UPDATED: '&e&lIslola | &7Ultimo aggiornamento: {0} fa'
+ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lIsola | &7Ultimo aggiornamento: &aAttualmente Attivo'
 ISLAND_INFO_LOCATION: '&e&lIsola | &7Casa: {0}'
 ISLAND_INFO_NAME: '&e&lIsola | &7Nome: {0}'
 ISLAND_INFO_OWNER: '&e&lIsola | &7Capo: {0}'
