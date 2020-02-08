@@ -219,4 +219,26 @@ public interface GridManager {
     @Deprecated
     boolean isSpawner(Material material);
 
+    /**
+     * Make the island to be deleted when server stops.
+     * @param island The island to delete.
+     */
+    void addIslandToPurge(Island island);
+
+    /**
+     * Remove the island from being deleted when server stops.
+     * @param island The island to keep.
+     */
+    void removeIslandFromPurge(Island island);
+
+    /**
+     * Check if the island will be deleted when the server stops?
+     */
+    boolean isIslandPurge(Island island);
+
+    /**
+     * Get all the islands that will be deleted when the server stops.
+     */
+    List<Island> getIslandsToPurge();
+
 }

@@ -67,6 +67,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} 
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
+COMMAND_ARGUMENT_CANCEL: 'cancel'
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EMAIL: ליימיא
 COMMAND_ARGUMENT_ISLAND_NAME: יאה םש
@@ -88,6 +89,7 @@ COMMAND_ARGUMENT_RATING: גוריד
 COMMAND_ARGUMENT_SCHEMATIC_NAME: הנבמה םש
 COMMAND_ARGUMENT_SETTINGS: תורדגה
 COMMAND_ARGUMENT_SIZE: לדוג
+COMMAND_ARGUMENT_TIME: 'time'
 COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
 COMMAND_ARGUMENT_VALUE: יווש
 COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
@@ -117,6 +119,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG_ALL: העדוה יא לש םינקחשה לכל ח
 COMMAND_DESCRIPTION_ADMIN_NAME: יא לש םשה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_OPEN: רוביצל יא חותפל.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: רחא יאב ןקחש הגרדב תולעהל.
+COMMAND_DESCRIPTION_ADMIN_PURGE: 'Purge islands.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
@@ -396,6 +399,7 @@ NO_DISBAND_PERMISSION: '&c&lהאיגש | &7יאה תא קוחמל תנמ לע ן
 NO_EXPEL_PERMISSION: '&c&lהאיגש | &7יאהמ םירקבמ שרגל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_INVITE_PERMISSION: '&c&lהאיגש | &7םינקחש ןימזהל תנמ לע ןימדא תגרדב תוחפל תויהל בייח התא.'
 NO_ISLAND_INVITE: '&c&lהאיגש | &7הזה יאהמ תונמזה אוצמל ןתינ היה אל.'
+NO_ISLANDS_TO_PURGE: '&c&lError | &7There were no islands to purge.'
 NO_KICK_PERMISSION: '&c&lהאיגש | &7םינקחש ףיעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_MORE_DISBANDS: '&c&lהאיגש | &7םייא דוע קוחמל לוכי אל התא.'
 NO_MORE_WARPS: '&c&lהאיגש | &7ךלש יאל םימוקימ דוע רוציל ןתינ אל.'
@@ -439,6 +443,10 @@ PLAYER_NOT_ONLINE: '&c&lהאיגש | &7רבוחמ אל הזה ןקחשה.'
 PLAYER_QUIT_ANNOUNCEMENT: '&e&lיא | &7תרשה תא בזע {0}.'
 PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7ךלשמ הכומנ הגרד ילעב םינקחש הגרד תולעהל קר לוכי התא.'
 PROMOTED_MEMBER: '&e&lיא | &7ולש יאב {1} תגרדל {0} תא הגרדב תלעה.'
+PURGE_CLEAR: '&e&lIsland | &7Successfully cleared all the queued islands to be purged.'
+PURGED_ISLANDS: |-
+  &e&lIsland | &7{0} islands will be purged when server restarts.
+  &e&lIsland | &7You can cancel it anytime using /is admin purge cancel.
 RATE_ANNOUNCEMENT: '&e&lיא | &75 ךותמ {1} ךלש יאה תא גריד {0}!'
 RATE_CHANGE_OTHER: '&e&lיא | &7{1} ל {0} לש גורידה תא תיניש.'
 RATE_OWN_ISLAND: '&c&lהאיגש | &7ךלש יאה תא גרדל לוכי אל התא.'

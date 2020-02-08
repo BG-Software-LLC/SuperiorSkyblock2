@@ -142,6 +142,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();
 
+            for(Island island : gridHandler.getIslandsToPurge())
+                island.disbandIsland();
+
             for (Player player : Bukkit.getOnlinePlayers()) {
                 player.closeInventory();
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);

@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.island.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
+import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -52,6 +53,7 @@ public final class GridHandler implements GridManager {
 
     private IslandRegistry islands = new IslandRegistry();
     private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
+    private Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -364,6 +366,26 @@ public final class GridHandler implements GridManager {
     @Override
     public boolean isSpawner(Material material) {
         return material == Materials.SPAWNER.toBukkitType();
+    }
+
+    @Override
+    public void addIslandToPurge(Island island) {
+        islandsToPurge.add(island.getOwner().getUniqueId());
+    }
+
+    @Override
+    public void removeIslandFromPurge(Island island) {
+        islandsToPurge.remove(island.getOwner().getUniqueId());
+    }
+
+    @Override
+    public boolean isIslandPurge(Island island) {
+        return islandsToPurge.contains(island.getOwner().getUniqueId());
+    }
+
+    @Override
+    public List<Island> getIslandsToPurge() {
+        return islandsToPurge.stream().map(this::getIsland).collect(Collectors.toList());
     }
 
     public void loadGrid(ResultSet resultSet) throws SQLException {

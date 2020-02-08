@@ -87,6 +87,13 @@ public final class PlayersListener implements Listener {
             ((SIsland) island).setLastTimeUpdate(-1);
         }
 
+        Executor.sync(() -> {
+            if(plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) == null){
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
+            }
+        }, 10L);
+
         Executor.async(() -> {
             java.util.Locale locale = superiorPlayer.getUserLocale();
             if(!Locale.GOT_INVITE.isEmpty(locale)){

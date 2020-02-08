@@ -85,6 +85,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công gi�
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
+COMMAND_ARGUMENT_CANCEL: 'cancel'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ISLAND_NAME: ten-dao
@@ -106,6 +107,7 @@ COMMAND_ARGUMENT_RATING: danh-gia
 COMMAND_ARGUMENT_SCHEMATIC_NAME: ten-schematic
 COMMAND_ARGUMENT_SETTINGS: cai-dat
 COMMAND_ARGUMENT_SIZE: kich-thuoc
+COMMAND_ARGUMENT_TIME: 'time'
 COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
@@ -138,6 +140,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Gửi cho tất cả các thành viên đảo
 COMMAND_DESCRIPTION_ADMIN_NAME: Thay đổi tên của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Mở một hòn đảo cho công cộng.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Thăng chức thành viên ở đảo của người chơi khác.
+COMMAND_DESCRIPTION_ADMIN_PURGE: 'Purge islands.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
@@ -443,6 +446,7 @@ NO_EXPEL_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để trục xu
   hòn đảo của bạn.'
 NO_INVITE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để mời người chơi.'
 NO_ISLAND_INVITE: '&c&lLỗi | &7Không thể tìm thấy bất kỳ lời mời từ hòn đảo này.'
+NO_ISLANDS_TO_PURGE: '&c&lError | &7There were no islands to purge.'
 NO_KICK_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để để kick người chơi.'
 NO_MORE_DISBANDS: '&c&lLỗi | &7Bạn không thể giải tán đảo nữa.'
 NO_MORE_WARPS: '&c&lLỗi | &7Đảo của bạn không thể có thêm khu vực.'
@@ -500,6 +504,10 @@ PLAYER_QUIT_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã thoát server.'
 PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thăng chức người chơi
   có vai trò đảo thấp hơn bạn.'
 PROMOTED_MEMBER: '&e&lĐảo Thần | &7Bạn đã thăng chức {0} thành {1} ở đảo của họ.'
+PURGE_CLEAR: '&e&lIsland | &7Successfully cleared all the queued islands to be purged.'
+PURGED_ISLANDS: |-
+  &e&lIsland | &7{0} islands will be purged when server restarts.
+  &e&lIsland | &7You can cancel it anytime using /is admin purge cancel.
 RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn {1} trên 5!.'
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'
