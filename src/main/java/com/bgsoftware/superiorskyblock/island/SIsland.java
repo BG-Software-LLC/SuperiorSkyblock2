@@ -1894,10 +1894,8 @@ public final class SIsland extends DatabaseObject implements Island {
             setGeneratorAmount(key, 0);
         }
         else if(percentage == 100){
-            cobbleGeneratorValues.run(cobbleGenerator -> {
-                cobbleGenerator.clear();
-                cobbleGenerator.put(key.toString(), 1);
-            });
+            cobbleGeneratorValues.run((Consumer<Map<String, Integer>>) Map::clear);
+            setGeneratorAmount(key, 1);
         }
         else {
             //Removing the key from the generator
@@ -1945,7 +1943,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             String[] cobbleGeneratorArray = new String[getGeneratorTotalAmount()];
             int index = 0;
-            for(Map.Entry<String, Integer> entry : cobbleGeneratorValues.get().entrySet()){
+            for(Map.Entry<String, Integer> entry : cobbleGenerator.entrySet()){
                 for(int i = 0; i < entry.getValue(); i++)
                     cobbleGeneratorArray[index++] = entry.getKey();
             }
