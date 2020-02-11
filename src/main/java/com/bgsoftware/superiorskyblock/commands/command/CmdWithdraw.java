@@ -31,7 +31,7 @@ public final class CmdWithdraw implements ICommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT + ">";
+        return "withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
