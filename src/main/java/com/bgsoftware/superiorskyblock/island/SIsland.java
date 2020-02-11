@@ -126,7 +126,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Map<Mission, Integer>> completedMissions = SyncedObject.of(new HashMap<>());
     private final SyncedObject<Biome> biome = SyncedObject.of(null);
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
-    private final SyncedObject<String> generatedSchematics = SyncedObject.of("normal");
+    private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(8);
     private final SyncedObject<String> schemName = SyncedObject.of("");
     private final SyncedObject<String> unlockedWorlds = SyncedObject.of("");
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
@@ -184,7 +184,23 @@ public final class SIsland extends DatabaseObject implements Island {
         this.islandName.set(resultSet.getString("name"));
         this.description.set(resultSet.getString("description"));
         this.ignored.set(resultSet.getBoolean("ignored"));
-        this.generatedSchematics.set(resultSet.getString("generatedSchematics"));
+
+        String generatedSchematics = resultSet.getString("generatedSchematics");
+        try{
+            this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
+        }catch(Exception ex){
+            int n = 0;
+
+            if(generatedSchematics.contains("normal"))
+                n |= 8;
+            else if(generatedSchematics.contains("nether"))
+                n |= 4;
+            else if(generatedSchematics.contains("the_end"))
+                n |= 3;
+
+            this.generatedSchematics.set(n);
+        }
+
         this.schemName.set(resultSet.getString("schemName"));
         this.unlockedWorlds.set(resultSet.getString("unlockedWorlds"));
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
@@ -1992,15 +2008,17 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
-        return generatedSchematics.get().contains(environment.name().toLowerCase());
+        int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
+        return (generatedSchematics.get() & n) == n;
     }
 
     @Override
     public void setSchematicGenerate(World.Environment environment) {
-        String generatedSchematics = this.generatedSchematics.get();
-        this.generatedSchematics.set(generatedSchematics + environment.name().toLowerCase());
+        int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
+        int generatedSchematics = this.generatedSchematics.get() | n;
+        this.generatedSchematics.set(generatedSchematics);
         Query.ISLAND_SET_GENERATED_SCHEMATICS.getStatementHolder()
-                .setString(generatedSchematics)
+                .setString(generatedSchematics + "")
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
@@ -2045,7 +2063,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored.get())
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
-                .setString(generatedSchematics.get())
+                .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get())
@@ -2093,7 +2111,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeSettings(islandSettings))
                 .setBoolean(ignored.get())
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
-                .setString(generatedSchematics.get())
+                .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get())
