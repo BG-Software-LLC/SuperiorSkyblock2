@@ -128,7 +128,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
     private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(8);
     private final SyncedObject<String> schemName = SyncedObject.of("");
-    private final SyncedObject<String> unlockedWorlds = SyncedObject.of("");
+    private final SyncedObject<Integer> unlockedWorlds = SyncedObject.of(0);
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
 
     /*
@@ -193,16 +193,30 @@ public final class SIsland extends DatabaseObject implements Island {
 
             if(generatedSchematics.contains("normal"))
                 n |= 8;
-            else if(generatedSchematics.contains("nether"))
+            if(generatedSchematics.contains("nether"))
                 n |= 4;
-            else if(generatedSchematics.contains("the_end"))
+            if(generatedSchematics.contains("the_end"))
                 n |= 3;
 
             this.generatedSchematics.set(n);
         }
 
         this.schemName.set(resultSet.getString("schemName"));
-        this.unlockedWorlds.set(resultSet.getString("unlockedWorlds"));
+
+        String unlockedWorlds = resultSet.getString("unlockedWorlds");
+        try{
+            this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
+        }catch(Exception ex){
+            int n = 0;
+
+            if(unlockedWorlds.contains("nether"))
+                n |= 1;
+            if(unlockedWorlds.contains("the_end"))
+                n |= 2;
+
+            this.unlockedWorlds.set(n);
+        }
+
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
 
         if(blockCounts.get().isEmpty())
@@ -648,52 +662,48 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getSettings().netherWorldUnlocked || unlockedWorlds.run(unlockedWorlds -> {
-            return unlockedWorlds.contains("nether");
-        });
+        return plugin.getSettings().netherWorldUnlocked || (unlockedWorlds.get() & 1) == 1;
     }
 
     @Override
     public void setNetherEnabled(boolean enabled) {
-        String unlockedWorlds = this.unlockedWorlds.run(_unlockedWorlds -> {
-            if(enabled){
-                return _unlockedWorlds.replace("nether", "") + "nether";
-            }
-            else{
-                return _unlockedWorlds.replace("nether", "");
-            }
-        });
+        int unlockedWorlds = this.unlockedWorlds.get();
+
+        if(enabled){
+            unlockedWorlds |= 1;
+        }
+        else {
+            unlockedWorlds &= 2;
+        }
 
         this.unlockedWorlds.set(unlockedWorlds);
 
         Query.ISLAND_SET_UNLOCK_WORLDS.getStatementHolder()
-                .setString(unlockedWorlds)
+                .setString(unlockedWorlds + "")
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getSettings().endWorldUnlocked || unlockedWorlds.run(unlockedWorlds -> {
-            return unlockedWorlds.contains("the_end");
-        });
+        return plugin.getSettings().endWorldUnlocked || (unlockedWorlds.get() & 2) == 2;
     }
 
     @Override
     public void setEndEnabled(boolean enabled) {
-        String unlockedWorlds = this.unlockedWorlds.run(_unlockedWorlds -> {
-            if(enabled){
-                return _unlockedWorlds.replace("the_end", "") + "the_end";
-            }
-            else{
-                return _unlockedWorlds.replace("the_end", "");
-            }
-        });
+        int unlockedWorlds = this.unlockedWorlds.get();
+
+        if(enabled){
+            unlockedWorlds |= 2;
+        }
+        else {
+            unlockedWorlds &= 1;
+        }
 
         this.unlockedWorlds.set(unlockedWorlds);
 
         Query.ISLAND_SET_UNLOCK_WORLDS.getStatementHolder()
-                .setString(unlockedWorlds)
+                .setString(unlockedWorlds + "")
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
@@ -2066,7 +2076,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
-                .setString(unlockedWorlds.get())
+                .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
@@ -2114,7 +2124,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
-                .setString(unlockedWorlds.get())
+                .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .execute(async);
     }
