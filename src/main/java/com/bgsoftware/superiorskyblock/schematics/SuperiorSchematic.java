@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -168,6 +169,11 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback) {
+        if(!Bukkit.isPrimaryThread()){
+            Executor.sync(() -> pasteSchematic(island, location, callback));
+            return;
+        }
+
         if(schematicProgress) {
             pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback));
             return;
