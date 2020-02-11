@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -115,7 +114,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
             //noinspection unchecked
             List<String> commands = (List<String>) getData(permissionName + "-has-access-commands");
             if (commands != null)
-                commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
             previousMove = false;
             open(previousMenu);
@@ -130,7 +129,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
             //noinspection unchecked
             List<String> commands = (List<String>) getData(permissionName + "-no-access-commands");
             if (commands != null)
-                commands.forEach(command -> CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
         }
     }
 

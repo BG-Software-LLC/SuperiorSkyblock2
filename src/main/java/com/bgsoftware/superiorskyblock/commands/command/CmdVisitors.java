@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -50,7 +49,7 @@ public final class CmdVisitors implements ICommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        CommandUtils.dispatchCommand(sender, "is panel visitors");
+        Bukkit.dispatchCommand(sender, "is panel visitors");
     }
 
     @Override

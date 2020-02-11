@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -271,7 +270,7 @@ public final class MissionsHandler implements MissionsManager {
 
         Executor.sync(() -> {
             for(String command : missionCompleteEvent.getCommandRewards()){
-                CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                         .replace("%mission%", mission.getName())
                         .replace("%player%", superiorPlayer.getName())
                         .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())

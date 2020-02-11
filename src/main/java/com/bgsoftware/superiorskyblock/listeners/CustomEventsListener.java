@@ -24,7 +24,6 @@ import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -388,7 +387,7 @@ public final class CustomEventsListener implements Listener {
         }
 
         for(String command : commands){
-            CommandUtils.dispatchCommand(Bukkit.getConsoleSender(), command
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                     .replace("%island%", islandName)
                     .replace("%player%", playerName)
                     .replace("%schematic%", schematicName)

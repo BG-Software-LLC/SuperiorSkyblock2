@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -193,7 +192,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             List<String> commands = (List<String>) getData("island-commands");
             if(commands != null)
                 commands.forEach(command ->
-                        CommandUtils.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
                                 command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
 
             previousMove = false;
@@ -214,7 +213,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         List<String> commands = (List<String>) getData("no-island-commands");
         if(commands != null)
             commands.forEach(command ->
-                    CommandUtils.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
+                    Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
                             command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
     }
 

@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -158,16 +157,16 @@ public final class CommandsHandler extends BukkitCommand {
                 Island island = superiorPlayer.getIsland();
 
                 if(args.length != 0){
-                    CommandUtils.dispatchCommand(sender, label + " help");
+                    Bukkit.dispatchCommand(sender, label + " help");
                 }
                 else if(island == null){
-                    CommandUtils.dispatchCommand(sender, label + " create");
+                    Bukkit.dispatchCommand(sender, label + " create");
                 }
                 else if(superiorPlayer.hasToggledPanel()){
-                    CommandUtils.dispatchCommand(sender, label + " panel");
+                    Bukkit.dispatchCommand(sender, label + " panel");
                 }
                 else{
-                    CommandUtils.dispatchCommand(sender, label + " tp");
+                    Bukkit.dispatchCommand(sender, label + " tp");
                 }
 
                 return false;
