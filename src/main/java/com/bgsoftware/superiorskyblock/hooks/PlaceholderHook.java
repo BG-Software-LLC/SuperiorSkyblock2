@@ -135,9 +135,15 @@ public abstract class PlaceholderHook {
                     }
                     else {
                         boolean value = false;
+                        boolean leader = false;
 
                         if((matcher = Pattern.compile("value_(.+)").matcher(matcherValue)).matches()){
                             value = true;
+                            matcherValue = matcher.group(1);
+                        }
+
+                        else if((matcher = Pattern.compile("leader_(.+)").matcher(matcherValue)).matches()){
+                            leader = true;
                             matcherValue = matcher.group(1);
                         }
 
@@ -163,7 +169,7 @@ public abstract class PlaceholderHook {
                                 }
 
                                 else{
-                                    return _island.getName().isEmpty() ? _island.getOwner().getName() : _island.getName();
+                                    return leader || _island.getName().isEmpty() ? _island.getOwner().getName() : _island.getName();
                                 }
                             }
                         } catch (IllegalArgumentException ignored) { }
