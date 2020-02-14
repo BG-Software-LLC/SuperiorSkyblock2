@@ -35,42 +35,37 @@ import java.io.File;
 
 public final class MenusHandler implements MenusManager {
 
-    public MenusHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
-        try {
-            //Reload all menus
-            MenuBiomes.init();
-            MenuBorderColor.init();
-            MenuConfirmDisband.init();
-            MenuControlPanel.init();
-            MenuGlobalWarps.init();
-            MenuIslandCreation.init();
-            MenuIslandMissions.init();
-            MenuIslandRate.init();
-            MenuIslandRatings.init();
-            MenuMemberManage.init();
-            MenuMemberRole.init();
-            MenuMembers.init();
-            MenuMissions.init();
-            MenuPermissions.init();
-            MenuPlayerLanguage.init();
-            MenuPlayerMissions.init();
-            MenuSettings.init();
-            MenuTopIslands.init();
-            MenuUniqueVisitors.init();
-            MenuUpgrades.init();
-            MenuValues.init();
-            MenuVisitors.init();
-            MenuWarps.init();
+    public MenusHandler(SuperiorSkyblockPlugin plugin){
+        //Reload all menus
+        loadMenu(MenuBiomes::init);
+        loadMenu(MenuBorderColor::init);
+        loadMenu(MenuConfirmDisband::init);
+        loadMenu(MenuControlPanel::init);
+        loadMenu(MenuGlobalWarps::init);
+        loadMenu(MenuIslandCreation::init);
+        loadMenu(MenuIslandMissions::init);
+        loadMenu(MenuIslandRate::init);
+        loadMenu(MenuIslandRatings::init);
+        loadMenu(MenuMemberManage::init);
+        loadMenu(MenuMemberRole::init);
+        loadMenu(MenuMembers::init);
+        loadMenu(MenuMissions::init);
+        loadMenu(MenuPermissions::init);
+        loadMenu(MenuPlayerLanguage::init);
+        loadMenu(MenuPlayerMissions::init);
+        loadMenu(MenuSettings::init);
+        loadMenu(MenuTopIslands::init);
+        loadMenu(MenuUniqueVisitors::init);
+        loadMenu(MenuUpgrades::init);
+        loadMenu(MenuValues::init);
+        loadMenu(MenuVisitors::init);
+        loadMenu(MenuWarps::init);
 
-            File guiFolder = new File(plugin.getDataFolder(), "guis");
-            if(guiFolder.exists()){
-                File oldGuisFolder = new File(plugin.getDataFolder(), "old-guis");
-                //noinspection ResultOfMethodCallIgnored
-                guiFolder.renameTo(oldGuisFolder);
-            }
-
-        }catch(Exception ex){
-            throw new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
+        File guiFolder = new File(plugin.getDataFolder(), "guis");
+        if(guiFolder.exists()){
+            File oldGuisFolder = new File(plugin.getDataFolder(), "old-guis");
+            //noinspection ResultOfMethodCallIgnored
+            guiFolder.renameTo(oldGuisFolder);
         }
     }
 
@@ -190,6 +185,14 @@ public final class MenusHandler implements MenusManager {
     @Override
     public void openMemberRoleMenu(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
         MenuMemberRole.openInventory(superiorPlayer, null, targetPlayer);
+    }
+
+    private void loadMenu(Runnable runnable){
+        try{
+            runnable.run();
+        }catch(Exception ex){
+            new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+        }
     }
 
 }

@@ -228,14 +228,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
-
-        try {
-            menusHandler = new MenusHandler(this);
-        }catch(HandlerLoadException ex){
-            if(!HandlerLoadException.handle(ex))
-                return;
-        }
-
+        menusHandler = new MenusHandler(this);
         keysHandler = new KeysHandler(this);
 
         Executor.sync(() -> {
