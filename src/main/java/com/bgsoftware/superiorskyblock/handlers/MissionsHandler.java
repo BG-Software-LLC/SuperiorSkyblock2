@@ -76,6 +76,8 @@ public final class MissionsHandler implements MissionsManager {
             cfg = YamlConfiguration.loadConfiguration(file);
         }
 
+        List<Mission> missionsToLoad = new ArrayList<>();
+
         for(String missionName : cfg.getConfigurationSection("").getKeys(false)){
             ConfigurationSection missionSection = cfg.getConfigurationSection(missionName);
             try {
@@ -97,6 +99,7 @@ public final class MissionsHandler implements MissionsManager {
                     mission = createInstance(missionClass.get(), missionName, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                     mission.load(plugin, missionSection);
                     missionMap.put(missionName.toLowerCase(), mission);
+                    missionsToLoad.add(mission);
                 }
 
                 missionDataMap.put(mission, new MissionData(mission, missionSection));
@@ -108,7 +111,7 @@ public final class MissionsHandler implements MissionsManager {
             }
         }
 
-        Executor.sync(this::loadMissionsData, 10L);
+        Executor.sync(() -> loadMissionsData(missionsToLoad), 10L);
 
     }
 
@@ -306,9 +309,13 @@ public final class MissionsHandler implements MissionsManager {
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void loadMissionsData() {
+        loadMissionsData(getAllMissions());
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void loadMissionsData(List<Mission> missionsList) {
         File file = new File(plugin.getDataFolder(), "missions/_data.yml");
 
         if(!file.exists()){
@@ -322,7 +329,7 @@ public final class MissionsHandler implements MissionsManager {
 
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
 
-        for(Mission mission : getAllMissions()){
+        for(Mission mission : missionsList){
             if(data.contains(mission.getName()))
                 mission.loadProgress(data.getConfigurationSection(mission.getName()));
         }

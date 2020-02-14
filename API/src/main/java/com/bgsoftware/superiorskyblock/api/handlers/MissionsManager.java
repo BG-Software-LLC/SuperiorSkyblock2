@@ -106,4 +106,10 @@ public interface MissionsManager {
      */
     void loadMissionsData();
 
+    /**
+     * Load all data related to missions of specific missions.
+     * All the data is loaded from a yaml file.
+     */
+    void loadMissionsData(List<Mission> missionsList);
+
 }
