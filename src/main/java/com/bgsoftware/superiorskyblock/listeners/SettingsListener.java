@@ -220,7 +220,7 @@ public final class SettingsListener implements Listener {
 
         else return;
 
-        if(damagerPlayer.getIslandLeader().equals(targetPlayer.getIslandLeader()) &&
+        if(!damagerPlayer.equals(targetPlayer) && damagerPlayer.getIslandLeader().equals(targetPlayer.getIslandLeader()) &&
                 !plugin.getSettings().pvpWorlds.contains(targetPlayer.getWorld().getName())){
             e.setCancelled(true);
             Locale.HIT_ISLAND_MEMBER.send(damagerPlayer);
