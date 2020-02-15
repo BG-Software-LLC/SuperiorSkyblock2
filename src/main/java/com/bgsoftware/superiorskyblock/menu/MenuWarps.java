@@ -36,10 +36,10 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
         Location location = island.getWarpLocation(warpName);
         if(location != null) {
             Executor.sync(() -> {
-                this.previousMenu = null;
+                previousMove = false;
                 superiorPlayer.asPlayer().closeInventory();
+                island.warpPlayer(superiorPlayer, warpName);
             }, 1L);
-            island.warpPlayer(superiorPlayer, warpName);
         }
     }
 
