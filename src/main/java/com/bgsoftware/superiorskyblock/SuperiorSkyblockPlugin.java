@@ -36,6 +36,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.tasks.CropsTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
@@ -132,12 +133,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 if(island != null)
                     island.setPlayerInside(superiorPlayer, true);
             }
+
+            CropsTask.startTask();
         }, 1L);
     }
 
     @Override
     public void onDisable() {
         ChunksProvider.stop();
+        CropsTask.cancelTask();
         try {
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();

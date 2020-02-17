@@ -5,12 +5,14 @@ import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Set;
 
 public interface NMSBlocks {
 
@@ -35,5 +37,7 @@ public interface NMSBlocks {
     void setTileEntitySign(Object tileEntitySign, String[] lines);
 
     void setTileEntityMobSpawner(Object tileEntityMobSpawner, EntityType spawnedType);
+
+    int tickWorld(World world, int random);
 
 }

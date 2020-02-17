@@ -428,3 +428,26 @@ values-menu: true
 
 # How many chunks should be loaded in one tick by SuperiorSkyblock?
 chunks-per-tick: 10
+
+# A list of crops that will be affected by the crop growth multiplier.
+crops-to-grow:
+- 'CACTUS'
+- 'SUGAR_CANE_BLOCK'
+- 'SUGAR_CANE'
+- 'MELON_STEM'
+- 'ATTACHED_MELON_STEM'
+- 'RED_MUSHROOM'
+- 'BROWN_MUSHROOM'
+- 'PUMPKIN_STEM'
+- 'ATTACHED_PUMPKIN_STEM'
+- 'VINE'
+- 'COCOA'
+- 'SAPLING'
+- 'DARK_OAK_SAPLING'
+- 'JUNGLE_SAPLING'
+- 'OAK_SAPLING'
+- 'ACACIA_SAPLING'
+- 'BIRCH_SAPLING'
+- 'SPRUCE_SAPLING'
+- 'CROPS'
+- 'WHEAT'

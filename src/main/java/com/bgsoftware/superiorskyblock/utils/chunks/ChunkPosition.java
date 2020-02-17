@@ -18,6 +18,10 @@ public final class ChunkPosition {
         return world.getChunkAt(x, z);
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public static ChunkPosition of(World world, int x, int z){
         return new ChunkPosition(world, x, z);
     }

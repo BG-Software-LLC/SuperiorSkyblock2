@@ -5,21 +5,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.UnsafeValues;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -27,9 +22,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,50 +31,8 @@ public final class UpgradesListener implements Listener {
 
     private SuperiorSkyblockPlugin plugin;
 
-    private Map<String, Byte> maxGrowthData = new HashMap<>();
-
     public UpgradesListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        maxGrowthData.put("BEETROOT_BLOCK", (byte) 3);
-        maxGrowthData.put("NETHER_WARTS", (byte) 3);
-        maxGrowthData.put("CHORUS_FLOWER", (byte) 5);
-
-    }
-
-    /*
-     *   CROP GROWTH
-     */
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    @Deprecated
-    @SuppressWarnings({"JavaReflectionMemberAccess", "JavaReflectionInvocation"})
-    public void onGrow(BlockGrowEvent e) {
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island == null)
-            return;
-
-        double cropGrowthMultiplier = island.getCropGrowthMultiplier();
-
-        if(cropGrowthMultiplier > 1){
-            Executor.sync(() -> {
-                byte newData = (byte) (e.getBlock().getData() + cropGrowthMultiplier);
-                if(newData > maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7))
-                    newData = maxGrowthData.getOrDefault(e.getBlock().getType().name(), (byte) 7);
-                if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
-                    try {
-                        Object blockData = UnsafeValues.class.getMethod("fromLegacy", Material.class, byte.class)
-                                .invoke(Bukkit.getUnsafe(), e.getBlock().getType(), newData);
-                        e.getBlock().getClass().getMethod("setBlockData", BlockData.class).invoke(e.getBlock(), blockData);
-                    }catch(Exception ignored){}
-                }else{
-                    try {
-                        e.getBlock().setData(newData);
-                    }catch(Throwable ignored){}
-                }
-                e.getBlock().getState().update();
-            }, 2L);
-        }
     }
 
     /*

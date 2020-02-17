@@ -1,8 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.collect.Iterators;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockFlowerPot;
@@ -28,6 +32,7 @@ import net.minecraft.server.v1_13_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_13_R1.TileEntitySign;
 import net.minecraft.server.v1_13_R1.TileEntitySkull;
 import net.minecraft.server.v1_13_R1.World;
+import net.minecraft.server.v1_13_R1.WorldServer;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
@@ -38,13 +43,16 @@ import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
@@ -214,6 +222,51 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
         MobSpawnerAbstract mobSpawner = ((TileEntityMobSpawner) objectTileEntityMobSpawner).getSpawner();
         //noinspection deprecation
         mobSpawner.setMobName(EntityTypes.a(spawnedType.getName()));
+    }
+
+    @Override
+    public int tickWorld(org.bukkit.World world, int random) {
+        WorldServer worldServer = ((CraftWorld) world).getHandle();
+        int globalRandomTickSpeed = worldServer.getGameRules().c("randomTickSpeed");
+        List<Chunk> activeChunks = new ArrayList<>();
+        List<Pair<BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
+
+        try{
+            Iterators.addAll(activeChunks, worldServer.getPlayerChunkMap().b());
+        }catch(Throwable ignored){}
+
+        for(Chunk chunk : activeChunks){
+            Island island = plugin.getGrid().getIslandAt(chunk.bukkitChunk);
+
+            int chunkRandomTickSpeed = (int) (globalRandomTickSpeed * (island == null ? 0 : island.getCropGrowthMultiplier() - 1));
+            int chunkX = chunk.locX * 16;
+            int chunkZ = chunk.locZ * 16;
+
+            if (chunkRandomTickSpeed > 0) {
+                ChunkSection[] chunkSections = chunk.getSections();
+                int i1 = chunkSections.length;
+                for(ChunkSection chunkSection : chunkSections){
+                    if (chunkSection != Chunk.a && chunkSection.b()) {
+                        for(int i = 0; i < chunkRandomTickSpeed; i++) {
+                            random = random * 3 + 1013904223;
+                            int factor = random >> 2;
+                            int x = factor & 15;
+                            int z = factor >> 8 & 15;
+                            int y = factor >> 16 & 15;
+                            IBlockData blockData = chunkSection.getType(x, y, z);
+                            if (blockData.t() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(blockData.getBlock()).name())) {
+                                blocksToTick.add(new Pair<>(new BlockPosition(x + chunkX, y + chunkSection.getYPosition(), z + chunkZ), blockData));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Executor.sync(() -> blocksToTick.forEach(pair ->
+                pair.getValue().b(worldServer, pair.getKey(), ThreadLocalRandom.current())));
+
+        return random;
     }
 
 }

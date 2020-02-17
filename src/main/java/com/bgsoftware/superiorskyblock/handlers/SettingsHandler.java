@@ -105,6 +105,7 @@ public final class SettingsHandler {
     public final boolean stopLeaving;
     public final boolean valuesMenu;
     public final int chunksPerTick;
+    public final List<String> cropsToGrow;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -239,6 +240,7 @@ public final class SettingsHandler {
         stopLeaving = cfg.getBoolean("stop-leaving", false);
         valuesMenu = cfg.getBoolean("values-menu", true);
         chunksPerTick = cfg.getInt("chunks-per-tick", 10);
+        cropsToGrow = cfg.getStringList("crops-to-grow");
     }
 
     public void updateValue(String path, Object value){
