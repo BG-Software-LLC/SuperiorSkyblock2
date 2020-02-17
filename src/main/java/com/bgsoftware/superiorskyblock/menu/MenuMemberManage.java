@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,11 +36,11 @@ public final class MenuMemberManage extends SuperiorMenu {
         }
 
         else if(e.getRawSlot() == banSlot){
-            Bukkit.dispatchCommand(e.getWhoClicked(), "island ban " + targetPlayer.getName());
+            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "ban " + targetPlayer.getName());
         }
 
         else if(e.getRawSlot() == kickSlot){
-            Bukkit.dispatchCommand(e.getWhoClicked(), "island kick " + targetPlayer.getName());
+            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
         }
     }
 

@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,11 +40,11 @@ public final class MenuMemberRole extends SuperiorMenu {
         PlayerRole playerRole = roleSlots.get(e.getRawSlot());
 
         if(playerRole.isLastRole()){
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island transfer " + targetPlayer.getName());
+            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "transfer " + targetPlayer.getName());
         }
 
         else{
-            Bukkit.dispatchCommand(superiorPlayer.asPlayer(), "island setrole " + targetPlayer.getName() + " " + playerRole.toString());
+            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "setrole " + targetPlayer.getName() + " " + playerRole.toString());
         }
     }
 
