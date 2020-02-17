@@ -193,6 +193,9 @@ public final class GridHandler implements GridManager {
 
     @Override
     public SpawnIsland getSpawnIsland(){
+        if(spawnIsland == null)
+            updateSpawn();
+
         return spawnIsland;
     }
 
