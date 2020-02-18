@@ -47,7 +47,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -246,6 +248,21 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
         for (int i = 0; i < entitySlices.length; i++)
             entitySlices[i] = new UnsafeList();
+    }
+
+    @Override
+    public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
+        ItemStack[] itemStacks = new ItemStack[7];
+
+        itemStacks[0] = new ItemStack(Material.ARMOR_STAND);
+        itemStacks[1] = entityEquipment.getItemInMainHand();
+        itemStacks[2] = entityEquipment.getItemInOffHand();
+        itemStacks[3] = entityEquipment.getHelmet();
+        itemStacks[4] = entityEquipment.getChestplate();
+        itemStacks[5] = entityEquipment.getLeggings();
+        itemStacks[6] = entityEquipment.getBoots();
+
+        return itemStacks;
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

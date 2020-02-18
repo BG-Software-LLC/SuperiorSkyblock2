@@ -1,6 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.entities;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
@@ -14,11 +17,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class EntityUtils {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Map<UUID, ItemStack[]> armorStandsContent = new HashMap<>();
 
     public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack){
         if(livingEntity instanceof Pig){
@@ -33,9 +42,20 @@ public final class EntityUtils {
                 itemStacks.add(horseInventory.getArmor());
             return itemStacks.contains(itemStack);
         }
+        else if(livingEntity instanceof ArmorStand){
+            if(armorStandsContent.containsKey(livingEntity.getUniqueId())) {
+                Bukkit.broadcastMessage(Arrays.asList(armorStandsContent.get(livingEntity.getUniqueId())) + "");
+                return contains(armorStandsContent.get(livingEntity.getUniqueId()), itemStack);
+            }
+        }
 
         EntityEquipment entityEquipment = livingEntity.getEquipment();
-        return contains(entityEquipment.getArmorContents(), itemStack) || itemStack.equals(entityEquipment.getItemInHand());
+
+        return contains(plugin.getNMSAdapter().getEquipment(entityEquipment), itemStack);
+    }
+
+    public static void cacheArmorStandEquipment(ArmorStand armorStand){
+        armorStandsContent.put(armorStand.getUniqueId(), plugin.getNMSAdapter().getEquipment(armorStand.getEquipment()));
     }
 
     public static boolean isPlayerDamager(EntityDamageEvent e){

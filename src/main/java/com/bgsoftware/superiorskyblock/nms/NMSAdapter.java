@@ -14,7 +14,9 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 public interface NMSAdapter {
 
@@ -55,5 +57,7 @@ public interface NMSAdapter {
     default void regenerateChunk(Chunk chunk){
         chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
     }
+
+    ItemStack[] getEquipment(EntityEquipment entityEquipment);
 
 }

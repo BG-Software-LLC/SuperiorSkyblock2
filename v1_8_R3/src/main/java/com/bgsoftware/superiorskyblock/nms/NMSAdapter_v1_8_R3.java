@@ -34,6 +34,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -192,6 +194,20 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
                 return true;
             }
         };
+    }
+
+    @Override
+    public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
+        ItemStack[] itemStacks = new ItemStack[6];
+
+        itemStacks[0] = new ItemStack(Material.ARMOR_STAND);
+        itemStacks[1] = entityEquipment.getItemInHand();
+        itemStacks[2] = entityEquipment.getHelmet();
+        itemStacks[3] = entityEquipment.getChestplate();
+        itemStacks[4] = entityEquipment.getLeggings();
+        itemStacks[5] = entityEquipment.getBoots();
+
+        return itemStacks;
     }
 
 }
