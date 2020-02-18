@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.entities;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Horse;
@@ -43,10 +42,8 @@ public final class EntityUtils {
             return itemStacks.contains(itemStack);
         }
         else if(livingEntity instanceof ArmorStand){
-            if(armorStandsContent.containsKey(livingEntity.getUniqueId())) {
-                Bukkit.broadcastMessage(Arrays.asList(armorStandsContent.get(livingEntity.getUniqueId())) + "");
+            if(armorStandsContent.containsKey(livingEntity.getUniqueId()))
                 return contains(armorStandsContent.get(livingEntity.getUniqueId()), itemStack);
-            }
         }
 
         EntityEquipment entityEquipment = livingEntity.getEquipment();
