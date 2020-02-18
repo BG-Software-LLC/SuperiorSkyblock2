@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
 public final class SQLHelper {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static Connection conn;
 
     private SQLHelper(){}
@@ -45,7 +46,8 @@ public final class SQLHelper {
     }
 
     public static void executeUpdate(String statement){
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement)){
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix))){
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
             System.out.println(statement);
@@ -56,7 +58,8 @@ public final class SQLHelper {
     public static boolean doesConditionExist(String statement){
         boolean ret = false;
 
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement); ResultSet resultSet = preparedStatement.executeQuery()){
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
             ret = resultSet.next();
         }catch(SQLException ex){
             ex.printStackTrace();
@@ -66,7 +69,8 @@ public final class SQLHelper {
     }
 
     public static void executeQuery(String statement, QueryCallback callback){
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement); ResultSet resultSet = preparedStatement.executeQuery()){
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
             callback.run(resultSet);
         }catch(SQLException ex){
             ex.printStackTrace();
@@ -88,7 +92,8 @@ public final class SQLHelper {
     }
 
     public static PreparedStatement buildStatement(String query) throws SQLException{
-        return conn.prepareStatement(query);
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        return conn.prepareStatement(query.replace("{prefix}", prefix));
     }
 
 }

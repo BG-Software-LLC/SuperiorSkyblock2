@@ -62,7 +62,7 @@ public final class DataHandler {
 
         try{
             //Saving grid
-            SQLHelper.executeUpdate("DELETE FROM grid;");
+            SQLHelper.executeUpdate("DELETE FROM {prefix}grid;");
             plugin.getGrid().executeGridInsertStatement(false);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -72,7 +72,7 @@ public final class DataHandler {
     @SuppressWarnings("WeakerAccess")
     public void loadDatabase(){
         //Creating default islands table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS islands (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands (" +
                 "owner VARCHAR(36) PRIMARY KEY, " +
                 "center TEXT, " +
                 "teleportLocation TEXT, " +
@@ -110,7 +110,7 @@ public final class DataHandler {
                 ");");
 
         //Creating default players table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS players (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players (" +
                 "player VARCHAR(36) PRIMARY KEY, " +
                 "teamLeader VARCHAR(36), " +
                 "name TEXT, " +
@@ -127,7 +127,7 @@ public final class DataHandler {
                 ");");
 
         //Creating default grid table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS grid (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}grid (" +
                 "lastIsland TEXT, " +
                 "stackedBlocks TEXT, " +
                 "maxIslandSize INTEGER, " +
@@ -138,7 +138,7 @@ public final class DataHandler {
             plugin.getGrid().executeGridInsertStatement(false);
 
         //Creating default stacked-blocks table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS stackedBlocks (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stackedBlocks (" +
                 "world TEXT, " +
                 "x INTEGER, " +
                 "y INTEGER, " +
@@ -174,7 +174,7 @@ public final class DataHandler {
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
-        SQLHelper.executeQuery("SELECT * FROM players;", resultSet -> {
+        SQLHelper.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
             ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Players Loader #%d").build());
 
             while (resultSet.next()) {
@@ -196,7 +196,7 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Finished players!");
         SuperiorSkyblockPlugin.log("Starting to load islands...");
 
-        SQLHelper.executeQuery("SELECT * FROM islands;", resultSet -> {
+        SQLHelper.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
             ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Islands Loader #%d").build());
 
             while (resultSet.next()) {
@@ -218,7 +218,7 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Finished islands!");
         SuperiorSkyblockPlugin.log("Starting to load grid...");
 
-        SQLHelper.executeQuery("SELECT * FROM grid;", resultSet -> {
+        SQLHelper.executeQuery("SELECT * FROM {prefix}grid;", resultSet -> {
             if (resultSet.next()) {
                 plugin.getGrid().loadGrid(resultSet);
             }
@@ -227,7 +227,7 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Finished grid!");
         SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
 
-        SQLHelper.executeQuery("SELECT * FROM stackedBlocks;", resultSet -> {
+        SQLHelper.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
             while (resultSet.next()) {
                 plugin.getGrid().loadStackedBlocks(resultSet);
             }
@@ -276,11 +276,11 @@ public final class DataHandler {
     }
 
     private boolean containsIsland(Island island){
-        return SQLHelper.doesConditionExist(String.format("SELECT * FROM islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
+        return SQLHelper.doesConditionExist(String.format("SELECT * FROM {prefix}islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
     }
 
     public void deleteIsland(Island island){
-        Executor.async(() -> SQLHelper.executeUpdate("DELETE FROM islands WHERE owner = '" + island.getOwner().getUniqueId() + "';"));
+        Executor.async(() -> SQLHelper.executeUpdate("DELETE FROM {prefix}islands WHERE owner = '" + island.getOwner().getUniqueId() + "';"));
     }
 
     public void insertPlayer(SuperiorPlayer player){
@@ -292,11 +292,11 @@ public final class DataHandler {
     }
 
     private boolean containsPlayer(SuperiorPlayer player){
-        return SQLHelper.doesConditionExist(String.format("SELECT * FROM players WHERE player = '%s';", player.getUniqueId()));
+        return SQLHelper.doesConditionExist(String.format("SELECT * FROM {prefix}players WHERE player = '%s';", player.getUniqueId()));
     }
 
     private boolean containsGrid(){
-        return SQLHelper.doesConditionExist("SELECT * FROM grid;");
+        return SQLHelper.doesConditionExist("SELECT * FROM {prefix}grid;");
     }
 
     private void addColumnIfNotExists(String column, String table, String def, String type) {
@@ -308,7 +308,7 @@ public final class DataHandler {
                 defaultSection = "";
         }
 
-        String statementStr = "ALTER TABLE " + table + " ADD " + column + " " + type + defaultSection + ";";
+        String statementStr = "ALTER TABLE {prefix}" + table + " ADD " + column + " " + type + defaultSection + ";";
 
         try(PreparedStatement statement = SQLHelper.buildStatement(statementStr)){
             statement.executeUpdate();

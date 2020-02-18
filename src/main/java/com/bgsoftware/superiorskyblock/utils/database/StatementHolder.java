@@ -10,12 +10,15 @@ import java.util.Map;
 
 public final class StatementHolder {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final String query;
     private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
     StatementHolder(Query query){
-        this.query = query.getStatement();
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        this.query = query.getStatement().replace("{prefix}", prefix);
     }
 
     public StatementHolder setString(String value){
