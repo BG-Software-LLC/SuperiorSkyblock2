@@ -62,6 +62,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -1416,7 +1417,15 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public BigDecimalFormatted getIslandLevel() {
         BigDecimalFormatted islandLevel = this.islandLevel.get(), bonusWorth = this.bonusWorth.get();
-        return plugin.getSettings().bonusAffectLevel ? islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth))) : islandLevel;
+
+        if(plugin.getSettings().bonusAffectLevel)
+            islandLevel = islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth)));
+
+        if(plugin.getSettings().roundedIslandLevel) {
+            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+        }
+
+        return islandLevel;
     }
 
     private void saveBlockCounts(){

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 public final class BigDecimalFormatted extends BigDecimal {
 
@@ -27,6 +28,12 @@ public final class BigDecimalFormatted extends BigDecimal {
     @Override
     public BigDecimalFormatted subtract(BigDecimal subtrahend) {
         return BigDecimalFormatted.of(super.subtract(subtrahend));
+    }
+
+
+    @Override
+    public BigDecimalFormatted setScale(int newScale, RoundingMode roundingMode) {
+        return BigDecimalFormatted.of(super.setScale(newScale, roundingMode));
     }
 
     @Override

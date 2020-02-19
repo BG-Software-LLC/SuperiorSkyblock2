@@ -92,6 +92,9 @@ stacked-blocks:
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
 island-level-formula: '{} / 2'
 
+# Should the island levels be a rounded integer?
+rounded-island-level: false
+
 # How should the island top be ordered by default?
 # Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'

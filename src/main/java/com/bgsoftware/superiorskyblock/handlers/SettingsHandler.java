@@ -50,6 +50,7 @@ public final class SettingsHandler {
     public final KeyMap<Integer> stackedBlocksLimits;
     public final boolean stackedBlocksAutoPickup;
     public final String islandLevelFormula;
+    public final boolean roundedIslandLevel;
     public final String islandTopOrder;
     public final ConfigurationSection islandRolesSection;
     public final long calcInterval;
@@ -162,6 +163,7 @@ public final class SettingsHandler {
         });
         stackedBlocksAutoPickup = cfg.getBoolean("stacked-blocks.auto-collect", false);
         islandLevelFormula = cfg.getString("island-level-formula", "{} / 2");
+        roundedIslandLevel = cfg.getBoolean("rounded-island-level", false);
         islandTopOrder = cfg.getString("island-top-order", "WORTH");
         islandRolesSection = cfg.getConfigurationSection("island-roles");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
