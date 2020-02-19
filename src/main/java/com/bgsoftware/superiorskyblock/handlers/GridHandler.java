@@ -117,6 +117,7 @@ public final class GridHandler implements GridManager {
     @Override
     public void deleteIsland(Island island){
         island.getAllPlayersInside().forEach(superiorPlayer -> {
+            superiorPlayer.asPlayer().closeInventory();
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });

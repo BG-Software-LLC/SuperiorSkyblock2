@@ -355,8 +355,10 @@ public final class SIsland extends DatabaseObject implements Island {
             members.remove(superiorPlayer);
             superiorPlayer.setIslandLeader(superiorPlayer);
 
-            if (superiorPlayer.isOnline())
+            if (superiorPlayer.isOnline()) {
+                superiorPlayer.asPlayer().closeInventory();
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            }
 
             MenuMemberManage.destroyMenus(superiorPlayer);
             MenuMemberRole.destroyMenus(superiorPlayer);
