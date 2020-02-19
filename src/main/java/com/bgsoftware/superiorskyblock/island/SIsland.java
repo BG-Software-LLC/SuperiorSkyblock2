@@ -855,7 +855,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         long lastUpdateTime =  getLastTimeUpdate();
 
-        if(lastUpdateTime == -1 || (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600){
+        if(lastUpdateTime != -1 && (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600){
             finishCalcIsland(asker, callback, getIslandLevel(), getWorth());
             return;
         }
