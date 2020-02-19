@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -356,7 +357,7 @@ public final class SIsland extends DatabaseObject implements Island {
             superiorPlayer.setIslandLeader(superiorPlayer);
 
             if (superiorPlayer.isOnline()) {
-                superiorPlayer.asPlayer().closeInventory();
+                SuperiorMenu.killMenu(superiorPlayer);
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
 

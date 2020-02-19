@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -117,7 +118,7 @@ public final class GridHandler implements GridManager {
     @Override
     public void deleteIsland(Island island){
         island.getAllPlayersInside().forEach(superiorPlayer -> {
-            superiorPlayer.asPlayer().closeInventory();
+            SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });

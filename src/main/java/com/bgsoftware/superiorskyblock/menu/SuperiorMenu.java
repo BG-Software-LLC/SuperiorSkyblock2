@@ -218,6 +218,14 @@ public abstract class SuperiorMenu implements InventoryHolder {
         return obj instanceof SuperiorMenu && ((SuperiorMenu) obj).getIdentifier().equals(getIdentifier());
     }
 
+    public static void killMenu(SuperiorPlayer superiorPlayer){
+        InventoryHolder inventoryHolder = superiorPlayer.asPlayer().getOpenInventory().getTopInventory().getHolder();
+        if(inventoryHolder instanceof SuperiorMenu)
+            ((SuperiorMenu) inventoryHolder).previousMove = false;
+
+        superiorPlayer.asPlayer().closeInventory();
+    }
+
     protected static <T extends SuperiorMenu> void refreshMenus(Class<T> menuClazz){
         runActionOnMenus(menuClazz, superiorMenu -> true, ((player, superiorMenu) -> {
             superiorMenu.previousMove = false;
