@@ -2,11 +2,15 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.listeners.events.DragonEggBreakEvent;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import net.minecraft.server.v1_8_R1.BlockPosition;
 import net.minecraft.server.v1_8_R1.Chunk;
+import net.minecraft.server.v1_8_R1.EntityFallingBlock;
+import net.minecraft.server.v1_8_R1.EntityItem;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.EnumParticle;
 import net.minecraft.server.v1_8_R1.EnumWorldBorderAction;
@@ -31,8 +35,10 @@ import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R1.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -209,6 +215,35 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
         itemStacks[5] = entityEquipment.getBoots();
 
         return itemStacks;
+    }
+
+    @Override
+    public void spawnDragonEgg(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        world.addEntity(new CustomEntityFallingBlock(location, Material.DRAGON_EGG));
+    }
+
+    private static class CustomEntityFallingBlock extends EntityFallingBlock {
+
+        public CustomEntityFallingBlock(Location location, Material material){
+            super(((CraftWorld) location.getWorld()).getHandle(), location.getX(), location.getY(), location.getZ(), CraftMagicNumbers.getBlock(material).getBlockData());
+        }
+
+        @Override
+        public EntityItem a(net.minecraft.server.v1_8_R1.ItemStack itemStack, float f) {
+            this.locY += 1;
+
+            DragonEggBreakEvent dragonEggBreakEvent = new DragonEggBreakEvent((FallingBlock) getBukkitEntity());
+            Bukkit.getPluginManager().callEvent(dragonEggBreakEvent);
+
+            if(dragonEggBreakEvent.isCancelled()){
+                world.setTypeAndData(new BlockPosition(locX, locY, locZ), getBlock(), 3);
+                return null;
+            }
+
+            return super.a(itemStack, f);
+        }
+
     }
 
 }

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.listeners.events.DragonEggBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -20,6 +21,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,6 +36,7 @@ import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
@@ -88,6 +91,26 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
             Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
+    }
+
+    private boolean listenToDragonEggs = true;
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEntitySpawn(EntitySpawnEvent e){
+        if(listenToDragonEggs && e.getEntity() instanceof FallingBlock && ((FallingBlock) e.getEntity()).getMaterial().name().contains("DRAGON_EGG")){
+            listenToDragonEggs = false;
+            plugin.getNMSAdapter().spawnDragonEgg(e.getEntity().getLocation());
+            listenToDragonEggs = true;
+            e.getEntity().remove();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDragonEggBreak(DragonEggBreakEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getFallingBlock().getLocation());
+
+        if(island != null)
+            island.handleBlockBreak(Key.of(e.getFallingBlock().getMaterial(), (byte) 0), 1);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.events.DragonEggChangeEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
@@ -29,11 +28,9 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -41,11 +38,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -301,32 +295,6 @@ public final class CustomEventsListener implements Listener {
                     }
                 }
             }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDragonEggChange(PlayerInteractEvent e){
-        if(e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DRAGON_EGG){
-            DragonEggChangeEvent dragonEggChangeEvent = new DragonEggChangeEvent(e.getClickedBlock());
-            Bukkit.getPluginManager().callEvent(dragonEggChangeEvent);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDragonEggChange(BlockPistonExtendEvent e){
-        for(Block block : e.getBlocks()){
-            if(block.getType() == Material.DRAGON_EGG){
-                DragonEggChangeEvent dragonEggChangeEvent = new DragonEggChangeEvent(e.getBlock());
-                Bukkit.getPluginManager().callEvent(dragonEggChangeEvent);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onDragonEggChange(EntityDamageEvent e){
-        if(e.getEntity() instanceof FallingBlock && ((FallingBlock) e.getEntity()).getMaterial() == Material.DRAGON_EGG){
-            DragonEggChangeEvent dragonEggChangeEvent = new DragonEggChangeEvent(e.getEntity().getLocation().getBlock());
-            Bukkit.getPluginManager().callEvent(dragonEggChangeEvent);
         }
     }
 
