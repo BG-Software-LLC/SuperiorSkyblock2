@@ -1,11 +1,13 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
+import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.World;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.lang.reflect.Method;
@@ -17,9 +19,9 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
     static {
         try{
-            Class blockVector3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
-            //noinspection unchecked
+            Class<?> blockVector3Class = Class.forName("com.sk89q.worldedit.math.BlockVector3");
             blockVector3AtMethod = blockVector3Class.getMethod("at", int.class, int.class, int.class);
+            //noinspection JavaReflectionMemberAccess
             blockVector3PasteMethod = com.boydti.fawe.object.schematic.Schematic.class
                     .getMethod("paste", World.class, blockVector3Class, boolean.class, boolean.class, Transform.class);
         }catch(Throwable ignored){ }
@@ -28,7 +30,8 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
     private com.boydti.fawe.object.schematic.Schematic schematic;
 
 
-    public WorldEditSchematic(com.boydti.fawe.object.schematic.Schematic schematic){
+    public WorldEditSchematic(String name, com.boydti.fawe.object.schematic.Schematic schematic){
+        super(name);
         this.schematic = schematic;
     }
 
@@ -57,6 +60,9 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
         }
 
         editSession.addNotifyTask(() -> {
+            IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
+            Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);
+
             callback.run();
 
             schematicProgress = false;

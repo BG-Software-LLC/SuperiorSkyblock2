@@ -10,6 +10,16 @@ public abstract class BaseSchematic implements Schematic {
 
     protected Queue<PasteSchematicData> pasteSchematicQueue = new Queue<>();
     protected static boolean schematicProgress = false;
+    protected final String name;
+
+    protected BaseSchematic(String name){
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
 
     protected static class PasteSchematicData {
 

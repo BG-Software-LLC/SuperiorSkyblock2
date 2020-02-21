@@ -10,8 +10,8 @@ import java.io.IOException;
 
 public final class FAWEHook {
 
-    public static Schematic loadSchematic(File file) throws IOException {
-        return new WorldEditSchematic(FaweAPI.load(file));
+    public static Schematic loadSchematic(String name, File file) throws IOException {
+        return new WorldEditSchematic(name, FaweAPI.load(file));
     }
 
     public static boolean isEnabled(){

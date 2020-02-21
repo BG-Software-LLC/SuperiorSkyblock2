@@ -79,9 +79,10 @@ public final class SchematicsHandler implements SchematicManager {
 
             //noinspection ConstantConditions
             for(File schemFile : schematicsFolder.listFiles()){
-                Schematic schematic = loadFromFile(schemFile);
+                String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
+                Schematic schematic = loadFromFile(schemName, schemFile);
                 if(schematic != null) {
-                    schematics.put(schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(), schematic);
+                    schematics.put(schemName, schematic);
                     SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
                             (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
                 }
@@ -208,7 +209,7 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("pitch", new FloatTag(pitch));
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
-        SuperiorSchematic schematic = new SuperiorSchematic(new CompoundTag(compoundValue));
+        SuperiorSchematic schematic = new SuperiorSchematic(schematicName, new CompoundTag(compoundValue));
         schematics.put(schematicName, schematic);
         saveIntoFile(schematicName, schematic);
 
@@ -224,7 +225,7 @@ public final class SchematicsHandler implements SchematicManager {
         return plugin.getNMSBlocks().getFlowerPot(block.getLocation());
     }
 
-    private Schematic loadFromFile(File file){
+    private Schematic loadFromFile(String schemName, File file){
         Schematic schematic = null;
 
         try {
@@ -239,10 +240,10 @@ public final class SchematicsHandler implements SchematicManager {
                     SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
                 if(compoundTag.getValue().isEmpty()) {
                     if(FAWEHook.isEnabled())
-                        schematic = FAWEHook.loadSchematic(file);
+                        schematic = FAWEHook.loadSchematic(schemName, file);
                 }
                 else {
-                    schematic = new SuperiorSchematic(compoundTag);
+                    schematic = new SuperiorSchematic(schemName, compoundTag);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

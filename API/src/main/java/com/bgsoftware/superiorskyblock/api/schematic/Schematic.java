@@ -6,6 +6,11 @@ import org.bukkit.Location;
 public interface Schematic {
 
     /**
+     * Get the name of the schematic.
+     */
+    String getName();
+
+    /**
      * Paste te schematic in a specific location.
      * @param location The location to paste the schematic at.
      * @param callback A callback runnable that runs when the process finishes

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
@@ -45,7 +46,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     private final SchematicBlock[][][] blocks;
     private final SchematicEntity[] entities;
 
-    public SuperiorSchematic(CompoundTag compoundTag){
+    public SuperiorSchematic(String name, CompoundTag compoundTag){
+        super(name);
         this.compoundTag = compoundTag;
 
         sizes[0] = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
@@ -199,10 +201,12 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 entity.spawnEntity(min);
             }
 
+            IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
+            Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);
+
             callback.run();
 
             Executor.sync(() -> {
-
                 schematicProgress = false;
 
                 if (pasteSchematicQueue.size() != 0) {
