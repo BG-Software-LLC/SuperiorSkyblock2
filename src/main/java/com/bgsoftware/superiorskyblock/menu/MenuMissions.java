@@ -50,8 +50,8 @@ public final class MenuMissions extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
 
-        playerSlot = charSlots.getOrDefault(cfg.getString("player-missions", "@").charAt(0), Collections.singletonList(-1)).get(0);
-        islandSlot = charSlots.getOrDefault(cfg.getString("island-missions", "^").charAt(0), Collections.singletonList(-1)).get(0);
+        playerSlot = charSlots.getOrDefault(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        islandSlot = charSlots.getOrDefault(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

@@ -65,9 +65,9 @@ public final class MenuMemberManage extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
-        rolesSlot = charSlots.getOrDefault(cfg.getString("roles", "%").charAt(0), Collections.singletonList(-1)).get(0);
-        banSlot = charSlots.getOrDefault(cfg.getString("ban", "*").charAt(0), Collections.singletonList(-1)).get(0);
-        kickSlot = charSlots.getOrDefault(cfg.getString("kick", "^").charAt(0), Collections.singletonList(-1)).get(0);
+        rolesSlot = charSlots.getOrDefault(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        banSlot = charSlots.getOrDefault(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        kickSlot = charSlots.getOrDefault(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){

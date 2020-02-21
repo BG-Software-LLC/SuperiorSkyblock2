@@ -77,11 +77,11 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
-        oneStarSlot = charSlots.getOrDefault(cfg.getString("one-star", "@").charAt(0), Collections.singletonList(-1)).get(0);
-        twoStarsSlot = charSlots.getOrDefault(cfg.getString("two-stars", "%").charAt(0), Collections.singletonList(-1)).get(0);
-        threeStarsSlot = charSlots.getOrDefault(cfg.getString("three-stars", "*").charAt(0), Collections.singletonList(-1)).get(0);
-        fourStarsSlot = charSlots.getOrDefault(cfg.getString("four-stars", "^").charAt(0), Collections.singletonList(-1)).get(0);
-        fiveStarsSlot = charSlots.getOrDefault(cfg.getString("five-stars", "&").charAt(0), Collections.singletonList(-1)).get(0);
+        oneStarSlot = charSlots.getOrDefault(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        twoStarsSlot = charSlots.getOrDefault(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        threeStarsSlot = charSlots.getOrDefault(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        fourStarsSlot = charSlots.getOrDefault(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        fiveStarsSlot = charSlots.getOrDefault(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, Island island, SuperiorMenu previousMenu){

@@ -90,7 +90,7 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                 for(String level : upgradeSection.getKeys(false)) {
                     if(NumberUtils.isNumber(level)) {
-                        int slot = charSlots.getOrDefault(upgradeSection.getString("item", "@").charAt(0), Collections.singletonList(-1)).get(0);
+                        int slot = charSlots.getOrDefault(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
 
                         if(slot == -1){
                             SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgradeName + " (level " + level + ") is not inside the pattern, skipping...");

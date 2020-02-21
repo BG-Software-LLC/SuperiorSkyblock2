@@ -72,10 +72,10 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        menuGlobalWarps.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0));
-        menuGlobalWarps.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0));
-        menuGlobalWarps.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0));
-        menuGlobalWarps.setSlots(charSlots.getOrDefault(cfg.getString("warps", "@").charAt(0), Collections.singletonList(-1)));
+        menuGlobalWarps.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setSlots(charSlots.getOrDefault(cfg.getString("warps", " ").charAt(0), Collections.singletonList(-1)));
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

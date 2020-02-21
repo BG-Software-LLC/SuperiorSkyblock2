@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -92,6 +93,8 @@ public final class MenuValues extends SuperiorMenu {
         menuValues.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");
+        int backButton = -1;
+        char backButtonChar = cfg.getString("back", " ").charAt(0);
 
         menuValues.setRowsSize(pattern.size());
 
@@ -102,7 +105,10 @@ public final class MenuValues extends SuperiorMenu {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    if(cfg.contains("items." + ch + ".block")) {
+                    if(backButtonChar == ch){
+                        backButton = slot;
+                    }
+                    else if(cfg.contains("items." + ch + ".block")) {
                         Key key = Key.of(cfg.getString("items." + ch + ".block"));
                         menuValues.addData(slot + "", key);
                         if(plugin.getBlockValues().getBlockWorth(key).doubleValue() == -1)
@@ -117,6 +123,11 @@ public final class MenuValues extends SuperiorMenu {
                 }
             }
         }
+
+        menuValues.setBackButton(backButton);
+
+        if(plugin.getSettings().onlyBackButton && backButton == -1)
+            SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

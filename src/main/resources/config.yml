@@ -455,3 +455,6 @@ crops-to-grow:
 - 'SPRUCE_SAPLING'
 - 'CROPS'
 - 'WHEAT'
+
+# Should only the back button work for closing menus?
+only-back-button: false

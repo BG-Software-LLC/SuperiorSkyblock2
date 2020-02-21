@@ -56,9 +56,9 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
-        membersSlot = charSlots.getOrDefault(cfg.getString("members", "%").charAt(0), Collections.singletonList(-1)).get(0);
-        settingsSlot = charSlots.getOrDefault(cfg.getString("settings", "*").charAt(0), Collections.singletonList(-1)).get(0);
-        visitorsSlot = charSlots.getOrDefault(cfg.getString("visitors", "^").charAt(0), Collections.singletonList(-1)).get(0);
+        membersSlot = charSlots.getOrDefault(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        settingsSlot = charSlots.getOrDefault(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        visitorsSlot = charSlots.getOrDefault(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

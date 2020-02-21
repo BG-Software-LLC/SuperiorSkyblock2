@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemFlag;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +126,12 @@ public final class FileUtils {
                 }
             }
         }
+
+        int backButton = charSlots.getOrDefault(cfg.getString("back", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        menu.setBackButton(backButton);
+
+        if(plugin.getSettings().onlyBackButton && backButton == -1)
+            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Menu doesn't have a back button, it's impossible to close it.");
 
         return charSlots;
     }

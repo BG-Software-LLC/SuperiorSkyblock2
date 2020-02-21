@@ -42,7 +42,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected final SuperiorPlayer superiorPlayer;
 
     protected SuperiorMenu previousMenu;
-    protected boolean previousMove = true;
+    protected boolean previousMove = true, closeButton = false, nextMove = false;
     private boolean refreshing = false;
 
     public SuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
@@ -67,6 +67,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
     public void addFillItem(int slot, ItemBuilder itemBuilder){
         if(itemBuilder != null)
             getData().fillItems.put(slot, itemBuilder);
+    }
+
+    public void setBackButton(int slot){
+        addData("backSlot", slot);
     }
 
     public void resetData(){
@@ -108,7 +112,12 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         Player player = superiorPlayer.asPlayer();
 
-        if(e.getCurrentItem() != null) {
+        if(e.getRawSlot() == getBackSlot()){
+            closeButton = true;
+            e.getWhoClicked().closeInventory();
+        }
+
+        else if(e.getCurrentItem() != null) {
             SoundWrapper sound = getSound(e.getRawSlot());
             if (sound != null)
                 sound.playSound(player);
@@ -141,8 +150,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
             SuperiorMenu currentMenu = null;
             InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
-            if(inventoryHolder instanceof SuperiorMenu)
+            if(inventoryHolder instanceof SuperiorMenu) {
                 currentMenu = (SuperiorMenu) inventoryHolder;
+                currentMenu.nextMove = true;
+            }
 
             if(Arrays.equals( player.getOpenInventory().getTopInventory().getContents(), inventory.getContents()))
                 return;
@@ -156,14 +167,21 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
-        if(previousMenu != null) {
-            Executor.sync(() -> {
-                if(previousMove)
+        Executor.sync(() -> {
+            if(!nextMove && !closeButton && plugin.getSettings().onlyBackButton) {
+                open(previousMenu);
+            }
+
+            else if(previousMenu != null) {
+                if (previousMove)
                     previousMenu.open(previousMenu.previousMenu);
                 else
                     previousMove = true;
-            });
-        }
+            }
+
+            closeButton = false;
+            nextMove = false;
+        });
     }
 
     protected Inventory buildInventory(Function<String, String> titleReplacer){
@@ -211,6 +229,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
 
         return dataMap.get(identifier);
+    }
+
+    private int getBackSlot() {
+        return (Integer) getData("backSlot");
     }
 
     @Override

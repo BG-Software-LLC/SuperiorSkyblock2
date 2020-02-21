@@ -235,13 +235,13 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuTopIslands, "top-islands.yml", cfg);
 
-        worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort", "%").charAt(0), Collections.singletonList(-1)).get(0);
-        levelSortSlot = charSlots.getOrDefault(cfg.getString("level-sort", "*").charAt(0), Collections.singletonList(-1)).get(0);
-        ratingSortSlot = charSlots.getOrDefault(cfg.getString("rating-sort", "^").charAt(0), Collections.singletonList(-1)).get(0);
-        playersSortSlot = charSlots.getOrDefault(cfg.getString("players-sort", "&").charAt(0), Collections.singletonList(-1)).get(0);
-        playerIslandSlot = charSlots.getOrDefault(cfg.getString("player-island", "$").charAt(0), Collections.singletonList(-1)).get(0);
+        worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        levelSortSlot = charSlots.getOrDefault(cfg.getString("level-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        ratingSortSlot = charSlots.getOrDefault(cfg.getString("rating-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        playersSortSlot = charSlots.getOrDefault(cfg.getString("players-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        playerIslandSlot = charSlots.getOrDefault(cfg.getString("player-island", " ").charAt(0), Collections.singletonList(-1)).get(0);
 
-        char slotsChar = cfg.getString("slots", "@").charAt(0);
+        char slotsChar = cfg.getString("slots", " ").charAt(0);
 
         menuTopIslands.addData("island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".island")));
         menuTopIslands.addData("no-island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".no-island")));
@@ -250,9 +250,9 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));
         menuTopIslands.addData("no-island-commands", cfg.getStringList("commands." + slotsChar + ".no-island"));
 
-        menuTopIslands.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0));
-        menuTopIslands.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0));
-        menuTopIslands.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0));
+        menuTopIslands.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuTopIslands.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuTopIslands.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuTopIslands.setSlots(charSlots.getOrDefault(slotsChar, Collections.singletonList(-1)));
     }
 

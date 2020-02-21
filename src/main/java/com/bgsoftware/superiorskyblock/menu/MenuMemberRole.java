@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -77,6 +78,8 @@ public final class MenuMemberRole extends SuperiorMenu {
         List<String> pattern = cfg.getStringList("pattern");
 
         menuMemberRole.setRowsSize(pattern.size());
+        int backButton = -1;
+        char backButtonChar = cfg.getString("back", " ").charAt(0);
 
         roleSlots = new HashMap<>();
 
@@ -87,10 +90,14 @@ public final class MenuMemberRole extends SuperiorMenu {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    if(cfg.contains("items." + ch + ".role"))
+                    if(backButtonChar == ch){
+                        backButton = slot;
+                    }
+                    else if (cfg.contains("items." + ch + ".role")){
                         roleSlots.put(slot, SPlayerRole.of(cfg.getString("items." + ch + ".role")));
+                    }
 
-                    menuMemberRole.addFillItem(slot,  FileUtils.getItemStack("member-role.yml", cfg.getConfigurationSection("items." + ch)));
+                    menuMemberRole.addFillItem(slot, FileUtils.getItemStack("member-role.yml", cfg.getConfigurationSection("items." + ch)));
                     menuMemberRole.addCommands(slot, cfg.getStringList("commands." + ch));
                     menuMemberRole.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
 
@@ -98,6 +105,11 @@ public final class MenuMemberRole extends SuperiorMenu {
                 }
             }
         }
+
+        menuMemberRole.setBackButton(backButton);
+
+        if(plugin.getSettings().onlyBackButton && backButton == -1)
+            SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){

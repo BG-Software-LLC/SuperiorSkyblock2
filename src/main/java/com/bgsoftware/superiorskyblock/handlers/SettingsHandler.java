@@ -108,6 +108,7 @@ public final class SettingsHandler {
     public final boolean valuesMenu;
     public final int chunksPerTick;
     public final List<String> cropsToGrow;
+    public final boolean onlyBackButton;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -245,6 +246,7 @@ public final class SettingsHandler {
         valuesMenu = cfg.getBoolean("values-menu", true);
         chunksPerTick = cfg.getInt("chunks-per-tick", 10);
         cropsToGrow = cfg.getStringList("crops-to-grow");
+        onlyBackButton = cfg.getBoolean("only-back-button", false);
     }
 
     public void updateValue(String path, Object value){

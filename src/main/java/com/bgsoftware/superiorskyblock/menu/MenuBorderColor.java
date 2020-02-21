@@ -65,9 +65,9 @@ public final class MenuBorderColor extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
-        greenColorSlot = charSlots.getOrDefault(cfg.getString("green-color", "@").charAt(0), Collections.singletonList(-1)).get(0);
-        redColorSlot = charSlots.getOrDefault(cfg.getString("red-color", "^").charAt(0), Collections.singletonList(-1)).get(0);
-        blueColorSlot = charSlots.getOrDefault(cfg.getString("blue-color", "$").charAt(0), Collections.singletonList(-1)).get(0);
+        greenColorSlot = charSlots.getOrDefault(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        redColorSlot = charSlots.getOrDefault(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        blueColorSlot = charSlots.getOrDefault(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

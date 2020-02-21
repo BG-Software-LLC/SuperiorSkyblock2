@@ -98,7 +98,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerMissions, "player-missions.yml", cfg);
 
-        char slotsChar = cfg.getString("slots", "@").charAt(0);
+        char slotsChar = cfg.getString("slots", " ").charAt(0);
 
         if(cfg.contains("sounds." + slotsChar + ".completed"))
             menuPlayerMissions.addData("sound-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".completed")));
@@ -107,9 +107,9 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuPlayerMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuPlayerMissions.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuPlayerMissions.setSlots(charSlots.getOrDefault(slotsChar, Collections.singletonList(-1)));
     }
 

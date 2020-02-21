@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -122,6 +124,8 @@ public final class MenuBiomes extends SuperiorMenu {
         List<String> pattern = cfg.getStringList("pattern");
 
         menuBiomes.setRowsSize(pattern.size());
+        int backButton = -1;
+        char backButtonChar = cfg.getString("back", " ").charAt(0);
 
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
@@ -130,7 +134,10 @@ public final class MenuBiomes extends SuperiorMenu {
             for(int i = 0; i < patternLine.length(); i++){
                 char ch = patternLine.charAt(i);
                 if(ch != ' '){
-                    if(cfg.contains("items." + ch + ".biome")){
+                    if(backButtonChar == ch){
+                        backButton = slot;
+                    }
+                    else if(cfg.contains("items." + ch + ".biome")){
                         ConfigurationSection itemSection = cfg.getConfigurationSection("items." + ch);
                         ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + ch);
                         ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + ch);
@@ -153,7 +160,7 @@ public final class MenuBiomes extends SuperiorMenu {
                     }
 
                     else{
-                        menuBiomes.addFillItem(slot,  FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
+                        menuBiomes.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
                         menuBiomes.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuBiomes.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
                     }
@@ -162,6 +169,11 @@ public final class MenuBiomes extends SuperiorMenu {
                 }
             }
         }
+
+        menuBiomes.setBackButton(backButton);
+
+        if(plugin.getSettings().onlyBackButton && backButton == -1)
+            SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

@@ -71,8 +71,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
         Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
-        confirmSlot = charSlots.getOrDefault(cfg.getString("confirm", "@").charAt(0), Collections.singletonList(-1)).get(0);
-        cancelSlot = charSlots.getOrDefault(cfg.getString("cancel", "^").charAt(0), Collections.singletonList(-1)).get(0);
+        confirmSlot = charSlots.getOrDefault(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        cancelSlot = charSlots.getOrDefault(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1)).get(0);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
