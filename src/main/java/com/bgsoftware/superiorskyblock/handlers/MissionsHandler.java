@@ -54,15 +54,15 @@ public final class MissionsHandler implements MissionsManager {
         File missionsDict = new File(plugin.getDataFolder(), "missions");
         File file = new File(plugin.getDataFolder(), "missions/missions.yml");
 
-        if(!missionsDict.exists()){
+        if(!missionsDict.exists())
             missionsDict.mkdirs();
-            plugin.saveResource("missions/BlocksMissions.jar", true);
-            plugin.saveResource("missions/CraftingMissions.jar", true);
-            plugin.saveResource("missions/EnchantingMissions.jar", true);
-            plugin.saveResource("missions/IslandMissions.jar", true);
-            plugin.saveResource("missions/ItemsMissions.jar", true);
-            plugin.saveResource("missions/KillsMissions.jar", true);
-        }
+
+        FileUtils.copyResource("missions/BlocksMissions.jar");
+        FileUtils.copyResource("missions/CraftingMissions.jar");
+        FileUtils.copyResource("missions/EnchantingMissions.jar");
+        FileUtils.copyResource("missions/IslandMissions.jar");
+        FileUtils.copyResource("missions/ItemsMissions.jar");
+        FileUtils.copyResource("missions/KillsMissions.jar");
 
         if(!file.exists())
             FileUtils.saveResource("missions/missions.yml");

@@ -140,6 +140,16 @@ public final class FileUtils {
                 Double.parseDouble(sections[3]), Float.parseFloat(sections[4]), Float.parseFloat(sections[5]));
     }
 
+    public static void copyResource(String resourcePath){
+        File file = new File(plugin.getDataFolder(), resourcePath);
+
+        if(file.exists())
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
+
+        plugin.saveResource(resourcePath, true);
+    }
+
     public static void saveResource(String resourcePath){
         saveResource(resourcePath, resourcePath);
     }
