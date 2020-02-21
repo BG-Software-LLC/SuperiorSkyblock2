@@ -122,11 +122,11 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeGenerator(SyncedObject<Map<String, Integer>> cobbleGenerator){
-        return cobbleGenerator.run((Function<Map<String, Integer>, String>) IslandSerializer::serializeGenerator);
+    public static String serializeGenerator(SyncedObject<KeyMap<Integer>> cobbleGenerator){
+        return cobbleGenerator.run((Function<KeyMap<Integer>, String>) IslandSerializer::serializeGenerator);
     }
 
-    public static String serializeGenerator(Map<String, Integer> cobbleGenerator){
+    public static String serializeGenerator(KeyMap<Integer> cobbleGenerator){
         StringBuilder missionsBuilder = new StringBuilder();
         cobbleGenerator.forEach((key, value) ->
                 missionsBuilder.append(",").append(key).append("=").append(value));

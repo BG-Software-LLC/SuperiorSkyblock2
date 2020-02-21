@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
+import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 
 public interface SuperiorSkyblock {
 
@@ -50,5 +51,10 @@ public interface SuperiorSkyblock {
      * Get the providers manager of the core.
      */
     ProvidersManager getProviders();
+
+    /**
+     * Get the upgrades manager of the core.
+     */
+    UpgradesManager getUpgrades();
 
 }

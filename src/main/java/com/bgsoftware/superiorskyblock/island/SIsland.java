@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -78,7 +80,7 @@ import java.util.stream.Collectors;
 public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
-    private static final int NO_BLOCK_LIMIT = -1;
+    public static final int NO_BLOCK_LIMIT = -1;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -105,8 +107,8 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<Object, SPermissionNode>> permissionNodes = SyncedObject.of(new HashMap<>());
-    private final SyncedObject<Map<String, Integer>> cobbleGeneratorValues = SyncedObject.of(new HashMap<>());
-    private final SyncedObject<String[]> cobbleGeneratorArray = SyncedObject.of(new String[0]);
+    private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
+    private final SyncedObject<Key[]> cobbleGeneratorArray = SyncedObject.of(new Key[0]);
     private final SyncedObject<Set<IslandSettings>> islandSettings = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<String, Integer>> upgrades = SyncedObject.of(new HashMap<>());
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
@@ -164,9 +166,9 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
 
 
-        String[] cobbleGeneratorArray = new String[getGeneratorTotalAmount()];
+        Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
         int index = 0;
-        for(Map.Entry<String, Integer> entry : cobbleGeneratorValues.get().entrySet()){
+        for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.get().entrySet()){
             for(int i = 0; i < entry.getValue(); i++)
                 cobbleGeneratorArray[index++] = entry.getKey();
         }
@@ -994,7 +996,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getIslandSize() {
-        return islandSize.get();
+        int islandSize = this.islandSize.get();
+        return upgrades.run(upgrades -> {
+            int maxIslandSize = islandSize;
+
+            for(String upgrade : upgrades.keySet())
+                maxIslandSize = Math.max(islandSize, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBorderSize());
+
+            return maxIslandSize;
+        });
     }
 
     @Override
@@ -1445,16 +1455,28 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
+    @Deprecated
     public int getUpgradeLevel(String upgradeName){
-        return upgrades.run(upgrades -> {
-            return upgrades.getOrDefault(upgradeName, 1);
-        });
+        return getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName)).getLevel();
     }
 
     @Override
+    public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
+        return upgrade.getUpgradeLevel(upgrades.run(upgrades -> {
+            return upgrades.getOrDefault(upgrade.getName(), 1);
+        }));
+    }
+
+    @Override
+    @Deprecated
     public void setUpgradeLevel(String upgradeName, int level){
+        setUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName), level);
+    }
+
+    @Override
+    public void setUpgradeLevel(Upgrade upgrade, int level) {
         upgrades.run(upgrades -> {
-            upgrades.put(upgradeName, Math.min(plugin.getUpgrades().getMaxUpgradeLevel(upgradeName), level));
+            upgrades.put(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
             Query.ISLAND_SET_UPGRADES.getStatementHolder()
                     .setString(IslandSerializer.serializeUpgrades(upgrades))
                     .setString(owner.getUniqueId().toString())
@@ -1466,7 +1488,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public double getCropGrowthMultiplier() {
-        return cropGrowth.get();
+        double cropGrowth = this.cropGrowth.get();
+        return upgrades.run(upgrades -> {
+           double maxCropGrowth = cropGrowth;
+
+           for(String upgrade : upgrades.keySet())
+               maxCropGrowth = Math.max(maxCropGrowth, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getCropGrowth());
+
+           return maxCropGrowth;
+        });
     }
 
     @Override
@@ -1480,7 +1510,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public double getSpawnerRatesMultiplier() {
-        return spawnerRates.get();
+        double spawnerRates = this.spawnerRates.get();
+        return upgrades.run(upgrades -> {
+            double maxSpawnerRates = spawnerRates;
+
+            for(String upgrade : upgrades.keySet())
+                maxSpawnerRates = Math.max(maxSpawnerRates, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getSpawnerRates());
+
+            return maxSpawnerRates;
+        });
     }
 
     @Override
@@ -1494,7 +1532,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public double getMobDropsMultiplier() {
-        return mobDrops.get();
+        double mobDrops = this.mobDrops.get();
+        return upgrades.run(upgrades -> {
+            double maxMobDrops = mobDrops;
+
+            for(String upgrade : upgrades.keySet())
+                maxMobDrops = Math.max(maxMobDrops, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getMobDrops());
+
+            return maxMobDrops;
+        });
     }
 
     @Override
@@ -1508,15 +1554,31 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return blockLimits.run(blockLimits -> {
+        int blockLimit = blockLimits.run(blockLimits -> {
             return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
+        });
+        return upgrades.run(upgrades -> {
+            int maxBlockLimit = blockLimit;
+
+            for(String upgrade : upgrades.keySet())
+                maxBlockLimit = Math.max(maxBlockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBlockLimit(key));
+
+            return maxBlockLimit;
         });
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return blockLimits.run(blockLimits -> {
+        int blockLimit = blockLimits.run(blockLimits -> {
             return blockLimits.getRaw(key, NO_BLOCK_LIMIT);
+        });
+        return upgrades.run(upgrades -> {
+            int maxBlockLimit = blockLimit;
+
+            for(String upgrade : upgrades.keySet())
+                maxBlockLimit = Math.max(maxBlockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getExactBlockLimit(key));
+
+            return maxBlockLimit;
         });
     }
 
@@ -1562,7 +1624,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getTeamLimit() {
-        return teamLimit.get();
+        int teamLimit = this.teamLimit.get();
+        return upgrades.run(upgrades -> {
+            int maxTeamLimit = teamLimit;
+
+            for(String upgrade : upgrades.keySet())
+                maxTeamLimit = Math.max(maxTeamLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getTeamLimit());
+
+            return maxTeamLimit;
+        });
     }
 
     @Override
@@ -1576,7 +1646,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getWarpsLimit() {
-        return warpsLimit.get();
+        int warpsLimit = this.warpsLimit.get();
+        return upgrades.run(upgrades -> {
+            int maxWarpsLimit = warpsLimit;
+
+            for(String upgrade : upgrades.keySet())
+                maxWarpsLimit = Math.max(maxWarpsLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getWarpsLimit());
+
+            return maxWarpsLimit;
+        });
     }
 
     @Override
@@ -1932,7 +2010,7 @@ public final class SIsland extends DatabaseObject implements Island {
             setGeneratorAmount(key, 0);
         }
         else if(percentage == 100){
-            cobbleGeneratorValues.run((Consumer<Map<String, Integer>>) Map::clear);
+            cobbleGeneratorValues.run((Consumer<KeyMap<Integer>>) Map::clear);
             setGeneratorAmount(key, 1);
         }
         else {
@@ -1966,7 +2044,7 @@ public final class SIsland extends DatabaseObject implements Island {
     public Map<String, Integer> getGeneratorPercentages() {
         Map<String, Integer> generatorPercentages = new HashMap<>();
         cobbleGeneratorValues.run(cobbleGenerator -> {
-            cobbleGenerator.keySet().forEach(key -> generatorPercentages.put(key, getGeneratorPercentage(Key.of(key))));
+            cobbleGenerator.keySet().forEach(key -> generatorPercentages.put(key.toString(), getGeneratorPercentage(key)));
         });
         return generatorPercentages;
     }
@@ -1975,13 +2053,13 @@ public final class SIsland extends DatabaseObject implements Island {
     public void setGeneratorAmount(Key key, int amount) {
         cobbleGeneratorValues.run(cobbleGenerator -> {
             if(amount <= 0)
-                cobbleGenerator.remove(key.toString());
+                cobbleGenerator.remove(key);
             else
-                cobbleGenerator.put(key.toString(), amount);
+                cobbleGenerator.put(key, amount);
 
-            String[] cobbleGeneratorArray = new String[getGeneratorTotalAmount()];
+            Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
             int index = 0;
-            for(Map.Entry<String, Integer> entry : cobbleGenerator.entrySet()){
+            for(Map.Entry<Key, Integer> entry : cobbleGenerator.entrySet()){
                 for(int i = 0; i < entry.getValue(); i++)
                     cobbleGeneratorArray[index++] = entry.getKey();
             }
@@ -1996,8 +2074,16 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getGeneratorAmount(Key key) {
-        return cobbleGeneratorValues.run(cobbleGenerator -> {
-            return cobbleGenerator.getOrDefault(key.toString(), 0);
+        int generatorAmount = cobbleGeneratorValues.run(cobbleGenerator -> {
+            return cobbleGenerator.getOrDefault(key, 0);
+        });
+        return upgrades.run(upgrades -> {
+            int maxGeneratorAmount = generatorAmount;
+
+            for(String upgrade : upgrades.keySet())
+                maxGeneratorAmount = Math.max(maxGeneratorAmount, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getGeneratorAmount(key));
+
+            return maxGeneratorAmount;
         });
     }
 
@@ -2014,13 +2100,26 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        return cobbleGeneratorValues.run((Function<Map<String, Integer>, HashMap<String, Integer>>) HashMap::new);
+        return cobbleGeneratorValues.run(cobbleGeneratorValues -> {
+            Map<String, Integer> cobbleGenerator = new HashMap<>();
+
+            for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.entrySet()){
+                cobbleGenerator.put(entry.getKey().toString(), entry.getValue());
+            }
+
+            return cobbleGenerator;
+        });
     }
 
     @Override
     public String[] getGeneratorArray() {
         return this.cobbleGeneratorArray.run(cobbleGenerator -> {
-            return Arrays.copyOf(cobbleGenerator, cobbleGenerator.length);
+            String[] newCobbleGenerator = new String[cobbleGenerator.length];
+
+            for(int i = 0; i < cobbleGenerator.length; i++)
+                newCobbleGenerator[i] = cobbleGenerator[i].toString();
+
+            return newCobbleGenerator;
         });
     }
 

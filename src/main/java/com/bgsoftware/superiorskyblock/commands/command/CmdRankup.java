@@ -5,9 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -76,9 +79,11 @@ public final class CmdRankup implements ICommand {
             return;
         }
 
-        int level = island.getUpgradeLevel(upgradeName);
 
-        String permission = plugin.getUpgrades().getUpgradePermission(upgradeName, level + 1);
+        Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
+        UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade), nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
+
+        String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
 
         if(!permission.isEmpty() && !superiorPlayer.hasPermission(permission)){
             Locale.NO_UPGRADE_PERMISSION.send(superiorPlayer);
@@ -87,10 +92,7 @@ public final class CmdRankup implements ICommand {
 
         boolean hasNextLevel;
 
-        List<String> commands = plugin.getUpgrades().getUpgradeCommands(upgradeName, level);
-
-        IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands,
-                plugin.getUpgrades().getUpgradePrice(upgradeName, level));
+        IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
         Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
 
         double nextUpgradePrice = islandUpgradeEvent.getAmountToWithdraw();
@@ -108,14 +110,16 @@ public final class CmdRankup implements ICommand {
             if (nextUpgradePrice > 0)
                 EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
 
-            for (String command : commands) {
+            for (String command : islandUpgradeEvent.getCommands()) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName()));
             }
 
             hasNextLevel = true;
         }
 
-        SoundWrapper sound = plugin.getUpgrades().getClickSound(upgradeName, level, hasNextLevel);
+        SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
+        SoundWrapper sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
+
         if(sound != null)
             sound.playSound(superiorPlayer.asPlayer());
     }
@@ -128,9 +132,9 @@ public final class CmdRankup implements ICommand {
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.RANKUP)){
             List<String> list = new ArrayList<>();
 
-            for(String upgrade : plugin.getUpgrades().getAllUpgrades()){
-                if(upgrade.toLowerCase().startsWith(args[1].toLowerCase()))
-                    list.add(upgrade.toLowerCase());
+            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
+                if(upgrade.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    list.add(upgrade.getName().toLowerCase());
             }
 
             return list;
@@ -142,8 +146,8 @@ public final class CmdRankup implements ICommand {
     private String getUpgradesString(SuperiorSkyblockPlugin plugin){
         StringBuilder stringBuilder = new StringBuilder();
 
-        for(String upgrade : plugin.getUpgrades().getAllUpgrades())
-            stringBuilder.append(", ").append(upgrade);
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            stringBuilder.append(", ").append(upgrade.getName());
 
         return stringBuilder.toString().substring(2);
     }

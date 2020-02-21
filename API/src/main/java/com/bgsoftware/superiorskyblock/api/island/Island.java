@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -662,15 +664,34 @@ public interface Island extends Comparable<Island> {
     /**
      * Get the level of an upgrade for the island.
      * @param upgradeName The upgrade's name to check.
+     *
+     * @deprecated see getUpgradeLevel(Upgrade)
      */
+    @Deprecated
     int getUpgradeLevel(String upgradeName);
+
+    /**
+     * Get the level of an upgrade for the island.
+     * @param upgrade The upgrade to check.
+     */
+    UpgradeLevel getUpgradeLevel(Upgrade upgrade);
 
     /**
      * Set the level of an upgrade for the island.
      * @param upgradeName The upgrade's name to set the level.
      * @param level The level to set.
+     *
+     * @deprecated See setUpgradeLevel(Upgrade, Integer)
      */
+    @Deprecated
     void setUpgradeLevel(String upgradeName, int level);
+
+    /**
+     * Set the level of an upgrade for the island.
+     * @param upgrade The upgrade to set the level.
+     * @param level The level to set.
+     */
+    void setUpgradeLevel(Upgrade upgrade, int level);
 
     /**
      * Get the crop-growth multiplier for the island.

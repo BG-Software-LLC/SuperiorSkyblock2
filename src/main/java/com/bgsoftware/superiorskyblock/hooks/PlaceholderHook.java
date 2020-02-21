@@ -100,7 +100,7 @@ public abstract class PlaceholderHook {
 
                 else if ((matcher = Pattern.compile("island_upgrade_(.+)").matcher(placeholder)).matches()) {
                     String upgradeName = matcher.group(1);
-                    return String.valueOf(island.getUpgradeLevel(upgradeName));
+                    return String.valueOf(island.getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName)).getLevel());
                 }
 
                 else if ((matcher = Pattern.compile("island_count_(.+)").matcher(placeholder)).matches()) {

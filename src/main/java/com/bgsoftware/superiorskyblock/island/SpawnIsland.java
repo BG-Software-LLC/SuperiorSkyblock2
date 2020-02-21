@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -623,7 +625,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
+        return upgrade.getUpgradeLevel(1);
+    }
+
+    @Override
     public void setUpgradeLevel(String upgradeName, int level) {
+
+    }
+
+    @Override
+    public void setUpgradeLevel(Upgrade upgrade, int level) {
 
     }
 

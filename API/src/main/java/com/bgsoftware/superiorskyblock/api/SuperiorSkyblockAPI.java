@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
+import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -185,6 +186,13 @@ public final class SuperiorSkyblockAPI {
      */
     public static MissionsManager getMissions(){
         return plugin.getMissions();
+    }
+
+    /**
+     * Get the upgrades manager of the core.
+     */
+    public static UpgradesManager getUpgrades(){
+        return plugin.getUpgrades();
     }
 
     /**

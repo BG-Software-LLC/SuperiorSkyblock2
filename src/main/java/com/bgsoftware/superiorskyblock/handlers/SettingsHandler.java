@@ -90,7 +90,7 @@ public final class SettingsHandler {
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
-    public final Map<String, Integer> defaultGenerator;
+    public final KeyMap<Integer> defaultGenerator;
     public final Map<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
     public final boolean skipOneItemMenus;
@@ -205,7 +205,7 @@ public final class SettingsHandler {
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
-        defaultGenerator = new HashMap<>();
+        defaultGenerator = new KeyMap<>();
         for(String line : cfg.getStringList("default-generator")){
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];

@@ -68,7 +68,7 @@ public final class IslandDeserializer {
             for(String entry : upgrades.split(",")) {
                 try {
                     String[] sections = entry.split("=");
-                    upgradesMap.put(sections[0], Integer.valueOf(sections[1]));
+                    upgradesMap.put(sections[0], Integer.parseInt(sections[1]));
                 }catch(Exception ignored){}
             }
         });
@@ -146,7 +146,7 @@ public final class IslandDeserializer {
         });
     }
 
-    public static void deserializeGenerators(String generator, SyncedObject<Map<String, Integer> > cobbleGeneratorSync){
+    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<Integer>> cobbleGeneratorSync){
         cobbleGeneratorSync.run(cobbleGenerator -> {
             for(String limit : generator.split(",")){
                 try {

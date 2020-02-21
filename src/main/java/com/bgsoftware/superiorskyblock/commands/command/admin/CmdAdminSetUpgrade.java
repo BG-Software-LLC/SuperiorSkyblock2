@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -87,14 +88,17 @@ public final class CmdAdminSetUpgrade implements ICommand {
             return;
         }
 
-        int maxLevel = plugin.getUpgrades().getMaxUpgradeLevel(upgradeName);
+        Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
+
+        int maxLevel = upgrade.getMaxUpgradeLevel();
 
         if(level > maxLevel){
             Locale.MAXIMUM_LEVEL.send(sender, maxLevel);
             return;
         }
 
-        island.setUpgradeLevel(upgradeName, level);
+
+        island.setUpgradeLevel(upgrade, level);
 
         if(targetPlayer == null)
             Locale.SET_UPGRADE_LEVEL_NAME.send(sender, upgradeName, island.getName());
@@ -122,8 +126,9 @@ public final class CmdAdminSetUpgrade implements ICommand {
         }
 
         else if(args.length == 4){
-            list.addAll(plugin.getUpgrades().getAllUpgrades().stream()
-                    .filter(upgrade -> upgrade.toLowerCase().startsWith(args[3].toLowerCase()))
+            list.addAll(plugin.getUpgrades().getUpgrades().stream()
+                    .filter(upgrade -> upgrade.getName().toLowerCase().startsWith(args[3].toLowerCase()))
+                    .map(Upgrade::getName)
                     .collect(Collectors.toList()));
         }
 
@@ -133,8 +138,8 @@ public final class CmdAdminSetUpgrade implements ICommand {
     private String getUpgradesString(SuperiorSkyblockPlugin plugin){
         StringBuilder stringBuilder = new StringBuilder();
 
-        for(String upgrade : plugin.getUpgrades().getAllUpgrades())
-            stringBuilder.append(", ").append(upgrade);
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            stringBuilder.append(", ").append(upgrade.getName());
 
         return stringBuilder.toString().substring(2);
     }

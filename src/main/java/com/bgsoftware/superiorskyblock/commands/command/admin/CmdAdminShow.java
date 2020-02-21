@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -117,8 +118,8 @@ public final class CmdAdminShow implements ICommand {
 
         if(!Locale.ISLAND_INFO_ADMIN_UPGRADES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.isEmpty(locale)){
             StringBuilder upgradesString = new StringBuilder();
-            for(String upgrade : plugin.getUpgrades().getAllUpgrades()){
-                upgradesString.append(Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(locale, upgrade, island.getUpgradeLevel(upgrade))).append("\n");
+            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
+                upgradesString.append(Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(locale, upgrade.getName(), island.getUpgradeLevel(upgrade).getLevel())).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_UPGRADES.getMessage(locale, upgradesString));
         }

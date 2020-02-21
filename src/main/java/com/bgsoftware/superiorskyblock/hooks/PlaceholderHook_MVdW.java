@@ -6,6 +6,7 @@ import be.maximvdw.placeholderapi.PlaceholderReplacer;
 import be.maximvdw.placeholderapi.events.PlaceholderAddedEvent;
 import be.maximvdw.placeholderapi.internal.PlaceholderPack;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.Field;
@@ -20,9 +21,9 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             registerPlaceholder("superior_island_location_permission_" + islandPermission.name());
         }
 
-        for(String upgrade : plugin.getUpgrades().getAllUpgrades()) {
-            registerPlaceholder("superior_island_upgrade_" + upgrade);
-            registerPlaceholder("superior_island_location_upgrade_" + upgrade);
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
+            registerPlaceholder("superior_island_upgrade_" + upgrade.getName());
+            registerPlaceholder("superior_island_location_upgrade_" + upgrade.getName());
         }
 
         registerPlaceholder("superior_panel_toggle");

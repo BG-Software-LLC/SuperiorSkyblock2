@@ -2,98 +2,49 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class UpgradesHandler {
+public final class UpgradesHandler implements UpgradesManager {
 
     private SuperiorSkyblockPlugin plugin;
-    private Map<String, UpgradeData> upgrades = new HashMap<>();
+    private Map<String, SUpgrade> upgrades = new HashMap<>();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         loadUpgrades();
     }
 
-    public Map<String, UpgradeData> getUpgrades() {
-        return upgrades;
+    @Override
+    public SUpgrade getUpgrade(String upgradeName){
+        return upgrades.get(upgradeName);
     }
 
-    public double getUpgradePrice(String upgradeName, int level){
-        if(isUpgrade(upgradeName)){
-            UpgradeData upgradeData = upgrades.get(upgradeName);
-
-            level = Math.min(level, getMaxUpgradeLevel(upgradeName));
-
-           return upgradeData.prices.get(level);
-        }
-
-        return 1;
+    @Override
+    public SUpgrade getUpgrade(int slot){
+        return upgrades.values().stream().filter(upgrade -> upgrade.getMenuSlot() == slot).findFirst().orElse(null);
     }
 
-    public String getUpgrade(int slot){
-        for(String _upgradeName : upgrades.keySet()) {
-            for (ItemData itemData : upgrades.get(_upgradeName).items.values()) {
-                if (slot == itemData.slot){
-                    return _upgradeName;
-                }
-            }
-        }
-
-        return "";
-    }
-
-    public List<String> getUpgradeCommands(String upgradeName, int level){
-        if(isUpgrade(upgradeName)){
-            return upgrades.get(upgradeName).commands.getOrDefault(level, new ArrayList<>());
-        }
-
-        return new ArrayList<>();
-    }
-
-    public String getUpgradePermission(String upgradeName, int level){
-        return isUpgrade(upgradeName) ? upgrades.get(upgradeName).permissions.getOrDefault(level, "") : "";
-    }
-
-    public int getMaxUpgradeLevel(String upgradeName){
-        if(!isUpgrade(upgradeName))
-            return -1;
-
-        UpgradeData upgradeData = upgrades.get(upgradeName);
-        int maxLevel = 0;
-
-        while (upgradeData.prices.containsKey(maxLevel + 1) && upgradeData.commands.containsKey(maxLevel + 1))
-            maxLevel++;
-
-        return maxLevel;
-    }
-
+    @Override
     public boolean isUpgrade(String upgradeName){
         return upgrades.containsKey(upgradeName.toLowerCase());
     }
 
-    public List<String> getAllUpgrades(){
-        return new ArrayList<>(upgrades.keySet());
-    }
-
-    public SoundWrapper getClickSound(String upgradeName, int level, boolean hasNextLevel){
-        UpgradeData upgradeData = upgrades.get(upgradeName);
-        SoundWrapper sound = null;
-
-        if(upgradeData.items.containsKey(level)){
-            ItemData itemData = upgradeData.items.get(level);
-            sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
-        }
-
-        return sound;
+    @Override
+    public Collection<Upgrade> getUpgrades() {
+        return Collections.unmodifiableCollection(upgrades.values());
     }
 
     private void loadUpgrades(){
@@ -107,45 +58,34 @@ public final class UpgradesHandler {
         ConfigurationSection upgrades = cfg.getConfigurationSection("upgrades");
 
         for(String upgradeName : upgrades.getKeys(false)){
-            UpgradeData upgradeData = new UpgradeData();
+            SUpgrade upgrade = new SUpgrade(upgradeName);
             for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
+                ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);
                 int level = Integer.parseInt(_level);
-                upgradeData.prices.put(level, upgrades.getDouble(upgradeName + "." + level + ".price"));
-                upgradeData.commands.put(level, upgrades.getStringList(upgradeName + "." + level + ".commands"));
-                upgradeData.permissions.put(level, upgrades.getString(upgradeName + "." + level + ".permission", ""));
+                double price = levelSection.getDouble("price");
+                List<String> commands = levelSection.getStringList("commands");
+                String permission = levelSection.getString("permission", "");
+                double cropGrowth = levelSection.getDouble("crops-growth", -1D);
+                double spawnerRates = levelSection.getDouble("spawner-rates", -1D);
+                double mobDrops = levelSection.getDouble("mob-drops", -1D);
+                int teamLimit = levelSection.getInt("team-limit", -1);
+                int warpsLimit = levelSection.getInt("warps-limit", -1);
+                int borderSize = levelSection.getInt("border-size", -1);
+                KeyMap<Integer> blockLimits = new KeyMap<>();
+                if(levelSection.contains("block-limits")){
+                    for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
+                        blockLimits.put(block, levelSection.getInt("block-limits." + block));
+                }
+                KeyMap<Integer> generatorRates = new KeyMap<>();
+                if(levelSection.contains("generator-rates")){
+                    for(String block : levelSection.getConfigurationSection("generator-rates").getKeys(false))
+                        generatorRates.put(block, levelSection.getInt("generator-rates." + block));
+                }
+                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, cropGrowth,
+                        spawnerRates, mobDrops, teamLimit, warpsLimit, borderSize, blockLimits, generatorRates));
             }
-            this.upgrades.put(upgradeName, upgradeData);
+            this.upgrades.put(upgradeName, upgrade);
         }
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public static class UpgradeData{
-
-        public Map<Integer, Double> prices = new HashMap<>();
-        public Map<Integer, List<String>> commands = new HashMap<>();
-        public Map<Integer, String> permissions = new HashMap<>();
-        public Map<Integer, ItemData> items = new HashMap<>();
-
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public static class ItemData{
-
-        public ItemBuilder hasNextLevel, noNextLevel;
-        public int slot;
-        public SoundWrapper hasNextLevelSound, noNextLevelSound;
-        public List<String> hasNextLevelCommands, noNextLevelCommands;
-
-        public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, int slot, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
-            this.hasNextLevel = hasNextLevel;
-            this.noNextLevel = noNextLevel;
-            this.slot = slot;
-            this.hasNextLevelSound = hasNextLevelSound;
-            this.noNextLevelSound = noNextLevelSound;
-            this.hasNextLevelCommands = hasNextLevelCommands;
-            this.noNextLevelCommands = noNextLevelCommands;
-        }
-
     }
 
 }

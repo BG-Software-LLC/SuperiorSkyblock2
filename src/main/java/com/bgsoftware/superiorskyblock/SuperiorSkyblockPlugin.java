@@ -283,6 +283,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return providersHandler;
     }
 
+    @Override
     public UpgradesHandler getUpgrades() {
         return upgradesHandler;
     }

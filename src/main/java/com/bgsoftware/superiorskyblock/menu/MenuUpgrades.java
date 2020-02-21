@@ -2,10 +2,13 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -33,10 +36,10 @@ public final class MenuUpgrades extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
-        String upgradeName = plugin.getUpgrades().getUpgrade(e.getRawSlot());
+        Upgrade upgrade = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
-        if(!upgradeName.isEmpty()){
-            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "rankup " + upgradeName);
+        if(upgrade != null){
+            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "rankup " + upgrade.getName());
             previousMove = false;
             open(previousMenu);
         }
@@ -46,17 +49,16 @@ public final class MenuUpgrades extends SuperiorMenu {
     protected Inventory buildInventory(Function<String, String> titleReplacer) {
         Inventory inv = super.buildInventory(titleReplacer);
 
-        Map<String, UpgradesHandler.UpgradeData> upgrades = plugin.getUpgrades().getUpgrades();
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
+            UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-        for(String upgrade : upgrades.keySet()){
-            int level = island.getUpgradeLevel(upgrade);
-            double nextLevelPrice = plugin.getUpgrades().getUpgradePrice(upgrade, level);
-            UpgradesHandler.UpgradeData upgradeData = upgrades.get(upgrade);
-            if(upgradeData.items.containsKey(level)) {
-                UpgradesHandler.ItemData itemData = upgradeData.items.get(level);
+            if(upgradeLevel != null){
+                double nextLevelPrice = upgradeLevel.getPrice();
+                SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
 
-                inv.setItem(itemData.slot, (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
+                inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
                         itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
+
             }
         }
 
@@ -85,27 +87,31 @@ public final class MenuUpgrades extends SuperiorMenu {
                 if(!plugin.getUpgrades().isUpgrade(upgradeName))
                     continue;
 
-                UpgradesHandler.UpgradeData upgradeData = plugin.getUpgrades().getUpgrades().get(upgradeName);
+                SUpgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
                 ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgradeName);
+
+                int slot = charSlots.getOrDefault(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
+                upgrade.setMenuSlot(slot);
 
                 for(String level : upgradeSection.getKeys(false)) {
                     if(NumberUtils.isNumber(level)) {
-                        int slot = charSlots.getOrDefault(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
-
                         if(slot == -1){
                             SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgradeName + " (level " + level + ") is not inside the pattern, skipping...");
                             continue;
                         }
 
-                        upgradeData.items.put(Integer.parseInt(level), new UpgradesHandler.ItemData(
-                                FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level")),
-                                FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level")),
-                                slot,
-                                FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound")),
-                                FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound")),
-                                upgradeSection.getStringList(level + ".has-next-level.commands"),
-                                upgradeSection.getStringList(level + ".no-next-level.commands"))
-                        );
+                        SUpgradeLevel upgradeLevel = upgrade.getUpgradeLevel(Integer.parseInt(level));
+
+                        if(upgradeLevel != null) {
+                            upgradeLevel.setItemData(
+                                    FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level")),
+                                    FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level")),
+                                    FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound")),
+                                    FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound")),
+                                    upgradeSection.getStringList(level + ".has-next-level.commands"),
+                                    upgradeSection.getStringList(level + ".no-next-level.commands")
+                            );
+                        }
                     }
                 }
             }
