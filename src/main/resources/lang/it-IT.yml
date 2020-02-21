@@ -109,7 +109,7 @@ COMMAND_ARGUMENT_RATING: valutazione
 COMMAND_ARGUMENT_SCHEMATIC_NAME: nome-schematica
 COMMAND_ARGUMENT_SETTINGS: impostazioni
 COMMAND_ARGUMENT_SIZE: dimensione
-COMMAND_ARGUMENT_TIME: 'time'
+COMMAND_ARGUMENT_TIME: tempo
 COMMAND_ARGUMENT_UPGRADE_NAME: nome-aggiornamento
 COMMAND_ARGUMENT_VALUE: valore
 COMMAND_ARGUMENT_WARP_NAME: nome-warp
@@ -144,7 +144,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Invia a tutti i membri dell'isola un messaggi
 COMMAND_DESCRIPTION_ADMIN_NAME: Cambia il nome di un'isola.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Apri un'isola al pubblico.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promuovi un membro nell'isola di un altro giocatore.
-COMMAND_DESCRIPTION_ADMIN_PURGE: 'Purge islands.'
+COMMAND_DESCRIPTION_ADMIN_PURGE: Elimina le isole.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del
   plugin.
@@ -469,7 +469,7 @@ NO_EXPEL_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per espellere i gioc
   dalla tua isola.'
 NO_INVITE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per invitare i giocatori.'
 NO_ISLAND_INVITE: '&c&lErrore | &7Impossibile trovare inviti da quest''isola.'
-NO_ISLANDS_TO_PURGE: '&c&lError | &7There were no islands to purge.'
+NO_ISLANDS_TO_PURGE: '&c&lErrore | &7Non ci sono isole da eliminare.'
 NO_KICK_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per cacciare i giocatori.'
 NO_MORE_DISBANDS: '&c&lErrore | &7Non puoi più sciogliere altre isole.'
 NO_MORE_WARPS: '&c&lErrore | &7La tua isola non può avere più warp.'
@@ -533,10 +533,10 @@ PLAYER_QUIT_ANNOUNCEMENT: '&e&lIsola | &7{0} è uscito dal server.'
 PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi promuovere solo giocatori con
   un ruolo inferiore al tuo.'
 PROMOTED_MEMBER: '&e&lIsola | &7Hai promosso {0} a {1} nella sua isola.'
-PURGE_CLEAR: '&e&lIsland | &7Successfully cleared all the queued islands to be purged.'
+PURGE_CLEAR: '&e&lIsola | &7Eliminate con successo tutte le isole in coda da eliminare.'
 PURGED_ISLANDS: |-
-  &e&lIsland | &7{0} islands will be purged when server restarts.
-  &e&lIsland | &7You can cancel it anytime using /is admin purge cancel.
+  &e&lIsola | &7{0} isole verranno eliminate al riavvio del server.
+  &e&lIsola | &7Puoi annullarlo in qualsiasi momento utilizzando /is admin purge cancel.
 RATE_ANNOUNCEMENT: '&e&lIsola | &7{0} ha valutato la tua isola {1} stelle su 5!'
 RATE_CHANGE_OTHER: '&e&lIsola | &7You changed the rating of {0} to {1}.'
 RATE_OWN_ISLAND: '&c&lErrore | &7You can''t rate your own island.'
