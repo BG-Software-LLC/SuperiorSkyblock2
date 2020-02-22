@@ -28,7 +28,7 @@ public final class SQLHelper {
                         password = plugin.getSettings().databaseMySQLPassword;
                 int port = plugin.getSettings().databaseMySQLPort;
 
-                String sqlURL = "jdbc:mysql://" + address + ":" + port + "/" + dbName;
+                String sqlURL = "jdbc:mysql://" + address + ":" + port + "/" + dbName + "?autoReconnect=true";
                 conn = DriverManager.getConnection(sqlURL, userName, password);
                 SuperiorSkyblockPlugin.log("Successfully established connection with MySQL database!");
             } else {
