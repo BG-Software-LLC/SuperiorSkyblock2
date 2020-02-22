@@ -112,12 +112,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         Player player = superiorPlayer.asPlayer();
 
-        if(e.getRawSlot() == getBackSlot()){
-            closeButton = true;
-            e.getWhoClicked().closeInventory();
-        }
-
-        else if(e.getCurrentItem() != null) {
+        if(e.getCurrentItem() != null) {
             SoundWrapper sound = getSound(e.getRawSlot());
             if (sound != null)
                 sound.playSound(player);
@@ -127,6 +122,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
                 commands.forEach(command ->
                         Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
                                 command.replace("PLAYER:", "").replace("%player%", player.getName())));
+        }
+
+        if(e.getRawSlot() == getBackSlot()){
+            closeButton = true;
+            e.getWhoClicked().closeInventory();
         }
 
         onPlayerClick(e);
