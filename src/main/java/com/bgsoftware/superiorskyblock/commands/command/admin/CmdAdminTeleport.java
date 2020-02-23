@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands.command.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ICommand;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -31,7 +30,7 @@ public final class CmdAdminTeleport implements ICommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "teleport <" +
+        return "admin teleport <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
@@ -43,12 +42,12 @@ public final class CmdAdminTeleport implements ICommand {
 
     @Override
     public int getMinArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -59,13 +58,13 @@ public final class CmdAdminTeleport implements ICommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
 
-        Island targetIsland = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
+        Island targetIsland = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(targetIsland == null){
             if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
             else
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
@@ -78,18 +77,16 @@ public final class CmdAdminTeleport implements ICommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         List<String> list = new ArrayList<>();
 
-        if(args.length == 2){
+        if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island island = onlinePlayer.getIsland();
-                if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
-                        (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)) ) {
-                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                if (island != null) {
+                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[2].toLowerCase()))
                         list.add(island.getName());
                 }
             }
