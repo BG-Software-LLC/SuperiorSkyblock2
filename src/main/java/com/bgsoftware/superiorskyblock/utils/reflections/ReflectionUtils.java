@@ -20,6 +20,7 @@ public final class ReflectionUtils {
 
     static {
         Class<?> chunkClass = getClass("net.minecraft.server.VERSION.Chunk"),
+                chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
 
@@ -38,6 +39,11 @@ public final class ReflectionUtils {
             fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
             fieldsMap.put(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
         }
+
+        try{
+            fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue"));
+        }catch (Exception ignored){}
+
     }
 
     public static Class<?> getClass(String classPath){

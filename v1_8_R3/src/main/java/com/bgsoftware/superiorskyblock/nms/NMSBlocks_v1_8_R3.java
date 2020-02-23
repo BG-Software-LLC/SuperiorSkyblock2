@@ -4,10 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
 import gnu.trove.iterator.TLongShortIterator;
 import gnu.trove.map.hash.TLongShortHashMap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockLeaves;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -40,6 +42,7 @@ import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_8_R3.util.LongHash;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -302,7 +305,20 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
             int chunkX = World.keyToX(chunkCoord);
             int chunkZ = World.keyToZ(chunkCoord);
 
-            if (!worldServer.chunkProviderServer.isChunkLoaded(chunkX, chunkZ) || worldServer.chunkProviderServer.unloadQueue.contains(chunkX, chunkZ))
+            if (!worldServer.chunkProviderServer.isChunkLoaded(chunkX, chunkZ))
+                continue;
+
+            boolean unloadQueueContains;
+
+            try{
+                unloadQueueContains = worldServer.chunkProviderServer.unloadQueue.contains(chunkX, chunkZ);
+            }catch(Throwable ex){
+                LongSet unloadQueue = (LongSet) Fields.CHUNK_PROVIDER_UNLOAD_QUEUE.get(worldServer.chunkProviderServer);
+                assert unloadQueue != null;
+                unloadQueueContains = unloadQueue.contains(LongHash.toLong(chunkX, chunkZ));
+            }
+
+            if(unloadQueueContains)
                 continue;
 
             Chunk chunk = worldServer.getChunkAt(chunkX, chunkZ);
