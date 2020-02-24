@@ -55,10 +55,10 @@ public final class MenuUpgrades extends SuperiorMenu {
             if(upgradeLevel != null){
                 double nextLevelPrice = upgradeLevel.getPrice();
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
-
-                inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
-                        itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
-
+                if(itemData != null) {
+                    inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
+                            itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
+                }
             }
         }
 
@@ -83,24 +83,25 @@ public final class MenuUpgrades extends SuperiorMenu {
 
         if(cfg.contains("upgrades")){
             ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
-            for(String upgradeName : upgradesSection.getKeys(false)){
-                if(!plugin.getUpgrades().isUpgrade(upgradeName))
-                    continue;
+            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
+                ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgrade.getName());
 
-                SUpgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
-                ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgradeName);
+                if(upgradeSection == null){
+                    SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " doesn't have an item in the menu.");
+                    continue;
+                }
 
                 int slot = charSlots.getOrDefault(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
-                upgrade.setMenuSlot(slot);
+                ((SUpgrade) upgrade).setMenuSlot(slot);
 
                 for(String level : upgradeSection.getKeys(false)) {
                     if(NumberUtils.isNumber(level)) {
                         if(slot == -1){
-                            SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgradeName + " (level " + level + ") is not inside the pattern, skipping...");
+                            SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgrade.getName() + " (level " + level + ") is not inside the pattern, skipping...");
                             continue;
                         }
 
-                        SUpgradeLevel upgradeLevel = upgrade.getUpgradeLevel(Integer.parseInt(level));
+                        SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(Integer.parseInt(level));
 
                         if(upgradeLevel != null) {
                             upgradeLevel.setItemData(
