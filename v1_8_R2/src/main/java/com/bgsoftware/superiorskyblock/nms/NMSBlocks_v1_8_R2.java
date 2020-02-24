@@ -286,19 +286,18 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
     public int tickWorld(org.bukkit.World world, int random) {
         WorldServer worldServer = ((CraftWorld) world).getHandle();
         int globalRandomTickSpeed = worldServer.getGameRules().c("randomTickSpeed");
-        TLongShortIterator activeChunks;
+        List<Long> activeChunks = new ArrayList<>();
         List<Pair<BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
 
         try{
-            activeChunks = ((TLongShortHashMap) chunkTickListField.get(worldServer)).iterator();
-        }catch(Exception ex){
-            return random;
-        }
+            TLongShortIterator iter = ((TLongShortHashMap) chunkTickListField.get(worldServer)).iterator();
+            while(iter.hasNext()){
+                iter.advance();
+                activeChunks.add(iter.key());
+            }
+        }catch(Exception ignored){}
 
-        while (activeChunks.hasNext()){
-            activeChunks.advance();
-            long chunkCoord = activeChunks.key();
-
+        for(long chunkCoord : activeChunks){
             int chunkX = World.keyToX(chunkCoord);
             int chunkZ = World.keyToZ(chunkCoord);
 
