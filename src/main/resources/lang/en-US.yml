@@ -38,6 +38,7 @@ CHANGED_CROP_GROWTH_NAME: '&e&lUpgrades | &7Successfully updated the crop growth
 CHANGED_DISCORD: '&e&lIsland | &7Successfully changed island discord to {0}.'
 CHANGED_ISLAND_SIZE: '&e&lUpgrades | &7Successfully updated the island size of {0}''s island.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lUpgrades | &7Successfully updated the island size of {0}.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
 CHANGED_LANGUAGE: '&e&lLanguage | &7Successfully changed your language to English.'
 CHANGED_MOB_DROPS: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of {0}''s island.'
 CHANGED_MOB_DROPS_ALL: '&e&lUpgrades | &7Successfully updated the mob drops multiplier of all the islands.'

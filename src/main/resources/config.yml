@@ -458,3 +458,8 @@ crops-to-grow:
 
 # Should only the back button work for closing menus?
 only-back-button: false
+
+# Should players be able to build outside their islands?
+# All islands will have the size of the max-island-size * 1.5, which means islands will be connected to each other.
+# It's recommended to have a low max island size when this feature is enabled!
+build-outside-island: false

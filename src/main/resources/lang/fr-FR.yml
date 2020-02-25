@@ -38,6 +38,7 @@ CHANGED_CROP_GROWTH_NAME: '&e&lAméliorations | &7Vous avez changé le multiplic
 CHANGED_DISCORD: '&e&lIle | &7Vous avez changé le Discord de l''île sur {0}.'
 CHANGED_ISLAND_SIZE: '&e&lAméliorations | &7Vous avez changé la taille de l''île de {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAméliorations | &7Vous avez changé la taille des îles {0}.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
 CHANGED_LANGUAGE: '&e&lLangage | &7Langue définie sur: Français.'
 CHANGED_MOB_DROPS: '&e&lAméliorations | &7Vous avez changé le multiplicateur de drops des mobs de l''île de {0}.'
 CHANGED_MOB_DROPS_ALL: '&e&lAméliorations | &7Vous avez changé le multiplicateur de drops des mobs de toutes les îles.'

@@ -109,6 +109,7 @@ public final class SettingsHandler {
     public final int chunksPerTick;
     public final List<String> cropsToGrow;
     public final boolean onlyBackButton;
+    public final boolean buildOutsideIsland;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -247,6 +248,7 @@ public final class SettingsHandler {
         chunksPerTick = cfg.getInt("chunks-per-tick", 10);
         cropsToGrow = cfg.getStringList("crops-to-grow");
         onlyBackButton = cfg.getBoolean("only-back-button", false);
+        buildOutsideIsland = cfg.getBoolean("build-outside-island", false);
     }
 
     public void updateValue(String path, Object value){

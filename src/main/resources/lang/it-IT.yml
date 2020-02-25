@@ -54,6 +54,7 @@ CHANGED_ISLAND_SIZE: '&e&lAggiornamenti | &7Aggiornata correttamente la dimensio
   dell''isola di {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAggiornamenti | &7Aggiornato con successo la dimensione
   dell''isola di {0}.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
 CHANGED_LANGUAGE: '&e&lLanguage | &7Lingua cambiata in Italiano.'
 CHANGED_MOB_DROPS: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore
   dei drops dei mob nell''isola di {0}.'

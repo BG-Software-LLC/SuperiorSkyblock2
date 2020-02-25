@@ -549,25 +549,25 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getMinimum(){
-        int islandDistance = plugin.getSettings().maxIslandSize;
+        int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
         return getCenter(World.Environment.NORMAL).subtract(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMinimumProtected() {
-        int islandSize = this.islandSize.get();
+        int islandSize = getIslandSize();
         return getCenter(World.Environment.NORMAL).subtract(islandSize, 0, islandSize);
     }
 
     @Override
     public Location getMaximum(){
-        int islandDistance = plugin.getSettings().maxIslandSize;
+        int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
         return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMaximumProtected() {
-        int islandSize = this.islandSize.get();
+        int islandSize = getIslandSize();
         return getCenter(World.Environment.NORMAL).add(islandSize, 0, islandSize);
     }
 
@@ -996,6 +996,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getIslandSize() {
+        if(plugin.getSettings().buildOutsideIsland)
+            return (int) Math.round(plugin.getSettings().maxIslandSize * 1.5);
+
         int islandSize = this.islandSize.get();
         return upgrades.run(upgrades -> {
             int maxIslandSize = islandSize;

@@ -85,6 +85,9 @@ public final class CmdAdminSetSize implements ICommand {
         else
             Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
 
+        if(plugin.getSettings().buildOutsideIsland)
+            Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
+
         island.updateBorder();
     }
 

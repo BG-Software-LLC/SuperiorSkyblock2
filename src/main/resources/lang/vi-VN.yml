@@ -52,6 +52,7 @@ CHANGED_DISCORD: '&e&lĐảo Thần | &7Thay đổi thành công discord của �
 CHANGED_ISLAND_SIZE: '&e&lNâng cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo của
   {0}.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
 CHANGED_LANGUAGE: '&e&lNgôn Ngữ | &7Thành công thay đổi ngôn ngữ của bạn thành tiếng
   Anh.'
 CHANGED_MOB_DROPS: '&e&lNâng cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật của
