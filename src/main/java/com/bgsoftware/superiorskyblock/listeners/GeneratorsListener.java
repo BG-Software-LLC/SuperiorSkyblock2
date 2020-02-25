@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -57,6 +58,8 @@ public final class GeneratorsListener implements Listener {
 
         if(typeSections[0].contains("COBBLESTONE"))
             return;
+
+        e.setCancelled(true);
 
         block.setType(Material.valueOf(typeSections[0]));
 
