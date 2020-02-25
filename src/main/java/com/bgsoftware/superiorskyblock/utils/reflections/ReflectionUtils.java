@@ -40,9 +40,12 @@ public final class ReflectionUtils {
             fieldsMap.put(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
         }
 
-        try{
-            fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue"));
-        }catch (Exception ignored){}
+        if(ServerVersion.isEquals(ServerVersion.v1_8)) {
+            try {
+                fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue"));
+            } catch (Exception ignored) {
+            }
+        }
 
     }
 
