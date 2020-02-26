@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdValue implements ICommand {
+public final class CmdValue implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

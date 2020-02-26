@@ -1,5 +1,7 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.command.*;
@@ -16,20 +18,20 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class CommandsHandler extends BukkitCommand {
-
-    private static CommandsHandler instance;
+public final class CommandsHandler extends BukkitCommand implements CommandsManager {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    private final Map<String, ICommand> subCommands = new LinkedHashMap<>();
-    private final Map<String, ICommand> aliasesToCommand = new HashMap<>();
+    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
+    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final CmdAdmin adminCommand;
 
     private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
@@ -42,62 +44,61 @@ public final class CommandsHandler extends BukkitCommand {
             super.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
         }
 
-        instance = this;
         this.plugin = plugin;
 
-        register(new CmdAccept());
-        register(new CmdAdmin());
-        register(new CmdBan());
-        register(new CmdBiome());
-        register(new CmdBorder());
-        register(new CmdClose());
-        register(new CmdCoop());
-        register(new CmdCreate());
-        register(new CmdDelWarp());
-        register(new CmdDemote());
-        register(new CmdDeposit());
-        register(new CmdDisband());
-        register(new CmdExpel());
-        register(new CmdFly());
-        register(new CmdHelp());
-        register(new CmdInvite());
-        register(new CmdKick());
-        register(new CmdLang());
-        register(new CmdLeave());
-        register(new CmdMembers());
-        register(new CmdMission());
-        register(new CmdMissions());
-        register(new CmdName());
-        register(new CmdOpen());
-        register(new CmdPanel());
-        register(new CmdPardon());
-        register(new CmdPermissions());
-        register(new CmdPromote());
-        register(new CmdRankup());
-        register(new CmdRate());
-        register(new CmdRatings());
-        register(new CmdRecalc());
-        register(new CmdSetDiscord());
-        register(new CmdSetPaypal());
-        register(new CmdSetRole());
-        register(new CmdSetTeleport());
-        register(new CmdSettings());
-        register(new CmdSetWarp());
-        register(new CmdShow());
-        register(new CmdTeam());
-        register(new CmdTeamChat());
-        register(new CmdTeleport());
-        register(new CmdToggle());
-        register(new CmdTop());
-        register(new CmdTransfer());
-        register(new CmdUncoop());
-        register(new CmdUpgrade());
-        register(new CmdValue());
-        register(new CmdVisit());
-        register(new CmdVisitors());
-        register(new CmdWarp());
-        register(new CmdWarps());
-        register(new CmdWithdraw());
+        registerCommand(new CmdAccept());
+        registerCommand((adminCommand = new CmdAdmin(this)));
+        registerCommand(new CmdBan());
+        registerCommand(new CmdBiome());
+        registerCommand(new CmdBorder());
+        registerCommand(new CmdClose());
+        registerCommand(new CmdCoop());
+        registerCommand(new CmdCreate());
+        registerCommand(new CmdDelWarp());
+        registerCommand(new CmdDemote());
+        registerCommand(new CmdDeposit());
+        registerCommand(new CmdDisband());
+        registerCommand(new CmdExpel());
+        registerCommand(new CmdFly());
+        registerCommand(new CmdHelp());
+        registerCommand(new CmdInvite());
+        registerCommand(new CmdKick());
+        registerCommand(new CmdLang());
+        registerCommand(new CmdLeave());
+        registerCommand(new CmdMembers());
+        registerCommand(new CmdMission());
+        registerCommand(new CmdMissions());
+        registerCommand(new CmdName());
+        registerCommand(new CmdOpen());
+        registerCommand(new CmdPanel());
+        registerCommand(new CmdPardon());
+        registerCommand(new CmdPermissions());
+        registerCommand(new CmdPromote());
+        registerCommand(new CmdRankup());
+        registerCommand(new CmdRate());
+        registerCommand(new CmdRatings());
+        registerCommand(new CmdRecalc());
+        registerCommand(new CmdSetDiscord());
+        registerCommand(new CmdSetPaypal());
+        registerCommand(new CmdSetRole());
+        registerCommand(new CmdSetTeleport());
+        registerCommand(new CmdSettings());
+        registerCommand(new CmdSetWarp());
+        registerCommand(new CmdShow());
+        registerCommand(new CmdTeam());
+        registerCommand(new CmdTeamChat());
+        registerCommand(new CmdTeleport());
+        registerCommand(new CmdToggle());
+        registerCommand(new CmdTop());
+        registerCommand(new CmdTransfer());
+        registerCommand(new CmdUncoop());
+        registerCommand(new CmdUpgrade());
+        registerCommand(new CmdValue());
+        registerCommand(new CmdVisit());
+        registerCommand(new CmdVisitors());
+        registerCommand(new CmdWarp());
+        registerCommand(new CmdWarps());
+        registerCommand(new CmdWithdraw());
     }
 
     @Override
@@ -105,7 +106,7 @@ public final class CommandsHandler extends BukkitCommand {
         java.util.Locale locale = LocaleUtils.getLocale(sender);
 
         if(args.length > 0){
-            ICommand command = getCommand(args[0]);
+            SuperiorCommand command = getCommand(args[0]);
             if(command != null){
                 if(!(sender instanceof Player) && !command.canBeExecutedByConsole()){
                     Locale.sendMessage(sender, "&cCan be executed only by players!");
@@ -182,7 +183,7 @@ public final class CommandsHandler extends BukkitCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String label, String[] args) {
         if(args.length > 0){
-            ICommand command = getCommand(args[0]);
+            SuperiorCommand command = getCommand(args[0]);
             if(command != null){
                 return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
                         new ArrayList<>() : command.tabComplete(plugin, sender, args);
@@ -191,7 +192,7 @@ public final class CommandsHandler extends BukkitCommand {
 
         List<String> list = new ArrayList<>();
 
-        for(ICommand subCommand : getSubCommands()) {
+        for(SuperiorCommand subCommand : getSubCommands()) {
             if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                 for (String aliases : subCommand.getAliases()) {
                     if (aliases.startsWith(args[0].toLowerCase())) {
@@ -205,25 +206,33 @@ public final class CommandsHandler extends BukkitCommand {
         return list;
     }
 
-    private void register(ICommand cmd){
-        List<String> aliases = cmd.getAliases();
-        subCommands.put(aliases.get(0).toLowerCase(), cmd);
+    @Override
+    public void registerCommand(SuperiorCommand superiorCommand) {
+        List<String> aliases = superiorCommand.getAliases();
+        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
         for(int i = 1; i < aliases.size(); i++){
-            aliasesToCommand.put(aliases.get(i).toLowerCase(), cmd);
+            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
         }
     }
 
-    private ICommand getCommand(String label){
+    @Override
+    public void registerAdminCommand(SuperiorCommand superiorCommand) {
+        adminCommand.registerCommand(superiorCommand);
+    }
+
+    @Override
+    public List<SuperiorCommand> getSubCommands() {
+        return Collections.unmodifiableList(new ArrayList<>(subCommands.values()));
+    }
+
+    @Override
+    public List<SuperiorCommand> getAdminSubCommands() {
+        return adminCommand.getSubCommands();
+    }
+
+    private SuperiorCommand getCommand(String label){
         label = label.toLowerCase();
         return subCommands.getOrDefault(label, aliasesToCommand.get(label));
-    }
-
-    public static List<ICommand> getSubCommands(){
-        return new ArrayList<>(instance.subCommands.values());
-    }
-
-    public static String getCommandLabel(){
-        return instance.getLabel();
     }
 
 

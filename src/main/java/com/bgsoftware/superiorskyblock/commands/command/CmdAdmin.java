@@ -1,65 +1,71 @@
 package com.bgsoftware.superiorskyblock.commands.command;
 
-import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.command.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class CmdAdmin implements ICommand {
+public final class CmdAdmin implements ISuperiorCommand {
 
-    private List<ICommand> subCommands = new ArrayList<>();
+    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
+    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final CommandsHandler commandsHandler;
 
-    public CmdAdmin(){
-        subCommands.add(new CmdAdminBonus());
-        subCommands.add(new CmdAdminBypass());
-        subCommands.add(new CmdAdminClose());
-        subCommands.add(new CmdAdminDemote());
-        subCommands.add(new CmdAdminDeposit());
-        subCommands.add(new CmdAdminDisband());
-        subCommands.add(new CmdAdminGiveDisbands());
-        subCommands.add(new CmdAdminIgnore());
-        subCommands.add(new CmdAdminJoin());
-        subCommands.add(new CmdAdminMission());
-        subCommands.add(new CmdAdminMsg());
-        subCommands.add(new CmdAdminMsgAll());
-        subCommands.add(new CmdAdminName());
-        subCommands.add(new CmdAdminOpen());
-        subCommands.add(new CmdAdminPromote());
-        subCommands.add(new CmdAdminPurge());
-        subCommands.add(new CmdAdminRecalc());
-        subCommands.add(new CmdAdminReload());
-        subCommands.add(new CmdAdminRemoveRatings());
-        subCommands.add(new CmdAdminSchematic());
-        subCommands.add(new CmdAdminSetBlockLimit());
-        subCommands.add(new CmdAdminSetCropGrowth());
-        subCommands.add(new CmdAdminSetLeader());
-        subCommands.add(new CmdAdminSetMobDrops());
-        subCommands.add(new CmdAdminSetPermission());
-        subCommands.add(new CmdAdminSetDisbands());
-        subCommands.add(new CmdAdminSetGenerator());
-        subCommands.add(new CmdAdminSetRate());
-        subCommands.add(new CmdAdminSetSettings());
-        subCommands.add(new CmdAdminSetSize());
-        subCommands.add(new CmdAdminSetSpawnerRates());
-        subCommands.add(new CmdAdminSetTeamLimit());
-        subCommands.add(new CmdAdminSetUpgrade());
-        subCommands.add(new CmdAdminSetWarpsLimit());
-        subCommands.add(new CmdAdminShow());
-        subCommands.add(new CmdAdminSpy());
-        subCommands.add(new CmdAdminTeleport());
-        subCommands.add(new CmdAdminUnignore());
-        subCommands.add(new CmdAdminUnlockWorld());
-        subCommands.add(new CmdAdminWithdraw());
+    public CmdAdmin(CommandsHandler commandsHandler){
+        this.commandsHandler = commandsHandler;
+        registerCommand(new CmdAdminBonus());
+        registerCommand(new CmdAdminBypass());
+        registerCommand(new CmdAdminClose());
+        registerCommand(new CmdAdminDemote());
+        registerCommand(new CmdAdminDeposit());
+        registerCommand(new CmdAdminDisband());
+        registerCommand(new CmdAdminGiveDisbands());
+        registerCommand(new CmdAdminIgnore());
+        registerCommand(new CmdAdminJoin());
+        registerCommand(new CmdAdminMission());
+        registerCommand(new CmdAdminMsg());
+        registerCommand(new CmdAdminMsgAll());
+        registerCommand(new CmdAdminName());
+        registerCommand(new CmdAdminOpen());
+        registerCommand(new CmdAdminPromote());
+        registerCommand(new CmdAdminPurge());
+        registerCommand(new CmdAdminRecalc());
+        registerCommand(new CmdAdminReload());
+        registerCommand(new CmdAdminRemoveRatings());
+        registerCommand(new CmdAdminSchematic());
+        registerCommand(new CmdAdminSetBlockLimit());
+        registerCommand(new CmdAdminSetCropGrowth());
+        registerCommand(new CmdAdminSetLeader());
+        registerCommand(new CmdAdminSetMobDrops());
+        registerCommand(new CmdAdminSetPermission());
+        registerCommand(new CmdAdminSetDisbands());
+        registerCommand(new CmdAdminSetGenerator());
+        registerCommand(new CmdAdminSetRate());
+        registerCommand(new CmdAdminSetSettings());
+        registerCommand(new CmdAdminSetSize());
+        registerCommand(new CmdAdminSetSpawnerRates());
+        registerCommand(new CmdAdminSetTeamLimit());
+        registerCommand(new CmdAdminSetUpgrade());
+        registerCommand(new CmdAdminSetWarpsLimit());
+        registerCommand(new CmdAdminShow());
+        registerCommand(new CmdAdminSpy());
+        registerCommand(new CmdAdminTeleport());
+        registerCommand(new CmdAdminUnignore());
+        registerCommand(new CmdAdminUnlockWorld());
+        registerCommand(new CmdAdminWithdraw());
     }
 
     @Override
@@ -102,27 +108,25 @@ public final class CmdAdmin implements ICommand {
         java.util.Locale locale = LocaleUtils.getLocale(sender);
 
         if(args.length > 1 && !isNumber(args[1])){
-            for(ICommand subCommand : subCommands){
-                if(subCommand.getAliases().contains(args[1].toLowerCase())){
-                    if(!(sender instanceof Player) && !subCommand.canBeExecutedByConsole()){
-                        Locale.sendMessage(sender, "&cCan be executed only by players!");
-                        return;
-                    }
-
-                    if(!subCommand.getPermission().isEmpty() && !sender.hasPermission(subCommand.getPermission())) {
-                        Locale.NO_COMMAND_PERMISSION.send(sender, locale);
-                        return;
-                    }
-
-                    if(args.length < subCommand.getMinArgs() || args.length > subCommand.getMaxArgs()){
-                        Locale.COMMAND_USAGE.send(sender, locale, CommandsHandler.getCommandLabel() + " " + subCommand.getUsage(locale));
-                        return;
-                    }
-
-                    subCommand.execute(plugin, sender, args);
-                    subCommand.tabComplete(plugin, sender, args);
+            SuperiorCommand command = getCommand(args[1]);
+            if(command != null){
+                if(!(sender instanceof Player) && !command.canBeExecutedByConsole()){
+                    Locale.sendMessage(sender, "&cCan be executed only by players!");
                     return;
                 }
+
+                if(!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                    Locale.NO_COMMAND_PERMISSION.send(sender, locale);
+                    return;
+                }
+
+                if(args.length < command.getMinArgs() || args.length > command.getMaxArgs()){
+                    Locale.COMMAND_USAGE.send(sender, locale, commandsHandler.getLabel() + " " + command.getUsage(locale));
+                    return;
+                }
+
+                command.execute(plugin, sender, args);
+                return;
             }
         }
 
@@ -139,7 +143,7 @@ public final class CmdAdmin implements ICommand {
             return;
         }
 
-        List<ICommand> subCommands = this.subCommands.stream()
+        List<SuperiorCommand> subCommands = this.subCommands.values().stream()
                 .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
                 .collect(Collectors.toList());
 
@@ -160,12 +164,12 @@ public final class CmdAdmin implements ICommand {
 
         Locale.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
 
-        for(ICommand _subCommand : subCommands) {
+        for(SuperiorCommand _subCommand : subCommands) {
             if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
                 String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ADMIN_HELP_LINE.send(sender, locale, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(locale), description);
+                Locale.ADMIN_HELP_LINE.send(sender, locale, commandsHandler.getLabel() + " " + _subCommand.getUsage(locale), description);
             }
         }
 
@@ -180,30 +184,15 @@ public final class CmdAdmin implements ICommand {
         List<String> list = new ArrayList<>();
 
         if(args.length > 1){
-            for(ICommand subCommand : subCommands) {
-                if (subCommand.getAliases().contains(args[1].toLowerCase())){
-                    if(subCommand.getPermission() != null && !sender.hasPermission(subCommand.getPermission())){
-                        return new ArrayList<>();
-                    }
-
-                    list = subCommand.tabComplete(plugin, sender, args);
-
-                    if(list == null) {
-                        list = new ArrayList<>();
-                        if (args.length == 3) {
-                            for (Player player : Bukkit.getOnlinePlayers()) {
-                                list.add(player.getName());
-                            }
-                        }
-                    }
-
-                    return list;
-                }
+            SuperiorCommand command = getCommand(args[1]);
+            if(command != null){
+                return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
+                        new ArrayList<>() : command.tabComplete(plugin, sender, args);
             }
         }
 
         if(args.length != 1) {
-            for (ICommand subCommand : subCommands) {
+            for (SuperiorCommand subCommand : subCommands.values()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                     for (String aliases : subCommand.getAliases()) {
                         if (aliases.startsWith(args[1].toLowerCase())) {
@@ -218,6 +207,18 @@ public final class CmdAdmin implements ICommand {
         return list;
     }
 
+    public void registerCommand(SuperiorCommand superiorCommand) {
+        List<String> aliases = superiorCommand.getAliases();
+        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
+        for(int i = 1; i < aliases.size(); i++){
+            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+        }
+    }
+
+    public List<SuperiorCommand> getSubCommands() {
+        return Collections.unmodifiableList(new ArrayList<>(subCommands.values()));
+    }
+
     private boolean isNumber(String str){
         try{
             Integer.valueOf(str);
@@ -225,6 +226,11 @@ public final class CmdAdmin implements ICommand {
         }catch(NumberFormatException ex){
             return false;
         }
+    }
+
+    private SuperiorCommand getCommand(String label){
+        label = label.toLowerCase();
+        return subCommands.getOrDefault(label, aliasesToCommand.get(label));
     }
 
 }

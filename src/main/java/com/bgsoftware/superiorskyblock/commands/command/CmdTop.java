@@ -5,14 +5,14 @@ import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdTop implements ICommand {
+public final class CmdTop implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

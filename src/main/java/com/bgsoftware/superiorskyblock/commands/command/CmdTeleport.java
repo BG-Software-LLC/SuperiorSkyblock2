@@ -7,14 +7,14 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdTeleport implements ICommand {
+public final class CmdTeleport implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases(){

@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
+import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
@@ -60,15 +60,17 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private GridHandler gridHandler = null;
     private BlockValuesHandler blockValuesHandler = null;
-    private PlayersHandler playersHandler = null;
     private SchematicsHandler schematicsHandler = null;
-    private SettingsHandler settingsHandler = null;
-    private DataHandler dataHandler = null;
-    private UpgradesHandler upgradesHandler = null;
-    private ProvidersHandler providersHandler = null;
+    private PlayersHandler playersHandler = null;
     private MissionsHandler missionsHandler = null;
     private MenusHandler menusHandler = null;
     private KeysHandler keysHandler = null;
+    private ProvidersHandler providersHandler = null;
+    private UpgradesHandler upgradesHandler = null;
+    private CommandsHandler commandsHandler = null;
+
+    private SettingsHandler settingsHandler = null;
+    private DataHandler dataHandler = null;
 
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
@@ -99,7 +101,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         loadSortingTypes();
         reloadPlugin(true);
 
-        nmsAdapter.registerCommand(new CommandsHandler(this, settingsHandler.islandCommand));
+        commandsHandler = new CommandsHandler(this, settingsHandler.islandCommand);
+        nmsAdapter.registerCommand(commandsHandler);
 
         if (Updater.isOutdated()) {
             log("");
@@ -264,36 +267,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     @Override
-    public KeysHandler getKeys() {
-        return keysHandler;
+    public GridHandler getGrid(){
+        return gridHandler;
     }
 
     @Override
-    public MenusManager getMenus() {
-        return menusHandler;
-    }
-
-    @Override
-    public MissionsHandler getMissions() {
-        return missionsHandler;
-    }
-
-    @Override
-    public ProvidersHandler getProviders() {
-        return providersHandler;
-    }
-
-    @Override
-    public UpgradesHandler getUpgrades() {
-        return upgradesHandler;
-    }
-
-    public DataHandler getDataHandler() {
-        return dataHandler;
-    }
-
-    public SettingsHandler getSettings() {
-        return settingsHandler;
+    public BlockValuesHandler getBlockValues() {
+        return blockValuesHandler;
     }
 
     @Override
@@ -307,13 +287,41 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     @Override
-    public GridHandler getGrid(){
-        return gridHandler;
+    public MissionsHandler getMissions() {
+        return missionsHandler;
     }
 
     @Override
-    public BlockValuesHandler getBlockValues() {
-        return blockValuesHandler;
+    public MenusManager getMenus() {
+        return menusHandler;
+    }
+
+    @Override
+    public KeysHandler getKeys() {
+        return keysHandler;
+    }
+
+    @Override
+    public ProvidersHandler getProviders() {
+        return providersHandler;
+    }
+
+    @Override
+    public UpgradesHandler getUpgrades() {
+        return upgradesHandler;
+    }
+
+    @Override
+    public CommandsHandler getCommands() {
+        return commandsHandler;
+    }
+
+    public DataHandler getDataHandler() {
+        return dataHandler;
+    }
+
+    public SettingsHandler getSettings() {
+        return settingsHandler;
     }
 
     public NMSAdapter getNMSAdapter() {

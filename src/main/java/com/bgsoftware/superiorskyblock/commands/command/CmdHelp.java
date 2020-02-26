@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import org.bukkit.command.CommandSender;
 
@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class CmdHelp implements ICommand {
+public final class CmdHelp implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -67,7 +67,7 @@ public final class CmdHelp implements ICommand {
             return;
         }
 
-        List<ICommand> subCommands = CommandsHandler.getSubCommands().stream()
+        List<SuperiorCommand> subCommands = plugin.getCommands().getSubCommands().stream()
                 .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
                 .collect(Collectors.toList());
 
@@ -90,12 +90,12 @@ public final class CmdHelp implements ICommand {
 
         java.util.Locale locale = LocaleUtils.getLocale(sender);
 
-        for(ICommand _subCommand : subCommands) {
+        for(SuperiorCommand _subCommand : subCommands) {
             if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
                 String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ISLAND_HELP_LINE.send(sender, CommandsHandler.getCommandLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
+                Locale.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
             }
         }
 
@@ -110,7 +110,7 @@ public final class CmdHelp implements ICommand {
         List<String> list = new ArrayList<>();
 
         if(args.length == 2){
-            List<ICommand> subCommands = CommandsHandler.getSubCommands().stream()
+            List<SuperiorCommand> subCommands = plugin.getCommands().getSubCommands().stream()
                     .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
                     .collect(Collectors.toList());
 

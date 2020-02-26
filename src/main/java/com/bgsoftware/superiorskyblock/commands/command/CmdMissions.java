@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class CmdMissions implements ICommand {
+public final class CmdMissions implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

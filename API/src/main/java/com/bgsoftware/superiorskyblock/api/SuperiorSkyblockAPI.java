@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api;
 
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
@@ -193,6 +194,14 @@ public final class SuperiorSkyblockAPI {
      */
     public static UpgradesManager getUpgrades(){
         return plugin.getUpgrades();
+    }
+
+    /**
+     * Register a sub-command.
+     * @param superiorCommand The sub command to register.
+     */
+    public static void registerCommand(SuperiorCommand superiorCommand){
+        plugin.getCommands().registerCommand(superiorCommand);
     }
 
     /**

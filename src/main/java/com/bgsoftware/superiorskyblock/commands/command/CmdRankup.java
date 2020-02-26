@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdRankup implements ICommand {
+public final class CmdRankup implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

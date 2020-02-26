@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdDisband implements ICommand {
+public final class CmdDisband implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

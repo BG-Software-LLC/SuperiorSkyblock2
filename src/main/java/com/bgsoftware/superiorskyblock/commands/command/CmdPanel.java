@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class CmdPanel implements ICommand {
+public final class CmdPanel implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

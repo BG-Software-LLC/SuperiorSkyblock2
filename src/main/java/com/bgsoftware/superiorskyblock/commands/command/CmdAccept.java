@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.google.common.collect.Lists;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public final class CmdAccept implements ICommand {
+public final class CmdAccept implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

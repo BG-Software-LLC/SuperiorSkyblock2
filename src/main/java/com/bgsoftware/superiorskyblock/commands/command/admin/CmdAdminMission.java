@@ -5,8 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class CmdAdminMission implements ICommand {
+public final class CmdAdminMission implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -84,7 +83,7 @@ public final class CmdAdminMission implements ICommand {
             return;
         }
 
-        Locale.COMMAND_USAGE.send(sender,CommandsHandler.getCommandLabel() + " " + getUsage(LocaleUtils.getLocale(sender)));
+        Locale.COMMAND_USAGE.send(sender,plugin.getCommands().getLabel() + " " + getUsage(LocaleUtils.getLocale(sender)));
     }
 
     @Override

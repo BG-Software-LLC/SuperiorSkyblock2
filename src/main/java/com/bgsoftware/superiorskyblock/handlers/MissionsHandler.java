@@ -207,79 +207,80 @@ public final class MissionsHandler implements MissionsManager {
             return;
         }
 
-        MissionData missionData = getMissionData(mission);
-        Island playerIsland = superiorPlayer.getIsland();
+        synchronized (superiorPlayer) {
+            MissionData missionData = getMissionData(mission);
+            Island playerIsland = superiorPlayer.getIsland();
 
-        if(!forceReward) {
-            if (!canCompleteAgain(superiorPlayer, mission)) {
-                mission.onCompleteFail(superiorPlayer);
-                return;
-            }
-
-            if (!canComplete(superiorPlayer, mission))
-                return;
-
-            if (missionData.islandMission && playerIsland == null) {
-                mission.onCompleteFail(superiorPlayer);
-                throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
-            }
-
-            if (checkAutoReward && !isAutoReward(mission)) {
-                if (canCompleteAgain(superiorPlayer, mission)) {
-                    Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+            if (!forceReward) {
+                if (!canCompleteAgain(superiorPlayer, mission)) {
+                    mission.onCompleteFail(superiorPlayer);
                     return;
                 }
+
+                if (!canComplete(superiorPlayer, mission))
+                    return;
+
+                if (missionData.islandMission && playerIsland == null) {
+                    mission.onCompleteFail(superiorPlayer);
+                    throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
+                }
+
+                if (checkAutoReward && !isAutoReward(mission)) {
+                    if (canCompleteAgain(superiorPlayer, mission)) {
+                        Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        return;
+                    }
+                }
             }
-        }
 
-        List<ItemStack> itemRewards = new ArrayList<>();
-        List<String> commandRewards;
+            List<ItemStack> itemRewards = new ArrayList<>();
+            List<String> commandRewards;
 
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (missionData) {
-            missionData.itemRewards.forEach(itemStack -> itemRewards.add(itemStack.clone()));
-            commandRewards = new ArrayList<>(missionData.commandRewards);
-        }
-
-        MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
-        Bukkit.getPluginManager().callEvent(missionCompleteEvent);
-
-        if(missionCompleteEvent.isCancelled()){
-            if(!forceReward)
-                mission.onCompleteFail(superiorPlayer);
-            return;
-        }
-
-        if(!forceReward)
-            mission.onComplete(superiorPlayer);
-
-        if(missionData.islandMission){
-            assert playerIsland != null;
-            playerIsland.completeMission(mission);
-        }
-        else{
-            superiorPlayer.completeMission(mission);
-        }
-
-        for(ItemStack itemStack : missionCompleteEvent.getItemRewards()){
-            ItemStack toGive = new ItemBuilder(itemStack)
-                    .replaceAll("{0}", mission.getName())
-                    .replaceAll("{1}", superiorPlayer.getName())
-                    .replaceAll("{2}", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
-                    .build();
-            toGive.setAmount(itemStack.getAmount());
-            superiorPlayer.asPlayer().getInventory().addItem(toGive);
-        }
-
-        Executor.sync(() -> {
-            for(String command : missionCompleteEvent.getCommandRewards()){
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
-                        .replace("%mission%", mission.getName())
-                        .replace("%player%", superiorPlayer.getName())
-                        .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
-                );
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (missionData) {
+                missionData.itemRewards.forEach(itemStack -> itemRewards.add(itemStack.clone()));
+                commandRewards = new ArrayList<>(missionData.commandRewards);
             }
-        });
+
+            MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
+            Bukkit.getPluginManager().callEvent(missionCompleteEvent);
+
+            if (missionCompleteEvent.isCancelled()) {
+                if (!forceReward)
+                    mission.onCompleteFail(superiorPlayer);
+                return;
+            }
+
+            if (!forceReward)
+                mission.onComplete(superiorPlayer);
+
+            if (missionData.islandMission) {
+                assert playerIsland != null;
+                playerIsland.completeMission(mission);
+            } else {
+                superiorPlayer.completeMission(mission);
+            }
+
+            for (ItemStack itemStack : missionCompleteEvent.getItemRewards()) {
+                ItemStack toGive = new ItemBuilder(itemStack)
+                        .replaceAll("{0}", mission.getName())
+                        .replaceAll("{1}", superiorPlayer.getName())
+                        .replaceAll("{2}", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
+                        .build();
+                toGive.setAmount(itemStack.getAmount());
+                superiorPlayer.asPlayer().getInventory().addItem(toGive);
+            }
+
+            Executor.sync(() -> {
+                for (String command : missionCompleteEvent.getCommandRewards()) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
+                            .replace("%mission%", mission.getName())
+                            .replace("%player%", superiorPlayer.getName())
+                            .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
+                    );
+                }
+            });
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

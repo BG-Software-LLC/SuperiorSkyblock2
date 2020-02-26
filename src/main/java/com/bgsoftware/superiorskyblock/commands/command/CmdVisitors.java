@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.command;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdVisitors implements ICommand {
+public final class CmdVisitors implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

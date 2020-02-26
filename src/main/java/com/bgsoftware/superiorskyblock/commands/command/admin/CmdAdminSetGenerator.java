@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class CmdAdminSetGenerator implements ICommand {
+public final class CmdAdminSetGenerator implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

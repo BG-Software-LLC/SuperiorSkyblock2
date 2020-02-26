@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.commands.ICommand;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 
 import org.bukkit.command.CommandSender;
 
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class CmdCreate implements ICommand {
+public final class CmdCreate implements ISuperiorCommand {
 
     private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
