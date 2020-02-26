@@ -71,6 +71,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,59 +99,59 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
         this.plugin = plugin;
 
-        registerCommand(new CmdAccept());
-        registerCommand((adminCommand = new CmdAdmin(this)));
-        registerCommand(new CmdBan());
-        registerCommand(new CmdBiome());
-        registerCommand(new CmdBorder());
-        registerCommand(new CmdClose());
-        registerCommand(new CmdCoop());
-        registerCommand(new CmdCreate());
-        registerCommand(new CmdDelWarp());
-        registerCommand(new CmdDemote());
-        registerCommand(new CmdDeposit());
-        registerCommand(new CmdDisband());
-        registerCommand(new CmdExpel());
-        registerCommand(new CmdFly());
-        registerCommand(new CmdHelp());
-        registerCommand(new CmdInvite());
-        registerCommand(new CmdKick());
-        registerCommand(new CmdLang());
-        registerCommand(new CmdLeave());
-        registerCommand(new CmdMembers());
-        registerCommand(new CmdMission());
-        registerCommand(new CmdMissions());
-        registerCommand(new CmdName());
-        registerCommand(new CmdOpen());
-        registerCommand(new CmdPanel());
-        registerCommand(new CmdPardon());
-        registerCommand(new CmdPermissions());
-        registerCommand(new CmdPromote());
-        registerCommand(new CmdRankup());
-        registerCommand(new CmdRate());
-        registerCommand(new CmdRatings());
-        registerCommand(new CmdRecalc());
-        registerCommand(new CmdSetDiscord());
-        registerCommand(new CmdSetPaypal());
-        registerCommand(new CmdSetRole());
-        registerCommand(new CmdSetTeleport());
-        registerCommand(new CmdSettings());
-        registerCommand(new CmdSetWarp());
-        registerCommand(new CmdShow());
-        registerCommand(new CmdTeam());
-        registerCommand(new CmdTeamChat());
-        registerCommand(new CmdTeleport());
-        registerCommand(new CmdToggle());
-        registerCommand(new CmdTop());
-        registerCommand(new CmdTransfer());
-        registerCommand(new CmdUncoop());
-        registerCommand(new CmdUpgrade());
-        registerCommand(new CmdValue());
-        registerCommand(new CmdVisit());
-        registerCommand(new CmdVisitors());
-        registerCommand(new CmdWarp());
-        registerCommand(new CmdWarps());
-        registerCommand(new CmdWithdraw());
+        registerCommand(new CmdAccept(), false);
+        registerCommand((adminCommand = new CmdAdmin(this)), false);
+        registerCommand(new CmdBan(), false);
+        registerCommand(new CmdBiome(), false);
+        registerCommand(new CmdBorder(), false);
+        registerCommand(new CmdClose(), false);
+        registerCommand(new CmdCoop(), false);
+        registerCommand(new CmdCreate(), false);
+        registerCommand(new CmdDelWarp(), false);
+        registerCommand(new CmdDemote(), false);
+        registerCommand(new CmdDeposit(), false);
+        registerCommand(new CmdDisband(), false);
+        registerCommand(new CmdExpel(), false);
+        registerCommand(new CmdFly(), false);
+        registerCommand(new CmdHelp(), false);
+        registerCommand(new CmdInvite(), false);
+        registerCommand(new CmdKick(), false);
+        registerCommand(new CmdLang(), false);
+        registerCommand(new CmdLeave(), false);
+        registerCommand(new CmdMembers(), false);
+        registerCommand(new CmdMission(), false);
+        registerCommand(new CmdMissions(), false);
+        registerCommand(new CmdName(), false);
+        registerCommand(new CmdOpen(), false);
+        registerCommand(new CmdPanel(), false);
+        registerCommand(new CmdPardon(), false);
+        registerCommand(new CmdPermissions(), false);
+        registerCommand(new CmdPromote(), false);
+        registerCommand(new CmdRankup(), false);
+        registerCommand(new CmdRate(), false);
+        registerCommand(new CmdRatings(), false);
+        registerCommand(new CmdRecalc(), false);
+        registerCommand(new CmdSetDiscord(), false);
+        registerCommand(new CmdSetPaypal(), false);
+        registerCommand(new CmdSetRole(), false);
+        registerCommand(new CmdSetTeleport(), false);
+        registerCommand(new CmdSettings(), false);
+        registerCommand(new CmdSetWarp(), false);
+        registerCommand(new CmdShow(), false);
+        registerCommand(new CmdTeam(), false);
+        registerCommand(new CmdTeamChat(), false);
+        registerCommand(new CmdTeleport(), false);
+        registerCommand(new CmdToggle(), false);
+        registerCommand(new CmdTop(), false);
+        registerCommand(new CmdTransfer(), false);
+        registerCommand(new CmdUncoop(), false);
+        registerCommand(new CmdUpgrade(), false);
+        registerCommand(new CmdValue(), false);
+        registerCommand(new CmdVisit(), false);
+        registerCommand(new CmdVisitors(), false);
+        registerCommand(new CmdWarp(), false);
+        registerCommand(new CmdWarps(), false);
+        registerCommand(new CmdWithdraw(), false);
     }
 
     @Override
@@ -260,10 +261,20 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
     @Override
     public void registerCommand(SuperiorCommand superiorCommand) {
+        registerCommand(superiorCommand, true);
+    }
+
+    private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
         List<String> aliases = superiorCommand.getAliases();
         subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
         for(int i = 1; i < aliases.size(); i++){
             aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+        }
+        if(sort){
+            List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
+            superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
+            subCommands.clear();
+            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
         }
     }
 
