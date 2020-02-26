@@ -280,7 +280,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
     @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
-        adminCommand.registerCommand(superiorCommand);
+        adminCommand.registerCommand(superiorCommand, true);
     }
 
     @Override
