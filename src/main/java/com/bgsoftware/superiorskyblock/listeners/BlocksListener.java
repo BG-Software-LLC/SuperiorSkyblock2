@@ -175,7 +175,7 @@ public final class BlocksListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island == null || island.isSpawn() || island.getIslandMembers(true).stream().anyMatch(SuperiorPlayer::isOnline))
+        if(island == null || island.isSpawn() || island.getLastTimeUpdate() == -1)
             return;
 
         e.setNewCurrent(0);
