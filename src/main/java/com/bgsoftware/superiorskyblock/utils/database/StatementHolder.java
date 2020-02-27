@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.utils.database;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,18 +60,29 @@ public final class StatementHolder {
             return;
         }
 
-        String errorQuery = query;
-        try(PreparedStatement preparedStatement = SQLHelper.buildStatement(query)){
+        StringHolder errorQuery = new StringHolder(query);
+
+        SQLHelper.buildStatement(query, preparedStatement -> {
             for(Map.Entry<Integer, Object> entry : values.entrySet()) {
                 preparedStatement.setObject(entry.getKey(), entry.getValue());
-                errorQuery = errorQuery.replaceFirst("\\?", entry.getValue() + "");
+                errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
             }
 
             preparedStatement.executeUpdate();
-        }catch(SQLException ex){
+        }, ex -> {
             SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
             ex.printStackTrace();
+        });
+    }
+
+    private static class StringHolder{
+
+        private String value;
+
+        StringHolder(String value){
+            this.value = value;
         }
+
     }
 
 }

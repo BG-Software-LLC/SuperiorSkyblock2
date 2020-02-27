@@ -310,14 +310,12 @@ public final class DataHandler {
 
         String statementStr = "ALTER TABLE {prefix}" + table + " ADD " + column + " " + type + defaultSection + ";";
 
-        try(PreparedStatement statement = SQLHelper.buildStatement(statementStr)){
-            statement.executeUpdate();
-        }catch(SQLException ex){
+        SQLHelper.buildStatement(statementStr, PreparedStatement::executeUpdate, ex -> {
             if(!ex.getMessage().toLowerCase().contains("duplicate")) {
                 System.out.println("Statement: " + statementStr);
                 ex.printStackTrace();
             }
-        }
+        });
     }
 
     private enum DatabaseType{

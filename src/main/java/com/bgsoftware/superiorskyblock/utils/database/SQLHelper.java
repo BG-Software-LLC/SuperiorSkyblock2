@@ -1,41 +1,46 @@
 package com.bgsoftware.superiorskyblock.utils.database;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.zaxxer.hikari.HikariDataSource;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.function.Consumer;
 
 public final class SQLHelper {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static Connection conn;
+    private static HikariDataSource dataSource;
 
     private SQLHelper(){}
 
     public static boolean createConnection(SuperiorSkyblockPlugin plugin){
         try {
             SuperiorSkyblockPlugin.log("Trying to connect to " + plugin.getSettings().databaseType + " database...");
-            if (plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")) {
-                Class.forName("com.mysql.jdbc.Driver");
+            dataSource = new HikariDataSource();
+            dataSource.setConnectionTestQuery("SELECT 1");
 
-                String address = plugin.getSettings().databaseMySQLAddress,
-                        dbName = plugin.getSettings().databaseMySQLDBName,
-                        userName = plugin.getSettings().databaseMySQLUsername,
-                        password = plugin.getSettings().databaseMySQLPassword;
+            if (plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")) {
+                dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+
+                String address = plugin.getSettings().databaseMySQLAddress;
+                String dbName = plugin.getSettings().databaseMySQLDBName;
+                String userName = plugin.getSettings().databaseMySQLUsername;
+                String password = plugin.getSettings().databaseMySQLPassword;
                 int port = plugin.getSettings().databaseMySQLPort;
 
-                String sqlURL = "jdbc:mysql://" + address + ":" + port + "/" + dbName + "?autoReconnect=true";
-                conn = DriverManager.getConnection(sqlURL, userName, password);
+                dataSource.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName);
+                dataSource.setUsername(userName);
+                dataSource.setPassword(password);
+
                 SuperiorSkyblockPlugin.log("Successfully established connection with MySQL database!");
             } else {
-                Class.forName("org.sqlite.JDBC");
+                dataSource.setDriverClassName("org.sqlite.JDBC");
                 File file = new File(plugin.getDataFolder(), "database.db");
-                String sqlURL = "jdbc:sqlite:" + file.getAbsolutePath().replace("\\", "/");
-                conn = DriverManager.getConnection(sqlURL);
+                dataSource.setJdbcUrl("jdbc:sqlite:" + file.getAbsolutePath().replace("\\", "/"));
                 SuperiorSkyblockPlugin.log("Successfully established connection with SQLite database!");
             }
 
@@ -47,7 +52,7 @@ public final class SQLHelper {
 
     public static void executeUpdate(String statement){
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix))){
+        try(Connection conn = dataSource.getConnection(); PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix))){
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
             System.out.println(statement);
@@ -59,7 +64,7 @@ public final class SQLHelper {
         boolean ret = false;
 
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
+        try(Connection conn = dataSource.getConnection(); PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
             ret = resultSet.next();
         }catch(SQLException ex){
             ex.printStackTrace();
@@ -68,32 +73,32 @@ public final class SQLHelper {
         return ret;
     }
 
-    public static void executeQuery(String statement, QueryCallback callback){
+    public static void executeQuery(String statement, QueryConsumer<ResultSet> callback){
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        try(PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
-            callback.run(resultSet);
+        try(Connection conn = dataSource.getConnection(); PreparedStatement preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)); ResultSet resultSet = preparedStatement.executeQuery()){
+            callback.accept(resultSet);
         }catch(SQLException ex){
             ex.printStackTrace();
         }
-    }
-
-    public interface QueryCallback{
-
-        void run(ResultSet resultSet) throws SQLException;
-
     }
 
     public static void close(){
-        try{
-            conn.close();
+        dataSource.close();
+    }
+
+    public static void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
+        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(query.replace("{prefix}", prefix))){
+            consumer.accept(ps);
         }catch(SQLException ex){
-            ex.printStackTrace();
+            failure.accept(ex);
         }
     }
 
-    public static PreparedStatement buildStatement(String query) throws SQLException{
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        return conn.prepareStatement(query.replace("{prefix}", prefix));
+    public interface QueryConsumer<T>{
+
+        void accept(T value) throws SQLException;
+
     }
 
 }
