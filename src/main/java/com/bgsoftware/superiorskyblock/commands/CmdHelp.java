@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import org.bukkit.command.CommandSender;
 

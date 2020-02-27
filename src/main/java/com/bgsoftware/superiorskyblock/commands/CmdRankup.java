@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
