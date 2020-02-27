@@ -266,6 +266,10 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
         List<String> aliases = superiorCommand.getAliases();
+        if(subCommands.containsKey(aliases.get(0).toLowerCase())){
+            subCommands.remove(aliases.get(0).toLowerCase());
+            aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
+        }
         subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
         for(int i = 1; i < aliases.size(); i++){
             aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
