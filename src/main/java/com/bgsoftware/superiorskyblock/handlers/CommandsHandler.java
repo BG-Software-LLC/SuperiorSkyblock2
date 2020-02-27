@@ -68,6 +68,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -76,7 +80,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 public final class CommandsHandler extends BukkitCommand implements CommandsManager {
 
@@ -152,6 +159,8 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
         registerCommand(new CmdWarp(), false);
         registerCommand(new CmdWarps(), false);
         registerCommand(new CmdWithdraw(), false);
+
+        loadCommands();
     }
 
     @Override
@@ -264,24 +273,6 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
         registerCommand(superiorCommand, true);
     }
 
-    private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
-        List<String> aliases = superiorCommand.getAliases();
-        if(subCommands.containsKey(aliases.get(0).toLowerCase())){
-            subCommands.remove(aliases.get(0).toLowerCase());
-            aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
-        }
-        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
-        for(int i = 1; i < aliases.size(); i++){
-            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
-        }
-        if(sort){
-            List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
-            superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
-            subCommands.clear();
-            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
-        }
-    }
-
     @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
         adminCommand.registerCommand(superiorCommand, true);
@@ -302,5 +293,101 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
         return subCommands.getOrDefault(label, aliasesToCommand.get(label));
     }
 
+    private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
+        List<String> aliases = superiorCommand.getAliases();
+        if(subCommands.containsKey(aliases.get(0).toLowerCase())){
+            subCommands.remove(aliases.get(0).toLowerCase());
+            aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
+        }
+        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
+        for(int i = 1; i < aliases.size(); i++){
+            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+        }
+        if(sort){
+            List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
+            superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
+            subCommands.clear();
+            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
+        }
+    }
+
+    @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
+    private void loadCommands(){
+        File commandsFolder = new File(plugin.getDataFolder(), "commands");
+
+        if(!commandsFolder.exists()){
+            commandsFolder.mkdirs();
+            return;
+        }
+
+        for(File file : commandsFolder.listFiles()){
+            if(!file.getName().endsWith(".jar"))
+                continue;
+
+            try {
+                Optional<Class<?>> commandClass = getCommandClasses(file.toURL()).stream().findFirst();
+
+                if(!commandClass.isPresent())
+                    continue;
+
+                SuperiorCommand superiorCommand = createInstance(commandClass.get());
+
+                if(file.getName().toLowerCase().contains("admin")) {
+                    registerAdminCommand(superiorCommand);
+                    SuperiorSkyblockPlugin.log("Successfully loaded external admin command: " + file.getName().split("\\.")[0]);
+                }
+                else {
+                    registerCommand(superiorCommand);
+                    SuperiorSkyblockPlugin.log("Successfully loaded external command: " + file.getName().split("\\.")[0]);
+                }
+
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+    }
+
+    private List<Class<?>> getCommandClasses(URL jar) {
+        List<Class<?>> list = new ArrayList<>();
+
+        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, SuperiorCommand.class.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
+            JarEntry jarEntry;
+            while ((jarEntry = jis.getNextJarEntry()) != null){
+                String name = jarEntry.getName();
+
+                if (name == null || name.isEmpty() || !name.endsWith(".class")) {
+                    continue;
+                }
+
+                name = name.replace("/", ".");
+                String clazzName = name.substring(0, name.lastIndexOf(".class"));
+
+                Class<?> c = cl.loadClass(clazzName);
+
+                if (SuperiorCommand.class.isAssignableFrom(c)) {
+                    list.add(c);
+                }
+            }
+        } catch (Throwable ignored) { }
+
+        return list;
+    }
+
+    private SuperiorCommand createInstance(Class<?> clazz) throws Exception{
+        if(!SuperiorCommand.class.isAssignableFrom(clazz))
+            throw new IllegalArgumentException("Class " + clazz + " is not a SuperiorCommand.");
+
+        for(Constructor<?> constructor : clazz.getConstructors()){
+            if(constructor.getParameterCount() == 0) {
+                if(!constructor.isAccessible())
+                    constructor.setAccessible(true);
+
+                return (SuperiorCommand) constructor.newInstance();
+            }
+        }
+
+        throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
+    }
 
 }

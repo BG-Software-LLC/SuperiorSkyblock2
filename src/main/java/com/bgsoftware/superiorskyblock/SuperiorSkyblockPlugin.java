@@ -101,9 +101,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         loadSortingTypes();
         reloadPlugin(true);
 
-        commandsHandler = new CommandsHandler(this, settingsHandler.islandCommand);
-        nmsAdapter.registerCommand(commandsHandler);
-
         if (Updater.isOutdated()) {
             log("");
             log("A new version is available (v" + Updater.getLatestVersion() + ")!");
@@ -224,6 +221,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
         missionsHandler = new MissionsHandler(this);
+
+        commandsHandler = new CommandsHandler(this, settingsHandler.islandCommand);
+        nmsAdapter.registerCommand(commandsHandler);
 
         if(loadGrid) {
             playersHandler = new PlayersHandler();
