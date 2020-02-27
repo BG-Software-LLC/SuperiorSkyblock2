@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -102,7 +101,6 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBucketFillMonitor(PlayerBucketFillEvent e){
-        Bukkit.broadcastMessage(e.getBlockClicked().getType() + "");
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island != null)
