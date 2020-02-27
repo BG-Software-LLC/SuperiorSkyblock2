@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.events.DragonEggBreakEvent;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -13,11 +12,8 @@ import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.DimensionManager;
-import net.minecraft.server.v1_13_R2.EntityFallingBlock;
-import net.minecraft.server.v1_13_R2.EntityItem;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.IMaterial;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
 import net.minecraft.server.v1_13_R2.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_13_R2.Particles;
@@ -44,17 +40,14 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -238,36 +231,6 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
         itemStacks[6] = entityEquipment.getBoots();
 
         return itemStacks;
-    }
-
-    @Override
-    public void spawnDragonEgg(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        world.addEntity(new CustomEntityFallingBlock(location, Material.DRAGON_EGG));
-    }
-
-    private static class CustomEntityFallingBlock extends EntityFallingBlock {
-
-        public CustomEntityFallingBlock(Location location, Material material){
-            super(((CraftWorld) location.getWorld()).getHandle(), location.getX(), location.getY(), location.getZ(), CraftMagicNumbers.getBlock(material, (byte) 0));
-        }
-
-        @Nullable
-        @Override
-        public EntityItem a(IMaterial imaterial) {
-            this.locY += 1;
-
-            DragonEggBreakEvent dragonEggBreakEvent = new DragonEggBreakEvent((FallingBlock) getBukkitEntity());
-            Bukkit.getPluginManager().callEvent(dragonEggBreakEvent);
-
-            if(dragonEggBreakEvent.isCancelled()){
-                world.setTypeAndData(new BlockPosition(locX, locY, locZ), getBlock(), 3);
-                return null;
-            }
-
-            return super.a(imaterial);
-        }
-
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {
