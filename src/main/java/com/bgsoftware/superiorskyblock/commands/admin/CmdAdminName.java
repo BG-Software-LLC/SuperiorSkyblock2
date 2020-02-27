@@ -97,6 +97,7 @@ public final class CmdAdminName implements ISuperiorCommand {
             return;
         }
 
+        String oldName = island.getName();
         island.setName(islandName);
 
         String coloredName = plugin.getSettings().islandNamesColorSupport ?
@@ -106,7 +107,7 @@ public final class CmdAdminName implements ISuperiorCommand {
             Locale.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);
 
         if(targetPlayer == null)
-            Locale.CHANGED_NAME_OTHER_NAME.send(sender, island.getName(), coloredName);
+            Locale.CHANGED_NAME_OTHER_NAME.send(sender, oldName, coloredName);
         else
             Locale.CHANGED_NAME_OTHER.send(sender, targetPlayer.getName(), coloredName);
     }
