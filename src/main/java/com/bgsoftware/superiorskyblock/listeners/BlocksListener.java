@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,6 +38,8 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
@@ -63,8 +66,21 @@ public final class BlocksListener implements Listener {
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island != null)
+        if(island != null) {
+            if(e.getBlockReplacedState().getType().name().contains("LAVA"))
+                island.handleBlockBreak(Key.of("LAVA"), 1);
+            else if(e.getBlockReplacedState().getType().name().contains("WATER"))
+                island.handleBlockBreak(Key.of("WATER"), 1);
             island.handleBlockPlace(e.getBlockPlaced());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBucketEmptyMonitor(PlayerBucketEmptyEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
+
+        if(island != null)
+            island.handleBlockPlace(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -82,6 +98,15 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockBreak(e.getBlock());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onBucketFillMonitor(PlayerBucketFillEvent e){
+        Bukkit.broadcastMessage(e.getBlockClicked().getType() + "");
+        Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
+
+        if(island != null)
+            island.handleBlockBreak(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
     }
 
     @EventHandler(ignoreCancelled = true)

@@ -20,6 +20,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
@@ -172,6 +173,21 @@ public final class UpgradesListener implements Listener {
         if(island.hasReachedBlockLimit(Key.of("HOPPER"))){
             e.setCancelled(true);
             Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format("hopper"));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onBucketEmpty(PlayerBucketEmptyEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
+
+        if(island == null)
+            return;
+
+        Key blockKey = Key.of(e.getBucket().name().replace("_BUCKET", ""));
+
+        if(island.hasReachedBlockLimit(blockKey)){
+            e.setCancelled(true);
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
         }
     }
 
