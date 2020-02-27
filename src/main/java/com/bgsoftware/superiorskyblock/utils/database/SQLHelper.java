@@ -35,6 +35,8 @@ public final class SQLHelper {
                 dataSource.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName);
                 dataSource.setUsername(userName);
                 dataSource.setPassword(password);
+                dataSource.setMinimumIdle(1);
+                dataSource.setMaximumPoolSize(1);
 
                 SuperiorSkyblockPlugin.log("Successfully established connection with MySQL database!");
             } else {
