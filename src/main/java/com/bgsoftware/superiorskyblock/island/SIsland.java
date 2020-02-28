@@ -596,9 +596,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
-        Location center = getCenter(environment);
+        World world = getCenter(environment).getWorld();
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+
+        min.setWorld(world);
+        max.setWorld(world);
+
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
 
         List<Chunk> chunks = new ArrayList<>();
