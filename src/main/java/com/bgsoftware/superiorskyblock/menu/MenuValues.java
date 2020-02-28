@@ -48,7 +48,7 @@ public final class MenuValues extends SuperiorMenu {
         for(int slot = 0; slot < inventory.getSize(); slot++){
             if(containsData(slot + "")){
                 Key block = (Key) getData(slot + "");
-                int amount = island.getBlockCount(block);
+                int amount = block.toString().contains("SPAWNER") ? island.getExactBlockCount(block) : island.getBlockCount(block);
                 if(inventory.getItem(slot) != null) {
                     ItemStack itemStack = new ItemBuilder(inventory.getItem(slot))
                             .replaceAll("{0}", amount + "")
