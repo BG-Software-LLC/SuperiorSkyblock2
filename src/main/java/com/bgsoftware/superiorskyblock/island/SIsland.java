@@ -618,7 +618,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-        World world = min.getWorld();
+        World world = getCenter(environment).getWorld();
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
@@ -1279,6 +1279,7 @@ public final class SIsland extends DatabaseObject implements Island {
             blockLimits.run(blockLimits -> {
                 blockCounts.run(blockCounts -> {
                     Key _key = plugin.getBlockValues().getBlockKey(key);
+
                     int currentAmount = blockCounts.getRaw(_key, 0);
                     blockCounts.put(_key, currentAmount + amount);
 
