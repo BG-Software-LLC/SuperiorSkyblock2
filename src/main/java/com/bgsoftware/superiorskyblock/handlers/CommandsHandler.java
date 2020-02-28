@@ -92,11 +92,13 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
     private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
     private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
     private final CmdAdmin adminCommand;
+    private final String label;
 
     private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin, String islandCommand){
         super(islandCommand.split(",")[0]);
+        label = islandCommand.split(",")[0];
 
         String[] commandSections = islandCommand.split(",");
 
@@ -286,6 +288,11 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
     @Override
     public List<SuperiorCommand> getAdminSubCommands() {
         return adminCommand.getSubCommands();
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 
     private SuperiorCommand getCommand(String label){
