@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -110,7 +111,10 @@ public final class CmdRankup implements ISuperiorCommand {
                 EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
 
             for (String command : islandUpgradeEvent.getCommands()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName()));
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
+                        .replace("%player%", superiorPlayer.getName())
+                        .replace("%leader%", island.getOwner().getName()))
+                );
             }
 
             hasNextLevel = true;

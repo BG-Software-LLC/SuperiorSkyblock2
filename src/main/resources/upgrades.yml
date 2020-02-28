@@ -13,6 +13,11 @@
 # Mob Drops: Will make your entities drop more items than usual.
 # Hoppers Limit: Will limit the amount of hoppers in your island.
 #
+# You can use the following placeholders in commands:
+# %player% - the name of the player.
+# %leader% - the name of the leader.
+# All PlaceholderAPI placeholders.
+#
 # Here is an example of how to create a custom upgrade:
 # upgrades:
 #   upgrade-name:                     // Custom name for your upgrade. Will be used as an identifier for the upgrade (also in commands)
