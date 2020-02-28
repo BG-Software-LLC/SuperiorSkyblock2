@@ -409,11 +409,11 @@ starter-chest:
 event-commands:
   IslandCreateEvent: []
 
-# A delay before getting teleported to a warp.
+# A delay before getting teleported to a warp (in milliseconds).
 # Players cannot move in that time, or the teleportation will be cancelled.
 warps-warmup: 0
 
-# A delay before getting teleported to your island.
+# A delay before getting teleported to your island (in milliseconds).
 # Players cannot move in that time, or the teleportation will be cancelled.
 home-warmup: 0
 
