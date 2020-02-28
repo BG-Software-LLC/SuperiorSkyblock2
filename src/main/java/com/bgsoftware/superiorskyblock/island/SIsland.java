@@ -2330,6 +2330,14 @@ public final class SIsland extends DatabaseObject implements Island {
                     .setString(owner.getUniqueId().toString())
                     .execute(true);
         });
+
+        Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
+        int index = 0;
+        for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.get().entrySet()){
+            for(int i = 0; i < entry.getValue(); i++)
+                cobbleGeneratorArray[index++] = entry.getKey();
+        }
+        this.cobbleGeneratorArray.set(cobbleGeneratorArray);
     }
 
     private void checkMembersDuplication(){
