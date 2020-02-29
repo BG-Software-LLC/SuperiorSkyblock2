@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -90,12 +91,14 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                island.getAllChunks(World.Environment.NORMAL, true).forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(chunk));
+                island.getAllChunks(World.Environment.NORMAL, true, true)
+                        .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(chunk));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                    island.getAllChunksAsync(World.Environment.NORMAL, true, ((chunk, throwable) -> plugin.getNMSBlocks().refreshChunk(chunk)));
+                    island.getAllChunksAsync(World.Environment.NORMAL, true, true,
+                            ((chunk, throwable) -> plugin.getNMSBlocks().refreshChunk(chunk)));
                     island.setBonusWorth(bonus);
                     island.setBiome(biome);
                     island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
@@ -417,6 +420,8 @@ public final class GridHandler implements GridManager {
             SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
             plugin.getSettings().updateValue("worlds.normal-world", world);
         }
+
+        ChunksTracker.deserialize(resultSet.getString("dirtyChunks"));
     }
 
     public void loadStackedBlocks(ResultSet set) throws SQLException {
@@ -447,6 +452,7 @@ public final class GridHandler implements GridManager {
                 .setString("")
                 .setInt(plugin.getSettings().maxIslandSize)
                 .setString(plugin.getSettings().islandWorldName)
+                .setString(ChunksTracker.serialize())
                 .execute(async);
     }
 
@@ -463,7 +469,7 @@ public final class GridHandler implements GridManager {
 
     private void setLastIsland(SBlockPosition blockPosition){
         this.lastIsland = blockPosition;
-        Query.GRID_UPDATE.getStatementHolder()
+        Query.GRID_UPDATE_LAST_ISLAND.getStatementHolder()
                 .setString(blockPosition.toString())
                 .execute(true);
     }

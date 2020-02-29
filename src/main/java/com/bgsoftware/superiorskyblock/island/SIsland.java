@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -596,6 +597,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
+        return getAllChunks(environment, onlyProtected, false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
@@ -609,7 +615,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                chunks.add(minChunk.getWorld().getChunkAt(x, z));
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z))
+                    chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
 
@@ -618,6 +625,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
+        return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
         List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
 
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
@@ -626,10 +638,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(whenComplete != null)
-                    chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
-                else
-                    chunks.add(ChunksProvider.loadChunk(world, x, z));
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z)) {
+                    if (whenComplete != null)
+                        chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                    else
+                        chunks.add(ChunksProvider.loadChunk(world, x, z));
+                }
             }
         }
 
@@ -838,13 +852,16 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().deleteIsland(this);
 
-        getAllChunksAsync(World.Environment.NORMAL, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+        getAllChunksAsync(World.Environment.NORMAL, true, true,
+                ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.NETHER))
-            getAllChunksAsync(World.Environment.NETHER, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+            getAllChunksAsync(World.Environment.NETHER, true, true,
+                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
 
         if(wasSchematicGenerated(World.Environment.THE_END))
-            getAllChunksAsync(World.Environment.THE_END, true, ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+            getAllChunksAsync(World.Environment.THE_END, true, true,
+                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
     }
 
     @Override
@@ -877,13 +894,13 @@ public final class SIsland extends DatabaseObject implements Island {
         };
 
         //noinspection all
-        chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, whenComplete).stream()
+        chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, true, whenComplete).stream()
                 .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
         if(wasSchematicGenerated(World.Environment.NETHER))
-            chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, whenComplete).stream()
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, true, whenComplete).stream()
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
         if(wasSchematicGenerated(World.Environment.THE_END))
-            chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, whenComplete).stream()
+            chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, true, whenComplete).stream()
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
 
         blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
@@ -1058,7 +1075,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBiome(Biome biome){
-        getAllChunksAsync(World.Environment.NORMAL, false, ((chunk, throwable) -> plugin.getNMSAdapter().setBiome(chunk, biome)));
+        getAllChunksAsync(World.Environment.NORMAL, false, false, ((chunk, throwable) -> plugin.getNMSAdapter().setBiome(chunk, biome)));
         this.biome.set(biome);
     }
 

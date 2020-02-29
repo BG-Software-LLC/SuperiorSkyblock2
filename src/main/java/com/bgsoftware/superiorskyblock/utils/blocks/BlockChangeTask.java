@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -39,15 +40,14 @@ public final class BlockChangeTask {
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
             plugin.getNMSBlocks().refreshLight(chunk);
+            ChunksTracker.markDirty(chunk);
             entry.getValue().forEach(blockData ->
                     plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args));
         }
 
         blocksCache.clear();
 
-        chunksToUpdate.forEach(chunk -> {
-            plugin.getNMSBlocks().refreshChunk(chunk);
-        });
+        chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
 
         chunksToUpdate.clear();
 

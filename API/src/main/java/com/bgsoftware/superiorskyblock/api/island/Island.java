@@ -237,19 +237,36 @@ public interface Island extends Comparable<Island> {
     List<Chunk> getAllChunks(World.Environment environment);
 
     /**
-     * Get all the chunks of the island.
+     * Get all the chunks of the island, including empty ones.
      * @param environment The environment to get the chunks from.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      */
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
 
     /**
-     * Get all the chunks of the island asynchronized.
+     * Get all the chunks of the island.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param noEmptyChunks Should empty chunks be loaded or not?
+     */
+    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
      * @param environment The environment to get the chunks from.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
      */
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete);
+
+    /**
+     * Get all the chunks of the island asynchronized.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete);
 
     /**
      * Check if the location is inside the island's area.

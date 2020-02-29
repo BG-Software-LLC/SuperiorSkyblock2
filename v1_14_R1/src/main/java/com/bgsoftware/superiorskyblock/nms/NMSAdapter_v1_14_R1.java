@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.mojang.authlib.GameProfile;
@@ -248,6 +249,14 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
 
         for (int i = 0; i < entitySlices.length; i++)
             entitySlices[i] = new UnsafeList();
+
+        ChunksTracker.markEmpty(bukkitChunk);
+    }
+
+    @Override
+    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.c());
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -56,7 +57,14 @@ public interface NMSAdapter {
 
     default void regenerateChunk(Chunk chunk){
         chunk.getWorld().regenerateChunk(chunk.getX(), chunk.getZ());
+        ChunksTracker.markEmpty(chunk);
     }
+
+    default void injectChunkSections(Chunk chunk){
+
+    }
+
+    boolean isChunkEmpty(Chunk chunk);
 
     ItemStack[] getEquipment(EntityEquipment entityEquipment);
 

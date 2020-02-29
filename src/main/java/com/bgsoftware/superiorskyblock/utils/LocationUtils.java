@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -46,7 +47,13 @@ public final class LocationUtils {
             }
         }
 
+        ChunksTracker.markEmpty(chunkSnapshot);
+
         return true;
+    }
+
+    public static Location getRelative(Location location, BlockFace face){
+        return location.clone().add(face.getModX(), face.getModY(), face.getModZ());
     }
 
 }

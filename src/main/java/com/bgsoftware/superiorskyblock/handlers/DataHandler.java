@@ -131,7 +131,8 @@ public final class DataHandler {
                 "lastIsland TEXT, " +
                 "stackedBlocks TEXT, " +
                 "maxIslandSize INTEGER, " +
-                "world TEXT" +
+                "world TEXT, " +
+                "dirtyChunks TEXT" +
                 ");");
 
         if(!containsGrid())
@@ -171,6 +172,7 @@ public final class DataHandler {
         addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
         addColumnIfNotExists("toggledBorder", "players", "1", "BOOLEAN");
         addColumnIfNotExists("lastTimeUpdate", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
+        addColumnIfNotExists("dirtyChunks", "grid", "''", "TEXT");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 

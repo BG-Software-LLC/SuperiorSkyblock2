@@ -219,6 +219,12 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.a());
+    }
+
+    @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
         ItemStack[] itemStacks = new ItemStack[7];
 

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -68,6 +69,11 @@ public final class ChunksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(firstBlock);
         if(island != null && island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
             plugin.getNMSAdapter().setBiome(e.getChunk(), island.getBiome());
+
+        plugin.getNMSAdapter().injectChunkSections(e.getChunk());
+
+        if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+            ChunksTracker.markDirty(e.getChunk());
     }
 
 }

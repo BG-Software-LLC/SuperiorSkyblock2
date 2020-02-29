@@ -7,10 +7,14 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import net.minecraft.server.v1_11_R1.BiomeBase;
+import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.Blocks;
 import net.minecraft.server.v1_11_R1.Chunk;
+import net.minecraft.server.v1_11_R1.ChunkSection;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumParticle;
+import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 import net.minecraft.server.v1_11_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_11_R1.PlayerInteractManager;
@@ -39,13 +43,34 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
 
+    private static Field nonEmptyBlockCountField, tickingBlockCountField, blockIdsField, emittedLightField, skyLightField;
+
     private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    static {
+        try {
+            nonEmptyBlockCountField = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
+            nonEmptyBlockCountField.setAccessible(true);
+            tickingBlockCountField = ChunkSection.class.getDeclaredField("tickingBlockCount");
+            tickingBlockCountField.setAccessible(true);
+            blockIdsField = ChunkSection.class.getDeclaredField("blockIds");
+            blockIdsField.setAccessible(true);
+            emittedLightField = ChunkSection.class.getDeclaredField("emittedLight");
+            emittedLightField.setAccessible(true);
+            skyLightField = ChunkSection.class.getDeclaredField("skyLight");
+            skyLightField.setAccessible(true);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -211,6 +236,19 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
     }
 
     @Override
+    public void injectChunkSections(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for(int i = 0; i < 16; i++)
+            chunk.getSections()[i] = EmptyCounterChunkSection.of(chunk.getSections()[i]);
+    }
+
+    @Override
+    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        return Arrays.stream(chunk.getSections()).allMatch(Objects::isNull);
+    }
+
+    @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
         ItemStack[] itemStacks = new ItemStack[7];
 
@@ -223,6 +261,79 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
         itemStacks[6] = entityEquipment.getBoots();
 
         return itemStacks;
+    }
+
+    private static class EmptyCounterChunkSection extends ChunkSection {
+
+        private int nonEmptyBlockCount = 0, tickingBlockCount = 0;
+
+        EmptyCounterChunkSection(ChunkSection chunkSection){
+            super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
+            try {
+                nonEmptyBlockCount = (int) nonEmptyBlockCountField.get(chunkSection);
+                tickingBlockCount = (int) tickingBlockCountField.get(chunkSection);
+                blockIdsField.set(this, chunkSection.getBlocks());
+                emittedLightField.set(this, chunkSection.getEmittedLightArray());
+                skyLightField.set(this, chunkSection.getSkyLightArray());
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        @Override
+        public void setType(int i, int j, int k, IBlockData iblockdata) {
+            Block currentBlock = getType(i, j, k).getBlock(), placedBlock = iblockdata.getBlock();
+
+            if (currentBlock != Blocks.AIR) {
+                nonEmptyBlockCount--;
+                if (currentBlock.isTicking()) {
+                    tickingBlockCount--;
+                }
+            }
+
+            if (placedBlock != Blocks.AIR) {
+                nonEmptyBlockCount++;
+                if (placedBlock.isTicking()) {
+                    tickingBlockCount++;
+                }
+            }
+
+            super.setType(i, j, k, iblockdata);
+        }
+
+        public void recalcBlockCounts() {
+            nonEmptyBlockCount = 0;
+            tickingBlockCount = 0;
+
+            for(int i = 0; i < 16; ++i) {
+                for(int j = 0; j < 16; ++j) {
+                    for(int k = 0; k < 16; ++k) {
+                        Block block = getType(i, j, k).getBlock();
+                        if (block != Blocks.AIR) {
+                            nonEmptyBlockCount++;
+                            if (block.isTicking()) {
+                                tickingBlockCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean shouldTick() {
+            return tickingBlockCount > 0;
+        }
+
+        @Override
+        public boolean a() {
+            return nonEmptyBlockCount == 0;
+        }
+
+        static EmptyCounterChunkSection of(ChunkSection chunkSection){
+            return chunkSection == null ?  null : new EmptyCounterChunkSection(chunkSection);
+        }
+
     }
 
 }

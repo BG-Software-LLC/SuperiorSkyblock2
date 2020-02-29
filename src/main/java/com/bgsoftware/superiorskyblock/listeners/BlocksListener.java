@@ -7,11 +7,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -72,6 +75,8 @@ public final class BlocksListener implements Listener {
                 island.handleBlockBreak(Key.of("WATER"), 1);
             island.handleBlockPlace(e.getBlockPlaced());
         }
+
+        ChunksTracker.markDirty(e.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -80,6 +85,8 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockPlace(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+
+        ChunksTracker.markDirty(LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace()));
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -97,6 +104,11 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockBreak(e.getBlock());
+
+        Executor.sync(() -> {
+            if(plugin.getNMSAdapter().isChunkEmpty(e.getBlock().getChunk()))
+                ChunksTracker.markEmpty(e.getBlock());
+        }, 2L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -105,6 +117,12 @@ public final class BlocksListener implements Listener {
 
         if(island != null)
             island.handleBlockBreak(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+
+        Executor.sync(() -> {
+            Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
+            if(plugin.getNMSAdapter().isChunkEmpty(location.getChunk()))
+                ChunksTracker.markEmpty(location);
+        }, 2L);
     }
 
     @EventHandler(ignoreCancelled = true)

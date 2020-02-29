@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -244,15 +245,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected) {
+        return getAllChunks(environment, onlyProtected, false);
+    }
+
+    @Override
+    public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+        World world = center.getWorld();
 
         List<Chunk> chunks = new ArrayList<>();
 
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                chunks.add(minChunk.getWorld().getChunkAt(x, z));
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z))
+                    chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
 
@@ -262,6 +270,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
+        return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
         List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
 
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
@@ -270,10 +283,12 @@ public final class SpawnIsland implements Island {
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(whenComplete != null)
-                    chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
-                else
-                    chunks.add(ChunksProvider.loadChunk(world, x, z));
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z)) {
+                    if (whenComplete != null)
+                        chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                    else
+                        chunks.add(ChunksProvider.loadChunk(world, x, z));
+                }
             }
         }
 
