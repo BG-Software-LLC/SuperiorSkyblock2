@@ -254,7 +254,6 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
                 if ((Boolean) outsideOfRangeMethod.invoke(playerChunkMap, chunkCoord))
                     continue;
             }catch(Exception ex){
-                ex.printStackTrace();
                 continue;
             }
 
