@@ -68,7 +68,7 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
         menuIslandRatings.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuIslandRatings.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuIslandRatings.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuIslandRatings.setSlots(charSlots.getOrDefault(cfg.getString("warps", " ").charAt(0), Collections.singletonList(-1)));
+        menuIslandRatings.setSlots(charSlots.getOrDefault(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
