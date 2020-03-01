@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UpgradeLevel {
 
@@ -31,5 +32,7 @@ public interface UpgradeLevel {
     int getBorderSize();
 
     int getGeneratorAmount(Key key);
+
+    Map<String, Integer> getGeneratorAmounts();
 
 }

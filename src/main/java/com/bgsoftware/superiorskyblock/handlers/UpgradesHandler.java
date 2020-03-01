@@ -65,7 +65,7 @@ public final class UpgradesHandler implements UpgradesManager {
                 double price = levelSection.getDouble("price");
                 List<String> commands = levelSection.getStringList("commands");
                 String permission = levelSection.getString("permission", "");
-                double cropGrowth = levelSection.getDouble("crops-growth", -1D);
+                double cropGrowth = levelSection.getDouble("crop-growth", -1D);
                 double spawnerRates = levelSection.getDouble("spawner-rates", -1D);
                 double mobDrops = levelSection.getDouble("mob-drops", -1D);
                 int teamLimit = levelSection.getInt("team-limit", -1);

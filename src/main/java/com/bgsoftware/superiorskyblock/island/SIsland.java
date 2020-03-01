@@ -109,7 +109,6 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<Object, SPermissionNode>> permissionNodes = SyncedObject.of(new HashMap<>());
     private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
-    private final SyncedObject<Key[]> cobbleGeneratorArray = SyncedObject.of(new Key[0]);
     private final SyncedObject<Set<IslandSettings>> islandSettings = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<String, Integer>> upgrades = SyncedObject.of(new HashMap<>());
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
@@ -165,15 +164,6 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
-
-
-        Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
-        int index = 0;
-        for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.get().entrySet()){
-            for(int i = 0; i < entry.getValue(); i++)
-                cobbleGeneratorArray[index++] = entry.getKey();
-        }
-        this.cobbleGeneratorArray.set(cobbleGeneratorArray);
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -1609,7 +1599,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return blockLimits.run((Function<KeyMap<Integer>, Map<Key, Integer>>) KeyMap::asKeyMap);
+        return this.blockLimits.run(_blockLimits -> {
+            Map<Key, Integer> blockLimits = new HashMap<>();
+
+            _blockLimits.keySet().forEach(key -> blockLimits.put(key, getBlockLimit(key)));
+
+            return blockLimits;
+        });
     }
 
     @Override
@@ -2068,9 +2064,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public Map<String, Integer> getGeneratorPercentages() {
         Map<String, Integer> generatorPercentages = new HashMap<>();
-        cobbleGeneratorValues.run(cobbleGenerator -> {
-            cobbleGenerator.keySet().forEach(key -> generatorPercentages.put(key.toString(), getGeneratorPercentage(key)));
-        });
+        getGeneratorAmounts().forEach((k ,v) -> generatorPercentages.put(k, getGeneratorPercentage(Key.of(k))));
         return generatorPercentages;
     }
 
@@ -2081,14 +2075,6 @@ public final class SIsland extends DatabaseObject implements Island {
                 cobbleGenerator.remove(key);
             else
                 cobbleGenerator.put(key, amount);
-
-            Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
-            int index = 0;
-            for(Map.Entry<Key, Integer> entry : cobbleGenerator.entrySet()){
-                for(int i = 0; i < entry.getValue(); i++)
-                    cobbleGeneratorArray[index++] = entry.getKey();
-            }
-            this.cobbleGeneratorArray.set(cobbleGeneratorArray);
 
             Query.ISLAND_SET_GENERATOR.getStatementHolder()
                     .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
@@ -2102,6 +2088,10 @@ public final class SIsland extends DatabaseObject implements Island {
         int generatorAmount = cobbleGeneratorValues.run(cobbleGenerator -> {
             return cobbleGenerator.getOrDefault(key, 0);
         });
+
+        if(generatorAmount > 0)
+            return generatorAmount;
+
         return upgrades.run(upgrades -> {
             int maxGeneratorAmount = generatorAmount;
 
@@ -2114,38 +2104,44 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getGeneratorTotalAmount() {
-        return cobbleGeneratorValues.run(cobbleGenerator -> {
-            int totalAmount = 0;
-            for(int amn : cobbleGenerator.values())
-                totalAmount += amn;
-            return totalAmount;
-        });
+        int totalAmount = 0;
+        for(int amt : getGeneratorAmounts().values())
+            totalAmount += amt;
+        return totalAmount;
     }
 
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        return cobbleGeneratorValues.run(cobbleGeneratorValues -> {
-            Map<String, Integer> cobbleGenerator = new HashMap<>();
-
-            for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.entrySet()){
-                cobbleGenerator.put(entry.getKey().toString(), entry.getValue());
-            }
-
-            return cobbleGenerator;
+        Map<String, Integer> cobbleGenerator = new HashMap<>();
+        cobbleGeneratorValues.run(cobbleGeneratorValues -> {
+            cobbleGeneratorValues.forEach((k, v) -> cobbleGenerator.put(k.toString(), getGeneratorAmount(k)));
         });
+
+        if(!cobbleGenerator.isEmpty())
+            return cobbleGenerator;
+
+        upgrades.run(upgrades -> {
+            for(String upgrade : upgrades.keySet()) {
+                for(Map.Entry<String, Integer> entry : getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getGeneratorAmounts().entrySet()) {
+                    cobbleGenerator.put(entry.getKey(), Math.max(entry.getValue(), cobbleGenerator.getOrDefault(entry.getKey(), 0)));
+                }
+            }
+        });
+
+        return cobbleGenerator;
     }
 
     @Override
     public String[] getGeneratorArray() {
-        return this.cobbleGeneratorArray.run(cobbleGenerator -> {
-            String[] newCobbleGenerator = new String[cobbleGenerator.length];
-
-            for(int i = 0; i < cobbleGenerator.length; i++)
-                newCobbleGenerator[i] = cobbleGenerator[i].toString();
-
-            return newCobbleGenerator;
-        });
+        String[] newCobbleGenerator = new String[getGeneratorTotalAmount()];
+        int index = 0;
+        for(Map.Entry<String, Integer> entry : getGeneratorAmounts().entrySet()){
+            for(; index < entry.getValue() && index < newCobbleGenerator.length; index++){
+                newCobbleGenerator[index] = entry.getKey();
+            }
+        }
+        return newCobbleGenerator;
     }
 
     /*
@@ -2341,25 +2337,19 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void assignGenerator(){
-        cobbleGeneratorValues.run(cobbleGenerator -> {
-            if(!cobbleGenerator.isEmpty() || owner == null)
-                return;
+        if(getGeneratorAmounts().isEmpty()) {
+            cobbleGeneratorValues.run(cobbleGenerator -> {
+                if (!cobbleGenerator.isEmpty() || owner == null)
+                    return;
 
-            cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
+                cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
 
-            Query.ISLAND_SET_GENERATOR.getStatementHolder()
-                    .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
-
-        Key[] cobbleGeneratorArray = new Key[getGeneratorTotalAmount()];
-        int index = 0;
-        for(Map.Entry<Key, Integer> entry : cobbleGeneratorValues.get().entrySet()){
-            for(int i = 0; i < entry.getValue(); i++)
-                cobbleGeneratorArray[index++] = entry.getKey();
+                Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                        .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
+                        .setString(owner.getUniqueId().toString())
+                        .execute(true);
+            });
         }
-        this.cobbleGeneratorArray.set(cobbleGeneratorArray);
     }
 
     private void checkMembersDuplication(){
