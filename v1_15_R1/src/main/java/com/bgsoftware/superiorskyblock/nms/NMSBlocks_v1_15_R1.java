@@ -247,7 +247,6 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
                 continue;
 
             Chunk chunk = optional.get();
-            playerChunk.a(chunk);
             ChunkCoordIntPair chunkCoord = playerChunk.i();
 
             try {

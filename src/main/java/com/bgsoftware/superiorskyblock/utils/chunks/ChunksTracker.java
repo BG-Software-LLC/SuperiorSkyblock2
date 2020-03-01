@@ -71,13 +71,13 @@ public final class ChunksTracker {
     }
 
     private static void markEmpty(ChunkPosition chunkPosition){
-        dirtyChunks.remove(chunkPosition);
-        increaseCounter();
+        if(dirtyChunks.remove(chunkPosition))
+            increaseCounter();
     }
 
     private static void markDirty(ChunkPosition chunkPosition){
-        dirtyChunks.add(chunkPosition);
-        increaseCounter();
+        if(dirtyChunks.add(chunkPosition))
+            increaseCounter();
     }
 
     private static void increaseCounter(){
