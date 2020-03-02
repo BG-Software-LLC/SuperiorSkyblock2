@@ -482,7 +482,14 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void resetMission(Mission mission) {
-        completedMissions.remove(mission);
+        if(completedMissions.getOrDefault(mission, 0) > 0) {
+            completedMissions.put(mission, completedMissions.get(mission) - 1);
+        }
+        else {
+            completedMissions.remove(mission);
+        }
+
+        mission.clearData(this);
 
         Query.PLAYER_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))

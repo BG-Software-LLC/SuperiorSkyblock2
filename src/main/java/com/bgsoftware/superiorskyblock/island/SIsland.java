@@ -1877,6 +1877,8 @@ public final class SIsland extends DatabaseObject implements Island {
                     .execute(true);
         });
 
+        mission.clearData(getOwner());
+
         MenuIslandMissions.refreshMenus();
     }
 

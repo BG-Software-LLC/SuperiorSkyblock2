@@ -78,7 +78,6 @@ public final class CmdAdminMission implements ISuperiorCommand {
         }
         else if(args[3].equalsIgnoreCase("reset")){
             targetPlayer.resetMission(mission);
-            mission.clearData(targetPlayer);
             Locale.MISSION_STATUS_RESET.send(sender, mission.getName(), targetPlayer.getName());
             return;
         }
