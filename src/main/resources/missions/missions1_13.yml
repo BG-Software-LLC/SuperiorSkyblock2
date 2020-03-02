@@ -435,6 +435,7 @@ add-member:
   auto-reward: true
   rewards:
     commands:
+      - 'eco give %player% 10000'
       - 'is admin msgall %player% &e&lMission | &7Successfully finished the mission Add Member!'
   events:
     - IslandJoinEvent
@@ -468,6 +469,49 @@ add-member:
       name: '&aAdd Member'
       lore:
         - '&7Add your first member to the island.'
+        - ''
+        - '&a&l ✔ &7Already Claimed.'
+
+10k-worth:
+  mission-file: IslandMissions
+  island: true
+  auto-reward: true
+  rewards:
+    commands:
+      - 'is admin msgall %player% &e&lMission | &7You reached island worth 10,000!'
+  events:
+    - IslandWorthUpdateEvent
+  success-check: 'event.getOldWorth() <= 10000 && event.getNewWorth() > 10000'
+  icons:
+    not-completed:
+      type: PAPER
+      name: '&aReach 10k'
+      lore:
+        - '&7Reach island worth of 10,000.'
+        - ''
+        - '&6Rewards:'
+        - '&8 - &7$10,000'
+        - ''
+        - '&c&l ✘ &7Not Completed'
+    can-complete:
+      type: PAPER
+      name: '&aReach 10k'
+      lore:
+        - '&7Reach island worth of 10,000.'
+        - ''
+        - '&6Rewards:'
+        - '&8 - &7$10,000'
+        - ''
+        - '&a&l ✔ &7Click to redeem your reward.'
+      enchants:
+        DURABILITY: 1
+      flags:
+        - HIDE_ENCHANTS
+    completed:
+      type: MAP
+      name: '&aReach 10k'
+      lore:
+        - '&7Reach island worth of 10,000.'
         - ''
         - '&a&l ✔ &7Already Claimed.'
 
