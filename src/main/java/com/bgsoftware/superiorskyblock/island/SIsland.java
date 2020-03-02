@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
@@ -1268,6 +1269,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         boolean increaseAmount = false;
 
+        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+
         if(blockValue.doubleValue() >= 0){
             islandWorth.run(islandWorth -> {
                 this.islandWorth.set(islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
@@ -1301,6 +1304,9 @@ public final class SIsland extends DatabaseObject implements Island {
                     }
                 });
             });
+
+            IslandWorthUpdateEvent islandWorthUpdateEvent = new IslandWorthUpdateEvent(this, oldWorth, oldLevel, getWorth(), getIslandLevel());
+            Bukkit.getPluginManager().callEvent(islandWorthUpdateEvent);
 
             updateLastTime();
 
