@@ -894,6 +894,8 @@ public final class SIsland extends DatabaseObject implements Island {
             chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, true, whenComplete).stream()
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
 
+        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+
         blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
         islandWorth.set(BigDecimalFormatted.ZERO);
         islandLevel.set(BigDecimalFormatted.ZERO);
@@ -994,7 +996,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
                 MenuValues.refreshMenus();
 
-                saveBlockCounts();
+                saveBlockCounts(oldWorth, oldLevel);
 
                 beingRecalculated.set(false);
             });
@@ -1305,14 +1307,11 @@ public final class SIsland extends DatabaseObject implements Island {
                 });
             });
 
-            IslandWorthUpdateEvent islandWorthUpdateEvent = new IslandWorthUpdateEvent(this, oldWorth, oldLevel, getWorth(), getIslandLevel());
-            Bukkit.getPluginManager().callEvent(islandWorthUpdateEvent);
-
             updateLastTime();
 
             if(save){
                 MenuValues.refreshMenus();
-                saveBlockCounts();
+                saveBlockCounts(oldWorth, oldLevel);
             }
         }
     }
@@ -1343,6 +1342,8 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
         boolean decreaseAmount = false;
+
+        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         if(blockValue.doubleValue() >= 0){
             BigDecimalFormatted islandWorth = this.islandWorth.get();
@@ -1389,7 +1390,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             MenuValues.refreshMenus();
 
-            if(save) saveBlockCounts();
+            if(save) saveBlockCounts(oldWorth, oldLevel);
         }
     }
 
@@ -1462,7 +1463,16 @@ public final class SIsland extends DatabaseObject implements Island {
         return islandLevel;
     }
 
-    private void saveBlockCounts(){
+    private void saveBlockCounts(BigDecimal oldWorth, BigDecimal oldLevel){
+        BigDecimal newWorth = getWorth(), newLevel = getIslandLevel();
+
+        if(oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
+            Executor.async(() -> {
+                IslandWorthUpdateEvent islandWorthUpdateEvent = new IslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel);
+                Bukkit.getPluginManager().callEvent(islandWorthUpdateEvent);
+            }, 0L);
+        }
+
         blockCounts.run(blockCounts -> {
             Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
                     .setString(IslandSerializer.serializeBlockCounts(blockCounts))
