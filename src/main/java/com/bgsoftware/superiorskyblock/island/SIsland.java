@@ -2135,13 +2135,9 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public String[] getGeneratorArray() {
         String[] newCobbleGenerator = new String[getGeneratorTotalAmount()];
-
-        if(newCobbleGenerator.length == 0)
-            return new String[] {"COBBLESTONE"};
-
         int index = 0;
         for(Map.Entry<String, Integer> entry : getGeneratorAmounts().entrySet()){
-            for(; index < entry.getValue() && index < newCobbleGenerator.length; index++){
+            for(int i = 0; i < entry.getValue() && index < newCobbleGenerator.length; i++, index++){
                 newCobbleGenerator[index] = entry.getKey();
             }
         }
