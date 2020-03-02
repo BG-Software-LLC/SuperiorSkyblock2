@@ -834,11 +834,10 @@ public final class SIsland extends DatabaseObject implements Island {
             if (plugin.getSettings().disbandInventoryClear)
                 plugin.getNMSAdapter().clearInventory(superiorPlayer.asOfflinePlayer());
 
-            superiorPlayer.getCompletedMissions().forEach(mission -> {
+            plugin.getMissions().getAllMissions().stream().filter(mission -> {
                 MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
-                if (missionData != null && missionData.disbandReset)
-                    superiorPlayer.resetMission(mission);
-            });
+                return missionData != null && missionData.disbandReset;
+            }).forEach(superiorPlayer::resetMission);
         });
 
         plugin.getGrid().deleteIsland(this);
