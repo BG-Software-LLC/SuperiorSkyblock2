@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;

@@ -78,6 +78,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             try{
                 pair = new Pair<>(chunkSnapshots.get(id).getStackedBarrelItem(location));
             }catch(Throwable ex){
+                //noinspection deprecation
                 Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
                 pair = new Pair<>(entry.getKey(), new ItemStack(entry.getValue()));
             }

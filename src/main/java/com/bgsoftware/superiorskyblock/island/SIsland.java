@@ -56,7 +56,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
