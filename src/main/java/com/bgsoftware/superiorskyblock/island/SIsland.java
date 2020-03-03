@@ -65,6 +65,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -948,11 +949,11 @@ public final class SIsland extends DatabaseObject implements Island {
                                     }
                                 }
 
-                                Pair<Integer, Material> blockPair = plugin.getProviders().getBlock(location);
+                                Pair<Integer, ItemStack> blockPair = plugin.getProviders().getBlock(location);
 
                                 if(blockPair != null){
                                     blockCount = blockPair.getKey();
-                                    blockKey = Key.of(blockPair.getValue().name());
+                                    blockKey = Key.of(blockPair.getValue());
                                 }
 
                                 handleBlockPlace(blockKey, blockCount, false);

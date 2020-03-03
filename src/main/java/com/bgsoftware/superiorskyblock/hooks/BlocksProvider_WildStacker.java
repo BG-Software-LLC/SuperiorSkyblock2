@@ -25,6 +25,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,11 +70,19 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
     }
 
     @Override
-    public Pair<Integer, Material> getBlock(Location location) {
+    public Pair<Integer, ItemStack> getBlock(Location location) {
         String id = getId(location);
         if(chunkSnapshots.containsKey(id)) {
-            Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
-            return entry.getValue().name().contains("AIR") ? null : new Pair<>(entry);
+            Pair<Integer, ItemStack> pair;
+
+            try{
+                pair = new Pair<>(chunkSnapshots.get(id).getStackedBarrelItem(location));
+            }catch(Throwable ex){
+                Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
+                pair = new Pair<>(entry.getKey(), new ItemStack(entry.getValue()));
+            }
+
+            return pair.getValue().getType().name().contains("AIR") ? null : pair;
         }
 
         throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);

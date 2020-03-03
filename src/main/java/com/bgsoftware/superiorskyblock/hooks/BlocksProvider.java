@@ -20,7 +20,7 @@ public interface BlocksProvider extends SpawnersProvider {
         return EntityType.PIG;
     }
 
-    default Pair<Integer, Material> getBlock(Location location){
+    default Pair<Integer, ItemStack> getBlock(Location location){
         return null;
     }
 

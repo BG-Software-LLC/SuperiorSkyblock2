@@ -75,7 +75,7 @@ public final class ProvidersHandler implements ProvidersManager {
         return spawnersProvider != null ? Key.of(Materials.SPAWNER.toBukkitType() + ":" + spawnersProvider.getSpawnerType(itemStack)) : Key.of(itemStack);
     }
 
-    public Pair<Integer, Material> getBlock(Location location){
+    public Pair<Integer, ItemStack> getBlock(Location location){
         return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
     }
 
