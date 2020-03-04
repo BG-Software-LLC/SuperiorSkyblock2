@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -18,6 +19,7 @@ public abstract class IslandEvent extends Event {
      * @param island The island object that was involved in the event.
      */
     public IslandEvent(Island island){
+        super(!Bukkit.isPrimaryThread());
         this.island = island;
     }
 
