@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.tasks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,10 +17,18 @@ public final class CropsTask {
 
     private CropsTask(){
         CropsTask.random = ThreadLocalRandom.current().nextInt();
-        CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for(World.Environment env : World.Environment.values())
-                random = tickWorld(plugin.getGrid().getIslandsWorld(env), random);
-        }, 5L, 5L);
+        if(ServerVersion.isAtLeast(ServerVersion.v1_14)){
+            CropsTask.task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                for (World.Environment env : World.Environment.values())
+                    random = tickWorld(plugin.getGrid().getIslandsWorld(env), random);
+            }, 5L, 5L);
+        }
+        else {
+            CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+                for (World.Environment env : World.Environment.values())
+                    random = tickWorld(plugin.getGrid().getIslandsWorld(env), random);
+            }, 5L, 5L);
+        }
     }
 
     private int tickWorld(World world, int random){
