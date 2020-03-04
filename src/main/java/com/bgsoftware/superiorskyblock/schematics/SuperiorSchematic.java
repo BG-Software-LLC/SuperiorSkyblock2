@@ -185,7 +185,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
         Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 
-        BlockChangeTask blockChangeTask = new BlockChangeTask();
+        BlockChangeTask blockChangeTask = new BlockChangeTask(island);
 
         for(int y = 0; y <= sizes[1]; y++){
             for(int x = 0; x <= sizes[0]; x++){

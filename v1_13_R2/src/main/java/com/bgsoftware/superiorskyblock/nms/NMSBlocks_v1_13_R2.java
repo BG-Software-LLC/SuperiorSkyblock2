@@ -34,6 +34,7 @@ import net.minecraft.server.v1_13_R2.World;
 import net.minecraft.server.v1_13_R2.WorldServer;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
@@ -263,6 +264,16 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
                 pair.getValue().b(worldServer, pair.getKey(), ThreadLocalRandom.current())));
 
         return random;
+    }
+
+    @Override
+    public Material getMaterial(int combinedId) {
+        return CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId)).getItemType();
+    }
+
+    @Override
+    public byte getData(int combinedId) {
+        return 0;
     }
 
 }

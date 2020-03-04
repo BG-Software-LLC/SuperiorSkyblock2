@@ -1,8 +1,12 @@
 package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -19,8 +23,13 @@ public final class BlockChangeTask {
 
     private final Map<ChunkPosition, List<BlockData>> blocksCache = Maps.newConcurrentMap();
     private final List<Chunk> chunksToUpdate = new ArrayList<>();
+    private final Island island;
 
     private boolean submitted = false;
+
+    public BlockChangeTask(Island island){
+        this.island = island;
+    }
 
     public void setBlock(Location location, int combinedId, BlockType blockType, Object... args){
         if(submitted)
@@ -36,14 +45,22 @@ public final class BlockChangeTask {
 
         submitted = true;
 
+        KeyMap<Integer> blocks = new KeyMap<>();
+
         for(Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()){
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
             plugin.getNMSBlocks().refreshLight(chunk);
             ChunksTracker.markDirty(chunk);
-            entry.getValue().forEach(blockData ->
-                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args));
+
+            for(BlockData blockData : entry.getValue()){
+                plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args);
+                Key key = Key.of(plugin.getNMSBlocks().getMaterial(blockData.combinedId), plugin.getNMSBlocks().getData(blockData.combinedId));
+                blocks.put(key, blocks.getRaw(key, 0) + 1);
+            }
         }
+
+        ((SIsland) island).handleBlocksPlace(blocks);
 
         blocksCache.clear();
 

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -12,7 +13,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.Set;
 
 public interface NMSBlocks {
 
@@ -39,5 +39,14 @@ public interface NMSBlocks {
     void setTileEntityMobSpawner(Object tileEntityMobSpawner, EntityType spawnedType);
 
     int tickWorld(World world, int random);
+
+    default Material getMaterial(int combinedId) {
+        //noinspection deprecation
+        return Material.getMaterial(combinedId & 4095);
+    }
+
+    default byte getData(int combinedId) {
+        return (byte) (combinedId >> 12 & 15);
+    }
 
 }

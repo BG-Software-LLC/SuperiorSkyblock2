@@ -1315,6 +1315,59 @@ public final class SIsland extends DatabaseObject implements Island {
         }
     }
 
+    public void handleBlocksPlace(KeyMap<Integer> blocks){
+        KeyMap<Integer> blockLimits = this.blockLimits.get();
+
+        KeyMap<Integer> blockCounts = new KeyMap<>();
+        BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
+
+        for(Map.Entry<Key, Integer> entry : blocks.entrySet()){
+            BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
+            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
+
+            boolean increaseAmount = false;
+
+            if(blockValue.doubleValue() >= 0){
+                blocksValues = blocksValues.add(blockValue.multiply(BigDecimal.valueOf(entry.getValue())));
+                increaseAmount = true;
+            }
+
+            if(blockLevel.doubleValue() >= 0){
+                blocksLevels = blocksLevels.add(blockValue.multiply(BigDecimal.valueOf(entry.getValue())));
+                increaseAmount = true;
+            }
+
+            if(increaseAmount || blockLimits.containsKey(entry.getKey())) {
+                Key _key = plugin.getBlockValues().getBlockKey(entry.getKey());
+
+                int currentAmount = blockCounts.getRaw(_key, 0);
+                blockCounts.put(_key, currentAmount + entry.getValue());
+
+                if (!_key.toString().equals(blockLimits.getKey(_key).toString())) {
+                    _key = blockLimits.getKey(_key);
+                    currentAmount = blockCounts.getRaw(_key, 0);
+                    blockCounts.put(_key, currentAmount + entry.getValue());
+                }
+            }
+        }
+
+        BigDecimal BLOCKS_VALUES = blocksValues, BLOCKS_LEVELS = blocksLevels;
+
+        this.islandWorth.run(islandWorth -> {
+            this.islandWorth.set(islandWorth.add(BLOCKS_VALUES));
+        });
+
+        this.islandLevel.run(islandLevel -> {
+            this.islandLevel.set(islandLevel.add(BLOCKS_LEVELS));
+        });
+
+        this.blockCounts.run(_blockCounts -> {
+            _blockCounts.putAll(blockCounts);
+        });
+
+        saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
+    }
+
     @Override
     public void handleBlockBreak(Block block){
         handleBlockBreak(Key.of(block), 1);

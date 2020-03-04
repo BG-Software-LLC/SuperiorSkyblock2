@@ -109,7 +109,6 @@ public final class GridHandler implements GridManager {
                             if (island.isInside(superiorPlayer.getLocation()))
                                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
                         }
-                        Executor.async(() -> island.calcIslandWorth(null));
                     }
                 });
 
