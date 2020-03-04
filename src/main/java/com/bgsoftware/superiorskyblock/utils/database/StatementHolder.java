@@ -60,6 +60,8 @@ public final class StatementHolder {
             return;
         }
 
+        SQLHelper.waitForConnection();
+
         StringHolder errorQuery = new StringHolder(query);
 
         SQLHelper.buildStatement(query, preparedStatement -> {
