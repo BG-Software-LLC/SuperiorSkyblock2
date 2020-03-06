@@ -152,7 +152,7 @@ public final class SQLHelper {
     }
 
     private static void close(AutoCloseable closeable){
-        if(closeable != null && !closeable.getClass().getName().contains("org.sqlite")){
+        if(closeable != null && plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")){
             try {
                 closeable.close();
             } catch (Exception ignored) {}
