@@ -1,11 +1,16 @@
 package com.bgsoftware.superiorskyblock.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
 public final class SUpgrade implements Upgrade {
+
+    private static SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
+            -1, -1, -1, -1, -1, -1, new KeyMap<>(), new KeyMap<>());
 
     private final String name;
 
@@ -23,7 +28,7 @@ public final class SUpgrade implements Upgrade {
 
     @Override
     public SUpgradeLevel getUpgradeLevel(int level) {
-        return level <= 0 || level > upgradeLevels.length ? null : upgradeLevels[level - 1];
+        return level <= 0 || level > upgradeLevels.length ? NULL_LEVEL : upgradeLevels[level - 1];
     }
 
     @Override
