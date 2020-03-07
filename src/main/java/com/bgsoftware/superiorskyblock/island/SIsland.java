@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -1489,6 +1490,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
         this.bonusWorth.set(bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth));
+        MenuTopIslands.refreshMenus();
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
                 .setString(this.bonusWorth.get().getAsString())
                 .setString(owner.getUniqueId().toString())
