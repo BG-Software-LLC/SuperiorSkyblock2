@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.schematics;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -145,6 +147,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     blocks[x][y][z] = SchematicBlock.of(combinedId);
                 }
 
+                readBlock(blocks[x][y][z]);
             }
         }
 
@@ -185,7 +188,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
         Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 
-        BlockChangeTask blockChangeTask = new BlockChangeTask(island);
+        BlockChangeTask blockChangeTask = new BlockChangeTask();
 
         for(int y = 0; y <= sizes[1]; y++){
             for(int x = 0; x <= sizes[0]; x++){
@@ -200,6 +203,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             for(SchematicEntity entity : entities) {
                 entity.spawnEntity(min);
             }
+
+            ((SIsland) island).handleBlocksPlace(cachedCounts);
 
             IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
             Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);
@@ -226,6 +231,12 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     public CompoundTag getTag(){
         return compoundTag;
+    }
+
+    private void readBlock(SchematicBlock block){
+        int combinedId = block.getCombinedId();
+        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId), plugin.getNMSBlocks().getData(combinedId));
+        cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 
     private <T extends Enum<T>> T getOrNull(Class<T> enumType, String name){

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import org.bukkit.Location;
 
@@ -11,6 +12,8 @@ public abstract class BaseSchematic implements Schematic {
     protected Queue<PasteSchematicData> pasteSchematicQueue = new Queue<>();
     protected static boolean schematicProgress = false;
     protected final String name;
+
+    protected final KeyMap<Integer> cachedCounts = new KeyMap<>();
 
     protected BaseSchematic(String name){
         this.name = name;
