@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -16,14 +17,22 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
 
+@SuppressWarnings("JavaReflectionMemberAccess")
 public final class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     private static Method blockVector3AtMethod = null;
     private static Method blockVector3PasteMethod = null;
+
+    private static Method getCurrentBaseblock = null;
+    private static Method baseBlockId = null;
+    private static Method baseBlockData = null;
+    private static Method getBlockTypes = null;
+    private static Method adaptBlockType = null;
 
     static {
         try{
@@ -33,6 +42,19 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
             blockVector3PasteMethod = com.boydti.fawe.object.schematic.Schematic.class
                     .getMethod("paste", World.class, blockVector3Class, boolean.class, boolean.class, Transform.class);
         }catch(Throwable ignored){ }
+
+        try{
+            Class<?> blockTypesClass = Class.forName("com.sk89q.worldedit.world.block.BlockTypes");
+            getBlockTypes = BlockStateHolder.class.getMethod("getBlockType");
+            adaptBlockType = BukkitAdapter.class.getMethod("adapt", blockTypesClass);
+        }catch(Throwable ignored){}
+
+        try{
+            getCurrentBaseblock = BlockChange.class.getMethod("getCurrent");
+            baseBlockId = BaseBlock.class.getMethod("getId");
+            baseBlockData = BaseBlock.class.getMethod("getData");
+        }catch(Throwable ignored){}
+
     }
 
     private com.boydti.fawe.object.schematic.Schematic schematic;
@@ -74,8 +96,25 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
             Change change = changeIterator.next();
             if(change instanceof BlockChange){
                 BlockChange blockChange = (BlockChange) change;
-                BlockStateHolder blockStateHolder = blockChange.getCurrent();
-                Key key = Key.of(BukkitAdapter.adapt(blockStateHolder.getBlockType()), (byte) blockStateHolder.getInternalId());
+                Key key;
+                try {
+                    //noinspection rawtypes
+                    BlockStateHolder blockStateHolder = blockChange.getCurrent();
+                    Material material = (Material) adaptBlockType.invoke(null, getBlockTypes.invoke(blockStateHolder));
+                    //noinspection deprecation
+                    key = Key.of(material, (byte) blockStateHolder.getInternalId());
+                }catch(Throwable ignored){
+                    try{
+                        Object baseBlock = getCurrentBaseblock.invoke(blockChange);
+                        int id = (Integer) baseBlockId.invoke(baseBlock);
+                        int data = (Integer) baseBlockData.invoke(baseBlock);
+                        //noinspection deprecation
+                        key = Key.of(Material.getMaterial(id), (byte) data);
+                    }catch(Throwable ex){
+                        ex.printStackTrace();
+                        break;
+                    }
+                }
                 blocks.put(key, blocks.getRaw(key, 0) + 1);
             }
         }
