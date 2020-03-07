@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
@@ -16,6 +17,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 public final class IslandRegistry implements Iterable<Island> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private Map<UUID, Island> islands = Maps.newHashMap();
     private Map<IslandPosition, Island> islandsByPositions = Maps.newHashMap();
@@ -50,6 +53,7 @@ public final class IslandRegistry implements Iterable<Island> {
         islandsByPositions.put(IslandPosition.of(island), island);
         for(TreeSet<Island> sortedTree : sortedTrees.values())
             sortedTree.add(island);
+        plugin.getProviders().updateIslandsTopHook(null);
     }
 
     public synchronized void remove(UUID uuid){
@@ -60,6 +64,7 @@ public final class IslandRegistry implements Iterable<Island> {
                 sortedTree.remove(island);
         }
         islands.remove(uuid);
+        plugin.getProviders().updateIslandsTopHook(null);
     }
 
     public int size(){
@@ -86,6 +91,7 @@ public final class IslandRegistry implements Iterable<Island> {
             if(!island.isIgnored())
                 sortedTree.add(island);
         }
+        plugin.getProviders().updateIslandsTopHook(sortingType);
         Executor.sync(MenuTopIslands::refreshMenus);
     }
 

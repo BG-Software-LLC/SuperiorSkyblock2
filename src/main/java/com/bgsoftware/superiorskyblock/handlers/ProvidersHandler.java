@@ -3,17 +3,21 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.IslandsTopHook;
+import com.bgsoftware.superiorskyblock.hooks.IslandsTopHook_HolographicDisplays;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.hooks.ProtocolLibHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -21,14 +25,21 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class ProvidersHandler implements ProvidersManager {
 
     private SpawnersProvider spawnersProvider;
+    private Set<IslandsTopHook> islandsTopHooks = new HashSet<>();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 LeaderHeadsHook.register();
+
+            if(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
+                ProtocolLibHook.init(plugin);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
@@ -53,6 +64,9 @@ public final class ProvidersHandler implements ProvidersManager {
                     setSpawnersProvider(new BlocksProvider_Default());
                 }
             }
+
+            if(Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays"))
+                islandsTopHooks.add(new IslandsTopHook_HolographicDisplays());
         });
 
         PlaceholderHook.register(plugin);
@@ -76,6 +90,10 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public Pair<Integer, ItemStack> getBlock(Location location){
         return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
+    }
+
+    public void updateIslandsTopHook(SortingType sortingType){
+        islandsTopHooks.forEach(islandsTopHook -> islandsTopHook.refresh(sortingType));
     }
 
 }

@@ -263,6 +263,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
     public static void refreshMenus(){
         SuperiorMenu.refreshMenus(MenuTopIslands.class);
+        plugin.getProviders().updateIslandsTopHook(null);
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){
