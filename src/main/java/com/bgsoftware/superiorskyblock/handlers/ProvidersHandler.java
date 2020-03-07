@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.IslandsTopHook;
+import com.bgsoftware.superiorskyblock.hooks.IslandsTopHook_Holograms;
 import com.bgsoftware.superiorskyblock.hooks.IslandsTopHook_HolographicDisplays;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -67,6 +68,8 @@ public final class ProvidersHandler implements ProvidersManager {
 
             if(Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays"))
                 islandsTopHooks.add(new IslandsTopHook_HolographicDisplays());
+            if(Bukkit.getPluginManager().isPluginEnabled("Holograms"))
+                islandsTopHooks.add(new IslandsTopHook_Holograms());
         });
 
         PlaceholderHook.register(plugin);
