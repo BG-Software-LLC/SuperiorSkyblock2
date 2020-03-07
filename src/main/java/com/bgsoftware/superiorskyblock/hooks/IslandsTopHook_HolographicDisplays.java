@@ -7,7 +7,7 @@ import com.gmail.filoghost.holographicdisplays.object.CraftHologram;
 import com.gmail.filoghost.holographicdisplays.object.NamedHologramManager;
 import com.gmail.filoghost.holographicdisplays.object.line.CraftTextLine;
 
-public class IslandsTopHook_HolographicDisplays extends IslandsTopHook {
+public final class IslandsTopHook_HolographicDisplays extends IslandsTopHook {
 
     @Override
     public void refresh(SortingType sortingType) {
