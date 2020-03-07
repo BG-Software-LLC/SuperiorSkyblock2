@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,7 +26,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
     private Island island;
 
     private MenuVisitors(SuperiorPlayer superiorPlayer, Island island){
-        super("menuVisitors", superiorPlayer, false);
+        super("menuVisitors", superiorPlayer, true);
         this.island = island;
     }
 
@@ -35,7 +36,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
             previousMove = false;
             MenuUniqueVisitors.openInventory(superiorPlayer, this, island);
         }
-        else{
+        else if(targetPlayer != null){
             if (event.getClick().name().contains("RIGHT")) {
                 CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "invite " + targetPlayer.getName());
             } else if (event.getClick().name().contains("LEFT")) {
