@@ -8,10 +8,10 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
-import com.gmail.filoghost.holographicdisplays.bridge.protocollib.current.packet.WrapperPlayServerEntityMetadata;
-import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,37 +24,34 @@ public final class ProtocolLibHook {
                 PacketContainer packet = event.getPacket();
 
                 if (packet.getType() == PacketType.Play.Server.ENTITY_METADATA) {
+                    WrappedDataWatcher watcher = new WrappedDataWatcher(packet.getWatchableCollectionModifier().read(0));
+                    List<WrappedWatchableObject> newWatchableObjects = new ArrayList<>();
+                    for (WrappedWatchableObject watchableObject : watcher.getWatchableObjects()) {
+                        if (watchableObject.getIndex() == 2)
+                            replacePlaceholders(watchableObject);
 
-                    WrapperPlayServerEntityMetadata entityMetadataPacket = new WrapperPlayServerEntityMetadata(packet.deepClone());
-                    List<WrappedWatchableObject> dataWatcherValues = entityMetadataPacket.getEntityMetadata();
-
-                    for (WrappedWatchableObject watchableObject : dataWatcherValues) {
-                        if (watchableObject.getIndex() == 2) {
-                            if (replacePlaceholders(watchableObject, event.getPlayer()))
-                                event.setPacket(entityMetadataPacket.getHandle());
-
-                            return;
-                        }
+                        newWatchableObjects.add(watchableObject);
                     }
+                    packet.getWatchableCollectionModifier().write(0, newWatchableObjects);
                 }
             }
         });
     }
 
-    private static boolean replacePlaceholders(WrappedWatchableObject customNameWatchableObject, Player player) {
-        if (customNameWatchableObject == null) return true;
+    private static void replacePlaceholders(WrappedWatchableObject customNameWatchableObject) {
+        if (customNameWatchableObject == null) return;
 
         Object customNameWatchableObjectValue = customNameWatchableObject.getValue();
         String customName;
 
         if (ServerVersion.isAtLeast(ServerVersion.v1_13)) {
             if (!(customNameWatchableObjectValue instanceof Optional)) {
-                return false;
+                return;
             }
 
             Optional<?> customNameOptional = (Optional<?>) customNameWatchableObjectValue;
             if (!customNameOptional.isPresent()) {
-                return false;
+                return;
             }
 
             WrappedChatComponent componentWrapper = WrappedChatComponent.fromHandle(customNameOptional.get());
@@ -71,8 +68,6 @@ public final class ProtocolLibHook {
         } else {
             customNameWatchableObject.setValue(customName);
         }
-
-        return true;
     }
 
     public static void disable(SuperiorSkyblockPlugin plugin){
