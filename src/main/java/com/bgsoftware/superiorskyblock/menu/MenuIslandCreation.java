@@ -67,6 +67,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
         String permission = (String) menu.getData(schematic + "-permission");
         if (menu.superiorPlayer.hasPermission(permission)) {
             BigDecimal bonusWorth = new BigDecimal((long) menu.getData(schematic + "-bonus"));
+            boolean offset = (boolean) menu.getData(schematic + "-offset");
+
             Biome biome = Biome.valueOf((String) menu.getData(schematic + "-biome"));
 
             SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-has-access-item-sound");
@@ -86,7 +88,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             }
 
             Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
-            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, biome, menu.islandName);
+            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, biome, menu.islandName, offset);
         }
         else{
             SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-no-access-item-sound");
@@ -159,6 +161,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission"));
                         menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
                         menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", itemSection.getLong("bonus-worth", 0)));
+                        menuIslandCreation.addData(schematic + "-offset", itemSection.getBoolean("offset", false));
                         menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("access")));
                         menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("no-access")));
 

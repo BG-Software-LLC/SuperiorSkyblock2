@@ -27,6 +27,17 @@ public interface GridManager {
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName);
 
     /**
+     * Create a new island.
+     * @param superiorPlayer The new owner for the island.
+     * @param schemName The schematic that should be used.
+     * @param bonus A starting worth for the island.
+     * @param biome A starting biome for the island.
+     * @param islandName The name of the new island.
+     * @param offset Should the island have an offset for it's values? If disabled, the bonus will be given.
+     */
+    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName, boolean offset);
+
+    /**
      * Delete an island.
      * @param island The island to delete.
      */
