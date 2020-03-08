@@ -11,9 +11,15 @@ import java.util.concurrent.TimeUnit;
 
 public final class Executor {
 
-    private static final ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Thread %d").build());
-    private static final ExecutorService databaseExecutor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static SuperiorSkyblockPlugin plugin;
+    private static ExecutorService executor;
+    private static ExecutorService databaseExecutor;
+
+    public static void init(SuperiorSkyblockPlugin plugin){
+        Executor.plugin = plugin;
+        executor = Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Thread %d").build());
+        databaseExecutor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
+    }
 
     public static void ensureMain(Runnable runnable){
         if(!Bukkit.isPrimaryThread()){

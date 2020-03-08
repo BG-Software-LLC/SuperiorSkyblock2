@@ -94,6 +94,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         loadNMSAdapter();
         loadAPI();
+        Executor.init(this);
 
         EnchantsUtils.registerGlowEnchantment();
 
