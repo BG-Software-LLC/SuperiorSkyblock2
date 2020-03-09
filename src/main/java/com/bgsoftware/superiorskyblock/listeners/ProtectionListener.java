@@ -3,10 +3,11 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -66,7 +67,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -92,7 +93,8 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPermission islandPermission = e.getBlock().getType() == Materials.SPAWNER.toBukkitType() ? IslandPermission.SPAWNER_BREAK : IslandPermission.BREAK;
+        IslandPrivilege islandPermission = e.getBlock().getType() == Materials.SPAWNER.toBukkitType() ?
+                IslandPrivileges.SPAWNER_BREAK : IslandPrivileges.BREAK;
 
         if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
@@ -129,15 +131,15 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPermission islandPermission;
+        IslandPrivilege islandPermission;
 
-        if(clickedBlock.getState() instanceof Chest) islandPermission = IslandPermission.CHEST_ACCESS;
-        else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPermission.USE;
-        else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPermission.SIGN_INTERACT;
-        else if(clickedBlock.getType() == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPermission.SPAWNER_BREAK;
+        if(clickedBlock.getState() instanceof Chest) islandPermission = IslandPrivileges.CHEST_ACCESS;
+        else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
+        else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
+        else if(clickedBlock.getType() == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
         else if(clickedBlock.getType().name().equals("SOIL") || clickedBlock.getType().name().equals("FARMLAND"))
-            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPermission.FARM_TRAMPING : IslandPermission.BUILD;
-        else islandPermission = IslandPermission.INTERACT;
+            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
+        else islandPermission = IslandPrivileges.INTERACT;
 
         if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
@@ -168,7 +170,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPermission islandPermission = e.getEntity() instanceof ItemFrame ? IslandPermission.ITEM_FRAME : IslandPermission.PAINTING;
+        IslandPrivilege islandPermission = e.getEntity() instanceof ItemFrame ? IslandPrivileges.ITEM_FRAME : IslandPrivileges.PAINTING;
         if(!island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
@@ -195,7 +197,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -221,7 +223,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.ITEM_FRAME)){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -299,7 +301,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.BUILD)){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -325,7 +327,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.BREAK)){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BREAK)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -345,7 +347,8 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
-        if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ? IslandPermission.INTERACT : IslandPermission.ANIMAL_BREED)){
+        if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ?
+                IslandPrivileges.INTERACT : IslandPrivileges.ANIMAL_BREED)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
@@ -356,7 +359,7 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.DROP_ITEMS)){
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.DROP_ITEMS)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
@@ -367,7 +370,7 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
@@ -395,7 +398,7 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        IslandPermission islandPermission = e.getEntity() instanceof ArmorStand ? IslandPermission.BREAK : e.getEntity() instanceof Animals ? IslandPermission.ANIMAL_DAMAGE : IslandPermission.MONSTER_DAMAGE;
+        IslandPrivilege islandPermission = e.getEntity() instanceof ArmorStand ? IslandPrivileges.BREAK : e.getEntity() instanceof Animals ? IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.MONSTER_DAMAGE;
 
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
@@ -416,7 +419,7 @@ public final class ProtectionListener implements Listener {
         if(spawnType == EntityType.UNKNOWN)
             return;
 
-        IslandPermission islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPermission.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPermission.ANIMAL_SPAWN : IslandPermission.MONSTER_SPAWN;
+        IslandPrivilege islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPrivileges.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.MONSTER_SPAWN;
 
         if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
             e.setCancelled(true);
@@ -445,7 +448,7 @@ public final class ProtectionListener implements Listener {
             SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
             Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
-            if(island != null && !island.hasPermission(superiorPlayer, IslandPermission.PICKUP_DROPS)){
+            if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
                 e.setCancelled(true);
                 Locale.sendProtectionMessage(superiorPlayer);
             }

@@ -1,5 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+/**
+ * @deprecated Check IslandPrivilege
+ */
+@Deprecated
 public enum IslandPermission {
 
     ALL,

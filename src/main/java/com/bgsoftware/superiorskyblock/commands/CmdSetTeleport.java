@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -59,8 +59,8 @@ public final class CmdSetTeleport implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.SET_HOME)){
-            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_HOME));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_HOME)){
+            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_HOME));
             return;
         }
 

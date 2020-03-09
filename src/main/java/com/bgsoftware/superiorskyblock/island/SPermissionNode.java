@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Set;
 @SuppressWarnings("WeakerAccess")
 public final class SPermissionNode implements PermissionNode {
 
-    private Set<IslandPermission> nodes = new HashSet<>();
+    private Set<IslandPrivilege> nodes = new HashSet<>();
     private SPermissionNode previousNode;
 
     public SPermissionNode(List<String> permissions, SPermissionNode previousNode){
@@ -21,7 +23,7 @@ public final class SPermissionNode implements PermissionNode {
         if(!permissions.isEmpty()) {
             for (String permission : permissions.split(";")) {
                 try {
-                    nodes.add(IslandPermission.valueOf(permission));
+                    nodes.add(IslandPrivilege.getByName(permission));
                 } catch (Exception ignored) {
                 }
             }
@@ -29,17 +31,25 @@ public final class SPermissionNode implements PermissionNode {
         this.previousNode = previousNode;
     }
 
-    private static String parse(List<String> permissions){
-        StringBuilder stringBuilder = new StringBuilder();
-        permissions.forEach(permission -> stringBuilder.append(";").append(permission));
-        return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
+    @Override
+    @Deprecated
+    public boolean hasPermission(IslandPermission permission) {
+        return hasPermission(IslandPrivilege.getByName(permission.name()));
     }
 
-    public boolean hasPermission(IslandPermission permission){
-        return nodes.contains(IslandPermission.ALL) || nodes.contains(permission) || (previousNode != null && previousNode.hasPermission(permission));
+    @Override
+    @Deprecated
+    public void setPermission(IslandPermission permission, boolean value) {
+        setPermission(IslandPrivilege.getByName(permission.name()), value);
     }
 
-    public void setPermission(IslandPermission permission, boolean value){
+    @Override
+    public boolean hasPermission(IslandPrivilege permission){
+        return nodes.contains(IslandPrivileges.ALL) || nodes.contains(permission) || (previousNode != null && previousNode.hasPermission(permission));
+    }
+
+    @Override
+    public void setPermission(IslandPrivilege permission, boolean value){
         if(value){
             nodes.add(permission);
             if(previousNode != null)
@@ -62,8 +72,14 @@ public final class SPermissionNode implements PermissionNode {
 
     public String getAsStatementString(){
         StringBuilder stringBuilder = new StringBuilder();
-        nodes.forEach(islandPermission -> stringBuilder.append(";").append(islandPermission.name()));
+        nodes.forEach(islandPrivilege -> stringBuilder.append(";").append(islandPrivilege.getName()));
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
+    }
+
+    private static String parse(List<String> permissions){
+        StringBuilder stringBuilder = new StringBuilder();
+        permissions.forEach(permission -> stringBuilder.append(";").append(permission));
+        return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
     }
 
 

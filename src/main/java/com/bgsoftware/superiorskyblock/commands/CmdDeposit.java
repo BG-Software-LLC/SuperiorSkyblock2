@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -67,8 +67,8 @@ public final class CmdDeposit implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.DEPOSIT_MONEY)){
-            Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DEPOSIT_MONEY));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.DEPOSIT_MONEY)){
+            Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
             return;
         }
 

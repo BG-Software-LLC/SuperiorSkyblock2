@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
@@ -62,8 +62,8 @@ public final class CmdName implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.CHANGE_NAME)){
-            Locale.NO_NAME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.CHANGE_NAME));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.CHANGE_NAME)){
+            Locale.NO_NAME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.CHANGE_NAME));
             return;
         }
 

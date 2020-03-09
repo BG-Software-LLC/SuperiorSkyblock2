@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -42,6 +43,7 @@ import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -730,19 +732,45 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public boolean hasPermission(CommandSender sender, IslandPermission islandPermission){
-        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
+    @Deprecated
+    public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
+        return hasPermission(sender, IslandPrivilege.getByName(islandPermission.name()));
     }
 
     @Override
-    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission){
-        return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPermission) || getPermissionNode(superiorPlayer).hasPermission(islandPermission);
+    @Deprecated
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
+        return hasPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()));
     }
 
     @Override
+    @Deprecated
     public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
+        setPermission(playerRole, IslandPrivilege.getByName(islandPermission.name()), value);
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+        setPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()), value);
+    }
+
+    @Override
+    public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege){
+        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPrivilege);
+    }
+
+    @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege){
+        return superiorPlayer.hasBypassModeEnabled() ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+                getPermissionNode(superiorPlayer).hasPermission(islandPrivilege);
+    }
+
+    @Override
+    public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
         permissionNodes.run(permissionNodes -> {
-            permissionNodes.get(playerRole).setPermission(islandPermission, value);
+            permissionNodes.get(playerRole).setPermission(islandPrivilege, value);
             Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
                     .setString(IslandSerializer.serializePermissions(permissionNodes))
                     .setString(owner.getUniqueId().toString())
@@ -751,11 +779,11 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
         permissionNodes.run(permissionNodes -> {
             SPermissionNode permissionNode = permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), new SPermissionNode("", null));
 
-            permissionNode.setPermission(islandPermission, value);
+            permissionNode.setPermission(islandPrivilege, value);
 
             permissionNodes.put(superiorPlayer.getUniqueId(), permissionNode);
 
@@ -784,9 +812,15 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    @Deprecated
     public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
+        return getRequiredPlayerRole(IslandPrivilege.getByName(islandPermission.name()));
+    }
+
+    @Override
+    public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
         return plugin.getPlayers().getRoles().stream()
-                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPermission))
+                .filter(_playerRole -> getPermissionNode(_playerRole).hasPermission(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 
@@ -1083,7 +1117,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.locked.set(locked);
         if(locked){
             for(SuperiorPlayer victimPlayer : getAllPlayersInside()){
-                if(!hasPermission(victimPlayer, IslandPermission.CLOSE_BYPASS)){
+                if(!hasPermission(victimPlayer, IslandPrivileges.CLOSE_BYPASS)){
                     victimPlayer.teleport(plugin.getGrid().getSpawnIsland());
                     Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
                 }

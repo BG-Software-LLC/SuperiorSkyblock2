@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -66,8 +66,8 @@ public final class CmdInvite implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.INVITE_MEMBER)){
-            Locale.NO_INVITE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.INVITE_MEMBER));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.INVITE_MEMBER)){
+            Locale.NO_INVITE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.INVITE_MEMBER));
             return;
         }
 
@@ -132,7 +132,7 @@ public final class CmdInvite implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.INVITE_MEMBER)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.INVITE_MEMBER)){
             List<String> list = new ArrayList<>();
 
             for(Player player : Bukkit.getOnlinePlayers()){

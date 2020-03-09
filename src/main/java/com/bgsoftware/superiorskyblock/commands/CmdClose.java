@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -59,8 +59,8 @@ public final class CmdClose implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.CLOSE_ISLAND)){
-            Locale.NO_CLOSE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.CLOSE_ISLAND));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.CLOSE_ISLAND)){
+            Locale.NO_CLOSE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.CLOSE_ISLAND));
             return;
         }
 

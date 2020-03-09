@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
@@ -60,8 +60,8 @@ public final class CmdRatings implements ISuperiorCommand {
             return;
         }
 
-        if(!island.hasPermission(superiorPlayer, IslandPermission.RATINGS_SHOW)){
-            Locale.NO_RATINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.RATINGS_SHOW));
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.RATINGS_SHOW)){
+            Locale.NO_RATINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.RATINGS_SHOW));
             return;
         }
 

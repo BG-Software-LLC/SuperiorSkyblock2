@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -82,7 +82,7 @@ public final class CmdVisit implements ISuperiorCommand {
             Locale.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 
-        if(targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)){
+        if(targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
             Locale.NO_CLOSE_BYPASS.send(sender);
             return;
         }
@@ -100,7 +100,7 @@ public final class CmdVisit implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island island = onlinePlayer.getIsland();
                 if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
-                        (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)) ) {
+                        (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) ) {
                     if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
                         list.add(player.getName());
                     if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))

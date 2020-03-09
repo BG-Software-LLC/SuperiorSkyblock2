@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -62,8 +62,8 @@ public final class CmdSettings implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.SET_SETTINGS)){
-            Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_SETTINGS));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)){
+            Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
             return;
         }
 
@@ -75,7 +75,7 @@ public final class CmdSettings implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.SET_PERMISSION)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_PERMISSION)){
             List<String> list = new ArrayList<>();
 
             for(Player player : Bukkit.getOnlinePlayers()){

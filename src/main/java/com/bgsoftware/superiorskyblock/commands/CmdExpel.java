@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.World;
@@ -77,8 +77,8 @@ public final class CmdExpel implements ISuperiorCommand {
                 return;
             }
 
-            if(!superiorPlayer.hasPermission(IslandPermission.EXPEL_PLAYERS)){
-                Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredPlayerRole(IslandPermission.EXPEL_PLAYERS));
+            if(!superiorPlayer.hasPermission(IslandPrivileges.EXPEL_PLAYERS)){
+                Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredPlayerRole(IslandPrivileges.EXPEL_PLAYERS));
                 return;
             }
 
@@ -87,7 +87,7 @@ public final class CmdExpel implements ISuperiorCommand {
                 return;
             }
 
-            if(island.hasPermission(targetPlayer, IslandPermission.EXPEL_BYPASS)){
+            if(island.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
                 Locale.PLAYER_EXPEL_BYPASS.send(sender);
                 return;
             }
@@ -104,7 +104,7 @@ public final class CmdExpel implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.EXPEL_BYPASS)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.EXPEL_BYPASS)){
             List<String> list = new ArrayList<>();
 
             for (SuperiorPlayer targetPlayer : superiorPlayer.getIsland().getIslandVisitors()) {

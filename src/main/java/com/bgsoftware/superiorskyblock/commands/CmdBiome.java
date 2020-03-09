@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuBiomes;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -60,8 +60,8 @@ public final class CmdBiome implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.SET_BIOME)){
-            Locale.NO_SET_BIOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_BIOME));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_BIOME)){
+            Locale.NO_SET_BIOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_BIOME));
             return;
         }
 

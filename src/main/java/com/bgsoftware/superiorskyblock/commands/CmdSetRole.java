@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -90,8 +90,8 @@ public final class CmdSetRole implements ISuperiorCommand {
                 return;
             }
 
-            if(!superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
-                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_ROLE));
+            if(!superiorPlayer.hasPermission(IslandPrivileges.SET_ROLE)){
+                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_ROLE));
                 return;
             }
 
@@ -139,7 +139,7 @@ public final class CmdSetRole implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(island != null && superiorPlayer.hasPermission(IslandPermission.SET_ROLE)){
+        if(island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_ROLE)){
             List<String> list = new ArrayList<>();
 
             if(args.length == 2) {

@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Material;
@@ -64,8 +64,8 @@ public final class CmdDelWarp implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.DELETE_WARP)){
-            Locale.NO_DELETE_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DELETE_WARP));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.DELETE_WARP)){
+            Locale.NO_DELETE_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DELETE_WARP));
             return;
         }
 
@@ -103,7 +103,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.DELETE_WARP)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.DELETE_WARP)){
             List<String> list = new ArrayList<>();
 
             for(String warpName : island.getAllWarps()){

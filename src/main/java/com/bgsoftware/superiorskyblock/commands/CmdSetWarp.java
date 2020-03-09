@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -62,8 +62,8 @@ public final class CmdSetWarp implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.SET_WARP)){
-            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_WARP));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_WARP)){
+            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_WARP));
             return;
         }
 

@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -59,8 +59,8 @@ public final class CmdSetDiscord implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.SET_DISCORD)){
-            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.SET_DISCORD));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_DISCORD)){
+            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_DISCORD));
             return;
         }
 

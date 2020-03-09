@@ -3,12 +3,11 @@ package com.bgsoftware.superiorskyblock.utils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -115,7 +114,7 @@ public final class StringUtils {
 
     public static String getPermissionsString(){
         StringBuilder stringBuilder = new StringBuilder();
-        Arrays.stream(IslandPermission.values()).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
+        IslandPrivilege.values().stream().sorted(Comparator.comparing(IslandPrivilege::getName)).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
         return stringBuilder.toString().substring(2);
     }
 

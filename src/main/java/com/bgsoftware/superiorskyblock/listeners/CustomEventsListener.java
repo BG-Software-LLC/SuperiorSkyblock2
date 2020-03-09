@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -23,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -214,8 +214,8 @@ public final class CustomEventsListener implements Listener {
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);
 
-        if(toIsland != null && toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)){
-            if(fromIsland != null && fromIsland.isLocked() && !fromIsland.hasPermission(superiorPlayer, IslandPermission.CLOSE_BYPASS)){
+        if(toIsland != null && toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
+            if(fromIsland != null && fromIsland.isLocked() && !fromIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
             else{

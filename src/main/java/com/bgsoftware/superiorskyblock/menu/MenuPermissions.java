@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -25,12 +25,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
+public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
-    private static List<IslandPermission> islandPermissions = new ArrayList<>();
+    private static List<IslandPrivilege> islandPermissions = new ArrayList<>();
 
     private final Island island;
     private final Object permissionHolder;
@@ -42,8 +43,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event, IslandPermission permission) {
-        String permissionName = permission.name().toLowerCase();
+    protected void onPlayerClick(InventoryClickEvent event, IslandPrivilege permission) {
+        String permissionName = permission.getName().toLowerCase();
         String permissionHolderName = "";
 
         boolean success = false, sendFailMessage = true;
@@ -134,9 +135,9 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, IslandPermission islandPermission) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, IslandPrivilege islandPermission) {
         ItemBuilder permissionItem = new ItemBuilder(Material.AIR);
-        String permissionName = islandPermission.name().toLowerCase();
+        String permissionName = islandPermission.getName().toLowerCase();
 
         if(permissionHolder instanceof PlayerRole){
             if (containsData(permissionName + "-role-permission")) {
@@ -156,7 +157,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
     }
 
     @Override
-    protected List<IslandPermission> requestObjects() {
+    protected List<IslandPrivilege> requestObjects() {
         return islandPermissions;
     }
 
@@ -180,8 +181,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
 
         islandPermissions = new ArrayList<>();
 
-        for(IslandPermission islandPermission : IslandPermission.values()){
-            String permission = islandPermission.name().toLowerCase();
+        for(IslandPrivilege islandPrivilege : IslandPrivilege.values()){
+            String permission = islandPrivilege.getName().toLowerCase();
             if(permissionsSection.contains(permission)){
                 ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
                 menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
@@ -193,9 +194,11 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPermission> {
                 if(permissionSection.contains("role-permission")) {
                     menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
                 }
-                islandPermissions.add(islandPermission);
+                islandPermissions.add(islandPrivilege);
             }
         }
+
+        islandPermissions.sort(Comparator.comparing(IslandPrivilege::getName));
 
         menuPermissions.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuPermissions.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));

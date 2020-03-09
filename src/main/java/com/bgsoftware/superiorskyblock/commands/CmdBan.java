@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -60,8 +60,8 @@ public final class CmdBan implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
-            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.BAN_MEMBER));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.BAN_MEMBER)){
+            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.BAN_MEMBER));
             return;
         }
 
@@ -95,7 +95,7 @@ public final class CmdBan implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.BAN_MEMBER)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.BAN_MEMBER)){
             List<String> list = new ArrayList<>();
 
             for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){

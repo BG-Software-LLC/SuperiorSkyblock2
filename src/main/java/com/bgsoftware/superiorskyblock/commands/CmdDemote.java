@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -60,8 +60,8 @@ public final class CmdDemote implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.DEMOTE_MEMBERS)){
-            Locale.NO_DEMOTE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DEMOTE_MEMBERS));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.DEMOTE_MEMBERS)){
+            Locale.NO_DEMOTE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEMOTE_MEMBERS));
             return;
         }
 
@@ -100,7 +100,7 @@ public final class CmdDemote implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.DEMOTE_MEMBERS)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.DEMOTE_MEMBERS)){
             List<String> list = new ArrayList<>();
 
             for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){

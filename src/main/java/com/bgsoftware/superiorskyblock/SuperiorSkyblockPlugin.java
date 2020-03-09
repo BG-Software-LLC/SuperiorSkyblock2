@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
@@ -40,6 +40,7 @@ import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.tasks.CropsTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -99,6 +100,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         loadSortingTypes();
         loadIslandFlags();
+        loadIslandPrivileges();
 
         EnchantsUtils.registerGlowEnchantment();
 
@@ -123,7 +125,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 Island playerIsland = superiorPlayer.getIsland();
 
                 if(superiorPlayer.hasIslandFlyEnabled()){
-                    if(island != null && island.hasPermission(superiorPlayer, IslandPermission.FLY)){
+                    if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
                         player.setAllowFlight(true);
                         player.setFlying(true);
                     }else{
@@ -297,6 +299,57 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandFlag.register("TREE_GROWTH");
         IslandFlag.register("WATER_FLOW");
         IslandFlag.register("WITHER_EXPLOSION");
+    }
+
+    private void loadIslandPrivileges() {
+        IslandPrivilege.register("ALL");
+        IslandPrivilege.register("ANIMAL_BREED");
+        IslandPrivilege.register("ANIMAL_DAMAGE");
+        IslandPrivilege.register("ANIMAL_SPAWN");
+        IslandPrivilege.register("BAN_MEMBER");
+        IslandPrivilege.register("BREAK");
+        IslandPrivilege.register("BUILD");
+        IslandPrivilege.register("CHANGE_NAME");
+        IslandPrivilege.register("CHEST_ACCESS");
+        IslandPrivilege.register("CLOSE_BYPASS");
+        IslandPrivilege.register("CLOSE_ISLAND");
+        IslandPrivilege.register("COOP_MEMBER");
+        IslandPrivilege.register("DELETE_WARP");
+        IslandPrivilege.register("DEMOTE_MEMBERS");
+        IslandPrivilege.register("DEPOSIT_MONEY");
+        IslandPrivilege.register("DISBAND_ISLAND");
+        IslandPrivilege.register("DISCORD_SHOW");
+        IslandPrivilege.register("DROP_ITEMS");
+        IslandPrivilege.register("EXPEL_BYPASS");
+        IslandPrivilege.register("EXPEL_PLAYERS");
+        IslandPrivilege.register("FARM_TRAMPING");
+        IslandPrivilege.register("FLY");
+        IslandPrivilege.register("INTERACT");
+        IslandPrivilege.register("INVITE_MEMBER");
+        IslandPrivilege.register("ITEM_FRAME");
+        IslandPrivilege.register("KICK_MEMBER");
+        IslandPrivilege.register("MONSTER_DAMAGE");
+        IslandPrivilege.register("MONSTER_SPAWN");
+        IslandPrivilege.register("OPEN_ISLAND");
+        IslandPrivilege.register("PAINTING");
+        IslandPrivilege.register("PAYPAL_SHOW");
+        IslandPrivilege.register("PICKUP_DROPS");
+        IslandPrivilege.register("PROMOTE_MEMBERS");
+        IslandPrivilege.register("RANKUP");
+        IslandPrivilege.register("RATINGS_SHOW");
+        IslandPrivilege.register("SET_BIOME");
+        IslandPrivilege.register("SET_DISCORD");
+        IslandPrivilege.register("SET_HOME");
+        IslandPrivilege.register("SET_PAYPAL");
+        IslandPrivilege.register("SET_PERMISSION");
+        IslandPrivilege.register("SET_ROLE");
+        IslandPrivilege.register("SET_SETTINGS");
+        IslandPrivilege.register("SET_WARP");
+        IslandPrivilege.register("SIGN_INTERACT");
+        IslandPrivilege.register("SPAWNER_BREAK");
+        IslandPrivilege.register("UNCOOP_MEMBER");
+        IslandPrivilege.register("USE");
+        IslandPrivilege.register("WITHDRAW_MONEY");
     }
 
     @Override

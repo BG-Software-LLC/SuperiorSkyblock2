@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -17,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -147,7 +147,7 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(e.getIsland().isLocked() && !e.getIsland().hasPermission(e.getPlayer(), IslandPermission.CLOSE_BYPASS)){
+        if(e.getIsland().isLocked() && !e.getIsland().hasPermission(e.getPlayer(), IslandPrivileges.CLOSE_BYPASS)){
             e.setCancelled(true);
             Locale.NO_CLOSE_BYPASS.send(e.getPlayer());
             if(e.getCause() == IslandEnterEvent.EnterCause.PLAYER_JOIN)
@@ -155,7 +155,7 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        if(e.getIsland().hasPermission(e.getPlayer(), IslandPermission.FLY) && e.getPlayer().hasIslandFlyEnabled()){
+        if(e.getIsland().hasPermission(e.getPlayer(), IslandPrivileges.FLY) && e.getPlayer().hasIslandFlyEnabled()){
             Player player = e.getPlayer().asPlayer();
             player.setAllowFlight(true);
             player.setFlying(true);

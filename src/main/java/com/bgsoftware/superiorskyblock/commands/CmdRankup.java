@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -67,8 +67,8 @@ public final class CmdRankup implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.RANKUP)){
-            Locale.NO_RANKUP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.RANKUP));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.RANKUP)){
+            Locale.NO_RANKUP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.RANKUP));
             return;
         }
 
@@ -132,7 +132,7 @@ public final class CmdRankup implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.RANKUP)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.RANKUP)){
             List<String> list = new ArrayList<>();
 
             for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){

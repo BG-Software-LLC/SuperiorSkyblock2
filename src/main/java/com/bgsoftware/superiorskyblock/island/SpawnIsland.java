@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -347,24 +348,48 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
-        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPermission);
+        return hasPermission(sender, IslandPrivilege.getByName(islandPermission.name()));
     }
 
     @Override
+    @Deprecated
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
-        return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPermission) ||
-                getPermissionNode(superiorPlayer).hasPermission(islandPermission);
+        return hasPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()));
     }
 
     @Override
+    @Deprecated
     public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
 
     }
 
     @Override
+    @Deprecated
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+
+    }
+
+    @Override
+    public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege) {
+        return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPrivilege);
+    }
+
+    @Override
+    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
+        return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+                getPermissionNode(superiorPlayer).hasPermission(islandPrivilege);
+    }
+
+    @Override
+    public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
+
+    }
+
+    @Override
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
 
     }
 
@@ -380,9 +405,15 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
+        return getRequiredPlayerRole(IslandPrivilege.getByName(islandPermission.name()));
+    }
+
+    @Override
+    public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
         return plugin.getPlayers().getRoles().stream()
-                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPermission))
+                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 

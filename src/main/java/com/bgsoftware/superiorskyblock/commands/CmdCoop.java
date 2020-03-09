@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -62,8 +62,8 @@ public final class CmdCoop implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.COOP_MEMBER)){
-            Locale.NO_COOP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.COOP_MEMBER));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.COOP_MEMBER)){
+            Locale.NO_COOP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.COOP_MEMBER));
             return;
         }
 
@@ -104,7 +104,7 @@ public final class CmdCoop implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPermission.COOP_MEMBER)){
+        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.COOP_MEMBER)){
             List<String> list = new ArrayList<>();
 
             for(Player player : Bukkit.getOnlinePlayers()){

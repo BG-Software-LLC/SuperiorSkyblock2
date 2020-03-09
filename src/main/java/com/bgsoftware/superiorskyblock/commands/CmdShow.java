@@ -2,11 +2,11 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -114,9 +114,9 @@ public final class CmdShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getMoneyInBank())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
-        if(!Locale.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(sender, IslandPermission.DISCORD_SHOW))
+        if(!Locale.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
-        if(!Locale.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPermission.PAYPAL_SHOW))
+        if(!Locale.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
         if(!Locale.ISLAND_INFO_VISITORS_COUNT.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitors().size())).append("\n");

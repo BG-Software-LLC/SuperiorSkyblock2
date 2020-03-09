@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -87,10 +87,10 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
             islands.add(island);
         }
 
-        IslandPermission islandPermission;
+        IslandPrivilege islandPermission;
 
         try{
-            islandPermission = IslandPermission.valueOf(args[3].toUpperCase());
+            islandPermission = IslandPrivilege.getByName(args[3]);
         }catch(IllegalArgumentException ex){
             Locale.INVALID_ISLAND_PERMISSION.send(sender, args[3], StringUtils.getPermissionsString());
             return;
@@ -108,11 +108,11 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
         Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPermission, true)));
 
         if(islands.size() > 1)
-            Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPermission.name()));
+            Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPermission.getName()));
         else if(targetPlayer == null)
-            Locale.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPermission.name()), islands.get(0).getName());
+            Locale.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPermission.getName()), islands.get(0).getName());
         else
-            Locale.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPermission.name()), targetPlayer.getName());
+            Locale.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPermission.getName()), targetPlayer.getName());
     }
 
     @Override
@@ -133,8 +133,8 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
         }
 
         else if(args.length == 4){
-            list.addAll(Arrays.stream(IslandPermission.values())
-                    .map(islandPermission -> islandPermission.toString().toLowerCase())
+            list.addAll(IslandPrivilege.values().stream()
+                    .map(islandPrivilege -> islandPrivilege.getName().toLowerCase())
                     .filter(islandPermissionName -> islandPermissionName.startsWith(args[3].toLowerCase()))
                     .collect(Collectors.toList())
             );

@@ -2,12 +2,13 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -91,7 +92,7 @@ public abstract class PlaceholderHook {
                     String permission = matcher.group(1);
 
                     try {
-                        IslandPermission islandPermission = IslandPermission.valueOf(permission.toUpperCase());
+                        IslandPrivilege islandPermission = IslandPrivilege.getByName(permission);
                         return String.valueOf(island.hasPermission(superiorPlayer, islandPermission));
                     } catch (IllegalArgumentException ex) {
                         return "";
@@ -243,9 +244,9 @@ public abstract class PlaceholderHook {
                     case "drops_multiplier":
                         return String.valueOf(island.getMobDropsMultiplier());
                     case "discord":
-                        return island.hasPermission(superiorPlayer, IslandPermission.DISCORD_SHOW) ? island.getDiscord() : "None";
+                        return island.hasPermission(superiorPlayer, IslandPrivileges.DISCORD_SHOW) ? island.getDiscord() : "None";
                     case "paypal":
-                        return island.hasPermission(superiorPlayer, IslandPermission.PAYPAL_SHOW) ? island.getPaypal() : "None";
+                        return island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None";
                     case "discord_all":
                         return island.getDiscord();
                     case "paypal_all":

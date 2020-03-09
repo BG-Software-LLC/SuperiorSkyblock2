@@ -321,14 +321,20 @@ public interface Island extends Comparable<Island> {
      * Check if a CommandSender has a permission.
      * @param sender The command-sender to check.
      * @param islandPermission The permission to check.
+     *
+     * @deprecated See hasPermission(CommandSender, IslandPrivilege)
      */
+    @Deprecated
     boolean hasPermission(CommandSender sender, IslandPermission islandPermission);
 
     /**
      * Check if a player has a permission.
      * @param superiorPlayer The player to check.
      * @param islandPermission The permission to check.
+     *
+     * @deprecated See hasPermission(SuperiorPlayer, IslandPrivilege)
      */
+    @Deprecated
     boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission);
 
     /**
@@ -336,7 +342,10 @@ public interface Island extends Comparable<Island> {
      * @param playerRole The role to set the permission to.
      * @param islandPermission The permission to set.
      * @param value The value to give the permission.
+     *
+     * @deprecated See setPermission(PlayerRole, IslandPrivilege, Boolean)
      */
+    @Deprecated
     void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value);
 
     /**
@@ -344,8 +353,41 @@ public interface Island extends Comparable<Island> {
      * @param superiorPlayer The player to set the permission to.
      * @param islandPermission The permission to set.
      * @param value The value to give the permission.
+     *
+     * @deprecated See setPermission(SuperiorPlayer, IslandPrivilege, Boolean)
      */
+    @Deprecated
     void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value);
+
+    /**
+     * Check if a CommandSender has a permission.
+     * @param sender The command-sender to check.
+     * @param islandPrivilege The permission to check.
+     */
+    boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege);
+
+    /**
+     * Check if a player has a permission.
+     * @param superiorPlayer The player to check.
+     * @param islandPrivilege The permission to check.
+     */
+    boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege);
+
+    /**
+     * Set a permission to a specific role.
+     * @param playerRole The role to set the permission to.
+     * @param islandPrivilege The permission to set.
+     * @param value The value to give the permission.
+     */
+    void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value);
+
+    /**
+     * Set a permission to a specific player.
+     * @param superiorPlayer The player to set the permission to.
+     * @param islandPrivilege The permission to set.
+     * @param value The value to give the permission.
+     */
+    void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value);
 
     /**
      * Get the permission-node of a role.
@@ -362,8 +404,17 @@ public interface Island extends Comparable<Island> {
     /**
      * Get the required role for a specific permission.
      * @param islandPermission The permission to check.
+     *
+     * @deprecated See getRequiredPlayerRole(IslandPrivilege)
      */
+    @Deprecated
     PlayerRole getRequiredPlayerRole(IslandPermission islandPermission);
+
+    /**
+     * Get the required role for a specific permission.
+     * @param islandPrivilege The permission to check.
+     */
+    PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege);
 
     /*
      *  General methods

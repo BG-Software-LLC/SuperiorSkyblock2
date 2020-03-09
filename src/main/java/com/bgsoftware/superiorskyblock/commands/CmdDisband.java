@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -63,8 +63,8 @@ public final class CmdDisband implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPermission.DISBAND_ISLAND)){
-            Locale.NO_DISBAND_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPermission.DISBAND_ISLAND));
+        if(!superiorPlayer.hasPermission(IslandPrivileges.DISBAND_ISLAND)){
+            Locale.NO_DISBAND_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DISBAND_ISLAND));
             return;
         }
 
