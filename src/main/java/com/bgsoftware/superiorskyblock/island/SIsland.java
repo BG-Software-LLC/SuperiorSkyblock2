@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -1566,6 +1565,9 @@ public final class SIsland extends DatabaseObject implements Island {
                     .setString(owner.getUniqueId().toString())
                     .execute(true);
         });
+
+        if(getUpgradeLevel(upgrade).getBorderSize() != -1)
+            updateBorder();
 
         MenuUpgrades.refreshMenus();
     }
