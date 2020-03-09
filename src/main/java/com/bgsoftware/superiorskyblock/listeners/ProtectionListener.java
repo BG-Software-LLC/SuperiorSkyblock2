@@ -34,6 +34,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -159,6 +160,33 @@ public final class ProtectionListener implements Listener {
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getRemover());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+                e.setCancelled(true);
+            }
+
+            return;
+        }
+
+        IslandPrivilege islandPermission = e.getEntity() instanceof ItemFrame ? IslandPrivileges.ITEM_FRAME : IslandPrivileges.PAINTING;
+        if(!island.hasPermission(superiorPlayer, islandPermission)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+            return;
+        }
+
+        if(!island.isInsideRange(e.getEntity().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onHangingPlace(HangingPlaceEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
