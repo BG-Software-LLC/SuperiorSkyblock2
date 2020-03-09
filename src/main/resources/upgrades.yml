@@ -77,7 +77,7 @@ upgrades:
       price: 1000000.0
       crop-growth: 25
       commands:
-        - - 'island admin setupgrade %player% crop-growth 4'
+        - 'island admin setupgrade %player% crop-growth 4'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x4!'
     '4':
       price: 0.0
