@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -198,7 +199,12 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             previousMove = false;
 
             if(inventoryAction == InventoryAction.PICKUP_HALF) {
-                MenuWarps.openInventory(superiorPlayer, this, island);
+                if(MenuGlobalWarps.visitorWarps){
+                    CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
+                }
+                else {
+                    MenuWarps.openInventory(superiorPlayer, this, island);
+                }
             } else if(plugin.getSettings().valuesMenu) {
                 MenuValues.openInventory(superiorPlayer, this, island);
             }

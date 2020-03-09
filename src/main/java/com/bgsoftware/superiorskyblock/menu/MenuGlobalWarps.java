@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
-    private static boolean visitorWarps;
+    public static boolean visitorWarps;
 
     private MenuGlobalWarps(SuperiorPlayer superiorPlayer){
         super("menuGlobalWarps", superiorPlayer);
