@@ -15,7 +15,7 @@ public final class IslandFlag {
     }
 
     /**
-     * Get the name of the sorting type.
+     * Get the name of the island flag.
      */
     public String getName() {
         return name;
@@ -43,12 +43,12 @@ public final class IslandFlag {
 
     @Override
     public String toString() {
-        return "SortingType{name=" + name + "}";
+        return "IslandFlag{name=" + name + "}";
     }
 
     /**
-     * Register a new sorting type.
-     * @param name The name for the sorting type.
+     * Register a new island flag.
+     * @param name The name for the island flag.
      */
     public static void register(String name){
         name = name.toUpperCase();
