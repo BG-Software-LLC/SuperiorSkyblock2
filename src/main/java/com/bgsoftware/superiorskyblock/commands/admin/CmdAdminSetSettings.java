@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -14,7 +14,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,10 +86,10 @@ public final class CmdAdminSetSettings implements ISuperiorCommand {
             islands.add(island);
         }
 
-        IslandSettings islandSettings;
+        IslandFlag islandFlag;
 
         try{
-            islandSettings = IslandSettings.valueOf(args[3].toUpperCase());
+            islandFlag = IslandFlag.getByName(args[3]);
         }catch(IllegalArgumentException ex){
             Locale.INVALID_SETTINGS.send(sender, args[3], StringUtils.getSettingsString());
             return;
@@ -100,17 +99,17 @@ public final class CmdAdminSetSettings implements ISuperiorCommand {
 
         Executor.data(() -> islands.forEach(island -> {
             if(value)
-                island.enableSettings(islandSettings);
+                island.enableSettings(islandFlag);
             else
-                island.disableSettings(islandSettings);
+                island.disableSettings(islandFlag);
         }));
 
         if(islands.size() != 1)
-            Locale.SETTINGS_UPDATED_ALL.send(sender, StringUtils.format(islandSettings.name()));
+            Locale.SETTINGS_UPDATED_ALL.send(sender, StringUtils.format(islandFlag.getName()));
         else if(targetPlayer == null)
-            Locale.SETTINGS_UPDATED_NAME.send(sender, StringUtils.format(islandSettings.name()), islands.get(0).getName());
+            Locale.SETTINGS_UPDATED_NAME.send(sender, StringUtils.format(islandFlag.getName()), islands.get(0).getName());
         else
-            Locale.SETTINGS_UPDATED.send(sender, StringUtils.format(islandSettings.name()), targetPlayer.getName());
+            Locale.SETTINGS_UPDATED.send(sender, StringUtils.format(islandFlag.getName()), targetPlayer.getName());
     }
 
     @Override
@@ -130,9 +129,9 @@ public final class CmdAdminSetSettings implements ISuperiorCommand {
             }
         }
         else if(args.length == 4){
-            list.addAll(Arrays.stream(IslandSettings.values())
-                    .map(islandSettings -> islandSettings.toString().toLowerCase())
-                    .filter(islandSettingsName -> islandSettingsName.startsWith(args[3].toLowerCase()))
+            list.addAll(IslandFlag.values().stream()
+                    .map(islandFlag -> islandFlag.getName().toLowerCase())
+                    .filter(islandFlagName -> islandFlagName.startsWith(args[3].toLowerCase()))
                     .collect(Collectors.toList())
             );
         }

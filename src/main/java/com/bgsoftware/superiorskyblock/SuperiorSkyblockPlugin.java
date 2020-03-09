@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -96,11 +97,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         loadAPI();
         Executor.init(this);
 
+        loadSortingTypes();
+        loadIslandFlags();
+
         EnchantsUtils.registerGlowEnchantment();
 
         loadWorld();
 
-        loadSortingTypes();
         reloadPlugin(true);
 
         if (Updater.isOutdated()) {
@@ -269,6 +272,31 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR);
         SortingType.register("RATING", SortingComparators.RATING_COMPARATOR);
         SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR);
+    }
+
+    private void loadIslandFlags(){
+        IslandFlag.register("ALWAYS_DAY");
+        IslandFlag.register("ALWAYS_MIDDLE_DAY");
+        IslandFlag.register("ALWAYS_NIGHT");
+        IslandFlag.register("ALWAYS_MIDDLE_NIGHT");
+        IslandFlag.register("ALWAYS_RAIN");
+        IslandFlag.register("ALWAYS_SHINY");
+        IslandFlag.register("CREEPER_EXPLOSION");
+        IslandFlag.register("CROPS_GROWTH");
+        IslandFlag.register("EGG_LAY");
+        IslandFlag.register("ENDERMAN_GRIEF");
+        IslandFlag.register("FIRE_SPREAD");
+        IslandFlag.register("GHAST_FIREBALL");
+        IslandFlag.register("LAVA_FLOW");
+        IslandFlag.register("NATURAL_ANIMALS_SPAWN");
+        IslandFlag.register("NATURAL_MONSTER_SPAWN");
+        IslandFlag.register("PVP");
+        IslandFlag.register("SPAWNER_ANIMALS_SPAWN");
+        IslandFlag.register("SPAWNER_MONSTER_SPAWN");
+        IslandFlag.register("TNT_EXPLOSION");
+        IslandFlag.register("TREE_GROWTH");
+        IslandFlag.register("WATER_FLOW");
+        IslandFlag.register("WITHER_EXPLOSION");
     }
 
     @Override

@@ -2,13 +2,14 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,7 +121,7 @@ public final class StringUtils {
 
     public static String getSettingsString(){
         StringBuilder stringBuilder = new StringBuilder();
-        Arrays.stream(IslandSettings.values()).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
+        IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName)).forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase()));
         return stringBuilder.toString().substring(2);
     }
 

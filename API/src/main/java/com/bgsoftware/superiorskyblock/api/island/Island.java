@@ -938,20 +938,44 @@ public interface Island extends Comparable<Island> {
     /**
      * Check whether a settings is enabled or not.
      * @param islandSettings The settings to check.
+     * @deprecated See hasSettingsEnabled(IslandFlag)
      */
+    @Deprecated
     boolean hasSettingsEnabled(IslandSettings islandSettings);
 
     /**
      * Enable an island settings.
      * @param islandSettings The settings to enable.
+     * @deprecated See enableSettings(IslandFlag)
      */
+    @Deprecated
     void enableSettings(IslandSettings islandSettings);
 
     /**
      * Disable an island settings.
      * @param islandSettings The settings to disable.
+     * @deprecated See disableSettings(IslandFlag)
      */
+    @Deprecated
     void disableSettings(IslandSettings islandSettings);
+
+    /**
+     * Check whether a settings is enabled or not.
+     * @param islandFlag The settings to check.
+     */
+    boolean hasSettingsEnabled(IslandFlag islandFlag);
+
+    /**
+     * Enable an island settings.
+     * @param islandFlag The settings to enable.
+     */
+    void enableSettings(IslandFlag islandFlag);
+
+    /**
+     * Disable an island settings.
+     * @param islandFlag The settings to disable.
+     */
+    void disableSettings(IslandFlag islandFlag);
 
     /*
      *  Generator related methods

@@ -1,5 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+/**
+ * @deprecated See IslandFlag
+ */
+@Deprecated
 public enum IslandSettings {
 
     ALWAYS_DAY,

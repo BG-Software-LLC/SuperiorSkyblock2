@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -111,14 +111,14 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeSettings(SyncedObject<Set<IslandSettings>> islandSettings){
-        return islandSettings.run((Function<Set<IslandSettings>, String>) IslandSerializer::serializeSettings);
+    public static String serializeSettings(SyncedObject<Set<IslandFlag>> islandSettings){
+        return islandSettings.run((Function<Set<IslandFlag>, String>) IslandSerializer::serializeSettings);
     }
 
-    public static String serializeSettings(Set<IslandSettings> islandSettings){
+    public static String serializeSettings(Set<IslandFlag> islandSettings){
         StringBuilder missionsBuilder = new StringBuilder();
         islandSettings.forEach(settings ->
-                missionsBuilder.append(";").append(settings));
+                missionsBuilder.append(";").append(settings.getName()));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 

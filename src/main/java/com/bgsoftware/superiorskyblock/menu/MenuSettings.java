@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -21,12 +21,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-public final class MenuSettings extends PagedSuperiorMenu<IslandSettings> {
+public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
-    private static List<IslandSettings> islandSettings = new ArrayList<>();
+    private static List<IslandFlag> islandSettings = new ArrayList<>();
 
     private final Island island;
 
@@ -36,17 +37,17 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandSettings> {
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event, IslandSettings settings) {
-        String settingsName = settings.name().toLowerCase();
+    protected void onPlayerClick(InventoryClickEvent event, IslandFlag islandFlag) {
+        String settingsName = islandFlag.getName().toLowerCase();
 
         if(!containsData(settingsName + "-settings-enabled"))
             return;
 
-        if(island.hasSettingsEnabled(settings)){
-            island.disableSettings(settings);
+        if(island.hasSettingsEnabled(islandFlag)){
+            island.disableSettings(islandFlag);
         }
         else{
-            island.enableSettings(settings);
+            island.enableSettings(islandFlag);
         }
 
         Locale.UPDATED_SETTINGS.send(superiorPlayer, StringUtils.format(settingsName));
@@ -64,16 +65,16 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandSettings> {
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, IslandSettings settings) {
-        String settingsName = settings.name().toLowerCase();
+    protected ItemStack getObjectItem(ItemStack clickedItem, IslandFlag islandFlag) {
+        String settingsName = islandFlag.getName().toLowerCase();
         return (containsData(settingsName + "-settings-enabled") ?
-                (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(settings) ? "enabled" : "disabled")) :
+                (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
                 new ItemBuilder(Material.AIR)
         ).clone().build(superiorPlayer);
     }
 
     @Override
-    protected List<IslandSettings> requestObjects() {
+    protected List<IslandFlag> requestObjects() {
         return islandSettings;
     }
 
@@ -97,17 +98,19 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandSettings> {
 
         ConfigurationSection settingsSection = cfg.getConfigurationSection("settings");
 
-        for(IslandSettings islandSettings : IslandSettings.values()){
-            String settings = islandSettings.name().toLowerCase();
+        for(IslandFlag islandFlag : IslandFlag.values()){
+            String settings = islandFlag.getName().toLowerCase();
             if(settingsSection.contains(settings)){
                 ConfigurationSection section = settingsSection.getConfigurationSection(settings);
                 menuSettings.addData(settings + "-sound", FileUtils.getSound(section.getConfigurationSection("sound")));
                 menuSettings.addData(settings + "-commands", section.getStringList("commands"));
                 menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
                 menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
-                MenuSettings.islandSettings.add(islandSettings);
+                MenuSettings.islandSettings.add(islandFlag);
             }
         }
+
+        islandSettings.sort(Comparator.comparing(IslandFlag::getName));
 
         menuSettings.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
         menuSettings.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));

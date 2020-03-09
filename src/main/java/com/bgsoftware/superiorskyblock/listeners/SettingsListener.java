@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
 import org.bukkit.Material;
@@ -62,12 +62,12 @@ public final class SettingsListener implements Listener {
                 case JOCKEY:
                 case CHUNK_GEN:
                 case NATURAL:
-                    if(!island.hasSettingsEnabled(animal ? IslandSettings.NATURAL_ANIMALS_SPAWN : IslandSettings.NATURAL_MONSTER_SPAWN))
+                    if(!island.hasSettingsEnabled(animal ? IslandFlags.NATURAL_ANIMALS_SPAWN : IslandFlags.NATURAL_MONSTER_SPAWN))
                         e.setCancelled(true);
                     break;
                 case SPAWNER:
                 case SPAWNER_EGG:
-                    if(!island.hasSettingsEnabled(animal ? IslandSettings.SPAWNER_ANIMALS_SPAWN : IslandSettings.SPAWNER_MONSTER_SPAWN))
+                    if(!island.hasSettingsEnabled(animal ? IslandFlags.SPAWNER_ANIMALS_SPAWN : IslandFlags.SPAWNER_MONSTER_SPAWN))
                         e.setCancelled(true);
                     break;
             }
@@ -82,7 +82,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(!island.hasSettingsEnabled(e.getBlock().getType().name().contains("WATER") ? IslandSettings.WATER_FLOW : IslandSettings.LAVA_FLOW))
+            if(!island.hasSettingsEnabled(e.getBlock().getType().name().contains("WATER") ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW))
                 e.setCancelled(true);
         }
     }
@@ -95,23 +95,23 @@ public final class SettingsListener implements Listener {
         if(!plugin.getSettings().spawnProtection && island.isSpawn())
             return;
 
-        if(island.hasSettingsEnabled(IslandSettings.ALWAYS_DAY)){
+        if(island.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)){
             player.setPlayerTime(0, false);
         }
-        else if(island.hasSettingsEnabled(IslandSettings.ALWAYS_MIDDLE_DAY)){
+        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)){
             player.setPlayerTime(6000, false);
         }
-        else if(island.hasSettingsEnabled(IslandSettings.ALWAYS_NIGHT)){
+        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)){
             player.setPlayerTime(14000, false);
         }
-        else if(island.hasSettingsEnabled(IslandSettings.ALWAYS_MIDDLE_NIGHT)){
+        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)){
             player.setPlayerTime(18000, false);
         }
 
-        if(island.hasSettingsEnabled(IslandSettings.ALWAYS_SHINY)){
+        if(island.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)){
             player.setPlayerWeather(WeatherType.CLEAR);
         }
-        else if(island.hasSettingsEnabled(IslandSettings.ALWAYS_RAIN)){
+        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)){
             player.setPlayerWeather(WeatherType.DOWNFALL);
         }
     }
@@ -131,7 +131,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(!island.hasSettingsEnabled(IslandSettings.CROPS_GROWTH))
+            if(!island.hasSettingsEnabled(IslandFlags.CROPS_GROWTH))
                 e.setCancelled(true);
         }
     }
@@ -144,7 +144,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(!island.hasSettingsEnabled(IslandSettings.TREE_GROWTH))
+            if(!island.hasSettingsEnabled(IslandFlags.TREE_GROWTH))
                 e.setCancelled(true);
         }
     }
@@ -157,7 +157,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(e.getNewState().getType() == Material.FIRE && !island.hasSettingsEnabled(IslandSettings.FIRE_SPREAD))
+            if(e.getNewState().getType() == Material.FIRE && !island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
                 e.setCancelled(true);
         }
     }
@@ -170,7 +170,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(!island.hasSettingsEnabled(IslandSettings.FIRE_SPREAD))
+            if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
                 e.setCancelled(true);
         }
     }
@@ -186,7 +186,7 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(!island.hasSettingsEnabled(IslandSettings.EGG_LAY)) {
+            if(!island.hasSettingsEnabled(IslandFlags.EGG_LAY)) {
                 for (Entity entity : e.getEntity().getNearbyEntities(1, 1, 1)) {
                     if (entity instanceof Chicken) {
                         e.setCancelled(true);
@@ -228,7 +228,7 @@ public final class SettingsListener implements Listener {
         }
 
         if (damagerPlayer.equals(targetPlayer) || island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) ||
-                island.hasSettingsEnabled(IslandSettings.PVP))
+                island.hasSettingsEnabled(IslandFlags.PVP))
             return;
 
         e.setCancelled(true);
@@ -248,7 +248,7 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) || island.hasSettingsEnabled(IslandSettings.PVP))
+        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) || island.hasSettingsEnabled(IslandFlags.PVP))
             return;
 
         for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){
@@ -270,10 +270,10 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if((e.getEntity() instanceof Creeper && !island.hasSettingsEnabled(IslandSettings.CREEPER_EXPLOSION)) ||
-                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandSettings.TNT_EXPLOSION) ||
-                    ((e.getEntity() instanceof Wither || e.getEntity() instanceof WitherSkull) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION)) ||
-                    (e.getEntity() instanceof Fireball && !island.hasSettingsEnabled(IslandSettings.GHAST_FIREBALL)))
+            if((e.getEntity() instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
+                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION) ||
+                    ((e.getEntity() instanceof Wither || e.getEntity() instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
+                    (e.getEntity() instanceof Fireball && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL)))
             e.blockList().clear();
         }
     }
@@ -285,8 +285,8 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandSettings.WITHER_EXPLOSION)) ||
-                    ((e.getEntity() instanceof Enderman) && !island.hasSettingsEnabled(IslandSettings.ENDERMAN_GRIEF)))
+            if(((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
+                    ((e.getEntity() instanceof Enderman) && !island.hasSettingsEnabled(IslandFlags.ENDERMAN_GRIEF)))
                 e.setCancelled(true);
         }
     }

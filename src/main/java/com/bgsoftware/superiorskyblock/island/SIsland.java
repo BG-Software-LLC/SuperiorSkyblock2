@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -40,6 +41,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -110,7 +112,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<Object, SPermissionNode>> permissionNodes = SyncedObject.of(new HashMap<>());
     private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
-    private final SyncedObject<Set<IslandSettings>> islandSettings = SyncedObject.of(new HashSet<>());
+    private final SyncedObject<Set<IslandFlag>> islandSettings = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Map<String, Integer>> upgrades = SyncedObject.of(new HashMap<>());
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
@@ -1985,14 +1987,32 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public boolean hasSettingsEnabled(IslandSettings settings) {
+    @Deprecated
+    public boolean hasSettingsEnabled(IslandSettings islandSettings) {
+        return hasSettingsEnabled(IslandFlag.getByName(islandSettings.name()));
+    }
+
+    @Override
+    @Deprecated
+    public void enableSettings(IslandSettings islandSettings) {
+        enableSettings(IslandFlag.getByName(islandSettings.name()));
+    }
+
+    @Override
+    @Deprecated
+    public void disableSettings(IslandSettings islandSettings) {
+        disableSettings(IslandFlag.getByName(islandSettings.name()));
+    }
+
+    @Override
+    public boolean hasSettingsEnabled(IslandFlag settings) {
         return islandSettings.run(islandSettings -> {
             return islandSettings.contains(settings);
         });
     }
 
     @Override
-    public void enableSettings(IslandSettings settings) {
+    public void enableSettings(IslandFlag settings) {
         islandSettings.run(islandSettings -> {
             islandSettings.add(settings);
         });
@@ -2000,32 +2020,32 @@ public final class SIsland extends DatabaseObject implements Island {
         boolean disableTime = false, disableWeather = false;
 
         //Updating times / weather if necessary
-        switch (settings){
-            case ALWAYS_DAY:
+        switch (settings.getName()){
+            case "ALWAYS_DAY":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(0, false));
                 disableTime = true;
                 break;
-            case ALWAYS_MIDDLE_DAY:
+            case "ALWAYS_MIDDLE_DAY":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(6000, false));
                 disableTime = true;
                 break;
-            case ALWAYS_NIGHT:
+            case "ALWAYS_NIGHT":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(14000, false));
                 disableTime = true;
                 break;
-            case ALWAYS_MIDDLE_NIGHT:
+            case "ALWAYS_MIDDLE_NIGHT":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(18000, false));
                 disableTime = true;
                 break;
-            case ALWAYS_SHINY:
+            case "ALWAYS_SHINY":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.CLEAR));
                 disableWeather = true;
                 break;
-            case ALWAYS_RAIN:
+            case "ALWAYS_RAIN":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.DOWNFALL));
                 disableWeather = true;
                 break;
-            case PVP:
+            case "PVP":
                 if(plugin.getSettings().teleportOnPVPEnable)
                     getIslandVisitors().forEach(superiorPlayer -> {
                         superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
@@ -2039,21 +2059,21 @@ public final class SIsland extends DatabaseObject implements Island {
         islandSettings.run(islandSettings -> {
             if(DISABLE_TIME){
                 //Disabling settings without saving to database.
-                if(settings != IslandSettings.ALWAYS_DAY)
-                    islandSettings.remove(IslandSettings.ALWAYS_DAY);
-                if(settings != IslandSettings.ALWAYS_MIDDLE_DAY)
-                    islandSettings.remove(IslandSettings.ALWAYS_MIDDLE_DAY);
-                if(settings != IslandSettings.ALWAYS_NIGHT)
-                    islandSettings.remove(IslandSettings.ALWAYS_NIGHT);
-                if(settings != IslandSettings.ALWAYS_MIDDLE_NIGHT)
-                    islandSettings.remove(IslandSettings.ALWAYS_MIDDLE_NIGHT);
+                if(settings != IslandFlags.ALWAYS_DAY)
+                    islandSettings.remove(IslandFlags.ALWAYS_DAY);
+                if(settings != IslandFlags.ALWAYS_MIDDLE_DAY)
+                    islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_DAY);
+                if(settings != IslandFlags.ALWAYS_NIGHT)
+                    islandSettings.remove(IslandFlags.ALWAYS_NIGHT);
+                if(settings != IslandFlags.ALWAYS_MIDDLE_NIGHT)
+                    islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT);
             }
 
             if(DISABLE_WEATHER){
-                if(settings != IslandSettings.ALWAYS_RAIN)
-                    islandSettings.remove(IslandSettings.ALWAYS_RAIN);
-                if(settings != IslandSettings.ALWAYS_SHINY)
-                    islandSettings.remove(IslandSettings.ALWAYS_SHINY);
+                if(settings != IslandFlags.ALWAYS_RAIN)
+                    islandSettings.remove(IslandFlags.ALWAYS_RAIN);
+                if(settings != IslandFlags.ALWAYS_SHINY)
+                    islandSettings.remove(IslandFlags.ALWAYS_SHINY);
             }
 
             Query.ISLAND_SET_SETTINGS.getStatementHolder()
@@ -2066,7 +2086,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void disableSettings(IslandSettings settings) {
+    public void disableSettings(IslandFlag settings) {
         islandSettings.run(islandSettings -> {
             islandSettings.remove(settings);
             Query.ISLAND_SET_SETTINGS.getStatementHolder()
@@ -2075,15 +2095,15 @@ public final class SIsland extends DatabaseObject implements Island {
                     .execute(true);
         });
 
-        switch (settings){
-            case ALWAYS_DAY:
-            case ALWAYS_MIDDLE_DAY:
-            case ALWAYS_NIGHT:
-            case ALWAYS_MIDDLE_NIGHT:
+        switch (settings.getName()){
+            case "ALWAYS_DAY":
+            case "ALWAYS_MIDDLE_DAY":
+            case "ALWAYS_NIGHT":
+            case "ALWAYS_MIDDLE_NIGHT":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerTime());
                 break;
-            case ALWAYS_RAIN:
-            case ALWAYS_SHINY:
+            case "ALWAYS_RAIN":
+            case "ALWAYS_SHINY":
                 getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerWeather());
                 break;
         }
@@ -2398,7 +2418,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             plugin.getSettings().defaultSettings.forEach(setting -> {
                 try{
-                    islandSettings.add(IslandSettings.valueOf(setting));
+                    islandSettings.add(IslandFlag.getByName(setting));
                 }catch(Exception ignored){}
             });
 

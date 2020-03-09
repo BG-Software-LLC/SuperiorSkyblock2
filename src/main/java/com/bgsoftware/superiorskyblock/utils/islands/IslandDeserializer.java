@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -133,16 +133,16 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeSettings(String settings, SyncedObject<Set<IslandSettings>> islandSettingsSync){
+    public static void deserializeSettings(String settings, SyncedObject<Set<IslandFlag>> islandSettingsSync){
         islandSettingsSync.run(islandSettings -> {
             islandSettings.addAll(Arrays.stream(settings.split(";")).filter(setting -> {
                 try{
-                    IslandSettings.valueOf(setting);
+                    IslandFlag.getByName(setting);
                     return true;
                 }catch(Exception ex){
                     return false;
                 }
-            }).map(IslandSettings::valueOf).collect(Collectors.toList()));
+            }).map(IslandFlag::getByName).collect(Collectors.toList()));
         });
     }
 

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -46,7 +47,7 @@ public final class SpawnIsland implements Island {
     private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
     private final Location center;
     private final int islandSize;
-    private final List<IslandSettings> islandSettings;
+    private final List<IslandFlag> islandSettings;
     private Biome biome = Biome.PLAINS;
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin){
@@ -54,7 +55,7 @@ public final class SpawnIsland implements Island {
 
         center = LocationUtils.getLocation(plugin.getSettings().spawnLocation.replace(" ", "")).add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().maxIslandSize;
-        islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandSettings::valueOf).collect(Collectors.toList());
+        islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
         assignPermissionNodes();
 
@@ -830,17 +831,35 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public boolean hasSettingsEnabled(IslandSettings islandSettings) {
-        return this.islandSettings.contains(islandSettings);
+        return hasSettingsEnabled(IslandFlag.getByName(islandSettings.name()));
     }
 
     @Override
+    @Deprecated
     public void enableSettings(IslandSettings islandSettings) {
 
     }
 
     @Override
+    @Deprecated
     public void disableSettings(IslandSettings islandSettings) {
+
+    }
+
+    @Override
+    public boolean hasSettingsEnabled(IslandFlag islandFlag) {
+        return this.islandSettings.contains(islandFlag);
+    }
+
+    @Override
+    public void enableSettings(IslandFlag islandFlag) {
+
+    }
+
+    @Override
+    public void disableSettings(IslandFlag islandFlag) {
 
     }
 

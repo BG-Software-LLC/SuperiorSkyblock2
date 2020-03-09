@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -17,6 +16,7 @@ import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -162,7 +162,7 @@ public final class PlayersListener implements Listener {
             Locale.ISLAND_FLY_ENABLED.send(player);
         }
 
-        if(!e.getIsland().isMember(e.getPlayer()) && e.getIsland().hasSettingsEnabled(IslandSettings.PVP)){
+        if(!e.getIsland().isMember(e.getPlayer()) && e.getIsland().hasSettingsEnabled(IslandFlags.PVP)){
             Locale.ENTER_PVP_ISLAND.send(e.getPlayer());
             if(plugin.getSettings().immuneToPVPWhenTeleport) {
                 ((SSuperiorPlayer) e.getPlayer()).setImmunedToPvP(true);
