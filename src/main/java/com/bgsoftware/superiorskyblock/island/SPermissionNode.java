@@ -70,6 +70,13 @@ public final class SPermissionNode implements PermissionNode {
         }
     }
 
+    public SPermissionNode combine(SPermissionNode other){
+        SPermissionNode node = clone();
+        IslandPrivilege.values().forEach(islandPrivilege ->
+                node.setPermission(islandPrivilege, node.hasPermission(islandPrivilege) || other.hasPermission(islandPrivilege)));
+        return node;
+    }
+
     public String getAsStatementString(){
         StringBuilder stringBuilder = new StringBuilder();
         nodes.forEach(islandPrivilege -> stringBuilder.append(";").append(islandPrivilege.getName()));
