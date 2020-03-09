@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 
-public class IslandFlags {
+public final class IslandFlags {
 
     public static IslandFlag ALWAYS_DAY = IslandFlag.getByName("ALWAYS_DAY");
     public static IslandFlag ALWAYS_MIDDLE_DAY = IslandFlag.getByName("ALWAYS_MIDDLE_DAY");
