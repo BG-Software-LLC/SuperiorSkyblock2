@@ -18,7 +18,7 @@ public final class IslandsTopHook_Holograms extends IslandsTopHook {
     public void refresh(SortingType sortingType) {
         for(Hologram hologram : hologramManager.getActiveHolograms().values()){
             for(HologramLine hologramLine : hologram.getLines()){
-                if(hasPlaceholders(hologramLine.getRaw())){
+                if(hasPlaceholders(hologramLine.getRaw()) && !hologramLine.isHidden()){
                     hologramLine.hide();
                     hologramLine.show();
                 }
