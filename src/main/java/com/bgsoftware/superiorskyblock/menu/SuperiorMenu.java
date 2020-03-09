@@ -241,6 +241,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public static void killMenu(SuperiorPlayer superiorPlayer){
+        if(!superiorPlayer.isOnline())
+            return;
+
         Inventory inventory = superiorPlayer.asPlayer().getOpenInventory().getTopInventory();
         InventoryHolder inventoryHolder = inventory == null ? null : inventory.getHolder();
         if(inventoryHolder instanceof SuperiorMenu)
