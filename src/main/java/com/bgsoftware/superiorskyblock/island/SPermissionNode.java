@@ -31,6 +31,11 @@ public final class SPermissionNode implements PermissionNode {
         this.previousNode = previousNode;
     }
 
+    public SPermissionNode(SPermissionNode other){
+        this.nodes = new HashSet<>(other.nodes);
+        this.previousNode = other.previousNode == null ? null : new SPermissionNode(other.previousNode);
+    }
+
     @Override
     @Deprecated
     public boolean hasPermission(IslandPermission permission) {
@@ -64,17 +69,11 @@ public final class SPermissionNode implements PermissionNode {
         try {
             SPermissionNode permissionNode = (SPermissionNode) super.clone();
             permissionNode.nodes = new HashSet<>(nodes);
+            permissionNode.previousNode = previousNode == null ? null : new SPermissionNode(previousNode);
             return permissionNode;
         }catch(CloneNotSupportedException ex){
             return new SPermissionNode("", null);
         }
-    }
-
-    public SPermissionNode combine(SPermissionNode other){
-        SPermissionNode node = clone();
-        IslandPrivilege.values().forEach(islandPrivilege ->
-                node.setPermission(islandPrivilege, node.hasPermission(islandPrivilege) || other.hasPermission(islandPrivilege)));
-        return node;
     }
 
     public String getAsStatementString(){
