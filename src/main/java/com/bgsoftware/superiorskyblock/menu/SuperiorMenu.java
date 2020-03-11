@@ -158,6 +158,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
             if(Arrays.equals( player.getOpenInventory().getTopInventory().getContents(), inventory.getContents()))
                 return;
 
+            if(previousMenu != null)
+                previousMenu.previousMove = false;
+
             player.openInventory(inventory);
 
             refreshing = false;

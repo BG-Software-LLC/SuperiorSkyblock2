@@ -32,6 +32,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
     @Override
     protected void onPlayerClick(InventoryClickEvent event, Island island) {
         if(visitorWarps){
+            previousMove = false;
             CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
         }
         else{
