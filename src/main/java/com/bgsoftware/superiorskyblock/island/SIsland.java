@@ -1061,7 +1061,7 @@ public final class SIsland extends DatabaseObject implements Island {
             int maxIslandSize = islandSize;
 
             for(String upgrade : upgrades.keySet())
-                maxIslandSize = Math.max(islandSize, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBorderSize());
+                maxIslandSize = Math.max(maxIslandSize, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBorderSize());
 
             return maxIslandSize;
         });
