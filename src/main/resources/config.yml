@@ -327,7 +327,9 @@ disable-redstone-offline: true
 # By default, all generators will generate cobblestone only.
 # Please note: this will not work with the synced-upgrade feature of generator upgrades.
 # Example: 'DIAMOND_BLOCK:50' will set 50% chance for diamond block.
-default-generator: []
+default-generator:
+- COBBLESTONE:95
+- COAL_ORE:5
 
 # A list of commands that should have cooldown.
 # Cooldowns are in milliseconds.
