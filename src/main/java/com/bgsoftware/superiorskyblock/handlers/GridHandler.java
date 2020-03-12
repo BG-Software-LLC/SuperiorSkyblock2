@@ -400,6 +400,11 @@ public final class GridHandler implements GridManager {
         return islandsToPurge.stream().map(this::getIsland).collect(Collectors.toList());
     }
 
+    @Override
+    public void registerSortingType(SortingType sortingType) {
+        islands.registerSortingType(sortingType, true);
+    }
+
     public void loadGrid(ResultSet resultSet) throws SQLException {
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
 

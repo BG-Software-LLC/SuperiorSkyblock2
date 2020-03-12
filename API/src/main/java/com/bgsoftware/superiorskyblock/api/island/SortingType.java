@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -60,7 +62,9 @@ public final class SortingType {
         if(sortingTypes.containsKey(name))
             throw new IllegalStateException("SortingType with the name " + name + " already exists.");
 
-        sortingTypes.put(name, new SortingType(name, comparator));
+        SortingType sortingType = new SortingType(name, comparator);
+        sortingTypes.put(name, sortingType);
+        SuperiorSkyblockAPI.getGrid().registerSortingType(sortingType);
     }
 
 }

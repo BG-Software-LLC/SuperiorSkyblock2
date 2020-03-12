@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -87,6 +88,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
     public static final int NO_BLOCK_LIMIT = -1;
+    private static int blocksUpdateCounter = 0;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -1352,6 +1354,10 @@ public final class SIsland extends DatabaseObject implements Island {
             if(save){
                 MenuValues.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
+                if(++blocksUpdateCounter >= 20){
+                    blocksUpdateCounter = 0;
+                    MenuTopIslands.refreshMenus();
+                }
             }
         }
     }
@@ -1481,9 +1487,14 @@ public final class SIsland extends DatabaseObject implements Island {
 
             updateLastTime();
 
-            MenuValues.refreshMenus();
-
-            if(save) saveBlockCounts(oldWorth, oldLevel);
+            if(save) {
+                MenuValues.refreshMenus();
+                saveBlockCounts(oldWorth, oldLevel);
+                if(++blocksUpdateCounter >= 20){
+                    blocksUpdateCounter = 0;
+                    MenuTopIslands.refreshMenus();
+                }
+            }
         }
     }
 
@@ -1530,6 +1541,9 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
         this.bonusWorth.set(bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth));
+
+        MenuTopIslands.refreshMenus();
+
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
                 .setString(this.bonusWorth.get().getAsString())
                 .setString(owner.getUniqueId().toString())

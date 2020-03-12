@@ -252,4 +252,10 @@ public interface GridManager {
      */
     List<Island> getIslandsToPurge();
 
+    /**
+     * Add a new sorting type to the registry of islands.
+     * @param sortingType The new sorting type to register.
+     */
+    void registerSortingType(SortingType sortingType);
+
 }

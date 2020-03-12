@@ -25,8 +25,7 @@ public final class IslandRegistry implements Iterable<Island> {
     private Map<SortingType, TreeSet<Island>> sortedTrees = new HashMap<>();
 
     public IslandRegistry(){
-        for(SortingType sortingAlgorithm : SortingType.values())
-            sortedTrees.put(sortingAlgorithm, Sets.newTreeSet(sortingAlgorithm.getComparator()));
+        SortingType.values().forEach(sortingType -> registerSortingType(sortingType, false));
     }
 
     public synchronized Island get(UUID uuid){
@@ -99,6 +98,15 @@ public final class IslandRegistry implements Iterable<Island> {
         Island island = get(oldOwner);
         remove(oldOwner);
         add(newOwner, island);
+    }
+
+    public synchronized void registerSortingType(SortingType sortingAlgorithm, boolean sort){
+        if(sortedTrees.containsKey(sortingAlgorithm))
+            throw new IllegalArgumentException("You cannot register an existing sorting type to the database.");
+
+        sortedTrees.put(sortingAlgorithm, Sets.newTreeSet(sortingAlgorithm.getComparator()));
+        if(sort)
+            sort(sortingAlgorithm);
     }
 
     private void ensureType(SortingType sortingType){
