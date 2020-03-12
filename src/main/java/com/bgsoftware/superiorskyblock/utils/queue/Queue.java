@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.queue;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +14,7 @@ public final class Queue<E> {
     }
 
     public E pop(){
-        if(size() <= 0)
-            throw new NullPointerException("Cannot pop an element from an empty queue!");
+        Preconditions.checkState(size() > 0, "Cannot pop an element from an empty queue!");
         E popped = this.list.get(0);
         list.remove(0);
         return popped;

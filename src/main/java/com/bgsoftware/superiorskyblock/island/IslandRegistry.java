@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -101,8 +102,7 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     public synchronized void registerSortingType(SortingType sortingAlgorithm, boolean sort){
-        if(sortedTrees.containsKey(sortingAlgorithm))
-            throw new IllegalArgumentException("You cannot register an existing sorting type to the database.");
+        Preconditions.checkArgument(!sortedTrees.containsKey(sortingAlgorithm), "You cannot register an existing sorting type to the database.");
 
         sortedTrees.put(sortingAlgorithm, Sets.newTreeSet(sortingAlgorithm.getComparator()));
         if(sort)
@@ -110,8 +110,7 @@ public final class IslandRegistry implements Iterable<Island> {
     }
 
     private void ensureType(SortingType sortingType){
-        if(!sortedTrees.containsKey(sortingType))
-            throw new IllegalStateException("The sorting-type " + sortingType + " doesn't exist in the database. Please contact author!");
+        Preconditions.checkState(sortedTrees.containsKey(sortingType), "The sorting-type " + sortingType + " doesn't exist in the database. Please contact author!");
     }
 
 }

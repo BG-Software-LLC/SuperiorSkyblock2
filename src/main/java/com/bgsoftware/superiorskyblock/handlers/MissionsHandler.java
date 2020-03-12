@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -378,8 +379,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{
-        if(!Mission.class.isAssignableFrom(clazz))
-            throw new IllegalArgumentException("Class " + clazz + " is not a Mission.");
+        Preconditions.checkArgument(Mission.class.isAssignableFrom(clazz), "Class " + clazz + " is not a Mission.");
 
         for(Constructor<?> constructor : clazz.getConstructors()){
             if(constructor.getParameterCount() == 0) {

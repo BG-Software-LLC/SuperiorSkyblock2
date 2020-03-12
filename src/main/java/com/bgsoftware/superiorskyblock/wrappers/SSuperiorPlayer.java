@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -143,8 +144,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setUserLocale(java.util.Locale userLocale) {
-        if(!Locale.isValidLocale(userLocale))
-            throw new IllegalArgumentException("Locale " + userLocale + " is not a valid locale.");
+        Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
         this.userLocale = userLocale;
 
@@ -656,27 +656,19 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     public static SuperiorPlayer of(CommandSender sender){
-        if(sender == null)
-            throw new NullPointerException("CommandSender cannot be null.");
-
+        Preconditions.checkArgument(sender != null, "CommandSender cannot be null.");
         return of((Player) sender);
     }
 
     public static SuperiorPlayer of(Player player){
-        if(player == null)
-            throw new NullPointerException("Player cannot be null.");
-        if(player.hasMetadata("NPC"))
-            throw new IllegalArgumentException("Cannot get SuperiorPlayer from an NPC.");
-
+        Preconditions.checkArgument(player != null, "Player cannot be null.");
+        Preconditions.checkArgument(!player.hasMetadata("NPC"), "Cannot get SuperiorPlayer from an NPC.");
         return of(player.getUniqueId());
     }
 
     public static SuperiorPlayer of(UUID uuid){
-        if(uuid == null)
-            throw new NullPointerException("UUID cannot be null.");
-        if(plugin.getPlayers() == null)
-            throw new NullPointerException("PlayersHandle is not ready yet.");
-
+        Preconditions.checkArgument(uuid != null, "UUID cannot be null.");
+        Preconditions.checkArgument(plugin.getPlayers() != null, "PlayersHandler is not ready yet.");
         return plugin.getPlayers().getSuperiorPlayer(uuid);
     }
 

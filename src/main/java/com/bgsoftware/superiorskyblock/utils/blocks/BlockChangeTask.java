@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -23,16 +24,13 @@ public final class BlockChangeTask {
     private boolean submitted = false;
 
     public void setBlock(Location location, int combinedId, BlockType blockType, Object... args){
-        if(submitted)
-            throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
-
+        Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
         ChunkPosition chunkPosition = new ChunkPosition(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
         blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new BlockData(location, combinedId, blockType, args));
     }
 
     public void submitUpdate(Runnable onFinish){
-        if(submitted)
-            throw new IllegalArgumentException("This MultiBlockChange was already submitted.");
+        Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
 
         submitted = true;
 

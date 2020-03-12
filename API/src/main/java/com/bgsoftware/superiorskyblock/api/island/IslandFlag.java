@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +37,7 @@ public final class IslandFlag {
     public static IslandFlag getByName(String name){
         IslandFlag islandFlag = islandFlags.get(name.toUpperCase());
 
-        if(islandFlag == null)
-            throw new IllegalArgumentException("Couldn't find an IslandFlag with the name " + name + ".");
+        Preconditions.checkArgument(islandFlag != null, "Couldn't find an IslandFlag with the name " + name + ".");
 
         return islandFlag;
     }
@@ -53,8 +54,7 @@ public final class IslandFlag {
     public static void register(String name){
         name = name.toUpperCase();
 
-        if(islandFlags.containsKey(name))
-            throw new IllegalStateException("IslandFlag with the name " + name + " already exists.");
+        Preconditions.checkState(!islandFlags.containsKey(name), "IslandFlag with the name " + name + " already exists.");
 
         islandFlags.put(name, new IslandFlag(name));
     }

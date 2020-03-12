@@ -63,6 +63,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -382,8 +383,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
     }
 
     private SuperiorCommand createInstance(Class<?> clazz) throws Exception{
-        if(!SuperiorCommand.class.isAssignableFrom(clazz))
-            throw new IllegalArgumentException("Class " + clazz + " is not a SuperiorCommand.");
+        Preconditions.checkArgument(SuperiorCommand.class.isAssignableFrom(clazz), "Class " + clazz + " is not a SuperiorCommand.");
 
         for(Constructor<?> constructor : clazz.getConstructors()){
             if(constructor.getParameterCount() == 0) {

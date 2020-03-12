@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.ProtocolLibHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -80,9 +81,7 @@ public final class ProvidersHandler implements ProvidersManager {
 
     @Override
     public void setSpawnersProvider(SpawnersProvider spawnersProvider){
-        if(spawnersProvider == null)
-            throw new IllegalArgumentException("SpawnersProvider cannot be null.");
-
+        Preconditions.checkArgument(spawnersProvider != null, "SpawnersProvider cannot be null.");
         this.spawnersProvider = spawnersProvider;
     }
 

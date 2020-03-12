@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -106,8 +107,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
     }
 
     public static ListTag fromNBT(Object tag){
-        if(!tag.getClass().equals(CLASS))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ListTag!");
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ListTag!");
 
         List<Tag<?>> list = new ArrayList<>();
 

@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -487,8 +488,7 @@ public final class SIsland extends DatabaseObject implements Island {
     public Location getCenter(World.Environment environment){
         World world = plugin.getGrid().getIslandsWorld(environment);
 
-        if(world == null)
-            throw new NullPointerException("Couldn't find world for environment " + environment);
+        Preconditions.checkNotNull(world, "Couldn't find world for environment " + environment + ".");
 
         return center.parse(world).add(0.5, 0, 0.5);
     }
@@ -2156,10 +2156,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setGeneratorPercentage(Key key, int percentage) {
-        if(percentage < 0 || percentage > 100){
-            throw new IllegalArgumentException("Percentage must be between 0 and 100 - got " + percentage + ".");
-        }
-        else if(percentage == 0){
+        Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
+
+        if(percentage == 0){
             setGeneratorAmount(key, 0);
         }
         else if(percentage == 100){

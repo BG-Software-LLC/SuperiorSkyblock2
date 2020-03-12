@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -85,8 +86,7 @@ public final class LongTag extends Tag<Long> {
     }
 
     public static LongTag fromNBT(Object tag){
-        if(!tag.getClass().equals(CLASS))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to LongTag!");
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);

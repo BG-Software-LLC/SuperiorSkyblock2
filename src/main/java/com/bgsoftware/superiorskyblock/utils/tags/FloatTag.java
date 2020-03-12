@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -84,8 +85,7 @@ public final class FloatTag extends Tag<Float> {
     }
 
     public static FloatTag fromNBT(Object tag){
-        if(!tag.getClass().equals(CLASS))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to FloatTag!");
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
             float value = plugin.getNMSTags().getNBTFloatValue(tag);

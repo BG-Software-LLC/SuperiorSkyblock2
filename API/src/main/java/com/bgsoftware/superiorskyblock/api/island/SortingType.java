@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -59,8 +60,7 @@ public final class SortingType {
      * @param comparator The comparator for sorting the islands.
      */
     public static void register(String name, Comparator<Island> comparator){
-        if(sortingTypes.containsKey(name))
-            throw new IllegalStateException("SortingType with the name " + name + " already exists.");
+        Preconditions.checkState(!sortingTypes.containsKey(name), "SortingType with the name " + name + " already exists.");
 
         SortingType sortingType = new SortingType(name, comparator);
         sortingTypes.put(name, sortingType);

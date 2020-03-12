@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +37,7 @@ public final class IslandPrivilege {
     public static IslandPrivilege getByName(String name){
         IslandPrivilege islandPrivilege = islandPrivileges.get(name.toUpperCase());
 
-        if(islandPrivilege == null)
-            throw new IllegalArgumentException("Couldn't find an IslandPrivilege with the name " + name + ".");
+        Preconditions.checkArgument(islandPrivilege != null, "Couldn't find an IslandPrivilege with the name " + name + ".");
 
         return islandPrivilege;
     }
@@ -53,8 +54,7 @@ public final class IslandPrivilege {
     public static void register(String name){
         name = name.toUpperCase();
 
-        if(islandPrivileges.containsKey(name))
-            throw new IllegalStateException("IslandPrivilege with the name " + name + " already exists.");
+        Preconditions.checkState(!islandPrivileges.containsKey(name), "IslandPrivilege with the name " + name + " already exists.");
 
         islandPrivileges.put(name, new IslandPrivilege(name));
     }

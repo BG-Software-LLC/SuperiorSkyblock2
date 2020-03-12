@@ -34,6 +34,7 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 
@@ -86,8 +87,7 @@ public final class ByteArrayTag extends Tag<byte[]> {
     }
 
     public static ByteArrayTag fromNBT(Object tag){
-        if(!tag.getClass().equals(CLASS))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to ByteArrayTag!");
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
 
         try {
             byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);

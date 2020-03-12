@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -122,8 +123,7 @@ public final class IntArrayTag extends Tag<int[]> {
     }
 
     public static IntArrayTag fromNBT(Object tag){
-        if(!tag.getClass().equals(CLASS))
-            throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to IntArrayTag!");
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
 
         try {
             int[] value = plugin.getNMSTags().getNBTIntArrayValue(tag);
