@@ -81,11 +81,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSBlocks nmsBlocks;
 
     @Override
-    public void onLoad() {
-        ReflectionUtils.init();
-    }
-
-    @Override
     public void onEnable() {
         plugin = this;
         new Metrics(this);

@@ -19,11 +19,10 @@ public final class ReflectionUtils {
     private static Map<Fields, Field> fieldsMap = new HashMap<>();
     private static Map<Methods, Method> methodsMap = new HashMap<>();
 
-    public static void init(){
+    static {
         Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
-                biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage"),
                 biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid"),
                 chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection"),
                 worldClass = getClass("net.minecraft.server.VERSION.World"),
@@ -31,6 +30,7 @@ public final class ReflectionUtils {
                 chunkCoordIntPairClass = getClass("net.minecraft.server.VERSION.ChunkCoordIntPair");
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_15)){
+            Class<?> biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage");
             fieldsMap.put(Fields.BIOME_GRID_BIOME_STORAGE, getField(biomeGridClass, "biome"));
             Field field = getField(biomeStorageClass, "f");
             if(field != null && !field.getType().getName().contains("BiomeBase"))
