@@ -19,7 +19,7 @@ public final class ReflectionUtils {
     private static Map<Fields, Field> fieldsMap = new HashMap<>();
     private static Map<Methods, Method> methodsMap = new HashMap<>();
 
-    static {
+    public static void init(){
         Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),

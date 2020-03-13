@@ -43,6 +43,7 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -78,6 +79,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
+
+    @Override
+    public void onLoad() {
+        ReflectionUtils.init();
+    }
 
     @Override
     public void onEnable() {
