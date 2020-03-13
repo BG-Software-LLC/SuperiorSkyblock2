@@ -67,6 +67,14 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerJoinAdmin(PlayerJoinEvent e){
+        if(e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")){
+            Bukkit.getScheduler().runTaskLater(plugin, () ->
+                    sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion()), 5L);
+        }
+    }
+
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         if(e.getPlayer().hasMetadata("NPC"))
             return;
@@ -513,6 +521,10 @@ public final class PlayersListener implements Listener {
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 
+    }
+
+    private void sendMessage(Player player, String message){
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
 }
