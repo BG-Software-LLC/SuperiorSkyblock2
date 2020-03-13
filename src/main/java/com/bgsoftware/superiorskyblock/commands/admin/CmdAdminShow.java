@@ -147,7 +147,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
             StringBuilder generatorString = new StringBuilder();
             for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
                 generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale, StringUtils.format(entry.getKey()),
-                        ((SIsland) island).getGeneratorPercentageDecimal(Key.of(entry.getKey())), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
+                        StringUtils.format(((SIsland) island).getGeneratorPercentageDecimal(Key.of(entry.getKey()))), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString));
         }
