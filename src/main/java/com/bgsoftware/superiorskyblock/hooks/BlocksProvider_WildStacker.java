@@ -33,6 +33,7 @@ import java.util.Map;
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     private static final Map<String, StackedSnapshot> chunkSnapshots = new HashMap<>();
+    private static final Map<String, Integer> callsAmount = new HashMap<>();
     private static boolean registered = false;
 
     public BlocksProvider_WildStacker(){
@@ -51,13 +52,28 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                 //noinspection deprecation
                 stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
             }
-            if (stackedSnapshot != null)
-                chunkSnapshots.put(getId(chunk), stackedSnapshot);
+            if (stackedSnapshot != null) {
+                String chunkId = getId(chunk);
+                if(chunkSnapshots.containsKey(chunkId))
+                    callsAmount.put(chunkId, callsAmount.getOrDefault(chunkId, 0) + 1);
+                else
+                    chunkSnapshots.put(getId(chunk), stackedSnapshot);
+            }
         }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
-        chunkSnapshots.remove(getId(chunk));
+        String chunkId = getId(chunk);
+        int callsAmount = BlocksProvider_WildStacker.callsAmount.getOrDefault(chunkId, 0);
+        if(callsAmount > 0) {
+            if(callsAmount == 1)
+                BlocksProvider_WildStacker.callsAmount.remove(chunkId);
+            else
+                BlocksProvider_WildStacker.callsAmount.put(chunkId, callsAmount - 1);
+        }
+        else {
+            chunkSnapshots.remove(chunkId);
+        }
     }
 
     @Override
