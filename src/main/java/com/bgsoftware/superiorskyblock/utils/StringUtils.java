@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -121,6 +122,12 @@ public final class StringUtils {
     public static String getSettingsString(){
         StringBuilder stringBuilder = new StringBuilder();
         IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName)).forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase()));
+        return stringBuilder.toString().substring(2);
+    }
+
+    public static String getUpgradesString(SuperiorSkyblockPlugin plugin){
+        StringBuilder stringBuilder = new StringBuilder();
+        plugin.getUpgrades().getUpgrades().forEach(upgrade -> stringBuilder.append(", ").append(upgrade.getName()));
         return stringBuilder.toString().substring(2);
     }
 

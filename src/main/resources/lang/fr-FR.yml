@@ -421,6 +421,13 @@ PLAYER_NOT_ONLINE: '&c&lErreur | &7Ce joueur n''est pas connecté !'
 PLAYER_QUIT_ANNOUNCEMENT: '&e&lIle | &7{0} a quitté le serveur.'
 PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErreur | &7Vous ne pouvez uniquement promouvoir les joueurs ayant un rôle inférieur au votre.'
 PROMOTED_MEMBER: '&e&lIle | &7Vous avez promu {0} {1} sur l''île.'
+PURGE_CLEAR: '&e&lIle | &7Toutes les îles en attente de purge ont été purgées.'
+PURGED_ISLANDS: |-
+  &e&lIsland | &7{0} île(s) seront purgée(s) au redémarrage du serveur.
+  &e&lIsland | &7Vous pouvez annuler ce processus à nimporte quel moment en tapant /is admin purge cancel.
+RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
+RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
+RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
 RATE_ANNOUNCEMENT: '&e&lIle | &7{0} a noté votre île {1} / 5 !.'
 RATE_CHANGE_OTHER: '&e&lIle | &7Vous avez modifié la note de {0} sur {1}.'
 RATE_OWN_ISLAND: '&c&lErreur | &7Vous ne pouvez pas noter votre île.'
@@ -498,8 +505,4 @@ WITHDRAW_ALL_MONEY: |-
 WITHDRAW_ANNOUNCEMENT: '&e&lBanque | &7{0} a retiré {1}$ du compte de l''île !'
 WITHDRAWN_MONEY: '&e&lBanque | &7Vous avez retiré {0}$ du compte de l''île de {1} !'
 WITHDRAWN_MONEY_NAME: '&e&lBanque | &7Vous avez retiré {0}$ du compte de l''île {1} !'
-PURGE_CLEAR: '&e&lIle | &7Toutes les îles en attente de purge ont été purgées.'
-PURGED_ISLANDS: |-
-  &e&lIsland | &7{0} île(s) seront purgée(s) au redémarrage du serveur.
-  &e&lIsland | &7Vous pouvez annuler ce processus à nimporte quel moment en tapant /is admin purge cancel.
 WORLD_NOT_UNLOCKED: '&e&lMondes | &7Le monde {0} n''a pas encore été dévérouillé !'

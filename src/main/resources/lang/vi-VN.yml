@@ -508,6 +508,9 @@ PURGE_CLEAR: '&e&lĐảo Thần | &7Thành công xóa tất cả các đảo x�
 PURGED_ISLANDS: |-
   &e&lĐảo Thần | &7{0} các đảo sẽ bị lọc khi máy chủ tải lại.
   &e&lĐảo Thần | &7Bạn có thể huỷ bỏ nó mọi lúc bằng cách sử dụng /is admin purge cancel.
+RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
+RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
+RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
 RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn {1} trên 5!.'
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'

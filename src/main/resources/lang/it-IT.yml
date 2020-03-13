@@ -538,6 +538,9 @@ PURGE_CLEAR: '&e&lIsola | &7Eliminate con successo tutte le isole in coda da eli
 PURGED_ISLANDS: |-
   &e&lIsola | &7{0} isole verranno eliminate al riavvio del server.
   &e&lIsola | &7Puoi annullarlo in qualsiasi momento utilizzando /is admin purge cancel.
+RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
+RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
+RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
 RATE_ANNOUNCEMENT: '&e&lIsola | &7{0} ha valutato la tua isola {1} stelle su 5!'
 RATE_CHANGE_OTHER: '&e&lIsola | &7You changed the rating of {0} to {1}.'
 RATE_OWN_ISLAND: '&c&lErrore | &7You can''t rate your own island.'

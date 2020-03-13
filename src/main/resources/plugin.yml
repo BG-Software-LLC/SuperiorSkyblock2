@@ -156,6 +156,10 @@ permissions:
             description: Open an island to the public.
           superior.admin.promote:
             description: Promote a member in another player's island.
+          superior.admin.purge:
+            description: Purge islands from database.
+          superior.admin.rankup:
+            description: Rankup an upgrade for an island.
           superior.admin.recalc:
             description: Re-calculates the worth of an island.
           superior.admin.reload:

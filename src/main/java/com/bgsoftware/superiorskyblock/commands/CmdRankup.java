@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -75,10 +76,9 @@ public final class CmdRankup implements ISuperiorCommand {
         String upgradeName = args[1];
 
         if(!plugin.getUpgrades().isUpgrade(upgradeName)){
-            Locale.INVALID_UPGRADE.send(superiorPlayer, upgradeName, getUpgradesString(plugin));
+            Locale.INVALID_UPGRADE.send(superiorPlayer, upgradeName, StringUtils.getUpgradesString(plugin));
             return;
         }
-
 
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
         UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade), nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
@@ -144,15 +144,6 @@ public final class CmdRankup implements ISuperiorCommand {
         }
 
         return new ArrayList<>();
-    }
-
-    private String getUpgradesString(SuperiorSkyblockPlugin plugin){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            stringBuilder.append(", ").append(upgrade.getName());
-
-        return stringBuilder.toString().substring(2);
     }
 
 }
