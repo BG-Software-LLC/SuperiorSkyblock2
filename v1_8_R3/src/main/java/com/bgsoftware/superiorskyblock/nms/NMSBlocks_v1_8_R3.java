@@ -25,7 +25,12 @@ import net.minecraft.server.v1_8_R3.NBTTagList;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.TileEntityBanner;
+import net.minecraft.server.v1_8_R3.TileEntityBrewingStand;
+import net.minecraft.server.v1_8_R3.TileEntityChest;
+import net.minecraft.server.v1_8_R3.TileEntityDispenser;
 import net.minecraft.server.v1_8_R3.TileEntityFlowerPot;
+import net.minecraft.server.v1_8_R3.TileEntityFurnace;
+import net.minecraft.server.v1_8_R3.TileEntityHopper;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R3.TileEntitySign;
 import net.minecraft.server.v1_8_R3.TileEntitySkull;
@@ -47,7 +52,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,16 +61,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Field chunkTickListField;
-
-    static {
-        try{
-            chunkTickListField = World.class.getDeclaredField("chunkTickList");
-            chunkTickListField.setAccessible(true);
-        }catch(Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
 
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
@@ -189,14 +183,10 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
 
     @Override
     public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
-        try{
-            Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
-            field.setAccessible(true);
-            ItemStack[] items = (ItemStack[]) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.length && i < contents.length; i++){
-                items[i] = CraftItemStack.asNMSCopy(contents[i]);
-            }
-        }catch(Exception ignored){ }
+        ItemStack[] items = getItems(tileEntityInventoryHolder);
+        for(int i = 0; i < items.length && i < contents.length; i++){
+            items[i] = CraftItemStack.asNMSCopy(contents[i]);
+        }
     }
 
     @Override
@@ -292,13 +282,13 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         List<Long> activeChunks = new ArrayList<>();
         List<Pair<BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
 
-        try{
-            TLongShortIterator iter = ((TLongShortHashMap) chunkTickListField.get(worldServer)).iterator();
-            while(iter.hasNext()){
-                iter.advance();
-                activeChunks.add(iter.key());
-            }
-        }catch(Exception ignored){}
+        TLongShortHashMap map = (TLongShortHashMap) Fields.WORLD_CHUNK_TICK_LIST.get(worldServer);
+        assert map != null;
+        TLongShortIterator iter = map.iterator();
+        while(iter.hasNext()){
+            iter.advance();
+            activeChunks.add(iter.key());
+        }
 
         for(long chunkCoord : activeChunks){
             int chunkX = World.keyToX(chunkCoord);
@@ -355,6 +345,28 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
                 pair.getValue().getBlock().a(worldServer, pair.getKey(), pair.getValue(), ThreadLocalRandom.current())));
 
         return random;
+    }
+
+    private ItemStack[] getItems(Object tileEntityInventoryHolder){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            return ((TileEntityChest) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            return ((TileEntityDispenser) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            return ((TileEntityBrewingStand) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            return ((TileEntityFurnace) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            return ((TileEntityHopper) tileEntityInventoryHolder).getContents();
+        }
+
+        SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
+
+        return new ItemStack[0];
     }
 
 }

@@ -25,8 +25,14 @@ import net.minecraft.server.v1_12_R1.NonNullList;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.TileEntityBanner;
+import net.minecraft.server.v1_12_R1.TileEntityBrewingStand;
+import net.minecraft.server.v1_12_R1.TileEntityChest;
+import net.minecraft.server.v1_12_R1.TileEntityDispenser;
 import net.minecraft.server.v1_12_R1.TileEntityFlowerPot;
+import net.minecraft.server.v1_12_R1.TileEntityFurnace;
+import net.minecraft.server.v1_12_R1.TileEntityHopper;
 import net.minecraft.server.v1_12_R1.TileEntityMobSpawner;
+import net.minecraft.server.v1_12_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_12_R1.TileEntitySign;
 import net.minecraft.server.v1_12_R1.TileEntitySkull;
 import net.minecraft.server.v1_12_R1.World;
@@ -46,7 +52,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -177,23 +182,9 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     @Override
     public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
-        try{
-            Field field;
-
-            try{
-                field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
-            }catch(Throwable ex){
-                field = tileEntityInventoryHolder.getClass().getSuperclass().getDeclaredField("items");
-            }
-
-            field.setAccessible(true);
-            //noinspection unchecked
-            NonNullList<ItemStack> items = (NonNullList<ItemStack>) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.size() && i < contents.length; i++){
-                items.set(i, CraftItemStack.asNMSCopy(contents[i]));
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
+        NonNullList<ItemStack> items = getItems(tileEntityInventoryHolder);
+        for(int i = 0; i < items.size() && i < contents.length; i++){
+            items.set(i, CraftItemStack.asNMSCopy(contents[i]));
         }
     }
 
@@ -329,4 +320,30 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
         return random;
     }
+
+    private NonNullList<ItemStack> getItems(Object tileEntityInventoryHolder){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            return (NonNullList<ItemStack>) ((TileEntityChest) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            return (NonNullList<ItemStack>) ((TileEntityDispenser) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            return (NonNullList<ItemStack>) ((TileEntityBrewingStand) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            return (NonNullList<ItemStack>) ((TileEntityFurnace) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            return (NonNullList<ItemStack>) ((TileEntityHopper) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityShulkerBox){
+            return (NonNullList<ItemStack>) ((TileEntityShulkerBox) tileEntityInventoryHolder).getContents();
+        }
+
+        SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
+
+        return NonNullList.a();
+    }
+
 }

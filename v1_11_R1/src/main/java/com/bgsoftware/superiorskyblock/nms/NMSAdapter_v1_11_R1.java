@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -45,7 +46,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -53,26 +53,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
 
-    private static Field nonEmptyBlockCountField, tickingBlockCountField, blockIdsField, emittedLightField, skyLightField;
-
     private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    static {
-        try {
-            nonEmptyBlockCountField = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
-            nonEmptyBlockCountField.setAccessible(true);
-            tickingBlockCountField = ChunkSection.class.getDeclaredField("tickingBlockCount");
-            tickingBlockCountField.setAccessible(true);
-            blockIdsField = ChunkSection.class.getDeclaredField("blockIds");
-            blockIdsField.setAccessible(true);
-            emittedLightField = ChunkSection.class.getDeclaredField("emittedLight");
-            emittedLightField.setAccessible(true);
-            skyLightField = ChunkSection.class.getDeclaredField("skyLight");
-            skyLightField.setAccessible(true);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-    }
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -283,19 +264,16 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
 
     private static class EmptyCounterChunkSection extends ChunkSection {
 
-        private int nonEmptyBlockCount = 0, tickingBlockCount = 0;
+        private int nonEmptyBlockCount, tickingBlockCount;
 
         EmptyCounterChunkSection(ChunkSection chunkSection){
             super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
-            try {
-                nonEmptyBlockCount = (int) nonEmptyBlockCountField.get(chunkSection);
-                tickingBlockCount = (int) tickingBlockCountField.get(chunkSection);
-                blockIdsField.set(this, chunkSection.getBlocks());
-                emittedLightField.set(this, chunkSection.getEmittedLightArray());
-                skyLightField.set(this, chunkSection.getSkyLightArray());
-            }catch(Exception ex){
-                ex.printStackTrace();
-            }
+
+            nonEmptyBlockCount = (int) Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT.get(chunkSection);
+            tickingBlockCount = (int) Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT.get(chunkSection);
+            Fields.CHUNK_SECTION_BLOCK_IDS.set(this, chunkSection.getBlocks());
+            Fields.CHUNK_SECTION_EMITTED_LIGHT.set(this, chunkSection.getEmittedLightArray());
+            Fields.CHUNK_SECTION_SKY_LIGHT.set(this, chunkSection.getSkyLightArray());
         }
 
         @Override

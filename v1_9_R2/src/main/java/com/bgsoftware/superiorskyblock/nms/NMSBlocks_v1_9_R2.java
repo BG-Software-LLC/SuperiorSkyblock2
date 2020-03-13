@@ -22,7 +22,12 @@ import net.minecraft.server.v1_9_R2.NBTTagList;
 import net.minecraft.server.v1_9_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_9_R2.TileEntity;
 import net.minecraft.server.v1_9_R2.TileEntityBanner;
+import net.minecraft.server.v1_9_R2.TileEntityBrewingStand;
+import net.minecraft.server.v1_9_R2.TileEntityChest;
+import net.minecraft.server.v1_9_R2.TileEntityDispenser;
 import net.minecraft.server.v1_9_R2.TileEntityFlowerPot;
+import net.minecraft.server.v1_9_R2.TileEntityFurnace;
+import net.minecraft.server.v1_9_R2.TileEntityHopper;
 import net.minecraft.server.v1_9_R2.TileEntityMobSpawner;
 import net.minecraft.server.v1_9_R2.TileEntitySign;
 import net.minecraft.server.v1_9_R2.TileEntitySkull;
@@ -43,7 +48,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -174,14 +178,10 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
 
     @Override
     public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
-        try{
-            Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
-            field.setAccessible(true);
-            ItemStack[] items = (ItemStack[]) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.length && i < contents.length; i++){
-                items[i] = CraftItemStack.asNMSCopy(contents[i]);
-            }
-        }catch(Exception ignored){ }
+        ItemStack[] items = getItems(tileEntityInventoryHolder);
+        for(int i = 0; i < items.length && i < contents.length; i++){
+            items[i] = CraftItemStack.asNMSCopy(contents[i]);
+        }
     }
 
     @Override
@@ -315,6 +315,28 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
                 pair.getValue().getBlock().a(worldServer, pair.getKey(), pair.getValue(), ThreadLocalRandom.current())));
 
         return random;
+    }
+
+    private ItemStack[] getItems(Object tileEntityInventoryHolder){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            return ((TileEntityChest) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            return ((TileEntityDispenser) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            return ((TileEntityBrewingStand) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            return ((TileEntityFurnace) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            return ((TileEntityHopper) tileEntityInventoryHolder).getContents();
+        }
+
+        SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
+
+        return new ItemStack[0];
     }
 
 }

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.Methods;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_14_R1.Block;
@@ -31,7 +32,14 @@ import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.TileEntityBanner;
+import net.minecraft.server.v1_14_R1.TileEntityBarrel;
+import net.minecraft.server.v1_14_R1.TileEntityBrewingStand;
+import net.minecraft.server.v1_14_R1.TileEntityChest;
+import net.minecraft.server.v1_14_R1.TileEntityDispenser;
+import net.minecraft.server.v1_14_R1.TileEntityFurnace;
+import net.minecraft.server.v1_14_R1.TileEntityHopper;
 import net.minecraft.server.v1_14_R1.TileEntityMobSpawner;
+import net.minecraft.server.v1_14_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_14_R1.TileEntitySign;
 import net.minecraft.server.v1_14_R1.TileEntitySkull;
 import net.minecraft.server.v1_14_R1.World;
@@ -52,8 +60,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,16 +69,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Method outsideOfRangeMethod;
-
-    static {
-        try {
-            outsideOfRangeMethod = PlayerChunkMap.class.getDeclaredMethod("isOutsideOfRange", ChunkCoordIntPair.class);
-            outsideOfRangeMethod.setAccessible(true);
-        }catch(Exception ex){
-            throw new RuntimeException(ex);
-        }
-    }
 
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
@@ -182,16 +178,9 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
 
     @Override
     public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
-        try{
-            Field field = tileEntityInventoryHolder.getClass().getDeclaredField("items");
-            field.setAccessible(true);
-            //noinspection unchecked
-            NonNullList<ItemStack> items = (NonNullList<ItemStack>) field.get(tileEntityInventoryHolder);
-            for(int i = 0; i < items.size() && i < contents.length; i++){
-                items.set(i, CraftItemStack.asNMSCopy(contents[i]));
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
+        NonNullList<ItemStack> items = getItems(tileEntityInventoryHolder);
+        for(int i = 0; i < items.size() && i < contents.length; i++){
+            items.set(i, CraftItemStack.asNMSCopy(contents[i]));
         }
     }
 
@@ -251,13 +240,8 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
             playerChunk.a(chunk);
             ChunkCoordIntPair chunkCoord = playerChunk.i();
 
-            try {
-                if ((Boolean) outsideOfRangeMethod.invoke(playerChunkMap, chunkCoord))
-                    continue;
-            }catch(Exception ex){
-                ex.printStackTrace();
+            if((Boolean) Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE.invoke(playerChunk, chunkCoord))
                 continue;
-            }
 
             Island island = plugin.getGrid().getIslandAt(chunk.bukkitChunk);
 
@@ -300,6 +284,34 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
     @Override
     public byte getData(int combinedId) {
         return 0;
+    }
+
+    private NonNullList<ItemStack> getItems(Object tileEntityInventoryHolder){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            return (NonNullList<ItemStack>) ((TileEntityChest) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            return (NonNullList<ItemStack>) ((TileEntityDispenser) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            return (NonNullList<ItemStack>) ((TileEntityBrewingStand) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            return (NonNullList<ItemStack>) ((TileEntityFurnace) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            return (NonNullList<ItemStack>) ((TileEntityHopper) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityShulkerBox){
+            return (NonNullList<ItemStack>) ((TileEntityShulkerBox) tileEntityInventoryHolder).getContents();
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBarrel){
+            return (NonNullList<ItemStack>) ((TileEntityBarrel) tileEntityInventoryHolder).getContents();
+        }
+
+        SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
+
+        return NonNullList.a();
     }
 
 }

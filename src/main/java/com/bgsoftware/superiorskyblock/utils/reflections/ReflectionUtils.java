@@ -17,13 +17,18 @@ public final class ReflectionUtils {
     private static String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 
     private static Map<Fields, Field> fieldsMap = new HashMap<>();
+    private static Map<Methods, Method> methodsMap = new HashMap<>();
 
     static {
         Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
                 biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage"),
-                biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid");
+                biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid"),
+                chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection"),
+                worldClass = getClass("net.minecraft.server.VERSION.World"),
+                playerChunkMapClass = getClass("net.minecraft.server.VERSION.PlayerChunkMap"),
+                chunkCoordIntPairClass = getClass("net.minecraft.server.VERSION.ChunkCoordIntPair");
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_15)){
             fieldsMap.put(Fields.BIOME_GRID_BIOME_STORAGE, getField(biomeGridClass, "biome"));
@@ -33,18 +38,27 @@ public final class ReflectionUtils {
             fieldsMap.put(Fields.BIOME_STORAGE_BIOME_BASES, field);
         }
 
+        if(ServerVersion.isAtLeast(ServerVersion.v1_14)){
+            methodsMap.put(Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE, getMethod(playerChunkMapClass, "isOutsideOfRange", chunkCoordIntPairClass));
+        }
+
         if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
             fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
             fieldsMap.put(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
         }
 
-        if(ServerVersion.isEquals(ServerVersion.v1_8)) {
-            try {
-                fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue"));
-            } catch (Exception ignored) {
-            }
+        if(ServerVersion.isEquals(ServerVersion.v1_11) || ServerVersion.isEquals(ServerVersion.v1_12)) {
+            fieldsMap.put(Fields.CHUNK_SECTION_BLOCK_IDS, getField(chunkSectionClass, "blockIds"));
+            fieldsMap.put(Fields.CHUNK_SECTION_EMITTED_LIGHT, getField(chunkSectionClass, "emittedLight"));
+            fieldsMap.put(Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT, getField(chunkSectionClass, "nonEmptyBlockCount"));
+            fieldsMap.put(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
+            fieldsMap.put(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
         }
 
+        if(ServerVersion.isEquals(ServerVersion.v1_8)) {
+            try { fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue")); } catch (Exception ignored) { }
+            try { fieldsMap.put(Fields.WORLD_CHUNK_TICK_LIST, getField(worldClass, "chunkTickList")); } catch (Exception ignored) { }
+        }
     }
 
     public static Class<?> getClass(String classPath){
@@ -86,6 +100,10 @@ public final class ReflectionUtils {
         return fieldsMap.get(fields);
     }
 
+    static Method getFromMethod(Methods methods){
+        return methodsMap.get(methods);
+    }
+
     private static Field getField(Class<?> clazz, String fieldName){
         try{
             Field field =  clazz.getDeclaredField(fieldName);
@@ -93,6 +111,19 @@ public final class ReflectionUtils {
             return field;
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("&cCouldn't find the field " + fieldName + " - Please contact Ome_R!");
+            Executor.sync(() -> Bukkit.getPluginManager().disablePlugin(plugin));
+            return null;
+        }
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static Method getMethod(Class<?> clazz, String methodName, Class<?> parameterTypes){
+        try{
+            Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+            method.setAccessible(true);
+            return method;
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("&cCouldn't find the method " + methodName + " - Please contact Ome_R!");
             Executor.sync(() -> Bukkit.getPluginManager().disablePlugin(plugin));
             return null;
         }
