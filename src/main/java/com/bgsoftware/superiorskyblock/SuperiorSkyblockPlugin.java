@@ -21,7 +21,6 @@ import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
-import com.bgsoftware.superiorskyblock.hooks.ProtocolLibHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
@@ -43,7 +42,6 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -148,9 +146,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onDisable() {
-        if(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
-            ProtocolLibHook.disable(this);
-
         ChunksProvider.stop();
         CropsTask.cancelTask();
         try {

@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.hooks.ProtocolLibHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -40,9 +39,6 @@ public final class ProvidersHandler implements ProvidersManager {
         Executor.sync(() -> {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 LeaderHeadsHook.register();
-
-            if(Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
-                ProtocolLibHook.init(plugin);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
