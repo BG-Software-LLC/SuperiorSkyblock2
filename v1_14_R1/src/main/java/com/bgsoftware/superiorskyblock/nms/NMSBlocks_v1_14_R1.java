@@ -240,7 +240,7 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
             playerChunk.a(chunk);
             ChunkCoordIntPair chunkCoord = playerChunk.i();
 
-            if((Boolean) Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE.invoke(playerChunk, chunkCoord))
+            if((Boolean) Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE.invoke(playerChunkMap, chunkCoord))
                 continue;
 
             Island island = plugin.getGrid().getIslandAt(chunk.bukkitChunk);
