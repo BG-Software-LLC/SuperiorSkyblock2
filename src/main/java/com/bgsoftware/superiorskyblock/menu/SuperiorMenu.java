@@ -123,9 +123,21 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
             List<String> commands = getCommands(e.getRawSlot());
             if (commands != null)
-                commands.forEach(command ->
+                commands.forEach(command -> {
+                    if(command.equalsIgnoreCase("close")){
+                        closeButton = true;
+                        previousMove = false;
+                        e.getWhoClicked().closeInventory();
+                    }
+                    else if(command.equalsIgnoreCase("back")){
+                        closeButton = true;
+                        e.getWhoClicked().closeInventory();
+                    }
+                    else {
                         Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
-                                command.replace("PLAYER:", "").replace("%player%", player.getName())));
+                                command.replace("PLAYER:", "").replace("%player%", player.getName()));
+                    }
+                });
         }
 
         if(e.getRawSlot() == getBackSlot()){
