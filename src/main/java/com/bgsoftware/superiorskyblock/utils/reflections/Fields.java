@@ -4,6 +4,9 @@ import java.lang.reflect.Field;
 
 public enum Fields {
 
+    BIOME_STORAGE_BIOME_BASES,
+    BIOME_GRID_BIOME_STORAGE,
+
     CHUNK_PROVIDER_UNLOAD_QUEUE,
 
     BLOCK_FLOWER_POT_CONTENT,

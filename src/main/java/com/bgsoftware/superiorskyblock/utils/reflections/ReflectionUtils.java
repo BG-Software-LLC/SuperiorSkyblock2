@@ -21,7 +21,17 @@ public final class ReflectionUtils {
     static {
         Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
-                craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
+                craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
+                biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage"),
+                biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid");
+
+        if(ServerVersion.isAtLeast(ServerVersion.v1_15)){
+            fieldsMap.put(Fields.BIOME_GRID_BIOME_STORAGE, getField(biomeGridClass, "biome"));
+            Field field = getField(biomeStorageClass, "f");
+            if(field != null && !field.getType().getName().contains("BiomeBase"))
+                field = getField(biomeStorageClass, "g");
+            fieldsMap.put(Fields.BIOME_STORAGE_BIOME_BASES, field);
+        }
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
             fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));

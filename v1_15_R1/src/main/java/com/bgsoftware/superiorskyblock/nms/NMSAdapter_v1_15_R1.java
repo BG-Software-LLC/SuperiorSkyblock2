@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_15_R1.BiomeBase;
-import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.ChatMessage;
@@ -49,7 +49,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -163,18 +162,7 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        BiomeBase[] biomeBases = null;
-
-        try{
-            Field field = BiomeStorage.class.getDeclaredField("f");
-            if(!field.getType().equals(BiomeBase[].class)){
-                field = BiomeStorage.class.getDeclaredField("g");
-            }
-            field.setAccessible(true);
-            biomeBases = (BiomeBase[]) field.get(chunk.getBiomeIndex());
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+        BiomeBase[] biomeBases = (BiomeBase[]) Fields.BIOME_STORAGE_BIOME_BASES.get(chunk.getBiomeIndex());
 
         if(biomeBases == null)
             throw new RuntimeException("Error while receiving biome bases of chunk (" + bukkitChunk.getX() + "," + bukkitChunk.getZ() + ").");
@@ -187,22 +175,8 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
 
-        BiomeBase[] biomeBases = null;
-
-        try{
-            Field biomeStorageField = biomeGrid.getClass().getDeclaredField("biome");
-            biomeStorageField.setAccessible(true);
-            Object biomeStorage = biomeStorageField.get(biomeGrid);
-
-            Field field = BiomeStorage.class.getDeclaredField("f");
-            if(!field.getType().equals(BiomeBase[].class)){
-                field = BiomeStorage.class.getDeclaredField("g");
-            }
-            field.setAccessible(true);
-            biomeBases = (BiomeBase[]) field.get(biomeStorage);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
+        Object biomeStorage = Fields.BIOME_GRID_BIOME_STORAGE.get(biomeGrid);
+        BiomeBase[] biomeBases = (BiomeBase[]) Fields.BIOME_STORAGE_BIOME_BASES.get(biomeStorage);
 
         if(biomeBases == null)
             return;
