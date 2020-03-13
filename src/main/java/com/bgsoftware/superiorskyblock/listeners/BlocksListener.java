@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -478,12 +477,20 @@ public final class BlocksListener implements Listener {
             }
         }
 
-        else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().welcomeWarpLine)){
+        else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
             String description = e.getLine(1) + "\n" + e.getLine(2) + "\n" + e.getLine(3);
-            String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
-            e.setLine(0, welcomeColor + plugin.getSettings().welcomeWarpLine);
+            e.setLine(0, plugin.getSettings().visitorsSignActive);
+
             for (int i = 1; i <= 3; i++)
                 e.setLine(i, ChatColor.translateAlternateColorCodes('&', e.getLine(i)));
+
+            Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
+            if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
+                Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
+                oldWelcomeSign.setLine(0, plugin.getSettings().visitorsSignInactive);
+                oldWelcomeSign.update();
+            }
+
             island.setVisitorsLocation(warpLocation);
             island.setDescription(description);
             Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
@@ -504,7 +511,7 @@ public final class BlocksListener implements Listener {
         }
         else{
             String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
-            if(sign.getLine(0).equalsIgnoreCase(welcomeColor + plugin.getSettings().welcomeWarpLine)){
+            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
                 island.setVisitorsLocation(null);
                 Locale.DELETE_WARP.send(superiorPlayer, SIsland.VISITORS_WARP_NAME);
             }

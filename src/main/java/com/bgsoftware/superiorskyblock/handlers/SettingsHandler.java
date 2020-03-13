@@ -55,7 +55,9 @@ public final class SettingsHandler {
     public final long calcInterval;
     public final String signWarpLine;
     public final List<String> signWarp;
-    public final String welcomeWarpLine;
+    public final String visitorsSignLine;
+    public final String visitorsSignActive;
+    public final String visitorsSignInactive;
     public final int bankWorthRate;
     public final String islandWorldName;
     public final boolean netherWorldEnabled;
@@ -169,7 +171,9 @@ public final class SettingsHandler {
         islandRolesSection = cfg.getConfigurationSection("island-roles");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = colorize(cfg.getStringList("sign-warp"));
-        welcomeWarpLine = cfg.getString("welcome-sign-line", "[Welcome]");
+        visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
+        visitorsSignActive = ChatColor.translateAlternateColorCodes('&', cfg.getString("visitors-sign.active", "&a[Welcome]"));
+        visitorsSignInactive = ChatColor.translateAlternateColorCodes('&', cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
@@ -305,6 +309,8 @@ public final class SettingsHandler {
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
         if(cfg.contains("island-world"))
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
+        if(cfg.contains("welcome-sign-line"))
+            cfg.set("visitors-sign.line", cfg.getString("welcome-sign-line"));
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){

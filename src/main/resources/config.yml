@@ -189,6 +189,15 @@ sign-warp:
 - ''
 - ''
 
+# All settings related to the visitors sign.
+visitors-sign:
+  # Set the line to create the visitors sign.
+  line: '[Welcome]'
+  # The line that will be displayed when the sign is active.
+  active: '&a[Welcome]'
+  # The line that will be displayed when the sign is inactive.
+  inactive: '&c[Welcome]'
+
 # Set the line to create the welcome sign.
 welcome-sign-line: '[Welcome]'
 
