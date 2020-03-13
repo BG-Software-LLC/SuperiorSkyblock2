@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
@@ -363,6 +364,10 @@ public final class PlayersListener implements Listener {
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
                 .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth())))
                 .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
+                .replace("{island-position-worth}", plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + "")
+                .replace("{island-position-level}", plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + "")
+                .replace("{island-position-rating}", plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + "")
+                .replace("{island-position-players}", plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + "")
         );
     }
 
