@@ -49,6 +49,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -1356,6 +1357,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 saveBlockCounts(oldWorth, oldLevel);
                 if(++blocksUpdateCounter >= 20){
                     blocksUpdateCounter = 0;
+                    plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+                    plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
                     MenuTopIslands.refreshMenus();
                 }
             }
@@ -1492,6 +1495,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 saveBlockCounts(oldWorth, oldLevel);
                 if(++blocksUpdateCounter >= 20){
                     blocksUpdateCounter = 0;
+                    plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+                    plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
                     MenuTopIslands.refreshMenus();
                 }
             }
@@ -1542,6 +1547,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public void setBonusWorth(BigDecimal bonusWorth){
         this.bonusWorth.set(bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth));
 
+        plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+        plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
         MenuTopIslands.refreshMenus();
 
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
