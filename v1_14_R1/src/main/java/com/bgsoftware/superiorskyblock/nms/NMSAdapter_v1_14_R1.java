@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -13,11 +12,8 @@ import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockPosition;
 import net.minecraft.server.v1_14_R1.ChatMessage;
 import net.minecraft.server.v1_14_R1.Chunk;
-import net.minecraft.server.v1_14_R1.ChunkSection;
-import net.minecraft.server.v1_14_R1.ChunkStatus;
 import net.minecraft.server.v1_14_R1.DimensionManager;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.HeightMap;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.MinecraftServer;
 import net.minecraft.server.v1_14_R1.PacketPlayOutWorldBorder;
@@ -36,7 +32,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.shorts.ShortList;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
@@ -53,9 +48,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -222,33 +214,18 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         };
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void regenerateChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        Map<HeightMap.Type, HeightMap> heightMap = new HashMap<>();
-        List[] entitySlices = new List[16];
+        for(int i = 0; i < 16; i++)
+            chunk.getSections()[i] = null;
 
-        Fields.CHUNK_SECTIONS.set(chunk, new ChunkSection[16]);
-        Fields.CHUNK_PENDING_BLOCK_ENTITIES.set(chunk, new HashMap<>());
-        Fields.CHUNK_HEIGHT_MAP.set(chunk, heightMap);
-        Fields.CHUNK_TILE_ENTITIES.set(chunk, new HashMap<>());
-        Fields.CHUNK_STRUCTURE_STARTS.set(chunk, new HashMap<>());
-        Fields.CHUNK_STRUCTURE_REFENCES.set(chunk, new HashMap<>());
-        Fields.CHUNK_POST_PROCESSING.set(chunk, new ShortList[16]);
-        Fields.CHUNK_ENTITY_SLICES.set(chunk, entitySlices);
+        for(int i = 0; i < 16; i++)
+            chunk.entitySlices[i] = new UnsafeList<>();
 
-        HeightMap.Type[] heightMapTypes = HeightMap.Type.values();
-
-        for (HeightMap.Type heightMapType : heightMapTypes) {
-            if (ChunkStatus.FULL.h().contains(heightMapType)) {
-                heightMap.put(heightMapType, new HeightMap(chunk, heightMapType));
-            }
-        }
-
-        for (int i = 0; i < entitySlices.length; i++)
-            entitySlices[i] = new UnsafeList();
+        chunk.tileEntities.keySet().forEach(chunk.world::removeTileEntity);
+        chunk.tileEntities.clear();
 
         ChunksTracker.markEmpty(bukkitChunk);
     }

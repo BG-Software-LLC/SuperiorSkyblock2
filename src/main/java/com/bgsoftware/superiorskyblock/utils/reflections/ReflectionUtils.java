@@ -19,21 +19,9 @@ public final class ReflectionUtils {
     private static Map<Fields, Field> fieldsMap = new HashMap<>();
 
     static {
-        Class<?> chunkClass = getClass("net.minecraft.server.VERSION.Chunk"),
-                chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
+        Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
                 blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                 craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory");
-
-        if(ServerVersion.isAtLeast(ServerVersion.v1_14)) {
-            fieldsMap.put(Fields.CHUNK_SECTIONS, getField(chunkClass, "sections"));
-            fieldsMap.put(Fields.CHUNK_PENDING_BLOCK_ENTITIES, getField(chunkClass, "e"));
-            fieldsMap.put(Fields.CHUNK_HEIGHT_MAP, getField(chunkClass, "heightMap"));
-            fieldsMap.put(Fields.CHUNK_TILE_ENTITIES, getField(chunkClass, "tileEntities"));
-            fieldsMap.put(Fields.CHUNK_STRUCTURE_STARTS, getField(chunkClass, "l"));
-            fieldsMap.put(Fields.CHUNK_STRUCTURE_REFENCES, getField(chunkClass, "m"));
-            fieldsMap.put(Fields.CHUNK_POST_PROCESSING, getField(chunkClass, "n"));
-            fieldsMap.put(Fields.CHUNK_ENTITY_SLICES, getField(chunkClass, "entitySlices"));
-        }
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
             fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
