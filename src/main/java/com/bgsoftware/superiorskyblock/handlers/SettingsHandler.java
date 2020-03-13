@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -265,13 +264,7 @@ public final class SettingsHandler {
 
         cfg.save(file);
 
-        try{
-            Field field = SuperiorSkyblockPlugin.class.getDeclaredField("settingsHandler");
-            field.setAccessible(true);
-            field.set(plugin, new SettingsHandler(plugin));
-        }catch(NoSuchFieldException | IllegalAccessException ex){
-            ex.printStackTrace();
-        }
+        plugin.setSettings(new SettingsHandler(plugin));
     }
 
     private List<String> colorize(List<String> list){

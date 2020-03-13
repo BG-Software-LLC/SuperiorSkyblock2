@@ -410,6 +410,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return settingsHandler;
     }
 
+    public void setSettings(SettingsHandler settingsHandler){
+        this.settingsHandler = settingsHandler;
+    }
+
     public NMSAdapter getNMSAdapter() {
         return nmsAdapter;
     }
