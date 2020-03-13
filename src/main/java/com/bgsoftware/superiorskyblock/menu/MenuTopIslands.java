@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -8,7 +9,6 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -19,6 +19,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,13 +27,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
-    private static int playerIslandSlot, worthSortSlot = -1, levelSortSlot = -1, ratingSortSlot = -1, playersSortSlot = -1;
+    private static int playerIslandSlot;
     private static boolean sortGlowWhenSelected;
 
     private SortingType sortingType;
@@ -131,24 +133,9 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         Inventory inventory = super.buildInventory(titleReplacer);
 
         if(sortGlowWhenSelected){
-            int glowSlot = -1;
-
-            if(sortingType == SortingTypes.BY_WORTH){
-                glowSlot = worthSortSlot;
-            }
-            else if(sortingType == SortingTypes.BY_LEVEL){
-                glowSlot = levelSortSlot;
-            }
-            else if(sortingType == SortingTypes.BY_RATING){
-                glowSlot = ratingSortSlot;
-            }
-            else if(sortingType == SortingTypes.BY_PLAYERS){
-                glowSlot = playersSortSlot;
-            }
-
-            if(glowSlot != -1){
+            int glowSlot = (Integer) getData(sortingType.getName(), -1);
+            if(glowSlot != -1)
                 inventory.setItem(glowSlot, new ItemBuilder(inventory.getItem(glowSlot)).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build(superiorPlayer));
-            }
         }
 
         if(playerIslandSlot != -1){
@@ -159,21 +146,12 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         return inventory;
     }
 
-    private boolean clickSort(int slot){
+    private boolean clickSort(int slot) {
         SortingType sortingType = null;
 
-        if(slot == worthSortSlot){
-            sortingType = SortingTypes.BY_WORTH;
-        }
-        else if(slot == levelSortSlot){
-            sortingType = SortingTypes.BY_LEVEL;
-        }
-        else if(slot == ratingSortSlot){
-            sortingType = SortingTypes.BY_RATING;
-        }
-        else if(slot == playersSortSlot){
-            sortingType = SortingTypes.BY_PLAYERS;
-        }
+        try{
+            sortingType = SortingType.getByName((String) getData(slot + "", ""));
+        }catch(IllegalArgumentException ignored){ }
 
         if(sortingType != null){
             this.sortingType = sortingType;
@@ -223,6 +201,45 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                             command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
     }
 
+//    public static void init(){
+//        MenuTopIslands menuTopIslands = new MenuTopIslands(null, null);
+//
+//        File file = new File(plugin.getDataFolder(), "menus/top-islands.yml");
+//
+//        if(!file.exists())
+//            FileUtils.saveResource("menus/top-islands.yml");
+//
+//        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+//
+//        if(convertOldGUI(cfg)){
+//            cfg.save(file);
+//        }
+//
+//        sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
+//
+//        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuTopIslands, "top-islands.yml", cfg);
+//
+//        worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+//        levelSortSlot = charSlots.getOrDefault(cfg.getString("level-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+//        ratingSortSlot = charSlots.getOrDefault(cfg.getString("rating-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+//        playersSortSlot = charSlots.getOrDefault(cfg.getString("players-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+//        playerIslandSlot = charSlots.getOrDefault(cfg.getString("player-island", " ").charAt(0), Collections.singletonList(-1)).get(0);
+//
+//        char slotsChar = cfg.getString("slots", " ").charAt(0);
+//
+//        menuTopIslands.addData("island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".island")));
+//        menuTopIslands.addData("no-island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".no-island")));
+//        menuTopIslands.addData("island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
+//        menuTopIslands.addData("no-island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
+//        menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));
+//        menuTopIslands.addData("no-island-commands", cfg.getStringList("commands." + slotsChar + ".no-island"));
+//
+//        menuTopIslands.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+//        menuTopIslands.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+//        menuTopIslands.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+//        menuTopIslands.setSlots(charSlots.getOrDefault(slotsChar, Collections.singletonList(-1)));
+//    }
+
     public static void init(){
         MenuTopIslands menuTopIslands = new MenuTopIslands(null, null);
 
@@ -239,12 +256,79 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
         sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuTopIslands, "top-islands.yml", cfg);
+        /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
 
-        worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        levelSortSlot = charSlots.getOrDefault(cfg.getString("level-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        ratingSortSlot = charSlots.getOrDefault(cfg.getString("rating-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        playersSortSlot = charSlots.getOrDefault(cfg.getString("players-sort", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        menuTopIslands.resetData();
+
+        menuTopIslands.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menuTopIslands.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+
+        List<String> pattern = cfg.getStringList("pattern");
+
+        menuTopIslands.setRowsSize(pattern.size());
+        int backButton = -1;
+        char backButtonChar = cfg.getString("back", " ").charAt(0);
+
+        Map<Character, List<Integer>> charSlots = new HashMap<>();
+
+        for(int row = 0; row < pattern.size(); row++){
+            String patternLine = pattern.get(row);
+            int slot = row * 9;
+
+            for(int i = 0; i < patternLine.length(); i++){
+                char ch = patternLine.charAt(i);
+                if(ch != ' '){
+                    if(backButtonChar == ch){
+                        backButton = slot;
+                    }
+
+                    else{
+                        menuTopIslands.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
+                        menuTopIslands.addCommands(slot, cfg.getStringList("commands." + ch));
+                        menuTopIslands.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+                        if(cfg.contains("items." + ch + ".sorting-type")) {
+                            String sortingType = cfg.getString("items." + ch + ".sorting-type");
+                            menuTopIslands.addData(slot + "", sortingType);
+                            menuTopIslands.addData(sortingType, slot);
+                        }
+                    }
+
+                    if(!charSlots.containsKey(ch))
+                        charSlots.put(ch, new ArrayList<>());
+
+                    charSlots.get(ch).add(slot);
+
+                    slot++;
+                }
+            }
+        }
+
+        menuTopIslands.setBackButton(backButton);
+
+        if(plugin.getSettings().onlyBackButton && backButton == -1)
+            SuperiorSkyblockPlugin.log("&c[top-islands.yml] Menu doesn't have a back button, it's impossible to close it.");
+
+        if(cfg.contains("worth-sort")) {
+            int worthSortSlot = charSlots.getOrDefault(cfg.getString("worth-sort").charAt(0), Collections.singletonList(-1)).get(0);
+            menuTopIslands.addData(worthSortSlot + "", "WORTH");
+            menuTopIslands.addData("WORTH", worthSortSlot);
+        }
+        if(cfg.contains("level-sort")) {
+            int worthSortSlot = charSlots.getOrDefault(cfg.getString("level-sort").charAt(0), Collections.singletonList(-1)).get(0);
+            menuTopIslands.addData(worthSortSlot + "", "LEVEL");
+            menuTopIslands.addData("LEVEL", worthSortSlot);
+        }
+        if(cfg.contains("rating-sort")) {
+            int worthSortSlot = charSlots.getOrDefault(cfg.getString("rating-sort").charAt(0), Collections.singletonList(-1)).get(0);
+            menuTopIslands.addData(worthSortSlot + "", "RATING");
+            menuTopIslands.addData("RATING", worthSortSlot);
+        }
+        if(cfg.contains("players-sort")) {
+            int worthSortSlot = charSlots.getOrDefault(cfg.getString("players-sort").charAt(0), Collections.singletonList(-1)).get(0);
+            menuTopIslands.addData(worthSortSlot + "", "PLAYERS");
+            menuTopIslands.addData("PLAYERS", worthSortSlot);
+        }
+
         playerIslandSlot = charSlots.getOrDefault(cfg.getString("player-island", " ").charAt(0), Collections.singletonList(-1)).get(0);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);

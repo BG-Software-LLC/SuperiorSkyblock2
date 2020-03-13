@@ -94,7 +94,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public Object getData(String key){
-        return getData().data.get(key);
+        return getData(key, null);
+    }
+
+    public Object getData(String key, Object def){
+        return getData().data.getOrDefault(key, def);
     }
 
     public boolean containsData(String key){

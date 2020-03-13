@@ -20,10 +20,6 @@ previous-page: '!'
 current-page: '-'
 next-page: '+'
 
-worth-sort: '%'
-level-sort: '*'
-rating-sort: '^'
-players-sort: '&'
 player-island: '$'
 sort-glow-when-selected: true
 
@@ -51,16 +47,20 @@ items:
       name: '&cInvalid Island'
   '%':
     type: DIAMOND
+    sorting-type: 'WORTH'
     name: '&6Sort by Worth'
   '*':
     type: GOLD_INGOT
+    sorting-type: 'LEVEL'
     name: '&6Sort by Level'
   '^':
     type: EMERALD
+    sorting-type: 'RATING'
     name: '&6Sort by Rating'
   '&':
     type: SKULL_ITEM
     data: 3
+    sorting-type: 'PLAYERS'
     name: '&6Sort by Players'
   '!':
     type: PAPER
