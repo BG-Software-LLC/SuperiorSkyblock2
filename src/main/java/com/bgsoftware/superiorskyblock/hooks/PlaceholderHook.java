@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -82,7 +83,7 @@ public abstract class PlaceholderHook {
 
                     island = plugin.getGrid().getIslandAt(player.getLocation());
 
-                    if (island == null)
+                    if (island == null || island instanceof SpawnIsland)
                         return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
 
                     subPlaceholder = subPlaceholder.replace("location_", "");
