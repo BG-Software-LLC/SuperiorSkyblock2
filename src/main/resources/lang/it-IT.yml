@@ -146,6 +146,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: Cambia il nome di un'isola.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Apri un'isola al pubblico.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promuovi un membro nell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_PURGE: Elimina le isole.
+COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del
   plugin.

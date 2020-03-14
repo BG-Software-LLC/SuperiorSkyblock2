@@ -120,6 +120,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: יא לש םשה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_OPEN: רוביצל יא חותפל.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: רחא יאב ןקחש הגרדב תולעהל.
 COMMAND_DESCRIPTION_ADMIN_PURGE: .םייא תוקנל
+COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.

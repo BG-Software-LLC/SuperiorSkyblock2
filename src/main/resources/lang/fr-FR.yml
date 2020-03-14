@@ -98,6 +98,7 @@ COMMAND_DESCRIPTION_ACCEPT: Accepter l'invitation d'un joueur.
 COMMAND_DESCRIPTION_ADMIN: Utiliser les commandes admin.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Se téléporter sur l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_PURGE: Purger les îles.
+COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_BONUS: Octroyer un bonus à un joueur.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Activer/Désactiver le mode bypass.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.

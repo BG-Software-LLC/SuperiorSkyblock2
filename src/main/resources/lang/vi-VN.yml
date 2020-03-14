@@ -141,6 +141,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: Thay đổi tên của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Mở một hòn đảo cho công cộng.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Thăng chức thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_PURGE: lọc đảo.
+COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
