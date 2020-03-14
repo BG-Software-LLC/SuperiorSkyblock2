@@ -153,6 +153,7 @@ COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
 COMMAND_DESCRIPTION_CLOSE: רוביצל יאה תא רוגסל.
 COMMAND_DESCRIPTION_COOP: יאה לש הלועפ ףתשמכ ןקחש ףיסוהל.
+COMMAND_DESCRIPTION_COUNTS: 'See block counts in your island.'
 COMMAND_DESCRIPTION_CREATE: שדח יא רוציל.
 COMMAND_DESCRIPTION_DEL_WARP: יאב םוקימ קוחמל.
 COMMAND_DESCRIPTION_DEMOTE: יאב ןקחש הגרדב דירוהל.

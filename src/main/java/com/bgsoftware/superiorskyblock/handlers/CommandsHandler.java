@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdBiome;
 import com.bgsoftware.superiorskyblock.commands.CmdBorder;
 import com.bgsoftware.superiorskyblock.commands.CmdClose;
 import com.bgsoftware.superiorskyblock.commands.CmdCoop;
+import com.bgsoftware.superiorskyblock.commands.CmdCounts;
 import com.bgsoftware.superiorskyblock.commands.CmdCreate;
 import com.bgsoftware.superiorskyblock.commands.CmdDelWarp;
 import com.bgsoftware.superiorskyblock.commands.CmdDemote;
@@ -116,6 +117,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
         registerCommand(new CmdBorder(), false);
         registerCommand(new CmdClose(), false);
         registerCommand(new CmdCoop(), false);
+        registerCommand(new CmdCounts(), false);
         registerCommand(new CmdCreate(), false);
         registerCommand(new CmdDelWarp(), false);
         registerCommand(new CmdDemote(), false);

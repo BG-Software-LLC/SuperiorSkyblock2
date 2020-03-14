@@ -624,6 +624,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public Map<Key, Integer> getBlockCounts() {
+        return new HashMap<>();
+    }
+
+    @Override
     public int getExactBlockCount(Key key) {
         return 0;
     }

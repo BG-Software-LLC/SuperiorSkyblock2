@@ -180,6 +180,7 @@ COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
 COMMAND_DESCRIPTION_CLOSE: Đóng đảo thành công cộng.
 COMMAND_DESCRIPTION_COOP: Thêm thành viên co-op cho đảo bạn.
+COMMAND_DESCRIPTION_COUNTS: 'See block counts in your island.'
 COMMAND_DESCRIPTION_CREATE: Tạo một hòn đảo mới.
 COMMAND_DESCRIPTION_DEL_WARP: Xóa một khu vực của đảo.
 COMMAND_DESCRIPTION_DEMOTE: Hạ cấp một thành viên trong hòn đảo của bạn.

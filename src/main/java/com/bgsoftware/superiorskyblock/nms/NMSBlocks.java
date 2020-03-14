@@ -26,6 +26,10 @@ public interface NMSBlocks {
 
     int getCombinedId(Location location);
 
+    default int compareMaterials(Material o1, Material o2){
+        return Integer.compare(o1.ordinal(), o2.ordinal());
+    }
+
     void setTileEntityBanner(Object tileEntityBanner, DyeColor dyeColor, List<Pattern> patterns);
 
     void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, ItemStack[] contents);

@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
@@ -1041,6 +1042,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     BlocksProvider_WildStacker.uncacheChunk(chunk);
 
                 MenuValues.refreshMenus();
+                MenuCounts.refreshMenus();
 
                 saveBlockCounts(oldWorth, oldLevel);
 
@@ -1354,6 +1356,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             if(save){
                 MenuValues.refreshMenus();
+                MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
                 if(++blocksUpdateCounter >= 20){
                     blocksUpdateCounter = 0;
@@ -1492,6 +1495,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             if(save) {
                 MenuValues.refreshMenus();
+                MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
                 if(++blocksUpdateCounter >= 20){
                     blocksUpdateCounter = 0;
@@ -1507,6 +1511,13 @@ public final class SIsland extends DatabaseObject implements Island {
     public int getBlockCount(Key key){
         return blockCounts.run(blockCounts -> {
             return blockCounts.getOrDefault(key, 0);
+        });
+    }
+
+    @Override
+    public Map<Key, Integer> getBlockCounts() {
+        return blockCounts.run(blockCounts -> {
+            return new HashMap<>(blockCounts.asKeyMap());
         });
     }
 

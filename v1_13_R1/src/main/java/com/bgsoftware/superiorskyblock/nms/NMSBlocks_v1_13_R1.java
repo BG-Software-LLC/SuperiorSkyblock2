@@ -169,6 +169,13 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
     }
 
     @Override
+    public int compareMaterials(Material o1, Material o2) {
+        int firstMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData());
+        int secondMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o2).getBlockData());
+        return Integer.compare(firstMaterial, secondMaterial);
+    }
+
+    @Override
     public void setTileEntityBanner(Object objectTileEntityBanner, DyeColor dyeColor, List<Pattern> patterns) {
         TileEntityBanner tileEntityBanner = (TileEntityBanner) objectTileEntityBanner;
         //noinspection deprecation

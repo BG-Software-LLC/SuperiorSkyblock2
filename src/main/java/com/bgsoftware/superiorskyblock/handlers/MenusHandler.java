@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuBiomes;
 import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
+import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
@@ -41,6 +42,7 @@ public final class MenusHandler implements MenusManager {
         loadMenu(MenuBorderColor::init);
         loadMenu(MenuConfirmDisband::init);
         loadMenu(MenuControlPanel::init);
+        loadMenu(MenuCounts::init);
         loadMenu(MenuGlobalWarps::init);
         loadMenu(MenuIslandCreation::init);
         loadMenu(MenuIslandMissions::init);
@@ -92,6 +94,11 @@ public final class MenusHandler implements MenusManager {
     @Override
     public void openIslandCreationMenu(SuperiorPlayer superiorPlayer, String islandName) {
         MenuIslandCreation.openInventory(superiorPlayer, null, islandName);
+    }
+
+    @Override
+    public void openIslandCountsMenu(SuperiorPlayer superiorPlayer, Island island) {
+        MenuCounts.openInventory(superiorPlayer, null, island);
     }
 
     @Override

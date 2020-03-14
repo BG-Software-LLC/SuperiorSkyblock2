@@ -27,6 +27,8 @@ permissions:
             description: Close the island to the public.
           superior.island.coop:
             description: Add a player as a co-op to your island.
+          superior.island.counts:
+            description: See block counts in your island.
           superior.island.create:
             description: Create a new island.
           superior.island.delwarp:

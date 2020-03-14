@@ -39,6 +39,13 @@ public interface MenusManager {
     void openIslandCreationMenu(SuperiorPlayer superiorPlayer, String islandName);
 
     /**
+     * Open the island counts menu for a player.
+     * @param superiorPlayer The player to open the menu for.
+     * @param island The island to get the block counts from.
+     */
+    void openIslandCountsMenu(SuperiorPlayer superiorPlayer, Island island);
+
+    /**
      * Open the main island missions menu for a player.
      * @param superiorPlayer The player to open the menu for.
      */
