@@ -34,6 +34,8 @@ items:
         - '&7'
         - '&6&l* &e&lPlace &7#{1}'
         - '&6&l* &e&lWorth &7${3}'
+        - '&6&l* &e&lRating {8} &7({9})'
+        - '&6&l* &e&lPlayers &7{10}'
         - '&7'
         - '&6&l* &e&lMembers:'
         - '{4}:&f  - &7{}'

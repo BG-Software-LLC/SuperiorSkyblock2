@@ -78,6 +78,10 @@ public final class StringUtils {
         return s;
     }
 
+    public static String fancyFormat(double d){
+        return fancyFormat(BigDecimal.valueOf(d));
+    }
+
     public static String fancyFormat(BigDecimal bigDecimal){
         double d = bigDecimal.doubleValue();
         if(d > Q)

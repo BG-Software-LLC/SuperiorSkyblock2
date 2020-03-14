@@ -75,7 +75,11 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     .replaceName("{2}", island.getIslandLevel().toString())
                     .replaceName("{3}", island.getWorth().toString())
                     .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel()))
-                    .replaceName("{6}", StringUtils.fancyFormat(island.getWorth()));
+                    .replaceName("{6}", StringUtils.fancyFormat(island.getWorth()))
+                    .replaceName("{7}", StringUtils.format(island.getTotalRating()))
+                    .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                    .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
+                    .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
 
             if(itemBuilder.getItemMeta().hasLore()){
                 List<String> lore = new ArrayList<>();
@@ -107,7 +111,11 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                                 .replace("{2}", island.getIslandLevel().toString())
                                 .replace("{3}", island.getWorth().toString())
                                 .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel()))
-                                .replace("{6}", StringUtils.fancyFormat(island.getWorth())));
+                                .replace("{6}", StringUtils.fancyFormat(island.getWorth()))
+                                .replace("{7}", StringUtils.format(island.getTotalRating()))
+                                .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                                .replace("{9}", StringUtils.format(island.getRatingAmount()))
+                                .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                     }
                 }
 
