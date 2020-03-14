@@ -252,6 +252,21 @@ public interface Island extends Comparable<Island> {
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
 
     /**
+     * Get all the loaded chunks of the island.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param noEmptyChunks Should empty chunks be loaded or not?
+     */
+    List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
+     * Get all the loaded chunks of the island.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param noEmptyChunks Should empty chunks be loaded or not?
+     */
+    List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
+
+    /**
      * Get all the chunks of the island asynchronized, including empty chunks.
      * @param environment The environment to get the chunks from.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.

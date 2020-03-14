@@ -271,6 +271,30 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
+        return getLoadedChunks(World.Environment.NORMAL, onlyProtected, noEmptyChunks);
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        World world = center.getWorld();
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
+            for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
+                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(world, chunkX, chunkZ))){
+                    chunks.add(world.getChunkAt(chunkX, chunkZ));
+                }
+            }
+        }
+
+        return chunks;
+    }
+
+    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
         return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
     }

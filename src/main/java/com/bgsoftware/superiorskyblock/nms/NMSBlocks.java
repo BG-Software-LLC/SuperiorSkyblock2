@@ -6,7 +6,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
-import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
@@ -42,7 +41,7 @@ public interface NMSBlocks {
 
     void setTileEntityMobSpawner(Object tileEntityMobSpawner, EntityType spawnedType);
 
-    int tickWorld(World world, int random);
+    int tickIslands(int random);
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

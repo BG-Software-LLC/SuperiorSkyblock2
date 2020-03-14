@@ -4,11 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
-import gnu.trove.iterator.TLongShortIterator;
-import gnu.trove.map.hash.TLongShortHashMap;
 import net.minecraft.server.v1_8_R2.Block;
 import net.minecraft.server.v1_8_R2.BlockLeaves;
 import net.minecraft.server.v1_8_R2.BlockPosition;
@@ -274,60 +272,57 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
     }
 
     @Override
-    public int tickWorld(org.bukkit.World world, int random) {
-        WorldServer worldServer = ((CraftWorld) world).getHandle();
-        int globalRandomTickSpeed = worldServer.getGameRules().c("randomTickSpeed");
-        List<Long> activeChunks = new ArrayList<>();
-        List<Pair<BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
+    public int tickIslands(int random) {
+        List<Pair<Island, List<org.bukkit.Chunk>>> activeChunks = new ArrayList<>();
+        List<BiPair<WorldServer, BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
+        org.bukkit.World normalWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.NORMAL),
+                netherWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.NETHER),
+                endWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.THE_END);
+        int[] globalRandomTickSpeeds = new int[] {
+                normalWorld == null ? 0 : ((CraftWorld) normalWorld).getHandle().getGameRules().c("randomTickSpeed"),
+                netherWorld == null ? 0 : ((CraftWorld) netherWorld).getHandle().getGameRules().c("randomTickSpeed"),
+                endWorld == null ? 0 : ((CraftWorld) endWorld).getHandle().getGameRules().c("randomTickSpeed")
+        };
 
-        TLongShortHashMap map = (TLongShortHashMap) Fields.WORLD_CHUNK_TICK_LIST.get(worldServer);
-        assert map != null;
-        TLongShortIterator iter = map.iterator();
-        while(iter.hasNext()){
-            iter.advance();
-            activeChunks.add(iter.key());
-        }
+        plugin.getGrid().getIslands().stream()
+                .filter(island -> island.getCropGrowthMultiplier() > 1 && !island.getAllPlayersInside().isEmpty())
+                .forEach(island -> activeChunks.add(new Pair<>(island, island.getLoadedChunks(true, true))));
 
-        for(long chunkCoord : activeChunks){
-            int chunkX = World.keyToX(chunkCoord);
-            int chunkZ = World.keyToZ(chunkCoord);
+        for(Pair<Island, List<org.bukkit.Chunk>> chunkPair : activeChunks){
+            Island island = chunkPair.getKey();
+            double islandCropGrowthMultiplier = island == null ? 0 : island.getCropGrowthMultiplier() - 1;
 
-            if (!worldServer.chunkProviderServer.isChunkLoaded(chunkX, chunkZ) || worldServer.chunkProviderServer.unloadQueue.contains(chunkX, chunkZ))
-                continue;
+            for(org.bukkit.Chunk bukkitChunk : chunkPair.getValue()) {
+                Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+                WorldServer chunkWorld = (WorldServer) chunk.world;
+                int chunkRandomTickSpeed = (int) (globalRandomTickSpeeds[chunkWorld.getWorld().getEnvironment().ordinal()] * islandCropGrowthMultiplier);
 
-            Chunk chunk = worldServer.getChunkAt(chunkX, chunkZ);
+                int chunkX = chunk.locX * 16;
+                int chunkZ = chunk.locZ * 16;
 
-            Island island = plugin.getGrid().getIslandAt(chunk.bukkitChunk);
-
-            int chunkRandomTickSpeed = (int) (globalRandomTickSpeed * (island == null ? 0 : island.getCropGrowthMultiplier() - 1));
-            chunkX *= 16;
-            chunkZ *= 16;
-
-            if (chunkRandomTickSpeed > 0) {
-                ChunkSection[] chunkSections = chunk.getSections();
-                int i1 = chunkSections.length;
-                for(ChunkSection chunkSection : chunkSections){
-                    if (chunkSection != null && chunkSection.shouldTick()) {
-                        for(int i = 0; i < chunkRandomTickSpeed; i++) {
-                            random = random * 3 + 1013904223;
-                            int factor = random >> 2;
-                            int x = factor & 15;
-                            int z = factor >> 8 & 15;
-                            int y = factor >> 16 & 15;
-                            IBlockData blockData = chunkSection.getType(x, y, z);
-                            Block block = blockData.getBlock();
-                            if (block.isTicking() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
-                                blocksToTick.add(new Pair<>(new BlockPosition(x + chunkX, y + chunkSection.getYPosition(), z + chunkZ), blockData));
+                if (chunkRandomTickSpeed > 0) {
+                    for (ChunkSection chunkSection : chunk.getSections()) {
+                        if (chunkSection != null && chunkSection.shouldTick()) {
+                            for (int i = 0; i < chunkRandomTickSpeed; i++) {
+                                random = random * 3 + 1013904223;
+                                int factor = random >> 2;
+                                int x = factor & 15;
+                                int z = factor >> 8 & 15;
+                                int y = factor >> 16 & 15;
+                                IBlockData blockData = chunkSection.getType(x, y, z);
+                                Block block = blockData.getBlock();
+                                if (block.isTicking() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
+                                    blocksToTick.add(new BiPair<>(chunkWorld, new BlockPosition(x + chunkX, y + chunkSection.getYPosition(), z + chunkZ), blockData));
+                                }
                             }
                         }
                     }
                 }
             }
-
         }
 
         Executor.sync(() -> blocksToTick.forEach(pair ->
-                pair.getValue().getBlock().a(worldServer, pair.getKey(), pair.getValue(), ThreadLocalRandom.current())));
+                pair.getZ().getBlock().a(pair.getX(), pair.getY(), pair.getZ(), ThreadLocalRandom.current())));
 
         return random;
     }

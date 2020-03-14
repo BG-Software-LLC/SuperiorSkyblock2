@@ -623,6 +623,38 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(World.Environment environment : World.Environment.values()) {
+            try {
+                chunks.addAll(getLoadedChunks(environment, onlyProtected, noEmptyChunks));
+            }catch(NullPointerException ignored){}
+        }
+
+        return chunks;
+    }
+
+    @Override
+    public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
+        World world = getCenter(environment).getWorld();
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+
+        List<Chunk> chunks = new ArrayList<>();
+
+        for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
+            for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
+                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(world, chunkX, chunkZ))){
+                    chunks.add(world.getChunkAt(chunkX, chunkZ));
+                }
+            }
+        }
+
+        return chunks;
+    }
+
+    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
         return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
     }
@@ -949,72 +981,75 @@ public final class SIsland extends DatabaseObject implements Island {
 
         Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
-            ExecutorService scanService = Executors.newFixedThreadPool(chunksToLoad.size(),
-                    new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
 
-            for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
-                ChunkSnapshot chunkSnapshot;
+            if(chunksToLoad.size() > 0){
+                ExecutorService scanService = Executors.newFixedThreadPool(chunksToLoad.size(),
+                        new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
 
-                try {
-                    chunkSnapshot = chunkToLoad.get();
-                }catch(Exception ex){
-                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                    ex.printStackTrace();
-                    continue;
-                }
+                for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
+                    ChunkSnapshot chunkSnapshot;
 
-                scanService.execute(() -> {
-                    if(LocationUtils.isChunkEmpty(chunkSnapshot))
-                        return;
+                    try {
+                        chunkSnapshot = chunkToLoad.get();
+                    }catch(Exception ex){
+                        SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                        ex.printStackTrace();
+                        continue;
+                    }
 
-                    double islandWorth = 0;
+                    scanService.execute(() -> {
+                        if(LocationUtils.isChunkEmpty(chunkSnapshot))
+                            return;
 
-                    for (int x = 0; x < 16; x++) {
-                        for (int z = 0; z < 16; z++) {
-                            for (int y = 0; y < 256; y++) {
-                                Key blockKey = Key.of("AIR");
+                        double islandWorth = 0;
 
-                                try{
-                                    blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
-                                }catch(ArrayIndexOutOfBoundsException ignored){ }
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
+                                for (int y = 0; y < 256; y++) {
+                                    Key blockKey = Key.of("AIR");
 
-                                if(blockKey.toString().contains("AIR"))
-                                    continue;
+                                    try{
+                                        blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
+                                    }catch(ArrayIndexOutOfBoundsException ignored){ }
 
-                                Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
-                                int blockCount = plugin.getGrid().getBlockAmount(location);
-
-                                if(blockKey.toString().contains("SPAWNER")){
-                                    Pair<Integer, EntityType> entry = plugin.getProviders().getSpawner(location);
-                                    blockCount = entry.getKey();
-                                    if(entry.getValue() == null){
-                                        spawnersToCheck.add(new Pair<>(location, blockCount));
+                                    if(blockKey.toString().contains("AIR"))
                                         continue;
+
+                                    Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
+                                    int blockCount = plugin.getGrid().getBlockAmount(location);
+
+                                    if(blockKey.toString().contains("SPAWNER")){
+                                        Pair<Integer, EntityType> entry = plugin.getProviders().getSpawner(location);
+                                        blockCount = entry.getKey();
+                                        if(entry.getValue() == null){
+                                            spawnersToCheck.add(new Pair<>(location, blockCount));
+                                            continue;
+                                        }
+                                        else{
+                                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
+                                        }
                                     }
-                                    else{
-                                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
+
+                                    Pair<Integer, ItemStack> blockPair = plugin.getProviders().getBlock(location);
+
+                                    if(blockPair != null){
+                                        blockCount = blockPair.getKey();
+                                        blockKey = Key.of(blockPair.getValue());
                                     }
+
+                                    handleBlockPlace(blockKey, blockCount, false);
                                 }
-
-                                Pair<Integer, ItemStack> blockPair = plugin.getProviders().getBlock(location);
-
-                                if(blockPair != null){
-                                    blockCount = blockPair.getKey();
-                                    blockKey = Key.of(blockPair.getValue());
-                                }
-
-                                handleBlockPlace(blockKey, blockCount, false);
                             }
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            try{
-                scanService.shutdown();
-                scanService.awaitTermination(1, TimeUnit.MINUTES);
-            }catch(Exception ex){
-                ex.printStackTrace();
+                try{
+                    scanService.shutdown();
+                    scanService.awaitTermination(1, TimeUnit.MINUTES);
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
             }
 
             Executor.sync(() -> {
