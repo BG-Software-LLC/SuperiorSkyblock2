@@ -53,7 +53,6 @@ public final class IslandRegistry implements Iterable<Island> {
         islandsByPositions.put(IslandPosition.of(island), island);
         for(TreeSet<Island> sortedTree : sortedTrees.values())
             sortedTree.add(island);
-        plugin.getProviders().updateIslandsTopHook(null);
     }
 
     public synchronized void remove(UUID uuid){
@@ -64,7 +63,6 @@ public final class IslandRegistry implements Iterable<Island> {
                 sortedTree.remove(island);
         }
         islands.remove(uuid);
-        plugin.getProviders().updateIslandsTopHook(null);
     }
 
     public int size(){
@@ -91,7 +89,6 @@ public final class IslandRegistry implements Iterable<Island> {
             if(!island.isIgnored())
                 sortedTree.add(island);
         }
-        plugin.getProviders().updateIslandsTopHook(sortingType);
         Executor.sync(MenuTopIslands::refreshMenus);
     }
 
