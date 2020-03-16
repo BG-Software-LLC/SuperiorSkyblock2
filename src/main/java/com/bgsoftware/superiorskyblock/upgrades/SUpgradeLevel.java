@@ -8,9 +8,9 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class SUpgradeLevel implements UpgradeLevel {
 
@@ -106,9 +106,9 @@ public final class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        Map<String, Integer> generatorRates = new HashMap<>();
-        this.generatorRates.forEach((key, value) -> generatorRates.put(key.toString(), value));
-        return generatorRates;
+        return this.generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
+                entry -> entry.getKey().toString(),
+                Map.Entry::getValue));
     }
 
     public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){

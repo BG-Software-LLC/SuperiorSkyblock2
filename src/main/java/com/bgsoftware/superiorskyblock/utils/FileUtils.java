@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,9 +20,7 @@ import org.bukkit.inventory.ItemFlag;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class FileUtils {
 
@@ -87,8 +86,8 @@ public final class FileUtils {
         return itemBuilder;
     }
 
-    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
-        Map<Character, List<Integer>> charSlots = new HashMap<>();
+    public static Registry<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
+        Registry<Character, List<Integer>> charSlots = Registry.createRegistry();
 
         menu.resetData();
 
@@ -118,7 +117,7 @@ public final class FileUtils {
                     }
 
                     if(!charSlots.containsKey(ch))
-                        charSlots.put(ch, new ArrayList<>());
+                        charSlots.add(ch, new ArrayList<>());
 
                     charSlots.get(ch).add(slot);
 
@@ -127,7 +126,7 @@ public final class FileUtils {
             }
         }
 
-        int backButton = charSlots.getOrDefault(cfg.getString("back", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        int backButton = charSlots.get(cfg.getString("back", " ").charAt(0), Collections.singletonList(-1)).get(0);
         menu.setBackButton(backButton);
 
         if(plugin.getSettings().onlyBackButton && backButton == -1)

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -16,7 +17,6 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -36,7 +36,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
             'X', 'Y', 'Z'
     };
 
-    private static final Map<String, MenuData> dataMap = new HashMap<>();
+    private static final Registry<String, MenuData> dataMap = Registry.createRegistry();
 
     private final String identifier;
     protected final SuperiorPlayer superiorPlayer;
@@ -56,17 +56,17 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public void addSound(int slot, SoundWrapper sound) {
         if(sound != null)
-            getData().sounds.put(slot, sound);
+            getData().sounds.add(slot, sound);
     }
 
     public void addCommands(int slot, List<String> commands) {
         if(commands != null && !commands.isEmpty())
-            getData().commands.put(slot, commands);
+            getData().commands.add(slot, commands);
     }
 
     public void addFillItem(int slot, ItemBuilder itemBuilder){
         if(itemBuilder != null)
-            getData().fillItems.put(slot, itemBuilder);
+            getData().fillItems.add(slot, itemBuilder);
     }
 
     public void setBackButton(int slot){
@@ -74,7 +74,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public void resetData(){
-        dataMap.put(identifier, new MenuData());
+        dataMap.add(identifier, new MenuData());
     }
 
     public void setTitle(String title){
@@ -90,7 +90,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public void addData(String key, Object value){
-        getData().data.put(key, value);
+        getData().data.add(key, value);
     }
 
     public Object getData(String key){
@@ -98,7 +98,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public Object getData(String key, Object def){
-        return getData().data.getOrDefault(key, def);
+        return getData().data.get(key, def);
     }
 
     public boolean containsData(String key){
@@ -225,7 +225,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         //noinspection all
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();
 
-        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
+        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entries()) {
             ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
             if(itemStackEntry.getKey() >= 0)
                 inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ? itemBuilder.build() : itemBuilder.build(superiorPlayer));
@@ -244,7 +244,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private MenuData getData(){
         if(!dataMap.containsKey(identifier)){
-            dataMap.put(identifier, new MenuData());
+            dataMap.add(identifier, new MenuData());
         }
 
         return dataMap.get(identifier);
@@ -301,10 +301,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static class MenuData{
 
-        private Map<Integer, SoundWrapper> sounds = new HashMap<>();
-        private Map<Integer, List<String>> commands = new HashMap<>();
-        private Map<Integer, ItemBuilder> fillItems = new HashMap<>();
-        private Map<String, Object> data = new HashMap<>();
+        private Registry<Integer, SoundWrapper> sounds = Registry.createRegistry();
+        private Registry<Integer, List<String>> commands = Registry.createRegistry();
+        private Registry<Integer, ItemBuilder> fillItems = Registry.createRegistry();
+        private Registry<String, Object> data = Registry.createRegistry();
         private String title = "";
         private InventoryType inventoryType = InventoryType.CHEST;
         private int rowsSize = 6;

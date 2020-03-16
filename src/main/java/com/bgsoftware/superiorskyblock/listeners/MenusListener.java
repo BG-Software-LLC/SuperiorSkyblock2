@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.entity.Player;
@@ -12,14 +13,12 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class MenusListener implements Listener {
 
-    private Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
+    private Registry<UUID, ItemStack> latestClickedItem = Registry.createRegistry();
 
     /**
      * The following two events are here for patching a dupe glitch caused
@@ -29,7 +28,7 @@ public final class MenusListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
         if(e.getCurrentItem() != null && e.isCancelled() && e.getInventory().getHolder() instanceof SuperiorMenu) {
-            latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+            latestClickedItem.add(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }

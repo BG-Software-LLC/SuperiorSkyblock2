@@ -6,22 +6,20 @@ import com.bgsoftware.superiorskyblock.commands.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class CmdAdmin implements ISuperiorCommand {
 
-    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
-    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
+    private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
     private final CommandsHandler commandsHandler;
 
     public CmdAdmin(CommandsHandler commandsHandler){
@@ -214,15 +212,15 @@ public final class CmdAdmin implements ISuperiorCommand {
             subCommands.remove(aliases.get(0).toLowerCase());
             aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
         }
-        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
+        subCommands.add(aliases.get(0).toLowerCase(), superiorCommand);
         for(int i = 1; i < aliases.size(); i++){
-            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+            aliasesToCommand.add(aliases.get(i).toLowerCase(), superiorCommand);
         }
         if(sort){
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
             subCommands.clear();
-            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
+            superiorCommands.forEach(s -> subCommands.add(s.getAliases().get(0), s));
         }
     }
 
@@ -241,7 +239,7 @@ public final class CmdAdmin implements ISuperiorCommand {
 
     private SuperiorCommand getCommand(String label){
         label = label.toLowerCase();
-        return subCommands.getOrDefault(label, aliasesToCommand.get(label));
+        return subCommands.get(label, aliasesToCommand.get(label));
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Registry<K, V> {
 
-    private final Registry<Z, TreeSet<V>> sortedValues = new Registry<Z, TreeSet<V>>() {};
+    private final Registry<Z, TreeSet<V>> sortedValues = createRegistry();
 
     protected SortedRegistry(){
         super();
@@ -28,10 +28,10 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
     }
 
     @Override
-    public synchronized void add(K key, V value) {
-        super.add(key, value);
+    public synchronized V add(K key, V value) {
         for(TreeSet<V> sortedTree : sortedValues.values())
             sortedTree.add(value);
+        return super.add(key, value);
     }
 
     @Override

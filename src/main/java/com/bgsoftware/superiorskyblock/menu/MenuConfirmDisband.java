@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
 
@@ -69,10 +69,12 @@ public final class MenuConfirmDisband extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
-        confirmSlot = charSlots.getOrDefault(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        cancelSlot = charSlots.getOrDefault(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        confirmSlot = charSlots.get(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        cancelSlot = charSlots.get(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

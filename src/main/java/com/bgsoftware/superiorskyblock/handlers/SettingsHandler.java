@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,9 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -75,7 +74,7 @@ public final class SettingsHandler {
     public final boolean coopDamage;
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
-    public final Map<String, String> defaultPlaceholders;
+    public final Registry<String, String> defaultPlaceholders;
     public final boolean disbandConfirm;
     public final String spawnersProvider;
     public final boolean disbandInventoryClear;
@@ -92,15 +91,15 @@ public final class SettingsHandler {
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
     public final KeyMap<Integer> defaultGenerator;
-    public final Map<String, Pair<Integer, String>> commandsCooldown;
+    public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
     public final boolean skipOneItemMenus;
     public final boolean teleportOnPVPEnable;
     public final boolean immuneToPVPWhenTeleport;
     public final List<String> blockedVisitorsCommands;
     public final boolean starterChestEnabled;
-    public final Map<Integer, ItemStack> starterChestContents;
-    public final Map<String, List<String>> eventCommands;
+    public final Registry<Integer, ItemStack> starterChestContents;
+    public final Registry<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final long homeWarmup;
     public final boolean liquidUpdate;
@@ -191,10 +190,10 @@ public final class SettingsHandler {
         coopDamage = cfg.getBoolean("coop-damage", true);
         disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
-        defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
+        defaultPlaceholders = Registry.createRegistry(cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
                 line -> line.split(":")[1]
-        ));
+        )));
         disbandConfirm = cfg.getBoolean("disband-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
@@ -217,11 +216,11 @@ public final class SettingsHandler {
             defaultGenerator.put(key, Integer.parseInt(percentage));
         }
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
-        commandsCooldown = new HashMap<>();
+        commandsCooldown = Registry.createRegistry();
         for(String subCommand : cfg.getConfigurationSection("commands-cooldown").getKeys(false)){
             int cooldown = cfg.getInt("commands-cooldown." + subCommand + ".cooldown");
             String permission = cfg.getString("commands-cooldown." + subCommand + ".bypass-permission");
-            commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
+            commandsCooldown.add(subCommand, new Pair<>(cooldown, permission));
         }
         numberFormat = cfg.getString("number-format", "en-US");
         StringUtils.setNumberFormatter(numberFormat);
@@ -230,17 +229,17 @@ public final class SettingsHandler {
         immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);
         blockedVisitorsCommands = cfg.getStringList("blocked-visitors-commands");
         starterChestEnabled = cfg.getBoolean("starter-chest.enabled", false);
-        starterChestContents = new HashMap<>();
+        starterChestContents = Registry.createRegistry();
         for(String slot : cfg.getConfigurationSection("starter-chest.contents").getKeys(false)){
             try {
                 ItemStack itemStack = FileUtils.getItemStack("config.yml", cfg.getConfigurationSection("starter-chest.contents." + slot)).build();
                 itemStack.setAmount(cfg.getInt("starter-chest.contents." + slot + ".amount", 1));
-                starterChestContents.put(Integer.parseInt(slot), itemStack);
+                starterChestContents.add(Integer.parseInt(slot), itemStack);
             }catch(Exception ignored){}
         }
-        eventCommands = new HashMap<>();
+        eventCommands = Registry.createRegistry();
         for(String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)){
-            eventCommands.put(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
+            eventCommands.add(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
         homeWarmup = cfg.getLong("home-warmup", 0);

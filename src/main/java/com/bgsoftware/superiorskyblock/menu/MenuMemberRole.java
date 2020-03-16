@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,13 +19,11 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuMemberRole extends SuperiorMenu {
 
-    private static Map<Integer, PlayerRole> roleSlots = new HashMap<>();
+    private static Registry<Integer, PlayerRole> roleSlots = Registry.createRegistry();
 
     private SuperiorPlayer targetPlayer;
 
@@ -81,7 +80,7 @@ public final class MenuMemberRole extends SuperiorMenu {
         int backButton = -1;
         char backButtonChar = cfg.getString("back", " ").charAt(0);
 
-        roleSlots = new HashMap<>();
+        roleSlots.clear();
 
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
@@ -94,7 +93,7 @@ public final class MenuMemberRole extends SuperiorMenu {
                         backButton = slot;
                     }
                     else if (cfg.contains("items." + ch + ".role")){
-                        roleSlots.put(slot, SPlayerRole.of(cfg.getString("items." + ch + ".role")));
+                        roleSlots.add(slot, SPlayerRole.of(cfg.getString("items." + ch + ".role")));
                     }
 
                     menuMemberRole.addFillItem(slot, FileUtils.getItemStack("member-role.yml", cfg.getConfigurationSection("items." + ch)));

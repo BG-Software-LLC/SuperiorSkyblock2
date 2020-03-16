@@ -1,24 +1,25 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
-    private Map<String, V> map;
+    private Registry<String, V> registry;
 
     public KeyMap(){
-        this.map = new HashMap<>();
+        this.registry = Registry.createRegistry();
     }
 
     public KeyMap(KeyMap<V> other){
-        this.map = new HashMap<>(other.map);
+        this.registry = Registry.createRegistry(other.registry.toMap());
     }
 
     @Override
@@ -28,7 +29,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public int size() {
-        return map.size();
+        return registry.size();
     }
 
     @Override
@@ -42,14 +43,14 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public V put(Key key, V value) {
-        return map.put(key.toString(), value);
+        return registry.add(key.toString(), value);
     }
 
     public Key getKey(Key key){
         String keyStr = key.toString();
-        if(keyStr.contains(":") && map.containsKey(keyStr.split(":")[0]))
+        if(keyStr.contains(":") && registry.containsKey(keyStr.split(":")[0]))
             keyStr = keyStr.split(":")[0];
-        else if(keyStr.contains(";") && map.containsKey(keyStr.split(";")[0]))
+        else if(keyStr.contains(";") && registry.containsKey(keyStr.split(";")[0]))
             keyStr = keyStr.split(";")[0];
         return Key.of(keyStr);
     }
@@ -58,15 +59,15 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     public V remove(Object key) {
         if(key instanceof Key) {
             String keyStr = key.toString();
-            map.remove(keyStr);
-            map.remove(keyStr.split(":")[0]);
-            map.remove(keyStr.split(";")[0]);
+            registry.remove(keyStr);
+            registry.remove(keyStr.split(":")[0]);
+            registry.remove(keyStr.split(";")[0]);
         }
-        return map.remove(key);
+        return registry.remove(key + "");
     }
 
-    public V removeRaw(Key key){
-        return map.remove(key.toString());
+    public void removeRaw(Key key){
+        registry.remove(key.toString());
     }
 
     public V get(ItemStack itemStack) {
@@ -83,45 +84,43 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public V get(Object o) {
-        if(map.containsKey("all"))
-            return map.get("all");
+        if(registry.containsKey("all"))
+            return registry.get("all");
 
         if(o instanceof Key) {
             String key = o.toString();
-            if(map.containsKey(key))
-                return map.get(key);
-            else if(key.contains(":") && map.containsKey(key.split(":")[0]))
-                return map.get(key.split(":")[0]);
-            else if(key.contains(";") && map.containsKey(key.split(";")[0]))
-                return map.get(key.split(";")[0]);
+            if(registry.containsKey(key))
+                return registry.get(key);
+            else if(key.contains(":") && registry.containsKey(key.split(":")[0]))
+                return registry.get(key.split(":")[0]);
+            else if(key.contains(";") && registry.containsKey(key.split(";")[0]))
+                return registry.get(key.split(";")[0]);
         }
 
-        return map.get(o.toString());
+        return registry.get(o.toString());
     }
 
     public V getRaw(Key key, V defaultValue){
-        return map.getOrDefault(key.toString(), defaultValue);
+        return registry.get(key.toString(), defaultValue);
     }
 
     @Override
     public String toString() {
-        return map.toString();
+        return registry.toString();
     }
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : map.getOrDefault(key, defaultValue);
+        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : registry.get(key + "", defaultValue);
     }
 
     @Override
     public void clear() {
-        map.clear();
+        registry.clear();
     }
 
     public Map<Key, V> asKeyMap(){
-        Map<Key, V> map = new HashMap<>();
-        this.map.forEach((key, value) -> map.put(Key.of(key), value));
-        return map;
+        return registry.toMap().entrySet().stream().collect(Collectors.toMap(entry -> Key.of(entry.getKey()), Entry::getValue));
     }
 
 }

@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -45,7 +46,7 @@ public final class SpawnIsland implements Island {
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
-    private final Map<Object, SPermissionNode> permissionNodes = new HashMap<>();
+    private final Registry<Object, SPermissionNode> permissionNodes = Registry.createRegistry();
     private final Location center;
     private final int islandSize;
     private final List<IslandFlag> islandSettings;
@@ -425,7 +426,7 @@ public final class SpawnIsland implements Island {
     @Override
     public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
-        return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
+        return permissionNodes.get(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
     }
 
     @Override
@@ -988,7 +989,7 @@ public final class SpawnIsland implements Island {
         for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
             if(!permissionNodes.containsKey(playerRole)) {
                 PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-                permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
+                permissionNodes.add(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
             }
         }
     }

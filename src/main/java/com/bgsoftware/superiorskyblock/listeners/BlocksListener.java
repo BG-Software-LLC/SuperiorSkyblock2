@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -46,10 +47,8 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -392,18 +391,20 @@ public final class BlocksListener implements Listener {
             if(!world.isChunkLoaded(chunkX, chunkZ))
                 return;
 
-            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Registry<Location, Integer> blocksToChange = Registry.createRegistry();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             for(Block block : e.getBlocks()){
                 int blockAmount = plugin.getGrid().getBlockAmount(block);
                 if(blockAmount > 1){
-                    blocksToChange.put(block.getRelative(e.getDirection()).getLocation(), blockAmount);
-                    blocksToChange.put(block.getLocation(), 0);
+                    blocksToChange.add(block.getRelative(e.getDirection()).getLocation(), blockAmount);
+                    blocksToChange.add(block.getLocation(), 0);
                 }
             }
 
-            Executor.sync(() ->
-                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+            Executor.sync(() -> {
+                blocksToChange.entries().forEach(entry -> plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue()));
+                blocksToChange.delete();
+            });
         }, 2L);
     }
 
@@ -411,18 +412,20 @@ public final class BlocksListener implements Listener {
     public void onPistonRetract(BlockPistonRetractEvent e){
         List<Location> locations = e.getBlocks().stream().map(Block::getLocation).collect(Collectors.toList());
         Executor.async(() -> {
-            Map<Location, Integer> blocksToChange = new HashMap<>();
+            Registry<Location, Integer> blocksToChange = Registry.createRegistry();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             for(Location location : locations){
                 int blockAmount = plugin.getGrid().getBlockAmount(location);
                 if(blockAmount > 1){
-                    blocksToChange.put(getRelative(location, e.getDirection()), blockAmount);
-                    blocksToChange.put(location, 0);
+                    blocksToChange.add(getRelative(location, e.getDirection()), blockAmount);
+                    blocksToChange.add(location, 0);
                 }
             }
 
-            Executor.sync(() ->
-                    blocksToChange.forEach((key, value) -> plugin.getGrid().setBlockAmount(key.getBlock(), value)));
+            Executor.sync(() -> {
+                blocksToChange.entries().forEach(entry -> plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue()));
+                blocksToChange.delete();
+            });
         }, 2L);
     }
 

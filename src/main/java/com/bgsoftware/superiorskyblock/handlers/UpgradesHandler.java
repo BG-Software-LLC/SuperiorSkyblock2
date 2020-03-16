@@ -7,20 +7,19 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class UpgradesHandler implements UpgradesManager {
 
     private SuperiorSkyblockPlugin plugin;
-    private Map<String, SUpgrade> upgrades = new HashMap<>();
+    private Registry<String, SUpgrade> upgrades = Registry.createRegistry();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -84,7 +83,7 @@ public final class UpgradesHandler implements UpgradesManager {
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, cropGrowth,
                         spawnerRates, mobDrops, teamLimit, warpsLimit, borderSize, blockLimits, generatorRates));
             }
-            this.upgrades.put(upgradeName, upgrade);
+            this.upgrades.add(upgradeName, upgrade);
         }
     }
 

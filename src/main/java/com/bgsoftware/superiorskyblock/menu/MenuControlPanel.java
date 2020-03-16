@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
@@ -61,11 +61,13 @@ public final class MenuControlPanel extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
-        membersSlot = charSlots.getOrDefault(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        settingsSlot = charSlots.getOrDefault(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        visitorsSlot = charSlots.getOrDefault(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        membersSlot = charSlots.get(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        settingsSlot = charSlots.get(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        visitorsSlot = charSlots.get(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

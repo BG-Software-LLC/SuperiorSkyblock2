@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.database;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public final class StatementHolder {
@@ -11,7 +11,7 @@ public final class StatementHolder {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String query;
-    private final Map<Integer, Object> values = new HashMap<>();
+    private final Registry<Integer, Object> values = Registry.createRegistry();
     private int currentIndex = 1;
 
     StatementHolder(Query query){
@@ -20,37 +20,37 @@ public final class StatementHolder {
     }
 
     public StatementHolder setString(String value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setInt(int value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setShort(short value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setLong(long value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setFloat(float value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setDouble(double value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setBoolean(boolean value){
-        values.put(currentIndex++, value);
+        values.add(currentIndex++, value);
         return this;
     }
 
@@ -65,7 +65,7 @@ public final class StatementHolder {
         StringHolder errorQuery = new StringHolder(query);
 
         SQLHelper.buildStatement(query, preparedStatement -> {
-            for(Map.Entry<Integer, Object> entry : values.entrySet()) {
+            for(Map.Entry<Integer, Object> entry : values.entries()) {
                 preparedStatement.setObject(entry.getKey(), entry.getValue());
                 errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
             }

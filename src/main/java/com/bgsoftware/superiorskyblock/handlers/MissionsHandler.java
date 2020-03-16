@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -30,9 +31,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.jar.JarEntry;
@@ -45,8 +44,8 @@ public final class MissionsHandler implements MissionsManager {
 
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
-    private final static Map<String, Mission> missionMap = new HashMap<>();
-    private final static Map<Mission, MissionData> missionDataMap = new HashMap<>();
+    private final static Registry<String, Mission> missionMap = Registry.createRegistry();
+    private final static Registry<Mission, MissionData> missionDataMap = Registry.createRegistry();
 
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
@@ -99,11 +98,11 @@ public final class MissionsHandler implements MissionsManager {
 
                     mission = createInstance(missionClass.get(), missionName, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                     mission.load(plugin, missionSection);
-                    missionMap.put(missionName.toLowerCase(), mission);
+                    missionMap.add(missionName.toLowerCase(), mission);
                     missionsToLoad.add(mission);
                 }
 
-                missionDataMap.put(mission, new MissionData(mission, missionSection));
+                missionDataMap.add(mission, new MissionData(mission, missionSection));
 
                 SuperiorSkyblockPlugin.log("Registered mission " + missionName);
             }catch(Exception ex){

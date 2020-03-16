@@ -37,7 +37,6 @@ import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,13 +59,17 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
         COMPOUND_GET = ReflectionUtils.getMethod(CLASS, "get", null, String.class);
     }
 
+    public CompoundTag() {
+        this(new HashMap<>());
+    }
+
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
     public CompoundTag(Map<String, Tag<?>> value) {
-        super(new HashMap<>(value));
+        super(value);
     }
 
     public void setString(String key, String value){
@@ -79,7 +82,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
 
     @Override
     public Map<String, Tag<?>> getValue() {
-        return Collections.unmodifiableMap(value);
+        return value;
     }
 
     @Override

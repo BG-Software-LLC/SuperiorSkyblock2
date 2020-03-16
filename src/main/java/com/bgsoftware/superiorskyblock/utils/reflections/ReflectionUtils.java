@@ -2,22 +2,21 @@ package com.bgsoftware.superiorskyblock.utils.reflections;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 public final class ReflectionUtils {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 
-    private static Map<Fields, Field> fieldsMap = new HashMap<>();
-    private static Map<Methods, Method> methodsMap = new HashMap<>();
+    private static Registry<Fields, Field> fieldsMap = Registry.createRegistry();
+    private static Registry<Methods, Method> methodsMap = Registry.createRegistry();
 
     static {
         Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
@@ -31,33 +30,33 @@ public final class ReflectionUtils {
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_15)){
             Class<?> biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage");
-            fieldsMap.put(Fields.BIOME_GRID_BIOME_STORAGE, getField(biomeGridClass, "biome"));
+            fieldsMap.add(Fields.BIOME_GRID_BIOME_STORAGE, getField(biomeGridClass, "biome"));
             Field field = getField(biomeStorageClass, "f");
             if(field != null && !field.getType().getName().contains("BiomeBase"))
                 field = getField(biomeStorageClass, "g");
-            fieldsMap.put(Fields.BIOME_STORAGE_BIOME_BASES, field);
+            fieldsMap.add(Fields.BIOME_STORAGE_BIOME_BASES, field);
         }
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_14)){
-            methodsMap.put(Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE, getMethod(playerChunkMapClass, "isOutsideOfRange", chunkCoordIntPairClass));
+            methodsMap.add(Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE, getMethod(playerChunkMapClass, "isOutsideOfRange", chunkCoordIntPairClass));
         }
 
         if(ServerVersion.isAtLeast(ServerVersion.v1_13)) {
-            fieldsMap.put(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
-            fieldsMap.put(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
+            fieldsMap.add(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
+            fieldsMap.add(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
         }
 
         if(ServerVersion.isEquals(ServerVersion.v1_11) || ServerVersion.isEquals(ServerVersion.v1_12)) {
-            fieldsMap.put(Fields.CHUNK_SECTION_BLOCK_IDS, getField(chunkSectionClass, "blockIds"));
-            fieldsMap.put(Fields.CHUNK_SECTION_EMITTED_LIGHT, getField(chunkSectionClass, "emittedLight"));
-            fieldsMap.put(Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT, getField(chunkSectionClass, "nonEmptyBlockCount"));
-            fieldsMap.put(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
-            fieldsMap.put(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
+            fieldsMap.add(Fields.CHUNK_SECTION_BLOCK_IDS, getField(chunkSectionClass, "blockIds"));
+            fieldsMap.add(Fields.CHUNK_SECTION_EMITTED_LIGHT, getField(chunkSectionClass, "emittedLight"));
+            fieldsMap.add(Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT, getField(chunkSectionClass, "nonEmptyBlockCount"));
+            fieldsMap.add(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
+            fieldsMap.add(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
         }
 
         if(ServerVersion.isEquals(ServerVersion.v1_8)) {
-            try { fieldsMap.put(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue")); } catch (Exception ignored) { }
-            try { fieldsMap.put(Fields.WORLD_CHUNK_TICK_LIST, getField(worldClass, "chunkTickList")); } catch (Exception ignored) { }
+            try { fieldsMap.add(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue")); } catch (Exception ignored) { }
+            try { fieldsMap.add(Fields.WORLD_CHUNK_TICK_LIST, getField(worldClass, "chunkTickList")); } catch (Exception ignored) { }
         }
     }
 

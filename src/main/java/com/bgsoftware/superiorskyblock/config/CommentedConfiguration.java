@@ -17,6 +17,7 @@
 
 package com.bgsoftware.superiorskyblock.config;
 
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -33,9 +34,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class CommentedConfiguration extends YamlConfiguration {
 
@@ -44,7 +43,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * Can be accessed by using the methods that are provided
      * by the class.
      */
-    private final Map<String, String> configComments = new HashMap<>();
+    private final Registry<String, String> configComments = Registry.createRegistry();
 
     /**
      * Sync the config with another resource.
@@ -76,7 +75,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
         if(comment == null)
             configComments.remove(path);
         else
-            configComments.put(path, comment);
+            configComments.add(path, comment);
     }
 
     /**
@@ -95,7 +94,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @return Returns a string that contains the comment. If no comment exists, the def value will be returned.
      */
     public String getComment(String path, String def){
-        return configComments.getOrDefault(path, def);
+        return configComments.get(path, def);
     }
 
     /**

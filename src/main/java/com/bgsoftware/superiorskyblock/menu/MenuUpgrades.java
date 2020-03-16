@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
@@ -79,7 +79,7 @@ public final class MenuUpgrades extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
         if(cfg.contains("upgrades")){
             ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
@@ -91,7 +91,7 @@ public final class MenuUpgrades extends SuperiorMenu {
                     continue;
                 }
 
-                int slot = charSlots.getOrDefault(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
+                int slot = charSlots.get(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
                 ((SUpgrade) upgrade).setMenuSlot(slot);
 
                 for(String level : upgradeSection.getKeys(false)) {
@@ -117,6 +117,8 @@ public final class MenuUpgrades extends SuperiorMenu {
                 }
             }
         }
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

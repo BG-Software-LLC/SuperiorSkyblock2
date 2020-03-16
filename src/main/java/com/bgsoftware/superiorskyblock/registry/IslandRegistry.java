@@ -25,9 +25,9 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
         return island == null || !island.isInside(location) ? null : island;
     }
 
-    public synchronized void add(UUID uuid, Island island){
-        super.add(uuid, island);
+    public synchronized Island add(UUID uuid, Island island){
         islandsByPositions.add(IslandPosition.of(island), island);
+        return super.add(uuid, island);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
@@ -56,7 +57,7 @@ public final class SchematicsHandler implements SchematicManager {
 
     private SuperiorSkyblockPlugin plugin;
 
-    private Map<String, Schematic> schematics = new HashMap<>();
+    private Registry<String, Schematic> schematics = Registry.createRegistry();
 
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -82,7 +83,7 @@ public final class SchematicsHandler implements SchematicManager {
                 String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
                 Schematic schematic = loadFromFile(schemName, schemFile);
                 if(schematic != null) {
-                    schematics.put(schemName, schematic);
+                    schematics.add(schemName, schematic);
                     SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
                             (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
                 }
@@ -100,12 +101,12 @@ public final class SchematicsHandler implements SchematicManager {
 
     @Override
     public List<String> getSchematics(){
-        return Lists.newArrayList(schematics.keySet());
+        return Lists.newArrayList(schematics.keys());
     }
 
     public String getDefaultSchematic(World.Environment environment){
         String suffix = environment == World.Environment.NETHER ? "_nether" : "_the_end";
-        for(Map.Entry<String, Schematic> entry : schematics.entrySet()){
+        for(Map.Entry<String, Schematic> entry : schematics.entries()){
             if(getSchematic(entry.getKey() + suffix) != null)
                 return entry.getKey();
         }
@@ -210,7 +211,7 @@ public final class SchematicsHandler implements SchematicManager {
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
         SuperiorSchematic schematic = new SuperiorSchematic(schematicName, new CompoundTag(compoundValue));
-        schematics.put(schematicName, schematic);
+        schematics.add(schematicName, schematic);
         saveIntoFile(schematicName, schematic);
 
         if(runnable != null)

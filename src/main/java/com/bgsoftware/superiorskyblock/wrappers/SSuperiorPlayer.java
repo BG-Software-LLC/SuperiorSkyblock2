@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import com.google.common.base.Preconditions;
@@ -37,9 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -49,7 +48,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Map<Mission, Integer> completedMissions = new HashMap<>();
+    private final Registry<Mission, Integer> completedMissions = Registry.createRegistry();
     private final UUID player;
 
     private UUID islandLeaderFromCache;
@@ -473,7 +472,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void completeMission(Mission mission) {
-        completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
+        completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
 
         Query.PLAYER_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
@@ -483,8 +482,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void resetMission(Mission mission) {
-        if(completedMissions.getOrDefault(mission, 0) > 0) {
-            completedMissions.put(mission, completedMissions.get(mission) - 1);
+        if(completedMissions.get(mission, 0) > 0) {
+            completedMissions.add(mission, completedMissions.get(mission) - 1);
         }
         else {
             completedMissions.remove(mission);
@@ -511,12 +510,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public int getAmountMissionCompleted(Mission mission) {
-        return completedMissions.getOrDefault(mission, 0);
+        return completedMissions.get(mission, 0);
     }
 
     @Override
     public List<Mission> getCompletedMissions() {
-        return new ArrayList<>(completedMissions.keySet());
+        return new ArrayList<>(completedMissions.keys());
     }
 
     @Override

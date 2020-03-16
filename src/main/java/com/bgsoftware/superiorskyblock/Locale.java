@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -10,9 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -490,7 +489,7 @@ public enum Locale {
     private static java.util.Locale defaultLocale = null;
 
     private String defaultMessage;
-    private Map<java.util.Locale, String> messages = new HashMap<>();
+    private Registry<java.util.Locale, String> messages = Registry.createRegistry();
 
     Locale(){
         this(null);
@@ -501,7 +500,7 @@ public enum Locale {
     }
 
     public boolean isEmpty(java.util.Locale locale){
-        return messages.getOrDefault(locale, "").isEmpty();
+        return messages.get(locale, "").isEmpty();
     }
 
     public String getMessage(java.util.Locale locale, Object... objects){
@@ -534,7 +533,7 @@ public enum Locale {
     private void setMessage(java.util.Locale locale, String message){
         if(message == null)
             message = "";
-        messages.put(locale, message);
+        messages.add(locale, message);
     }
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

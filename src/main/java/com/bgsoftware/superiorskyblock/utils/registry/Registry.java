@@ -12,48 +12,110 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     protected static final Set<Registry<?, ?>> loadedRegisteries = Sets.newHashSet();
 
-    private final Map<K ,V> registry = Maps.newHashMap();
+    private final Map<K ,V> registry;
 
     protected Registry(){
+        this(Maps.newHashMap());
+    }
+
+    protected Registry(Map<K, V> map){
+        this.registry = map;
         loadedRegisteries.add(this);
     }
 
-    public synchronized V get(K key){
-        return registry.get(key);
+    public V get(K key){
+        synchronized (registry){
+            return registry.get(key);
+        }
     }
 
-    public synchronized void add(K key, V value){
-        registry.put(key, value);
+    public V get(K key, V def){
+        synchronized (registry){
+            return registry.getOrDefault(key, def);
+        }
     }
 
-    public synchronized V remove(K key){
-        return registry.remove(key);
+    public V add(K key, V value){
+        synchronized (registry){
+            return registry.put(key, value);
+        }
     }
 
-    public synchronized boolean containsKey(K key){
-        return registry.containsKey(key);
+    public V remove(K key){
+        synchronized (registry){
+            return registry.remove(key);
+        }
     }
 
-    public synchronized Collection<V> values(){
-        return registry.values();
+    public boolean containsKey(K key){
+        synchronized (registry){
+            return registry.containsKey(key);
+        }
     }
 
-    public synchronized void clear(){
-        registry.clear();
+    public Collection<V> values(){
+        synchronized (registry){
+            return registry.values();
+        }
+    }
+
+    public Collection<K> keys(){
+        synchronized (registry){
+            return registry.keySet();
+        }
+    }
+
+    public Collection<Map.Entry<K, V>> entries(){
+        synchronized (registry){
+            return registry.entrySet();
+        }
+    }
+
+    public void clear(){
+        synchronized (registry){
+            registry.clear();
+        }
+    }
+
+    public void delete(){
+        clear();
+        loadedRegisteries.remove(this);
+    }
+
+    public Map<K, V> toMap(){
+        return Maps.newHashMap(registry);
     }
 
     public int size(){
         return registry.size();
     }
 
+    public boolean isEmpty(){
+        return size() == 0;
+    }
+
     @Override
-    public synchronized Iterator<V> iterator() {
-        return registry.values().iterator();
+    public Iterator<V> iterator() {
+        synchronized (registry){
+            return registry.values().iterator();
+        }
     }
 
     public static void clearCache(){
         loadedRegisteries.forEach(Registry::clear);
         loadedRegisteries.clear();
+    }
+
+    public static <K, V> Registry<K, V> createRegistry(){
+        return new Registry<K, V>() {};
+    }
+
+    public static <K, V> Registry<K, V> createRegistry(Map<K, V> defaults){
+        return new Registry<K, V>(defaults) {};
+    }
+
+    public static <K, V> Registry<K, V> createLinkedRegistry(){
+        return createRegistry(Maps.newLinkedHashMap());
     }
 
 }

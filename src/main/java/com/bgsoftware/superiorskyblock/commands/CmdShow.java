@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -19,9 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class CmdShow implements ISuperiorCommand {
 
@@ -122,9 +121,9 @@ public final class CmdShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitors().size())).append("\n");
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
-            Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
+            Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
             plugin.getPlayers().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
-                    .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
+                    .forEach(playerRole -> rolesStrings.add(playerRole, new StringBuilder()));
 
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
@@ -139,10 +138,12 @@ public final class CmdShow implements ISuperiorCommand {
                 });
             }
 
-            rolesStrings.keySet().stream()
+            rolesStrings.keys().stream()
                     .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
                     .forEach(playerRole ->
                     infoMessage.append(Locale.ISLAND_INFO_ROLES.getMessage(locale, playerRole, rolesStrings.get(playerRole))));
+
+            rolesStrings.delete();
         }
 
         if(!Locale.ISLAND_INFO_FOOTER.isEmpty(locale))

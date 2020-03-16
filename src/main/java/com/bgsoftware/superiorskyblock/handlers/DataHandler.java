@@ -203,7 +203,10 @@ public final class DataHandler {
 
             while (resultSet.next()) {
                 CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
-                executor.execute(() -> plugin.getGrid().createIsland(cachedResultSet));
+                executor.execute(() -> {
+                    plugin.getGrid().createIsland(cachedResultSet);
+                    cachedResultSet.delete();
+                });
             }
 
             try {

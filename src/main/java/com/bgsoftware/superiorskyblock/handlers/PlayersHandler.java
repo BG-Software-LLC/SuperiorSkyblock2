@@ -6,14 +6,13 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,8 @@ public final class PlayersHandler implements PlayersManager {
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static Map<UUID, SuperiorPlayer> players = new HashMap<>();
-    private static Map<Integer, PlayerRole> roles = new HashMap<>();
+    private static Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
+    private static Registry<Integer, PlayerRole> roles = Registry.createRegistry();
     private static int lastRole = Integer.MIN_VALUE;
 
     public PlayersHandler(){
@@ -48,7 +47,7 @@ public final class PlayersHandler implements PlayersManager {
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         if(!players.containsKey(uuid)) {
-            players.put(uuid, new SSuperiorPlayer(uuid));
+            players.add(uuid, new SSuperiorPlayer(uuid));
             Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
         }
         return players.get(uuid);
@@ -96,7 +95,7 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public List<PlayerRole> getRoles(){
-        return new ArrayList<>(roles.keySet()).stream().sorted().map(roles::get).collect(Collectors.toList());
+        return roles.keys().stream().sorted().map(roles::get).collect(Collectors.toList());
     }
 
 
@@ -104,13 +103,14 @@ public final class PlayersHandler implements PlayersManager {
         UUID player = UUID.fromString(resultSet.getString("player"));
         SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         synchronized (this) {
-            players.put(player, superiorPlayer);
+            players.add(player, superiorPlayer);
         }
+        resultSet.delete();
     }
 
     private void loadRole(ConfigurationSection section, int type){
         int weight = section.getInt("weight", type);
-        roles.put(weight, new SPlayerRole(section.getString("name"), weight, section.getStringList("permissions")));
+        roles.add(weight, new SPlayerRole(section.getString("name"), weight, section.getStringList("permissions")));
         if(weight > lastRole)
             lastRole = weight;
     }

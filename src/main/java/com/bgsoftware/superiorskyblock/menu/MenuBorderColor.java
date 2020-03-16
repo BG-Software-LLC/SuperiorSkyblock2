@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +17,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuBorderColor extends SuperiorMenu {
 
@@ -63,11 +63,13 @@ public final class MenuBorderColor extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
-        greenColorSlot = charSlots.getOrDefault(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        redColorSlot = charSlots.getOrDefault(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        blueColorSlot = charSlots.getOrDefault(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        greenColorSlot = charSlots.get(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        redColorSlot = charSlots.get(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        blueColorSlot = charSlots.get(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

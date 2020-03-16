@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,7 +17,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
@@ -96,7 +96,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerMissions, "player-missions.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerMissions, "player-missions.yml", cfg);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 
@@ -107,10 +107,12 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuPlayerMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuPlayerMissions.setPreviousSlot(charSlots.getOrDefault(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setCurrentSlot(charSlots.getOrDefault(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setNextSlot(charSlots.getOrDefault(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setSlots(charSlots.getOrDefault(slotsChar, Collections.singletonList(-1)));
+        menuPlayerMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

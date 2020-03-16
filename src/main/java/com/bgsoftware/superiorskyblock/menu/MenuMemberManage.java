@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuMemberManage extends SuperiorMenu {
 
@@ -63,11 +63,13 @@ public final class MenuMemberManage extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
-        rolesSlot = charSlots.getOrDefault(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        banSlot = charSlots.getOrDefault(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        kickSlot = charSlots.getOrDefault(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        rolesSlot = charSlots.get(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        banSlot = charSlots.get(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        kickSlot = charSlots.get(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){

@@ -63,6 +63,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -78,10 +79,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.jar.JarEntry;
@@ -91,12 +89,12 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
     private final SuperiorSkyblockPlugin plugin;
 
-    private final Map<String, SuperiorCommand> subCommands = new LinkedHashMap<>();
-    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
+    private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
     private final CmdAdmin adminCommand;
     private final String label;
 
-    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
+    private final Registry<UUID, Registry<String, Long>> commandsCooldown = Registry.createRegistry();
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin, String islandCommand){
         super(islandCommand.split(",")[0]);
@@ -206,11 +204,11 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
                     }
 
                     if(!commandsCooldown.containsKey(uuid)){
-                        commandsCooldown.put(uuid, new HashMap<>());
+                        commandsCooldown.add(uuid, Registry.createRegistry());
                     }
 
-                    Map<String, Long> timedCommands = commandsCooldown.get(uuid);
-                    timedCommands.put(commandLabel, timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
+                    Registry<String, Long> timedCommands = commandsCooldown.get(uuid);
+                    timedCommands.add(commandLabel, timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
                 }
 
                 command.execute(plugin, sender, args);
@@ -300,7 +298,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
     private SuperiorCommand getCommand(String label){
         label = label.toLowerCase();
-        return subCommands.getOrDefault(label, aliasesToCommand.get(label));
+        return subCommands.get(label, aliasesToCommand.get(label));
     }
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
@@ -309,15 +307,15 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
             subCommands.remove(aliases.get(0).toLowerCase());
             aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
         }
-        subCommands.put(aliases.get(0).toLowerCase(), superiorCommand);
+        subCommands.add(aliases.get(0).toLowerCase(), superiorCommand);
         for(int i = 1; i < aliases.size(); i++){
-            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+            aliasesToCommand.add(aliases.get(i).toLowerCase(), superiorCommand);
         }
         if(sort){
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
             subCommands.clear();
-            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
+            superiorCommands.forEach(s -> subCommands.add(s.getAliases().get(0), s));
         }
     }
 

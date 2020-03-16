@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.entities;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Horse;
@@ -16,9 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 public final class EntityUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Map<UUID, ItemStack[]> armorStandsContent = new HashMap<>();
+    private static final Registry<UUID, ItemStack[]> armorStandsContent = Registry.createRegistry();
 
     public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack){
         if(livingEntity instanceof Pig){
@@ -52,7 +51,7 @@ public final class EntityUtils {
     }
 
     public static void cacheArmorStandEquipment(ArmorStand armorStand){
-        armorStandsContent.put(armorStand.getUniqueId(), plugin.getNMSAdapter().getEquipment(armorStand.getEquipment()));
+        armorStandsContent.add(armorStand.getUniqueId(), plugin.getNMSAdapter().getEquipment(armorStand.getEquipment()));
     }
 
     public static boolean isPlayerDamager(EntityDamageEvent e){

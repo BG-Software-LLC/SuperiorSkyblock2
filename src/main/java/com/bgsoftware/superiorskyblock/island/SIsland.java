@@ -53,6 +53,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -117,13 +118,13 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> banned = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
-    private final SyncedObject<Map<Object, SPermissionNode>> permissionNodes = SyncedObject.of(new HashMap<>());
+    private final Registry<Object, SPermissionNode> permissionNodes = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<Set<IslandFlag>> islandSettings = SyncedObject.of(new HashSet<>());
-    private final SyncedObject<Map<String, Integer>> upgrades = SyncedObject.of(new HashMap<>());
+    private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
-    private final SyncedObject<Map<String, WarpData>> warps = SyncedObject.of(new HashMap<>());
+    private final Registry<String, WarpData> warps = Registry.createRegistry();
     private final SyncedObject<BigDecimalFormatted> islandBank = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
@@ -131,13 +132,13 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
     private final SyncedObject<Integer> islandSize = SyncedObject.of(plugin.getSettings().defaultIslandSize);
-    private final SyncedObject<Map<World.Environment, Location>> teleportLocations = SyncedObject.of(new HashMap<>());
+    private final Registry<World.Environment, Location> teleportLocations = Registry.createRegistry();
     private final SyncedObject<Location> visitorsLocation = SyncedObject.of(null);
     private final SyncedObject<Boolean> locked = SyncedObject.of(false);
     private final SyncedObject<String> islandName = SyncedObject.of("");
     private final SyncedObject<String> description = SyncedObject.of("");
-    private final SyncedObject<Map<UUID, Rating>> ratings = SyncedObject.of(new HashMap<>());
-    private final SyncedObject<Map<Mission, Integer>> completedMissions = SyncedObject.of(new HashMap<>());
+    private final Registry<UUID, Rating> ratings = Registry.createRegistry();
+    private final Registry<Mission, Integer> completedMissions = Registry.createRegistry();
     private final SyncedObject<Biome> biome = SyncedObject.of(null);
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
     private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(8);
@@ -509,9 +510,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getTeleportLocation(World.Environment environment) {
-        Location teleportLocation = teleportLocations.run(teleportLocations -> {
-            return teleportLocations.get(environment);
-        });
+        Location teleportLocation = teleportLocations.get(environment);
 
         if (teleportLocation == null)
             teleportLocation = getCenter(environment);
@@ -521,13 +520,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
-        teleportLocations.run(teleportLocations -> {
-            teleportLocations.put(teleportLocation.getWorld().getEnvironment(), teleportLocation.clone());
-            Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
-                    .setString(IslandSerializer.serializeLocations(teleportLocations))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        teleportLocations.add(teleportLocation.getWorld().getEnvironment(), teleportLocation.clone());
+        Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
+                .setString(IslandSerializer.serializeLocations(teleportLocations))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
@@ -813,46 +810,38 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
-        permissionNodes.run(permissionNodes -> {
-            permissionNodes.get(playerRole).setPermission(islandPrivilege, value);
-            Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
-                    .setString(IslandSerializer.serializePermissions(permissionNodes))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        permissionNodes.get(playerRole).setPermission(islandPrivilege, value);
+        Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
+                .setString(IslandSerializer.serializePermissions(permissionNodes))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
-        permissionNodes.run(permissionNodes -> {
-            SPermissionNode permissionNode = permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), new SPermissionNode("", null));
+        SPermissionNode permissionNode = permissionNodes.get(superiorPlayer.getUniqueId(), new SPermissionNode("", null));
 
-            permissionNode.setPermission(islandPrivilege, value);
+        permissionNode.setPermission(islandPrivilege, value);
 
-            permissionNodes.put(superiorPlayer.getUniqueId(), permissionNode);
+        permissionNodes.add(superiorPlayer.getUniqueId(), permissionNode);
 
-            Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
-                    .setString(IslandSerializer.serializePermissions(permissionNodes))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
+                .setString(IslandSerializer.serializePermissions(permissionNodes))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         MenuPermissions.refreshMenus();
     }
 
     @Override
     public SPermissionNode getPermissionNode(PlayerRole playerRole) {
-        return permissionNodes.run(permissionNodes -> {
-            return permissionNodes.get(playerRole);
-        });
+        return permissionNodes.get(playerRole);
     }
 
     @Override
     public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
         PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
-        return permissionNodes.run(permissionNodes -> {
-            return permissionNodes.getOrDefault(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
-        });
+        return permissionNodes.get(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
     }
 
     @Override
@@ -1664,13 +1653,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setUpgradeLevel(Upgrade upgrade, int level) {
-        upgrades.run(upgrades -> {
-            upgrades.put(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
-            Query.ISLAND_SET_UPGRADES.getStatementHolder()
-                    .setString(IslandSerializer.serializeUpgrades(upgrades))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        upgrades.add(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
+        Query.ISLAND_SET_UPGRADES.getStatementHolder()
+                .setString(IslandSerializer.serializeUpgrades(upgrades))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         if(getUpgradeLevel(upgrade).getBorderSize() != -1)
             updateBorder();
@@ -1679,10 +1666,8 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public Map<String, Integer> getUpgrades(){
-        Map<String, Integer> upgrades = this.upgrades.get();
-
         if(!upgrades.isEmpty())
-            return new HashMap<>(upgrades);
+            return upgrades.toMap();
 
         return plugin.getUpgrades().getUpgrades().stream().collect(Collectors.toMap(Upgrade::getName, upgrade -> 1));
     }
@@ -1771,11 +1756,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public Map<Key, Integer> getBlocksLimits() {
         return this.blockLimits.run(_blockLimits -> {
-            Map<Key, Integer> blockLimits = new HashMap<>();
-
-            _blockLimits.keySet().forEach(key -> blockLimits.put(key, getBlockLimit(key)));
-
-            return blockLimits;
+            return _blockLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getBlockLimit));
         });
     }
 
@@ -1858,24 +1839,22 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getWarpLocation(String name){
-        return warps.run(warps -> warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).location.clone() : null);
+        return warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).location.clone() : null;
     }
 
     @Override
     public boolean isWarpPrivate(String name) {
-        return warps.run(warps -> !warps.containsKey(name.toLowerCase()) || warps.get(name.toLowerCase()).privateFlag);
+        return !warps.containsKey(name.toLowerCase()) || warps.get(name.toLowerCase()).privateFlag;
     }
 
     @Override
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
-        warps.run(warps -> {
-            warps.put(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
+        warps.add(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
 
-            Query.ISLAND_SET_WARPS.getStatementHolder()
-                    .setString(IslandSerializer.serializeWarps(warps))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        Query.ISLAND_SET_WARPS.getStatementHolder()
+                .setString(IslandSerializer.serializeWarps(warps))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         MenuGlobalWarps.refreshMenus();
         MenuWarps.refreshMenus();
@@ -1894,9 +1873,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
-        Location location = warps.run(warps -> {
-            return warps.get(warp.toLowerCase()).location.clone();
-        });
+        Location location = warps.get(warp.toLowerCase()).location.clone();
 
         Block warpBlock = location.getBlock();
         ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
@@ -1919,26 +1896,23 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
-        warps.run(warps -> {
-            for(String warpName : new ArrayList<>(warps.keySet())){
-                if(LocationUtils.isSameBlock(location, warps.get(warpName).location)){
-                    deleteWarp(warpName);
-                    if(superiorPlayer != null)
-                        Locale.DELETE_WARP.send(superiorPlayer, warpName);
-                }
+        for(String warpName : warps.keys()){
+            if(LocationUtils.isSameBlock(location, warps.get(warpName).location)){
+                deleteWarp(warpName);
+                if(superiorPlayer != null)
+                    Locale.DELETE_WARP.send(superiorPlayer, warpName);
             }
-        });
+        }
     }
 
     @Override
     public void deleteWarp(String name){
-        warps.run(warps -> {
-            warps.remove(name);
-            Query.ISLAND_SET_WARPS.getStatementHolder()
-                    .setString(IslandSerializer.serializeWarps(warps))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        warps.remove(name);
+
+        Query.ISLAND_SET_WARPS.getStatementHolder()
+                .setString(IslandSerializer.serializeWarps(warps))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         MenuGlobalWarps.refreshMenus();
         MenuWarps.refreshMenus();
@@ -1946,15 +1920,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<String> getAllWarps(){
-        return warps.run(warps -> {
-            return new ArrayList<>(warps.keySet());
-        });
+        return new ArrayList<>(warps.keys());
     }
 
     @Override
     public boolean hasMoreWarpSlots() {
-        int warpsLimit = this.warpsLimit.get();
-        return warps.run(warps -> warps.size() < warpsLimit);
+        return warps.size() < this.warpsLimit.get();
     }
 
     /*
@@ -1963,50 +1934,42 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Rating getRating(SuperiorPlayer superiorPlayer) {
-        return ratings.run(ratings -> {
-            return ratings.getOrDefault(superiorPlayer.getUniqueId(), Rating.UNKNOWN);
-        });
+        return ratings.get(superiorPlayer.getUniqueId(), Rating.UNKNOWN);
     }
 
     @Override
     public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
-        ratings.run(ratings -> {
-            if(rating == Rating.UNKNOWN)
-                ratings.remove(superiorPlayer.getUniqueId());
-            else
-                ratings.put(superiorPlayer.getUniqueId(), rating);
+        if(rating == Rating.UNKNOWN)
+            ratings.remove(superiorPlayer.getUniqueId());
+        else
+            ratings.add(superiorPlayer.getUniqueId(), rating);
 
-            Query.ISLAND_SET_RATINGS.getStatementHolder()
-                    .setString(IslandSerializer.serializeRatings(ratings))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        Query.ISLAND_SET_RATINGS.getStatementHolder()
+                .setString(IslandSerializer.serializeRatings(ratings))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         MenuIslandRatings.refreshMenus();
     }
 
     @Override
     public double getTotalRating() {
-        double avg = ratings.run(ratings -> {
-           double _avg = 0;
+        double avg = 0;
 
-            for(Rating rating : ratings.values())
-                _avg += rating.getValue();
-
-            return _avg;
-        });
+        for(Rating rating : ratings.values())
+            avg += rating.getValue();
 
         return avg == 0 ? 0 : avg / getRatingAmount();
     }
 
     @Override
     public int getRatingAmount() {
-        return ratings.run((Function<Map<UUID, Rating>, Integer>) Map::size);
+        return ratings.size();
     }
 
     @Override
     public Map<UUID, Rating> getRatings() {
-        return ratings.run((Function<Map<UUID, Rating>, HashMap<UUID, Rating>>) HashMap::new);
+        return ratings.toMap();
     }
 
     /*
@@ -2015,32 +1978,30 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void completeMission(Mission mission) {
-        completedMissions.run(completedMissions -> {
-            completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
-            Query.ISLAND_SET_MISSIONS.getStatementHolder()
-                    .setString(IslandSerializer.serializeMissions(completedMissions))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
+
+        Query.ISLAND_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         MenuIslandMissions.refreshMenus();
     }
 
     @Override
     public void resetMission(Mission mission) {
-        completedMissions.run(completedMissions -> {
-            if(completedMissions.getOrDefault(mission, 0) > 0) {
-                completedMissions.put(mission, completedMissions.get(mission) - 1);
-            }
-            else {
-                completedMissions.remove(mission);
-            }
+        if(completedMissions.get(mission, 0) > 0) {
+            completedMissions.add(mission, completedMissions.get(mission) - 1);
+        }
 
-            Query.ISLAND_SET_MISSIONS.getStatementHolder()
-                    .setString(IslandSerializer.serializeMissions(completedMissions))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        else {
+            completedMissions.remove(mission);
+        }
+
+        Query.ISLAND_SET_MISSIONS.getStatementHolder()
+                .setString(IslandSerializer.serializeMissions(completedMissions))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
 
         mission.clearData(getOwner());
 
@@ -2049,9 +2010,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasCompletedMission(Mission mission) {
-        return completedMissions.run(completedMissions -> {
-            return completedMissions.containsKey(mission);
-        });
+        return completedMissions.containsKey(mission);
     }
 
     @Override
@@ -2062,16 +2021,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getAmountMissionCompleted(Mission mission) {
-        return completedMissions.run(completedMissions -> {
-            return completedMissions.getOrDefault(mission, 0);
-        });
+        return completedMissions.get(mission, 0);
     }
 
     @Override
     public List<Mission> getCompletedMissions() {
-        return completedMissions.run(completedMissions -> {
-            return new ArrayList<>(completedMissions.keySet());
-        });
+        return new ArrayList<>(completedMissions.keys());
     }
 
     /*
@@ -2247,9 +2202,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorPercentages() {
-        Map<String, Integer> generatorPercentages = new HashMap<>();
-        getGeneratorAmounts().forEach((k ,v) -> generatorPercentages.put(k, getGeneratorPercentage(Key.of(k))));
-        return generatorPercentages;
+        return getGeneratorAmounts().keySet().stream().collect(Collectors.toMap(key -> key, key -> getGeneratorAmount(Key.of(key))));
     }
 
     @Override
@@ -2476,24 +2429,22 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     private void assignPermissionNodes(){
-        permissionNodes.run(permissionNodes -> {
-            boolean save = false;
+        boolean save = false;
 
-            for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-                if(!permissionNodes.containsKey(playerRole)) {
-                    PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-                    permissionNodes.put(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
-                    save = true;
-                }
+        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+            if(!permissionNodes.containsKey(playerRole)) {
+                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+                permissionNodes.add(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
+                save = true;
             }
+        }
 
-            if(save && owner != null){
-                Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
-                        .setString(IslandSerializer.serializePermissions(permissionNodes))
-                        .setString(owner.getUniqueId().toString())
-                        .execute(true);
-            }
-        });
+        if(save && owner != null){
+            Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
+                    .setString(IslandSerializer.serializePermissions(permissionNodes))
+                    .setString(owner.getUniqueId().toString())
+                    .execute(true);
+        }
     }
 
     private void assignSettings(){

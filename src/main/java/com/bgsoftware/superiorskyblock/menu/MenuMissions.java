@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -12,7 +13,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuMissions extends SuperiorMenu {
 
@@ -48,10 +48,12 @@ public final class MenuMissions extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
 
-        playerSlot = charSlots.getOrDefault(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        islandSlot = charSlots.getOrDefault(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        playerSlot = charSlots.get(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        islandSlot = charSlots.get(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

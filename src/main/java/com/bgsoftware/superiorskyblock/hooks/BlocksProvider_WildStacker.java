@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -27,13 +28,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
-    private static final Map<String, StackedSnapshot> chunkSnapshots = new HashMap<>();
-    private static final Map<String, Integer> callsAmount = new HashMap<>();
+    private static final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
+    private static final Registry<String, Integer> callsAmount = Registry.createRegistry();
     private static boolean registered = false;
 
     public BlocksProvider_WildStacker(){
@@ -55,21 +55,21 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             if (stackedSnapshot != null) {
                 String chunkId = getId(chunk);
                 if(chunkSnapshots.containsKey(chunkId))
-                    callsAmount.put(chunkId, callsAmount.getOrDefault(chunkId, 0) + 1);
+                    callsAmount.add(chunkId, callsAmount.get(chunkId, 0) + 1);
                 else
-                    chunkSnapshots.put(getId(chunk), stackedSnapshot);
+                    chunkSnapshots.add(getId(chunk), stackedSnapshot);
             }
         }catch(Throwable ignored){}
     }
 
     public static void uncacheChunk(Chunk chunk){
         String chunkId = getId(chunk);
-        int callsAmount = BlocksProvider_WildStacker.callsAmount.getOrDefault(chunkId, 0);
+        int callsAmount = BlocksProvider_WildStacker.callsAmount.get(chunkId, 0);
         if(callsAmount > 0) {
             if(callsAmount == 1)
                 BlocksProvider_WildStacker.callsAmount.remove(chunkId);
             else
-                BlocksProvider_WildStacker.callsAmount.put(chunkId, callsAmount - 1);
+                BlocksProvider_WildStacker.callsAmount.add(chunkId, callsAmount - 1);
         }
         else {
             chunkSnapshots.remove(chunkId);

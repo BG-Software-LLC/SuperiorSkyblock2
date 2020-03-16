@@ -32,7 +32,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,8 +90,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 if(compoundValue.containsKey("baseColor") || compoundValue.containsKey("patterns")) {
                     blocks[x][y][z] = SchematicBlock.of(
                             combinedId,
-                            getOrNull(DyeColor.class, ((StringTag) compoundValue.getOrDefault("baseColor", null)).getValue()),
-                            TagUtils.getPatternsFromTag((CompoundTag) compoundValue.getOrDefault("patterns", new CompoundTag(new HashMap<>())))
+                            getOrNull(DyeColor.class, ((StringTag) compoundValue.getOrDefault("baseColor", new StringTag(null))).getValue()),
+                            TagUtils.getPatternsFromTag((CompoundTag) compoundValue.getOrDefault("patterns", new CompoundTag()))
                     );
                 }
 
@@ -102,7 +101,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     if(plugin.getSettings().starterChestEnabled){
                         contents = new ItemStack[27];
 
-                        for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entrySet())
+                        for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entries())
                             contents[entry.getKey()] = entry.getValue().clone();
                     }
 

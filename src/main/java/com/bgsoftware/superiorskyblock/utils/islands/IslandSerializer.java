@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -32,13 +33,9 @@ public final class IslandSerializer {
         return builder.toString();
     }
 
-    public static String serializePermissions(SyncedObject<Map<Object, SPermissionNode>> permissions){
-        return permissions.run((Function<Map<Object, SPermissionNode>, String>) IslandSerializer::serializePermissions);
-    }
-
-    public static String serializePermissions(Map<Object, SPermissionNode> permissions){
+    public static String serializePermissions(Registry<Object, SPermissionNode> permissions){
         StringBuilder permissionNodes = new StringBuilder();
-        permissions.keySet().forEach(_islandRole ->
+        permissions.keys().forEach(_islandRole ->
                 permissionNodes.append(",").append(_islandRole.toString()).append("=").append(permissions.get(_islandRole).getAsStatementString()));
         return permissionNodes.toString();
     }
@@ -65,49 +62,34 @@ public final class IslandSerializer {
         return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
     }
 
-    public static String serializeUpgrades(SyncedObject<Map<String, Integer>> upgrades){
-        return upgrades.run((Function<Map<String, Integer>, String>) IslandSerializer::serializeUpgrades);
-    }
-
-    public static String serializeUpgrades(Map<String, Integer> upgrades){
+    public static String serializeUpgrades(Registry<String, Integer> upgrades){
         StringBuilder upgradesBuilder = new StringBuilder();
-        upgrades.keySet().forEach(upgrade ->
+        upgrades.keys().forEach(upgrade ->
                 upgradesBuilder.append(",").append(upgrade).append("=").append(upgrades.get(upgrade)));
         return upgradesBuilder.toString();
     }
 
-    public static String serializeWarps(SyncedObject<Map<String, SIsland.WarpData>> warps){
-        return warps.run((Function<Map<String, SIsland.WarpData>, String>) IslandSerializer::serializeWarps);
-    }
-
-    public static String serializeWarps(Map<String, SIsland.WarpData> warps){
+    public static String serializeWarps(Registry<String, SIsland.WarpData> warps){
         StringBuilder warpsBuilder = new StringBuilder();
-        warps.keySet().forEach(warp -> {
+        warps.keys().forEach(warp -> {
             SIsland.WarpData warpData = warps.get(warp);
             warpsBuilder.append(";").append(warp).append("=").append(FileUtils.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
         });
         return warpsBuilder.length() == 0 ? "" : warpsBuilder.toString().substring(1);
     }
 
-    public static String serializeRatings(SyncedObject<Map<UUID, Rating>> ratings){
-        return ratings.run((Function<Map<UUID, Rating>, String>) IslandSerializer::serializeRatings);
-    }
-
-    public static String serializeRatings(Map<UUID, Rating> ratings){
+    public static String serializeRatings(Registry<UUID, Rating> ratings){
         StringBuilder ratingsBuilder = new StringBuilder();
-        ratings.keySet().forEach(_uuid ->
+        ratings.keys().forEach(_uuid ->
                 ratingsBuilder.append(";").append(_uuid).append("=").append(ratings.get(_uuid).getValue()));
         return ratingsBuilder.length() == 0 ? "" : ratingsBuilder.toString().substring(1);
     }
 
-    public static String serializeMissions(SyncedObject<Map<Mission, Integer>> missions){
-        return missions.run((Function<Map<Mission, Integer>, String>) IslandSerializer::serializeMissions);
-    }
 
-    public static String serializeMissions(Map<Mission, Integer> missions){
+    public static String serializeMissions(Registry<Mission, Integer> missions){
         StringBuilder missionsBuilder = new StringBuilder();
-        missions.forEach((mission, amount) ->
-                missionsBuilder.append(";").append(mission).append("=").append(amount));
+        missions.entries().forEach(entry ->
+                missionsBuilder.append(";").append(entry.getKey()).append("=").append(entry.getValue()));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
@@ -133,13 +115,9 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeLocations(SyncedObject<Map<World.Environment, Location>> locations){
-        return locations.run((Function<Map<World.Environment, Location>, String>) IslandSerializer::serializeLocations);
-    }
-
-    public static String serializeLocations(Map<World.Environment, Location> locations){
+    public static String serializeLocations(Registry<World.Environment, Location> locations){
         StringBuilder locationsBuilder = new StringBuilder();
-        for(Map.Entry<World.Environment, Location> entry : locations.entrySet()){
+        for(Map.Entry<World.Environment, Location> entry : locations.entries()){
             Location loc = entry.getValue();
             String locationString = loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw() + "," + loc.getPitch();
             locationsBuilder.append(";").append(entry.getKey().name().toLowerCase()).append("=").append(locationString);

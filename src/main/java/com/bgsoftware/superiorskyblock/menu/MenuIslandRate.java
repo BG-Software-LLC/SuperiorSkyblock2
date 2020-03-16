@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
@@ -75,13 +75,15 @@ public final class MenuIslandRate extends SuperiorMenu {
             cfg.save(file);
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
-        oneStarSlot = charSlots.getOrDefault(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        twoStarsSlot = charSlots.getOrDefault(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        threeStarsSlot = charSlots.getOrDefault(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        fourStarsSlot = charSlots.getOrDefault(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        fiveStarsSlot = charSlots.getOrDefault(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        oneStarSlot = charSlots.get(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        twoStarsSlot = charSlots.get(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        threeStarsSlot = charSlots.get(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        fourStarsSlot = charSlots.get(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        fiveStarsSlot = charSlots.get(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+
+        charSlots.delete();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, Island island, SuperiorMenu previousMenu){
