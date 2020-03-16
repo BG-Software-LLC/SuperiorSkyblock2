@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.registry;
+package com.bgsoftware.superiorskyblock.utils.registry;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

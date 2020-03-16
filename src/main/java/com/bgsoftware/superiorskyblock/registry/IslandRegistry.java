@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.registry;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.island.IslandPosition;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.registry.SortedRegistry;
 import org.bukkit.Location;
 
 import java.util.UUID;
