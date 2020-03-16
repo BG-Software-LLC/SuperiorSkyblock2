@@ -9,8 +9,10 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.SPermissionNode;
+import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -40,24 +42,34 @@ public final class IslandDeserializer {
         });
     }
 
-    public static void deserializePermissions(String permissions, Registry<Object, SPermissionNode> permissionNodes){
+    public static void deserializePermissions(String permissions, Registry<Object, PermissionNodeAbstract> permissionNodes, Island island){
         Registry<PlayerRole, String> permissionsMap = Registry.createRegistry();
+
+        boolean shouldSaveAgain = false;
 
         for(String entry : permissions.split(",")) {
             try {
                 String[] sections = entry.split("=");
+
+                if(!shouldSaveAgain && sections.length == 2 && !sections[1].contains(":"))
+                    shouldSaveAgain = true;
+
                 try {
                     permissionsMap.add(SPlayerRole.of(sections[0]), sections.length == 1 ? "" : sections[1]);
                 }catch(Exception ex){
-                    permissionNodes.add(UUID.fromString(sections[0]), new SPermissionNode(sections.length == 1 ? "" : sections[1], null));
+                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(UUID.fromString(sections[0]));
+                    permissionNodes.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, sections.length == 1 ? "" : sections[1]));
                 }
             }catch(Exception ignored){}
         }
 
         for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
             PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-            permissionNodes.add(playerRole, new SPermissionNode(permissionsMap.get(playerRole, ""), permissionNodes.get(previousRole)));
+            permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole), permissionsMap.get(playerRole, "")));
         }
+
+        if(shouldSaveAgain)
+            ((SIsland) island).savePermissionNodes();
 
         permissionsMap.delete();
     }

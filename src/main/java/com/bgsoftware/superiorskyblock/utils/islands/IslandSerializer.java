@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.SPermissionNode;
+import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -33,10 +33,10 @@ public final class IslandSerializer {
         return builder.toString();
     }
 
-    public static String serializePermissions(Registry<Object, SPermissionNode> permissions){
+    public static String serializePermissions(Registry<Object, PermissionNodeAbstract> permissions){
         StringBuilder permissionNodes = new StringBuilder();
-        permissions.keys().forEach(_islandRole ->
-                permissionNodes.append(",").append(_islandRole.toString()).append("=").append(permissions.get(_islandRole).getAsStatementString()));
+        permissions.entries().forEach(entry ->
+                permissionNodes.append(",").append(entry.getKey().toString()).append("=").append(entry.getValue().getAsStatementString()));
         return permissionNodes.toString();
     }
 

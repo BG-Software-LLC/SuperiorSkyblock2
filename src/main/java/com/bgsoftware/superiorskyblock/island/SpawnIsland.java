@@ -13,11 +13,12 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
+import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 
@@ -46,7 +47,6 @@ public final class SpawnIsland implements Island {
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
-    private final Registry<Object, SPermissionNode> permissionNodes = Registry.createRegistry();
     private final Location center;
     private final int islandSize;
     private final List<IslandFlag> islandSettings;
@@ -58,8 +58,6 @@ public final class SpawnIsland implements Island {
         center = LocationUtils.getLocation(plugin.getSettings().spawnLocation.replace(" ", "")).add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().maxIslandSize;
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
-
-        assignPermissionNodes();
 
         Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
     }
@@ -419,14 +417,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public SPermissionNode getPermissionNode(PlayerRole playerRole) {
-        return permissionNodes.get(playerRole);
+    public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
+        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
     }
 
     @Override
-    public SPermissionNode getPermissionNode(SuperiorPlayer superiorPlayer) {
-        PlayerRole playerRole = isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
-        return permissionNodes.get(superiorPlayer.getUniqueId(), getPermissionNode(playerRole));
+    public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
+        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
     }
 
     @Override
@@ -983,15 +980,6 @@ public final class SpawnIsland implements Island {
     @Override
     public int compareTo(Island o) {
         return 0;
-    }
-
-    private void assignPermissionNodes(){
-        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-            if(!permissionNodes.containsKey(playerRole)) {
-                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-                permissionNodes.add(playerRole, new SPermissionNode(((SPlayerRole) playerRole).getDefaultPermissions(), permissionNodes.get(previousRole)));
-            }
-        }
     }
 
 }

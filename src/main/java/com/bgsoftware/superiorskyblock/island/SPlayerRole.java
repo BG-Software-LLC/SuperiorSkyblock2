@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
@@ -11,14 +11,20 @@ public final class SPlayerRole implements PlayerRole {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private String name;
-    private int weight;
-    private List<String> defaultPermissions;
+    private final String name;
+    private final int weight;
+    private RolePermissionNode defaultPermissions;
 
-    public SPlayerRole(String name, int weight, List<String> defaultPermissions){
+    public SPlayerRole(String name, int weight, List<String> defaultPermissions, SPlayerRole previousRole){
         this.name = name;
         this.weight = weight;
-        this.defaultPermissions = defaultPermissions;
+
+        StringBuilder permissions = new StringBuilder();
+        defaultPermissions.forEach(perm -> permissions.append(";").append(perm));
+
+        this.defaultPermissions = new RolePermissionNode(null,
+                previousRole == null ? RolePermissionNode.EmptyRolePermissionNode.INSTANCE : previousRole.defaultPermissions,
+                permissions.length() == 0 ? "" : permissions.substring(1));
     }
 
     @Override
@@ -66,11 +72,8 @@ public final class SPlayerRole implements PlayerRole {
         return name;
     }
 
-    public List<String> getDefaultPermissions() {
-        List<String> permissions = new ArrayList<>(defaultPermissions);
-        if(getPreviousRole() != null)
-            permissions.addAll(((SPlayerRole) getPreviousRole()).getDefaultPermissions());
-        return permissions;
+    public RolePermissionNode getDefaultPermissions() {
+        return defaultPermissions;
     }
 
     public static PlayerRole defaultRole(){

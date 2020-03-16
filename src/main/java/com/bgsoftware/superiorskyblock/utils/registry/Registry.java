@@ -101,6 +101,13 @@ public abstract class Registry<K, V> implements Iterable<V> {
         }
     }
 
+    @Override
+    public String toString() {
+        synchronized (registry){
+            return registry.toString();
+        }
+    }
+
     public static void clearCache(){
         loadedRegisteries.forEach(Registry::clear);
         loadedRegisteries.clear();

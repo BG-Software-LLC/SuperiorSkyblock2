@@ -28,10 +28,11 @@ public final class PlayersHandler implements PlayersManager {
 
     public PlayersHandler(){
         ConfigurationSection rolesSection = plugin.getSettings().islandRolesSection;
-        loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX);
-        loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX);
+        loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX, null);
+        loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX, (SPlayerRole) getGuestRole());
+        SPlayerRole previousRole = (SPlayerRole) getCoopRole();
         for(String roleSection : rolesSection.getConfigurationSection("ladder").getKeys(false))
-            loadRole(rolesSection.getConfigurationSection("ladder." + roleSection), 0);
+            previousRole = (SPlayerRole) getPlayerRole(loadRole(rolesSection.getConfigurationSection("ladder." + roleSection), 0, previousRole));
     }
 
     @Override
@@ -108,11 +109,12 @@ public final class PlayersHandler implements PlayersManager {
         resultSet.delete();
     }
 
-    private void loadRole(ConfigurationSection section, int type){
+    private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){
         int weight = section.getInt("weight", type);
-        roles.add(weight, new SPlayerRole(section.getString("name"), weight, section.getStringList("permissions")));
+        roles.add(weight, new SPlayerRole(section.getString("name"), weight, section.getStringList("permissions"), previousRole));
         if(weight > lastRole)
             lastRole = weight;
+        return weight;
     }
 
 }
