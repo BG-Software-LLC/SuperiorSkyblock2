@@ -571,7 +571,7 @@ public enum Locale {
 
             locales.add(fileLocale);
 
-            if(fileLocale.getLanguage().equals("en"))
+            if(plugin.getSettings().defaultLanguage.equalsIgnoreCase(fileName))
                 defaultLocale = fileLocale;
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);

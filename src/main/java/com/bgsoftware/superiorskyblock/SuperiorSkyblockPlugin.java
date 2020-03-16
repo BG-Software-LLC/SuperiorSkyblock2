@@ -224,13 +224,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public void reloadPlugin(boolean loadGrid){
-        Locale.reload();
         CalcTask.startTask();
 
         blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
         upgradesHandler = new UpgradesHandler(this);
         missionsHandler = new MissionsHandler(this);
+
+        Locale.reload();
 
         commandsHandler = new CommandsHandler(this, settingsHandler.islandCommand);
         nmsAdapter.registerCommand(commandsHandler);

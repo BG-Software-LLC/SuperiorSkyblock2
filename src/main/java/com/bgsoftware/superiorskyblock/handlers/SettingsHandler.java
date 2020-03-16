@@ -110,6 +110,7 @@ public final class SettingsHandler {
     public final List<String> cropsToGrow;
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
+    public final String defaultLanguage;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -251,6 +252,7 @@ public final class SettingsHandler {
         cropsToGrow = cfg.getStringList("crops-to-grow");
         onlyBackButton = cfg.getBoolean("only-back-button", false);
         buildOutsideIsland = cfg.getBoolean("build-outside-island", false);
+        defaultLanguage = cfg.getString("default-language", "en-US");
     }
 
     public void updateValue(String path, Object value){
