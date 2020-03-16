@@ -16,7 +16,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     }
 
     protected PermissionNodeAbstract(Registry<IslandPrivilege, PrivilegeStatus> privileges){
-        this.privileges = Registry.createRegistry(privileges.toMap());
+        this.privileges = Registry.createRegistry(privileges);
     }
 
     protected void setPermissions(String permissions, boolean checkDefaults){

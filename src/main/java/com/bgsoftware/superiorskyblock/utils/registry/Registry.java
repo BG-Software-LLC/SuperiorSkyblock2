@@ -1,16 +1,17 @@
 package com.bgsoftware.superiorskyblock.utils.registry;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 public abstract class Registry<K, V> implements Iterable<V> {
 
-    protected static final Set<Registry<?, ?>> loadedRegisteries = Sets.newHashSet();
+    protected static final Set<Registry<?, ?>> loadedRegisteries = Collections.newSetFromMap(new WeakHashMap<>());
 
     private final Map<K ,V> registry;
 
@@ -20,6 +21,11 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     protected Registry(Map<K, V> map){
         this.registry = map;
+        loadedRegisteries.add(this);
+    }
+
+    protected Registry(Registry<K, V> other){
+        this.registry = Maps.newHashMap(other.registry);
         loadedRegisteries.add(this);
     }
 
@@ -82,8 +88,15 @@ public abstract class Registry<K, V> implements Iterable<V> {
         loadedRegisteries.remove(this);
     }
 
+    @Override
+    protected void finalize(){
+        delete();
+    }
+
     public Map<K, V> toMap(){
-        return Maps.newHashMap(registry);
+        synchronized (registry) {
+            return Maps.newHashMap(registry);
+        }
     }
 
     public int size(){
@@ -119,6 +132,10 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     public static <K, V> Registry<K, V> createRegistry(Map<K, V> defaults){
         return new Registry<K, V>(defaults) {};
+    }
+
+    public static <K, V> Registry<K, V> createRegistry(Registry<K, V> other){
+        return new Registry<K, V>(other) {};
     }
 
     public static <K, V> Registry<K, V> createLinkedRegistry(){

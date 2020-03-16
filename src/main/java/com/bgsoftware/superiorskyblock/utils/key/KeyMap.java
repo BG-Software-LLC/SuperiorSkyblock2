@@ -19,7 +19,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     public KeyMap(KeyMap<V> other){
-        this.registry = Registry.createRegistry(other.registry.toMap());
+        this.registry = Registry.createRegistry(other.registry);
     }
 
     @Override
