@@ -165,10 +165,12 @@ public final class PlayersListener implements Listener {
         }
 
         if(e.getIsland().hasPermission(e.getPlayer(), IslandPrivileges.FLY) && e.getPlayer().hasIslandFlyEnabled()){
-            Player player = e.getPlayer().asPlayer();
-            player.setAllowFlight(true);
-            player.setFlying(true);
-            Locale.ISLAND_FLY_ENABLED.send(player);
+            Executor.sync(() -> {
+                Player player = e.getPlayer().asPlayer();
+                player.setAllowFlight(true);
+                player.setFlying(true);
+                Locale.ISLAND_FLY_ENABLED.send(player);
+            }, 5L);
         }
 
         if(!e.getIsland().isMember(e.getPlayer()) && e.getIsland().hasSettingsEnabled(IslandFlags.PVP)){
