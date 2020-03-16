@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.island.IslandRegistry;
+import com.bgsoftware.superiorskyblock.registry.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
 import com.google.common.collect.Sets;

@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class SortingType {
+public final class SortingType implements Comparator<Island> {
 
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
 
@@ -47,6 +47,11 @@ public final class SortingType {
      */
     public static SortingType getByName(String name){
         return sortingTypes.get(name);
+    }
+
+    @Override
+    public int compare(Island o1, Island o2) {
+        return comparator.compare(o1, o2);
     }
 
     @Override
