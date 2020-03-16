@@ -22,11 +22,8 @@ import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public final class IslandDeserializer {
 
@@ -132,17 +129,25 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeSettings(String settings, SyncedObject<Set<IslandFlag>> islandSettingsSync){
-        islandSettingsSync.run(islandSettings -> {
-            islandSettings.addAll(Arrays.stream(settings.split(";")).filter(setting -> {
-                try{
-                    IslandFlag.getByName(setting);
-                    return true;
-                }catch(Exception ex){
-                    return false;
+    public static void deserializeSettings(String settings, Registry<IslandFlag, Byte> islandSettings, Island island){
+        boolean shouldSaveAgain = false;
+
+        for(String setting : settings.split(";")){
+            try {
+                if (setting.contains("=")) {
+                    String[] settingSections = setting.split("=");
+                    islandSettings.add(IslandFlag.getByName(settingSections[0]), Byte.valueOf(settingSections[1]));
+                } else {
+                    shouldSaveAgain = true;
+                    if(!plugin.getSettings().defaultSettings.contains(setting))
+                        islandSettings.add(IslandFlag.getByName(setting), (byte) 1);
                 }
-            }).map(IslandFlag::getByName).collect(Collectors.toList()));
-        });
+            }catch(Exception ignored){}
+        }
+
+        if(shouldSaveAgain)
+            ((SIsland) island).saveSettings();
+
     }
 
     public static void deserializeGenerators(String generator, SyncedObject<KeyMap<Integer>> cobbleGeneratorSync){

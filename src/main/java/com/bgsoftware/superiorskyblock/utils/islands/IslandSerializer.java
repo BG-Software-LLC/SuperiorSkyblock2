@@ -15,7 +15,6 @@ import org.bukkit.World;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -93,14 +92,10 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeSettings(SyncedObject<Set<IslandFlag>> islandSettings){
-        return islandSettings.run((Function<Set<IslandFlag>, String>) IslandSerializer::serializeSettings);
-    }
-
-    public static String serializeSettings(Set<IslandFlag> islandSettings){
+    public static String serializeSettings(Registry<IslandFlag, Byte> islandSettings){
         StringBuilder missionsBuilder = new StringBuilder();
-        islandSettings.forEach(settings ->
-                missionsBuilder.append(";").append(settings.getName()));
+        islandSettings.entries().forEach(entry ->
+                missionsBuilder.append(";").append(entry.getKey().getName()).append("=").append(entry.getValue()));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 

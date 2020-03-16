@@ -124,7 +124,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
     private final Registry<Object, PermissionNodeAbstract> permissionNodes = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
-    private final SyncedObject<Set<IslandFlag>> islandSettings = SyncedObject.of(new HashSet<>());
+    private final Registry<IslandFlag, Byte> islandSettings = Registry.createRegistry();
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
@@ -176,7 +176,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
+        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings, this);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
 
@@ -233,7 +233,6 @@ public final class SIsland extends DatabaseObject implements Island {
             calcIslandWorth(null);
 
         assignPermissionNodes();
-        assignSettings();
         checkMembersDuplication();
 
         Executor.sync(() -> biome.set(getCenter(World.Environment.NORMAL).getBlock().getBiome()));
@@ -255,7 +254,6 @@ public final class SIsland extends DatabaseObject implements Island {
         this.islandName.set(islandName);
         this.schemName.set(schemName);
         assignPermissionNodes();
-        assignSettings();
         assignGenerator();
     }
 
@@ -2048,16 +2046,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
-        return islandSettings.run(islandSettings -> {
-            return islandSettings.contains(settings);
-        });
+        return islandSettings.get(settings, (byte) (plugin.getSettings().defaultSettings.contains(settings.getName()) ? 1 : 0)) == 1;
     }
 
     @Override
     public void enableSettings(IslandFlag settings) {
-        islandSettings.run(islandSettings -> {
-            islandSettings.add(settings);
-        });
+        islandSettings.add(settings, (byte) 1);
 
         boolean disableTime = false, disableWeather = false;
 
@@ -2096,46 +2090,35 @@ public final class SIsland extends DatabaseObject implements Island {
                 break;
         }
 
-        boolean DISABLE_TIME = disableTime, DISABLE_WEATHER = disableWeather;
+        if(disableTime){
+            //Disabling settings without saving to database.
+            if(settings != IslandFlags.ALWAYS_DAY)
+                islandSettings.remove(IslandFlags.ALWAYS_DAY);
+            if(settings != IslandFlags.ALWAYS_MIDDLE_DAY)
+                islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_DAY);
+            if(settings != IslandFlags.ALWAYS_NIGHT)
+                islandSettings.remove(IslandFlags.ALWAYS_NIGHT);
+            if(settings != IslandFlags.ALWAYS_MIDDLE_NIGHT)
+                islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT);
+        }
 
-        islandSettings.run(islandSettings -> {
-            if(DISABLE_TIME){
-                //Disabling settings without saving to database.
-                if(settings != IslandFlags.ALWAYS_DAY)
-                    islandSettings.remove(IslandFlags.ALWAYS_DAY);
-                if(settings != IslandFlags.ALWAYS_MIDDLE_DAY)
-                    islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_DAY);
-                if(settings != IslandFlags.ALWAYS_NIGHT)
-                    islandSettings.remove(IslandFlags.ALWAYS_NIGHT);
-                if(settings != IslandFlags.ALWAYS_MIDDLE_NIGHT)
-                    islandSettings.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT);
-            }
+        if(disableWeather){
+            if(settings != IslandFlags.ALWAYS_RAIN)
+                islandSettings.remove(IslandFlags.ALWAYS_RAIN);
+            if(settings != IslandFlags.ALWAYS_SHINY)
+                islandSettings.remove(IslandFlags.ALWAYS_SHINY);
+        }
 
-            if(DISABLE_WEATHER){
-                if(settings != IslandFlags.ALWAYS_RAIN)
-                    islandSettings.remove(IslandFlags.ALWAYS_RAIN);
-                if(settings != IslandFlags.ALWAYS_SHINY)
-                    islandSettings.remove(IslandFlags.ALWAYS_SHINY);
-            }
-
-            Query.ISLAND_SET_SETTINGS.getStatementHolder()
-                    .setString(IslandSerializer.serializeSettings(islandSettings))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        saveSettings();
 
         MenuSettings.refreshMenus();
     }
 
     @Override
     public void disableSettings(IslandFlag settings) {
-        islandSettings.run(islandSettings -> {
-            islandSettings.remove(settings);
-            Query.ISLAND_SET_SETTINGS.getStatementHolder()
-                    .setString(IslandSerializer.serializeSettings(islandSettings))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        islandSettings.add(settings, (byte) 0);
+
+        saveSettings();
 
         switch (settings.getName()){
             case "ALWAYS_DAY":
@@ -2151,6 +2134,13 @@ public final class SIsland extends DatabaseObject implements Island {
         }
 
         MenuSettings.refreshMenus();
+    }
+
+    public void saveSettings(){
+        Query.ISLAND_SET_SETTINGS.getStatementHolder()
+                .setString(IslandSerializer.serializeSettings(islandSettings))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*
@@ -2436,24 +2426,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(save && owner != null)
             savePermissionNodes();
-    }
-
-    private void assignSettings(){
-        islandSettings.run(islandSettings -> {
-            if(!islandSettings.isEmpty() || owner == null)
-                return;
-
-            plugin.getSettings().defaultSettings.forEach(setting -> {
-                try{
-                    islandSettings.add(IslandFlag.getByName(setting));
-                }catch(Exception ignored){}
-            });
-
-            Query.ISLAND_SET_SETTINGS.getStatementHolder()
-                    .setString(IslandSerializer.serializeSettings(islandSettings))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
     }
 
     private void assignGenerator(){
