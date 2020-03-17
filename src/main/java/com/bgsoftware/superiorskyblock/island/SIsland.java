@@ -1403,7 +1403,7 @@ public final class SIsland extends DatabaseObject implements Island {
             }
 
             if(blockLevel.doubleValue() >= 0){
-                blocksLevels = blocksLevels.add(blockValue.multiply(BigDecimal.valueOf(entry.getValue())));
+                blocksLevels = blocksLevels.add(blockLevel.multiply(BigDecimal.valueOf(entry.getValue())));
                 increaseAmount = true;
             }
 
@@ -1468,16 +1468,16 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         if(blockValue.doubleValue() >= 0){
-            BigDecimalFormatted islandWorth = this.islandWorth.get();
-            this.islandWorth.set(islandWorth.subtract(blockValue.multiply(new BigDecimal(amount))));
+            BigDecimalFormatted islandWorth = this.islandWorth.get().subtract(blockValue.multiply(new BigDecimal(amount)));
+            this.islandWorth.set(islandWorth);
             if(islandWorth.doubleValue() < 0)
                 this.islandWorth.set(BigDecimalFormatted.ZERO);
             decreaseAmount = true;
         }
 
         if(blockLevel.doubleValue() >= 0){
-            BigDecimalFormatted islandLevel = this.islandLevel.get();
-            this.islandLevel.set(islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount))));
+            BigDecimalFormatted islandLevel = this.islandLevel.get().subtract(blockLevel.multiply(new BigDecimal(amount)));
+            this.islandLevel.set(islandLevel);
             if(islandLevel.doubleValue() < 0)
                 this.islandLevel.set(BigDecimalFormatted.ZERO);
             decreaseAmount = true;
