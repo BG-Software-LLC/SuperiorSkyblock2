@@ -72,19 +72,21 @@ public final class BlocksListener implements Listener {
             else if(e.getBlockReplacedState().getType().name().contains("WATER"))
                 island.handleBlockBreak(Key.of("WATER"), 1);
             island.handleBlockPlace(e.getBlockPlaced());
-        }
 
-        ChunksTracker.markDirty(e.getBlock());
+            ChunksTracker.markDirty(island, e.getBlock(), true);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBucketEmptyMonitor(PlayerBucketEmptyEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
-        if(island != null)
-            island.handleBlockPlace(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+        if(island == null)
+            return;
 
-        ChunksTracker.markDirty(LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace()));
+        island.handleBlockPlace(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+
+        ChunksTracker.markDirty(island, LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace()), true);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -100,12 +102,14 @@ public final class BlocksListener implements Listener {
     public void onBlockBreakMonitor(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island != null)
-            island.handleBlockBreak(e.getBlock());
+        if(island == null)
+            return;
+
+        island.handleBlockBreak(e.getBlock());
 
         Executor.sync(() -> {
             if(plugin.getNMSAdapter().isChunkEmpty(e.getBlock().getChunk()))
-                ChunksTracker.markEmpty(e.getBlock());
+                ChunksTracker.markEmpty(island, e.getBlock(), true);
         }, 2L);
     }
 
@@ -113,13 +117,15 @@ public final class BlocksListener implements Listener {
     public void onBucketFillMonitor(PlayerBucketFillEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
-        if(island != null)
-            island.handleBlockBreak(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+        if(island == null)
+            return;
+
+        island.handleBlockBreak(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
 
         Executor.sync(() -> {
             Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
             if(plugin.getNMSAdapter().isChunkEmpty(location.getChunk()))
-                ChunksTracker.markEmpty(location);
+                ChunksTracker.markEmpty(island, location, true);
         }, 2L);
     }
 

@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
@@ -105,6 +106,7 @@ public final class SIsland extends DatabaseObject implements Island {
      */
     private SuperiorPlayer owner;
     private final BlockPosition center;
+    private short dirtyChunksCounter = 0;
 
     /*
      * Island flags
@@ -161,7 +163,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Double> spawnerRates = SyncedObject.of((double) plugin.getSettings().defaultSpawnerRates);
     private final SyncedObject<Double> mobDrops = SyncedObject.of((double) plugin.getSettings().defaultMobDrops);
 
-    public SIsland(CachedResultSet resultSet){
+    public SIsland(GridHandler grid, CachedResultSet resultSet){
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
 
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
@@ -233,6 +235,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(blockCounts.get().isEmpty())
             calcIslandWorth(null);
+
+        ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
 
         assignPermissionNodes();
         checkMembersDuplication();
@@ -616,7 +620,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z))
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -647,7 +651,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
             for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
-                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(world, chunkX, chunkZ))){
+                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))){
                     chunks.add(world.getChunkAt(chunkX, chunkZ));
                 }
             }
@@ -671,7 +675,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z)) {
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
                     if (whenComplete != null)
                         chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete((chunk, throwable) -> Executor.sync(() -> whenComplete.accept(chunk, throwable))));
                     else
@@ -914,15 +918,15 @@ public final class SIsland extends DatabaseObject implements Island {
         plugin.getGrid().deleteIsland(this);
 
         getAllChunksAsync(World.Environment.NORMAL, true, true,
-                ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+                ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(this, chunk)));
 
         if(wasSchematicGenerated(World.Environment.NETHER))
             getAllChunksAsync(World.Environment.NETHER, true, true,
-                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(this, chunk)));
 
         if(wasSchematicGenerated(World.Environment.THE_END))
             getAllChunksAsync(World.Environment.THE_END, true, true,
-                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(chunk)));
+                    ((chunk, throwable) -> plugin.getNMSAdapter().regenerateChunk(this, chunk)));
     }
 
     @Override
@@ -989,7 +993,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     }
 
                     scanService.execute(() -> {
-                        if(LocationUtils.isChunkEmpty(chunkSnapshot))
+                        if(LocationUtils.isChunkEmpty(this, chunkSnapshot))
                             return;
 
                         double islandWorth = 0;
@@ -2335,6 +2339,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
+                .setString(ChunksTracker.serialize(this))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2383,7 +2388,15 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializePlayers(uniqueVisitors))
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
+                .setString(ChunksTracker.serialize(this))
                 .execute(async);
+    }
+
+    public void saveDirtyChunks(){
+        Query.ISLAND_SET_DIRTY_CHUNKS.getStatementHolder()
+                .setString(ChunksTracker.serialize(this))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*

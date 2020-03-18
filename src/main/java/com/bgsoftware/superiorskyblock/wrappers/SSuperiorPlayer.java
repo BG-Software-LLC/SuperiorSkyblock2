@@ -230,7 +230,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                     continue;
                 }
 
-                if (LocationUtils.isChunkEmpty(chunkSnapshot))
+                if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
                     continue;
 
                 for(int x = 0; x < 16; x++){

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
@@ -40,14 +41,14 @@ public final class LocationUtils {
         return underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
     }
 
-    public static boolean isChunkEmpty(ChunkSnapshot chunkSnapshot){
+    public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot){
         for(int i = 0; i < 16; i++){
             if(!chunkSnapshot.isSectionEmpty(i)){
                 return false;
             }
         }
 
-        ChunksTracker.markEmpty(chunkSnapshot);
+        ChunksTracker.markEmpty(island, chunkSnapshot, true);
 
         return true;
     }

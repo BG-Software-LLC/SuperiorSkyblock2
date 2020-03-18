@@ -212,7 +212,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
     }
 
     @Override
-    public void regenerateChunk(org.bukkit.Chunk bukkitChunk) {
+    public void regenerateChunk(Island island, org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
         for(int i = 0; i < 16; i++)
@@ -224,7 +224,7 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         chunk.tileEntities.keySet().forEach(chunk.world::s);
         chunk.tileEntities.clear();
 
-        ChunksTracker.markEmpty(bukkitChunk);
+        ChunksTracker.markEmpty(island, bukkitChunk, false);
     }
 
     @Override

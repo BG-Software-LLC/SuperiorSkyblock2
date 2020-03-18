@@ -38,7 +38,7 @@ public final class BlockChangeTask {
             Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
             chunksToUpdate.add(chunk);
             plugin.getNMSBlocks().refreshLight(chunk);
-            ChunksTracker.markDirty(chunk);
+            ChunksTracker.markDirty(null, chunk, false);
 
             for(BlockData blockData : entry.getValue()){
                 plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args);

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 
 public abstract class Registry<K, V> implements Iterable<V> {
 
@@ -38,6 +39,12 @@ public abstract class Registry<K, V> implements Iterable<V> {
     public V get(K key, V def){
         synchronized (registry){
             return registry.getOrDefault(key, def);
+        }
+    }
+
+    public V computeIfAbsent(K key, Function<K, V> mappingFunction){
+        synchronized (registry){
+            return registry.computeIfAbsent(key, mappingFunction);
         }
     }
 

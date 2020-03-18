@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -72,7 +73,7 @@ public final class GridHandler implements GridManager {
 
     public void createIsland(CachedResultSet resultSet){
         UUID owner = UUID.fromString(resultSet.getString("owner"));
-        islands.add(owner, new SIsland(resultSet));
+        islands.add(owner, new SIsland(this, resultSet));
     }
 
     @Override
@@ -87,7 +88,7 @@ public final class GridHandler implements GridManager {
 
         if(!preIslandCreateEvent.isCancelled()) {
             Location islandLocation = getNextLocation();
-            Island island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
+            SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
 
             IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island, schemName);
             Bukkit.getPluginManager().callEvent(islandCreateEvent);
@@ -97,7 +98,7 @@ public final class GridHandler implements GridManager {
                 setLastIsland(SBlockPosition.of(islandLocation));
 
                 island.getAllChunks(World.Environment.NORMAL, true, true)
-                        .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(chunk));
+                        .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(island, chunk));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
@@ -430,6 +431,8 @@ public final class GridHandler implements GridManager {
             SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
             plugin.getSettings().updateValue("worlds.normal-world", world);
         }
+
+        ChunksTracker.deserialize(this, null, resultSet.getString("dirtyChunks"));
     }
 
     public void loadStackedBlocks(ResultSet set) throws SQLException {

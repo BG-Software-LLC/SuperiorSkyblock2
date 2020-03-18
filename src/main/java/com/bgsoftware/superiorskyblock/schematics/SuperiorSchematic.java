@@ -204,6 +204,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             }
 
             ((SIsland) island).handleBlocksPlace(cachedCounts);
+            ((SIsland) island).saveDirtyChunks();
 
             IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
             Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);

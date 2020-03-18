@@ -260,7 +260,7 @@ public final class SpawnIsland implements Island {
 
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z))
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -284,7 +284,7 @@ public final class SpawnIsland implements Island {
 
         for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
             for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
-                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(world, chunkX, chunkZ))){
+                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))){
                     chunks.add(world.getChunkAt(chunkX, chunkZ));
                 }
             }
@@ -308,7 +308,7 @@ public final class SpawnIsland implements Island {
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z)) {
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
                     if (whenComplete != null)
                         chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
                     else

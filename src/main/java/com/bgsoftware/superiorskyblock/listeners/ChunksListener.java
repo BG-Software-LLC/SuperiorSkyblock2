@@ -67,13 +67,17 @@ public final class ChunksListener implements Listener {
 
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
         Island island = plugin.getGrid().getIslandAt(firstBlock);
-        if(island != null && island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
+
+        if(island == null)
+            return;
+
+        if(island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
             plugin.getNMSAdapter().setBiome(e.getChunk(), island.getBiome());
 
         plugin.getNMSAdapter().injectChunkSections(e.getChunk());
 
         if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
-            ChunksTracker.markDirty(e.getChunk());
+            ChunksTracker.markDirty(island, e.getChunk(), true);
     }
 
 }
