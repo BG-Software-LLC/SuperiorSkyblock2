@@ -45,4 +45,5 @@ public final class PlayerPermissionNode extends PermissionNodeAbstract {
     public PermissionNodeAbstract clone() {
         return new PlayerPermissionNode(privileges, superiorPlayer, island);
     }
+
 }

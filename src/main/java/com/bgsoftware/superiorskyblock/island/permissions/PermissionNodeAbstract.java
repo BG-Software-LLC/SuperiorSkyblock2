@@ -74,11 +74,6 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
         return false;
     }
 
-    @Override
-    public String toString() {
-        return "PermissionNodeAbstract{" + privileges + "}";
-    }
-
     protected enum PrivilegeStatus{
 
         ENABLED,

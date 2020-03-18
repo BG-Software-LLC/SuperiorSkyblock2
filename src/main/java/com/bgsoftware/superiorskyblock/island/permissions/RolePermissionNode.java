@@ -24,12 +24,16 @@ public class RolePermissionNode extends PermissionNodeAbstract {
         super(privileges);
 
         this.playerRole = playerRole;
-        this.previousNode = previousNode == null ? (RolePermissionNode) previousNode.clone() : previousNode;
+        this.previousNode = previousNode != null ? (RolePermissionNode) previousNode.clone() : null;
     }
 
     @Override
     public boolean hasPermission(IslandPrivilege permission) {
         return super.hasPermission(permission) || (previousNode != null && previousNode.hasPermission(permission));
+    }
+
+    public boolean hasPermissionRaw(IslandPrivilege permission) {
+        return privileges.get(permission, PrivilegeStatus.DISABLED) == PrivilegeStatus.ENABLED;
     }
 
     @Override

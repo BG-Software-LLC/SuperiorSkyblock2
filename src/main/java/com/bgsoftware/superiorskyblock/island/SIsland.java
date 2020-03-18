@@ -846,7 +846,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
        return plugin.getPlayers().getRoles().stream()
-                .filter(_playerRole -> getPermissionNode(_playerRole).hasPermission(islandPrivilege))
+                .filter(_playerRole -> ((RolePermissionNode) getPermissionNode(_playerRole)).hasPermissionRaw(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 
