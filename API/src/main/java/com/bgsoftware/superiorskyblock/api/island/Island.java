@@ -446,6 +446,11 @@ public interface Island extends Comparable<Island> {
     String getName();
 
     /**
+     * Get the name of the island, unformatted.
+     */
+    String getRawName();
+
+    /**
      * Set the name of the island.
      * @param islandName The name to set.
      */

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,7 +65,7 @@ public final class CmdAdminTeleport implements ISuperiorCommand {
 
         if(targetIsland == null){
             if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
             else
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;

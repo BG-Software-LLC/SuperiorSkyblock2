@@ -87,7 +87,7 @@ public final class CmdShow implements ISuperiorCommand {
             if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
                 Locale.INVALID_ISLAND.send(sender);
             else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
             else
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;

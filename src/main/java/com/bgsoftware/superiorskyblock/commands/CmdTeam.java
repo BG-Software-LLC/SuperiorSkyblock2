@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -81,7 +82,7 @@ public final class CmdTeam implements ISuperiorCommand {
             if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
                 Locale.INVALID_ISLAND.send(sender);
             else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
             else
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;

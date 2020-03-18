@@ -80,7 +80,7 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
                 if (args[2].equalsIgnoreCase(sender.getName()))
                     Locale.INVALID_ISLAND.send(sender);
                 else if (targetPlayer == null)
-                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[2]);
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
                 else
                     Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
                 return;

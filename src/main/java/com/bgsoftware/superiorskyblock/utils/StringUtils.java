@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import org.bukkit.ChatColor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,6 +18,8 @@ public final class StringUtils {
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
     private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
     private static final char SPACE_ASCII = 160;
+
+    private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)(&|" + ChatColor.COLOR_CHAR + ")[0-9A-FK-OR]");
 
     private static NumberFormat numberFormatter;
 
@@ -200,6 +203,10 @@ public final class StringUtils {
         }
 
         return RTL ? timeBuilder.substring(2) : timeBuilder.substring(0, timeBuilder.length() - 2);
+    }
+
+    public static String stripColors(String str){
+        return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
     }
 
 }

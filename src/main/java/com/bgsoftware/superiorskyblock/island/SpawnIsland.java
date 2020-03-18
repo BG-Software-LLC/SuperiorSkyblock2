@@ -450,6 +450,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public String getRawName() {
+        return "";
+    }
+
+    @Override
     public void setName(String islandName) {
 
     }

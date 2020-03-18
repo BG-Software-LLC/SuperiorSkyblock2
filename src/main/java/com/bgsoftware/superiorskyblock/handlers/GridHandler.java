@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -145,7 +146,8 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIsland(String islandName) {
-        return getIslands().stream().filter(island -> island.getName().equalsIgnoreCase(islandName)).findFirst().orElse(null);
+        String inputName = StringUtils.stripColors(islandName);
+        return getIslands().stream().filter(island -> ((SIsland) island).getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 
     @Override

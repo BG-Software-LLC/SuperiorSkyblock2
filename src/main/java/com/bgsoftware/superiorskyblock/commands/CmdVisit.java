@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -64,7 +65,7 @@ public final class CmdVisit implements ISuperiorCommand {
 
         if(targetIsland == null){
             if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, args[1]);
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
             else
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;

@@ -140,6 +140,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Location> visitorsLocation = SyncedObject.of(null);
     private final SyncedObject<Boolean> locked = SyncedObject.of(false);
     private final SyncedObject<String> islandName = SyncedObject.of("");
+    private final SyncedObject<String> islandRawName = SyncedObject.of("");
     private final SyncedObject<String> description = SyncedObject.of("");
     private final Registry<UUID, Rating> ratings = Registry.createRegistry();
     private final Registry<Mission, Integer> completedMissions = Registry.createRegistry();
@@ -192,6 +193,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.paypal.set(resultSet.getString("paypal"));
         this.locked.set(resultSet.getBoolean("locked"));
         this.islandName.set(resultSet.getString("name"));
+        this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
         this.description.set(resultSet.getString("description"));
         this.ignored.set(resultSet.getBoolean("ignored"));
 
@@ -252,6 +254,7 @@ public final class SIsland extends DatabaseObject implements Island {
         }
         this.center = wrappedLocation;
         this.islandName.set(islandName);
+        this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
         assignPermissionNodes();
         assignGenerator();
@@ -861,12 +864,18 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public String getName() {
-        return islandName.get();
+        return plugin.getSettings().islandNamesColorSupport ? islandName.get() : islandRawName.get();
+    }
+
+    @Override
+    public String getRawName(){
+        return islandRawName.get();
     }
 
     @Override
     public void setName(String islandName) {
         this.islandName.set(islandName);
+        this.islandRawName.set(StringUtils.stripColors(islandName));
         Query.ISLAND_SET_NAME.getStatementHolder()
                 .setString(islandName)
                 .setString(owner.getUniqueId().toString())
