@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -147,7 +146,7 @@ public final class GridHandler implements GridManager {
     @Override
     public Island getIsland(String islandName) {
         String inputName = StringUtils.stripColors(islandName);
-        return getIslands().stream().filter(island -> ((SIsland) island).getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
+        return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 
     @Override
@@ -431,8 +430,6 @@ public final class GridHandler implements GridManager {
             SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
             plugin.getSettings().updateValue("worlds.normal-world", world);
         }
-
-        ChunksTracker.deserialize(resultSet.getString("dirtyChunks"));
     }
 
     public void loadStackedBlocks(ResultSet set) throws SQLException {
@@ -463,7 +460,7 @@ public final class GridHandler implements GridManager {
                 .setString("")
                 .setInt(plugin.getSettings().maxIslandSize)
                 .setString(plugin.getSettings().islandWorldName)
-                .setString(ChunksTracker.serialize())
+                .setString("")
                 .execute(async);
     }
 

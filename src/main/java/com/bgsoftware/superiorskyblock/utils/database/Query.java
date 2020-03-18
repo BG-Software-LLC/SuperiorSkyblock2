@@ -57,7 +57,6 @@ public enum Query {
     STACKED_BLOCKS_DELETE("DELETE FROM {prefix}stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
 
     GRID_UPDATE_LAST_ISLAND("UPDATE {prefix}grid SET lastIsland=?;"),
-    GRID_UPDATE_DIRTY_CHUNKS("UPDATE {prefix}grid SET dirtyChunks=?;"),
     GRID_INSERT("INSERT INTO {prefix}grid (lastIsland,stackedBlocks,maxIslandSize,world,dirtyChunks) VALUES(?,?,?,?,?);");
 
     private String query;
