@@ -670,7 +670,7 @@ public final class SIsland extends DatabaseObject implements Island {
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
                 if(!noEmptyChunks || ChunksTracker.isMarkedDirty(world, x, z)) {
                     if (whenComplete != null)
-                        chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                        chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete((chunk, throwable) -> Executor.sync(() -> whenComplete.accept(chunk, throwable))));
                     else
                         chunks.add(ChunksProvider.loadChunk(world, x, z));
                 }
