@@ -57,12 +57,11 @@ public final class CmdAdminRankup implements ISuperiorCommand {
 
     @Override
     public boolean canBeExecutedByConsole() {
-        return false;
+        return true;
     }
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
         List<Island> islands = new ArrayList<>();
 
@@ -98,7 +97,7 @@ public final class CmdAdminRankup implements ISuperiorCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
+            IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(null, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
             Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
 
             if(!islandUpgradeEvent.isCancelled()){
