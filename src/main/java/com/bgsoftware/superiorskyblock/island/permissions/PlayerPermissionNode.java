@@ -6,9 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 
-public final class PlayerPermissionNode extends PermissionNodeAbstract {
+public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     private final SuperiorPlayer superiorPlayer;
     private final SIsland island;
@@ -31,12 +32,15 @@ public final class PlayerPermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
+    public boolean hasPermission(IslandPrivilege permission) {
+        return getStatus(IslandPrivileges.ALL) == PrivilegeStatus.ENABLED || getStatus(permission) == PrivilegeStatus.ENABLED;
+    }
+
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
         PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
-        PrivilegeStatus status = island.getPermissionNode(playerRole).getStatus(islandPrivilege);
 
-        if(status == PrivilegeStatus.ENABLED)
-            return status;
+        if(island.hasPermission(playerRole, islandPrivilege))
+            return PrivilegeStatus.ENABLED;
 
         return privileges.get(islandPrivilege, PrivilegeStatus.DISABLED);
     }
@@ -44,6 +48,27 @@ public final class PlayerPermissionNode extends PermissionNodeAbstract {
     @Override
     public PermissionNodeAbstract clone() {
         return new PlayerPermissionNode(privileges, superiorPlayer, island);
+    }
+
+    public static class EmptyPlayerPermissionNode extends PlayerPermissionNode{
+
+        public static EmptyPlayerPermissionNode INSTANCE;
+
+        EmptyPlayerPermissionNode(){
+            super(null, null);
+            INSTANCE = this;
+        }
+
+        @Override
+        public boolean hasPermission(IslandPrivilege permission) {
+            return false;
+        }
+
+        @Override
+        public void setPermission(IslandPrivilege permission, boolean value) {
+
+        }
+
     }
 
 }

@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
+import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -383,18 +384,6 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
-
-    }
-
-    @Override
-    @Deprecated
-    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
-
-    }
-
-    @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege) {
         return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPrivilege);
     }
@@ -404,6 +393,23 @@ public final class SpawnIsland implements Island {
         return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
                 superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
                 getPermissionNode(superiorPlayer).hasPermission(islandPrivilege);
+    }
+
+    @Override
+    public boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
+        return getRequiredPlayerRole(islandPrivilege).getWeight() <= playerRole.getWeight();
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
+
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+
     }
 
     @Override
@@ -418,12 +424,14 @@ public final class SpawnIsland implements Island {
 
     @Override
     public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
+        SuperiorSkyblockPlugin.log("&cIt seems like a plugin developer is using a deprecated method. Please inform him about it.");
+        new Throwable().printStackTrace();
         return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
     }
 
     @Override
     public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
-        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
+        return PlayerPermissionNode.EmptyPlayerPermissionNode.INSTANCE;
     }
 
     @Override
@@ -435,7 +443,7 @@ public final class SpawnIsland implements Island {
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
         return plugin.getPlayers().getRoles().stream()
-                .filter(playerRole -> getPermissionNode(playerRole).hasPermission(islandPrivilege))
+                .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 

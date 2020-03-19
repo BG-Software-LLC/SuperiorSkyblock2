@@ -4,21 +4,21 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -39,7 +39,7 @@ public final class IslandDeserializer {
         });
     }
 
-    public static void deserializePermissions(String permissions, Registry<Object, PermissionNodeAbstract> permissionNodes, Island island){
+    public static void deserializePermissions(String permissions, Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> rolePermissions, Island island){
         Registry<PlayerRole, String> permissionsMap = Registry.createRegistry();
 
         boolean shouldSaveAgain = false;
@@ -52,18 +52,31 @@ public final class IslandDeserializer {
                     shouldSaveAgain = true;
 
                 try {
+                    PlayerRole playerRole = SPlayerRole.of(sections[0]);
+                    if(sections.length != 1){
+                        String[] permission = permissions.split(";");
+                        for (String perm : permission) {
+                            String[] permissionSections = perm.split(":");
+                            try {
+                                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
+                                if (permissionSections.length == 2 && permissionSections[1].equals("1")) {
+                                    rolePermissions.add(islandPrivilege, playerRole);
+                                }
+                            }catch(Exception ignored){}
+                        }
+                    }
                     permissionsMap.add(SPlayerRole.of(sections[0]), sections.length == 1 ? "" : sections[1]);
                 }catch(Exception ex){
                     SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(UUID.fromString(sections[0]));
-                    permissionNodes.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, sections.length == 1 ? "" : sections[1]));
+                    playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, sections.length == 1 ? "" : sections[1]));
                 }
             }catch(Exception ignored){}
         }
 
-        for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
-            PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-            permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole), permissionsMap.get(playerRole, "")));
-        }
+//        for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
+////            PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+////            permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole), permissionsMap.get(playerRole, "")));
+////        }
 
         if(shouldSaveAgain)
             ((SIsland) island).savePermissionNodes();

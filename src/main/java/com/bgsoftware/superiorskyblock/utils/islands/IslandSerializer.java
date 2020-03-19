@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
+import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -14,7 +16,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -32,11 +36,26 @@ public final class IslandSerializer {
         return builder.toString();
     }
 
-    public static String serializePermissions(Registry<Object, PermissionNodeAbstract> permissions){
+    public static String serializePermissions(Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> playerRoles){
         StringBuilder permissionNodes = new StringBuilder();
-        permissions.entries().forEach(entry ->
-                permissionNodes.append(",").append(entry.getKey().toString()).append("=").append(entry.getValue().getAsStatementString()));
+        playerPermissions.entries().forEach(entry ->
+                permissionNodes.append(",").append(entry.getKey().getUniqueId().toString()).append("=").append(entry.getValue().getAsStatementString()));
+
+        Registry<PlayerRole, Set<IslandPrivilege>> reorderRoles = Registry.createRegistry();
+        playerRoles.entries().forEach(entry -> reorderRoles.computeIfAbsent(entry.getValue(), s -> new HashSet<>()).add(entry.getKey()));
+
+        reorderRoles.entries().forEach(entry ->
+                permissionNodes.append(",").append(entry.getKey().toString()).append("=").append(getAsStatementString(entry.getValue())));
+
+        reorderRoles.delete();
+
         return permissionNodes.toString();
+    }
+
+    private static String getAsStatementString(Set<IslandPrivilege> islandPrivileges){
+        StringBuilder stringBuilder = new StringBuilder();
+        islandPrivileges.forEach(privilege -> stringBuilder.append(";").append(privilege.getName()).append(":").append("1"));
+        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
     public static String serializeBlockCounts(SyncedObject<KeyMap<Integer>> blocks){

@@ -50,9 +50,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     }
 
     @Override
-    public boolean hasPermission(IslandPrivilege permission){
-        return getStatus(IslandPrivileges.ALL) == PrivilegeStatus.ENABLED || getStatus(permission) == PrivilegeStatus.ENABLED;
-    }
+    public abstract boolean hasPermission(IslandPrivilege permission);
 
     @Override
     public void setPermission(IslandPrivilege permission, boolean value){
@@ -67,8 +65,6 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
         privileges.entries().forEach(entry -> stringBuilder.append(";").append(entry.getKey().getName()).append(":").append(entry.getValue().toString()));
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
-
-    protected abstract PrivilegeStatus getStatus(IslandPrivilege islandPrivilege);
 
     protected boolean isDefault(IslandPrivilege islandPrivilege){
         return false;

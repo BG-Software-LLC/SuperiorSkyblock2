@@ -64,7 +64,6 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                     }
                     else {
                         island.setPermission(previousRole, permission, true);
-                        island.setPermission(currentRole, permission, false);
                     }
                 }
             }

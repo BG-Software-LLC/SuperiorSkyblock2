@@ -124,7 +124,8 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> banned = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
-    private final Registry<Object, PermissionNodeAbstract> permissionNodes = Registry.createRegistry();
+    private final Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions = Registry.createRegistry();
+    private final Registry<IslandPrivilege, PlayerRole> rolePermissions = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
     private final Registry<IslandFlag, Byte> islandSettings = Registry.createRegistry();
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
@@ -172,7 +173,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
         IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
-        IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.permissionNodes, this);
+        IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
         IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
         IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
         IslandDeserializer.deserializeBlockCounts(resultSet.getString("blockCounts"), this);
@@ -238,7 +239,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
 
-        assignPermissionNodes();
+        //assignPermissionNodes();
         checkMembersDuplication();
 
         Executor.sync(() -> biome.set(getCenter(World.Environment.NORMAL).getBlock().getBiome()));
@@ -260,7 +261,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
-        assignPermissionNodes();
+        //assignPermissionNodes();
         assignGenerator();
     }
 
@@ -786,18 +787,6 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    @Deprecated
-    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
-        setPermission(playerRole, IslandPrivilege.getByName(islandPermission.name()), value);
-    }
-
-    @Override
-    @Deprecated
-    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
-        setPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()), value);
-    }
-
-    @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege){
         return sender instanceof ConsoleCommandSender || hasPermission(SSuperiorPlayer.of(sender), islandPrivilege);
     }
@@ -810,17 +799,36 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
+        return getRequiredPlayerRole(islandPrivilege).getWeight() <= playerRole.getWeight();
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
+        setPermission(playerRole, IslandPrivilege.getByName(islandPermission.name()), value);
+    }
+
+    @Override
+    @Deprecated
+    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
+        setPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()), value);
+    }
+
+    @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
-        permissionNodes.get(playerRole).setPermission(islandPrivilege, value);
-        savePermissionNodes();
+        if(value) {
+            rolePermissions.add(islandPrivilege, playerRole);
+            savePermissionNodes();
+        }
     }
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
-        if(!permissionNodes.containsKey(superiorPlayer))
-            permissionNodes.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
+        if(!playerPermissions.containsKey(superiorPlayer))
+            playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
 
-        permissionNodes.get(superiorPlayer).setPermission(islandPrivilege, value);
+        playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
         savePermissionNodes();
 
@@ -829,12 +837,14 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
-        return permissionNodes.get(playerRole);
+        SuperiorSkyblockPlugin.log("&cIt seems like a plugin developer is using a deprecated method. Please inform him about it.");
+        new Throwable().printStackTrace();
+        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
     }
 
     @Override
     public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
-        return permissionNodes.get(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
+        return playerPermissions.get(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
     }
 
     @Override
@@ -845,14 +855,19 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
-       return plugin.getPlayers().getRoles().stream()
-                .filter(_playerRole -> ((RolePermissionNode) getPermissionNode(_playerRole)).hasPermissionRaw(islandPrivilege))
+        PlayerRole playerRole = rolePermissions.get(islandPrivilege);
+
+        if(playerRole != null)
+            return playerRole;
+
+        return plugin.getPlayers().getRoles().stream()
+                .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
     }
 
     public void savePermissionNodes(){
         Query.ISLAND_SET_PERMISSION_NODES.getStatementHolder()
-                .setString(IslandSerializer.serializePermissions(permissionNodes))
+                .setString(IslandSerializer.serializePermissions(playerPermissions, rolePermissions))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
@@ -2311,7 +2326,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(LocationUtils.getLocation(visitorsLocation.get()))
                 .setString(IslandSerializer.serializePlayers(members))
                 .setString(IslandSerializer.serializePlayers(banned))
-                .setString(IslandSerializer.serializePermissions(permissionNodes))
+                .setString(IslandSerializer.serializePermissions(playerPermissions, rolePermissions))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
                 .setString(islandBank.get().getAsString())
@@ -2359,7 +2374,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeLocations(teleportLocations))
                 .setString(IslandSerializer.serializePlayers(members))
                 .setString(IslandSerializer.serializePlayers(banned))
-                .setString(IslandSerializer.serializePermissions(permissionNodes))
+                .setString(IslandSerializer.serializePermissions(playerPermissions, rolePermissions))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
                 .setString(islandBank.get().getAsString())
@@ -2435,20 +2450,20 @@ public final class SIsland extends DatabaseObject implements Island {
      *  Private methods
      */
 
-    private void assignPermissionNodes(){
-        boolean save = false;
-
-        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-            if(!permissionNodes.containsKey(playerRole)) {
-                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-                permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole)));
-                save = true;
-            }
-        }
-
-        if(save && owner != null)
-            savePermissionNodes();
-    }
+//    private void assignPermissionNodes(){
+//        boolean save = false;
+//
+//        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
+//            if(!permissionNodes.containsKey(playerRole)) {
+//                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
+//                permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole)));
+//                save = true;
+//            }
+//        }
+//
+//        if(save && owner != null)
+//            savePermissionNodes();
+//    }
 
     private void assignGenerator(){
         if(getGeneratorAmounts().isEmpty()) {

@@ -29,11 +29,40 @@ public class RolePermissionNode extends PermissionNodeAbstract {
 
     @Override
     public boolean hasPermission(IslandPrivilege permission) {
-        return super.hasPermission(permission) || (previousNode != null && previousNode.hasPermission(permission));
+        PrivilegeStatus status = getStatus(permission);
+
+        if(status != PrivilegeStatus.DEFAULT){
+            return status == PrivilegeStatus.ENABLED;
+        }
+
+        status = previousNode == null ? PrivilegeStatus.DEFAULT : previousNode.getStatus(permission);
+
+        if(status != PrivilegeStatus.DEFAULT){
+            return status == PrivilegeStatus.ENABLED;
+        }
+
+        return playerRole != null && playerRole.getDefaultPermissions().hasPermission(permission);
     }
 
     public boolean hasPermissionRaw(IslandPrivilege permission) {
         return privileges.get(permission, PrivilegeStatus.DISABLED) == PrivilegeStatus.ENABLED;
+    }
+
+    public boolean hasPermissionNoDefault(IslandPrivilege permission){
+        if(hasPermissionRaw(permission))
+            return true;
+
+        else if(previousNode != null && previousNode.hasPermissionRaw(permission)){
+            return true;
+        }
+
+        else{
+            return false;
+        }
+    }
+
+    public PrivilegeStatus getStatus(IslandPrivilege permission){
+        return privileges.get(permission, PrivilegeStatus.DEFAULT);
     }
 
     @Override
@@ -49,7 +78,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
             super.setPermission(permission, value);
         }
 
-        if (value && previousNode != null)
+        if (previousNode != null)
             previousNode.setPermission(permission, false, false);
     }
 
@@ -66,13 +95,13 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
-    protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
-        return privileges.get(islandPrivilege, playerRole == null ? PrivilegeStatus.DISABLED : playerRole.getDefaultPermissions().getStatus(islandPrivilege));
+    public PermissionNodeAbstract clone() {
+        return new RolePermissionNode(privileges, playerRole, previousNode);
     }
 
     @Override
-    public PermissionNodeAbstract clone() {
-        return new RolePermissionNode(privileges, playerRole, previousNode);
+    public String toString() {
+        return "RolePermissionNode" + privileges;
     }
 
     public static class EmptyRolePermissionNode extends RolePermissionNode{
@@ -92,11 +121,6 @@ public class RolePermissionNode extends PermissionNodeAbstract {
         @Override
         public void setPermission(IslandPrivilege permission, boolean value) {
 
-        }
-
-        @Override
-        protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
-            return PrivilegeStatus.DISABLED;
         }
 
     }
