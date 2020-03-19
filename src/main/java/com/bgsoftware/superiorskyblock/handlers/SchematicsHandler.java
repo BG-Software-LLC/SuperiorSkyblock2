@@ -62,36 +62,34 @@ public final class SchematicsHandler implements SchematicManager {
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
 
-        Executor.sync(() -> {
-            File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
+        File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
-            if(!schematicsFolder.exists()) {
-                schematicsFolder.mkdirs();
-                FileUtils.saveResource("schematics/desert.schematic");
-                FileUtils.saveResource("schematics/desert_nether.schematic", "schematics/normal_nether.schematic");
-                FileUtils.saveResource("schematics/desert_the_end.schematic", "schematics/normal_the_end.schematic");
-                FileUtils.saveResource("schematics/mycel.schematic");
-                FileUtils.saveResource("schematics/mycel_nether.schematic", "schematics/normal_nether.schematic");
-                FileUtils.saveResource("schematics/mycel_the_end.schematic", "schematics/normal_the_end.schematic");
-                FileUtils.saveResource("schematics/normal.schematic");
-                FileUtils.saveResource("schematics/normal_nether.schematic");
-                FileUtils.saveResource("schematics/normal_the_end.schematic");
-            }
+        if(!schematicsFolder.exists()) {
+            schematicsFolder.mkdirs();
+            FileUtils.saveResource("schematics/desert.schematic");
+            FileUtils.saveResource("schematics/desert_nether.schematic", "schematics/normal_nether.schematic");
+            FileUtils.saveResource("schematics/desert_the_end.schematic", "schematics/normal_the_end.schematic");
+            FileUtils.saveResource("schematics/mycel.schematic");
+            FileUtils.saveResource("schematics/mycel_nether.schematic", "schematics/normal_nether.schematic");
+            FileUtils.saveResource("schematics/mycel_the_end.schematic", "schematics/normal_the_end.schematic");
+            FileUtils.saveResource("schematics/normal.schematic");
+            FileUtils.saveResource("schematics/normal_nether.schematic");
+            FileUtils.saveResource("schematics/normal_the_end.schematic");
+        }
 
-            //noinspection ConstantConditions
-            for(File schemFile : schematicsFolder.listFiles()){
-                String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
-                Schematic schematic = loadFromFile(schemName, schemFile);
-                if(schematic != null) {
-                    schematics.add(schemName, schematic);
-                    SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
-                            (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
-                }
-                else{
-                    SuperiorSkyblockPlugin.log("Couldn't load schematic " + schemFile.getName() + ".");
-                }
+        //noinspection ConstantConditions
+        for(File schemFile : schematicsFolder.listFiles()){
+            String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
+            Schematic schematic = loadFromFile(schemName, schemFile);
+            if(schematic != null) {
+                schematics.add(schemName, schematic);
+                SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
+                        (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
             }
-        });
+            else{
+                SuperiorSkyblockPlugin.log("Couldn't load schematic " + schemFile.getName() + ".");
+            }
+        }
     }
 
     @Override

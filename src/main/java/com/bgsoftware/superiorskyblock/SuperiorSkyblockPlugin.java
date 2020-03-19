@@ -37,6 +37,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -82,10 +83,26 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
 
+    private boolean shouldEnable = true;
+
     @Override
-    public void onEnable() {
+    public void onLoad() {
         plugin = this;
         new Metrics(this);
+
+        loadAPI();
+
+        if(!loadNMSAdapter() || !ReflectionUtils.init()) {
+            shouldEnable = false;
+        }
+    }
+
+    @Override
+    public void onEnable() {
+        if(!shouldEnable) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
         getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
@@ -97,8 +114,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         getServer().getPluginManager().registerEvents(new SettingsListener(this), this);
         getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
 
-        loadNMSAdapter();
-        loadAPI();
         Executor.init(this);
 
         loadSortingTypes();
@@ -150,6 +165,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onDisable() {
+        if(!shouldEnable)
+            return;
+
         ChunksProvider.stop();
         CropsTask.cancelTask();
         try {
@@ -193,14 +211,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
     }
 
-    private void loadNMSAdapter(){
+    private boolean loadNMSAdapter(){
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
+            return true;
         }catch(Exception ex){
             ex.printStackTrace();
+            return false;
         }
     }
 
@@ -262,22 +282,22 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         menusHandler = new MenusHandler(this);
         keysHandler = new KeysHandler(this);
 
+        if(gridHandler.getSpawnIsland().getCenter(World.Environment.NORMAL).getWorld() == null){
+            new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        if (loadGrid) {
+            try {
+                dataHandler = new DataHandler(this);
+            }catch(HandlerLoadException ex){
+                if(!HandlerLoadException.handle(ex))
+                    return;
+            }
+        }
+
         Executor.sync(() -> {
-            if(gridHandler.getSpawnIsland().getCenter(World.Environment.NORMAL).getWorld() == null){
-                new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
-                Bukkit.getPluginManager().disablePlugin(this);
-                return;
-            }
-
-            if (loadGrid) {
-                try {
-                    dataHandler = new DataHandler(this);
-                }catch(HandlerLoadException ex){
-                    if(!HandlerLoadException.handle(ex))
-                        return;
-                }
-            }
-
             for(Player player : Bukkit.getOnlinePlayers())
                 nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
         });
