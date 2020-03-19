@@ -17,11 +17,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 public final class ChunksTracker {
 
-    private static final Registry<Island, Set<ChunkPosition>> dirtyChunks = Registry.createRegistry(new WeakHashMap<>());
+    private static final Registry<Island, Set<ChunkPosition>> dirtyChunks = Registry.createRegistry();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void markEmpty(Island island, Block block, boolean save){
@@ -54,6 +53,13 @@ public final class ChunksTracker {
 
     public static boolean isMarkedDirty(Island island, World world, int x, int z){
         return dirtyChunks.containsKey(island) && dirtyChunks.get(island).contains(ChunkPosition.of(world, x, z));
+    }
+
+    public static void removeIsland(Island island){
+        if(dirtyChunks.containsKey(island)){
+            dirtyChunks.get(island).clear();
+            dirtyChunks.remove(island);
+        }
     }
 
     public static String serialize(Island island){

@@ -14,7 +14,7 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
 
     private static final Predicate<Island> ISLANDS_PREDICATE = island -> !island.isIgnored();
 
-    private final Registry<IslandPosition, Island> islandsByPositions = new Registry<IslandPosition, Island>() {};
+    private final Registry<IslandPosition, Island> islandsByPositions = createRegistry();
 
     public IslandRegistry(){
         SortingType.values().forEach(sortingType -> registerSortingType(sortingType, false, ISLANDS_PREDICATE));

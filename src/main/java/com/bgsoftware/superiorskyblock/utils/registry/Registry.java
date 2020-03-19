@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.utils.registry;
 
-import com.google.common.collect.Maps;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public abstract class Registry<K, V> implements Iterable<V> {
@@ -17,7 +17,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
     private final Map<K ,V> registry;
 
     protected Registry(){
-        this(Maps.newHashMap());
+        this(new ConcurrentHashMap<>());
     }
 
     protected Registry(Map<K, V> map){
@@ -26,68 +26,48 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     protected Registry(Registry<K, V> other){
-        this.registry = Maps.newHashMap(other.registry);
-        loadedRegisteries.add(this);
+        this();
+        this.registry.putAll(other.registry);
     }
 
     public V get(K key){
-        synchronized (registry){
-            return registry.get(key);
-        }
+        return registry.get(key);
     }
 
     public V get(K key, V def){
-        synchronized (registry){
-            return registry.getOrDefault(key, def);
-        }
+        return registry.getOrDefault(key, def);
     }
 
     public V computeIfAbsent(K key, Function<K, V> mappingFunction){
-        synchronized (registry){
-            return registry.computeIfAbsent(key, mappingFunction);
-        }
+        return registry.computeIfAbsent(key, mappingFunction);
     }
 
     public V add(K key, V value){
-        synchronized (registry){
-            return registry.put(key, value);
-        }
+        return value == null ? null : registry.put(key, value);
     }
 
     public V remove(K key){
-        synchronized (registry){
-            return registry.remove(key);
-        }
+        return registry.remove(key);
     }
 
     public boolean containsKey(K key){
-        synchronized (registry){
-            return registry.containsKey(key);
-        }
+        return registry.containsKey(key);
     }
 
     public Collection<V> values(){
-        synchronized (registry){
-            return registry.values();
-        }
+        return registry.values();
     }
 
     public Collection<K> keys(){
-        synchronized (registry){
-            return registry.keySet();
-        }
+        return registry.keySet();
     }
 
     public Collection<Map.Entry<K, V>> entries(){
-        synchronized (registry){
-            return registry.entrySet();
-        }
+        return registry.entrySet();
     }
 
     public void clear(){
-        synchronized (registry){
-            registry.clear();
-        }
+        registry.clear();
     }
 
     public void delete(){
@@ -101,9 +81,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public Map<K, V> toMap(){
-        synchronized (registry) {
-            return Maps.newHashMap(registry);
-        }
+        return new ConcurrentHashMap<>(registry);
     }
 
     public int size(){
@@ -116,16 +94,12 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     @Override
     public Iterator<V> iterator() {
-        synchronized (registry){
-            return registry.values().iterator();
-        }
+        return registry.values().iterator();
     }
 
     @Override
     public String toString() {
-        synchronized (registry){
-            return registry.toString();
-        }
+        return registry.toString();
     }
 
     public static void clearCache(){
@@ -146,7 +120,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public static <K, V> Registry<K, V> createLinkedRegistry(){
-        return createRegistry(Maps.newLinkedHashMap());
+        return createRegistry(Collections.synchronizedMap(new LinkedHashMap<>()));
     }
 
 }

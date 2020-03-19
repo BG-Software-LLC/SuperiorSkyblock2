@@ -132,6 +132,7 @@ public final class GridHandler implements GridManager {
         });
         islands.remove(island.getOwner().getUniqueId());
         plugin.getDataHandler().deleteIsland(island);
+        ChunksTracker.removeIsland(island);
     }
 
     @Override
