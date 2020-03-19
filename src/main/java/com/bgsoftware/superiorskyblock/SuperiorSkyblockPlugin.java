@@ -35,6 +35,8 @@ import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.utils.database.Query;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
@@ -56,6 +58,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -156,19 +159,29 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Island island : gridHandler.getIslandsToPurge())
                 island.disbandIsland();
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.closeInventory();
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-                superiorPlayer.updateLastTimeStatus();
-                Island playerIsland = superiorPlayer.getIsland();
-                if(playerIsland != null){
-                    playerIsland.updateLastTime();
-                }
-                nmsAdapter.setWorldBorder(superiorPlayer, null);
-                if (superiorPlayer.hasIslandFlyEnabled()) {
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                }
+            if(Bukkit.getOnlinePlayers().size() > 0){
+                long lastTimeStatus = System.currentTimeMillis() / 1000;
+
+                StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder();
+                Bukkit.getOnlinePlayers().stream().map(SSuperiorPlayer::of).forEach(superiorPlayer ->
+                        playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
+                playerStatusHolder.execute(false);
+
+                StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
+                Bukkit.getOnlinePlayers().stream().map(player -> SSuperiorPlayer.of(player).getIsland()).filter(Objects::nonNull)
+                        .forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
+                islandStatusHolder.execute(false);
+
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                    player.closeInventory();
+                    nmsAdapter.setWorldBorder(superiorPlayer, null);
+                    if (superiorPlayer.hasIslandFlyEnabled()) {
+                        player.setAllowFlight(false);
+                        player.setFlying(false);
+                    }
+                });
+
             }
         }catch(Exception ignored){
             //Ignore

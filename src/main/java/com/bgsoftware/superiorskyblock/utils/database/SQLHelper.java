@@ -159,6 +159,30 @@ public final class SQLHelper {
         }
     }
 
+    public static void setAutoCommit(boolean autoCommit){
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(autoCommit);
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        } finally {
+            close(conn);
+        }
+    }
+
+    public static void commit(){
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            conn.commit();
+        }catch(SQLException ex){
+            ex.printStackTrace();
+        } finally {
+            close(conn);
+        }
+    }
+
     public interface QueryConsumer<T>{
 
         void accept(T value) throws SQLException;

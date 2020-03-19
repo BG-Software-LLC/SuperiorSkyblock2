@@ -4,11 +4,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private final List<Registry<Integer, Object>> batches = new ArrayList<>();
 
     private final String query;
     private final Registry<Integer, Object> values = Registry.createRegistry();
@@ -54,6 +59,14 @@ public final class StatementHolder {
         return this;
     }
 
+    public void addBatch(){
+        if(batches.isEmpty())
+            SQLHelper.setAutoCommit(false);
+        batches.add(Registry.createRegistry(values));
+        values.clear();
+        currentIndex = 1;
+    }
+
     public void execute(boolean async) {
         if(async && !Executor.isDataThread()){
             Executor.data(() -> execute(false));
@@ -65,12 +78,26 @@ public final class StatementHolder {
         StringHolder errorQuery = new StringHolder(query);
 
         SQLHelper.buildStatement(query, preparedStatement -> {
-            for(Map.Entry<Integer, Object> entry : values.entries()) {
-                preparedStatement.setObject(entry.getKey(), entry.getValue());
-                errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
+            if(!batches.isEmpty()){
+                for (Registry<Integer, Object> values : batches) {
+                    for (Map.Entry<Integer, Object> entry : values.entries()) {
+                        preparedStatement.setObject(entry.getKey(), entry.getValue());
+                        errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
+                    }
+                    preparedStatement.addBatch();
+                    values.delete();
+                }
+                preparedStatement.executeBatch();
+                SQLHelper.commit();
+                SQLHelper.setAutoCommit(true);
             }
-
-            preparedStatement.executeUpdate();
+            else {
+                for (Map.Entry<Integer, Object> entry : values.entries()) {
+                    preparedStatement.setObject(entry.getKey(), entry.getValue());
+                    errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
+                }
+                preparedStatement.executeUpdate();
+            }
         }, ex -> {
             SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
             ex.printStackTrace();
