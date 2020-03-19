@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -136,7 +137,7 @@ public final class ChunksTracker {
         if(island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        if(dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save)
+        if(dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save && !(island instanceof SpawnIsland))
             ((SIsland) island).saveDirtyChunks();
     }
 
