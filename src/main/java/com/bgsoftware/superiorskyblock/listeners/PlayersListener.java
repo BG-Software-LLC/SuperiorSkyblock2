@@ -40,6 +40,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -190,6 +191,11 @@ public final class PlayersListener implements Listener {
             if(islandEnterProtectedEvent.getCancelTeleport() != null)
                 e.setCancelTeleport(islandEnterProtectedEvent.getCancelTeleport());
         }
+    }
+
+    @EventHandler
+    public void onWorldSwitch(PlayerChangedWorldEvent e){
+
     }
 
     @EventHandler

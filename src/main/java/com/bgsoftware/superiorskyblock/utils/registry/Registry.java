@@ -31,15 +31,15 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public V get(K key){
-        return registry.get(key);
+        return key == null ? null : registry.get(key);
     }
 
     public V get(K key, V def){
-        return registry.getOrDefault(key, def);
+        return key == null ? def : registry.getOrDefault(key, def);
     }
 
     public V computeIfAbsent(K key, Function<K, V> mappingFunction){
-        return registry.computeIfAbsent(key, mappingFunction);
+        return key == null ? null : registry.computeIfAbsent(key, mappingFunction);
     }
 
     public V add(K key, V value){
@@ -47,11 +47,11 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public V remove(K key){
-        return registry.remove(key);
+        return key == null ? null : registry.remove(key);
     }
 
     public boolean containsKey(K key){
-        return registry.containsKey(key);
+        return key != null && registry.containsKey(key);
     }
 
     public Collection<V> values(){
