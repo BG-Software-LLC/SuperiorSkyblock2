@@ -220,24 +220,25 @@ public final class SettingsListener implements Listener {
 
         else return;
 
+        boolean cancelFlames = false;
+
         if(!damagerPlayer.equals(targetPlayer) && damagerPlayer.getIslandLeader().equals(targetPlayer.getIslandLeader()) &&
                 !plugin.getSettings().pvpWorlds.contains(targetPlayer.getWorld().getName())){
             e.setCancelled(true);
             Locale.HIT_ISLAND_MEMBER.send(damagerPlayer);
-            return;
+            cancelFlames = true;
         }
 
-        if (damagerPlayer.equals(targetPlayer) || island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) ||
-                island.hasSettingsEnabled(IslandFlags.PVP))
-            return;
-
-        e.setCancelled(true);
+        else if (!damagerPlayer.equals(targetPlayer) && island != null && (plugin.getSettings().spawnProtection || !island.isSpawn()) &&
+                !island.hasSettingsEnabled(IslandFlags.PVP)) {
+            e.setCancelled(true);
+            Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
+            cancelFlames = true;
+        }
 
         //Disable flame
-        if(e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
+        if(cancelFlames && e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
             targetPlayer.asPlayer().setFireTicks(0);
-
-        Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
