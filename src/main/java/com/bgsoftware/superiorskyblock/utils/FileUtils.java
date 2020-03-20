@@ -83,6 +83,10 @@ public final class FileUtils {
             itemBuilder.asSkullOf(section.getString("skull"));
         }
 
+        if(section.getBoolean("unbreakable", false)){
+            itemBuilder.setUnbreakable();
+        }
+
         return itemBuilder;
     }
 
