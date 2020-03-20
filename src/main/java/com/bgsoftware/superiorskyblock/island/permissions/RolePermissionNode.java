@@ -106,11 +106,14 @@ public class RolePermissionNode extends PermissionNodeAbstract {
 
     public static class EmptyRolePermissionNode extends RolePermissionNode{
 
-        public static EmptyRolePermissionNode INSTANCE;
+        public static final EmptyRolePermissionNode INSTANCE;
+
+        static {
+            INSTANCE = new EmptyRolePermissionNode();
+        }
 
         EmptyRolePermissionNode(){
             super(null, null);
-            INSTANCE = this;
         }
 
         @Override

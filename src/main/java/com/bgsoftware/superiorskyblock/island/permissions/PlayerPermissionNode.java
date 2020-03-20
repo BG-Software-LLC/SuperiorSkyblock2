@@ -52,11 +52,14 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     public static class EmptyPlayerPermissionNode extends PlayerPermissionNode{
 
-        public static EmptyPlayerPermissionNode INSTANCE;
+        public static final EmptyPlayerPermissionNode INSTANCE;
+
+        static {
+            INSTANCE = new EmptyPlayerPermissionNode();
+        }
 
         EmptyPlayerPermissionNode(){
             super(null, null);
-            INSTANCE = this;
         }
 
         @Override
