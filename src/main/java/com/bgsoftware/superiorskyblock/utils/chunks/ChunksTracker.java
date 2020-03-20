@@ -84,7 +84,7 @@ public final class ChunksTracker {
     }
 
     public static void deserialize(GridHandler grid, Island island, String serialized){
-        if(!serialized.isEmpty()) {
+        if(serialized != null && !serialized.isEmpty()) {
             if (serialized.contains("|")) {
                 deserializeNew(island, serialized);
             } else {
