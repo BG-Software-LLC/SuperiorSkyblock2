@@ -30,6 +30,19 @@ public abstract class PlaceholderHook {
     protected static SuperiorSkyblockPlugin plugin;
     private static boolean PlaceholderAPI = false;
 
+    private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
+    private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
+    private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
+    private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
+    private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
+    private static final Pattern TOP_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("worth_(.+)");
+    private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
+    private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
+    private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
+
     public static void register(SuperiorSkyblockPlugin plugin){
         PlaceholderHook.plugin = plugin;
 
@@ -49,8 +62,6 @@ public abstract class PlaceholderHook {
     }
 
     public static String parse(OfflinePlayer offlinePlayer, String str){
-//        if(MVdWPlaceholderAPI && str.contains("{"))
-//            str = PlaceholderHook_MVdW.parse(offlinePlayer, str);
         if (PlaceholderAPI && str.contains("%"))
             str = PlaceholderHook_PAPI.parse(offlinePlayer, str);
 
@@ -58,23 +69,28 @@ public abstract class PlaceholderHook {
     }
 
     protected String parsePlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
+        Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(offlinePlayer.getUniqueId());
+        Island island = superiorPlayer.getIsland();
+
         try {
-            Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(offlinePlayer.getUniqueId());
-            Island island = superiorPlayer.getIsland();
             Matcher matcher;
 
             placeholder = placeholder.toLowerCase();
 
-            if(placeholder.equals("superior_panel_toggle")){
+            if(placeholder.equals("panel_toggle")){
                 return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
             }
 
-            else if(placeholder.equals("superior_player_texture")){
+            else if(placeholder.equals("player_texture")){
                 return superiorPlayer.getTextureValue();
             }
 
-            else if ((matcher = Pattern.compile("island_(.+)").matcher(placeholder)).matches()) {
+            else if(placeholder.equals("player_role")){
+                return superiorPlayer.getPlayerRole() + "";
+            }
+
+            else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase();
 
                 if (subPlaceholder.startsWith("location_")) {
@@ -89,7 +105,7 @@ public abstract class PlaceholderHook {
                     subPlaceholder = subPlaceholder.replace("location_", "");
                 }
 
-                if ((matcher = Pattern.compile("island_permission_(.+)").matcher(placeholder)).matches()) {
+                if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String permission = matcher.group(1);
 
                     try {
@@ -100,30 +116,30 @@ public abstract class PlaceholderHook {
                     }
                 }
 
-                else if ((matcher = Pattern.compile("island_upgrade_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String upgradeName = matcher.group(1);
                     return String.valueOf(island.getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName)).getLevel());
                 }
 
-                else if ((matcher = Pattern.compile("island_count_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1).toUpperCase();
                     return String.valueOf(island.getBlockCount(Key.of(keyName)));
                 }
 
-                else if ((matcher = Pattern.compile("island_top_(.+)").matcher(placeholder)).matches()) {
+                else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String topType = matcher.group(1);
                     SortingType sortingType;
 
-                    if((matcher = Pattern.compile("worth_(.+)").matcher(topType)).matches()){
+                    if((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(topType)).matches()){
                         sortingType = SortingTypes.BY_WORTH;
                     }
-                    else if((matcher = Pattern.compile("level_(.+)").matcher(topType)).matches()){
+                    else if((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(topType)).matches()){
                         sortingType = SortingTypes.BY_LEVEL;
                     }
-                    else if((matcher = Pattern.compile("rating_(.+)").matcher(topType)).matches()){
+                    else if((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(topType)).matches()){
                         sortingType = SortingTypes.BY_RATING;
                     }
-                    else if((matcher = Pattern.compile("players_(.+)").matcher(topType)).matches()){
+                    else if((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(topType)).matches()){
                         sortingType = SortingTypes.BY_PLAYERS;
                     }
                     else{
@@ -139,12 +155,12 @@ public abstract class PlaceholderHook {
                         boolean value = false;
                         boolean leader = false;
 
-                        if((matcher = Pattern.compile("value_(.+)").matcher(matcherValue)).matches()){
+                        if((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(matcherValue)).matches()){
                             value = true;
                             matcherValue = matcher.group(1);
                         }
 
-                        else if((matcher = Pattern.compile("leader_(.+)").matcher(matcherValue)).matches()){
+                        else if((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(matcherValue)).matches()){
                             leader = true;
                             matcherValue = matcher.group(1);
                         }
@@ -178,7 +194,7 @@ public abstract class PlaceholderHook {
                     }
                 }
 
-                else if ((matcher = Pattern.compile("member_(.+)").matcher(subPlaceholder)).matches()) {
+                else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                     try{
                         int index = Integer.parseInt(matcher.group(1)) - 1;
                         if(index >= 0) {
