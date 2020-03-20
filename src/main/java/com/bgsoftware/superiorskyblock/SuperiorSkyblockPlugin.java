@@ -274,19 +274,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler = new GridHandler(this);
         }
         else{
-            gridHandler.updateSpawn();
+            Executor.sync(gridHandler::updateSpawn);
         }
 
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
         menusHandler = new MenusHandler(this);
         keysHandler = new KeysHandler(this);
-
-        if(gridHandler.getSpawnIsland().getCenter(World.Environment.NORMAL).getWorld() == null){
-            new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
 
         if (loadGrid) {
             try {
