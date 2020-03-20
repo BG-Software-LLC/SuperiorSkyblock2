@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
@@ -96,10 +97,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                                         Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
                                         Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
 
-                                lore.add(memberFormat
+                                lore.add(PlaceholderHook.parse(member, memberFormat
                                         .replace("{}", member.getName())
                                         .replace("{0}", member.getName())
-                                        .replace("{1}", onlineMessage == null ? "" : onlineMessage)
+                                        .replace("{1}", onlineMessage == null ? "" : onlineMessage))
                                 );
                             });
                         }
