@@ -195,7 +195,13 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onWorldSwitch(PlayerChangedWorldEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
+        if(island != null && island.hasPermission(e.getPlayer(), IslandPrivileges.FLY) && superiorPlayer.hasIslandFlyEnabled()){
+            e.getPlayer().setAllowFlight(true);
+            e.getPlayer().setFlying(true);
+        }
     }
 
     @EventHandler
