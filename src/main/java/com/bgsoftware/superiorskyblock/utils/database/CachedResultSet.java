@@ -1,20 +1,25 @@
 package com.bgsoftware.superiorskyblock.utils.database;
 
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class CachedResultSet {
 
-    private final Registry<String, Object> cache = Registry.createRegistry();
+    private final Map<String, Object> cache;
+
+    public CachedResultSet(Map<String, Object> cache) {
+        this.cache = cache;
+    }
 
     public CachedResultSet(ResultSet resultSet) throws SQLException {
+        this(new HashMap<>());
         ResultSetMetaData metaData = resultSet.getMetaData();
         for(int i = 1; i <= metaData.getColumnCount(); i++) {
-            cache.add(metaData.getColumnName(i), resultSet.getObject(i));
+            cache.put(metaData.getColumnName(i), resultSet.getObject(i));
         }
     }
 
@@ -78,7 +83,7 @@ public final class CachedResultSet {
     }
 
     public void delete(){
-        cache.delete();
+        cache.clear();
     }
 
 }

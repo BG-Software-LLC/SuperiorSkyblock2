@@ -10,14 +10,12 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler {
@@ -179,21 +177,14 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
         SQLHelper.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
-            ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Players Loader #%d").build());
-
             while (resultSet.next()) {
-                CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
-                executor.execute(() -> plugin.getPlayers().loadPlayer(cachedResultSet));
-            }
-
-            try {
-                executor.shutdown();
-                if(!executor.awaitTermination(3, TimeUnit.MINUTES)){
-                    Bukkit.getPluginManager().disablePlugin(plugin);
-                    throw new RuntimeException("Loading players timed out.");
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int size = metaData.getColumnCount();
+                Map<String, Object> cache = new HashMap<>(size);
+                for(int i = 1; i <= size; i++) {
+                    cache.put(metaData.getColumnName(i), resultSet.getObject(i));
                 }
-            }catch(InterruptedException ex){
-                ex.printStackTrace();
+                plugin.getPlayers().loadPlayer(new CachedResultSet(cache));
             }
         });
 
@@ -201,24 +192,8 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Starting to load islands...");
 
         SQLHelper.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
-            ExecutorService executor = Executors.newFixedThreadPool(10, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Islands Loader #%d").build());
-
             while (resultSet.next()) {
-                CachedResultSet cachedResultSet = new CachedResultSet(resultSet);
-                executor.execute(() -> {
-                    plugin.getGrid().createIsland(cachedResultSet);
-                    cachedResultSet.delete();
-                });
-            }
-
-            try {
-                executor.shutdown();
-                if(!executor.awaitTermination(3, TimeUnit.MINUTES)){
-                    Bukkit.getPluginManager().disablePlugin(plugin);
-                    throw new RuntimeException("Loading islands timed out.");
-                }
-            }catch(InterruptedException ex){
-                ex.printStackTrace();
+                plugin.getGrid().createIsland(resultSet);
             }
         });
 
@@ -241,7 +216,6 @@ public final class DataHandler {
         });
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
-
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.

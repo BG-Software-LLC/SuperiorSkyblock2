@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
@@ -71,7 +70,7 @@ public final class GridHandler implements GridManager {
         spawnIsland = new SpawnIsland(plugin);
     }
 
-    public void createIsland(CachedResultSet resultSet){
+    public void createIsland(ResultSet resultSet) throws SQLException{
         UUID owner = UUID.fromString(resultSet.getString("owner"));
         islands.add(owner, new SIsland(this, resultSet));
     }

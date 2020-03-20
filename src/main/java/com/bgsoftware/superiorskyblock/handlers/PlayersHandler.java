@@ -13,7 +13,9 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -101,11 +103,10 @@ public final class PlayersHandler implements PlayersManager {
 
 
     public void loadPlayer(CachedResultSet resultSet){
+        long startTime = System.currentTimeMillis();
         UUID player = UUID.fromString(resultSet.getString("player"));
         SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
-        synchronized (this) {
-            players.add(player, superiorPlayer);
-        }
+        players.add(player, superiorPlayer);
         resultSet.delete();
     }
 

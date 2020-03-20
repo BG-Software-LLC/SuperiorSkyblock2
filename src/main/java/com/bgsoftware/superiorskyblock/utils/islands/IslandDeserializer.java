@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -40,16 +39,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializePermissions(String permissions, Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> rolePermissions, Island island){
-        Registry<PlayerRole, String> permissionsMap = Registry.createRegistry();
-
-        boolean shouldSaveAgain = false;
-
         for(String entry : permissions.split(",")) {
             try {
                 String[] sections = entry.split("=");
-
-                if(!shouldSaveAgain && sections.length == 2 && !sections[1].contains(":"))
-                    shouldSaveAgain = true;
 
                 try {
                     PlayerRole playerRole = SPlayerRole.of(sections[0]);
@@ -65,23 +57,12 @@ public final class IslandDeserializer {
                             }catch(Exception ignored){}
                         }
                     }
-                    permissionsMap.add(SPlayerRole.of(sections[0]), sections.length == 1 ? "" : sections[1]);
                 }catch(Exception ex){
                     SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(UUID.fromString(sections[0]));
                     playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, sections.length == 1 ? "" : sections[1]));
                 }
             }catch(Exception ignored){}
         }
-
-//        for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
-////            PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-////            permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole), permissionsMap.get(playerRole, "")));
-////        }
-
-        if(shouldSaveAgain)
-            ((SIsland) island).savePermissionNodes();
-
-        permissionsMap.delete();
     }
 
     public static void deserializeUpgrades(String upgrades, Registry<String, Integer> upgradesMap){
@@ -143,24 +124,17 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeSettings(String settings, Registry<IslandFlag, Byte> islandSettings, Island island){
-        boolean shouldSaveAgain = false;
-
         for(String setting : settings.split(";")){
             try {
                 if (setting.contains("=")) {
                     String[] settingSections = setting.split("=");
                     islandSettings.add(IslandFlag.getByName(settingSections[0]), Byte.valueOf(settingSections[1]));
                 } else {
-                    shouldSaveAgain = true;
                     if(!plugin.getSettings().defaultSettings.contains(setting))
                         islandSettings.add(IslandFlag.getByName(setting), (byte) 1);
                 }
             }catch(Exception ignored){}
         }
-
-        if(shouldSaveAgain)
-            ((SIsland) island).saveSettings();
-
     }
 
     public static void deserializeGenerators(String generator, SyncedObject<KeyMap<Integer>> cobbleGeneratorSync){

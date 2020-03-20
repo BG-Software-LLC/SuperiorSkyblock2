@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
@@ -82,6 +81,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -164,7 +165,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Double> spawnerRates = SyncedObject.of((double) plugin.getSettings().defaultSpawnerRates);
     private final SyncedObject<Double> mobDrops = SyncedObject.of((double) plugin.getSettings().defaultMobDrops);
 
-    public SIsland(GridHandler grid, CachedResultSet resultSet){
+    public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
 
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
