@@ -124,15 +124,12 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
 
                 else if(compoundValue.containsKey("signLine1") || compoundValue.containsKey("signLine2") || compoundValue.containsKey("signLine3") || compoundValue.containsKey("signLine4")){
-                    List<String> lines = new ArrayList<>(4);
+                    String[] lines = new String[] { "", "", "", "" };
 
                     for(int i = 0; i < 4; i++)
-                        lines.add(i, ((StringTag) compoundValue.getOrDefault("signLine" + i, new StringTag(""))).getValue());
+                        lines[i] = ((StringTag) compoundValue.getOrDefault("signLine" + i, new StringTag(""))).getValue();
 
-                    blocks[x][y][z] = SchematicBlock.of(
-                            combinedId,
-                            lines.toArray(new String[0])
-                    );
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, lines);
                 }
 
                 else if(compoundValue.containsKey("spawnedType")){
