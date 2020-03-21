@@ -75,33 +75,38 @@ public final class StatementHolder {
 
         SQLHelper.waitForConnection();
 
-        StringHolder errorQuery = new StringHolder(query);
+        try {
+            SQLHelper.waitForLock();
 
-        SQLHelper.buildStatement(query, preparedStatement -> {
-            if(!batches.isEmpty()){
-                for (Registry<Integer, Object> values : batches) {
+            StringHolder errorQuery = new StringHolder(query);
+
+            SQLHelper.buildStatement(query, preparedStatement -> {
+                if (!batches.isEmpty()) {
+                    for (Registry<Integer, Object> values : batches) {
+                        for (Map.Entry<Integer, Object> entry : values.entries()) {
+                            preparedStatement.setObject(entry.getKey(), entry.getValue());
+                            errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
+                        }
+                        preparedStatement.addBatch();
+                        values.delete();
+                    }
+                    preparedStatement.executeBatch();
+                    SQLHelper.commit();
+                    SQLHelper.setAutoCommit(true);
+                } else {
                     for (Map.Entry<Integer, Object> entry : values.entries()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());
                         errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                     }
-                    preparedStatement.addBatch();
-                    values.delete();
+                    preparedStatement.executeUpdate();
                 }
-                preparedStatement.executeBatch();
-                SQLHelper.commit();
-                SQLHelper.setAutoCommit(true);
-            }
-            else {
-                for (Map.Entry<Integer, Object> entry : values.entries()) {
-                    preparedStatement.setObject(entry.getKey(), entry.getValue());
-                    errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
-                }
-                preparedStatement.executeUpdate();
-            }
-        }, ex -> {
-            SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-            ex.printStackTrace();
-        });
+            }, ex -> {
+                SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
+                ex.printStackTrace();
+            });
+        } finally {
+            SQLHelper.releaseLock();
+        }
     }
 
     private static class StringHolder{

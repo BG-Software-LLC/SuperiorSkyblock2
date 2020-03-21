@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 
 public final class SQLHelper {
@@ -18,6 +20,8 @@ public final class SQLHelper {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final CompletableFuture<Void> ready = new CompletableFuture<>();
     private static HikariDataSource dataSource;
+
+    private static ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private SQLHelper(){}
 
@@ -27,6 +31,14 @@ public final class SQLHelper {
         }catch(Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    public static void waitForLock(){
+        lock.readLock().lock();
+    }
+
+    public static void releaseLock(){
+        lock.readLock().unlock();
     }
 
     public static boolean createConnection(SuperiorSkyblockPlugin plugin){
@@ -168,6 +180,12 @@ public final class SQLHelper {
             ex.printStackTrace();
         } finally {
             close(conn);
+            if(autoCommit) {
+                lock.writeLock().unlock();
+            }
+            else{
+                lock.writeLock().lock();
+            }
         }
     }
 
