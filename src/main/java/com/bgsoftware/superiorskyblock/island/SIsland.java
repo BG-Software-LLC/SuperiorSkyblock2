@@ -966,12 +966,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
         beingRecalculated.set(true);
 
-        List<Chunk> chunks = new ArrayList<>();
         List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
+        BlocksProvider_WildStacker.WildStackerSnapshot snapshot = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
+                new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
         BiConsumer<Chunk, Throwable> whenComplete = (chunk, throwable) -> {
-            chunks.add(chunk);
-            BlocksProvider_WildStacker.cacheChunk(chunk);
+            if(snapshot != null)
+                snapshot.cacheChunk(chunk);
         };
 
         //noinspection all
@@ -1030,7 +1031,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                     int blockCount = plugin.getGrid().getBlockAmount(location);
 
                                     if(blockKey.toString().contains("SPAWNER")){
-                                        Pair<Integer, EntityType> entry = plugin.getProviders().getSpawner(location);
+                                        Pair<Integer, EntityType> entry = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
                                         blockCount = entry.getKey();
                                         if(entry.getValue() == null){
                                             spawnersToCheck.add(new Pair<>(location, blockCount));
@@ -1041,7 +1042,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                         }
                                     }
 
-                                    Pair<Integer, ItemStack> blockPair = plugin.getProviders().getBlock(location);
+                                    Pair<Integer, ItemStack> blockPair = snapshot != null ? snapshot.getBlock(location) : plugin.getProviders().getBlock(location);
 
                                     if(blockPair != null){
                                         blockCount = blockPair.getKey();
@@ -1084,8 +1085,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
                 finishCalcIsland(asker, callback, islandLevel, islandWorth);
 
-                for(Chunk chunk : chunks)
-                    BlocksProvider_WildStacker.uncacheChunk(chunk);
+                if(snapshot != null)
+                    snapshot.delete();
 
                 MenuValues.refreshMenus();
                 MenuCounts.refreshMenus();

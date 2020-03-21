@@ -32,8 +32,6 @@ import java.util.Map;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
-    private static final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
-    private static final Registry<String, Integer> callsAmount = Registry.createRegistry();
     private static boolean registered = false;
 
     public BlocksProvider_WildStacker(){
@@ -43,66 +41,65 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         }
     }
 
-    public static void cacheChunk(Chunk chunk){
-        try {
-            StackedSnapshot stackedSnapshot;
-            try {
-                stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk);
-            } catch (Throwable ex) {
-                //noinspection deprecation
-                stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
-            }
-            if (stackedSnapshot != null) {
-                String chunkId = getId(chunk);
-                if(chunkSnapshots.containsKey(chunkId))
-                    callsAmount.add(chunkId, callsAmount.get(chunkId, 0) + 1);
-                else
-                    chunkSnapshots.add(getId(chunk), stackedSnapshot);
-            }
-        }catch(Throwable ignored){}
-    }
-
-    public static void uncacheChunk(Chunk chunk){
-        String chunkId = getId(chunk);
-        int callsAmount = BlocksProvider_WildStacker.callsAmount.get(chunkId, 0);
-        if(callsAmount > 0) {
-            if(callsAmount == 1)
-                BlocksProvider_WildStacker.callsAmount.remove(chunkId);
-            else
-                BlocksProvider_WildStacker.callsAmount.add(chunkId, callsAmount - 1);
-        }
-        else {
-            chunkSnapshots.remove(chunkId);
-        }
-    }
-
     @Override
     public Pair<Integer, EntityType> getSpawner(Location location) {
-        String id = getId(location);
-        if(chunkSnapshots.containsKey(id))
-            return new Pair<>(chunkSnapshots.get(id).getStackedSpawner(location));
-
-        throw new RuntimeException("Chunk " + id + " is not cached.");
+        throw new UnsupportedOperationException("Unsupported Operation");
     }
 
     @Override
     public Pair<Integer, ItemStack> getBlock(Location location) {
-        String id = getId(location);
-        if(chunkSnapshots.containsKey(id)) {
-            Pair<Integer, ItemStack> pair;
+        throw new UnsupportedOperationException("Unsupported Operation");
+    }
 
-            try{
-                pair = new Pair<>(chunkSnapshots.get(id).getStackedBarrelItem(location));
-            }catch(Throwable ex){
-                //noinspection deprecation
-                Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
-                pair = new Pair<>(entry.getKey(), new ItemStack(entry.getValue()));
-            }
+    public static class WildStackerSnapshot {
 
-            return pair.getValue().getType().name().contains("AIR") ? null : pair;
+        private final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
+
+        public void cacheChunk(Chunk chunk){
+            try {
+                StackedSnapshot stackedSnapshot;
+                try {
+                    stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk);
+                } catch (Throwable ex) {
+                    //noinspection deprecation
+                    stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
+                }
+                if (stackedSnapshot != null) {
+                    chunkSnapshots.add(getId(chunk), stackedSnapshot);
+                }
+            }catch(Throwable ignored){}
         }
 
-        throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);
+        public void delete(){
+            chunkSnapshots.delete();
+        }
+
+        public Pair<Integer, EntityType> getSpawner(Location location) {
+            String id = getId(location);
+            if(chunkSnapshots.containsKey(id))
+                return new Pair<>(chunkSnapshots.get(id).getStackedSpawner(location));
+
+            throw new RuntimeException("Chunk " + id + " is not cached.");
+        }
+
+        public Pair<Integer, ItemStack> getBlock(Location location) {
+            String id = getId(location);
+            if(chunkSnapshots.containsKey(id)) {
+                Pair<Integer, ItemStack> pair;
+
+                try{
+                    pair = new Pair<>(chunkSnapshots.get(id).getStackedBarrelItem(location));
+                }catch(Throwable ex){
+                    //noinspection deprecation
+                    Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
+                    pair = new Pair<>(entry.getKey(), new ItemStack(entry.getValue()));
+                }
+
+                return pair.getValue().getType().name().contains("AIR") ? null : pair;
+            }
+
+            throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);
+        }
     }
 
     @SuppressWarnings("unused")
