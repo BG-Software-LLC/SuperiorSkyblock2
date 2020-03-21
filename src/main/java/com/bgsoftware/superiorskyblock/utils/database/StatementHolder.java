@@ -16,7 +16,7 @@ public final class StatementHolder {
     private final List<Registry<Integer, Object>> batches = new ArrayList<>();
 
     private final String query;
-    private final Registry<Integer, Object> values = Registry.createRegistry();
+    private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
     StatementHolder(Query query){
@@ -25,37 +25,37 @@ public final class StatementHolder {
     }
 
     public StatementHolder setString(String value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setInt(int value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setShort(short value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setLong(long value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setFloat(float value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setDouble(double value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
     public StatementHolder setBoolean(boolean value){
-        values.add(currentIndex++, value);
+        values.put(currentIndex++, value);
         return this;
     }
 
@@ -94,7 +94,7 @@ public final class StatementHolder {
                     SQLHelper.commit();
                     SQLHelper.setAutoCommit(true);
                 } else {
-                    for (Map.Entry<Integer, Object> entry : values.entries()) {
+                    for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());
                         errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                     }
@@ -106,6 +106,7 @@ public final class StatementHolder {
             });
         } finally {
             SQLHelper.releaseLock();
+            values.clear();
         }
     }
 
