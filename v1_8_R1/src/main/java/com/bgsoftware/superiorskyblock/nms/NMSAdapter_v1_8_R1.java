@@ -41,6 +41,7 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -212,7 +213,7 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
             chunk.entitySlices[i] = new UnsafeList<>();
 
         //noinspection unchecked
-        ((Set<BlockPosition>) chunk.tileEntities.keySet()).forEach(chunk.world::t);
+        new HashSet<>((Set<BlockPosition>) chunk.tileEntities.keySet()).forEach(chunk.world::t);
         chunk.tileEntities.clear();
 
         ChunksTracker.markEmpty(island, bukkitChunk, false);
