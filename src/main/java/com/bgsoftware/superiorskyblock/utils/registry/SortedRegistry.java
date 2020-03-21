@@ -1,17 +1,19 @@
 package com.bgsoftware.superiorskyblock.utils.registry;
 
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import org.bukkit.Bukkit;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Predicate;
 
 public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Registry<K, V> {
 
-    private final Registry<Z, TreeSet<V>> sortedValues = createRegistry();
+    private final Registry<Z, Set<V>> sortedValues = createRegistry();
 
     protected SortedRegistry(){
         super();
@@ -29,7 +31,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
 
     @Override
     public synchronized V add(K key, V value) {
-        for(TreeSet<V> sortedTree : sortedValues.values())
+        for(Set<V> sortedTree : sortedValues.values())
             sortedTree.add(value);
         return super.add(key, value);
     }
@@ -38,7 +40,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
     public synchronized V remove(K key) {
         V value = super.remove(key);
         if(value != null){
-            for (TreeSet<V> sortedTree : sortedValues.values())
+            for (Set<V> sortedTree : sortedValues.values())
                 sortedTree.remove(value);
         }
         return value;
@@ -50,8 +52,13 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
     }
 
     protected synchronized void sort(Z sortingType, Predicate<V> predicate){
+        if(Bukkit.isPrimaryThread()){
+            Executor.async(() -> sort(sortingType, predicate));
+            return;
+        }
+
         ensureType(sortingType);
-        TreeSet<V> sortedTree = sortedValues.get(sortingType);
+        Set<V> sortedTree = sortedValues.get(sortingType);
         Iterator<V> clonedTree = super.iterator();
         sortedTree.clear();
         while(clonedTree.hasNext()) {
@@ -64,7 +71,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
     protected synchronized void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
         Preconditions.checkArgument(!sortedValues.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
 
-        sortedValues.add(sortingType, Sets.newTreeSet(sortingType));
+        sortedValues.add(sortingType, new ConcurrentSkipListSet<>(sortingType));
 
         if(sort)
             sort(sortingType, predicate);
