@@ -82,6 +82,11 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName, boolean offset) {
+        if(!Bukkit.isPrimaryThread()){
+            Executor.sync(() -> createIsland(superiorPlayer, schemName, bonus, biome, islandName, offset));
+            return;
+        }
+
         PreIslandCreateEvent preIslandCreateEvent = new PreIslandCreateEvent(superiorPlayer, islandName);
         Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
 
@@ -96,7 +101,7 @@ public final class GridHandler implements GridManager {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
-                island.getAllChunks(World.Environment.NORMAL, true, true)
+                island.getAllChunks(World.Environment.NORMAL, true, false)
                         .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(island, chunk));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
@@ -272,7 +277,7 @@ public final class GridHandler implements GridManager {
         }
 
         if(getIslandAt(location) != null){
-            lastIsland = SBlockPosition.of(location);
+            setLastIsland(SBlockPosition.of(location));
             return getNextLocation();
         }
 
