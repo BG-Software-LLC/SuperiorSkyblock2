@@ -3,12 +3,14 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -22,11 +24,16 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final Pattern COMMAND_PATTERN_ARGS = Pattern.compile("\\[(.+)](.+)");
+    private static final Pattern COMMAND_PATTERN = Pattern.compile("\\[(.+)]");
 
     public static final char[] itemChars = new char[] {
             '!', '@', '#', '$', '%', '^', '&', '*', '-', '_', '+', '=',
@@ -123,21 +130,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
             List<String> commands = getCommands(e.getRawSlot());
             if (commands != null)
-                commands.forEach(command -> {
-                    if(command.equalsIgnoreCase("close")){
-                        closeButton = true;
-                        previousMove = false;
-                        e.getWhoClicked().closeInventory();
-                    }
-                    else if(command.equalsIgnoreCase("back")){
-                        closeButton = true;
-                        e.getWhoClicked().closeInventory();
-                    }
-                    else {
-                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
-                                command.replace("PLAYER:", "").replace("%player%", player.getName()));
-                    }
-                });
+                commands.forEach(command -> runCommand(command, e, Bukkit.getConsoleSender()));
         }
 
         if(e.getRawSlot() == getBackSlot()){
@@ -146,6 +139,60 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
 
         onPlayerClick(e);
+    }
+
+    private void runCommand(String command, InventoryClickEvent e, CommandSender sender){
+        Matcher matcher = COMMAND_PATTERN_ARGS.matcher(command);
+
+        if(matcher.matches()){
+            String subCommand = matcher.group(1), args = matcher.group(2).trim();
+            handleSubCommand(subCommand, args, e, sender);
+        }
+
+        else if((matcher = COMMAND_PATTERN.matcher(command)).matches()){
+            String subCommand = matcher.group(1);
+            handleSubCommand(subCommand, "", e, sender);
+        }
+
+        else if (command.equalsIgnoreCase("close")) {
+            closeButton = true;
+            previousMove = false;
+            e.getWhoClicked().closeInventory();
+        }
+
+        else if (command.equalsIgnoreCase("back")) {
+            closeButton = true;
+            e.getWhoClicked().closeInventory();
+        }
+
+        else {
+            Bukkit.dispatchCommand(sender instanceof Player || command.startsWith("PLAYER:") ? e.getWhoClicked() : Bukkit.getConsoleSender(),
+                    command.replace("PLAYER:", "").replace("%player%", e.getWhoClicked().getName()));
+        }
+    }
+
+    private void handleSubCommand(String subCommand, String args, InventoryClickEvent e, CommandSender sender){
+        switch (subCommand.toLowerCase()){
+            case "player":
+                runCommand(args, e, e.getWhoClicked());
+                break;
+            case "admin":
+                String commandLabel = plugin.getSettings().islandCommand.split(",")[0];
+                runCommand(commandLabel + " admin " + args, e, sender);
+                break;
+            case "close":
+                closeButton = true;
+                previousMove = false;
+                e.getWhoClicked().closeInventory();
+                break;
+            case "back":
+                closeButton = true;
+                e.getWhoClicked().closeInventory();
+                break;
+            default:
+                CommandUtils.dispatchSubCommand(sender, subCommand, args);
+                break;
+        }
     }
 
     protected abstract void onPlayerClick(InventoryClickEvent e);
