@@ -165,16 +165,21 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void teleport(Location location) {
-        asPlayer().teleport(location);
+        if(isOnline())
+            asPlayer().teleport(location);
     }
 
     @Override
     public void teleport(Island island) {
-        teleport(island, null);
+        if(isOnline())
+            teleport(island, null);
     }
 
     @Override
     public void teleport(Island island, Consumer<Boolean> result) {
+        if(!isOnline())
+            return;
+
         Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
         Location islandCenterLocation = island.getCenter(World.Environment.NORMAL);
 
