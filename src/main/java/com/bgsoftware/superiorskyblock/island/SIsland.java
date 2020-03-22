@@ -286,7 +286,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(includeOwner)
             members.add(owner);
 
-        this.members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members::addAll);
+        this.members.run((Consumer<PriorityQueue<SuperiorPlayer>>) _members -> _members.addAll(members));
 
         return members;
     }
@@ -863,7 +863,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         return plugin.getPlayers().getRoles().stream()
                 .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
-                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
+                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.lastRole());
     }
 
     public void savePermissionNodes(){
@@ -1218,9 +1218,7 @@ public final class SIsland extends DatabaseObject implements Island {
         executeDeleteStatement(true);
 
         //Kick member without saving to database
-        members.run(members -> {
-            members.remove(superiorPlayer);
-        });
+        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.remove(superiorPlayer));
 
         superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
 
