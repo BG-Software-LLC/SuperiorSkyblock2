@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.utils.registry;
 
+import com.bgsoftware.superiorskyblock.utils.maps.SynchronizedLinkedHashMap;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -120,7 +121,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public static <K, V> Registry<K, V> createLinkedRegistry(){
-        return createRegistry(Collections.synchronizedMap(new LinkedHashMap<>()));
+        return createRegistry(new SynchronizedLinkedHashMap<>());
     }
 
 }
