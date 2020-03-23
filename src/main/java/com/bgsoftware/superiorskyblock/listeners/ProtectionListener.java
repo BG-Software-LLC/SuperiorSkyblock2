@@ -134,7 +134,7 @@ public final class ProtectionListener implements Listener {
 
         IslandPrivilege islandPermission;
 
-        if(clickedBlock.getState() instanceof Chest) islandPermission = IslandPrivileges.CHEST_ACCESS;
+        if(clickedBlock.getState() instanceof Chest || clickedBlock.getType().name().contains("SHULKER_BOX")) islandPermission = IslandPrivileges.CHEST_ACCESS;
         else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
         else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
         else if(clickedBlock.getType() == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
