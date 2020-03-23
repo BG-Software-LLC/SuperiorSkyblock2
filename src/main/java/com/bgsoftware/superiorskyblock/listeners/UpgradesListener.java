@@ -87,7 +87,8 @@ public final class UpgradesListener implements Listener {
 
         if(mobDropsMultiplier > 1){
             for(ItemStack itemStack : e.getDrops()){
-                if(itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack)) {
+                if(itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack) &&
+                        !plugin.getNMSTags().getNBTTag(itemStack).getValue().containsKey("WildChests")) {
                     itemStack.setAmount((int) (itemStack.getAmount() * mobDropsMultiplier));
                 }
             }

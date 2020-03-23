@@ -184,6 +184,7 @@ COMMAND_DESCRIPTION_TRANSFER: Transferer la direction de votre île.
 COMMAND_DESCRIPTION_UNCOOP: Supprimer un joueur coopérateur de votre île.
 COMMAND_DESCRIPTION_UPGRADE: Ouvrir le menu des améliorations.
 COMMAND_DESCRIPTION_VALUE: Obtenir la valeur d'une bloc.
+COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
 COMMAND_DESCRIPTION_VISIT: Se téléporter sur la zone visiteurs d'une île.
 COMMAND_DESCRIPTION_VISITORS: Ouvrir le menu des visiteurs.
 COMMAND_DESCRIPTION_WARP: Se téléporter au warp d'une île.

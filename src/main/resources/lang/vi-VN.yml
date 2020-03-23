@@ -227,6 +227,7 @@ COMMAND_DESCRIPTION_TRANSFER: Chuyển lãnh đạo đảo của bạn.
 COMMAND_DESCRIPTION_UNCOOP: Loại bỏ người chơi thành viên co-op trong đảo bạn.
 COMMAND_DESCRIPTION_UPGRADE: Mở bảng nâng cấp.
 COMMAND_DESCRIPTION_VALUE: Nhận giá trị giá trị của một khối.
+COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
 COMMAND_DESCRIPTION_VISIT: Dịch chuyển đến vị trí của du khách trên đảo.
 COMMAND_DESCRIPTION_VISITORS: Mở menu khách.
 COMMAND_DESCRIPTION_WARP: Warp đến một đảo khu vực.

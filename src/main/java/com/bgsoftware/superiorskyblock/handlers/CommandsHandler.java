@@ -53,6 +53,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdTransfer;
 import com.bgsoftware.superiorskyblock.commands.CmdUncoop;
 import com.bgsoftware.superiorskyblock.commands.CmdUpgrade;
 import com.bgsoftware.superiorskyblock.commands.CmdValue;
+import com.bgsoftware.superiorskyblock.commands.CmdValues;
 import com.bgsoftware.superiorskyblock.commands.CmdVisit;
 import com.bgsoftware.superiorskyblock.commands.CmdVisitors;
 import com.bgsoftware.superiorskyblock.commands.CmdWarp;
@@ -157,6 +158,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
         registerCommand(new CmdUncoop(), false);
         registerCommand(new CmdUpgrade(), false);
         registerCommand(new CmdValue(), false);
+        registerCommand(new CmdValues(), false);
         registerCommand(new CmdVisit(), false);
         registerCommand(new CmdVisitors(), false);
         registerCommand(new CmdWarp(), false);

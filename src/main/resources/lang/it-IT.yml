@@ -238,6 +238,7 @@ COMMAND_DESCRIPTION_TRANSFER: Trasferisci la leadership della tua isola.
 COMMAND_DESCRIPTION_UNCOOP: Rimuovi un giocatore dall'essere un co-op nella tua isola.
 COMMAND_DESCRIPTION_UPGRADE: Apri il pannello degli aggiornamenti.
 COMMAND_DESCRIPTION_VALUE: Ottieni il valore di un blocco.
+COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
 COMMAND_DESCRIPTION_VISIT: Teletrasportati nell'isola di un giocatore.
 COMMAND_DESCRIPTION_VISITORS: Apri il menu dei visitatori.
 COMMAND_DESCRIPTION_WARP: Teletrasportati ad una warp dell'isola.

@@ -195,6 +195,7 @@ COMMAND_DESCRIPTION_TRANSFER: יאה תוגיהנמ תא ריבעהל.
 COMMAND_DESCRIPTION_UNCOOP: יאה לש הלועפ ףתשמ תויהלמ ןקחש דירוהל.
 COMMAND_DESCRIPTION_UPGRADE: םיגורדשה טירפת תא חותפל.
 COMMAND_DESCRIPTION_VALUE: קולב לש יווש גיצהל.
+COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
 COMMAND_DESCRIPTION_VISIT: יאה לש םירקבמה תדוקנל רגתשהל.
 COMMAND_DESCRIPTION_VISITORS: םירקבמה טירפת תא חותפל.
 COMMAND_DESCRIPTION_WARP: יאב םוקימל רגתשהל.
