@@ -20,6 +20,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -35,6 +36,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -42,6 +44,8 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 @SuppressWarnings("unused")
@@ -450,6 +454,76 @@ public final class ProtectionListener implements Listener {
         IslandPrivilege islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPrivileges.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.MONSTER_SPAWN;
 
         if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onVehicleSpawn(PlayerInteractEvent e){
+        if(e.getClickedBlock() == null || !e.getClickedBlock().getType().name().contains("RAIL") ||
+                e.getItem() == null || !e.getItem().getType().name().contains("MINECART"))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(e.getPlayer(), IslandPrivileges.MINECART_PLACE)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onVehicleDestroy(VehicleDamageEvent e){
+        if(!(e.getAttacker() instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getAttacker());
+        Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_DAMAGE)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onVehicleEnter(VehicleEnterEvent e){
+        if(!(e.getEntered() instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getEntered());
+        Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_ENTER)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onVehicleOpen(InventoryOpenEvent e){
+        InventoryHolder inventoryHolder = e.getInventory().getHolder();
+
+        if(!(inventoryHolder instanceof Minecart))
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(((Minecart) inventoryHolder).getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_OPEN)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }

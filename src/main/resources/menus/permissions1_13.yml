@@ -877,6 +877,126 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  minecart_damage:
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Damage'
+      lore:
+        - '&7Access to damage minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_enter:
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Enter'
+      lore:
+        - '&7Access to enter minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_open:
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Open'
+      lore:
+        - '&7Access to open minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
+  minecart_place:
+    permission-enabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: MINECART
+      name: '&6Minecart Place'
+      lore:
+        - '&7Access to place minecarts inside the island.'
+        - '&7Role: &e{}&7.'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   monster_spawn:
     permission-enabled:
       type: CAVE_SPIDER_SPAWN_EGG

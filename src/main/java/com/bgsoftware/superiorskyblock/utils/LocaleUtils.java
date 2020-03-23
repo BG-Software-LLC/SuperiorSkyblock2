@@ -11,13 +11,12 @@ import java.util.regex.Pattern;
 
 public final class LocaleUtils {
 
-    private static final Locale englishLocale = new Locale("en", "US");
     private static final Pattern RTL_LOCALE_PATTERN = Pattern.compile(
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
     private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
 
     public static Locale getLocale(CommandSender sender){
-        return sender instanceof Player ? SSuperiorPlayer.of(sender).getUserLocale() : englishLocale;
+        return sender instanceof Player ? SSuperiorPlayer.of(sender).getUserLocale() : com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
     }
 
     public static Locale getLocale(SuperiorPlayer superiorPlayer){
