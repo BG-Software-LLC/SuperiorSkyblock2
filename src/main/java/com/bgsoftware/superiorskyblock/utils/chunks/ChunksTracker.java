@@ -99,7 +99,7 @@ public final class ChunksTracker {
             for (String dirtyChunk : dirtyChunkSections) {
                 String[] dirtyChunkSection = dirtyChunk.split(",");
                 if (dirtyChunkSection.length == 3) {
-                    ChunkPosition chunkPosition = ChunkPosition.of(Bukkit.getWorld(dirtyChunkSection[0]),
+                    ChunkPosition chunkPosition = ChunkPosition.of(dirtyChunkSection[0],
                             Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
 
                     if (island == null)
@@ -121,7 +121,7 @@ public final class ChunksTracker {
                 for (String dirtyChunk : dirtyChunkSections) {
                     String[] dirtyChunkSection = dirtyChunk.split(",");
                     if (dirtyChunkSection.length == 2) {
-                        markDirty(island, ChunkPosition.of(Bukkit.getWorld(worldSections[0]),
+                        markDirty(island, ChunkPosition.of(worldSections[0],
                                 Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1])), false);
                     }
                 }
