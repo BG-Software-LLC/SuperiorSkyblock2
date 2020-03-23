@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface Island extends Comparable<Island> {
 
@@ -271,8 +272,19 @@ public interface Island extends Comparable<Island> {
      * @param environment The environment to get the chunks from.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
+     *
+     * @deprecated See getAllChunksAsync(World.Environment, Boolean, Consumer)
      */
+    @Deprecated
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete);
+
+    /**
+     * Get all the chunks of the island asynchronized, including empty chunks.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized.
@@ -280,8 +292,20 @@ public interface Island extends Comparable<Island> {
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
+     *
+     * @deprecated See getAllChunksAsync(World.Environment, Boolean, Boolean, Consumer)
      */
+    @Deprecated
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete);
+
+    /**
+     * Get all the chunks of the island asynchronized.
+     * @param environment The environment to get the chunks from.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param noEmptyChunks Should empty chunks be loaded or not?
+     * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
+     */
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad);
 
     /**
      * Check if the location is inside the island's area.

@@ -221,7 +221,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
          *   Finding a new block to teleport the player to.
          */
 
-        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, null)
+        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, (Consumer<Chunk>) null)
                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
         Executor.async(() -> {

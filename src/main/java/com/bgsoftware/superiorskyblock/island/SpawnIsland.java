@@ -43,6 +43,7 @@ import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class SpawnIsland implements Island {
@@ -308,6 +309,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad) {
+        return getAllChunksAsync(environment, onlyProtected, false, onChunkLoad);
+    }
+
+    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
         List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
 
@@ -319,9 +325,28 @@ public final class SpawnIsland implements Island {
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
                 if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
                     if (whenComplete != null)
-                        chunks.add(ChunksProvider.loadChunk(world, x, z).whenComplete(whenComplete));
+                        chunks.add(ChunksProvider.loadChunk(world, x, z, null).whenComplete(whenComplete));
                     else
-                        chunks.add(ChunksProvider.loadChunk(world, x, z));
+                        chunks.add(ChunksProvider.loadChunk(world, x, z, null));
+                }
+            }
+        }
+
+        return chunks;
+    }
+
+    @Override
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
+        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+        World world = min.getWorld();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
+                    chunks.add(ChunksProvider.loadChunk(world, x, z, onChunkLoad));
                 }
             }
         }

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -11,19 +11,20 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
 public final class ChunksProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ConcurrentLinkedQueue<Pair<ChunkPosition, CompletableFuture<Chunk>>>
+    private static final ConcurrentLinkedQueue<BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>>>
             pendingChunks = new ConcurrentLinkedQueue<>();
 
     private static BukkitTask chunksLoaderId;
 
-    public static CompletableFuture<Chunk> loadChunk(World world, int x, int z){
+    public static CompletableFuture<Chunk> loadChunk(World world, int x, int z, Consumer<Chunk> onLoadConsumer){
         CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
-        pendingChunks.add(new Pair<>(ChunkPosition.of(world, x, z), completableFuture));
+        pendingChunks.add(new BiPair<>(ChunkPosition.of(world, x, z), completableFuture, onLoadConsumer));
         return completableFuture;
     }
 
@@ -39,12 +40,17 @@ public final class ChunksProvider {
     private static BukkitTask runChunksLoader(){
         Runnable loadChunks = () -> {
             for(int i = 0; i < plugin.getSettings().chunksPerTick; i++) {
-                Pair<ChunkPosition, CompletableFuture<Chunk>> pair = pendingChunks.poll();
+                BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>> pair = pendingChunks.poll();
 
                 if (pair == null)
                     return;
 
-                pair.getValue().complete(pair.getKey().loadChunk());
+                Chunk chunk = pair.getX().loadChunk();
+
+                if(pair.getZ() != null)
+                    pair.getZ().accept(chunk);
+
+                pair.getY().complete(chunk);
             }
         };
 
