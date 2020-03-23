@@ -879,19 +879,19 @@ permissions:
 
   minecart_damage:
     permission-enabled:
-      type: MINECART
+      type: TNT_MINECART
       name: '&6Minecart Damage'
       lore:
         - '&7Access to damage minecarts inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: MINECART
+      type: TNT_MINECART
       name: '&6Minecart Damage'
       lore:
         - '&7Access to damage minecarts inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: MINECART
+      type: TNT_MINECART
       name: '&6Minecart Damage'
       lore:
         - '&7Access to damage minecarts inside the island.'
@@ -909,19 +909,19 @@ permissions:
 
   minecart_enter:
     permission-enabled:
-      type: MINECART
+      type: HOPPER_MINECART
       name: '&6Minecart Enter'
       lore:
         - '&7Access to enter minecarts inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: MINECART
+      type: HOPPER_MINECART
       name: '&6Minecart Enter'
       lore:
         - '&7Access to enter minecarts inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: MINECART
+      type: HOPPER_MINECART
       name: '&6Minecart Enter'
       lore:
         - '&7Access to enter minecarts inside the island.'
@@ -939,19 +939,19 @@ permissions:
 
   minecart_open:
     permission-enabled:
-      type: MINECART
+      type: CHEST_MINECART
       name: '&6Minecart Open'
       lore:
         - '&7Access to open minecarts inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: MINECART
+      type: CHEST_MINECART
       name: '&6Minecart Open'
       lore:
         - '&7Access to open minecarts inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: MINECART
+      type: CHEST_MINECART
       name: '&6Minecart Open'
       lore:
         - '&7Access to open minecarts inside the island.'
