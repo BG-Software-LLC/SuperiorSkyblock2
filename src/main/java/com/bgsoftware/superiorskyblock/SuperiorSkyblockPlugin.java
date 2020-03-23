@@ -297,6 +297,84 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
     }
 
+    @Override
+    public GridHandler getGrid(){
+        return gridHandler;
+    }
+
+    @Override
+    public BlockValuesHandler getBlockValues() {
+        return blockValuesHandler;
+    }
+
+    @Override
+    public SchematicsHandler getSchematics() {
+        return schematicsHandler;
+    }
+
+    @Override
+    public PlayersHandler getPlayers() {
+        return playersHandler;
+    }
+
+    @Override
+    public MissionsHandler getMissions() {
+        return missionsHandler;
+    }
+
+    @Override
+    public MenusManager getMenus() {
+        return menusHandler;
+    }
+
+    @Override
+    public KeysHandler getKeys() {
+        return keysHandler;
+    }
+
+    @Override
+    public ProvidersHandler getProviders() {
+        return providersHandler;
+    }
+
+    @Override
+    public UpgradesHandler getUpgrades() {
+        return upgradesHandler;
+    }
+
+    @Override
+    public CommandsHandler getCommands() {
+        return commandsHandler;
+    }
+
+    public DataHandler getDataHandler() {
+        return dataHandler;
+    }
+
+    public SettingsHandler getSettings() {
+        return settingsHandler;
+    }
+
+    public void setSettings(SettingsHandler settingsHandler){
+        this.settingsHandler = settingsHandler;
+    }
+
+    public NMSAdapter getNMSAdapter() {
+        return nmsAdapter;
+    }
+
+    public NMSTags getNMSTags(){
+        return nmsTags;
+    }
+
+    public NMSBlocks getNMSBlocks() {
+        return nmsBlocks;
+    }
+
+    public String getFileName(){
+        return getFile().getName();
+    }
+
     private void loadSortingTypes(){
         try { SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR); }catch(NullPointerException ignored) {}
         try { SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR); }catch(NullPointerException ignored) {}
@@ -378,80 +456,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("UNCOOP_MEMBER");
         IslandPrivilege.register("USE");
         IslandPrivilege.register("WITHDRAW_MONEY");
-    }
-
-    @Override
-    public GridHandler getGrid(){
-        return gridHandler;
-    }
-
-    @Override
-    public BlockValuesHandler getBlockValues() {
-        return blockValuesHandler;
-    }
-
-    @Override
-    public SchematicsHandler getSchematics() {
-        return schematicsHandler;
-    }
-
-    @Override
-    public PlayersHandler getPlayers() {
-        return playersHandler;
-    }
-
-    @Override
-    public MissionsHandler getMissions() {
-        return missionsHandler;
-    }
-
-    @Override
-    public MenusManager getMenus() {
-        return menusHandler;
-    }
-
-    @Override
-    public KeysHandler getKeys() {
-        return keysHandler;
-    }
-
-    @Override
-    public ProvidersHandler getProviders() {
-        return providersHandler;
-    }
-
-    @Override
-    public UpgradesHandler getUpgrades() {
-        return upgradesHandler;
-    }
-
-    @Override
-    public CommandsHandler getCommands() {
-        return commandsHandler;
-    }
-
-    public DataHandler getDataHandler() {
-        return dataHandler;
-    }
-
-    public SettingsHandler getSettings() {
-        return settingsHandler;
-    }
-
-    public void setSettings(SettingsHandler settingsHandler){
-        this.settingsHandler = settingsHandler;
-    }
-
-    public NMSAdapter getNMSAdapter() {
-        return nmsAdapter;
-    }
-
-    public NMSTags getNMSTags(){
-        return nmsTags;
-    }
-
-    public NMSBlocks getNMSBlocks() {
-        return nmsBlocks;
     }
 
     public static void log(String message){

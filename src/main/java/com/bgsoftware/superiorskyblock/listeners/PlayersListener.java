@@ -63,16 +63,20 @@ import java.util.UUID;
 public final class PlayersListener implements Listener {
 
     private SuperiorSkyblockPlugin plugin;
+    private final String buildName;
 
     public PlayersListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+        String fileName = plugin.getFileName().split("\\.")[0];
+        String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";
+        this.buildName = buildName.isEmpty() ? "" : " (Build: " + buildName + ")";
     }
 
     @EventHandler
     public void onPlayerJoinAdmin(PlayerJoinEvent e){
         if(e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")){
             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion()), 5L);
+                    sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion() + buildName), 5L);
         }
     }
 
