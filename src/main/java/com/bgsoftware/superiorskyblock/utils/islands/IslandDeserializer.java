@@ -29,7 +29,7 @@ public final class IslandDeserializer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void deserializePlayers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync){
-        membersSetSync.run(membersSet -> {
+        membersSetSync.write(membersSet -> {
             for(String uuid : members.split(",")) {
                 try {
                     membersSet.add(SSuperiorPlayer.of(UUID.fromString(uuid)));
@@ -94,7 +94,7 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeBlockLimits(String blocks, SyncedObject<KeyMap<Integer>> blockLimitsSync){
-        blockLimitsSync.run(blockLimits -> {
+        blockLimitsSync.write(blockLimits -> {
             for(String limit : blocks.split(",")){
                 try {
                     String[] sections = limit.split("=");
@@ -123,7 +123,7 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeSettings(String settings, Registry<IslandFlag, Byte> islandSettings, Island island){
+    public static void deserializeSettings(String settings, Registry<IslandFlag, Byte> islandSettings){
         for(String setting : settings.split(";")){
             try {
                 if (setting.contains("=")) {
@@ -138,7 +138,7 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeGenerators(String generator, SyncedObject<KeyMap<Integer>> cobbleGeneratorSync){
-        cobbleGeneratorSync.run(cobbleGenerator -> {
+        cobbleGeneratorSync.write(cobbleGenerator -> {
             for(String limit : generator.split(",")){
                 try {
                     String[] sections = limit.split("=");

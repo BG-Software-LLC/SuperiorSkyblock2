@@ -90,7 +90,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -181,7 +180,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings, this);
+        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
 
@@ -235,7 +234,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
 
-        if(blockCounts.get().isEmpty())
+        if(blockCounts.readAndGet(Map::isEmpty))
             calcIslandWorth(null);
 
         ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
@@ -286,64 +285,57 @@ public final class SIsland extends DatabaseObject implements Island {
         if(includeOwner)
             members.add(owner);
 
-        this.members.run((Function<PriorityQueue<SuperiorPlayer>, Boolean>) members::addAll);
+        this.members.read(members::addAll);
 
         return members;
     }
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return banned.run((Function<Set<SuperiorPlayer>, ArrayList<SuperiorPlayer>>) ArrayList::new);
+        return banned.readAndGet(ArrayList::new);
     }
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors() {
-        return playersInside.run(playersInside -> {
-            return playersInside.stream().filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList());
-        });
+        return playersInside.readAndGet(playersInside -> playersInside.stream()
+                .filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList()));
     }
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return playersInside.run((Function<PriorityQueue<SuperiorPlayer>, ArrayList<SuperiorPlayer>>) ArrayList::new);
+        return playersInside.readAndGet(ArrayList::new);
     }
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return uniqueVisitors.run((Function<PriorityQueue<SuperiorPlayer>, ArrayList<SuperiorPlayer>>) ArrayList::new);
+        return uniqueVisitors.readAndGet(ArrayList::new);
     }
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer){
-        invitedPlayers.run((Consumer<Set<SuperiorPlayer>>) invitedPlayers -> invitedPlayers.add(superiorPlayer));
+        invitedPlayers.write(invitedPlayers -> invitedPlayers.add(superiorPlayer));
         //Revoke the invite after 5 minutes
         Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
 
     @Override
     public void revokeInvite(SuperiorPlayer superiorPlayer){
-        invitedPlayers.run(invitedPlayers -> {
-            invitedPlayers.remove(superiorPlayer);
-        });
+        invitedPlayers.write(invitedPlayers -> invitedPlayers.remove(superiorPlayer));
     }
 
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer){
-        return invitedPlayers.run(invitedPlayers -> {
-            return invitedPlayers.contains(superiorPlayer);
-        });
+        return invitedPlayers.readAndGet(invitedPlayers -> invitedPlayers.contains(superiorPlayer));
     }
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
-        return invitedPlayers.run(invitedPlayers -> {
-            return Collections.unmodifiableList(new ArrayList<>(invitedPlayers));
-        });
+        return invitedPlayers.readAndGet(ArrayList::new);
     }
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
-        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.add(superiorPlayer));
+        members.write(members -> members.add(superiorPlayer));
 
         superiorPlayer.setIslandLeader(owner);
         superiorPlayer.setPlayerRole(playerRole);
@@ -358,7 +350,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
-        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.remove(superiorPlayer));
+        members.write(members -> members.remove(superiorPlayer));
 
         superiorPlayer.setIslandLeader(superiorPlayer);
 
@@ -383,13 +375,11 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public boolean checkMember(SuperiorPlayer superiorPlayer){
-        return superiorPlayer == owner || members.run(members -> {
-            return members.contains(superiorPlayer);
-        });
+        return superiorPlayer == owner || members.readAndGet(members -> members.contains(superiorPlayer));
     }
 
     public void addMemberRaw(SuperiorPlayer superiorPlayer){
-        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.add(superiorPlayer));
+        members.write(members -> members.add(superiorPlayer));
         Query.ISLAND_SET_MEMBERS.getStatementHolder()
                 .setString(IslandSerializer.serializePlayers(members))
                 .setString(owner.getUniqueId().toString())
@@ -398,64 +388,52 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
-        banned.run(banned -> {
-            banned.add(superiorPlayer);
+        banned.write(banned -> banned.add(superiorPlayer));
 
-            if (isMember(superiorPlayer))
-                kickMember(superiorPlayer);
+        if (isMember(superiorPlayer))
+            kickMember(superiorPlayer);
 
-            if (superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        if (superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
 
-            Query.ISLAND_SET_BANNED.getStatementHolder()
-                    .setString(IslandSerializer.serializePlayers(banned))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        Query.ISLAND_SET_BANNED.getStatementHolder()
+                .setString(IslandSerializer.serializePlayers(banned))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
-        banned.run(banned -> {
-            banned.remove(superiorPlayer);
-            Query.ISLAND_SET_BANNED.getStatementHolder()
-                    .setString(IslandSerializer.serializePlayers(banned))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        banned.write(banned -> banned.remove(superiorPlayer));
+        Query.ISLAND_SET_BANNED.getStatementHolder()
+                .setString(IslandSerializer.serializePlayers(banned))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer){
-        return banned.run(banned -> {
-            return banned.contains(superiorPlayer);
-        });
+        return banned.readAndGet(banned -> banned.contains(superiorPlayer));
     }
 
     @Override
     public void addCoop(SuperiorPlayer superiorPlayer) {
-        coop.run(coop -> {
-            coop.add(superiorPlayer);
-        });
+        coop.write(coop -> coop.add(superiorPlayer));
     }
 
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
-        coop.run(coop -> {
-            coop.remove(superiorPlayer);
-        });
+        coop.write(coop -> coop.remove(superiorPlayer));
     }
 
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
-        return coop.run(coop -> {
-            return coop.contains(superiorPlayer);
-        });
+        return coop.readAndGet(coop -> coop.contains(superiorPlayer));
     }
 
     @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
-        playersInside.run(playersInside -> {
+        playersInside.write(playersInside -> {
             if (inside)
                 playersInside.add(superiorPlayer);
             else
@@ -463,14 +441,7 @@ public final class SIsland extends DatabaseObject implements Island {
         });
 
         if(inside && !isMember(superiorPlayer)){
-            boolean newVisitor = uniqueVisitors.run(uniqueVisitors -> {
-                if(!uniqueVisitors.contains(superiorPlayer)){
-                    uniqueVisitors.add(superiorPlayer);
-                    return true;
-                }
-
-                return false;
-            });
+            boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors -> uniqueVisitors.add(superiorPlayer));
 
             if(newVisitor){
                 Query.ISLAND_SET_VISITORS.getStatementHolder()
@@ -513,8 +484,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getVisitorsLocation() {
-        Location visitorsLocation = this.visitorsLocation.get();
-        return visitorsLocation == null ? null : visitorsLocation.clone();
+        return visitorsLocation.readAndGet(location -> location == null ? null : location.clone());
     }
 
     @Override
@@ -1014,7 +984,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-        blockCounts.run((Consumer<KeyMap<Integer>>) KeyMap::clear);
+        blockCounts.write(KeyMap::clear);
         islandWorth.set(BigDecimalFormatted.ZERO);
         islandLevel.set(BigDecimalFormatted.ZERO);
 
@@ -1245,14 +1215,12 @@ public final class SIsland extends DatabaseObject implements Island {
         executeDeleteStatement(true);
 
         //Kick member without saving to database
-        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.remove(superiorPlayer));
+        members.write(members -> members.remove(superiorPlayer));
 
         superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
 
         //Add member without saving to database
-        members.run(members -> {
-            members.add(previousOwner);
-        });
+        members.write(members -> members.add(previousOwner));
 
         PlayerRole previousRole = SPlayerRole.lastRole().getPreviousRole();
         previousOwner.setPlayerRole(previousRole == null ? SPlayerRole.lastRole() : previousRole);
@@ -1290,7 +1258,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void updateLastTime() {
-        this.lastTimeUpdate.run(lastTimeUpdate -> {
+        this.lastTimeUpdate.write(lastTimeUpdate -> {
             if(lastTimeUpdate != -1)
                 setLastTimeUpdate(System.currentTimeMillis() / 1000);
         });
@@ -1323,7 +1291,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public BigDecimal getMoneyInBank() {
-        return islandBank.run(islandBank -> {
+        return islandBank.writeAndGet(islandBank -> {
             if(islandBank.doubleValue() < 0) {
                 islandBank = BigDecimalFormatted.ZERO;
                 this.islandBank.set(islandBank);
@@ -1335,26 +1303,30 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void depositMoney(double amount){
-        this.islandBank.run(islandBank -> {
+        String islandBankString = this.islandBank.writeAndGet(islandBank -> {
             islandBank = islandBank.add(BigDecimalFormatted.of(amount));
             this.islandBank.set(islandBank);
-            Query.ISLAND_SET_BANK.getStatementHolder()
-                    .setString(islandBank.getAsString())
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
+            return islandBank.getAsString();
         });
+
+        Query.ISLAND_SET_BANK.getStatementHolder()
+                .setString(islandBankString)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public void withdrawMoney(double amount){
-        islandBank.run(islandBank -> {
+        String islandBankString = islandBank.writeAndGet(islandBank -> {
             islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
             this.islandBank.set(islandBank);
-            Query.ISLAND_SET_BANK.getStatementHolder()
-                    .setString(islandBank.getAsString())
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
+            return islandBank.getAsString();
         });
+
+        Query.ISLAND_SET_BANK.getStatementHolder()
+                .setString(islandBankString)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*
@@ -1391,37 +1363,31 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         if(blockValue.doubleValue() >= 0){
-            islandWorth.run(islandWorth -> {
-                this.islandWorth.set(islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
-            });
+            islandWorth.set(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
         if(blockLevel.doubleValue() >= 0){
-            islandLevel.run(islandLevel -> {
-                this.islandLevel.set(islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
-            });
+            islandLevel.set(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.run(blockLimits -> {
-            return blockLimits.containsKey(key);
-        });
+        boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
 
         if(increaseAmount || hasBlockLimit) {
-            blockLimits.run(blockLimits -> {
-                blockCounts.run(blockCounts -> {
-                    Key _key = plugin.getBlockValues().getBlockKey(key);
+            KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
-                    int currentAmount = blockCounts.getRaw(_key, 0);
+            blockCounts.write(blockCounts -> {
+                Key _key = plugin.getBlockValues().getBlockKey(key);
+
+                int currentAmount = blockCounts.getRaw(_key, 0);
+                blockCounts.put(_key, currentAmount + amount);
+
+                if (!_key.toString().equals(blockLimits.getKey(_key).toString())) {
+                    _key = blockLimits.getKey(_key);
+                    currentAmount = blockCounts.getRaw(_key, 0);
                     blockCounts.put(_key, currentAmount + amount);
-
-                    if (!_key.toString().equals(blockLimits.getKey(_key).toString())) {
-                        _key = blockLimits.getKey(_key);
-                        currentAmount = blockCounts.getRaw(_key, 0);
-                        blockCounts.put(_key, currentAmount + amount);
-                    }
-                });
+                }
             });
 
             updateLastTime();
@@ -1441,7 +1407,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void handleBlocksPlace(KeyMap<Integer> blocks){
-        KeyMap<Integer> blockLimits = this.blockLimits.get();
+        KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
         KeyMap<Integer> blockCounts = new KeyMap<>();
         BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
@@ -1478,17 +1444,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BigDecimal BLOCKS_VALUES = blocksValues, BLOCKS_LEVELS = blocksLevels;
 
-        this.islandWorth.run(islandWorth -> {
-            this.islandWorth.set(islandWorth.add(BLOCKS_VALUES));
-        });
-
-        this.islandLevel.run(islandLevel -> {
-            this.islandLevel.set(islandLevel.add(BLOCKS_LEVELS));
-        });
-
-        this.blockCounts.run(_blockCounts -> {
-            _blockCounts.putAll(blockCounts);
-        });
+        this.islandWorth.set(islandWorth -> islandWorth.add(BLOCKS_VALUES));
+        this.islandLevel.set(islandLevel -> islandLevel.add(BLOCKS_LEVELS));
+        this.blockCounts.write(_blockCounts -> _blockCounts.putAll(blockCounts));
 
         saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
     }
@@ -1538,29 +1496,27 @@ public final class SIsland extends DatabaseObject implements Island {
             decreaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.run(blockLimits -> {
-            return blockLimits.containsKey(key);
-        });
+        boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
 
         if(decreaseAmount || hasBlockLimit){
-            blockLimits.run(blockLimits -> {
-                blockCounts.run(blockCounts -> {
-                    Key _key = plugin.getBlockValues().getBlockKey(key);
-                    int currentAmount = blockCounts.getRaw(_key, 0);
+            KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
+
+            blockCounts.write(blockCounts -> {
+                Key _key = plugin.getBlockValues().getBlockKey(key);
+                int currentAmount = blockCounts.getRaw(_key, 0);
+                if(currentAmount <= amount)
+                    blockCounts.removeRaw(_key);
+                else
+                    blockCounts.put(_key, currentAmount - amount);
+
+                if(!_key.toString().equals(blockLimits.getKey(_key).toString())){
+                    _key = blockLimits.getKey(_key);
+                    currentAmount = blockCounts.getRaw(_key, 0);
                     if(currentAmount <= amount)
                         blockCounts.removeRaw(_key);
                     else
                         blockCounts.put(_key, currentAmount - amount);
-
-                    if(!_key.toString().equals(blockLimits.getKey(_key).toString())){
-                        _key = blockLimits.getKey(_key);
-                        currentAmount = blockCounts.getRaw(_key, 0);
-                        if(currentAmount <= amount)
-                            blockCounts.removeRaw(_key);
-                        else
-                            blockCounts.put(_key, currentAmount - amount);
-                    }
-                });
+                }
             });
 
             updateLastTime();
@@ -1581,23 +1537,17 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockCount(Key key){
-        return blockCounts.run(blockCounts -> {
-            return blockCounts.getOrDefault(key, 0);
-        });
+        return blockCounts.readAndGet(blockCounts -> blockCounts.getOrDefault(key, 0));
     }
 
     @Override
     public Map<Key, Integer> getBlockCounts() {
-        return blockCounts.run(blockCounts -> {
-            return new HashMap<>(blockCounts.asKeyMap());
-        });
+        return blockCounts.readAndGet(blockCounts -> new HashMap<>(blockCounts.asKeyMap()));
     }
 
     @Override
     public int getExactBlockCount(Key key) {
-        return blockCounts.run(blockCounts -> {
-            return blockCounts.getRaw(key, 0);
-        });
+        return blockCounts.readAndGet(blockCounts -> blockCounts.getRaw(key, 0));
     }
 
     @Override
@@ -1628,14 +1578,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
-        this.bonusWorth.set(bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth));
+        BigDecimalFormatted newBonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
+        this.bonusWorth.set(newBonusWorth);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
         MenuTopIslands.refreshMenus();
 
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder()
-                .setString(this.bonusWorth.get().getAsString())
+                .setString(newBonusWorth.getAsString())
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
     }
@@ -1670,12 +1621,10 @@ public final class SIsland extends DatabaseObject implements Island {
             }, 0L);
         }
 
-        blockCounts.run(blockCounts -> {
-            Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
-                    .setString(IslandSerializer.serializeBlockCounts(blockCounts))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        blockCounts.read(blockCounts -> Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockCounts(blockCounts))
+                .setString(owner.getUniqueId().toString())
+                .execute(true));
     }
 
     /*
@@ -1779,9 +1728,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        int blockLimit = blockLimits.run(blockLimits -> {
-            return blockLimits.getOrDefault(key, NO_BLOCK_LIMIT);
-        });
+        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getOrDefault(key, NO_BLOCK_LIMIT));
 
         for(String upgrade : getUpgrades().keySet())
             blockLimit = Math.max(blockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBlockLimit(key));
@@ -1791,9 +1738,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getExactBlockLimit(Key key) {
-        int blockLimit = blockLimits.run(blockLimits -> {
-            return blockLimits.getRaw(key, NO_BLOCK_LIMIT);
-        });
+        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getRaw(key, NO_BLOCK_LIMIT));
 
         for(String upgrade : getUpgrades().keySet())
             blockLimit = Math.max(blockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getExactBlockLimit(key));
@@ -1803,24 +1748,22 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return this.blockLimits.run(_blockLimits -> {
-            return _blockLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getBlockLimit));
-        });
+        return this.blockLimits.readAndGet(_blockLimits -> _blockLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getBlockLimit)));
     }
 
     @Override
     public void setBlockLimit(Key key, int limit) {
-        blockLimits.run(blockLimits -> {
+        blockLimits.write(blockLimits -> {
             if(limit <= NO_BLOCK_LIMIT)
                 blockLimits.removeRaw(key);
             else
                 blockLimits.put(key, limit);
-
-            Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
-                    .setString(IslandSerializer.serializeBlockLimits(blockLimits))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
         });
+
+        Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockLimits(blockLimits))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
@@ -2210,7 +2153,7 @@ public final class SIsland extends DatabaseObject implements Island {
             setGeneratorAmount(key, 0);
         }
         else if(percentage == 100){
-            cobbleGeneratorValues.run((Consumer<KeyMap<Integer>>) Map::clear);
+            cobbleGeneratorValues.write(Map::clear);
             setGeneratorAmount(key, 1);
         }
         else {
@@ -2220,9 +2163,8 @@ public final class SIsland extends DatabaseObject implements Island {
             double realPercentage = percentage / 100D;
             double amount = (realPercentage * totalAmount) / (1 - realPercentage);
             if(amount < 1){
-                cobbleGeneratorValues.run(cobbleGenerator -> {
-                    cobbleGenerator.keySet().forEach(mat -> cobbleGenerator.put(mat, cobbleGenerator.get(mat) * 10));
-                });
+                cobbleGeneratorValues.write(cobbleGenerator ->
+                        cobbleGenerator.keySet().forEach(mat -> cobbleGenerator.put(mat, cobbleGenerator.get(mat) * 10)));
                 amount *= 10;
             }
             setGeneratorAmount(key, (int) Math.round(amount));
@@ -2247,24 +2189,22 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setGeneratorAmount(Key key, int amount) {
-        cobbleGeneratorValues.run(cobbleGenerator -> {
+        cobbleGeneratorValues.write(cobbleGenerator -> {
             if(amount <= 0)
                 cobbleGenerator.remove(key);
             else
                 cobbleGenerator.put(key, amount);
-
-            Query.ISLAND_SET_GENERATOR.getStatementHolder()
-                    .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
         });
+
+        Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public int getGeneratorAmount(Key key) {
-        int generatorAmount = cobbleGeneratorValues.run(cobbleGenerator -> {
-            return cobbleGenerator.getOrDefault(key, 0);
-        });
+        int generatorAmount = cobbleGeneratorValues.readAndGet(cobbleGenerator -> cobbleGenerator.getOrDefault(key, 0));
 
         if(generatorAmount > 0)
             return generatorAmount;
@@ -2287,9 +2227,8 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
         Map<String, Integer> cobbleGenerator = new HashMap<>();
-        cobbleGeneratorValues.run(cobbleGeneratorValues -> {
-            cobbleGeneratorValues.forEach((k, v) -> cobbleGenerator.put(k.toString(), getGeneratorAmount(k)));
-        });
+        cobbleGeneratorValues.read(cobbleGeneratorValues ->
+                cobbleGeneratorValues.forEach((k, v) -> cobbleGenerator.put(k.toString(), getGeneratorAmount(k))));
 
         if(!cobbleGenerator.isEmpty())
             return cobbleGenerator;
@@ -2494,22 +2433,20 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private void assignGenerator(){
         if(getGeneratorAmounts().isEmpty()) {
-            cobbleGeneratorValues.run(cobbleGenerator -> {
-                if (!cobbleGenerator.isEmpty() || owner == null)
-                    return;
-
-                cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
-
-                Query.ISLAND_SET_GENERATOR.getStatementHolder()
-                        .setString(IslandSerializer.serializeGenerator(cobbleGenerator))
-                        .setString(owner.getUniqueId().toString())
-                        .execute(true);
+            cobbleGeneratorValues.write(cobbleGenerator -> {
+                if (cobbleGenerator.isEmpty() && owner != null)
+                    cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
             });
+
+            Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                    .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
+                    .setString(owner.getUniqueId().toString())
+                    .execute(true);
         }
     }
 
     private void checkMembersDuplication(){
-        members.run(members -> {
+        boolean toSave = members.writeAndGet(members -> {
             Iterator<SuperiorPlayer> iterator = members.iterator();
             boolean removed = false;
 
@@ -2525,13 +2462,15 @@ public final class SIsland extends DatabaseObject implements Island {
                 }
             }
 
-            if(removed){
-                Query.ISLAND_SET_MEMBERS.getStatementHolder()
-                        .setString(IslandSerializer.serializePlayers(members))
-                        .setString(owner.getUniqueId().toString())
-                        .execute(true);
-            }
+            return removed;
         });
+
+        if(toSave) {
+            Query.ISLAND_SET_MEMBERS.getStatementHolder()
+                    .setString(IslandSerializer.serializePlayers(members))
+                    .setString(owner.getUniqueId().toString())
+                    .execute(true);
+        }
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

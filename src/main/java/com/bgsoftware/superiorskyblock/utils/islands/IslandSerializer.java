@@ -20,14 +20,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 
 public final class IslandSerializer {
 
     public static String serializePlayers(SyncedObject<? extends Collection<SuperiorPlayer>> collection) {
-        return collection.run(collection_ -> {
-            return serializePlayers(collection_);
-        });
+        return collection.readAndGet(IslandSerializer::serializePlayers);
     }
 
     public static String serializePlayers(Collection<SuperiorPlayer> collection) {
@@ -59,7 +56,7 @@ public final class IslandSerializer {
     }
 
     public static String serializeBlockCounts(SyncedObject<KeyMap<Integer>> blocks){
-        return blocks.run((Function<KeyMap<Integer>, String>) IslandSerializer::serializeBlockCounts);
+        return blocks.readAndGet(IslandSerializer::serializeBlockCounts);
     }
 
     public static String serializeBlockCounts(KeyMap<Integer> blocks){
@@ -70,7 +67,7 @@ public final class IslandSerializer {
     }
 
     public static String serializeBlockLimits(SyncedObject<KeyMap<Integer>> blocks){
-        return blocks.run((Function<KeyMap<Integer>, String>) IslandSerializer::serializeBlockLimits);
+        return blocks.readAndGet(IslandSerializer::serializeBlockLimits);
     }
 
     public static String serializeBlockLimits(KeyMap<Integer> blocks){
@@ -119,7 +116,7 @@ public final class IslandSerializer {
     }
 
     public static String serializeGenerator(SyncedObject<KeyMap<Integer>> cobbleGenerator){
-        return cobbleGenerator.run((Function<KeyMap<Integer>, String>) IslandSerializer::serializeGenerator);
+        return cobbleGenerator.readAndGet(IslandSerializer::serializeGenerator);
     }
 
     public static String serializeGenerator(KeyMap<Integer> cobbleGenerator){
