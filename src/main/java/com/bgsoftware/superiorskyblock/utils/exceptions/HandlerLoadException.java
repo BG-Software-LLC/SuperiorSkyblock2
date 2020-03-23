@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.exceptions;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -80,13 +79,9 @@ public class HandlerLoadException extends Exception {
     public static boolean handle(HandlerLoadException ex){
         ex.printStackTrace();
 
-        switch (ex.getErrorLevel()){
-            case PLUGIN_SHUTDOWN:
-                Executor.sync(() -> Bukkit.getPluginManager().disablePlugin(plugin));
-                return false;
-            case SERVER_SHUTDOWN:
-                Bukkit.shutdown();
-                return false;
+        if(ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN){
+            Bukkit.shutdown();
+            return false;
         }
 
         return true;
@@ -95,7 +90,6 @@ public class HandlerLoadException extends Exception {
     public enum ErrorLevel{
 
         SERVER_SHUTDOWN,
-        PLUGIN_SHUTDOWN,
         CONTINUE
 
     }

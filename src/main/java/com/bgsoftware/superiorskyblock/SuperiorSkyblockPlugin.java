@@ -99,68 +99,74 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public void onEnable() {
-        if(!shouldEnable) {
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
-        getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
-        getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
-        getServer().getPluginManager().registerEvents(new GeneratorsListener(this), this);
-        getServer().getPluginManager().registerEvents(new MenusListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
-        getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
-        getServer().getPluginManager().registerEvents(new SettingsListener(this), this);
-        getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
-
-        Executor.init(this);
-
-        loadSortingTypes();
-        loadIslandFlags();
-        loadIslandPrivileges();
-
-        EnchantsUtils.registerGlowEnchantment();
-
-        loadWorld();
-
-        reloadPlugin(true);
-
-        if (Updater.isOutdated()) {
-            log("");
-            log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-            log("Version's description: \"" + Updater.getVersionDescription() + "\"");
-            log("");
-        }
-
-        ChunksProvider.init();
-
-        Executor.sync(() -> {
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-                superiorPlayer.updateLastTimeStatus();
-                Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
-                Island playerIsland = superiorPlayer.getIsland();
-
-                if(superiorPlayer.hasIslandFlyEnabled()){
-                    if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
-                        player.setAllowFlight(true);
-                        player.setFlying(true);
-                    }else{
-                        superiorPlayer.toggleIslandFly();
-                    }
-                }
-
-                if(playerIsland != null){
-                    ((SIsland) playerIsland).setLastTimeUpdate(-1);
-                }
-
-                if(island != null)
-                    island.setPlayerInside(superiorPlayer, true);
+        try {
+            if (!shouldEnable) {
+                Bukkit.shutdown();
+                return;
             }
 
-            CropsTask.startTask();
-        }, 1L);
+            getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
+            getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
+            getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
+            getServer().getPluginManager().registerEvents(new GeneratorsListener(this), this);
+            getServer().getPluginManager().registerEvents(new MenusListener(), this);
+            getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
+            getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
+            getServer().getPluginManager().registerEvents(new SettingsListener(this), this);
+            getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
+
+            Executor.init(this);
+
+            loadSortingTypes();
+            loadIslandFlags();
+            loadIslandPrivileges();
+
+            EnchantsUtils.registerGlowEnchantment();
+
+            loadWorld();
+
+            reloadPlugin(true);
+
+            if (Updater.isOutdated()) {
+                log("");
+                log("A new version is available (v" + Updater.getLatestVersion() + ")!");
+                log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+                log("");
+            }
+
+            ChunksProvider.init();
+
+            Executor.sync(() -> {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                    superiorPlayer.updateLastTimeStatus();
+                    Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
+                    Island playerIsland = superiorPlayer.getIsland();
+
+                    if (superiorPlayer.hasIslandFlyEnabled()) {
+                        if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                            player.setAllowFlight(true);
+                            player.setFlying(true);
+                        } else {
+                            superiorPlayer.toggleIslandFly();
+                        }
+                    }
+
+                    if (playerIsland != null) {
+                        ((SIsland) playerIsland).setLastTimeUpdate(-1);
+                    }
+
+                    if (island != null)
+                        island.setPlayerInside(superiorPlayer, true);
+                }
+
+                CropsTask.startTask();
+            }, 1L);
+        }catch (Throwable ex){
+            shouldEnable = false;
+            ex.printStackTrace();
+            Bukkit.shutdown();
+        }
     }
 
     @Override

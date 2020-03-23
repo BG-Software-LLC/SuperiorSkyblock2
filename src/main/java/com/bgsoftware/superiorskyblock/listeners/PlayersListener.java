@@ -66,6 +66,7 @@ public final class PlayersListener implements Listener {
     private final String buildName;
 
     public PlayersListener(SuperiorSkyblockPlugin plugin){
+        String str;
         this.plugin = plugin;
         String fileName = plugin.getFileName().split("\\.")[0];
         String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";

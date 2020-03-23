@@ -64,8 +64,8 @@ public final class SpawnIsland implements Island {
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
         if(center.getWorld() == null){
-            new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.PLUGIN_SHUTDOWN).printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(plugin);
+            new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+            Bukkit.shutdown();
             return;
         }
 
