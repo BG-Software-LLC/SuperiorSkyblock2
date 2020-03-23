@@ -286,7 +286,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(includeOwner)
             members.add(owner);
 
-        this.members.run((Consumer<PriorityQueue<SuperiorPlayer>>) _members -> _members.addAll(members));
+        this.members.run((Function<PriorityQueue<SuperiorPlayer>, Boolean>) members::addAll);
 
         return members;
     }
@@ -315,14 +315,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer){
-        boolean result = invitedPlayers.run(invitedPlayers -> {
-            if (invitedPlayers.contains(superiorPlayer))
-                return false;
-
-            invitedPlayers.add(superiorPlayer);
-            return true;
-        });
-
+        invitedPlayers.run((Consumer<Set<SuperiorPlayer>>) invitedPlayers -> invitedPlayers.add(superiorPlayer));
         //Revoke the invite after 5 minutes
         Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
@@ -350,46 +343,57 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
-        members.run(members -> {
-            members.add(superiorPlayer);
+        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.add(superiorPlayer));
 
-            superiorPlayer.setIslandLeader(owner);
-            superiorPlayer.setPlayerRole(playerRole);
+        superiorPlayer.setIslandLeader(owner);
+        superiorPlayer.setPlayerRole(playerRole);
 
-            MenuMembers.refreshMenus();
+        MenuMembers.refreshMenus();
 
-            Query.ISLAND_SET_MEMBERS.getStatementHolder()
-                    .setString(IslandSerializer.serializePlayers(members))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        Query.ISLAND_SET_MEMBERS.getStatementHolder()
+                .setString(IslandSerializer.serializePlayers(members))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
-        members.run(members -> {
-            members.remove(superiorPlayer);
-            superiorPlayer.setIslandLeader(superiorPlayer);
+        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.remove(superiorPlayer));
 
-            if (superiorPlayer.isOnline()) {
-                SuperiorMenu.killMenu(superiorPlayer);
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            }
+        superiorPlayer.setIslandLeader(superiorPlayer);
 
-            MenuMemberManage.destroyMenus(superiorPlayer);
-            MenuMemberRole.destroyMenus(superiorPlayer);
-            MenuMembers.refreshMenus();
+        if (superiorPlayer.isOnline()) {
+            SuperiorMenu.killMenu(superiorPlayer);
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        }
 
-            Query.ISLAND_SET_MEMBERS.getStatementHolder()
-                    .setString(IslandSerializer.serializePlayers(members))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        });
+        MenuMemberManage.destroyMenus(superiorPlayer);
+        MenuMemberRole.destroyMenus(superiorPlayer);
+        MenuMembers.refreshMenus();
+
+        Query.ISLAND_SET_MEMBERS.getStatementHolder()
+                .setString(IslandSerializer.serializePlayers(members))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
     public boolean isMember(SuperiorPlayer superiorPlayer){
         return owner.equals(superiorPlayer.getIslandLeader());
+    }
+
+    public boolean checkMember(SuperiorPlayer superiorPlayer){
+        return superiorPlayer == owner || members.run(members -> {
+            return members.contains(superiorPlayer);
+        });
+    }
+
+    public void addMemberRaw(SuperiorPlayer superiorPlayer){
+        members.run((Consumer<PriorityQueue<SuperiorPlayer>>) members -> members.add(superiorPlayer));
+        Query.ISLAND_SET_MEMBERS.getStatementHolder()
+                .setString(IslandSerializer.serializePlayers(members))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
@@ -2512,6 +2516,10 @@ public final class SIsland extends DatabaseObject implements Island {
             while (iterator.hasNext()){
                 SuperiorPlayer superiorPlayer = iterator.next();
                 if(!superiorPlayer.getIslandLeader().equals(owner)){
+                    iterator.remove();
+                    removed = true;
+                }
+                if(superiorPlayer.equals(owner)){
                     iterator.remove();
                     removed = true;
                 }
