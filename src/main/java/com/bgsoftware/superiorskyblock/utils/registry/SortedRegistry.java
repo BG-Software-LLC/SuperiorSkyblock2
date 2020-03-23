@@ -19,25 +19,25 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         super();
     }
 
-    public synchronized V get(int index, Z sortingType){
+    public V get(int index, Z sortingType){
         ensureType(sortingType);
         return index >= sortedValues.get(sortingType).size() ? null : Iterables.get(sortedValues.get(sortingType), index);
     }
 
-    public synchronized int indexOf(V value, Z sortingType){
+    public int indexOf(V value, Z sortingType){
         ensureType(sortingType);
         return Iterables.indexOf(sortedValues.get(sortingType), value::equals);
     }
 
     @Override
-    public synchronized V add(K key, V value) {
+    public V add(K key, V value) {
         for(Set<V> sortedTree : sortedValues.values())
             sortedTree.add(value);
         return super.add(key, value);
     }
 
     @Override
-    public synchronized V remove(K key) {
+    public V remove(K key) {
         V value = super.remove(key);
         if(value != null){
             for (Set<V> sortedTree : sortedValues.values())
@@ -46,12 +46,12 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         return value;
     }
 
-    public synchronized Iterator<V> iterator(Z sortingType){
+    public Iterator<V> iterator(Z sortingType){
         ensureType(sortingType);
         return Iterables.unmodifiableIterable(sortedValues.get(sortingType)).iterator();
     }
 
-    protected synchronized void sort(Z sortingType, Predicate<V> predicate){
+    protected void sort(Z sortingType, Predicate<V> predicate){
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> sort(sortingType, predicate));
             return;
@@ -68,7 +68,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         }
     }
 
-    protected synchronized void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
+    protected void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
         Preconditions.checkArgument(!sortedValues.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
 
         sortedValues.add(sortingType, new ConcurrentSkipListSet<>(sortingType));
