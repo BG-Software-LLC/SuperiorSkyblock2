@@ -94,19 +94,21 @@ public final class ChunksTracker {
     }
 
     private static void deserializeOld(GridHandler grid, Island island, String serialized){
-        String[] dirtyChunkSections = serialized.split(";");
-        for(String dirtyChunk : dirtyChunkSections) {
-            String[] dirtyChunkSection = dirtyChunk.split(",");
-            if(dirtyChunkSection.length == 3) {
-                ChunkPosition chunkPosition = ChunkPosition.of(Bukkit.getWorld(dirtyChunkSection[0]),
-                        Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
+        try {
+            String[] dirtyChunkSections = serialized.split(";");
+            for (String dirtyChunk : dirtyChunkSections) {
+                String[] dirtyChunkSection = dirtyChunk.split(",");
+                if (dirtyChunkSection.length == 3) {
+                    ChunkPosition chunkPosition = ChunkPosition.of(Bukkit.getWorld(dirtyChunkSection[0]),
+                            Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
 
-                if(island == null)
-                    island = getIsland(grid, chunkPosition);
+                    if (island == null)
+                        island = getIsland(grid, chunkPosition);
 
-                markDirty(island, chunkPosition, false);
+                    markDirty(island, chunkPosition, false);
+                }
             }
-        }
+        }catch(Exception ignored){}
     }
 
     private static void deserializeNew(Island island, String serialized){
