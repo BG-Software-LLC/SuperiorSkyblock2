@@ -51,9 +51,9 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         return Iterables.unmodifiableIterable(sortedValues.get(sortingType)).iterator();
     }
 
-    protected void sort(Z sortingType, Predicate<V> predicate){
+    protected void sort(Z sortingType, Predicate<V> predicate, Runnable onFinish){
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> sort(sortingType, predicate));
+            Executor.async(() -> sort(sortingType, predicate, onFinish));
             return;
         }
 
@@ -66,6 +66,9 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
             if(predicate == null || predicate.test(value))
                 sortedTree.add(value);
         }
+
+        if(onFinish != null)
+            onFinish.run();
     }
 
     protected void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
@@ -74,7 +77,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         sortedValues.add(sortingType, new ConcurrentSkipListSet<>(sortingType));
 
         if(sort)
-            sort(sortingType, predicate);
+            sort(sortingType, predicate, null);
     }
 
     private void ensureType(Z sortingType){

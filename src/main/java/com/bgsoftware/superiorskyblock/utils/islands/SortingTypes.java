@@ -9,6 +9,9 @@ public final class SortingTypes {
     public static SortingType BY_LEVEL = SortingType.getByName("LEVEL");
     public static SortingType BY_RATING = SortingType.getByName("RATING");
     public static SortingType BY_PLAYERS = SortingType.getByName("PLAYERS");
-    public static SortingType DEFAULT = SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopOrder);
+
+    public static SortingType getDefaultSorting(){
+        return SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopOrder);
+    }
 
 }

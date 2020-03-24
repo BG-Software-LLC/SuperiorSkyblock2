@@ -38,8 +38,8 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
         return island;
     }
 
-    public void sort(SortingType sortingType) {
-        super.sort(sortingType, ISLANDS_PREDICATE);
+    public void sort(SortingType sortingType, Runnable onFinish) {
+        super.sort(sortingType, ISLANDS_PREDICATE, onFinish);
     }
 
     public void registerSortingType(SortingType sortingType, boolean sort) {

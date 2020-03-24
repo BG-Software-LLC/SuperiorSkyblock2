@@ -50,7 +50,7 @@ public final class CmdTop implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        MenuTopIslands.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.DEFAULT);
+        MenuTopIslands.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.getDefaultSorting());
     }
 
     @Override

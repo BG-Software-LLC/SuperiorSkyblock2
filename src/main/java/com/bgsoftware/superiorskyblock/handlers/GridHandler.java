@@ -157,7 +157,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Island getIsland(int index){
-        return getIsland(index, SortingTypes.DEFAULT);
+        return getIsland(index, SortingTypes.getDefaultSorting());
     }
 
     @Override
@@ -296,12 +296,16 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void sortIslands(SortingType sortingType) {
-        islands.sort(sortingType);
+        sortIslands(sortingType, null);
+    }
+
+    public void sortIslands(SortingType sortingType, Runnable onFinish) {
+        islands.sort(sortingType, onFinish);
     }
 
     @Override
     public List<UUID> getAllIslands(){
-        return getAllIslands(SortingTypes.DEFAULT);
+        return getAllIslands(SortingTypes.getDefaultSorting());
     }
 
     @Override
@@ -321,7 +325,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void openTopIslands(SuperiorPlayer superiorPlayer){
-        MenuTopIslands.openInventory(superiorPlayer, null, SortingTypes.DEFAULT);
+        MenuTopIslands.openInventory(superiorPlayer, null, SortingTypes.getDefaultSorting());
     }
 
     @Override

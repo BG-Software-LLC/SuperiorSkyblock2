@@ -357,8 +357,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SortingType sortingType){
-        new MenuTopIslands(superiorPlayer, sortingType).open(previousMenu);
-        plugin.getGrid().sortIslands(sortingType);
+        plugin.getGrid().sortIslands(sortingType, () -> new MenuTopIslands(superiorPlayer, sortingType).open(previousMenu));
     }
 
     public static void refreshMenus(){
