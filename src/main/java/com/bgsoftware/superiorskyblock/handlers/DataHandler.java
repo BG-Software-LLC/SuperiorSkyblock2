@@ -226,6 +226,11 @@ public final class DataHandler {
                 SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + " is an island leader, but have a guest role - fixing it...");
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
+
+            if(superiorPlayer.getIsland() != null && !((SIsland) superiorPlayer.getIsland()).checkMember(superiorPlayer)){
+                SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + "'s island had corrupted members. Fixing it...");
+                ((SIsland) superiorPlayer.getIsland()).addMemberRaw(superiorPlayer);
+            }
         }
 
     }
