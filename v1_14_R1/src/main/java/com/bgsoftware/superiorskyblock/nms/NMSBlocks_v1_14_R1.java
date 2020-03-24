@@ -129,10 +129,12 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
 
         Location location = new Location(bukkitChunk.getWorld(), bukkitChunk.getX() << 4, 128, bukkitChunk.getZ() << 4);
 
-        for(Entity player : bukkitChunk.getWorld().getNearbyEntities(location, 60, 128, 60)) {
-            if(player instanceof Player)
-                ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutMapChunk);
-        }
+        Executor.ensureMain(() -> {
+            for(Entity player : bukkitChunk.getWorld().getNearbyEntities(location, 60, 128, 60)) {
+                if(player instanceof Player)
+                    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutMapChunk);
+            }
+        });
     }
 
     @Override
