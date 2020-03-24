@@ -71,7 +71,7 @@ public final class SyncedObject<T> {
             lock.writeLock().lock();
             consumer.accept(value);
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -80,7 +80,7 @@ public final class SyncedObject<T> {
             lock.writeLock().lock();
             return function.apply(value);
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
