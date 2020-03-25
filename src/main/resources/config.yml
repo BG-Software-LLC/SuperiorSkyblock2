@@ -477,3 +477,19 @@ build-outside-island: false
 # The default language to be used.
 # This should be the same as your language file's name.
 default-language: 'en-US'
+
+# Should world borders be enabled by default for new players?
+default-world-border: true
+
+# Should blocks stacking be enabled by default for new players?
+default-blocks-stacker: true
+
+# Should panels be toggled by default for new players?
+default-toggled-panel: false
+
+# Should fly mode be enabled by default for new players?
+default-island-fly: false
+
+# What the default color for world borders be?
+# Can be BLUE, GREEN or RED.
+default-border-color: BLUE

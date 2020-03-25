@@ -111,6 +111,11 @@ public final class SettingsHandler {
     public final boolean onlyBackButton;
     public final boolean buildOutsideIsland;
     public final String defaultLanguage;
+    public final boolean defaultWorldBorder;
+    public final boolean defaultBlocksStacker;
+    public final boolean defaultToggledPanel;
+    public final boolean defaultIslandFly;
+    public final String defaultBorderColor;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -253,6 +258,11 @@ public final class SettingsHandler {
         onlyBackButton = cfg.getBoolean("only-back-button", false);
         buildOutsideIsland = cfg.getBoolean("build-outside-island", false);
         defaultLanguage = cfg.getString("default-language", "en-US");
+        defaultWorldBorder = cfg.getBoolean("default-world-border", true);
+        defaultBlocksStacker = cfg.getBoolean("default-blocks-stacker", true);
+        defaultToggledPanel = cfg.getBoolean("default-toggled-panel", false);
+        defaultIslandFly = cfg.getBoolean("default-island-fly", false);
+        defaultBorderColor = cfg.getString("default-border-color", "BLUE");
     }
 
     public void updateValue(String path, Object value){

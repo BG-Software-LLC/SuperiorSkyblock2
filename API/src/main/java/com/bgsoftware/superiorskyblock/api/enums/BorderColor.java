@@ -7,6 +7,14 @@ public enum BorderColor {
 
     RED,
     GREEN,
-    BLUE
+    BLUE;
+
+    public static BorderColor safeValue(String name, BorderColor def){
+        try{
+            return BorderColor.valueOf(name);
+        }catch(IllegalArgumentException ex){
+            return def;
+        }
+    }
 
 }

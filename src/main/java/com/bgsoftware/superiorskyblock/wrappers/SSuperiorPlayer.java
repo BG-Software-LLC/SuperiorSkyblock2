@@ -58,17 +58,18 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
 
-    private boolean worldBorderEnabled = true;
-    private boolean blocksStackerEnabled = true;
+    private boolean worldBorderEnabled = plugin.getSettings().defaultWorldBorder;
+    private boolean blocksStackerEnabled = plugin.getSettings().defaultBlocksStacker;
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
+    private boolean toggledPanel = plugin.getSettings().defaultToggledPanel;
+    private boolean islandFly = plugin.getSettings().defaultIslandFly;
+    private boolean adminSpyEnabled = false;
+
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
     private int disbands;
-    private boolean toggledPanel = false;
-    private boolean islandFly = false;
-    private boolean adminSpyEnabled = false;
-    private BorderColor borderColor = BorderColor.BLUE;
+    private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().defaultBorderColor, BorderColor.BLUE);
     private long lastTimeStatus = -1;
 
     private boolean immuneToPvP = false;
