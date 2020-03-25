@@ -58,14 +58,13 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         }
 
         ensureType(sortingType);
+
         Set<V> sortedTree = sortedValues.get(sortingType);
-        Iterator<V> clonedTree = super.iterator();
+        Set<V> newSortedTree = new ConcurrentSkipListSet<>(sortingType);
+        sortedTree.stream().filter(s -> predicate == null || predicate.test(s)).forEach(newSortedTree::add);
         sortedTree.clear();
-        while(clonedTree.hasNext()) {
-            V value = clonedTree.next();
-            if(predicate == null || predicate.test(value))
-                sortedTree.add(value);
-        }
+
+        sortedValues.add(sortingType, newSortedTree);
 
         if(onFinish != null)
             onFinish.run();
