@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class MenuMissions extends SuperiorMenu {
 
-    private static int playerSlot, islandSlot;
+    private static List<Integer> playerSlot, islandSlot;
 
     private MenuMissions(SuperiorPlayer superiorPlayer){
         super("menuMissions", superiorPlayer);
@@ -24,11 +24,11 @@ public final class MenuMissions extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
-        if(e.getRawSlot() == playerSlot){
+        if(playerSlot.contains(e.getRawSlot())){
             previousMove = false;
             MenuPlayerMissions.openInventory(superiorPlayer, this);
         }
-        else if(e.getRawSlot() == islandSlot){
+        else if(islandSlot.contains(e.getRawSlot())){
             previousMove = false;
             MenuIslandMissions.openInventory(superiorPlayer, this);
         }
@@ -50,8 +50,8 @@ public final class MenuMissions extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
 
-        playerSlot = charSlots.get(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        islandSlot = charSlots.get(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        playerSlot = charSlots.get(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1));
+        islandSlot = charSlots.get(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

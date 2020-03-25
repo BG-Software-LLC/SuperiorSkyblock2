@@ -32,8 +32,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
         objects = requestObjects();
 
-        int previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot();
-        List<Integer> slots = getSlots();
+        List<Integer> previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot(), slots = getSlots();
 
         for(int i = 0; i < slots.size(); i++){
             int objectIndex = i + (slots.size() * (currentPage - 1));
@@ -49,36 +48,45 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             }
         }
 
-        if(previousSlot >= 0)
-            inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
-                    .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
+        for(int _previousSlot : previousSlot) {
+            if (_previousSlot >= 0)
+                inventory.setItem(_previousSlot, new ItemBuilder(inventory.getItem(_previousSlot))
+                        .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
+        }
 
-        if(currentSlot >= 0)
-            inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
-                    .replaceAll("{0}", currentPage + "").build(superiorPlayer));
+        for(int _currentSlot : currentSlot) {
+            if (_currentSlot >= 0)
+                inventory.setItem(_currentSlot, new ItemBuilder(inventory.getItem(_currentSlot))
+                        .replaceAll("{0}", currentPage + "").build(superiorPlayer));
+        }
 
-        if(nextSlot >= 0)
-            inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
-                    .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
+        for(int _nextSlot : nextSlot) {
+            if (_nextSlot >= 0)
+                inventory.setItem(_nextSlot, new ItemBuilder(inventory.getItem(_nextSlot))
+                        .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
+        }
 
         return inventory;
     }
 
     @Override
     protected final void onPlayerClick(InventoryClickEvent e) {
-        int previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot();
-        List<Integer> slots = getSlots();
+        List<Integer> previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot(), slots = getSlots();
 
-        if(e.getRawSlot() == previousSlot || e.getRawSlot() == nextSlot || e.getRawSlot() == currentSlot){
-            if(e.getRawSlot() == currentSlot)
+        boolean isPreviousSlot = previousSlot.contains(e.getRawSlot()),
+                isNextSlot = nextSlot.contains(e.getRawSlot()),
+                isCurrentSlot = currentSlot.contains(e.getRawSlot());
+
+        if(isPreviousSlot || isNextSlot || isCurrentSlot){
+            if(isCurrentSlot)
                 return;
 
             boolean nextPage = slots.size() * currentPage < objects.size();
 
-            if((!nextPage && e.getRawSlot() == nextSlot) || (currentPage == 1 && e.getRawSlot() == previousSlot))
+            if((!nextPage && isNextSlot) || (currentPage == 1 && isPreviousSlot))
                 return;
 
-            currentPage = e.getRawSlot() == nextSlot ? currentPage + 1 : currentPage - 1;
+            currentPage = isNextSlot ? currentPage + 1 : currentPage - 1;
 
             previousMove = false;
             open(previousMenu);
@@ -114,15 +122,15 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
     protected abstract List<T> requestObjects();
 
-    public void setCurrentSlot(int currentSlot){
+    public void setCurrentSlot(List<Integer> currentSlot){
         addData("currentSlot", currentSlot);
     }
 
-    public void setNextSlot(int nextSlot) {
+    public void setNextSlot(List<Integer> nextSlot) {
         addData("nextSlot", nextSlot);
     }
 
-    public void setPreviousSlot(int previousSlot) {
+    public void setPreviousSlot(List<Integer> previousSlot) {
         addData("previousSlot", previousSlot);
     }
 
@@ -131,16 +139,19 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
         slots.sort(Integer::compareTo);
     }
 
-    private int getCurrentSlot(){
-        return (Integer) getData("currentSlot");
+    private List<Integer> getCurrentSlot(){
+        //noinspection unchecked
+        return (List<Integer>) getData("currentSlot");
     }
 
-    private int getNextSlot(){
-        return (Integer) getData("nextSlot");
+    private List<Integer> getNextSlot(){
+        //noinspection unchecked
+        return (List<Integer>) getData("nextSlot");
     }
 
-    private int getPreviousSlot(){
-        return (Integer) getData("previousSlot");
+    private List<Integer> getPreviousSlot(){
+        //noinspection unchecked
+        return (List<Integer>) getData("previousSlot");
     }
 
     private List<Integer> getSlots(){

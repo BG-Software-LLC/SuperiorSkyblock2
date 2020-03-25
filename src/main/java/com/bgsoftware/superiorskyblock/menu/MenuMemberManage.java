@@ -19,7 +19,7 @@ import java.util.List;
 
 public final class MenuMemberManage extends SuperiorMenu {
 
-    private static int rolesSlot, banSlot, kickSlot;
+    private static List<Integer> rolesSlot, banSlot, kickSlot;
 
     private SuperiorPlayer targetPlayer;
 
@@ -30,16 +30,16 @@ public final class MenuMemberManage extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
-        if(e.getRawSlot() == rolesSlot){
+        if(rolesSlot.contains(e.getRawSlot())){
             previousMove = false;
             MenuMemberRole.openInventory(SSuperiorPlayer.of(e.getWhoClicked()), this, targetPlayer);
         }
 
-        else if(e.getRawSlot() == banSlot){
+        else if(banSlot.contains(e.getRawSlot())){
             CommandUtils.dispatchSubCommand(e.getWhoClicked(), "ban " + targetPlayer.getName());
         }
 
-        else if(e.getRawSlot() == kickSlot){
+        else if(kickSlot.contains(e.getRawSlot())){
             CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
         }
     }
@@ -65,9 +65,9 @@ public final class MenuMemberManage extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
-        rolesSlot = charSlots.get(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        banSlot = charSlots.get(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        kickSlot = charSlots.get(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        rolesSlot = charSlots.get(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1));
+        banSlot = charSlots.get(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1));
+        kickSlot = charSlots.get(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

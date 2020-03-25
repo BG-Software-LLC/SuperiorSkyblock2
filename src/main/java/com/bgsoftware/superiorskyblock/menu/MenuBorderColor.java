@@ -20,7 +20,7 @@ import java.util.List;
 
 public final class MenuBorderColor extends SuperiorMenu {
 
-    private static int greenColorSlot, blueColorSlot, redColorSlot;
+    private static List<Integer> greenColorSlot, blueColorSlot, redColorSlot;
 
     private MenuBorderColor(SuperiorPlayer superiorPlayer){
         super("menuBorderColor", superiorPlayer);
@@ -30,11 +30,11 @@ public final class MenuBorderColor extends SuperiorMenu {
     protected void onPlayerClick(InventoryClickEvent e) {
         BorderColor borderColor;
 
-        if(e.getRawSlot() == greenColorSlot)
+        if(greenColorSlot.contains(e.getRawSlot()))
             borderColor = BorderColor.GREEN;
-        else if(e.getRawSlot() == blueColorSlot)
+        else if(blueColorSlot.contains(e.getRawSlot()))
             borderColor = BorderColor.BLUE;
-        else if(e.getRawSlot() == redColorSlot)
+        else if(redColorSlot.contains(e.getRawSlot()))
             borderColor = BorderColor.RED;
         else return;
 
@@ -65,9 +65,9 @@ public final class MenuBorderColor extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
-        greenColorSlot = charSlots.get(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        redColorSlot = charSlots.get(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        blueColorSlot = charSlots.get(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        greenColorSlot = charSlots.get(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1));
+        redColorSlot = charSlots.get(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1));
+        blueColorSlot = charSlots.get(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

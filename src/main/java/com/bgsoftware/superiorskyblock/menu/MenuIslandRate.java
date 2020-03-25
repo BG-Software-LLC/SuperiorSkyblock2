@@ -22,7 +22,7 @@ import java.util.List;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
-    private static int oneStarSlot, twoStarsSlot, threeStarsSlot, fourStarsSlot, fiveStarsSlot;
+    private static List<Integer> oneStarSlot, twoStarsSlot, threeStarsSlot, fourStarsSlot, fiveStarsSlot;
 
     private final Island island;
 
@@ -35,15 +35,15 @@ public final class MenuIslandRate extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         Rating rating = Rating.UNKNOWN;
 
-        if(e.getRawSlot() == oneStarSlot)
+        if(oneStarSlot.contains(e.getRawSlot()))
             rating = Rating.ONE_STAR;
-        else if(e.getRawSlot() == twoStarsSlot)
+        else if(twoStarsSlot.contains(e.getRawSlot()))
             rating = Rating.TWO_STARS;
-        else if(e.getRawSlot() == threeStarsSlot)
+        else if(threeStarsSlot.contains(e.getRawSlot()))
             rating = Rating.THREE_STARS;
-        else if(e.getRawSlot() == fourStarsSlot)
+        else if(fourStarsSlot.contains(e.getRawSlot()))
             rating = Rating.FOUR_STARS;
-        else if(e.getRawSlot() == fiveStarsSlot)
+        else if(fiveStarsSlot.contains(e.getRawSlot()))
             rating = Rating.FIVE_STARS;
 
         if(rating == Rating.UNKNOWN)
@@ -77,11 +77,11 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
-        oneStarSlot = charSlots.get(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        twoStarsSlot = charSlots.get(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        threeStarsSlot = charSlots.get(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        fourStarsSlot = charSlots.get(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        fiveStarsSlot = charSlots.get(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        oneStarSlot = charSlots.get(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1));
+        twoStarsSlot = charSlots.get(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1));
+        threeStarsSlot = charSlots.get(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1));
+        fourStarsSlot = charSlots.get(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1));
+        fiveStarsSlot = charSlots.get(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

@@ -73,9 +73,9 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        menuGlobalWarps.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuGlobalWarps.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuGlobalWarps.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuGlobalWarps.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuGlobalWarps.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuGlobalWarps.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
         menuGlobalWarps.setSlots(charSlots.get(cfg.getString("warps", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();

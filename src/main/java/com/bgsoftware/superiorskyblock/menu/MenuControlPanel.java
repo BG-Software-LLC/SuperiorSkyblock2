@@ -19,7 +19,7 @@ import java.util.List;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
-    private static int membersSlot, settingsSlot, visitorsSlot;
+    private static List<Integer> membersSlot, settingsSlot, visitorsSlot;
 
     private MenuControlPanel(SuperiorPlayer superiorPlayer){
         super("menuControlPanel", superiorPlayer);
@@ -29,10 +29,10 @@ public final class MenuControlPanel extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
-        if(membersSlot == e.getRawSlot()){
+        if(membersSlot.contains(e.getRawSlot())){
             MenuMembers.openInventory(superiorPlayer, this, island);
         }
-        else if (settingsSlot == e.getRawSlot()) {
+        else if (settingsSlot.contains(e.getRawSlot())) {
             if(superiorPlayer.hasPermission("superior.island.settings")) {
                 if(!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)){
                     Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
@@ -42,7 +42,7 @@ public final class MenuControlPanel extends SuperiorMenu {
                 MenuSettings.openInventory(superiorPlayer, this, island);
             }
         }
-        else if (visitorsSlot == e.getRawSlot()) {
+        else if (visitorsSlot.contains(e.getRawSlot())) {
             MenuVisitors.openInventory(superiorPlayer, this, island);
         }
     }
@@ -63,9 +63,9 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
-        membersSlot = charSlots.get(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        settingsSlot = charSlots.get(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        visitorsSlot = charSlots.get(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        membersSlot = charSlots.get(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1));
+        settingsSlot = charSlots.get(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1));
+        visitorsSlot = charSlots.get(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

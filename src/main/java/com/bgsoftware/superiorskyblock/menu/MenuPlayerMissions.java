@@ -107,9 +107,9 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuPlayerMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuPlayerMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuPlayerMissions.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuPlayerMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuPlayerMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuPlayerMissions.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
         menuPlayerMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
 
         charSlots.delete();

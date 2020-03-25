@@ -20,7 +20,7 @@ import java.util.List;
 
 public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
-    private static int uniqueVisitorsSlot;
+    private static List<Integer> uniqueVisitorsSlot;
 
     private Island island;
 
@@ -31,7 +31,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
     @Override
     protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
-        if(event.getRawSlot() == uniqueVisitorsSlot){
+        if(uniqueVisitorsSlot.contains(event.getRawSlot())){
             previousMove = false;
             MenuUniqueVisitors.openInventory(superiorPlayer, this, island);
         }
@@ -77,11 +77,11 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
 
-        uniqueVisitorsSlot = charSlots.get(cfg.getString("unique-visitors", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        uniqueVisitorsSlot = charSlots.get(cfg.getString("unique-visitors", " ").charAt(0), Collections.singletonList(-1));
 
-        menuVisitors.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuVisitors.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
-        menuVisitors.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)).get(0));
+        menuVisitors.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuVisitors.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
+        menuVisitors.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
         menuVisitors.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();

@@ -23,7 +23,7 @@ import java.util.List;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
 
-    private static int confirmSlot, cancelSlot;
+    private static List<Integer> confirmSlot, cancelSlot;
 
     private MenuConfirmDisband(SuperiorPlayer superiorPlayer){
         super("menuConfirmDisband", superiorPlayer);
@@ -33,7 +33,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
     protected void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
-        if(confirmSlot == e.getRawSlot()){
+        if(confirmSlot.contains(e.getRawSlot())){
             IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
             Bukkit.getPluginManager().callEvent(islandDisbandEvent);
 
@@ -46,7 +46,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                 island.disbandIsland();
             }
         }
-        else if(e.getRawSlot() != cancelSlot)
+        else if(!cancelSlot.contains(e.getRawSlot()))
             return;
 
         Executor.sync(() -> {
@@ -71,8 +71,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
-        confirmSlot = charSlots.get(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1)).get(0);
-        cancelSlot = charSlots.get(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        confirmSlot = charSlots.get(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1));
+        cancelSlot = charSlots.get(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
     }

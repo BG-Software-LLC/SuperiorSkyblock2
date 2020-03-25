@@ -115,9 +115,9 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuIslandMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuIslandMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)).get(0));
-        menuIslandMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)).get(0));
-        menuIslandMissions.setNextSlot(charSlots.get(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)).get(0));
+        menuIslandMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)));
+        menuIslandMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)));
+        menuIslandMissions.setNextSlot(charSlots.get(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)));
         menuIslandMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
 
         charSlots.delete();
