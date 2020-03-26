@@ -137,8 +137,11 @@ island-roles:
   #  - You can add as many roles as you'd like.
   #  - The default role for new members has a weight of 0.
   #  - Every role has all the permissions of the role before it.
+  #  - Every role should have a custom id, to determine the role if the name is changed.
+  #    Do not change ids!!! They don't have to be in an order.
   ladder:
     member:
+      id: 0
       name: 'Member'
       weight: 0
       permissions:
@@ -150,6 +153,7 @@ island-roles:
       - RANKUP
       - SPAWNER_BREAK
     mod:
+      id: 1
       name: 'Moderator'
       weight: 1
       permissions:
@@ -164,6 +168,7 @@ island-roles:
       - SET_WARP
       - WITHDRAW_MONEY
     admin:
+      id: 2
       name: 'Admin'
       weight: 2
       permissions:
@@ -181,6 +186,7 @@ island-roles:
       - SET_SETTINGS
       - UNCOOP_MEMBER
     leader:
+      id: 3
       name: 'Leader'
       weight: 3
       permissions:

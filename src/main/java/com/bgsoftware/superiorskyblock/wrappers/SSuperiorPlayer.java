@@ -81,7 +81,15 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");
         textureValue = resultSet.getString("textureValue");
-        playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
+
+        try{
+            playerRole = SPlayerRole.fromId(Integer.parseInt(resultSet.getString("islandRole")));
+        }catch(Exception ex){
+            playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
+            // Update the role in the database to be based on id.
+            setPlayerRole(playerRole);
+        }
+
         disbands = resultSet.getInt("disbands");
         toggledPanel = resultSet.getBoolean("toggledPanel");
         islandFly = resultSet.getBoolean("islandFly");
@@ -319,7 +327,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setPlayerRole(PlayerRole playerRole) {
         this.playerRole = playerRole;
         Query.PLAYER_SET_ROLE.getStatementHolder()
-                .setString(playerRole.toString())
+                .setString(playerRole.getId() + "")
                 .setString(player.toString())
                 .execute(true);
     }
@@ -604,7 +612,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Query.PLAYER_UPDATE.getStatementHolder()
                 .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
-                .setString(playerRole.toString())
+                .setString(playerRole.getId() + "")
                 .setString(textureValue)
                 .setInt(disbands)
                 .setBoolean(toggledPanel)
@@ -624,7 +632,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(player.toString())
                 .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
-                .setString(playerRole.toString())
+                .setString(playerRole.getId() + "")
                 .setString(textureValue)
                 .setInt(plugin.getSettings().disbandCount)
                 .setBoolean(toggledPanel)

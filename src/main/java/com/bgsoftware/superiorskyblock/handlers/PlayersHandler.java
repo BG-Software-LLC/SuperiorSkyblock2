@@ -9,13 +9,12 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -24,8 +23,12 @@ public final class PlayersHandler implements PlayersManager {
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
+    private static Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
+    private static Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
+
     private static Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
-    private static Registry<Integer, PlayerRole> roles = Registry.createRegistry();
     private static int lastRole = Integer.MIN_VALUE;
 
     public PlayersHandler(){
@@ -63,17 +66,18 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public PlayerRole getPlayerRole(int index) {
-        return roles.get(index);
+        return rolesByWeight.get(index);
+    }
+
+    @Override
+    public PlayerRole getPlayerRoleFromId(int id) {
+        return rolesById.get(id);
     }
 
     @Override
     public PlayerRole getPlayerRole(String name) {
-        for(PlayerRole playerRole : roles.values()){
-            if(playerRole.toString().equalsIgnoreCase(name))
-                return playerRole;
-        }
-
-        throw new IllegalArgumentException("Invalid role name: " + name);
+        Preconditions.checkArgument(rolesByName.containsKey(name), "Invalid role name: " + name);
+        return rolesByName.get(name);
     }
 
     @Override
@@ -98,12 +102,11 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public List<PlayerRole> getRoles(){
-        return roles.keys().stream().sorted().map(roles::get).collect(Collectors.toList());
+        return rolesById.keys().stream().sorted().map(rolesById::get).collect(Collectors.toList());
     }
 
 
     public void loadPlayer(CachedResultSet resultSet){
-        long startTime = System.currentTimeMillis();
         UUID player = UUID.fromString(resultSet.getString("player"));
         SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         players.add(player, superiorPlayer);
@@ -112,9 +115,18 @@ public final class PlayersHandler implements PlayersManager {
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){
         int weight = section.getInt("weight", type);
-        roles.add(weight, new SPlayerRole(section.getString("name"), weight, section.getStringList("permissions"), previousRole));
+        int id = section.getInt("id", weight);
+        String name = section.getString("name");
+
+        PlayerRole playerRole = new SPlayerRole(name, id, weight, section.getStringList("permissions"), previousRole);
+
+        rolesByWeight.add(weight, playerRole);
+        rolesById.add(id, playerRole);
+        rolesByName.add(name, playerRole);
+
         if(weight > lastRole)
             lastRole = weight;
+
         return weight;
     }
 

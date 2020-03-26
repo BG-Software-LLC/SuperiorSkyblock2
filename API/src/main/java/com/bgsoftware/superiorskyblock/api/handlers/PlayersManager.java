@@ -35,6 +35,13 @@ public interface PlayersManager {
     PlayerRole getPlayerRole(int weight);
 
     /**
+     * Get a player role by it's id.
+     * @param id The id to check.
+     * @return The player role with that weight. May be null.
+     */
+    PlayerRole getPlayerRoleFromId(int id);
+
+    /**
      * Get a player role by it's name.
      * @param name The name to check.
      * @return The player role with that name. Throws IllegalArgumentException.

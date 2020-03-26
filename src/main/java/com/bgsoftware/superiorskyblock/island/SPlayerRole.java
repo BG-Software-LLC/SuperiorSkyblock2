@@ -12,11 +12,12 @@ public final class SPlayerRole implements PlayerRole {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String name;
-    private final int weight;
+    private final int id, weight;
     private RolePermissionNode defaultPermissions;
 
-    public SPlayerRole(String name, int weight, List<String> defaultPermissions, SPlayerRole previousRole){
+    public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole){
         this.name = name;
+        this.id = id;
         this.weight = weight;
 
         StringBuilder permissions = new StringBuilder();
@@ -25,6 +26,11 @@ public final class SPlayerRole implements PlayerRole {
         this.defaultPermissions = new RolePermissionNode(null,
                 previousRole == null ? RolePermissionNode.EmptyRolePermissionNode.INSTANCE : previousRole.defaultPermissions,
                 permissions.length() == 0 ? "" : permissions.substring(1));
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 
     @Override
@@ -94,6 +100,10 @@ public final class SPlayerRole implements PlayerRole {
 
     public static PlayerRole of(int weight){
         return plugin.getPlayers().getPlayerRole(weight);
+    }
+
+    public static PlayerRole fromId(int id){
+        return plugin.getPlayers().getPlayerRoleFromId(id);
     }
 
     public static PlayerRole of(String name){

@@ -322,6 +322,12 @@ public final class SettingsHandler {
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
         if(cfg.contains("welcome-sign-line"))
             cfg.set("visitors-sign.line", cfg.getString("welcome-sign-line"));
+        if(cfg.contains("island-roles.ladder")){
+            for(String name : cfg.getConfigurationSection("island-roles.ladder").getKeys(false)){
+                if(!cfg.contains("island-roles.ladder." + name + ".id"))
+                    cfg.set("island-roles.ladder." + name + ".id", cfg.getInt("island-roles.ladder." + name + ".weight"));
+            }
+        }
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){

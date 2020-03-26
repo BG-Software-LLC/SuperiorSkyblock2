@@ -3,6 +3,11 @@ package com.bgsoftware.superiorskyblock.api.island;
 public interface PlayerRole {
 
     /**
+     * Get the id of the role.
+     */
+    int getId();
+
+    /**
      * Get the weight of the role in the ladder.
      */
     int getWeight();
