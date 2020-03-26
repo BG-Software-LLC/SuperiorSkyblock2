@@ -106,7 +106,6 @@ public final class SIsland extends DatabaseObject implements Island {
      */
     private SuperiorPlayer owner;
     private final BlockPosition center;
-    private short dirtyChunksCounter = 0;
 
     /*
      * Island flags

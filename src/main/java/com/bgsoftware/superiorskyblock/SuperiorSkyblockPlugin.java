@@ -187,11 +187,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 long lastTimeStatus = System.currentTimeMillis() / 1000;
 
                 StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder();
+                playerStatusHolder.prepareBatch();
                 Bukkit.getOnlinePlayers().stream().map(SSuperiorPlayer::of).forEach(superiorPlayer ->
                         playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
                 playerStatusHolder.execute(false);
 
                 StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
+                islandStatusHolder.prepareBatch();
                 Bukkit.getOnlinePlayers().stream().map(player -> SSuperiorPlayer.of(player).getIsland()).filter(Objects::nonNull)
                         .forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
                 islandStatusHolder.execute(false);
@@ -205,7 +207,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         player.setFlying(false);
                     }
                 });
-
             }
         }catch(Exception ignored){
             //Ignore

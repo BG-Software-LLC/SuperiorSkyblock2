@@ -19,6 +19,8 @@ public final class StatementHolder {
     private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
+    private boolean isBatch = false;
+
     StatementHolder(Query query){
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
         this.query = query.getStatement().replace("{prefix}", prefix);
@@ -67,6 +69,10 @@ public final class StatementHolder {
         currentIndex = 1;
     }
 
+    public void prepareBatch(){
+        isBatch = true;
+    }
+
     public void execute(boolean async) {
         if(async && !Executor.isDataThread()){
             Executor.data(() -> execute(false));
@@ -81,7 +87,12 @@ public final class StatementHolder {
             StringHolder errorQuery = new StringHolder(query);
 
             SQLHelper.buildStatement(query, preparedStatement -> {
-                if (!batches.isEmpty()) {
+                if (isBatch) {
+                    if(batches.isEmpty()){
+                        isBatch = false;
+                        return;
+                    }
+
                     for (Registry<Integer, Object> values : batches) {
                         for (Map.Entry<Integer, Object> entry : values.entries()) {
                             preparedStatement.setObject(entry.getKey(), entry.getValue());
