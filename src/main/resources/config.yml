@@ -118,9 +118,14 @@ island-roles:
     - BUILD
     - CLOSE_BYPASS
     - DROP_ITEMS
+    - EXPEL_BYPASS
     - FARM_TRAMPING
     - INTERACT
     - ITEM_FRAME
+    - MINECART_DAMAGE
+    - MINECART_ENTER
+    - MINECART_OPEN
+    - MINECART_PLACE
     - MONSTER_DAMAGE
     - PAINTING
     - PICKUP_DROPS
@@ -140,10 +145,10 @@ island-roles:
       - ANIMAL_SPAWN
       - CHEST_ACCESS
       - DEPOSIT_MONEY
-      - EXPEL_BYPASS
       - FLY
       - MONSTER_SPAWN
       - RANKUP
+      - SPAWNER_BREAK
     mod:
       name: 'Moderator'
       weight: 1
@@ -162,7 +167,7 @@ island-roles:
       name: 'Admin'
       weight: 2
       permissions:
-      - CHECK_PERMISSION
+      - COOP_MEMBER
       - DEMOTE_MEMBERS
       - DISCORD_SHOW
       - PAYPAL_SHOW
@@ -173,6 +178,8 @@ island-roles:
       - SET_PAYPAL
       - SET_PERMISSION
       - SET_ROLE
+      - SET_SETTINGS
+      - UNCOOP_MEMBER
     leader:
       name: 'Leader'
       weight: 3
