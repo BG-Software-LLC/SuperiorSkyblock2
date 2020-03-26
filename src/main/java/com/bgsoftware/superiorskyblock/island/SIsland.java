@@ -844,7 +844,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
-        return playerPermissions.get(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
+        return playerPermissions.get(superiorPlayer, PlayerPermissionNode.EmptyPlayerPermissionNode.INSTANCE);
     }
 
     @Override
