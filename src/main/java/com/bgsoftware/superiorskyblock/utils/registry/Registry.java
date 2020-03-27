@@ -117,7 +117,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public static <K, V> Registry<K, V> createRegistry(Registry<K, V> other){
-        return new Registry<K, V>(other) {};
+        return other == null ? null : new Registry<K, V>(other) {};
     }
 
     public static <K, V> Registry<K, V> createLinkedRegistry(){

@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
-    private final SuperiorPlayer superiorPlayer;
-    private final SIsland island;
+    protected final SuperiorPlayer superiorPlayer;
+    protected final SIsland island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
         this(superiorPlayer, island, "");
@@ -59,12 +59,16 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         }
 
         EmptyPlayerPermissionNode(){
-            super(null, null);
+            this(null, null);
+        }
+
+        EmptyPlayerPermissionNode(SuperiorPlayer superiorPlayer, SIsland island){
+            super(null, superiorPlayer, island);
         }
 
         @Override
         public boolean hasPermission(IslandPrivilege permission) {
-            return false;
+            return superiorPlayer != null && island != null && super.hasPermission(permission);
         }
 
         @Override
@@ -72,6 +76,15 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
 
         }
 
+        @Override
+        protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
+            PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+
+            if(island.hasPermission(playerRole, islandPrivilege))
+                return PrivilegeStatus.ENABLED;
+
+            return PrivilegeStatus.DISABLED;
+        }
     }
 
 }
