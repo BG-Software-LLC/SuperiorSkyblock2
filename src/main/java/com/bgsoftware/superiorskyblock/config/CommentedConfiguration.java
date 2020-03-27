@@ -19,6 +19,7 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -54,8 +55,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
      *                        if they are already exist in the config. If they are not in the
      *                        config, they will be synced with the resource's config.
      */
-    public void syncWithConfig(File file, InputStream resource, String... ignoredSections){
-        CommentedConfiguration cfg = loadConfiguration(resource);
+    public void syncWithConfig(File file, InputStream resource, String fileName, String... ignoredSections){
+        CommentedConfiguration cfg = loadConfiguration(resource, fileName);
         if(syncConfigurationSection(cfg, cfg.getConfigurationSection(""), Arrays.asList(ignoredSections)) && file != null) {
             try {
                 save(file);
@@ -124,20 +125,20 @@ public final class CommentedConfiguration extends YamlConfiguration {
         StringBuilder comments = new StringBuilder();
         String currentSection = "";
 
-        while(currentIndex < lines.length){
+        while (currentIndex < lines.length) {
             //Checking if the current line is a comment.
-            if(isComment(lines[currentIndex])){
+            if (isComment(lines[currentIndex])) {
                 //Adding the comment to the builder with an enter at the end.
                 comments.append(lines[currentIndex]).append("\n");
             }
 
             //Checking if the current line is a valid new section.
-            else if(isNewSection(lines[currentIndex])){
+            else if (isNewSection(lines[currentIndex])) {
                 //Parsing the line into a full-path.
                 currentSection = getSectionPath(this, lines[currentIndex], currentSection);
 
                 //If there is a valid comment for the section.
-                if(comments.length() > 0)
+                if (comments.length() > 0)
                     //Adding the comment.
                     setComment(currentSection, comments.toString().substring(0, comments.length() - 1));
 
@@ -268,7 +269,7 @@ public final class CommentedConfiguration extends YamlConfiguration {
     public static CommentedConfiguration loadConfiguration(File file) {
         try {
             FileInputStream stream = new FileInputStream(file);
-            return loadConfiguration(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            return loadConfiguration(new InputStreamReader(stream, StandardCharsets.UTF_8), file.getName());
         }catch(FileNotFoundException ex){
             Bukkit.getLogger().warning("File " + file.getName() + " doesn't exist.");
             return new CommentedConfiguration();
@@ -280,8 +281,8 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @param inputStream The input-stream to load the config from.
      * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
      */
-    public static CommentedConfiguration loadConfiguration(InputStream inputStream) {
-        return loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+    public static CommentedConfiguration loadConfiguration(InputStream inputStream, String fileName) {
+        return loadConfiguration(new InputStreamReader(inputStream, StandardCharsets.UTF_8), fileName);
     }
 
     /**
@@ -289,21 +290,24 @@ public final class CommentedConfiguration extends YamlConfiguration {
      * @param reader The reader to load the config from.
      * @return A new instance of CommentedConfiguration contains all the data (keys, values and comments).
      */
-    public static CommentedConfiguration loadConfiguration(Reader reader) {
+    public static CommentedConfiguration loadConfiguration(Reader reader, String fileName) {
         //Creating a blank instance of the config.
         CommentedConfiguration config = new CommentedConfiguration();
 
         //Parsing the reader into a BufferedReader for an easy reading of it.
-        try(BufferedReader bufferedReader = reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader(reader)){
+        try(BufferedReader bufferedReader = reader instanceof BufferedReader ? (BufferedReader)reader : new BufferedReader(reader)) {
             StringBuilder contents = new StringBuilder();
 
             String line;
-            while((line = bufferedReader.readLine()) != null) {
+            while ((line = bufferedReader.readLine()) != null) {
                 contents.append(line).append('\n');
             }
 
             config.loadFromString(contents.toString());
-        } catch (IOException | InvalidConfigurationException ex) {
+        }catch(InvalidConfigurationException ex){
+            Bukkit.getLogger().warning(ChatColor.RED + "An issue occurred while loading the file " + fileName + ":");
+            ex.printStackTrace();
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 

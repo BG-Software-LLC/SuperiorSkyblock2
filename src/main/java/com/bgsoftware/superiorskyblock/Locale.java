@@ -577,7 +577,7 @@ public enum Locale {
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
             InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
-            cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream);
+            cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
 
             for(Locale locale : values()){
                 locale.setMessage(fileLocale, ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));

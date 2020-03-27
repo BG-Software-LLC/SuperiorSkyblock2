@@ -127,7 +127,8 @@ public final class SettingsHandler {
         convertData(cfg);
         convertInteractables(plugin, cfg);
 
-        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown", "contents", "event-commands");
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"),  "config.yml",
+                "ladder", "commands-cooldown", "contents", "event-commands");
 
         databaseType = cfg.getString("database.type");
         databaseMySQLAddress = cfg.getString("database.address");
@@ -273,7 +274,8 @@ public final class SettingsHandler {
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "ladder", "commands-cooldown", "contents", "event-commands");
+        cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
+                "ladder", "commands-cooldown", "contents", "event-commands");
 
         cfg.set(path, value);
 
