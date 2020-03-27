@@ -97,6 +97,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
     public static final int NO_BLOCK_LIMIT = -1;
+    public static final int BLOCKS_UPDATE_AMOUNT = 100;
     private static int blocksUpdateCounter = 0;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -1395,7 +1396,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 MenuValues.refreshMenus();
                 MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
-                if(++blocksUpdateCounter >= 20){
+                if(++blocksUpdateCounter >= BLOCKS_UPDATE_AMOUNT){
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
@@ -1524,7 +1525,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 MenuValues.refreshMenus();
                 MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
-                if(++blocksUpdateCounter >= 20){
+                if(++blocksUpdateCounter >= BLOCKS_UPDATE_AMOUNT){
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
