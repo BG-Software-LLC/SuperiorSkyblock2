@@ -39,8 +39,8 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
     private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
     private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
-    private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
-    private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
+    private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
 
     public static void register(SuperiorSkyblockPlugin plugin){
