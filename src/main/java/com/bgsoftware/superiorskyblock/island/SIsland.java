@@ -2456,7 +2456,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     iterator.remove();
                     removed = true;
                 }
-                if(superiorPlayer.equals(owner)){
+                else if(superiorPlayer.equals(owner)){
                     iterator.remove();
                     removed = true;
                 }
