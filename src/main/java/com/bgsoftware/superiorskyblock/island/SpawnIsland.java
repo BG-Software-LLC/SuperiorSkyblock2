@@ -35,7 +35,6 @@ import org.bukkit.command.ConsoleCommandSender;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -424,7 +423,8 @@ public final class SpawnIsland implements Island {
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
         return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
-                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName());
+                superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
+                hasPermission(SPlayerRole.guestRole(), islandPrivilege);
     }
 
     @Override
@@ -474,9 +474,8 @@ public final class SpawnIsland implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
-        return plugin.getPlayers().getRoles().stream()
-                .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
-                .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.guestRole());
+        return plugin.getSettings().spawnPermissions.contains(islandPrivilege.getName()) ?
+                SPlayerRole.guestRole() : SPlayerRole.lastRole();
     }
 
     @Override

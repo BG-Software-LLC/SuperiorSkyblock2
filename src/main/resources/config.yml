@@ -254,6 +254,9 @@ spawn:
     - TREE_GROWTH
     - WATER_FLOW
 
+  # A list of permissions for the spawn island.
+  permissions: []
+
   # Should a world border be displayed in the spawn?
   world-border: false
 
