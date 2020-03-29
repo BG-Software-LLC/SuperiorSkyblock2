@@ -14,16 +14,16 @@ public final class CropsTask {
     private static int random;
 
     private CropsTask(){
-        CropsTask.random = ThreadLocalRandom.current().nextInt();
-        CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () ->
-                random = plugin.getNMSBlocks().tickIslands(random), 5L, 5L);
     }
 
     public static void startTask(){
         if(task != null)
             cancelTask();
 
-        new CropsTask();
+        int interval = plugin.getSettings().cropsInterval;
+        CropsTask.random = ThreadLocalRandom.current().nextInt();
+        CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () ->
+                random = plugin.getNMSBlocks().tickIslands(random), interval, interval);
     }
 
     public static void cancelTask(){

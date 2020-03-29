@@ -159,8 +159,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     if (island != null)
                         island.setPlayerInside(superiorPlayer, true);
                 }
-
-                CropsTask.startTask();
             }, 1L);
         }catch (Throwable ex){
             shouldEnable = false;
@@ -301,6 +299,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         Executor.sync(() -> {
             for(Player player : Bukkit.getOnlinePlayers())
                 nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
+            CropsTask.startTask();
         });
     }
 

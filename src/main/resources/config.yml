@@ -479,6 +479,9 @@ crops-to-grow:
 - 'CROPS'
 - 'WHEAT'
 
+# How frequency should the crops task run? (in ticks)
+crops-interval: 5
+
 # Should only the back button work for closing menus?
 only-back-button: false
 
