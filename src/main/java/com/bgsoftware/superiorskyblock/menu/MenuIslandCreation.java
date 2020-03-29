@@ -158,7 +158,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         String schematic = itemSection.getString("schematic").toLowerCase();
 
                         menuIslandCreation.addData(schematic + "-slot", slot);
-                        menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission"));
+                        menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission", ""));
                         menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
                         menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", itemSection.getLong("bonus-worth", 0)));
                         menuIslandCreation.addData(schematic + "-offset", itemSection.getBoolean("offset", false));
