@@ -187,6 +187,11 @@ public final class PlayersListener implements Listener {
             }
         }
 
+        if(e.getIsland().isMember(e.getPlayer())){
+            ((SSuperiorPlayer) e.getPlayer()).setImmunedToTeleport(true);
+            Executor.sync(() -> ((SSuperiorPlayer) e.getPlayer()).setImmunedToTeleport(false), 100L);
+        }
+
         e.getIsland().setPlayerInside(e.getPlayer(), true);
 
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(e.getPlayer(), e.getIsland(), e.getCause());
@@ -470,6 +475,9 @@ public final class PlayersListener implements Listener {
         e.setCancelled(true);
 
         World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+
+        if(((SSuperiorPlayer) superiorPlayer).isImmunedToTeleport())
+            return;
 
         if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
                 (environment == World.Environment.THE_END && !island.isEndEnabled())){

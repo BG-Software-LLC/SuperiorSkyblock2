@@ -73,6 +73,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private long lastTimeStatus = -1;
 
     private boolean immuneToPvP = false;
+    private boolean immuneToTeleport = false;
 
     private BukkitTask teleportTask = null;
 
@@ -605,6 +606,14 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public BukkitTask getTeleportTask(){
         return teleportTask;
+    }
+
+    public boolean isImmunedToTeleport(){
+        return immuneToTeleport;
+    }
+
+    public void setImmunedToTeleport(boolean immuneToTeleport){
+        this.immuneToTeleport = immuneToTeleport;
     }
 
     @Override
