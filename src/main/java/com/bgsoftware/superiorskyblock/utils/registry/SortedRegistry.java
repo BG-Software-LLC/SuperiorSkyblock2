@@ -73,7 +73,9 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
     protected void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
         Preconditions.checkArgument(!sortedValues.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
 
-        sortedValues.add(sortingType, new ConcurrentSkipListSet<>(sortingType));
+        Set<V> sortedIslands = new ConcurrentSkipListSet<>(sortingType);
+        sortedIslands.addAll(values());
+        sortedValues.add(sortingType, sortedIslands);
 
         if(sort)
             sort(sortingType, predicate, null);
