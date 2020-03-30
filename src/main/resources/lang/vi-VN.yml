@@ -554,6 +554,7 @@ SETTINGS_UPDATED_NAME: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều
   đảo {1}.'
 SETTINGS_UPDATED_ALL: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh {0} cho tất
   cả các đảo.'
+SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'

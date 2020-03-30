@@ -79,6 +79,11 @@ public final class CmdAdminSetSize implements ISuperiorCommand {
             return;
         }
 
+        if(size > plugin.getSettings().maxIslandSize){
+            Locale.SIZE_BIGGER_MAX.send(sender);
+            return;
+        }
+
         island.setIslandSize(size);
 
         if(targetPlayer == null)

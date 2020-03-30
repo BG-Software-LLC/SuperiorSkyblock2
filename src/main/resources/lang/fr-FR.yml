@@ -465,6 +465,7 @@ SET_WARP_OUTSIDE: '&c&lErreur | &7Vous ne pouvez pas définir de warps hors de v
 SETTINGS_UPDATED: '&e&lIle | &7Paramètre {0} mit à jour pour l''île de {1}.'
 SETTINGS_UPDATED_NAME: '&e&lIle | &7Paramètre {0} mit à jour pour l''île {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIle | &7Paramètre {0} mit à jour pour toutes les îles.'
+SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
 SPY_TEAM_CHAT_FORMAT: '&7[Espion] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErreur | &7Vous n''êtes pas sûr votre île.'
