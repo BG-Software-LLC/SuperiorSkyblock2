@@ -54,7 +54,7 @@ public final class PlayersHandler implements PlayersManager {
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         if(!players.containsKey(uuid)) {
             players.add(uuid, new SSuperiorPlayer(uuid));
-            Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)));
+            Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)), 1L);
         }
         return players.get(uuid);
     }
