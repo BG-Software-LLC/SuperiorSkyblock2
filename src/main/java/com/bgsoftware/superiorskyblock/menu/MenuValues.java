@@ -53,8 +53,8 @@ public final class MenuValues extends SuperiorMenu {
                             .replaceAll("{0}", amount + "")
                             .replaceAll("{1}", StringUtils.format(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount))))
                             .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount))))
-                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount))))
-                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount))))
+                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
                             .build(superiorPlayer);
                     itemStack.setAmount(Math.max(1, Math.min(64, amount)));
                     inventory.setItem(slot, itemStack);

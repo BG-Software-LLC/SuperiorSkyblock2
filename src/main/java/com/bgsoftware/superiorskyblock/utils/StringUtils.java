@@ -81,22 +81,22 @@ public final class StringUtils {
         return s;
     }
 
-    public static String fancyFormat(double d){
-        return fancyFormat(BigDecimal.valueOf(d));
+    public static String fancyFormat(double d, java.util.Locale locale){
+        return fancyFormat(BigDecimal.valueOf(d), locale);
     }
 
-    public static String fancyFormat(BigDecimal bigDecimal){
+    public static String fancyFormat(BigDecimal bigDecimal, java.util.Locale locale){
         double d = bigDecimal.doubleValue();
         if(d > Q)
-            return format((d / Q)) + "Q";
+            return format((d / Q)) + Locale.FORMAT_QUAD.getMessage(locale);
         else if(d > T)
-            return format((d / T)) + "T";
+            return format((d / T)) + Locale.FORMAT_TRILLION.getMessage(locale);
         else if(d > B)
-            return format((d / B)) + "B";
+            return format((d / B)) + Locale.FORMAT_BILLION.getMessage(locale);
         else if(d > M)
-            return format((d / M)) + "M";
+            return format((d / M)) + Locale.FORMAT_MILLION.getMessage(locale);
         else if(d > K)
-            return format((d / K)) + "K";
+            return format((d / K)) + Locale.FORMAT_THOUSANDS.getMessage(locale);
         else
             return format(d);
     }

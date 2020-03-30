@@ -271,6 +271,11 @@ DISBANDED_ISLAND_OTHER_NAME: '&e&lIsola | &7Hai sciolto l''isola {0}.'
 ENTER_PVP_ISLAND: '&7&oSei stato teletrasportato in un''isola con PVP abilitato. Sei
   immune al PVP per i prossimi 10 secondi...'
 EXPELLED_PLAYER: '&e&lIsola | &7{0} è stato espulso dall''isola.'
+FORMAT_QUAD: 'Q'
+FORMAT_TRILLION: 'T'
+FORMAT_BILLION: 'B'
+FORMAT_MILLION: 'M'
+FORMAT_THOUSANDS: 'K'
 GENERATOR_UPDATED: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione
   di {0} sull''isola di {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione

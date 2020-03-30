@@ -224,6 +224,11 @@ DISBANDED_ISLAND_OTHER: '&e&lיא | &7{0} לש יאה תא תקחמ.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lיא | &7{0} יאה תא תקחמ.'
 ENTER_PVP_ISLAND: '&7&oתוינש 10 כ ךשמב תוכמ לבקת אל התא .תוכמ וב תתל ןתינש יא לא תרגוש...'
 EXPELLED_PLAYER: '&e&lיא | &7יאה ןמ שרוג {0}.'
+FORMAT_QUAD: 'Q'
+FORMAT_TRILLION: 'T'
+FORMAT_BILLION: 'B'
+FORMAT_MILLION: 'M'
+FORMAT_THOUSANDS: 'K'
 GENERATOR_UPDATED: '&e&lיא | &7החלצהב ןכדוע {1} לש יאה לש רוטארנגב {0} רמוחה לש
   תומכה.'
 GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש רוטארנגב {0} רמוחה

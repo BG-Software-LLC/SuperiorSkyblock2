@@ -386,9 +386,9 @@ public final class PlayersListener implements Listener {
 
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
-                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel())))
+                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale())))
                 .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth())))
+                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
                 .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
                 .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
                 .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")

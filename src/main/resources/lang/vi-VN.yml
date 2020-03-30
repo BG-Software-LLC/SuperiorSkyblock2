@@ -260,6 +260,11 @@ DISBANDED_ISLAND_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đ�
 ENTER_PVP_ISLAND: '&7&oBạn đã được dịch chuyển đến một hòn đảo có bật PVP. Bạn được
   miễn dịch với PVP trong 10 giây tiếp theo...'
 EXPELLED_PLAYER: '&e&lĐảo Thần | &7{0} đã bị trục xuất khỏi đảo.'
+FORMAT_QUAD: 'Q'
+FORMAT_TRILLION: 'T'
+FORMAT_BILLION: 'B'
+FORMAT_MILLION: 'M'
+FORMAT_THOUSANDS: 'K'
 GENERATOR_UPDATED: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
 GENERATOR_UPDATED_NAME: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'
