@@ -44,7 +44,7 @@ public final class MenusListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMenuClick(InventoryClickEvent e){
         InventoryHolder inventoryHolder = e.getClickedInventory() == null || e.getView().getTopInventory() == null ? null : e.getView().getTopInventory().getHolder();
 
@@ -57,7 +57,7 @@ public final class MenusListener implements Listener {
             ((SuperiorMenu) inventoryHolder).onClick(e);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMenuClose(InventoryCloseEvent e){
         InventoryHolder inventoryHolder = e.getInventory() == null ? null : e.getInventory().getHolder();
 
