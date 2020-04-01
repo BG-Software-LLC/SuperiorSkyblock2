@@ -382,10 +382,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadSortingTypes(){
-        try { SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR); }catch(NullPointerException ignored) {}
-        try { SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR); }catch(NullPointerException ignored) {}
-        try { SortingType.register("RATING", SortingComparators.RATING_COMPARATOR); }catch(NullPointerException ignored) {}
-        try { SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR); }catch(NullPointerException ignored) {}
+        try { SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR, false); }catch(NullPointerException ignored) {}
+        try { SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR, false); }catch(NullPointerException ignored) {}
+        try { SortingType.register("RATING", SortingComparators.RATING_COMPARATOR, false); }catch(NullPointerException ignored) {}
+        try { SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false); }catch(NullPointerException ignored) {}
     }
 
     private void loadIslandFlags(){

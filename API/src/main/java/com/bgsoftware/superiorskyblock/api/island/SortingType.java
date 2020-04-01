@@ -12,12 +12,21 @@ public final class SortingType implements Comparator<Island> {
 
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
 
+    private static final Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
+        String firstName = o1.getName().isEmpty() ? o1.getOwner().getName() : o1.getName();
+        String secondName = o2.getName().isEmpty() ? o2.getOwner().getName() : o2.getName();
+        return firstName.compareTo(secondName);
+    };
+
     private String name;
     private Comparator<Island> comparator;
 
-    private SortingType(String name, Comparator<Island> comparator){
+    private SortingType(String name, Comparator<Island> comparator, boolean handleEqualsIslands){
         this.name = name;
-        this.comparator = comparator;
+        this.comparator = !handleEqualsIslands ? comparator : (o1, o2) -> {
+            int compare = comparator.compare(o1, o2);
+            return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
+        };
     }
 
     /**
@@ -65,9 +74,20 @@ public final class SortingType implements Comparator<Island> {
      * @param comparator The comparator for sorting the islands.
      */
     public static void register(String name, Comparator<Island> comparator){
+        register(name, comparator, true);
+    }
+
+    /**
+     * Register a new sorting type.
+     * @param name The name for the sorting type.
+     * @param comparator The comparator for sorting the islands.
+     * @param handleEqualsIslands Should the plugin handle equals islands?
+     *                            If that's false, you should handle it on your own.
+     */
+    public static void register(String name, Comparator<Island> comparator, boolean handleEqualsIslands){
         Preconditions.checkState(!sortingTypes.containsKey(name), "SortingType with the name " + name + " already exists.");
 
-        SortingType sortingType = new SortingType(name, comparator);
+        SortingType sortingType = new SortingType(name, comparator, handleEqualsIslands);
         sortingTypes.put(name, sortingType);
         SuperiorSkyblockAPI.getGrid().registerSortingType(sortingType);
     }
