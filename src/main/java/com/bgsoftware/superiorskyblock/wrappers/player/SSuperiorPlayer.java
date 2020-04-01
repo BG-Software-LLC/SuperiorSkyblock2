@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.wrappers;
+package com.bgsoftware.superiorskyblock.wrappers.player;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -684,8 +685,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public static SuperiorPlayer of(Player player){
         Preconditions.checkArgument(player != null, "Player cannot be null.");
-        Preconditions.checkArgument(!player.hasMetadata("NPC"), "Cannot get SuperiorPlayer from an NPC.");
-        return of(player.getUniqueId());
+        return player.hasMetadata("NPC") ? new SuperiorNPCPlayer(player) : of(player.getUniqueId());
     }
 
     public static SuperiorPlayer of(UUID uuid){

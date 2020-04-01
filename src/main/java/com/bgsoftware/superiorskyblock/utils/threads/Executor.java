@@ -61,9 +61,13 @@ public final class Executor {
 
     public static void close(){
         try{
+            System.out.println("Shutting down executor");
             executor.shutdown();
+            System.out.println("Waiting for executor...");
             executor.awaitTermination(1, TimeUnit.MINUTES);
+            System.out.println("Shutting down database executor");
             databaseExecutor.shutdown();
+            System.out.println("Waiting for database executor...");
             databaseExecutor.awaitTermination(1, TimeUnit.MINUTES);
         }catch(Exception ex){
             ex.printStackTrace();

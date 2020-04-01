@@ -24,8 +24,9 @@ import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
+import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -87,12 +88,9 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(superiorPlayer == null)
+        if(superiorPlayer == null || superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
         Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
@@ -136,13 +134,13 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
         Executor.sync(() -> {
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-            if(superiorPlayer == null || superiorPlayer.asPlayer() == null)
+            if(!superiorPlayer.isOnline())
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
@@ -164,10 +162,10 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
@@ -180,10 +178,10 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
 
         Island island = plugin.getGrid().getIslandAt(e.getTo());
 
@@ -207,10 +205,10 @@ public final class CustomEventsListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
 
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);

@@ -7,8 +7,9 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
+import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Animals;
@@ -199,10 +200,14 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerAttack(EntityDamageByEntityEvent e){
-        if(!(e.getEntity() instanceof Player) || e.getEntity().hasMetadata("NPC"))
+        if(!(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+
+        if(targetPlayer instanceof SuperiorNPCPlayer)
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         SuperiorPlayer damagerPlayer;

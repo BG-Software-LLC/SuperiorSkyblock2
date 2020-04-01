@@ -20,9 +20,10 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
+import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -83,10 +84,11 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         superiorPlayer.updateLastTimeStatus();
 
         if(!superiorPlayer.getName().equals(e.getPlayer().getName())){
@@ -128,10 +130,11 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         superiorPlayer.updateLastTimeStatus();
 
         Island island = superiorPlayer.getIsland();
@@ -327,7 +330,7 @@ public final class PlayersListener implements Listener {
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(superiorPlayer.hasBypassModeEnabled())
+        if(superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.hasBypassModeEnabled())
             return;
 
         if (plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld()) &&
@@ -340,10 +343,14 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onVisitorDamage(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof Player) || e.getEntity().hasMetadata("NPC"))
+        if(!(e.getEntity() instanceof Player))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(EntityUtils.isPlayerDamager(e)){
@@ -351,8 +358,6 @@ public final class PlayersListener implements Listener {
                 e.setCancelled(true);
             return;
         }
-
-
 
         if(island != null && (!(island instanceof SpawnIsland) || plugin.getSettings().spawnProtection) &&
                 island.isVisitor(superiorPlayer, !plugin.getSettings().coopDamage) && !plugin.getSettings().visitorsDamage) {
@@ -435,9 +440,6 @@ public final class PlayersListener implements Listener {
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
             return;
 
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island == null)
@@ -462,10 +464,10 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
-        if(e.getPlayer().hasMetadata("NPC"))
-            return;
-
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
 
         Island island = plugin.getGrid().getIslandAt(e.getFrom());
 
@@ -543,10 +545,11 @@ public final class PlayersListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        if(e.getPlayer().hasMetadata("NPC"))
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         BukkitTask teleportTask = ((SSuperiorPlayer) superiorPlayer).getTeleportTask();
 
         if(teleportTask != null){

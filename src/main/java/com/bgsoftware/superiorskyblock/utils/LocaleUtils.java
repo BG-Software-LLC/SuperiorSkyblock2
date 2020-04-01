@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.wrappers.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
