@@ -107,10 +107,10 @@ public final class GridHandler implements GridManager {
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                    island.getAllChunksAsync(World.Environment.NORMAL, true, true,
-                            chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setBonusWorth(offset ? island.getRawWorth().negate() : bonus);
                     island.setBiome(biome);
+                    island.getAllChunksAsync(World.Environment.NORMAL, true, true,
+                            chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
                     if (superiorPlayer.isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
