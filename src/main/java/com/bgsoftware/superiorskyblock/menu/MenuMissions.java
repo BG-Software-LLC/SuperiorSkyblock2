@@ -54,6 +54,8 @@ public final class MenuMissions extends SuperiorMenu {
         islandSlot = charSlots.get(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuMissions.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

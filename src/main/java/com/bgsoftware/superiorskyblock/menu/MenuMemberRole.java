@@ -109,6 +109,8 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         if(plugin.getSettings().onlyBackButton && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
+
+        menuMemberRole.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){

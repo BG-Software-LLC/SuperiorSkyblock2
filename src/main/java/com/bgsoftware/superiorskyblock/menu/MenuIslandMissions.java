@@ -121,6 +121,8 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         menuIslandMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuIslandMissions.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

@@ -198,6 +198,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected abstract void onPlayerClick(InventoryClickEvent e);
 
     public void open(SuperiorMenu previousMenu){
+        if(!(this instanceof SuperiorMenuBlank) && !isCompleted()){
+            SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
+            return;
+        }
+
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> open(previousMenu));
             return;
@@ -299,6 +304,14 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private int getBackSlot() {
         return (Integer) getData("backSlot");
+    }
+
+    protected void markCompleted(){
+        addData("completed", true);
+    }
+
+    protected boolean isCompleted(){
+        return (Boolean) getData("completed", false);
     }
 
     @Override

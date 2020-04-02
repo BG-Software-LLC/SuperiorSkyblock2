@@ -99,6 +99,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
         menuCounts.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuCounts.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

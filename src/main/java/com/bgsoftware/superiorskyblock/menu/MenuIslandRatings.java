@@ -72,6 +72,8 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
         menuIslandRatings.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuIslandRatings.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

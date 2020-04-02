@@ -75,6 +75,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
         cancelSlot = charSlots.get(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuConfirmDisband.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

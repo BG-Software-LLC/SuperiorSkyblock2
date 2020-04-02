@@ -70,6 +70,8 @@ public final class MenuMemberManage extends SuperiorMenu {
         kickSlot = charSlots.get(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuMemberManage.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, SuperiorPlayer targetPlayer){

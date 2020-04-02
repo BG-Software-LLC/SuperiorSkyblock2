@@ -84,6 +84,8 @@ public final class MenuIslandRate extends SuperiorMenu {
         fiveStarsSlot = charSlots.get(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuIslandRate.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, Island island, SuperiorMenu previousMenu){

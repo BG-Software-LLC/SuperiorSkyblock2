@@ -118,6 +118,8 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         menuSettings.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuSettings.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

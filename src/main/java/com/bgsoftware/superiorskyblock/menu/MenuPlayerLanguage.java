@@ -60,6 +60,8 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
         }
 
         charSlots.delete();
+
+        menuPlayerLanguage.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

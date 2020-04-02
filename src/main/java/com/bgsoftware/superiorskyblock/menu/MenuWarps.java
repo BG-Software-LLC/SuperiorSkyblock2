@@ -83,6 +83,8 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
         menuWarps.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuWarps.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

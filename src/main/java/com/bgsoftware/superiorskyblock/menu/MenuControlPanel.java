@@ -68,6 +68,8 @@ public final class MenuControlPanel extends SuperiorMenu {
         visitorsSlot = charSlots.get(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuControlPanel.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

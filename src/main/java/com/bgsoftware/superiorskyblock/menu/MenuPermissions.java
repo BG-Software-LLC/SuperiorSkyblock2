@@ -205,6 +205,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         menuPermissions.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuPermissions.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island, Object permissionHolder){

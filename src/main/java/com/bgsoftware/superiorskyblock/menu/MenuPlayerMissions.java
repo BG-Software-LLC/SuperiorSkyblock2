@@ -113,6 +113,8 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         menuPlayerMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuPlayerMissions.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){

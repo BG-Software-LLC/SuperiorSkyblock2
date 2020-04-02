@@ -67,6 +67,8 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
         menuMembers.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuMembers.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

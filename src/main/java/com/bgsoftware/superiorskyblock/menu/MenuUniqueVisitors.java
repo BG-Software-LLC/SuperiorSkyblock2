@@ -73,6 +73,8 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
         menuUniqueVisitors.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
 
         charSlots.delete();
+
+        menuUniqueVisitors.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

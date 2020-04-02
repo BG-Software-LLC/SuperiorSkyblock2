@@ -119,6 +119,8 @@ public final class MenuUpgrades extends SuperiorMenu {
         }
 
         charSlots.delete();
+
+        menuUpgrades.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

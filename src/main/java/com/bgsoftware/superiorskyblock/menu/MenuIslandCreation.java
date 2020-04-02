@@ -190,6 +190,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
 
         if(plugin.getSettings().onlyBackButton && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
+
+        menuIslandCreation.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){

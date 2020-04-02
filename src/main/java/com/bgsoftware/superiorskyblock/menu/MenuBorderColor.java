@@ -70,6 +70,8 @@ public final class MenuBorderColor extends SuperiorMenu {
         blueColorSlot = charSlots.get(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1));
 
         charSlots.delete();
+
+        menuBorderColor.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
