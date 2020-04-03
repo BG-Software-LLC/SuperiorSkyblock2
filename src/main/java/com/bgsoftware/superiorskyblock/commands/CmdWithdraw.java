@@ -79,7 +79,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
             amount = Double.parseDouble(args[1]);
         }catch(IllegalArgumentException ignored){}
 
-        if(amount < 0){
+        if(amount <= 0){
             Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
             return;
         }
