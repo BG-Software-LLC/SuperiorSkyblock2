@@ -512,3 +512,6 @@ default-island-fly: false
 # What the default color for world borders be?
 # Can be BLUE, GREEN or RED.
 default-border-color: BLUE
+
+# Should the custom generators be handled by SuperiorSkyblock?
+generators: true

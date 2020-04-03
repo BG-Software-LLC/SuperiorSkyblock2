@@ -26,6 +26,9 @@ public final class GeneratorsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFormEvent(BlockFromToEvent e){
+        if(!plugin.getSettings().generators)
+            return;
+        
         Block block = e.getToBlock();
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());

@@ -118,6 +118,7 @@ public final class SettingsHandler {
     public final boolean defaultToggledPanel;
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
+    public final boolean generators;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -268,6 +269,7 @@ public final class SettingsHandler {
         defaultToggledPanel = cfg.getBoolean("default-toggled-panel", false);
         defaultIslandFly = cfg.getBoolean("default-island-fly", false);
         defaultBorderColor = cfg.getString("default-border-color", "BLUE");
+        generators = cfg.getBoolean("generators", true);
     }
 
     public void updateValue(String path, Object value){
