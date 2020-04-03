@@ -983,10 +983,9 @@ public final class SIsland extends DatabaseObject implements Island {
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
-
-        blockCounts.write(KeyMap::clear);
-        islandWorth.set(BigDecimalFormatted.ZERO);
-        islandLevel.set(BigDecimalFormatted.ZERO);
+        SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
+        SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
+        SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
 
         Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
@@ -1009,8 +1008,6 @@ public final class SIsland extends DatabaseObject implements Island {
                     scanService.execute(() -> {
                         if(LocationUtils.isChunkEmpty(this, chunkSnapshot))
                             return;
-
-                        double islandWorth = 0;
 
                         for (int x = 0; x < 16; x++) {
                             for (int z = 0; z < 16; z++) {
@@ -1046,7 +1043,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                         blockKey = Key.of(blockPair.getValue());
                                     }
 
-                                    handleBlockPlace(blockKey, blockCount, false);
+                                    handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
                                 }
                             }
                         }
@@ -1077,10 +1074,18 @@ public final class SIsland extends DatabaseObject implements Island {
                 }
                 spawnersToCheck.clear();
 
-                BigDecimal islandLevel = getIslandLevel();
-                BigDecimal islandWorth = getWorth();
+                this.blockCounts.write(_blockCounts -> {
+                    _blockCounts.clear();
+                    blockCounts.read(_blockCounts::putAll);
+                });
 
-                finishCalcIsland(asker, callback, islandLevel, islandWorth);
+                this.islandWorth.set(islandWorth.get());
+                this.islandLevel.set(islandLevel.get());
+
+                BigDecimal newIslandLevel = getIslandLevel();
+                BigDecimal newIslandWorth = getWorth();
+
+                finishCalcIsland(asker, callback, newIslandLevel, newIslandWorth);
 
                 if(snapshot != null)
                     snapshot.delete();
@@ -1355,6 +1360,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void handleBlockPlace(Key key, int amount, boolean save) {
+        handleBlockPlace(key, amount, save, blockCounts, islandWorth, islandLevel);
+    }
+
+    private void handleBlockPlace(Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts,
+                                  SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
@@ -1363,12 +1373,12 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         if(blockValue.doubleValue() >= 0){
-            islandWorth.set(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
+            syncedIslandWorth.set(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
         if(blockLevel.doubleValue() >= 0){
-            islandLevel.set(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
+            syncedIslandLevel.set(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
@@ -1377,7 +1387,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(increaseAmount || hasBlockLimit) {
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
-            blockCounts.write(blockCounts -> {
+            syncedBlockCounts.write(blockCounts -> {
                 Key _key = plugin.getBlockValues().getBlockKey(key);
 
                 int currentAmount = blockCounts.getRaw(_key, 0);
