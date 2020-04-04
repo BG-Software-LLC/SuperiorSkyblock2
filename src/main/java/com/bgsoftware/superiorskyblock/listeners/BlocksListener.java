@@ -245,6 +245,9 @@ public final class BlocksListener implements Listener {
                 !superiorPlayer.hasPermission("superior.island.stacker." + e.getBlock().getType())))
             return;
 
+        if(e.getBlockAgainst().getType().name().equals("GLOWING_REDSTONE_ORE"))
+            e.getBlockAgainst().setType(Material.REDSTONE_ORE);
+
         //noinspection deprecation
         if(e.getBlockAgainst().getType() != e.getBlock().getType() || e.getBlockAgainst().getData() != e.getBlock().getData() ||
                 e.getBlockReplacedState().getType() != Material.AIR)
