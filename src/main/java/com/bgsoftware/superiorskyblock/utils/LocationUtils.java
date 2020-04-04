@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -37,8 +38,9 @@ public final class LocationUtils {
     }
 
     public static boolean isSafeBlock(Block block){
-        Block underBlock = block.getRelative(BlockFace.DOWN);
-        return underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid();
+        Block underBlock = block.getRelative(BlockFace.DOWN), upperBlock = block.getRelative(BlockFace.UP);
+        return upperBlock.getType() == Material.AIR && block.getType() == Material.AIR &&
+                (underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid());
     }
 
     public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot){
