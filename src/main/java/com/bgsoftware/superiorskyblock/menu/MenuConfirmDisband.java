@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
@@ -71,8 +70,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
-        confirmSlot = charSlots.get(cfg.getString("confirm", " ").charAt(0), Collections.singletonList(-1));
-        cancelSlot = charSlots.get(cfg.getString("cancel", " ").charAt(0), Collections.singletonList(-1));
+        confirmSlot = getSlots(cfg, "confirm", charSlots);
+        cancelSlot = getSlots(cfg, "cancel", charSlots);
 
         charSlots.delete();
 

@@ -141,9 +141,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         Inventory inventory = super.buildInventory(titleReplacer);
 
         if(sortGlowWhenSelected){
-            int glowSlot = (Integer) getData(sortingType.getName(), -1);
-            if(glowSlot != -1)
-                inventory.setItem(glowSlot, new ItemBuilder(inventory.getItem(glowSlot)).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build(superiorPlayer));
+            //noinspection unchecked
+            List<Integer> glowSlots = (List<Integer>) getData(sortingType.getName(), Collections.singletonList(-1));
+            glowSlots.stream().filter(slot -> slot != -1).forEach(slot ->
+                inventory.setItem(slot, new ItemBuilder(inventory.getItem(slot)).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build(superiorPlayer)));
         }
 
         for(int playerIslandSlot : playerIslandSlot) {
@@ -280,27 +281,27 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             SuperiorSkyblockPlugin.log("&c[top-islands.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         if(cfg.contains("worth-sort")) {
-            int worthSortSlot = charSlots.get(cfg.getString("worth-sort").charAt(0), Collections.singletonList(-1)).get(0);
-            menuTopIslands.addData(worthSortSlot + "", "WORTH");
-            menuTopIslands.addData("WORTH", worthSortSlot);
+            List<Integer> worthSortSlots = getSlots(cfg, "worth-sort", charSlots);
+            worthSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "WORTH"));
+            menuTopIslands.addData("WORTH", worthSortSlots);
         }
         if(cfg.contains("level-sort")) {
-            int worthSortSlot = charSlots.get(cfg.getString("level-sort").charAt(0), Collections.singletonList(-1)).get(0);
-            menuTopIslands.addData(worthSortSlot + "", "LEVEL");
-            menuTopIslands.addData("LEVEL", worthSortSlot);
+            List<Integer> levelSortSlots = getSlots(cfg, "level-sort", charSlots);
+            levelSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "LEVEL"));
+            menuTopIslands.addData("LEVEL", levelSortSlots);
         }
         if(cfg.contains("rating-sort")) {
-            int worthSortSlot = charSlots.get(cfg.getString("rating-sort").charAt(0), Collections.singletonList(-1)).get(0);
-            menuTopIslands.addData(worthSortSlot + "", "RATING");
-            menuTopIslands.addData("RATING", worthSortSlot);
+            List<Integer> ratingSortSlots = getSlots(cfg, "rating-sort", charSlots);
+            ratingSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "RATING"));
+            menuTopIslands.addData("RATING", ratingSortSlots);
         }
         if(cfg.contains("players-sort")) {
-            int worthSortSlot = charSlots.get(cfg.getString("players-sort").charAt(0), Collections.singletonList(-1)).get(0);
-            menuTopIslands.addData(worthSortSlot + "", "PLAYERS");
-            menuTopIslands.addData("PLAYERS", worthSortSlot);
+            List<Integer> playerSortSlots = getSlots(cfg, "players-sort", charSlots);
+            playerSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "PLAYERS"));
+            menuTopIslands.addData("PLAYERS", playerSortSlots);
         }
 
-        playerIslandSlot = charSlots.get(cfg.getString("player-island", " ").charAt(0), Collections.singletonList(-1));
+        playerIslandSlot = getSlots(cfg, "player-island", charSlots);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 
@@ -311,10 +312,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));
         menuTopIslands.addData("no-island-commands", cfg.getStringList("commands." + slotsChar + ".no-island"));
 
-        menuTopIslands.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuTopIslands.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuTopIslands.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuTopIslands.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
+        menuTopIslands.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuTopIslands.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuTopIslands.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuTopIslands.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

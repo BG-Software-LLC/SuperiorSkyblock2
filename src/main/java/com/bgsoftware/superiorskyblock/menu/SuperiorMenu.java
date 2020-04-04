@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -19,6 +21,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -383,6 +386,26 @@ public abstract class SuperiorMenu implements InventoryHolder {
         private InventoryType inventoryType = InventoryType.CHEST;
         private int rowsSize = 6;
 
+    }
+
+    protected static List<Integer> getSlots(ConfigurationSection section, String key, Registry<Character, List<Integer>> charSlots) {
+        if(!section.contains(key))
+            return new ArrayList<>();
+
+        List<Character> chars = new ArrayList<>();
+
+        if(section.isString(key)) {
+            chars.add(section.getString(key, " ").charAt(0));
+        }
+        else if(section.isList(key)){
+            section.getStringList(key).forEach(str -> chars.add(str.charAt(0)));
+        }
+
+        List<Integer> slots = new ArrayList<>();
+
+        chars.stream().filter(charSlots::containsKey).forEach(ch -> slots.addAll(charSlots.get(ch)));
+
+        return slots.isEmpty() ? Collections.singletonList(-1) : slots;
     }
 
 }

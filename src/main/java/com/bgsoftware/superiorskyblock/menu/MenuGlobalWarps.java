@@ -15,8 +15,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,10 +73,20 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        menuGlobalWarps.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuGlobalWarps.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuGlobalWarps.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuGlobalWarps.setSlots(charSlots.get(cfg.getString("warps", " ").charAt(0), Collections.singletonList(-1)));
+        menuGlobalWarps.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuGlobalWarps.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuGlobalWarps.setNextSlot(getSlots(cfg, "next-page", charSlots));
+
+        List<Integer> slots = new ArrayList<>();
+
+        if(cfg.contains("warps"))
+            slots.addAll(getSlots(cfg, "warps", charSlots));
+        if(cfg.contains("slots"))
+            slots.addAll(getSlots(cfg, "slots", charSlots));
+        if(slots.isEmpty())
+            slots.add(-1);
+
+        menuGlobalWarps.setSlots(slots);
 
         charSlots.delete();
 

@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -106,7 +105,7 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandMissions, "island-missions.yml", cfg);
 
-        char slotsChar = cfg.getString("slots", "@").charAt(0);
+        char slotsChar = cfg.getString("slots", " ").charAt(0);
 
         if(cfg.contains("sounds." + slotsChar + ".completed"))
             menuIslandMissions.addData("sound-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".completed")));
@@ -115,10 +114,10 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuIslandMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuIslandMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", "%").charAt(0), Collections.singletonList(-1)));
-        menuIslandMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", "*").charAt(0), Collections.singletonList(-1)));
-        menuIslandMissions.setNextSlot(charSlots.get(cfg.getString("next-page", "^").charAt(0), Collections.singletonList(-1)));
-        menuIslandMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
+        menuIslandMissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuIslandMissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuIslandMissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuIslandMissions.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

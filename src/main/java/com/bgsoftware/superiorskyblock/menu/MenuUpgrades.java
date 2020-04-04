@@ -21,7 +21,6 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -91,7 +90,7 @@ public final class MenuUpgrades extends SuperiorMenu {
                     continue;
                 }
 
-                int slot = charSlots.get(upgradeSection.getString("item", " ").charAt(0), Collections.singletonList(-1)).get(0);
+                int slot = getSlots(upgradeSection, "item", charSlots).get(0);
                 ((SUpgrade) upgrade).setMenuSlot(slot);
 
                 for(String level : upgradeSection.getKeys(false)) {

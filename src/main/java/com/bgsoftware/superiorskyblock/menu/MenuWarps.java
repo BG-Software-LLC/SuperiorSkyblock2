@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,10 +76,10 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarps, "warps.yml", cfg);
 
-        menuWarps.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuWarps.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuWarps.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuWarps.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
+        menuWarps.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuWarps.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuWarps.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuWarps.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

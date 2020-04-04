@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -66,10 +65,10 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
 
-        menuIslandRatings.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuIslandRatings.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuIslandRatings.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuIslandRatings.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
+        menuIslandRatings.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuIslandRatings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuIslandRatings.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuIslandRatings.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

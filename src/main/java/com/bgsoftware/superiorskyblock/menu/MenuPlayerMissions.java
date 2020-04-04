@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,10 +106,10 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuPlayerMissions.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuPlayerMissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPlayerMissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPlayerMissions.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPlayerMissions.setSlots(charSlots.get(slotsChar, Collections.singletonList(-1)));
+        menuPlayerMissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuPlayerMissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuPlayerMissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuPlayerMissions.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

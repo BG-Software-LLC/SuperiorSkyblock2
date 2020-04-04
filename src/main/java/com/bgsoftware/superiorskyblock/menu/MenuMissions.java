@@ -11,7 +11,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuMissions extends SuperiorMenu {
@@ -50,8 +49,8 @@ public final class MenuMissions extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
 
-        playerSlot = charSlots.get(cfg.getString("player-missions", " ").charAt(0), Collections.singletonList(-1));
-        islandSlot = charSlots.get(cfg.getString("island-missions", " ").charAt(0), Collections.singletonList(-1));
+        playerSlot = getSlots(cfg, "player-missions", charSlots);
+        islandSlot = getSlots(cfg, "island-missions", charSlots);
 
         charSlots.delete();
 

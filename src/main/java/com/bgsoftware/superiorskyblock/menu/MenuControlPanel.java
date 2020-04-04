@@ -14,7 +14,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuControlPanel extends SuperiorMenu {
@@ -63,9 +62,9 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
-        membersSlot = charSlots.get(cfg.getString("members", " ").charAt(0), Collections.singletonList(-1));
-        settingsSlot = charSlots.get(cfg.getString("settings", " ").charAt(0), Collections.singletonList(-1));
-        visitorsSlot = charSlots.get(cfg.getString("visitors", " ").charAt(0), Collections.singletonList(-1));
+        membersSlot = getSlots(cfg, "members", charSlots);
+        settingsSlot = getSlots(cfg, "settings", charSlots);
+        visitorsSlot = getSlots(cfg, "visitors", charSlots);
 
         charSlots.delete();
 

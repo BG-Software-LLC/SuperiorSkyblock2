@@ -25,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -199,10 +198,10 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
         islandPermissions.sort(Comparator.comparing(IslandPrivilege::getName));
 
-        menuPermissions.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPermissions.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPermissions.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuPermissions.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
+        menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuPermissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuPermissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuPermissions.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

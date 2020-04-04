@@ -14,7 +14,6 @@ import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuMemberManage extends SuperiorMenu {
@@ -65,9 +64,9 @@ public final class MenuMemberManage extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
-        rolesSlot = charSlots.get(cfg.getString("roles", " ").charAt(0), Collections.singletonList(-1));
-        banSlot = charSlots.get(cfg.getString("ban", " ").charAt(0), Collections.singletonList(-1));
-        kickSlot = charSlots.get(cfg.getString("kick", " ").charAt(0), Collections.singletonList(-1));
+        rolesSlot = getSlots(cfg, "roles", charSlots);
+        banSlot = getSlots(cfg, "ban", charSlots);
+        kickSlot = getSlots(cfg, "kick", charSlots);
 
         charSlots.delete();
 

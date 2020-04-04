@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -112,10 +111,10 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
         islandSettings.sort(Comparator.comparing(IslandFlag::getName));
 
-        menuSettings.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuSettings.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuSettings.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuSettings.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
+        menuSettings.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuSettings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuSettings.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuSettings.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuIslandRate extends SuperiorMenu {
@@ -77,11 +76,11 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
-        oneStarSlot = charSlots.get(cfg.getString("one-star", " ").charAt(0), Collections.singletonList(-1));
-        twoStarsSlot = charSlots.get(cfg.getString("two-stars", " ").charAt(0), Collections.singletonList(-1));
-        threeStarsSlot = charSlots.get(cfg.getString("three-stars", " ").charAt(0), Collections.singletonList(-1));
-        fourStarsSlot = charSlots.get(cfg.getString("four-stars", " ").charAt(0), Collections.singletonList(-1));
-        fiveStarsSlot = charSlots.get(cfg.getString("five-stars", " ").charAt(0), Collections.singletonList(-1));
+        oneStarSlot = getSlots(cfg, "one-star", charSlots);
+        twoStarsSlot = getSlots(cfg, "two-star", charSlots);
+        threeStarsSlot = getSlots(cfg, "three-star", charSlots);
+        fourStarsSlot = getSlots(cfg, "four-star", charSlots);
+        fiveStarsSlot = getSlots(cfg, "five-star", charSlots);
 
         charSlots.delete();
 

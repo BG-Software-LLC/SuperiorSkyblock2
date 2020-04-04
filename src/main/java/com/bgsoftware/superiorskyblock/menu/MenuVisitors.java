@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
@@ -77,12 +76,12 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
 
-        uniqueVisitorsSlot = charSlots.get(cfg.getString("unique-visitors", " ").charAt(0), Collections.singletonList(-1));
+        uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", charSlots);
 
-        menuVisitors.setPreviousSlot(charSlots.get(cfg.getString("previous-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuVisitors.setCurrentSlot(charSlots.get(cfg.getString("current-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuVisitors.setNextSlot(charSlots.get(cfg.getString("next-page", " ").charAt(0), Collections.singletonList(-1)));
-        menuVisitors.setSlots(charSlots.get(cfg.getString("slots", " ").charAt(0), Collections.singletonList(-1)));
+        menuVisitors.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
+        menuVisitors.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
+        menuVisitors.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuVisitors.setSlots(getSlots(cfg, "slots", charSlots));
 
         charSlots.delete();
 

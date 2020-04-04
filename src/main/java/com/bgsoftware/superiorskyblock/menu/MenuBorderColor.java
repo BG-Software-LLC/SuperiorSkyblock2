@@ -15,7 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public final class MenuBorderColor extends SuperiorMenu {
@@ -65,9 +64,9 @@ public final class MenuBorderColor extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
-        greenColorSlot = charSlots.get(cfg.getString("green-color", " ").charAt(0), Collections.singletonList(-1));
-        redColorSlot = charSlots.get(cfg.getString("red-color", " ").charAt(0), Collections.singletonList(-1));
-        blueColorSlot = charSlots.get(cfg.getString("blue-color", " ").charAt(0), Collections.singletonList(-1));
+        greenColorSlot = getSlots(cfg, "green-color", charSlots);
+        redColorSlot = getSlots(cfg, "red-color", charSlots);
+        blueColorSlot = getSlots(cfg, "blue-color", charSlots);
 
         charSlots.delete();
 
