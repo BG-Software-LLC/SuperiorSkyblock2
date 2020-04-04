@@ -191,11 +191,11 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         if(!isOnline())
             return;
 
-        Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
-        Location islandCenterLocation = island.getCenter(World.Environment.NORMAL);
+        Block islandTeleportBlock = island.getTeleportLocation(World.Environment.NORMAL).getBlock();
+        Block islandCenterBlock = island.getCenter(World.Environment.NORMAL).getBlock();
 
         if(island instanceof SpawnIsland){
-            teleport(islandTeleportLocation.add(0, 0.5, 0));
+            teleport(islandTeleportBlock.getLocation().add(0, 0.5, 0));
             if(result != null)
                 result.accept(true);
             return;
@@ -204,20 +204,20 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Location toTeleport = null;
 
         //We check if the island's teleport location is safe.
-        if(LocationUtils.isSafeBlock(islandTeleportLocation.getBlock())){
-            toTeleport = islandTeleportLocation;
+        if(LocationUtils.isSafeBlock(islandTeleportBlock)){
+            toTeleport = islandTeleportBlock.getLocation();
         }
 
         //We check if the island's center location is safe.
-        else if(LocationUtils.isSafeBlock(islandCenterLocation.getBlock())){
-            island.setTeleportLocation(islandCenterLocation);
-            toTeleport = islandCenterLocation;
+        else if(LocationUtils.isSafeBlock(islandCenterBlock)){
+            toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
+            island.setTeleportLocation(toTeleport);
         }
 
         //We check if the highest block at the island's center location is safe.
-        else if(LocationUtils.isSafeBlock(islandCenterLocation.getWorld().getHighestBlockAt(islandCenterLocation))){
-            island.setTeleportLocation(islandCenterLocation);
-            toTeleport = islandCenterLocation;
+        else if(LocationUtils.isSafeBlock((islandCenterBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation())))){
+            toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
+            island.setTeleportLocation(toTeleport);
         }
 
         //Checking if one of the options above is safe.
