@@ -76,8 +76,11 @@ public final class PlayersHandler implements PlayersManager {
 
     @Override
     public PlayerRole getPlayerRole(String name) {
-        Preconditions.checkArgument(rolesByName.containsKey(name), "Invalid role name: " + name);
-        return rolesByName.get(name);
+        PlayerRole playerRole = rolesByName.get(name.toUpperCase());
+
+        Preconditions.checkArgument(playerRole != null, "Invalid role name: " + name);
+
+        return playerRole;
     }
 
     @Override
@@ -122,7 +125,7 @@ public final class PlayersHandler implements PlayersManager {
 
         rolesByWeight.add(weight, playerRole);
         rolesById.add(id, playerRole);
-        rolesByName.add(name, playerRole);
+        rolesByName.add(name.toUpperCase(), playerRole);
 
         if(weight > lastRole)
             lastRole = weight;
