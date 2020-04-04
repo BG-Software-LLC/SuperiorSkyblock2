@@ -46,7 +46,7 @@ public final class IslandDeserializer {
                 try {
                     PlayerRole playerRole = SPlayerRole.of(sections[0]);
                     if(sections.length != 1){
-                        String[] permission = permissions.split(";");
+                        String[] permission = sections[1].split(";");
                         for (String perm : permission) {
                             String[] permissionSections = perm.split(":");
                             try {
