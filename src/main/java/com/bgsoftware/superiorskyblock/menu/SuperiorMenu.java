@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -394,12 +393,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         List<Character> chars = new ArrayList<>();
 
-        if(section.isString(key)) {
-            chars.add(section.getString(key, " ").charAt(0));
-        }
-        else if(section.isList(key)){
-            section.getStringList(key).forEach(str -> chars.add(str.charAt(0)));
-        }
+        for(char ch : section.getString(key).toCharArray())
+            chars.add(ch);
 
         List<Integer> slots = new ArrayList<>();
 
