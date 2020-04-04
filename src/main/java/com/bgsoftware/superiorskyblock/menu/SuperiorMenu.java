@@ -208,7 +208,21 @@ public abstract class SuperiorMenu implements InventoryHolder {
             return;
         }
 
-        Inventory inventory = getInventory();
+        Inventory inventory;
+
+        try{
+            inventory = getInventory();
+        }catch(Exception ex){
+            if(!(this instanceof SuperiorMenuBlank)){
+                addData("completed", false);
+                SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
+            }
+            else{
+                ex.printStackTrace();
+            }
+
+            return;
+        }
 
         Executor.sync(() -> {
             Player player = superiorPlayer.asPlayer();
