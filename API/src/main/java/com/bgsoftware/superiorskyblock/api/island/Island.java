@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public interface Island extends Comparable<Island> {
 
@@ -42,10 +41,6 @@ public interface Island extends Comparable<Island> {
      * @param includeOwner Whether or not the owner should be returned.
      */
     List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
-
-    default List<UUID> getAllMembers(){
-        return getIslandMembers(true).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
 
     /**
      * Get the list of all banned players.
