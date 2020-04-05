@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -14,8 +14,6 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler {
@@ -177,14 +175,24 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
         SQLHelper.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
+            boolean updateRoles = false;
+
             while (resultSet.next()) {
-                ResultSetMetaData metaData = resultSet.getMetaData();
-                int size = metaData.getColumnCount();
-                Map<String, Object> cache = new HashMap<>(size);
-                for(int i = 1; i <= size; i++) {
-                    cache.put(metaData.getColumnName(i), resultSet.getObject(i));
+                plugin.getPlayers().loadPlayer(resultSet);
+
+                if(!updateRoles) {
+                    try {
+                        Integer.parseInt(resultSet.getString("islandRole"));
+                    } catch (NumberFormatException ex) {
+                        updateRoles = true;
+                    }
                 }
-                plugin.getPlayers().loadPlayer(new CachedResultSet(cache));
+            }
+
+            if(updateRoles){
+                for(PlayerRole playerRole : plugin.getPlayers().getRoles()){
+                    SQLHelper.executeUpdate("UPDATE {prefix}players SET islandRole = '" + playerRole.getId() + "' WHERE islandRole = '" + playerRole + "';");
+                }
             }
         });
 

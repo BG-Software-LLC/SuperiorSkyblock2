@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -12,6 +11,8 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -108,12 +109,10 @@ public final class PlayersHandler implements PlayersManager {
         return rolesById.keys().stream().sorted().map(rolesById::get).collect(Collectors.toList());
     }
 
-
-    public void loadPlayer(CachedResultSet resultSet){
+    public void loadPlayer(ResultSet resultSet) throws SQLException {
         UUID player = UUID.fromString(resultSet.getString("player"));
         SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         players.add(player, superiorPlayer);
-        resultSet.delete();
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

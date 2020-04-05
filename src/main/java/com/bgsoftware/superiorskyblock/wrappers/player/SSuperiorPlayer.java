@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.database.CachedResultSet;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -38,6 +37,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -78,7 +79,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(CachedResultSet resultSet){
+    public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         player = UUID.fromString(resultSet.getString("player"));
         islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");
@@ -88,8 +89,6 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
             playerRole = SPlayerRole.fromId(Integer.parseInt(resultSet.getString("islandRole")));
         }catch(Exception ex){
             playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
-            // Update the role in the database to be based on id.
-            setPlayerRole(playerRole);
         }
 
         disbands = resultSet.getInt("disbands");
