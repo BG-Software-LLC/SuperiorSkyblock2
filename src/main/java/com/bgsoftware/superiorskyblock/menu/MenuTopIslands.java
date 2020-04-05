@@ -261,7 +261,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                         if(cfg.contains("items." + ch + ".sorting-type")) {
                             String sortingType = cfg.getString("items." + ch + ".sorting-type");
                             menuTopIslands.addData(slot + "", sortingType);
-                            menuTopIslands.addData(sortingType, slot);
+                            //noinspection unchecked
+                            List<Integer> slots = (List<Integer>) menuTopIslands.getData(sortingType, new ArrayList<>());
+                            slots.add(slot);
+                            menuTopIslands.addData(sortingType, slots);
                         }
                     }
 
