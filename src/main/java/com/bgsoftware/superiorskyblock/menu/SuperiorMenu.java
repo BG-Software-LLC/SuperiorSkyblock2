@@ -219,10 +219,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
                 addData("completed", false);
                 SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
             }
-            else{
-                ex.printStackTrace();
-            }
 
+            ex.printStackTrace();
             return;
         }
 

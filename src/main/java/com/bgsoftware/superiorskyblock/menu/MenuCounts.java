@@ -47,7 +47,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
         String materialName;
 
-        if(blockMaterial == Materials.SPAWNER.toBukkitType()){
+        if(blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1){
             itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(
                     new ItemStack(Materials.PLAYER_HEAD.toBukkitType()),
                     HeadUtils.getTexture(keySections[1])));
