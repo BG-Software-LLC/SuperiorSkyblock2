@@ -529,7 +529,7 @@ public final class PlayersListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island != null && !island.isSpawn() && !island.isMember(superiorPlayer) &&
                 plugin.getSettings().blockedVisitorsCommands.stream().anyMatch(cmd -> e.getMessage().contains(cmd))){
