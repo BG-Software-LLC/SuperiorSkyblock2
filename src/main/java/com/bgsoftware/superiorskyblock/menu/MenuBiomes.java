@@ -2,10 +2,11 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -40,10 +41,8 @@ public final class MenuBiomes extends SuperiorMenu {
 
                 if(slot == e.getRawSlot()){
                     if (superiorPlayer.hasPermission(permission)) {
-                        IslandBiomeChangeEvent islandBiomeChangeEvent = new IslandBiomeChangeEvent(superiorPlayer, superiorPlayer.getIsland(), biome);
-                        Bukkit.getPluginManager().callEvent(islandBiomeChangeEvent);
-
-                        if(!islandBiomeChangeEvent.isCancelled()) {
+                        EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(superiorPlayer, superiorPlayer.getIsland(), biome);
+                        if(event.isCancelled()){
                             SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
                             if (soundWrapper != null)
                                 soundWrapper.playSound(superiorPlayer.asPlayer());
@@ -52,8 +51,8 @@ public final class MenuBiomes extends SuperiorMenu {
                             if (commands != null)
                                 commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
 
-                            superiorPlayer.getIsland().setBiome(islandBiomeChangeEvent.getBiome());
-                            Locale.CHANGED_BIOME.send(superiorPlayer, islandBiomeChangeEvent.getBiome().name().toLowerCase());
+                            superiorPlayer.getIsland().setBiome(event.getResult());
+                            Locale.CHANGED_BIOME.send(superiorPlayer, event.getResult().name().toLowerCase());
 
                             Executor.sync(() -> {
                                 previousMove = false;

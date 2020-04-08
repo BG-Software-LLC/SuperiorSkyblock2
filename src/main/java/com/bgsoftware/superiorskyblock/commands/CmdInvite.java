@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -103,10 +103,7 @@ public final class CmdInvite implements ISuperiorCommand {
                 return;
             }
 
-            IslandInviteEvent islandInviteEvent = new IslandInviteEvent(superiorPlayer, targetPlayer, island);
-            Bukkit.getPluginManager().callEvent(islandInviteEvent);
-
-            if(islandInviteEvent.isCancelled())
+            if(!EventsCaller.callIslandInviteEvent(superiorPlayer, targetPlayer, island))
                 return;
 
             island.inviteMember(targetPlayer);

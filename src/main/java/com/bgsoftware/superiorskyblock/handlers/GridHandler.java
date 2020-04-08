@@ -1,8 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
-import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -15,6 +13,8 @@ import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -87,17 +87,11 @@ public final class GridHandler implements GridManager {
             return;
         }
 
-        PreIslandCreateEvent preIslandCreateEvent = new PreIslandCreateEvent(superiorPlayer, islandName);
-        Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
-
-        if(!preIslandCreateEvent.isCancelled()) {
+        if(EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName)) {
             Location islandLocation = getNextLocation();
             SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
-
-            IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island, schemName);
-            Bukkit.getPluginManager().callEvent(islandCreateEvent);
-
-            if(!islandCreateEvent.isCancelled()) {
+            EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
+            if(!event.isCancelled()) {
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
 
@@ -114,7 +108,7 @@ public final class GridHandler implements GridManager {
                     island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
                     if (superiorPlayer.isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
-                        if (islandCreateEvent.canTeleport()) {
+                        if (event.getResult()) {
                             superiorPlayer.teleport(island);
                             if (island.isInside(superiorPlayer.getLocation()))
                                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);

@@ -2,16 +2,13 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
-
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
+
 import org.bukkit.Material;
-import org.bukkit.WeatherType;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
@@ -86,42 +83,6 @@ public final class SettingsListener implements Listener {
             if(!island.hasSettingsEnabled(e.getBlock().getType().name().contains("WATER") ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW))
                 e.setCancelled(true);
         }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onIslandJoin(IslandEnterEvent e){
-        Player player = e.getPlayer().asPlayer();
-        Island island = e.getIsland();
-
-        if(!plugin.getSettings().spawnProtection && island.isSpawn())
-            return;
-
-        if(island.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)){
-            player.setPlayerTime(0, false);
-        }
-        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)){
-            player.setPlayerTime(6000, false);
-        }
-        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)){
-            player.setPlayerTime(14000, false);
-        }
-        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)){
-            player.setPlayerTime(18000, false);
-        }
-
-        if(island.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)){
-            player.setPlayerWeather(WeatherType.CLEAR);
-        }
-        else if(island.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)){
-            player.setPlayerWeather(WeatherType.DOWNFALL);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onIslandLeave(IslandLeaveEvent e){
-        Player player = e.getPlayer().asPlayer();
-        player.resetPlayerTime();
-        player.resetPlayerWeather();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
@@ -32,7 +30,6 @@ import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
-import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
@@ -47,6 +44,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -1211,10 +1209,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         SuperiorPlayer previousOwner = getOwner();
 
-        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(this, previousOwner, superiorPlayer);
-        Bukkit.getPluginManager().callEvent(islandTransferEvent);
-
-        if(islandTransferEvent.isCancelled())
+        if(!EventsCaller.callIslandTransferEvent(this, previousOwner, superiorPlayer))
             return false;
 
         executeDeleteStatement(true);
@@ -1625,10 +1620,8 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimal newWorth = getWorth(), newLevel = getIslandLevel();
 
         if(oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            Executor.async(() -> {
-                IslandWorthUpdateEvent islandWorthUpdateEvent = new IslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel);
-                Bukkit.getPluginManager().callEvent(islandWorthUpdateEvent);
-            }, 0L);
+            Executor.async(() ->
+                    EventsCaller.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
         blockCounts.read(blockCounts -> Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
@@ -2484,7 +2477,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){
-        Bukkit.getPluginManager().callEvent(new IslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth));
+        EventsCaller.callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
 
         if(asker != null)
             Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);

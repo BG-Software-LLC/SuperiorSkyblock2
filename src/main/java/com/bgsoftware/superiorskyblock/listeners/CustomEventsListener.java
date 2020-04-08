@@ -3,12 +3,10 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
@@ -18,23 +16,27 @@ import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
-
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.WeatherType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -95,41 +97,11 @@ public final class CustomEventsListener implements Listener {
 
         Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-        boolean sameWorld = e.getFrom().getWorld().equals(e.getTo().getWorld());
 
-        if(fromIsland != null && fromIsland.equals(toIsland)) {
-            //We want to update the border if player teleported between dimensions of his island.
-            if(!sameWorld){
-                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
-            }
-            else{
-                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT, e.getTo());
-                Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
-                if(islandLeaveProtectedEvent.isCancelled())
-                    e.setCancelled(true);
-            }
-
+        if(!handlePlayerLeave(superiorPlayer, e.getFrom(), e.getTo(), fromIsland, toIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT, e))
             return;
-        }
 
-        if (fromIsland != null && !fromIsland.isSpawn()) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_TELEPORT, e.getTo());
-            Bukkit.getPluginManager().callEvent(islandLeaveEvent);
-            if(islandLeaveEvent.isCancelled()) {
-                e.setCancelled(true);
-                return;
-            }
-        }
-
-        if (toIsland != null && !toIsland.isSpawn()) {
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, toIsland, IslandEnterEvent.EnterCause.PLAYER_TELEPORT);
-            Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled()) {
-                e.setCancelled(true);
-                if(islandEnterEvent.getCancelTeleport() != null)
-                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
-            }
-        }
+        handlePlayerEnter(superiorPlayer, e.getFrom(), e.getTo(), fromIsland, toIsland, IslandEnterEvent.EnterCause.PLAYER_TELEPORT, e);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -139,25 +111,9 @@ public final class CustomEventsListener implements Listener {
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        Executor.sync(() -> {
-            if(!superiorPlayer.isOnline())
-                return;
+        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-            Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-
-            if(island != null && island.isBanned(superiorPlayer)){
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                return;
-            }
-
-            if(island != null && !island.isSpawn()){
-                IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, island, IslandEnterEvent.EnterCause.PLAYER_JOIN);
-                Bukkit.getPluginManager().callEvent(islandEnterEvent);
-                if(islandEnterEvent.isCancelled() && islandEnterEvent.getCancelTeleport() != null) {
-                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
-                }
-            }
-        }, 1L);
+        handlePlayerEnter(superiorPlayer, null, e.getPlayer().getLocation(), null, island, IslandEnterEvent.EnterCause.PLAYER_JOIN, e);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -169,10 +125,9 @@ public final class CustomEventsListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        if(island != null && !(island instanceof SpawnIsland)){
+        if(island != null){
             island.setPlayerInside(superiorPlayer, false);
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, island, IslandLeaveEvent.LeaveCause.PLAYER_QUIT, null);
-            Bukkit.getPluginManager().callEvent(islandLeaveEvent);
+            handlePlayerLeave(superiorPlayer, superiorPlayer.getLocation(), null, island, null, IslandLeaveEvent.LeaveCause.PLAYER_QUIT, e);
         }
     }
 
@@ -183,22 +138,16 @@ public final class CustomEventsListener implements Listener {
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getTo());
+        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
+        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
 
-        if(island != null && !(island instanceof SpawnIsland)){
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, island, IslandEnterEvent.EnterCause.PORTAL);
-            Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled()) {
-                e.setCancelled(true);
-                if(islandEnterEvent.getCancelTeleport() != null)
-                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
-            }
-        }
+        handlePlayerEnter(superiorPlayer, e.getFrom(), e.getTo(), fromIsland, toIsland, IslandEnterEvent.EnterCause.PORTAL, e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMove(PlayerMoveEvent e){
-        if(plugin.getGrid() == null) return;
+        if(plugin.getGrid() == null)
+            return;
 
         Location from = e.getFrom(), to = e.getTo();
 
@@ -213,55 +162,10 @@ public final class CustomEventsListener implements Listener {
         Island fromIsland = plugin.getGrid().getIslandAt(from);
         Island toIsland = plugin.getGrid().getIslandAt(to);
 
-        if(toIsland != null && toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
-            if(fromIsland != null && fromIsland.isLocked() && !fromIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            }
-            else{
-                e.setCancelled(true);
-            }
-
-            Locale.NO_CLOSE_BYPASS.send(superiorPlayer);
-
+        if(!handlePlayerLeave(superiorPlayer, from, to, fromIsland, toIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE, e))
             return;
-        }
 
-        if(fromIsland != null && fromIsland.equals(toIsland)){
-            if(fromIsland.isInsideRange(e.getFrom()) && !fromIsland.isInsideRange(e.getTo())){
-                IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, toIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE, e.getTo());
-                Bukkit.getPluginManager().callEvent(islandLeaveProtectedEvent);
-                if(islandLeaveProtectedEvent.isCancelled())
-                    e.setCancelled(true);
-            }
-            else if(!fromIsland.isInsideRange(e.getFrom()) && fromIsland.isInsideRange(e.getTo())){
-                IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(superiorPlayer, toIsland, IslandEnterEvent.EnterCause.PLAYER_MOVE);
-                Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
-                if(islandEnterProtectedEvent.isCancelled()) {
-                    e.setCancelled(true);
-                    if(islandEnterProtectedEvent.getCancelTeleport() != null)
-                        e.getPlayer().teleport(islandEnterProtectedEvent.getCancelTeleport());
-                }
-            }
-            return;
-        }
-
-        if (fromIsland != null && !(fromIsland instanceof SpawnIsland)) {
-            IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, fromIsland, IslandLeaveEvent.LeaveCause.PLAYER_MOVE, e.getTo());
-            Bukkit.getPluginManager().callEvent(islandLeaveEvent);
-            if(islandLeaveEvent.isCancelled())
-                e.setCancelled(true);
-        }
-
-        if (toIsland != null && !(toIsland instanceof SpawnIsland)) {
-            IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, toIsland, IslandEnterEvent.EnterCause.PLAYER_MOVE);
-            Bukkit.getPluginManager().callEvent(islandEnterEvent);
-            if(islandEnterEvent.isCancelled()) {
-                e.setCancelled(true);
-                if(islandEnterEvent.getCancelTeleport() != null)
-                    e.getPlayer().teleport(islandEnterEvent.getCancelTeleport());
-            }
-        }
-
+        handlePlayerEnter(superiorPlayer, from, to, fromIsland, toIsland, IslandEnterEvent.EnterCause.PLAYER_MOVE, e);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -366,6 +270,149 @@ public final class CustomEventsListener implements Listener {
                     .replace("%worth%", worth)
                     .replace("%level%", level)
             );
+        }
+    }
+
+    private boolean handlePlayerLeave(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
+                                      Island fromIsland, Island toIsland, IslandLeaveEvent.LeaveCause leaveCause, Event event){
+        if(fromIsland != null){
+            if(!fromIsland.equals(toIsland)){
+                if(!EventsCaller.callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
+                    if(event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                    return false;
+                }
+                else{
+                    fromIsland.setPlayerInside(superiorPlayer, false);
+                    Player player = superiorPlayer.asPlayer();
+                    player.resetPlayerTime();
+                    player.resetPlayerWeather();
+                }
+            }
+
+            if((toIsland == null || !toIsland.equals(fromIsland) || !toIsland.isInsideRange(toLocation)) && fromIsland.isInsideRange(fromLocation)){
+                if(plugin.getSettings().stopLeaving && toLocation != null && !superiorPlayer.hasBypassModeEnabled() &&
+                        fromLocation.getWorld().equals(toLocation.getWorld()) && (toIsland == null || toIsland.equals(fromIsland)) &&
+                        !fromIsland.isInsideRange(toLocation)) {
+                    if(event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                    return false;
+                }
+
+                if(!EventsCaller.callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
+                    if(event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                    return false;
+                }
+                else{
+                    if(superiorPlayer.hasIslandFlyEnabled()){
+                        Player player = superiorPlayer.asPlayer();
+                        if(player.getGameMode() != GameMode.CREATIVE) {
+                            player.setAllowFlight(false);
+                            player.setFlying(false);
+                        }
+                        Locale.ISLAND_FLY_DISABLED.send(player);
+                    }
+                }
+            }
+
+            boolean sameWorld = toLocation != null && fromLocation.getWorld().equals(toLocation.getWorld());
+
+            //We want to update the border if player teleported between dimensions of his island.
+            if(!sameWorld){
+                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+            }
+
+            else{
+                Executor.sync(() -> {
+                    if(superiorPlayer.isOnline())
+                        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+                }, 5L);
+            }
+        }
+
+        return true;
+    }
+
+    private void handlePlayerEnter(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
+                                   Island fromIsland, Island toIsland, IslandEnterEvent.EnterCause enterCause, Event event){
+        if (toIsland != null) {
+            if(!superiorPlayer.hasBypassModeEnabled() && toIsland.isBanned(superiorPlayer)){
+                if(event instanceof Cancellable)
+                    ((Cancellable) event).setCancelled(true);
+                Locale.BANNED_FROM_ISLAND.send(superiorPlayer);
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                return;
+            }
+
+            if(toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)){
+                if(event instanceof Cancellable)
+                    ((Cancellable) event).setCancelled(true);
+                Locale.NO_CLOSE_BYPASS.send(superiorPlayer);
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                return;
+            }
+
+            if(!toIsland.equals(fromIsland)) {
+                if (!EventsCaller.callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
+                    if (event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                }
+
+                else{
+                    toIsland.setPlayerInside(superiorPlayer, true);
+
+                    if(!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)){
+                        Locale.ENTER_PVP_ISLAND.send(superiorPlayer);
+                        if(plugin.getSettings().immuneToPVPWhenTeleport) {
+                            ((SSuperiorPlayer) superiorPlayer).setImmunedToPvP(true);
+                            Executor.sync(() -> ((SSuperiorPlayer) superiorPlayer).setImmunedToPvP(false), 200L);
+                        }
+                    }
+
+                    if(toIsland.isMember(superiorPlayer)){
+                        ((SSuperiorPlayer) superiorPlayer).setImmunedToTeleport(true);
+                        Executor.sync(() -> ((SSuperiorPlayer) superiorPlayer).setImmunedToTeleport(false), 100L);
+                    }
+
+                    if(plugin.getSettings().spawnProtection || !toIsland.isSpawn()) {
+                        Player player = superiorPlayer.asPlayer();
+                        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
+                            player.setPlayerTime(0, false);
+                        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
+                            player.setPlayerTime(6000, false);
+                        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
+                            player.setPlayerTime(14000, false);
+                        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
+                            player.setPlayerTime(18000, false);
+                        }
+
+                        if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
+                            player.setPlayerWeather(WeatherType.CLEAR);
+                        } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
+                            player.setPlayerWeather(WeatherType.DOWNFALL);
+                        }
+                    }
+                }
+            }
+
+            if((fromIsland == null || !fromIsland.equals(toIsland) || !fromIsland.isInsideRange(fromLocation)) && toIsland.isInsideRange(toLocation)){
+                if (!EventsCaller.callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
+                    if (event instanceof Cancellable)
+                        ((Cancellable) event).setCancelled(true);
+                }
+
+                else {
+                    if(toIsland.hasPermission(superiorPlayer, IslandPrivileges.FLY) && superiorPlayer.hasIslandFlyEnabled()) {
+                        Executor.sync(() -> {
+                            Player player = superiorPlayer.asPlayer();
+                            player.setAllowFlight(true);
+                            player.setFlying(true);
+                            Locale.ISLAND_FLY_ENABLED.send(player);
+                        }, 5L);
+                    }
+                }
+            }
         }
     }
 

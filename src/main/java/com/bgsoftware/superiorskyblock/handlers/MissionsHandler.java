@@ -2,13 +2,15 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -242,10 +244,10 @@ public final class MissionsHandler implements MissionsManager {
                 commandRewards = new ArrayList<>(missionData.commandRewards);
             }
 
-            MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
-            Bukkit.getPluginManager().callEvent(missionCompleteEvent);
+            EventResult<Pair<List<ItemStack>, List<String>>> event = EventsCaller
+                    .callMissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
 
-            if (missionCompleteEvent.isCancelled()) {
+            if (event.isCancelled()) {
                 if (!forceReward)
                     mission.onCompleteFail(superiorPlayer);
                 return;
@@ -261,7 +263,7 @@ public final class MissionsHandler implements MissionsManager {
                 superiorPlayer.completeMission(mission);
             }
 
-            for (ItemStack itemStack : missionCompleteEvent.getItemRewards()) {
+            for (ItemStack itemStack : event.getResult().getKey()) {
                 ItemStack toGive = new ItemBuilder(itemStack)
                         .replaceAll("{0}", mission.getName())
                         .replaceAll("{1}", superiorPlayer.getName())
@@ -272,7 +274,7 @@ public final class MissionsHandler implements MissionsManager {
             }
 
             Executor.sync(() -> {
-                for (String command : missionCompleteEvent.getCommandRewards()) {
+                for (String command : event.getResult().getValue()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())

@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.collect.Lists;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -87,10 +86,7 @@ public final class CmdAccept implements ISuperiorCommand {
             return;
         }
 
-        IslandJoinEvent islandJoinEvent = new IslandJoinEvent(superiorPlayer, island);
-        Bukkit.getPluginManager().callEvent(islandJoinEvent);
-
-        if(islandJoinEvent.isCancelled())
+        if(!EventsCaller.callIslandJoinEvent(superiorPlayer, island))
             return;
 
         ((SIsland) island).sendMessage(Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());

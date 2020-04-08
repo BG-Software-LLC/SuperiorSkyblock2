@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
@@ -203,8 +203,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             ((SIsland) island).handleBlocksPlace(cachedCounts);
             ((SIsland) island).saveDirtyChunks();
 
-            IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
-            Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);
+            EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 
             callback.run();
 

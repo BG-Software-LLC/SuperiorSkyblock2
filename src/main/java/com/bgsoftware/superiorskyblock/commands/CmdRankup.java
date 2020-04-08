@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -92,12 +94,11 @@ public final class CmdRankup implements ISuperiorCommand {
 
         boolean hasNextLevel;
 
-        IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
-        Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
+        EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
-        double nextUpgradePrice = islandUpgradeEvent.getAmountToWithdraw();
+        double nextUpgradePrice = event.getResult().getValue();
 
-        if(islandUpgradeEvent.isCancelled()){
+        if(event.isCancelled()){
             hasNextLevel = false;
         }
 
@@ -110,7 +111,7 @@ public final class CmdRankup implements ISuperiorCommand {
             if (nextUpgradePrice > 0)
                 EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
 
-            for (String command : islandUpgradeEvent.getCommands()) {
+            for (String command : event.getResult().getKey()) {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
                         .replace("%player%", superiorPlayer.getName())
                         .replace("%leader%", island.getOwner().getName()))

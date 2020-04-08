@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -90,8 +90,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
         editSession.addNotifyTask(() -> {
             ((SIsland) island).handleBlocksPlace(cachedCounts);
 
-            IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
-            Bukkit.getPluginManager().callEvent(islandSchematicPasteEvent);
+            EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 
             callback.run();
 

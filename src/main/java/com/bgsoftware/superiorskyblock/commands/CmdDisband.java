@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -77,18 +76,13 @@ public final class CmdDisband implements ISuperiorCommand {
             MenuConfirmDisband.openInventory(superiorPlayer, null);
         }
 
-        else{
-            IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
-            Bukkit.getPluginManager().callEvent(islandDisbandEvent);
+        else if(EventsCaller.callIslandDisbandEvent(superiorPlayer, island)){
+            ((SIsland) island).sendMessage(Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
-            if(!islandDisbandEvent.isCancelled()) {
-                ((SIsland) island).sendMessage(Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+            Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
-                Locale.DISBANDED_ISLAND.send(superiorPlayer);
-
-                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
-                island.disbandIsland();
-            }
+            superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+            island.disbandIsland();
         }
 
     }

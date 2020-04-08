@@ -1,0 +1,30 @@
+package com.bgsoftware.superiorskyblock.utils.events;
+
+public final class EventResult<T>{
+
+    private final boolean cancelled;
+    private final T result;
+
+    private EventResult(boolean cancelled, T result){
+        this.cancelled = cancelled;
+        this.result = result;
+    }
+
+    public boolean isCancelled(){
+        return cancelled;
+    }
+
+    public T getResult(){
+        return result;
+    }
+
+    static <T> EventResult<T> of(boolean cancelled){
+        return new EventResult<>(cancelled, null);
+    }
+
+    static <T> EventResult<T> of(boolean cancelled, T result){
+        return new EventResult<>(cancelled, result);
+    }
+
+}
+

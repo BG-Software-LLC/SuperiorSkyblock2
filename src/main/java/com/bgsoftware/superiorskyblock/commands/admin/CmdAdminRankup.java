@@ -2,14 +2,16 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -97,12 +99,12 @@ public final class CmdAdminRankup implements ISuperiorCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(null, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
-            Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
+            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(
+                    null, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
-            if(!islandUpgradeEvent.isCancelled()){
+            if(!event.isCancelled()){
                 SuperiorPlayer owner = island.getOwner();
-                for (String command : islandUpgradeEvent.getCommands()) {
+                for (String command : event.getResult().getKey()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(owner, command
                             .replace("%player%", owner.getName())
                             .replace("%leader%", owner.getName()))
