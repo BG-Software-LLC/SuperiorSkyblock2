@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.registry;
 
 import com.bgsoftware.superiorskyblock.utils.maps.SynchronizedLinkedHashMap;
+import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.function.Function;
 
 public abstract class Registry<K, V> implements Iterable<V> {
 
-    protected static final Set<Registry<?, ?>> loadedRegisteries = Collections.newSetFromMap(new WeakHashMap<>());
+    protected static final SyncedObject<Set<Registry<?, ?>>> loadedRegisteries = SyncedObject.of(Collections.newSetFromMap(new WeakHashMap<>()));
 
     private final Map<K ,V> registry;
 
@@ -23,7 +24,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     protected Registry(Map<K, V> map){
         this.registry = map;
-        loadedRegisteries.add(this);
+        loadedRegisteries.write(loadedRegisteries -> loadedRegisteries.add(this));
     }
 
     protected Registry(Registry<K, V> other){
@@ -73,7 +74,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     public void delete(){
         clear();
-        loadedRegisteries.remove(this);
+        loadedRegisteries.write(loadedRegisteries -> loadedRegisteries.remove(this));
     }
 
     @Override
@@ -104,8 +105,8 @@ public abstract class Registry<K, V> implements Iterable<V> {
     }
 
     public static void clearCache(){
-        loadedRegisteries.forEach(Registry::clear);
-        loadedRegisteries.clear();
+        loadedRegisteries.read(loadedRegisteries -> loadedRegisteries.forEach(Registry::clear));
+        loadedRegisteries.write(Set::clear);
     }
 
     public static <K, V> Registry<K, V> createRegistry(){
