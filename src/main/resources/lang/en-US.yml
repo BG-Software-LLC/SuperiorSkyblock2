@@ -408,6 +408,7 @@ NO_UPGRADE_PERMISSION: '&c&lError | &7You are lacking the permission to upgrade 
 NO_WITHDRAW_PERMISSION: '&c&lError | &7You must be at least {0} in order to withdraw money from island bank.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lError | &7You don''t have enough money to deposit {0} dollars into your island''s bank.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lError | &7You don''t have enough money.'
+OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Toggled island panel &cOFF&7.
   &e&lPanel | &7Running /is will teleport you to the island.

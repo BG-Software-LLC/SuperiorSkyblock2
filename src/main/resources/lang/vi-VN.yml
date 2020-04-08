@@ -488,6 +488,7 @@ NO_WITHDRAW_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để rút t
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để gửi {0}$ vào ngân
   hàng đảo của bạn.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để nâng cấp.'
+OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
 PANEL_TOGGLE_OFF: |-
   &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo : &cTẮT&7.
   &e&lBảng điều khiển | &7Xài /is sẽ dịch chuyển bạn về đảo.'

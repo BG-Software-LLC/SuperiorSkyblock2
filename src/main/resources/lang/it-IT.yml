@@ -516,6 +516,7 @@ NO_WITHDRAW_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per prelevare den
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErrore | &7Non hai abbastanza soldi per depositare
   {0} dollari nella banca della tua isola.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErrore | &7Non hai abbastanza soldi.'
+OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Pannello dell'isola impostato &cOFF&7.
   &e&lPanel | &7Eseguendo /is ti teletrasporterai sulla tua isola.

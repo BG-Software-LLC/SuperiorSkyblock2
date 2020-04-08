@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -200,6 +201,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected abstract void onPlayerClick(InventoryClickEvent e);
 
     public void open(SuperiorMenu previousMenu){
+        if(superiorPlayer.asPlayer().isSleeping()){
+            Locale.OPEN_MENU_WHILE_SLEEPING.send(superiorPlayer);
+            return;
+        }
+
         if(!(this instanceof SuperiorMenuBlank) && !isCompleted()){
             SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
             return;
