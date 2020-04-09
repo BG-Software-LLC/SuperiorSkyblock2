@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -38,16 +37,17 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                 Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
                 superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
+
+                previousMove = false;
+                superiorPlayer.asPlayer().closeInventory();
+
                 island.disbandIsland();
             }
         }
-        else if(!cancelSlot.contains(e.getRawSlot()))
-            return;
-
-        Executor.sync(() -> {
+        else if(cancelSlot.contains(e.getRawSlot())) {
             previousMove = false;
             superiorPlayer.asPlayer().closeInventory();
-        }, 1L);
+        }
     }
 
     public static void init(){
