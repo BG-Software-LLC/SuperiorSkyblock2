@@ -162,6 +162,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Chuyển đổi cài đặt cho một h�
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Thay đổi tỷ lệ phần trăm của vật liệu cho
   máy tạo quặng.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Thay đổi kích thước đảo của người chơi khác.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Đặt tỉ lệ nhân đôi spawner cho hòn đảo
   của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Đặt giới hạn thành viên cho đảo của người
@@ -169,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Đặt giới hạn thành viên cho �
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Đặt mức nâng cấp cho đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Đặt giới hạn hu vực của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Dịch chuyển đến hòn đảo khác
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
@@ -556,6 +558,8 @@ SETTINGS_UPDATED_NAME: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều
 SETTINGS_UPDATED_ALL: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh {0} cho tất
   cả các đảo.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
+SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'

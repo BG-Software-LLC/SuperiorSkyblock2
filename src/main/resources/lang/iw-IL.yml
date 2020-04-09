@@ -137,12 +137,14 @@ COMMAND_DESCRIPTION_ADMIN_SET_RATE: יאל ןתנ ןקחשש גוריד תונש
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: יאל הרדגה ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: רוטרנ'גמ והשלכ רמוח לש זוחא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: ןקחש לש יא לש לדוג תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: רחא ןקחש לש יא לש םירנואפסה סונוב תא
   תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: רחא ןקחש לש יא לש םינקחש תלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: רחא ןקחש לש יא לש גורדש לש המרה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: רחא ןקחש לש יא לש םימוקימה תלבגה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: רחא יא לא רגתשהל.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
@@ -489,6 +491,8 @@ SETTINGS_UPDATED: '&e&lיא | &7{1} לש יאב החלצהב הנכדוע {0} ה
 SETTINGS_UPDATED_NAME: '&e&lיא | &7{1} יאב החלצהב הנכדוע {0} הרדגהה.'
 SETTINGS_UPDATED_ALL: '&e&lיא | &7םייאה לכב החלצהב הנכדוע {0} הרדגהה.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
+SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאב אצמנ אל התא.'

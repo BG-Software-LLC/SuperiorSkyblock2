@@ -128,11 +128,13 @@ COMMAND_DESCRIPTION_ADMIN_SET_RATE: Définir une note à la place d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Activer/Désactiver les paramètres pour une île spécifique.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Changer le poucentage d'un matériau pour le générateur de cobble.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Changer la taille de l'île d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Définir le multiplicateur de taux des spawners pour l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Définir une limite de membres pour l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Définir le niveau d'une amélioration de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Définir la limite de warps d'une île.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Obtenir des informations sur une île.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: Activer/Désactiver le mode espion du chat
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Réafficher une île dans le top des îles.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Dévérouiller un mode pour une île.
@@ -467,6 +469,8 @@ SETTINGS_UPDATED: '&e&lIle | &7Paramètre {0} mit à jour pour l''île de {1}.'
 SETTINGS_UPDATED_NAME: '&e&lIle | &7Paramètre {0} mit à jour pour l''île {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIle | &7Paramètre {0} mit à jour pour toutes les îles.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
+SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Espion] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErreur | &7Vous n''êtes pas sûr votre île.'

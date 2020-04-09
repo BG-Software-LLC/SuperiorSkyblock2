@@ -171,6 +171,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Attiva/disattiva le impostazioni di un'i
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Modifica la percentuale di generazione di
   un materiale dal generatore di ciottoli.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Cambia la dimensione dell'isola di un giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Imposta il moltiplicatore dei tassi dei
   generatori di mob per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Imposta il limite dei membri per l'isola
@@ -179,6 +180,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Imposta il livello di un potenziamento pe
   l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Imposta il limite delle warp di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Ottieni informazioni su un'isola.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle migliori
@@ -587,6 +589,8 @@ SETTINGS_UPDATED_NAME: '&e&lIsola | &7Aggiornate correttamente le impostazioni {
 SETTINGS_UPDATED_ALL: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0}
   a tutte le isole.'
 SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
+SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
+SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErrore | &7Non sei nella tua isola.'
