@@ -1,0 +1,524 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# If you wish to create a new language file, please copy this one.
+# Make sure you give the name a correct language name.
+# https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+
+ADMIN_DEPOSIT_MONEY: '&e&l岛屿银行 | &7你向岛屿银行存入了 &6${0} &7金币.'
+ADMIN_DEPOSIT_MONEY_NAME: '&e&l岛屿银行 | &7你向 &b{1} 的岛屿银行存入了 &6${0} 金币.'
+ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7开发 &bby Ome_R'
+ADMIN_HELP_HEADER: '&e&l岛屿 &7管理命令列表 [{0}/{1}]:'
+ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
+ADMIN_HELP_NEXT_PAGE: '&e&l岛屿 &7输入 /is admin {0} 来查看下一页.'
+ALREADY_IN_ISLAND: '&c&l错误 | &7你现在已经在一个岛屿上了.'
+ALREADY_IN_ISLAND_OTHER: '&c&l错误 | &7这个玩家已经是你的岛屿成员了.'
+BAN_ANNOUNCEMENT: '&e&l岛屿 | &b{1} &7将 &b{0} 从你的岛屿中禁封了,他将不能再进入你的岛屿.'
+BAN_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能禁封岛屿中职位比你低的玩家.'
+BANNED_FROM_ISLAND: '&c&l错误 | &7你被这个岛屿禁封了！'
+BLOCK_LEVEL: '&e&l岛屿等级 | &7方块 &b{0} &7的等级为 &a{1}.'
+BLOCK_VALUE: '&e&l岛屿价值 | &7方块 &b{0} &7的价值为 &a{1}.'
+BLOCK_VALUE_WORTHLESS: '&e&l岛屿价值 | &7方块 &b{0} &7一文不值.'
+BONUS_SET_SUCCESS: '&e&l岛屿 | &7已成功更新岛屿奖励至 &b{0}&7.'
+BORDER_PLAYER_COLOR_UPDATED: '&e&l岛屿边界 | &7已成功将岛屿边界颜色更新为 {0}.'
+BUILD_OUTSIDE_ISLAND: '&c&l错误 | &7你不能超出岛屿边界.'
+CANNOT_SET_ROLE: '&c&l错误 | &7你不能设置玩家的空岛职位为 {0}.'
+CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&l错误 | &7你只能为比你岛屿职位更低的玩家设置权限'
+CHANGED_BIOME: '&e&l岛屿 | &7岛屿生物群系已更新！你需要重新进入岛屿才能看到变化.'
+CHANGED_BLOCK_LIMIT: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
+CHANGED_BLOCK_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿将 {0} &7方块数量限制提升.'
+CHANGED_BLOCK_LIMIT_NAME: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
+CHANGED_CROP_GROWTH: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速度为 &b{0} &7倍.'
+CHANGED_CROP_GROWTH_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新农作物生长速度.'
+CHANGED_CROP_GROWTH_NAME: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速度为 &b{0} &7倍.'
+CHANGED_DISCORD: '&e&l岛屿 | &7岛屿Discord频道已设置为 &b{0}.'
+CHANGED_ISLAND_SIZE: '&e&l岛屿升级 | &7成功升级{0}的岛屿边界范围！'
+CHANGED_ISLAND_SIZE_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的边界范围！'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&o玩家可以在岛外建造，所以岛屿的大小没有影响，你可以在配置文件中关闭此功能，这样岛屿的大小会再次受到影响.'
+CHANGED_LANGUAGE: '&e&l语言 | &7成功将你的语言设置为 &b简体中文&7.'
+CHANGED_MOB_DROPS: '&e&l岛屿升级 | &7成功升级岛屿生物掉落概率为 &b{0} &7倍.'
+CHANGED_MOB_DROPS_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新生物掉落概率.'
+CHANGED_MOB_DROPS_NAME: '&e&l岛屿升级 | &7成功升级岛屿生物掉落概率为 &b{0} &7倍.'
+CHANGED_NAME: '&e&l岛屿 | &7你将岛屿更名为 &b{0}&7.'
+CHANGED_NAME_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿更名为 &b{1}&7.'
+CHANGED_NAME_OTHER_NAME: '&e&l岛屿 | &7你将这个岛屿名从 &b{0} &7更名为 &b{1}&7.'
+CHANGED_PAYPAL: '&e&l岛屿 | &7成功设置岛屿Paypal为 &b{0}.'
+CHANGED_SPAWNER_RATES: '&e&l岛屿升级 | &7成功升级{0}的岛屿刷怪率！'
+CHANGED_SPAWNER_RATES_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新刷怪率！'
+CHANGED_SPAWNER_RATES_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的刷怪率！'
+CHANGED_TEAM_LIMIT: '&e&l岛屿升级 | &7成功升级{0}的岛屿团队人数！'
+CHANGED_TEAM_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新团队人数！'
+CHANGED_TEAM_LIMIT_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的团队最大人数！'
+CHANGED_TELEPORT_LOCATION: '&e&l岛屿 | &7成功设置岛屿传送点.'
+CHANGED_WARPS_LIMIT: '&e&l岛屿升级 | &7成功升级{0}的岛屿最大地标数！'
+CHANGED_WARPS_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新最大地标数！'
+CHANGED_WARPS_LIMIT_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的最大地标数！'
+COMMAND_ARGUMENT_ALL_ISLANDS: '*'
+COMMAND_ARGUMENT_ALL_PLAYERS: '*'
+COMMAND_ARGUMENT_AMOUNT: 数量
+COMMAND_ARGUMENT_DISCORD: Discord频道...
+COMMAND_ARGUMENT_EMAIL: 邮箱
+COMMAND_ARGUMENT_ISLAND_NAME: 岛屿名
+COMMAND_ARGUMENT_ISLAND_ROLE: 岛屿职位
+COMMAND_ARGUMENT_LEADER: 领导者
+COMMAND_ARGUMENT_LEVEL: 岛屿等级
+COMMAND_ARGUMENT_LIMIT: 限制
+COMMAND_ARGUMENT_MATERIAL: 材质
+COMMAND_ARGUMENT_MESSAGE: 信息...
+COMMAND_ARGUMENT_MISSION_NAME: 任务名
+COMMAND_ARGUMENT_MULTIPLIER: 倍率
+COMMAND_ARGUMENT_NAME: 名字
+COMMAND_ARGUMENT_NEW_LEADER: 新领导者
+COMMAND_ARGUMENT_PAGE: 页数
+COMMAND_ARGUMENT_PERMISSION: 权限
+COMMAND_ARGUMENT_PLAYER_NAME: 玩家名
+COMMAND_ARGUMENT_PRIVATE: 私有
+COMMAND_ARGUMENT_RATING: 评分
+COMMAND_ARGUMENT_SCHEMATIC_NAME: 地图文件名
+COMMAND_ARGUMENT_SETTINGS: 设置
+COMMAND_ARGUMENT_SIZE: 尺寸
+COMMAND_ARGUMENT_TIME: 时间
+COMMAND_ARGUMENT_UPGRADE_NAME: 升级项目
+COMMAND_ARGUMENT_VALUE: 数值
+COMMAND_ARGUMENT_WARP_NAME: 地标名
+COMMAND_COOLDOWN_FORMAT: '&e&l岛屿 | &7你只能在 &b{0} &7后再次使用这个命令.'
+COMMAND_COOLDOWN_SECONDS_NAME: 秒
+COMMAND_COOLDOWN_SECOND_NAME: 秒
+COMMAND_COOLDOWN_MINUTES_NAME: 分
+COMMAND_COOLDOWN_MINUTE_NAME: 分
+COMMAND_COOLDOWN_HOURS_NAME: 时
+COMMAND_COOLDOWN_HOUR_NAME: 时
+COMMAND_COOLDOWN_DAYS_NAME: 天
+COMMAND_COOLDOWN_DAY_NAME: 天
+COMMAND_DESCRIPTION_ACCEPT: 同意玩家的岛屿邀请.
+COMMAND_DESCRIPTION_ADMIN: 查看管理员命令.
+COMMAND_DESCRIPTION_ADMIN_BONUS: 给玩家岛屿奖励.
+COMMAND_DESCRIPTION_ADMIN_BYPASS: 打开管理员忽略模式.
+COMMAND_DESCRIPTION_ADMIN_CLOSE: 将一个岛屿向公众关闭.
+COMMAND_DESCRIPTION_ADMIN_DEMOTE: 降级其他岛屿上的成员.
+COMMAND_DESCRIPTION_ADMIN_DEPOSIT: 往一个岛屿银行中存款.
+COMMAND_DESCRIPTION_ADMIN_DISBAND: 强制解散一个玩家的岛屿.
+COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: 给与一个玩家解散岛屿次数.
+COMMAND_DESCRIPTION_ADMIN_IGNORE: 将岛屿从岛屿排行榜中忽略.
+COMMAND_DESCRIPTION_ADMIN_JOIN: 不需要允许强制加入岛屿.
+COMMAND_DESCRIPTION_ADMIN_MISSION: 更改玩家的任务状态.
+COMMAND_DESCRIPTION_ADMIN_MSG: 向玩家发送一条不带前缀的消息.
+COMMAND_DESCRIPTION_ADMIN_MSG_ALL: 向一个岛屿的全部玩家发送一条不带前缀的消息.
+COMMAND_DESCRIPTION_ADMIN_NAME: 强制修改岛屿名称.
+COMMAND_DESCRIPTION_ADMIN_OPEN: 将一个岛屿向公众开放.
+COMMAND_DESCRIPTION_ADMIN_PROMOTE: 晋升其他岛屿上的成员.
+COMMAND_DESCRIPTION_ADMIN_PURGE: 清除岛屿.
+COMMAND_DESCRIPTION_ADMIN_RANKUP: 将一个岛屿升级.
+COMMAND_DESCRIPTION_ADMIN_RECALC: 重新计算一个岛屿的价值.
+COMMAND_DESCRIPTION_ADMIN_RELOAD: 重载插件.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛屿评分.
+COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
+COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 更新其他玩家岛屿的农作物生长速度.
+COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 更新其他玩家的岛屿解散次数.
+COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 把一个岛屿转让给他人.
+COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 更新其他玩家岛屿的怪物掉落倍率.
+COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 为所有岛屿更新职位的权限.
+COMMAND_DESCRIPTION_ADMIN_SET_RATE: 修改其他玩家给出的岛屿评分.
+COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: 修改其他玩家的岛屿设置.
+COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: 修改其他玩家岛屿的空岛矿机概率.
+COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 修改其他玩家的岛屿边界范围.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: 设置服务器的重生点.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: 修改其他玩家的岛屿生物生成速度.
+COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: 修改其他玩家的岛屿团队人数.
+COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: 修改其他玩家岛屿的岛屿升级.
+COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: 修改其他玩家的岛屿最大地标数.
+COMMAND_DESCRIPTION_ADMIN_SHOW: 查看一个岛屿的详细信息.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: 传送至重生点.
+COMMAND_DESCRIPTION_ADMIN_SPY: 切换聊天监视模式
+COMMAND_DESCRIPTION_ADMIN_TELEPORT: 传送到其他玩家的岛屿.
+COMMAND_DESCRIPTION_ADMIN_UNIGNORE: 取消岛屿在排行榜的忽略.
+COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 为岛屿解锁新维度
+COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 从一个岛屿银行中取款.
+COMMAND_DESCRIPTION_BAN: 在岛屿上禁封一个玩家.
+COMMAND_DESCRIPTION_BIOME: 改变岛屿群系.
+COMMAND_DESCRIPTION_BORDER: 更新岛屿边界颜色.
+COMMAND_DESCRIPTION_CLOSE: 将岛屿向公众关闭.
+COMMAND_DESCRIPTION_COOP: 将一个玩家加入岛屿临时成员&c(下线后自动取消)&7.
+COMMAND_DESCRIPTION_COUNTS: 查看岛屿上的方块数量.
+COMMAND_DESCRIPTION_CREATE: 创建岛屿.
+COMMAND_DESCRIPTION_DEL_WARP: 移除一个岛屿地标.
+COMMAND_DESCRIPTION_DEMOTE: 降职一名岛屿成员职位.
+COMMAND_DESCRIPTION_DEPOSIT: 向岛屿银行中存款.
+COMMAND_DESCRIPTION_DISBAND: 解散岛屿&c(此操作不可逆)&7.
+COMMAND_DESCRIPTION_EXPEL: 将一名游客从岛屿踢出.
+COMMAND_DESCRIPTION_FLY: 开关岛屿飞行.
+COMMAND_DESCRIPTION_HELP: 查看岛屿帮助.
+COMMAND_DESCRIPTION_INVITE: 邀请玩家加入你的岛屿.
+COMMAND_DESCRIPTION_KICK: 踢出一名岛屿成员.
+COMMAND_DESCRIPTION_LANG: 更换你的游戏语言.
+COMMAND_DESCRIPTION_LEAVE: 离开你的岛屿团队.
+COMMAND_DESCRIPTION_MEMBERS: 打开岛屿成员界面.
+COMMAND_DESCRIPTION_MISSION: 完成一个岛屿任务.
+COMMAND_DESCRIPTION_MISSIONS: 打开岛屿任务界面.
+COMMAND_DESCRIPTION_NAME: 更改你的岛屿名称.
+COMMAND_DESCRIPTION_OPEN: 将岛屿向公众开放.
+COMMAND_DESCRIPTION_PANEL: 打开岛屿控制面板.
+COMMAND_DESCRIPTION_PARDON: 从岛屿上移除玩家的禁封.
+COMMAND_DESCRIPTION_PERMISSIONS: 设置岛屿职位的权限.
+COMMAND_DESCRIPTION_PROMOTE: 晋升一名岛屿成员职位.
+COMMAND_DESCRIPTION_RANKUP: 岛屿升级.
+COMMAND_DESCRIPTION_RATE: 给岛屿评分.
+COMMAND_DESCRIPTION_RATINGS: 查看岛屿的历史评分.
+COMMAND_DESCRIPTION_SETTINGS: 打开岛屿设置界面.
+COMMAND_DESCRIPTION_RECALC: 计算岛屿价值.
+COMMAND_DESCRIPTION_SET_DISCORD: 为岛屿设置Discord频道.
+COMMAND_DESCRIPTION_SET_PAYPAL: 设置岛屿的PayPal账户.
+COMMAND_DESCRIPTION_SET_ROLE: 改变你岛屿成员的职位.
+COMMAND_DESCRIPTION_SET_TELEPORT: 将空岛传送点设置到脚下.
+COMMAND_DESCRIPTION_SET_WARP: 创建空岛地标.
+COMMAND_DESCRIPTION_SHOW: 查看一个岛屿的详细信息.
+COMMAND_DESCRIPTION_TEAM: 查看岛屿团队信息.
+COMMAND_DESCRIPTION_TEAM_CHAT: 开关岛屿聊天频道.
+COMMAND_DESCRIPTION_TELEPORT: 传送至你的岛屿.
+COMMAND_DESCRIPTION_TOGGLE: 开关岛屿边界和方块堆叠.
+COMMAND_DESCRIPTION_TOP: 查看岛屿排行榜.
+COMMAND_DESCRIPTION_TRANSFER: 转移你的岛屿领导权.
+COMMAND_DESCRIPTION_UNCOOP: 取消一个玩家的临时成员身份.
+COMMAND_DESCRIPTION_UPGRADE: 打开岛屿升级界面.
+COMMAND_DESCRIPTION_VALUE: 查看手中方块的价值.
+COMMAND_DESCRIPTION_VALUES: 打开岛屿价值菜单.
+COMMAND_DESCRIPTION_VISIT: 前往一个玩家的岛屿参观.
+COMMAND_DESCRIPTION_VISITORS: 打开游客者管理菜单.
+COMMAND_DESCRIPTION_WARP: 传送至空岛地标.
+COMMAND_DESCRIPTION_WARPS: 查看地标列表.
+COMMAND_DESCRIPTION_WITHDRAW: 从岛屿银行中取款.
+COMMAND_USAGE: '&c正确用法: /{0}'
+COOP_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将 &b{1} &7设置为岛屿临时成员.'
+COOP_BANNED_PLAYER: '&c&l错误 | &7这个玩家被岛屿禁封了，不能成为临时成员.'
+CREATE_ISLAND: '&e&l岛屿 | &7已为你创建新岛屿，耗时 &b{1}ms &7开始冒险吧！'
+DELETE_WARP: '&e&l岛屿 | &7你移除了地标 &b{0}.'
+DELETE_WARP_SIGN_BROKE: '&7&o有一个地标被移除了，它的告示牌被拆下...'
+DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能给比你空岛职位低的玩家降职.'
+DEMOTED_MEMBER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿职位降职为 &b{1}&7.'
+DEPOSIT_ANNOUNCEMENT: '&e&l岛屿银行 | &b{0} &7向岛屿银行存入了 &e$&b{1}&7！'
+DESTROY_OUTSIDE_ISLAND: '&c&l错误 | &7你无法破坏超出岛屿边界范围外的东西.'
+DISBAND_ANNOUNCEMENT: '&e&l岛屿 | &7你的岛屿被 &b{0} &7解散了.'
+DISBAND_GIVE: '&e&l岛屿 | &7你获得了 &b{0} &7次解散岛屿的机会.'
+DISBAND_GIVE_ALL: '&e&l岛屿 | &7你给予了全部玩家 &b{0} &7次解散岛屿的机会.'
+DISBAND_GIVE_OTHER: '&e&l岛屿 | &7你给予了 &b{1} {0} &7次解散岛屿的机会.'
+DISBAND_SET: '&e&l岛屿 | &7你剩余解散岛屿次数为 &b{0}.'
+DISBAND_SET_ALL: '&e&l岛屿 | &7你将所有玩家的岛屿解散次数设置为 &b{0}.'
+DISBAND_SET_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿解散次数设置为 &b{1}.'
+DISBANDED_ISLAND: '&e&l岛屿 | &7你解散了你的岛屿...'
+DISBANDED_ISLAND_OTHER: '&e&l岛屿 | &7你解散了 &b{0} &7的岛屿.'
+DISBANDED_ISLAND_OTHER_NAME: '&e&l岛屿 | &7Y你解散了岛屿 &b{0}.'
+ENTER_PVP_ISLAND: '&c小心！你传送至了一个开启PVP的岛屿，十秒后你将可被其他玩家攻击...'
+EXPELLED_PLAYER: '&e&l岛屿 | &b{0} &7被逐出岛屿.'
+FORMAT_QUAD: Q
+FORMAT_TRILLION: T
+FORMAT_BILLION: B
+FORMAT_MILLION: M
+FORMAT_THOUSANDS: K
+GENERATOR_UPDATED: '&e&l岛屿 | &7成功升级 &b{1} &7岛屿矿机的 &e{0} &7概率.'
+GENERATOR_UPDATED_NAME: '&e&l岛屿 | &7成功将 &b{1} &7的岛屿矿机升级至 &e{0}级&7.'
+GENERATOR_UPDATED_ALL: '&e&l岛屿 | &7成功将所有岛屿的矿机升级至 &e{0}级&7.'
+GLOBAL_MESSAGE_SENT: '&e&l岛屿 | &7成功给 &b{0} &7岛屿的所有成员发送信息！'
+GLOBAL_MESSAGE_SENT_NAME: '&e&l岛屿 | &7成功给 &b{0} &7岛屿的所有成员发送信息！'
+GOT_BANNED: '&e&l岛屿 | &7你被 &b{0} &7的岛屿禁封了！将无法再进入他的岛屿.'
+GOT_DEMOTED: '&e&l岛屿 | &7你的岛屿职位被降职为 &b{0}&7.'
+GOT_EXPELLED: '&e&l岛屿 | &7&o你被 &b{0} &7逐出了这个岛屿.'
+GOT_INVITE: "&e&l岛屿 | &b{0} &e邀请你加入他的岛屿   \n                &7[&a&l点击同意&7]\n"
+GOT_INVITE_TOOLTIP: '&a点击同意加入岛屿'
+GOT_KICKED: '&e&l岛屿 | &7你被 &b{0} &7踢出了岛屿团队.'
+GOT_PROMOTED: '&e&l岛屿 | &7你的岛屿职位被晋升为 &b{0}.'
+GOT_REVOKED: '&e&l岛屿 | &b{0} &7取消了对你的岛屿邀请.'
+GOT_UNBANNED: '&e&l岛屿 | &7你已被 &b{0} &7的岛屿禁封.'
+HIT_ISLAND_MEMBER: '&c&l错误 | &7你不能攻击你的岛屿团队成员.'
+HIT_PLAYER_IN_ISLAND: '&c&l错误 | &7你不能在岛屿上攻击玩家.'
+IGNORED_ISLAND: '&e&l岛屿 | &b{0} &7的岛屿现在不再被统计进入排行榜.'
+IGNORED_ISLAND_NAME: '&e&l岛屿 | &7岛屿 &b{0} 不再被统计进入排行榜.'
+INTERACT_OUTSIDE_ISLAND: '&c&l错误 | &7你无法对边界范围外的东西操作.'
+INVALID_AMOUNT: '&c&l错误 | &7未知数量 &b{0}.'
+INVALID_ENVIRONMENT: '&c&l错误 | &7未知世界 &b{0}.'
+INVALID_ISLAND: '&c&l错误 | &7你还没有岛屿哦！'
+INVALID_ISLAND_LOCATION: '&c&l错误 | &7他还没有岛屿.'
+INVALID_ISLAND_OTHER: '&c&l错误 | &b{0} 还没有岛屿哦.'
+INVALID_ISLAND_OTHER_NAME: '&c&l错误 | &7没有找到名为 &b{0} &7的岛屿.'
+INVALID_ISLAND_PERMISSION: |
+  &c&l错误 | &7找不到这个岛屿权限 {0}.
+  &c&l错误 | &7岛屿权限: {1}
+INVALID_LEVEL: '&c&l错误 | &7未知等级 {0}.'
+INVALID_LIMIT: '&c&l错误 | &7未知方块限制 {0}.'
+INVALID_MATERIAL: '&c&l错误 | &7未知材质 {0}.'
+INVALID_MISSION: '&c&l错误 | &7未知任务 {0}.'
+INVALID_MULTIPLIER: '&c&l错误 | &7未知倍率 {0}.'
+INVALID_PERCENTAGE: '&c&l错误 | &7百分比必须在0到100之间.'
+INVALID_PLAYER: '&c&l错误 | &7找不到名为 &b{0} &7的玩家'
+INVALID_RATE: |
+  &c&l错误 | &7找不到这个评分等级 {0}.
+  &c&l错误 | &7岛屿评级: {1}
+INVALID_ROLE: |
+  &c&l错误 | &7找不到这个岛屿职位 {0}.
+  &c&l错误 | &7岛屿职位: {1}
+INVALID_SCHEMATIC: '&c&l错误 | &7没有找到名为 &b{0} &7的岛屿预设.'
+INVALID_SETTINGS: |
+  &c&l错误 | &7找不到这个岛屿设置 {0}.
+  &c&l错误 | &7岛屿设置: {1}
+INVALID_SIZE: '&c&l错误 | &7未知尺寸 {0}.'
+INVALID_TOGGLE_MODE: '&c&l错误 | &7无法切换 {0}.'
+INVALID_UPGRADE: |
+  &c&l错误 | &7无法找到岛屿升级类型 {0}.
+  &c&l错误 | &7岛屿升级类型: {1}
+INVALID_VISIT_LOCATION: '&c&l错误 | &7这个岛屿没有设置游客传送点.'
+INVALID_VISIT_LOCATION_BYPASS: '&7&o你有忽略模式，将你传送至岛屿上...'
+INVALID_WARP: '&c&l错误 | &7未知地标 {0}.'
+INVITE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7邀请了 &b{1} 加入空岛团队.'
+INVITE_BANNED_PLAYER: '&c&l错误 | &7这个玩家被岛屿禁封了，无法邀请.'
+INVITE_TO_FULL_ISLAND: '&c&l错误 | &7你的岛屿成员数量已达上限，不能再邀请更多成员了！'
+ISLAND_ALREADY_EXIST: '&c&l错误 | &7已经有一个岛屿叫这个名字了.'
+ISLAND_BANK_EMPTY: '&e&l岛屿银行 | &7岛屿银行是空的.'
+ISLAND_BEING_CALCULATED: '&c&l错误 | &7正在计算岛屿等级！请稍后.'
+ISLAND_CLOSED: '&e&l岛屿 | &7已将岛屿设置为对公众关闭.'
+ISLAND_CREATE_PROCCESS_REQUEST: '&e&l岛屿 | &7正在处理...'
+ISLAND_FLY_DISABLED: '&e&l岛屿飞行 | &7岛屿飞行已自动 &c关闭&7.'
+ISLAND_FLY_ENABLED: '&e&l岛屿飞行 | &7岛屿飞行已自动 &a开启&7.'
+ISLAND_GOT_DELETED_WHILE_INSIDE: '&e&l岛屿 | &7你所在的岛屿被解散了，已将你传回出生点...'
+ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE: '&e&l岛屿 | &7你在一个开启了PVP的岛屿，已将你传回出生点...'
+ISLAND_HELP_FOOTER: '&e&l岛屿 &7帮助列表'
+ISLAND_HELP_HEADER: '&e&l岛屿 &7命令列表 [{0}/{1}]:'
+ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
+ISLAND_HELP_NEXT_PAGE: '&e&l岛屿 &7使用 &b/is help {0} &7来查看下一页.'
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
+  &e&l岛屿 | &7岛屿方块限制:
+  {0}
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&l岛屿 | &7农作物生长速度: {0}'
+ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&l岛屿 | &7掉落物概率: {0}'
+ISLAND_INFO_ADMIN_GENERATOR_RATES: |
+  &e&l岛屿 | &7空岛矿机:
+  {0}
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&l岛屿 | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_SIZE: '&e&l岛屿 | &7边界范围: {0}'
+ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&l岛屿 | &7生物生成率: {0}'
+ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&l岛屿 | &7团队最大人数: {0}'
+ISLAND_INFO_ADMIN_UPGRADES: |
+  &e&l岛屿 | &7空岛升级:
+  {0}
+ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&l岛屿 | &7  {0}: {1}'
+ISLAND_INFO_BANK: '&e&l岛屿 | &7银行: {0}'
+ISLAND_INFO_DISCORD: '&e&l岛屿 | &7Discord频道: {0}'
+ISLAND_INFO_FOOTER: ''
+ISLAND_INFO_HEADER: ''
+ISLAND_INFO_LAST_TIME_UPDATED: '&e&l岛屿 | &7最后更新时间: &b{0} &7前'
+ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&l岛屿 | &7上次更新时间: &a正在活动'
+ISLAND_INFO_LOCATION: '&e&l岛屿 | &7位置: {0}'
+ISLAND_INFO_NAME: '&e&l岛屿 | &7岛屿名: {0}'
+ISLAND_INFO_OWNER: '&e&l岛屿 | &7岛屿主: {0}'
+ISLAND_INFO_PAYPAL: '&e&l岛屿 | &7Paypal账户: {0}'
+ISLAND_INFO_PLAYER_LINE: '&e&l岛屿 | &7 - {0}'
+ISLAND_INFO_RATE: '&e&l岛屿 | &7岛屿评分: {0} &7({1}/5) - {2} 总评分.'
+ISLAND_INFO_RATE_EMPTY_SYMBOL: '&f✧'
+ISLAND_INFO_RATE_SYMBOL: ✦
+ISLAND_INFO_RATE_ONE_COLOR: '&7&l'
+ISLAND_INFO_RATE_TWO_COLOR: '&f&l'
+ISLAND_INFO_RATE_THREE_COLOR: '&a&l'
+ISLAND_INFO_RATE_FOUR_COLOR: '&e&l'
+ISLAND_INFO_RATE_FIVE_COLOR: '&6&l'
+ISLAND_INFO_ROLES: |
+  &e&l岛屿 | &7{0}s:
+  {1}
+ISLAND_INFO_VISITORS_COUNT: '&e&l岛屿 | &7总游客量: {0}'
+ISLAND_INFO_WORTH: '&e&l岛屿 | &7价值: {0}'
+ISLAND_OPENED: '&e&l岛屿 | &7已将岛屿设置为对公众开放.'
+ISLAND_PROTECTED: '&c&l错误 | &7岛屿保护.'
+ISLAND_TEAM_STATUS_FOOTER: ''
+ISLAND_TEAM_STATUS_HEADER: '&e&l岛屿 | &b{0} &7的岛屿成员 &8[&e{1}&8/&e{2}&8]&7:'
+ISLAND_TEAM_STATUS_OFFLINE: '&c(离线)'
+ISLAND_TEAM_STATUS_ONLINE: '&a(在线)'
+ISLAND_TEAM_STATUS_ROLES: '&e&l岛屿 | &7 * [{0}] {1} {2} &7({3})'
+ISLAND_TOP_STATUS_OFFLINE: '&c(离线)'
+ISLAND_TOP_STATUS_ONLINE: '&a(在线)'
+ISLAND_WARP_PUBLIC: ''
+ISLAND_WARP_PRIVATE: '&c[私有]'
+ISLAND_WAS_CLOSED: '&e&l岛屿 | &7&o这个岛屿停止了对外开放，你被传回了出生点...'
+ISLAND_WORTH_RESULT: '&e&l岛屿 | &7你的岛屿价值为 &b{0} &e[{1}级]'
+JOIN_ADMIN_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7加入了你的岛屿团队.'
+JOIN_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7加入了你的岛屿团队.'
+JOIN_FULL_ISLAND: '&c&l错误 | &7这个岛屿已经达到最大团队人数上限.'
+JOIN_WHILE_IN_ISLAND: '&c&l错误 | &7你已经有岛屿或已加入岛屿团队了.'
+JOINED_ISLAND: '&e&l岛屿 | &7你加入了 &b{0} &7的岛屿团队.'
+JOINED_ISLAND_NAME: '&e&l岛屿 | &7你加入了岛屿 &b{0}.'
+JOINED_ISLAND_AS_COOP: '&e&l岛屿 | &7你现在成为了 &b{0} &7的岛屿临时成员，下线后失效.'
+JOINED_ISLAND_AS_COOP_NAME: '&e&l岛屿 | &7你现在成为了 &b{0} &7岛屿的临时成员，下线后失效..'
+KICK_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 被 &b{1} &7踢出了岛屿.'
+KICK_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能踢出比你岛屿职位更低的玩家.'
+LACK_CHANGE_PERMISSION: '&c&l错误 | &7无法更换为其他职位.'
+LAST_ROLE_DEMOTE: '&c&l错误 | &7他已经是最低的成员职位了，不能再降职了.'
+LAST_ROLE_PROMOTE: '&c&l错误 | &7你不能再提升他的职位了.'
+LEAVE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7离开了岛屿团队...'
+LEAVE_ISLAND_AS_LEADER: |-
+  &c&l错误 | &7你不能离开你自己领导的岛屿.
+  &c&l错误 | &7你可以使用 &a/is transfer <岛屿成员名> &7转移领导权.
+  &c&l错误 | &7或者使用 &a/is disband &7来解散岛屿 &c(解散有次数限制)
+LEFT_ISLAND: '&e&l岛屿 | &7你离开了你的岛屿团队...'
+LEFT_ISLAND_COOP: '&e&l岛屿 | &7你不再是 &b{0} &7岛屿的临时成员了.'
+LEFT_ISLAND_COOP_NAME: '&e&l岛屿 | &7你不再是 &b{0} &7岛屿的临时成员了.'
+MATERIAL_NOT_SOLID: '&c&l错误 | &7你必须提供一个坚实的材质.'
+MAXIMUM_LEVEL: '&c&l错误 | &7这个岛屿升级项目的最高等级为 &e{0}&7.'
+MESSAGE_SENT: '&e&l岛屿 | &7成功向 &b{0} &7发送信息！'
+MISSION_CANNOT_COMPLETE: '&c&l错误 | &7你还不能完成这个任务.'
+MISSION_NO_AUTO_REWARD: '&e&l岛屿任务 | &7你已经收集了任务 &b{0} &7所需的所有材料 - 使用 &a/is missions
+  &7打开任务系统去完成它！'
+MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&c&l错误 | &7在完成此任务前，你需要先完成任务 &b{0}&7.'
+MISSION_STATUS_COMPLETE: '&e&l岛屿任务 | &7已将 &b{1} &7的任务 &b{0} &7状态更新为已完成.'
+MISSION_STATUS_RESET: '&e&l岛屿任务 | &7重置 &b{1} &7任务 &b{0} &7的状态.'
+NAME_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将他的岛屿更名为 &b{1}.'
+NAME_BLACKLISTED: '&c&l错误 | &7你不能使用这个岛屿名字.'
+NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
+NAME_TOO_LONG: '&c&l错误 | &7岛屿名最大不可超过16个字符长度.'
+NAME_TOO_SHORT: '&c&l错误 | &7岛屿名最小不可小于3个字符长度.'
+NO_BAN_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能在岛屿中禁封玩家.'
+NO_CLOSE_BYPASS: '&c&l错误 | &7这个岛屿不对游客开放.'
+NO_CLOSE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能将岛屿设置为不对游客开放.'
+NO_COMMAND_PERMISSION: '&8&l[&c&l！&8&l] &7未知命令.'
+NO_COOP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能添加临时成员.'
+NO_DELETE_WARP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能移除岛屿地标.'
+NO_DEMOTE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给其他成员降职.'
+NO_DEPOSIT_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能向岛屿银行存款.'
+NO_DISBAND_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能解散岛屿.'
+NO_EXPEL_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能踢出岛屿成员.'
+NO_INVITE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能发送岛屿团队邀请.'
+NO_ISLAND_INVITE: '&c&l错误 | &7没有找到这个岛屿团队邀请.'
+NO_ISLANDS_TO_PURGE: '&c&l错误 | &7没有需要清理的岛屿.'
+NO_KICK_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能踢出玩家.'
+NO_MORE_DISBANDS: '&c&l错误 | &7你已经不能再解散岛屿了，且行且珍惜！'
+NO_MORE_WARPS: '&c&l错误 | &7你的岛屿地标数已达到设置上限，不能再创建更多地标了！'
+NO_NAME_PERMISSION: '&c&l错误 | &7你不能给你的岛屿更名！'
+NO_OPEN_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置岛屿为对游客开放.'
+NO_PERMISSION_CHECK_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能编辑岛屿职位权限.'
+NO_PROMOTE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给其他成员晋升.'
+NO_RANKUP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给岛屿进行升级.'
+NO_RATINGS_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能查看岛屿历史评分.'
+NO_SET_BIOME_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能更新岛屿群系.'
+NO_SET_DISCORD_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能更换岛屿Discord频道.'
+NO_SET_HOME_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置岛屿传送点.'
+NO_SET_PAYPAL_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能更换岛屿Paypal账户.'
+NO_SET_ROLE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置其他成员的职位.'
+NO_SET_SETTINGS_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能更改岛屿设置.'
+NO_SET_WARP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置岛屿地标.'
+NO_TRANSFER_PERMISSION: '&c&l错误 | &7只有岛屿主才可以转移岛屿领导权哦！'
+NO_UNCOOP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能移除岛屿临时成员.'
+NO_UPGRADE_PERMISSION: '&c&l错误 | &7你没有权限给岛屿进行升级.'
+NO_WITHDRAW_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能从岛屿银行中取款.'
+NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&l错误 | &7你没有这么多的游戏币来存入岛屿银行.'
+NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&l错误 | &7你没有这么多游戏币来升级岛屿.'
+OPEN_MENU_WHILE_SLEEPING: '&7&o你太困了，先睡吧....'
+PANEL_TOGGLE_OFF: |-
+  &e&l岛屿管理 | &7岛屿管理面板 &c关闭&7.
+  &e&l岛屿管理 | &7现在使用 &b/is &7将会直接传送回岛屿.
+PANEL_TOGGLE_ON: |-
+  &e&l岛屿管理 | &7岛屿管理面板 &a开启&7.
+  &e&l岛屿管理 | &7现在使用 &b/is &7将会打开岛屿管理面板.
+PERMISSION_CHANGED: '&e&l岛屿 | &7成功更新 &b{1} &7岛屿的 &b{0} &7权限.'
+PERMISSION_CHANGED_NAME: '&e&l岛屿 | &7成功更新 &b{1} &7岛屿的 &b{0} &7权限.'
+PERMISSION_CHANGED_ALL: '&e&l岛屿 | &7成功为所有岛屿更新 &b{0} &7权限.'
+PLAYER_ALREADY_BANNED: '&c&l错误 | &7这个玩家已经被岛屿禁封了.'
+PLAYER_ALREADY_COOP: '&c&l错误 | &7这个玩家已经是岛屿的临时成员了.'
+PLAYER_ALREADY_IN_ROLE: '&c&l错误 | &7成员 &b{0} &7已经是 &b{1} &7职位了.'
+PLAYER_EXPEL_BYPASS: '&c&l错误 | &7你无法将这个玩家从岛屿团队中踢出.'
+PLAYER_JOIN_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7进入了服务器.'
+PLAYER_NOT_BANNED: '&c&l错误 | &7这个玩家并没有被岛屿禁封.'
+PLAYER_NOT_COOP: '&c&l错误 | &7这个玩家并不是岛屿的临时成员.'
+PLAYER_NOT_INSIDE_ISLAND: '&c&l错误 | &7这个玩家不在你的岛屿中.'
+PLAYER_NOT_ONLINE: '&c&l错误 | &7这个玩家不在线！'
+PLAYER_QUIT_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7离线了.'
+PROMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能给比你岛屿职位更低的成员提升职位.'
+PROMOTED_MEMBER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿职位提升至 &b{1}&7.'
+PURGE_CLEAR: '&e&l岛屿 | &7成功清除所有排队清除中的岛屿.'
+PURGED_ISLANDS: |-
+  &e&l岛屿 | &7{0} 个岛屿将在服务器下次启动被清除.
+  &e&l岛屿 | &7在这之前你可以随时使用 &b/is admin purge cancel &7来取消.
+RANKUP_SUCCESS: '&e&l岛屿 | &7已成功为 {1} 的岛屿更新 {0} 的升级.'
+RANKUP_SUCCESS_ALL: '&e&l岛屿 | &7成功为所有岛屿更新 {0} 的升级.'
+RANKUP_SUCCESS_NAME: '&7已成功为岛屿 {1} 更新 {0} 的升级.'
+RATE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7给你的岛屿评了 &b{1} &7分！.'
+RATE_CHANGE_OTHER: '&e&l岛屿 | &7你将岛屿评分从 &b{0} &7修改至 &b{1}&7.'
+RATE_OWN_ISLAND: '&c&l错误 | &7你不能给你自己的岛屿评分.'
+RATE_REMOVE_ALL: '&e&l岛屿 | &7成功移除了 &b{0} &7岛屿的所有评分数据.'
+RATE_SUCCESS: '&e&l岛屿 | &7你给岛屿评了 &6&l{0} &7分！'
+REACHED_BLOCK_LIMIT: '&e&l岛屿升级 | &7这个方块已经达到了岛屿最大放置数量限制！'
+RECALC_ALL_ISLANDS: '&e&l岛屿 | &7正在重新计算所有岛屿...'
+RECALC_ALL_ISLANDS_DONE: '&e&l岛屿 | &7所有岛屿已计算完成.'
+RECALC_PROCCESS_REQUEST: '&e&l岛屿 | &7处理请求中...'
+RELOAD_COMPLETED: '&e&l岛屿 | &7插件已重载'
+RELOAD_PROCCESS_REQUEST: '&e&l岛屿 | &7开始重载插件配置...'
+REVOKE_INVITE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7取消了对 &b{1} &7的岛屿团队邀请.'
+SAME_NAME_CHANGE: '&c&l错误 | &7新的岛屿名不能和之前相同.'
+SCHEMATIC_LEFT_SELECT: '&e&l岛屿预设 | &7选定点 #2 ({0})'
+SCHEMATIC_NOT_READY: '&c&l错误 | &7你没有选定两个点.'
+SCHEMATIC_PROCCESS_REQUEST: '&e&l岛屿预设 | &7处理请求中...'
+SCHEMATIC_READY_TO_CREATE: |
+  &e&l岛屿预设 | &7已选定两个点. 使用 &b/is admin schematic <名字> &7创建岛屿预设.
+  &e&l岛屿预设 | &7请确保站在岛屿传送点位置处再输入命令！
+SCHEMATIC_RIGHT_SELECT: '&e&l岛屿预设 | &7选择点 #1 ({0})'
+SCHEMATIC_SAVED: '&e&l岛屿预设 | &7成功保存岛屿预设！'
+SELF_ROLE_CHANGE: '&c&l错误 | &7你不能更改你自己的岛屿职位.'
+SET_UPGRADE_LEVEL: '&e&l岛屿升级 | &7已更新 &b{1} &7岛屿的 &b{0} &7等级.'
+SET_UPGRADE_LEVEL_NAME: '&e&l岛屿升级 | &7已更新 &b{1} &7的岛屿等级为 &b{0}&7.'
+SET_WARP: '&e&l岛屿 | &7成功创建新的空岛地标！你可以输入 &b/is warp &7来查看并传送.'
+SET_WARP_OUTSIDE: '&c&l错误 | &7你只能在你的岛屿中设置岛屿地标.'
+SETTINGS_UPDATED: '&e&l岛屿 | &7成功更新岛屿 &b{1} &7的 &b{0} &7设置.'
+SETTINGS_UPDATED_NAME: '&e&l岛屿 | &7成功更新岛屿 &b{1} &7的 &b{0} &7设置.'
+SETTINGS_UPDATED_ALL: '&e&l岛屿 | &7成功为所有岛屿更新 &b{0} &7设置.'
+SIZE_BIGGER_MAX: '&c&l错误 | &7不能超过岛屿最大大小限制.'
+SPAWN_TELEPORT_SUCCESS: '&e&l重生 | &7成功将 {0} 传送至出生点.'
+SPAWN_SET_SUCCESS: '&e&l重生 | &7成功将重生点位置设置为 {0}.'
+SPY_TEAM_CHAT_FORMAT: '&7[&a&l岛屿频道&7] &7[&c&l管理员&7] &b{1} &f&l说: &7{2}'
+TEAM_CHAT_FORMAT: '&7[&a&l岛屿频道&7] &7[&e&l{0}&7] &b{1} &f&l说: &7{2}'
+TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&l错误 | &7你现在不在你的岛屿中.'
+TELEPORT_WARMUP: '&7正在传送至 &b{0}&7... 请不要移动！'
+TELEPORT_WARMUP_CANCEL: '&7你移动了，传送取消.'
+TELEPORTED_FAILED: '&e&l岛屿 | &7这个岛屿传送点不安全！'
+TELEPORTED_SUCCESS: '&e&l岛屿 | &7你被传送回你的岛屿.'
+TELEPORTED_TO_WARP: '&e&l岛屿 | &7岛屿地标传送成功.'
+TOGGLE_FLY_OUTSIDE_ISLAND: '&c&l错误 | &7你不能在你的岛屿外切换飞行模式.'
+TOGGLED_BYPASS_OFF: '&e&l忽略模式 | &7管理员忽略模式 &c&l关闭&7.'
+TOGGLED_BYPASS_ON: '&e&l忽略模式 | &7管理员忽略模式 &a&l开启&7.'
+TOGGLED_FLY_OFF: '&e&l岛屿飞行 | &7岛屿飞行模式 &c&l关闭&7.'
+TOGGLED_FLY_ON: '&e&l岛屿飞行 | &7岛屿飞行模式 &a&l开启&7.'
+TOGGLED_SCHEMATIC_OFF: '&e&l岛屿预设 | &7岛屿预设创建模式 &c&l关闭&7.'
+TOGGLED_SCHEMATIC_ON: |-
+  &e&l岛屿预设 | &7岛屿预设创建模式 &a&l开启&7.
+  &e&l岛屿预设 | &7使用金斧头选点创建区域.
+TOGGLED_SPY_OFF: '&e&l监察模式 | &7管理员监察模式 &c&l关闭&7.'
+TOGGLED_SPY_ON: '&e&l监察模式 | &7管理员监察模式 &a&l开启&7.'
+TOGGLED_STACKED_BLOCKS_OFF: '&e&l岛屿堆叠 | &7方块堆叠模式 &c&l关闭&7.'
+TOGGLED_STACKED_BLOCKS_ON: '&e&l岛屿堆叠 | &7方块堆叠模式 &a&l开启&7.'
+TOGGLED_TEAM_CHAT_OFF: '&e&l岛屿聊天 | &7岛屿聊天模式 &c&l关闭&7.'
+TOGGLED_TEAM_CHAT_ON: '&e&l岛屿聊天 | &7岛屿聊天模式 &a&l开启&7.'
+TOGGLED_WORLD_BORDER_OFF: '&e&l岛屿边界 | &7岛屿边界显示 &c&l关闭&7.'
+TOGGLED_WORLD_BORDER_ON: '&e&l岛屿边界 | &7岛屿边界显示 &a&l开启&7.'
+TRANSFER_ADMIN: '&e&l岛屿 | &7你将 &b{0} &7岛屿的领导权转变给 &b{1}&7.'
+TRANSFER_ADMIN_ALREADY_LEADER: '&c&l错误 | &b{0} &7已经是岛屿主了.'
+TRANSFER_ADMIN_DIFFERENT_ISLAND: '&c&l错误 | &7这些玩家不在同一个岛屿团队中.'
+TRANSFER_ADMIN_NOT_LEADER: '&c&l错误 | &7这个玩家不是岛屿主，没有领导权.'
+TRANSFER_ALREADY_LEADER: '&c&l错误 | &7你已经是这个岛屿的岛屿主了.'
+TRANSFER_BROADCAST: '&e&l岛屿 | &7岛屿的领导权已转让给 &b{0}.'
+UNBAN_ANNOUNCEMENT: '&e&l岛屿 | &b{1} &7将 &b{0} &7从岛屿禁封列表中移除.'
+UNCOOP_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将 &b{1} &7从岛屿临时成员列表中移除.'
+UNCOOP_LEFT_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 下线了，不再是岛屿的临时成员了.'
+UNIGNORED_ISLAND: '&e&l岛屿 | &b{0} &7的岛屿现在可正常统计并排入排行榜.'
+UNIGNORED_ISLAND_NAME: '&e&l岛屿 | &7岛屿 &b{0} &7的岛屿现在可正常统计并排入排行榜.'
+UNLOCK_WORLD_ANNOUNCEMENT: '&e&l岛屿维度 | &7你的岛屿解锁了新的世界维度：&d{0}'
+UNSAFE_WARP: '&e&l岛屿 | &7&o这个岛屿地标传送点不安全，请检查一下.'
+UPDATED_PERMISSION: '&e&l岛屿 | &7更新了岛屿的 &b{0} &7权限.'
+UPDATED_SETTINGS: '&e&l岛屿 | &7更新了岛屿的 &b{0} &7设置.'
+VISITOR_BLOCK_COMMAND: '&c&l错误 | &7这个岛屿不能在他人岛屿中使用.'
+WARP_ALREADY_EXIST: '&c&l错误 | &7已经有一个岛屿地标叫这个名字了.'
+WITHDRAW_ALL_MONEY: |-
+  &e&l岛屿银行 | &7岛屿银行余额: &e&l{0}
+  &e&l岛屿银行 | &7取出所有余额..."
+WITHDRAW_ANNOUNCEMENT: '&e&l岛屿银行 | &b{0} &7从岛屿银行取出了 &e&l${1} &7游戏币！'
+WITHDRAWN_MONEY: '&e&l岛屿银行 | &7你从 &b{1} &7的岛屿银行取出了 &e&l${0} &7游戏币！'
+WITHDRAWN_MONEY_NAME: '&e&l岛屿银行 | &7你从 &b{1} &7岛屿银行取出了 &e&l${0} &7游戏币！'
+WORLD_NOT_UNLOCKED: '&e&l岛屿维度 | &7你的岛屿还未解锁这个世界维度！'
