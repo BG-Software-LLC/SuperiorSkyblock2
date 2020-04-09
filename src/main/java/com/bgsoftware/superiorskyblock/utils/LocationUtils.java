@@ -39,7 +39,7 @@ public final class LocationUtils {
 
     public static boolean isSafeBlock(Block block){
         Block underBlock = block.getRelative(BlockFace.DOWN), upperBlock = block.getRelative(BlockFace.UP);
-        return upperBlock.getType() == Material.AIR && block.getType() == Material.AIR &&
+        return !upperBlock.getType().isOccluding() && !block.getType().isOccluding() &&
                 (underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid());
     }
 
