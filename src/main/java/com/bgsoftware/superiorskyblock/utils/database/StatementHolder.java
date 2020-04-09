@@ -64,7 +64,7 @@ public final class StatementHolder {
     public void addBatch(){
         if(batches.isEmpty())
             SQLHelper.setAutoCommit(false);
-        batches.add(Registry.createRegistry(values));
+        batches.add(Registry.createRegistry(new HashMap<>(values)));
         values.clear();
         currentIndex = 1;
     }
