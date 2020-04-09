@@ -296,12 +296,15 @@ public final class BlocksListener implements Listener {
 
         plugin.getGrid().setBlockAmount(e.getBlock(), (leftAmount = blockAmount - amount));
 
+        ItemStack blockItem = e.getBlock().getState().getData().toItemStack(amount);
+
+        if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE"))
+            blockItem.setType(Material.REDSTONE_ORE);
+
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if(island != null){
-            island.handleBlockBreak(e.getBlock(), amount);
+            island.handleBlockBreak(Key.of(blockItem), amount);
         }
-
-        ItemStack blockItem = e.getBlock().getState().getData().toItemStack(amount);
 
         // If the amount of the stack is less than 0, it should be air.
         if(leftAmount <= 0){
@@ -340,6 +343,9 @@ public final class BlocksListener implements Listener {
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
+
+        if(e.getClickedBlock().getType().name().equals("GLOWING_REDSTONE_ORE"))
+            e.getClickedBlock().setType(Material.REDSTONE_ORE);
 
         plugin.getGrid().setBlockAmount(e.getClickedBlock(), (leftAmount = blockAmount - amount));
 
