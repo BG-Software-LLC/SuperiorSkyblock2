@@ -1868,8 +1868,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
         Location location = warps.get(warp.toLowerCase()).location.clone();
-
-        Block warpBlock = location.getBlock();
         ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
 
         if(!isInsideRange(location)){
@@ -1878,12 +1876,12 @@ public final class SIsland extends DatabaseObject implements Island {
             return;
         }
 
-        if(!LocationUtils.isSafeBlock(warpBlock)){
+        if(!LocationUtils.isSafeBlock(location.getBlock())){
             Locale.UNSAFE_WARP.send(superiorPlayer);
             return;
         }
 
-        if(superiorPlayer.asPlayer().teleport(location.add(0.5, 0, 0.5))){
+        if(superiorPlayer.asPlayer().teleport(location)){
             Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
         }
     }
@@ -2492,7 +2490,8 @@ public final class SIsland extends DatabaseObject implements Island {
         public boolean privateFlag;
 
         public WarpData(Location location, boolean privateFlag){
-            this.location = location;
+            this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
+                    location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
             this.privateFlag = privateFlag;
         }
 
