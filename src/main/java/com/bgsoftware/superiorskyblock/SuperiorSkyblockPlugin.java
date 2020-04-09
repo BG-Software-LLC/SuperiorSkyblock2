@@ -59,7 +59,10 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -181,22 +184,28 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Island island : gridHandler.getIslandsToPurge())
                 island.disbandIsland();
 
-            if(Bukkit.getOnlinePlayers().size() > 0){
+            Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+
+            if(!players.isEmpty()){
                 long lastTimeStatus = System.currentTimeMillis() / 1000;
 
                 StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder();
                 playerStatusHolder.prepareBatch();
-                Bukkit.getOnlinePlayers().stream().map(SSuperiorPlayer::of).forEach(superiorPlayer ->
+                players.stream().map(SSuperiorPlayer::of).forEach(superiorPlayer ->
                         playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
                 playerStatusHolder.execute(false);
 
-                StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
-                islandStatusHolder.prepareBatch();
-                Bukkit.getOnlinePlayers().stream().map(player -> SSuperiorPlayer.of(player).getIsland()).filter(Objects::nonNull)
-                        .forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
-                islandStatusHolder.execute(false);
+                List<Island> islandList = players.stream().map(player -> SSuperiorPlayer.of(player).getIsland())
+                        .filter(Objects::nonNull).collect(Collectors.toList());
 
-                Bukkit.getOnlinePlayers().forEach(player -> {
+                if(!islandList.isEmpty()) {
+                    StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
+                    islandStatusHolder.prepareBatch();
+                    islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
+                    islandStatusHolder.execute(false);
+                }
+
+                players.forEach(player -> {
                     SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
                     player.closeInventory();
                     nmsAdapter.setWorldBorder(superiorPlayer, null);
