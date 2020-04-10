@@ -54,7 +54,7 @@ CHANGED_ISLAND_SIZE: '&e&lAggiornamenti | &7Aggiornata correttamente la dimensio
   dell''isola di {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAggiornamenti | &7Aggiornato con successo la dimensione
   dell''isola di {0}.'
-CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oIl giocatore ha il permesso di costruire fuori dai limiti della sua isola, però il size dell''isola non ha effetti. Puoi disattivare questa funzione dalle configurazione in modo che le dimensioni dell''isola abbiano di nuovo effetto.'
 CHANGED_LANGUAGE: '&e&lLanguage | &7Lingua cambiata in Italiano.'
 CHANGED_MOB_DROPS: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore
   dei drops dei mob nell''isola di {0}.'
@@ -146,7 +146,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: Cambia il nome di un'isola.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Apri un'isola al pubblico.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promuovi un membro nell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_PURGE: Elimina le isole.
-COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
+COMMAND_DESCRIPTION_ADMIN_RANKUP: Potenzia un upgrade per un isola.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Ricalcola il valore di un'isola.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attività del
   plugin.
@@ -171,7 +171,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Attiva/disattiva le impostazioni di un'i
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Modifica la percentuale di generazione di
   un materiale dal generatore di ciottoli.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Cambia la dimensione dell'isola di un giocatore.
-COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Imposta la posizione di spawn del server.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Imposta il moltiplicatore dei tassi dei
   generatori di mob per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Imposta il limite dei membri per l'isola
@@ -180,7 +180,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Imposta il livello di un potenziamento pe
   l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Imposta il limite delle warp di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Ottieni informazioni su un'isola.
-COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Teletrasportati nella posizione di spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle migliori
@@ -193,7 +193,7 @@ COMMAND_DESCRIPTION_BIOME: Cambia il bioma dell'isola.
 COMMAND_DESCRIPTION_BORDER: Cambia il colore del bordo delle isole.
 COMMAND_DESCRIPTION_CLOSE: Chiudi l'isola al pubblico.
 COMMAND_DESCRIPTION_COOP: Aggiungi un giocatore come co-op alla tua isola.
-COMMAND_DESCRIPTION_COUNTS: 'See block counts in your island.'
+COMMAND_DESCRIPTION_COUNTS: Vedi il numero dei blocchi della tua isola.
 COMMAND_DESCRIPTION_CREATE: Crea una nuova isola.
 COMMAND_DESCRIPTION_DEL_WARP: Elimina una warp dell'isola.
 COMMAND_DESCRIPTION_DEMOTE: Diminuisci il ruolo di un membro nella tua isola.
@@ -240,7 +240,7 @@ COMMAND_DESCRIPTION_TRANSFER: Trasferisci la leadership della tua isola.
 COMMAND_DESCRIPTION_UNCOOP: Rimuovi un giocatore dall'essere un co-op nella tua isola.
 COMMAND_DESCRIPTION_UPGRADE: Apri il pannello degli aggiornamenti.
 COMMAND_DESCRIPTION_VALUE: Ottieni il valore di un blocco.
-COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
+COMMAND_DESCRIPTION_VALUES: Apri il menu dei valori.
 COMMAND_DESCRIPTION_VISIT: Teletrasportati nell'isola di un giocatore.
 COMMAND_DESCRIPTION_VISITORS: Apri il menu dei visitatori.
 COMMAND_DESCRIPTION_WARP: Teletrasportati ad una warp dell'isola.
@@ -382,7 +382,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIsola | &7  {0}: {1}'
 ISLAND_INFO_BANK: '&e&lIsola | &7Banca: {0}'
-ISLAND_INFO_BONUS: '&e&lIsland | &7Bonus: {0}'
+ISLAND_INFO_BONUS: '&e&lIsola | &7Bonus: {0}'
 ISLAND_INFO_DISCORD: '&e&lIsola | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
@@ -408,7 +408,6 @@ ISLAND_INFO_VISITORS_COUNT: '&e&lIsola | &7Numero di visitatori: {0}'
 ISLAND_INFO_WORTH: '&e&lIsola | &7Valore: {0}'
 ISLAND_OPENED: '&e&lIsola | &7Aperta con successo l''isola al pubblico.'
 ISLAND_PROTECTED: '&c&lErrore | &7Quest''isola è protetta.'
-                             
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lIsola | &7Membri dell''isola di {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Disconnesso)'
@@ -519,7 +518,7 @@ NO_WITHDRAW_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per prelevare den
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErrore | &7Non hai abbastanza soldi per depositare
   {0} dollari nella banca della tua isola.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErrore | &7Non hai abbastanza soldi.'
-OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
+OPEN_MENU_WHILE_SLEEPING: '&7&oNon credi di essere troppo stanco per interagire con i menu?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Pannello dell'isola impostato &cOFF&7.
   &e&lPanel | &7Eseguendo /is ti teletrasporterai sulla tua isola.
@@ -550,9 +549,9 @@ PURGE_CLEAR: '&e&lIsola | &7Eliminate con successo tutte le isole in coda da eli
 PURGED_ISLANDS: |-
   &e&lIsola | &7{0} isole verranno eliminate al riavvio del server.
   &e&lIsola | &7Puoi annullarlo in qualsiasi momento utilizzando /is admin purge cancel.
-RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
-RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
-RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
+RANKUP_SUCCESS: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per l''isola di {1}.'
+RANKUP_SUCCESS_ALL: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per tutte le isole.'
+RANKUP_SUCCESS_NAME: '&e&lIsola | &7Aggiornato con successo il livello del upgrade {0} per l''isola {1}.'
 RATE_ANNOUNCEMENT: '&e&lIsola | &7{0} ha valutato la tua isola {1} stelle su 5!'
 RATE_CHANGE_OTHER: '&e&lIsola | &7You changed the rating of {0} to {1}.'
 RATE_OWN_ISLAND: '&c&lErrore | &7You can''t rate your own island.'
@@ -589,9 +588,9 @@ SETTINGS_UPDATED_NAME: '&e&lIsola | &7Aggiornate correttamente le impostazioni {
   di {1}.'
 SETTINGS_UPDATED_ALL: '&e&lIsola | &7Aggiornate correttamente le impostazioni {0}
   a tutte le isole.'
-SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
-SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
-SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
+SIZE_BIGGER_MAX: '&c&lErrore | &7Non è possibile impostare una dimensione maggiore della dimensione massima dell''isola.'
+SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Hai teletrasportato {0} con successo allo spawn.'
+SPAWN_SET_SUCCESS: '&e&lSpawn | &7La posizione di spawn è stata aggiornata correttamente alle coordinate: {0}'
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErrore | &7Non sei nella tua isola.'
