@@ -21,6 +21,7 @@ database:
   user-name: 'root'
   password: 'root'
   prefix: ''
+  useSSL: true
 
 # Set the main command of the plugin.
 # You can add aliases by adding "," after the command name, and split them using ",".

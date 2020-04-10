@@ -30,6 +30,7 @@ public final class SettingsHandler {
     public final String databaseMySQLUsername;
     public final String databaseMySQLPassword;
     public final String databaseMySQLPrefix;
+    public final boolean databaseMySQLSSL;
     public final int maxIslandSize;
     public final String islandCommand;
     public final int defaultIslandSize;
@@ -140,6 +141,7 @@ public final class SettingsHandler {
         databaseMySQLUsername = cfg.getString("database.user-name");
         databaseMySQLPassword = cfg.getString("database.password");
         databaseMySQLPrefix = cfg.getString("database.prefix");
+        databaseMySQLSSL = cfg.getBoolean("database.useSSL");
 
         calcInterval = cfg.getLong("calc-interval", 6000);
         islandCommand = cfg.getString("island-command", "island,is,islands");
