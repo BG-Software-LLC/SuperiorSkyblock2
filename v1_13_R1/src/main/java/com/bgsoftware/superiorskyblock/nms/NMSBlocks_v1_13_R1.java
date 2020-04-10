@@ -289,7 +289,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
     @Override
     public Material getMaterial(int combinedId) {
-        return CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId)).getItemType();
+        return CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId).getBlock());
     }
 
     @Override
