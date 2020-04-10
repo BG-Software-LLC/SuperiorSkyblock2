@@ -363,6 +363,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lNâng cấp | &7  {0}: {1}'
 ISLAND_INFO_BANK: '&e&lĐảo Thần| &7Ngân Hàng: {0}'
+ISLAND_INFO_BONUS: '&e&lIsland | &7Bonus: {0}'
 ISLAND_INFO_DISCORD: '&e&lĐảo Thần | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''

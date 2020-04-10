@@ -324,6 +324,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lיא | &7  {0}: {1}'
 ISLAND_INFO_BANK: '&e&lיא | &7קנב: {0}'
+ISLAND_INFO_BONUS: '&e&lIsland | &7Bonus: {0}'
 ISLAND_INFO_DISCORD: '&e&lיא | &7דרוקסיד: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''

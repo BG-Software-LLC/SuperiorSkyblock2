@@ -722,6 +722,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public BigDecimal getBonusWorth() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
     public void setBonusWorth(BigDecimal bonusWorth) {
 
     }

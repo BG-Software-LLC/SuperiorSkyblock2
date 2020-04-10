@@ -1582,6 +1582,11 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public BigDecimal getBonusWorth() {
+        return bonusWorth.get();
+    }
+
+    @Override
     public void setBonusWorth(BigDecimal bonusWorth){
         BigDecimalFormatted newBonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
         this.bonusWorth.set(newBonusWorth);

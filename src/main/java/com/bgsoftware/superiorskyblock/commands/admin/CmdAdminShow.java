@@ -109,6 +109,8 @@ public final class CmdAdminShow implements ISuperiorCommand {
         }
         if(!Locale.ISLAND_INFO_BANK.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getMoneyInBank())).append("\n");
+        if(!Locale.ISLAND_INFO_BONUS.isEmpty(locale))
+            infoMessage.append(Locale.ISLAND_INFO_BONUS.getMessage(locale, island.getBonusWorth())).append("\n");
         if(!Locale.ISLAND_INFO_WORTH.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
         if(!Locale.ISLAND_INFO_DISCORD.isEmpty(locale))

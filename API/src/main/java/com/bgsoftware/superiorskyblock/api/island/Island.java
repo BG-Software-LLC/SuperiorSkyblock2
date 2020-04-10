@@ -43,10 +43,6 @@ public interface Island extends Comparable<Island> {
      */
     List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
 
-    default List<UUID> getAllMembers(){
-        return getIslandMembers(true).stream().map(SuperiorPlayer::getUniqueId).collect(Collectors.toList());
-    }
-
     /**
      * Get the list of all banned players.
      */
@@ -769,6 +765,11 @@ public interface Island extends Comparable<Island> {
      * Get the worth value of the island, excluding the money in the bank.
      */
     BigDecimal getRawWorth();
+
+    /**
+     * Get the bonus worth of the island.
+     */
+    BigDecimal getBonusWorth();
 
     /**
      * Set a bonus worth for the island.
