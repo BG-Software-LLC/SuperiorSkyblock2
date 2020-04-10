@@ -52,7 +52,7 @@ CHANGED_DISCORD: '&e&lĐảo Thần | &7Thay đổi thành công discord của �
 CHANGED_ISLAND_SIZE: '&e&lNâng cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo của
   {0}.'
-CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
+CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oNgười chơi có thể xây dựng bên ngoài hòn đảo của họ, vì vậy kích thước đảo không ảnh hưởng. Bạn có thể tắt tính năng đó trong cấu hình để kích thước đảo có ảnh hưởng trở lại.'
 CHANGED_LANGUAGE: '&e&lNgôn Ngữ | &7Thành công thay đổi ngôn ngữ của bạn thành tiếng
   Anh.'
 CHANGED_MOB_DROPS: '&e&lNâng cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật của
@@ -141,7 +141,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: Thay đổi tên của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Mở một hòn đảo cho công cộng.
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Thăng chức thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_PURGE: lọc đảo.
-COMMAND_DESCRIPTION_ADMIN_RANKUP: 'Rankup an upgrade for an island.'
+COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
@@ -162,7 +162,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Chuyển đổi cài đặt cho một h�
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Thay đổi tỷ lệ phần trăm của vật liệu cho
   máy tạo quặng.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Thay đổi kích thước đảo của người chơi khác.
-COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Set the spawn location of the server.
+COMMAND_DESCRIPTION_ADMIN_SET_SPAWN: Đặt vị trí trung tâm của máy chủ.
 COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Đặt tỉ lệ nhân đôi spawner cho hòn đảo
   của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Đặt giới hạn thành viên cho đảo của người
@@ -170,7 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Đặt giới hạn thành viên cho �
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Đặt mức nâng cấp cho đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Đặt giới hạn hu vực của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
-COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
+COMMAND_DESCRIPTION_ADMIN_SPAWN: Dịch chuyển đến vị trí trung tâm.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Dịch chuyển đến hòn đảo khác
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
@@ -182,7 +182,7 @@ COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
 COMMAND_DESCRIPTION_CLOSE: Đóng đảo thành công cộng.
 COMMAND_DESCRIPTION_COOP: Thêm thành viên co-op cho đảo bạn.
-COMMAND_DESCRIPTION_COUNTS: 'See block counts in your island.'
+COMMAND_DESCRIPTION_COUNTS: Xem số khối trong đảo của bạn.
 COMMAND_DESCRIPTION_CREATE: Tạo một hòn đảo mới.
 COMMAND_DESCRIPTION_DEL_WARP: Xóa một khu vực của đảo.
 COMMAND_DESCRIPTION_DEMOTE: Hạ cấp một thành viên trong hòn đảo của bạn.
@@ -229,7 +229,7 @@ COMMAND_DESCRIPTION_TRANSFER: Chuyển lãnh đạo đảo của bạn.
 COMMAND_DESCRIPTION_UNCOOP: Loại bỏ người chơi thành viên co-op trong đảo bạn.
 COMMAND_DESCRIPTION_UPGRADE: Mở bảng nâng cấp.
 COMMAND_DESCRIPTION_VALUE: Nhận giá trị giá trị của một khối.
-COMMAND_DESCRIPTION_VALUES: 'Open the values menu.'
+COMMAND_DESCRIPTION_VALUES: Mở menu giá trị.
 COMMAND_DESCRIPTION_VISIT: Dịch chuyển đến vị trí của du khách trên đảo.
 COMMAND_DESCRIPTION_VISITORS: Mở menu khách.
 COMMAND_DESCRIPTION_WARP: Warp đến một đảo khu vực.
@@ -491,7 +491,7 @@ NO_WITHDRAW_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để rút t
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để gửi {0}$ vào ngân
   hàng đảo của bạn.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để nâng cấp.'
-OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
+OPEN_MENU_WHILE_SLEEPING: '&7&oBạn quá mệt mỏi để tương tác với các menu, bạn không nghĩ vậy sao?'
 PANEL_TOGGLE_OFF: |-
   &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo : &cTẮT&7.
   &e&lBảng điều khiển | &7Xài /is sẽ dịch chuyển bạn về đảo.'
@@ -520,9 +520,9 @@ PURGE_CLEAR: '&e&lĐảo Thần | &7Thành công xóa tất cả các đảo x�
 PURGED_ISLANDS: |-
   &e&lĐảo Thần | &7{0} các đảo sẽ bị lọc khi máy chủ tải lại.
   &e&lĐảo Thần | &7Bạn có thể huỷ bỏ nó mọi lúc bằng cách sử dụng /is admin purge cancel.
-RANKUP_SUCCESS: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}''s island.'
-RANKUP_SUCCESS_ALL: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for all the islands.'
-RANKUP_SUCCESS_NAME: '&e&lIsland | &7Successfully updated the level of the upgrade {0} for {1}.'
+RANKUP_SUCCESS: '&e&lĐảo Thần | &7Cập nhật thành công mức độ nâng cấp {0} cho đảo của {1}.'
+RANKUP_SUCCESS_ALL: '&e&lĐảo Thần | &7Cập nhật thành công mức độ nâng cấp {0} cho tất cả các đảo.'
+RANKUP_SUCCESS_NAME: '&e&lĐảo Thần | &7Cập nhật thành công mức độ nâng cấp {0} cho {1}.'
 RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn {1} trên 5!.'
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'
@@ -558,9 +558,9 @@ SETTINGS_UPDATED_NAME: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều
   đảo {1}.'
 SETTINGS_UPDATED_ALL: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh {0} cho tất
   cả các đảo.'
-SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island size.'
-SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
-SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
+SIZE_BIGGER_MAX: '&c&lLỗi | &7Bạn không thể đặt kích thước lớn hơn kích thước tối đa của đảo.'
+SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
+SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'
