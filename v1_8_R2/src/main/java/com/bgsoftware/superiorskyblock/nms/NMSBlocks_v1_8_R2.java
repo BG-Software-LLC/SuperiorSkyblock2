@@ -35,6 +35,7 @@ import net.minecraft.server.v1_8_R2.World;
 import net.minecraft.server.v1_8_R2.WorldServer;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
@@ -187,6 +188,9 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
 
     @Override
     public void setTileEntityFlowerPot(Object objectTileEntityFlowerPot, org.bukkit.inventory.ItemStack bukkitFlower) {
+        if(bukkitFlower == null || bukkitFlower.getType() == Material.AIR)
+            return;
+
         TileEntityFlowerPot tileEntityFlowerPot = (TileEntityFlowerPot) objectTileEntityFlowerPot;
         ItemStack flower = CraftItemStack.asNMSCopy(bukkitFlower);
         tileEntityFlowerPot.a(flower.getItem(), flower.getData());
