@@ -42,7 +42,7 @@ public final class MenuBiomes extends SuperiorMenu {
                 if(slot == e.getRawSlot()){
                     if (superiorPlayer.hasPermission(permission)) {
                         EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(superiorPlayer, superiorPlayer.getIsland(), biome);
-                        if(event.isCancelled()){
+                        if(!event.isCancelled()){
                             SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
                             if (soundWrapper != null)
                                 soundWrapper.playSound(superiorPlayer.asPlayer());
