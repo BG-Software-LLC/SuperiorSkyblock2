@@ -201,6 +201,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected abstract void onPlayerClick(InventoryClickEvent e);
 
     public void open(SuperiorMenu previousMenu){
+        if(!superiorPlayer.isOnline())
+            return;
+
         if(superiorPlayer.asPlayer().isSleeping()){
             Locale.OPEN_MENU_WHILE_SLEEPING.send(superiorPlayer);
             return;
