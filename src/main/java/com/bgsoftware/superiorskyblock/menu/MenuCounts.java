@@ -54,17 +54,17 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
             keySections[0] = blocksToItems.get(keySections[0]);
 
         Material blockMaterial;
+        String materialName = null;
 
         try{
             blockMaterial = Material.valueOf(keySections[0]);
         }catch (Exception ex){
             blockMaterial = Material.BEDROCK;
+            materialName = keySections[0];
         }
 
         ItemMeta currentMeta = clickedItem.getItemMeta();
         ItemBuilder itemBuilder;
-
-        String materialName;
 
         if(blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1){
             itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(
@@ -75,7 +75,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
         else {
             itemBuilder = new ItemBuilder(blockMaterial);
-            materialName = blockMaterial.name();
+            if(materialName == null)
+                materialName = blockMaterial.name();
         }
 
         ItemStack itemStack = itemBuilder
