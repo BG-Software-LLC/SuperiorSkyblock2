@@ -58,7 +58,7 @@ public final class SQLHelper {
                 boolean useSSL = plugin.getSettings().databaseMySQLSSL;
                 int port = plugin.getSettings().databaseMySQLPort;
 
-                config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName + "&useSSL=" + useSSL);
+                config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName + "?useSSL=" + useSSL);
                 config.setUsername(userName);
                 config.setPassword(password);
                 config.setMaximumPoolSize(10);
