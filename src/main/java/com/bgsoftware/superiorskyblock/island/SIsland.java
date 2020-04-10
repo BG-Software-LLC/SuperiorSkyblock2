@@ -1423,17 +1423,21 @@ public final class SIsland extends DatabaseObject implements Island {
 
             boolean increaseAmount = false;
 
+            BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+
             if(blockValue.doubleValue() >= 0){
-                blocksValues = blocksValues.add(blockValue.multiply(BigDecimal.valueOf(entry.getValue())));
+                blocksValues = blocksValues.add(blockValue.multiply(new BigDecimal(entry.getValue())));
                 increaseAmount = true;
             }
 
             if(blockLevel.doubleValue() >= 0){
-                blocksLevels = blocksLevels.add(blockLevel.multiply(BigDecimal.valueOf(entry.getValue())));
+                blocksLevels = blocksLevels.add(blockLevel.multiply(new BigDecimal(entry.getValue())));
                 increaseAmount = true;
             }
 
-            if(increaseAmount || blockLimits.containsKey(entry.getKey())) {
+            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey());
+
+            if(increaseAmount || hasBlockLimit) {
                 Key _key = plugin.getBlockValues().getBlockKey(entry.getKey());
 
                 int currentAmount = blockCounts.getRaw(_key, 0);
