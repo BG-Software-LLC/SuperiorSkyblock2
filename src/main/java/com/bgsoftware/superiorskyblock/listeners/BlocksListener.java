@@ -25,6 +25,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -226,98 +228,37 @@ public final class BlocksListener implements Listener {
      */
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockStack(BlockPlaceEvent e){
-        if(!plugin.getSettings().stackedBlocksEnabled)
-            return;
+    public void onBlockStack(PlayerInteractEvent e){
+        if(e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DRAGON_EGG){
+            if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) > 1) {
+                e.setCancelled(true);
+                if(e.getItem() == null)
+                    tryUnstack(e.getPlayer(), e.getClickedBlock());
+            }
 
+            if(e.getItem() != null && canStackBlocks(e.getPlayer(), e.getItem(), e.getClickedBlock(), null) &&
+                    tryStack(e.getPlayer(), e.getItem(), e.getClickedBlock(), e)){
+                e.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockStack(BlockPlaceEvent e){
         if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
             plugin.getGrid().setBlockAmount(e.getBlock(), 1);
 
-        if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(e.getBlock().getWorld().getName()))
+        if(!canStackBlocks(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e.getBlockReplacedState()))
             return;
 
-        if(!plugin.getSettings().whitelistedStackedBlocks.contains(e.getBlock()))
-            return;
-
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
-                !superiorPlayer.hasPermission("superior.island.stacker." + e.getBlock().getType())))
-            return;
-
-        if(e.getBlockAgainst().getType().name().equals("GLOWING_REDSTONE_ORE"))
-            e.getBlockAgainst().setType(Material.REDSTONE_ORE);
-
-        //noinspection deprecation
-        if(e.getBlockAgainst().getType() != e.getBlock().getType() || e.getBlockAgainst().getData() != e.getBlock().getData() ||
-                e.getBlockReplacedState().getType() != Material.AIR)
-            return;
-
-        // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
-        int amount = !e.getPlayer().isSneaking() ? 1 : e.getItemInHand().getAmount();
-        int blockAmount = plugin.getGrid().getBlockAmount(e.getBlockAgainst());
-        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(Key.of(e.getBlockAgainst()), Integer.MAX_VALUE);
-
-        if(amount + blockAmount > blockLimit){
-            amount = blockLimit - blockAmount;
-        }
-
-        if(amount <= 0)
-            return;
-
-        e.setCancelled(true);
-
-        plugin.getGrid().setBlockAmount(e.getBlockAgainst(), blockAmount + amount);
-
-        Island island = plugin.getGrid().getIslandAt(e.getBlockAgainst().getLocation());
-        if(island != null){
-            island.handleBlockPlace(e.getBlockAgainst(), amount);
-        }
-
-        ItemStack inHand = e.getItemInHand().clone();
-        inHand.setAmount(amount);
-        ItemUtils.removeItem(inHand, e);
+        if(tryStack(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(BlockBreakEvent e){
-        int blockAmount = plugin.getGrid().getBlockAmount(e.getBlock());
-
-        if(blockAmount <= 1)
-            return;
-
-        e.setCancelled(true);
-
-        // When sneaking, you'll break 64 from the stack. Otherwise, 1.
-        int amount = !e.getPlayer().isSneaking() ? 1 : 64, leftAmount;
-
-        // Fix amount so it won't be more than the stack's amount
-        amount = Math.min(amount, blockAmount);
-
-        plugin.getGrid().setBlockAmount(e.getBlock(), (leftAmount = blockAmount - amount));
-
-        ItemStack blockItem = e.getBlock().getState().getData().toItemStack(amount);
-
-        if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE"))
-            blockItem.setType(Material.REDSTONE_ORE);
-
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null){
-            island.handleBlockBreak(Key.of(blockItem), amount);
-        }
-
-        // If the amount of the stack is less than 0, it should be air.
-        if(leftAmount <= 0){
-            e.getBlock().setType(Material.AIR);
-        }
-
-        // Dropping the item
-        if(plugin.getSettings().stackedBlocksAutoPickup){
-            ItemUtils.addItem(blockItem, e.getPlayer().getInventory(), e.getBlock().getLocation());
-        }
-        else {
-            e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), blockItem);
-        }
+        if(tryUnstack(e.getPlayer(), e.getBlock()))
+            e.setCancelled(true);
     }
 
     private Set<UUID> recentlyClicked = new HashSet<>();
@@ -328,46 +269,105 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        int blockAmount = plugin.getGrid().getBlockAmount(e.getClickedBlock());
-
-        if(blockAmount <= 1)
-            return;
-
         recentlyClicked.add(e.getPlayer().getUniqueId());
         Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
-        e.setCancelled(true);
+        if(tryUnstack(e.getPlayer(), e.getClickedBlock()))
+            e.setCancelled(true);
+    }
+
+    private boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
+        if(!plugin.getSettings().stackedBlocksEnabled)
+            return false;
+
+        if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(againstBlock.getWorld().getName()))
+            return false;
+
+        if(againstBlock.getType().name().equals("GLOWING_REDSTONE_ORE"))
+            againstBlock.setType(Material.REDSTONE_ORE);
+
+        //noinspection deprecation
+        if(againstBlock.getType() != placeItem.getType() || againstBlock.getData() != placeItem.getDurability() ||
+                (replaceState != null && replaceState.getType() != Material.AIR))
+            return false;
+
+        if(!plugin.getSettings().whitelistedStackedBlocks.contains(againstBlock))
+            return false;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+
+        if(!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
+                !superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType())))
+            return false;
+
+        return true;
+    }
+
+    private boolean tryStack(Player player, ItemStack placeItem, Block againstBlock, Event event){
+        // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
+        int amount = !player.isSneaking() ? 1 : placeItem.getAmount();
+        int blockAmount = plugin.getGrid().getBlockAmount(againstBlock);
+        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(Key.of(againstBlock), Integer.MAX_VALUE);
+
+        if(amount + blockAmount > blockLimit){
+            amount = blockLimit - blockAmount;
+        }
+
+        if(amount <= 0)
+            return false;
+
+        plugin.getGrid().setBlockAmount(againstBlock, blockAmount + amount);
+
+        Island island = plugin.getGrid().getIslandAt(againstBlock.getLocation());
+        if(island != null){
+            island.handleBlockPlace(againstBlock, amount);
+        }
+
+        ItemStack inHand = placeItem.clone();
+        inHand.setAmount(amount);
+        ItemUtils.removeItem(inHand, event, player);
+
+        return true;
+    }
+
+    private boolean tryUnstack(Player player, Block block){
+        int blockAmount = plugin.getGrid().getBlockAmount(block);
+
+        if(blockAmount <= 1)
+            return false;
 
         // When sneaking, you'll break 64 from the stack. Otherwise, 1.
-        int amount = !e.getPlayer().isSneaking() ? 1 : 64, leftAmount;
+        int amount = !player.isSneaking() ? 1 : 64, leftAmount;
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
 
-        if(e.getClickedBlock().getType().name().equals("GLOWING_REDSTONE_ORE"))
-            e.getClickedBlock().setType(Material.REDSTONE_ORE);
+        plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
 
-        plugin.getGrid().setBlockAmount(e.getClickedBlock(), (leftAmount = blockAmount - amount));
+        ItemStack blockItem = block.getState().getData().toItemStack(amount);
 
-        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+        if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE"))
+            blockItem.setType(Material.REDSTONE_ORE);
+
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
         if(island != null){
-            island.handleBlockBreak(e.getClickedBlock(), amount);
+            island.handleBlockBreak(Key.of(blockItem), amount);
         }
-
-        ItemStack blockItem = e.getClickedBlock().getState().getData().toItemStack(amount);
 
         // If the amount of the stack is less than 0, it should be air.
         if(leftAmount <= 0){
-            e.getClickedBlock().setType(Material.AIR);
+            block.setType(Material.AIR);
         }
 
         // Dropping the item
         if(plugin.getSettings().stackedBlocksAutoPickup){
-            ItemUtils.addItem(blockItem, e.getPlayer().getInventory(), e.getClickedBlock().getLocation());
+            ItemUtils.addItem(blockItem, player.getInventory(), block.getLocation());
         }
         else {
-            e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), blockItem);
+            block.getWorld().dropItemNaturally(block.getLocation(), blockItem);
         }
+
+        return true;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

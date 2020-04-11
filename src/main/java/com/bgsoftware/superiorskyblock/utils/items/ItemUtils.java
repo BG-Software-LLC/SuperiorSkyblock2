@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -15,21 +17,21 @@ import java.util.Map;
 public final class ItemUtils {
 
     @SuppressWarnings("JavaReflectionMemberAccess")
-    public static void removeItem(ItemStack itemStack, BlockPlaceEvent event){
+    public static void removeItem(ItemStack itemStack, Event event, Player player){
         try{
             EquipmentSlot equipmentSlot = (EquipmentSlot) BlockPlaceEvent.class.getMethod("getHand").invoke(event);
             if(equipmentSlot.name().equals("OFF_HAND")){
-                ItemStack offHand = (ItemStack) PlayerInventory.class.getMethod("getItemInOffHand").invoke(event.getPlayer().getInventory());
+                ItemStack offHand = (ItemStack) PlayerInventory.class.getMethod("getItemInOffHand").invoke(player.getInventory());
                 if(offHand.isSimilar(itemStack)){
                     offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
                     PlayerInventory.class.getMethod("setItemInOffHand", ItemStack.class)
-                            .invoke(event.getPlayer().getInventory(), offHand);
+                            .invoke(player.getInventory(), offHand);
                     return;
                 }
             }
         }catch(Exception ignored){}
 
-        event.getPlayer().getInventory().removeItem(itemStack);
+        player.getInventory().removeItem(itemStack);
     }
 
     public static EntityType getEntityType(ItemStack itemStack){
