@@ -1067,7 +1067,7 @@ public final class SIsland extends DatabaseObject implements Island {
                         blockCount = pair.getValue();
                         if(blockCount <= 0)
                             blockCount = plugin.getProviders().getSpawner(pair.getKey()).getKey();
-                        handleBlockPlace(blockKey, blockCount, false);
+                        handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
                     }catch(Throwable ignored){}
                 }
                 spawnersToCheck.clear();
