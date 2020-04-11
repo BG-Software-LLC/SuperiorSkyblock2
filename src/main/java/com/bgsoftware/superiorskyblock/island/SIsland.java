@@ -929,8 +929,6 @@ public final class SIsland extends DatabaseObject implements Island {
             }).forEach(superiorPlayer::resetMission);
         });
 
-        plugin.getGrid().deleteIsland(this);
-
         getAllChunksAsync(World.Environment.NORMAL, true, true,
                 chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
 
@@ -941,6 +939,8 @@ public final class SIsland extends DatabaseObject implements Island {
         if(wasSchematicGenerated(World.Environment.THE_END))
             getAllChunksAsync(World.Environment.THE_END, true, true,
                     chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
+
+        plugin.getGrid().deleteIsland(this);
     }
 
     @Override
