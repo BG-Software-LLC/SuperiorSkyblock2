@@ -924,7 +924,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 plugin.getNMSAdapter().clearInventory(superiorPlayer.asOfflinePlayer());
 
             plugin.getMissions().getAllMissions().stream().filter(mission -> {
-                MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
+                MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
                 return missionData != null && missionData.disbandReset;
             }).forEach(superiorPlayer::resetMission);
         });
@@ -2016,8 +2016,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean canCompleteMissionAgain(Mission mission) {
-        MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
-        return getAmountMissionCompleted(mission) < missionData.resetAmount;
+        Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
+        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) < missionDataOptional.get().resetAmount;
     }
 
     @Override

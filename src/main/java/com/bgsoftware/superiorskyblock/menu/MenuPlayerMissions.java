@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
@@ -49,7 +50,12 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
-        MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission);
+        Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
+
+        if(!missionDataOptional.isPresent())
+            return clickedItem;
+
+        MissionsHandler.MissionData missionData = missionDataOptional.get();
         boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
         int percentage = getPercentage(mission.getProgress(superiorPlayer));
         int progressValue = mission.getProgressValue(superiorPlayer);

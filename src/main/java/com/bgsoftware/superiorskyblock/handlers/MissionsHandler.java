@@ -139,7 +139,13 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission mission) {
-        MissionData missionData = getMissionData(mission);
+        Optional<MissionData> missionDataOptional = getMissionData(mission);
+
+        if(!missionDataOptional.isPresent())
+            return false;
+
+        MissionData missionData = missionDataOptional.get();
+
         Island playerIsland = superiorPlayer.getIsland();
 
         if(missionData.islandMission){
@@ -155,7 +161,13 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission mission) {
-        MissionData missionData = getMissionData(mission);
+        Optional<MissionData> missionDataOptional = getMissionData(mission);
+
+        if(!missionDataOptional.isPresent())
+            return false;
+
+        MissionData missionData = missionDataOptional.get();
+
         Island playerIsland = superiorPlayer.getIsland();
 
         if(missionData.islandMission){
@@ -182,7 +194,8 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission mission){
-        return mission.getRequiredMissions().stream().allMatch(_mission -> hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
+        return mission.getRequiredMissions().stream().allMatch(_mission ->
+                _mission != null && hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
     }
 
     @Override
@@ -209,8 +222,13 @@ public final class MissionsHandler implements MissionsManager {
             return;
         }
 
+        Optional<MissionData> missionDataOptional = getMissionData(mission);
+
+        if(!missionDataOptional.isPresent())
+            return;
+
         synchronized (superiorPlayer) {
-            MissionData missionData = getMissionData(mission);
+            MissionData missionData = missionDataOptional.get();
             Island playerIsland = superiorPlayer.getIsland();
 
             if (!forceReward) {
@@ -338,12 +356,22 @@ public final class MissionsHandler implements MissionsManager {
         }
     }
 
-    public MissionData getMissionData(Mission mission){
-        return missionDataMap.get(mission);
+    public Optional<MissionData> getMissionData(Mission mission){
+        MissionData missionData = missionDataMap.get(mission);
+
+        if(missionData == null){
+            missionDataMap.remove(mission);
+            if(mission != null)
+                missionMap.remove(mission.getName());
+            return Optional.empty();
+        }
+
+        return Optional.of(missionData);
     }
 
     private boolean isAutoReward(Mission mission){
-        return getMissionData(mission).autoReward;
+        Optional<MissionData> missionDataOptional = getMissionData(mission);
+        return missionDataOptional.isPresent() && missionDataOptional.get().autoReward;
     }
 
     private List<Mission> getFilteredMissions(Predicate<MissionData> predicate) {
