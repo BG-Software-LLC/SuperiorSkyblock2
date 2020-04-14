@@ -301,7 +301,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return playersInside.readAndGet(ArrayList::new);
+        return playersInside.readAndGet(playersInside -> playersInside.stream().filter(SuperiorPlayer::isOnline).collect(Collectors.toList()));
     }
 
     @Override
