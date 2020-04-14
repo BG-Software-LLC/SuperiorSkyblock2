@@ -1110,8 +1110,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         int islandSize = this.islandSize.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            islandSize = Math.max(islandSize, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBorderSize());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            islandSize = Math.max(islandSize, getUpgradeLevel(upgrade).getBorderSize());
 
         return islandSize;
     }
@@ -1685,8 +1685,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public double getCropGrowthMultiplier() {
         double cropGrowth = this.cropGrowth.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            cropGrowth = Math.max(cropGrowth, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getCropGrowth());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            cropGrowth = Math.max(cropGrowth, getUpgradeLevel(upgrade).getCropGrowth());
 
         return cropGrowth;
     }
@@ -1704,8 +1704,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public double getSpawnerRatesMultiplier() {
         double spawnerRates = this.spawnerRates.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            spawnerRates = Math.max(spawnerRates, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getSpawnerRates());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            spawnerRates = Math.max(spawnerRates, getUpgradeLevel(upgrade).getSpawnerRates());
 
         return spawnerRates;
     }
@@ -1723,8 +1723,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public double getMobDropsMultiplier() {
         double mobDrops = this.mobDrops.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            mobDrops = Math.max(mobDrops, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getMobDrops());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            mobDrops = Math.max(mobDrops, getUpgradeLevel(upgrade).getMobDrops());
 
         return mobDrops;
     }
@@ -1742,8 +1742,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public int getBlockLimit(Key key) {
         int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getOrDefault(key, NO_BLOCK_LIMIT));
 
-        for(String upgrade : getUpgrades().keySet())
-            blockLimit = Math.max(blockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getBlockLimit(key));
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getBlockLimit(key));
 
         return blockLimit;
     }
@@ -1752,8 +1752,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public int getExactBlockLimit(Key key) {
         int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getRaw(key, NO_BLOCK_LIMIT));
 
-        for(String upgrade : getUpgrades().keySet())
-            blockLimit = Math.max(blockLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getExactBlockLimit(key));
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getExactBlockLimit(key));
 
         return blockLimit;
     }
@@ -1802,8 +1802,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public int getTeamLimit() {
         int teamLimit = this.teamLimit.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            teamLimit = Math.max(teamLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getTeamLimit());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            teamLimit = Math.max(teamLimit, getUpgradeLevel(upgrade).getTeamLimit());
 
         return teamLimit;
     }
@@ -1821,8 +1821,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public int getWarpsLimit() {
         int warpsLimit = this.warpsLimit.get();
 
-        for(String upgrade : getUpgrades().keySet())
-            warpsLimit = Math.max(warpsLimit, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getWarpsLimit());
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            warpsLimit = Math.max(warpsLimit, getUpgradeLevel(upgrade).getWarpsLimit());
 
         return warpsLimit;
     }
@@ -2219,8 +2219,8 @@ public final class SIsland extends DatabaseObject implements Island {
         if(generatorAmount > 0)
             return generatorAmount;
 
-        for(String upgrade : getUpgrades().keySet())
-            generatorAmount = Math.max(generatorAmount, getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getGeneratorAmount(key));
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            generatorAmount = Math.max(generatorAmount, getUpgradeLevel(upgrade).getGeneratorAmount(key));
 
         return generatorAmount;
     }
@@ -2243,8 +2243,8 @@ public final class SIsland extends DatabaseObject implements Island {
         if(!cobbleGenerator.isEmpty())
             return cobbleGenerator;
 
-        for(String upgrade : getUpgrades().keySet()) {
-            for(Map.Entry<String, Integer> entry : getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgrade)).getGeneratorAmounts().entrySet()) {
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
+            for(Map.Entry<String, Integer> entry : getUpgradeLevel(upgrade).getGeneratorAmounts().entrySet()) {
                 cobbleGenerator.put(entry.getKey(), Math.max(entry.getValue(), cobbleGenerator.getOrDefault(entry.getKey(), 0)));
             }
         }
