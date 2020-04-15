@@ -102,17 +102,7 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakMonitor(BlockBreakEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island == null)
-            return;
-
-        island.handleBlockBreak(e.getBlock());
-
-        Executor.sync(() -> {
-            if(plugin.getNMSAdapter().isChunkEmpty(e.getBlock().getChunk()))
-                ChunksTracker.markEmpty(island, e.getBlock(), true);
-        }, 2L);
+        handleBlockBreak(plugin, e.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -233,7 +223,7 @@ public final class BlocksListener implements Listener {
             if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) > 1) {
                 e.setCancelled(true);
                 if(e.getItem() == null)
-                    tryUnstack(e.getPlayer(), e.getClickedBlock());
+                    tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin);
             }
 
             if(e.getItem() != null && canStackBlocks(e.getPlayer(), e.getItem(), e.getClickedBlock(), null) &&
@@ -257,7 +247,7 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(BlockBreakEvent e){
-        if(tryUnstack(e.getPlayer(), e.getBlock()))
+        if(tryUnstack(e.getPlayer(), e.getBlock(), plugin))
             e.setCancelled(true);
     }
 
@@ -272,7 +262,7 @@ public final class BlocksListener implements Listener {
         recentlyClicked.add(e.getPlayer().getUniqueId());
         Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
-        if(tryUnstack(e.getPlayer(), e.getClickedBlock()))
+        if(tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
             e.setCancelled(true);
     }
 
@@ -330,14 +320,14 @@ public final class BlocksListener implements Listener {
         return true;
     }
 
-    private boolean tryUnstack(Player player, Block block){
+    public static boolean tryUnstack(Player player, Block block, SuperiorSkyblockPlugin plugin){
         int blockAmount = plugin.getGrid().getBlockAmount(block);
 
         if(blockAmount <= 1)
             return false;
 
         // When sneaking, you'll break 64 from the stack. Otherwise, 1.
-        int amount = !player.isSneaking() ? 1 : 64, leftAmount;
+        int amount = player == null || !player.isSneaking() ? 1 : 64, leftAmount;
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
@@ -360,7 +350,7 @@ public final class BlocksListener implements Listener {
         }
 
         // Dropping the item
-        if(plugin.getSettings().stackedBlocksAutoPickup){
+        if(player != null && plugin.getSettings().stackedBlocksAutoPickup){
             ItemUtils.addItem(blockItem, player.getInventory(), block.getLocation());
         }
         else {
@@ -545,6 +535,20 @@ public final class BlocksListener implements Listener {
         }
 
         return true;
+    }
+
+    public static void handleBlockBreak(SuperiorSkyblockPlugin plugin, Block block){
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
+
+        if(island == null)
+            return;
+
+        island.handleBlockBreak(block);
+
+        Executor.sync(() -> {
+            if(plugin.getNMSAdapter().isChunkEmpty(block.getChunk()))
+                ChunksTracker.markEmpty(island, block, true);
+        }, 2L);
     }
 
 }
