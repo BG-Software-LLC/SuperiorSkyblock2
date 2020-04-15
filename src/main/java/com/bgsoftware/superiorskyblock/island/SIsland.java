@@ -422,6 +422,11 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
         coop.write(coop -> coop.remove(superiorPlayer));
+
+        if (isLocked() && superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation())) {
+            SuperiorMenu.killMenu(superiorPlayer);
+            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+        }
     }
 
     @Override
