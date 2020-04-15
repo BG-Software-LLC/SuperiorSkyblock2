@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -33,10 +34,15 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
-        return new ItemBuilder(clickedItem)
-                .replaceAll("{0}", superiorPlayer.getName())
-                .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
-                .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+        try {
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", superiorPlayer.getName())
+                    .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
+                    .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            throw ex;
+        }
     }
 
     @Override

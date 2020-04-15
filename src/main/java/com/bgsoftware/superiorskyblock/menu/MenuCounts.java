@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -45,50 +46,53 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Pair<Key, Integer> block) {
-        Key blockKey = block.getKey();
-        int amount = block.getValue();
+        try {
+            Key blockKey = block.getKey();
+            int amount = block.getValue();
 
-        String[] keySections = blockKey.toString().split(":");
+            String[] keySections = blockKey.toString().split(":");
 
-        if(blocksToItems.containsKey(keySections[0]))
-            keySections[0] = blocksToItems.get(keySections[0]);
+            if (blocksToItems.containsKey(keySections[0]))
+                keySections[0] = blocksToItems.get(keySections[0]);
 
-        Material blockMaterial;
-        String materialName = null;
+            Material blockMaterial;
+            String materialName = null;
 
-        try{
-            blockMaterial = Material.valueOf(keySections[0]);
-        }catch (Exception ex){
-            blockMaterial = Material.BEDROCK;
-            materialName = keySections[0];
+            try {
+                blockMaterial = Material.valueOf(keySections[0]);
+            } catch (Exception ex) {
+                blockMaterial = Material.BEDROCK;
+                materialName = keySections[0];
+            }
+
+            ItemMeta currentMeta = clickedItem.getItemMeta();
+            ItemBuilder itemBuilder;
+
+            if (blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1) {
+                itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(
+                        new ItemStack(Materials.PLAYER_HEAD.toBukkitType()),
+                        HeadUtils.getTexture(keySections[1])));
+                materialName = keySections[1] + "_SPAWNER";
+            } else {
+                itemBuilder = new ItemBuilder(blockMaterial);
+                if (materialName == null)
+                    materialName = blockMaterial.name();
+            }
+
+            ItemStack itemStack = itemBuilder
+                    .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
+                    .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
+                    .replaceAll("{0}", StringUtils.format(materialName))
+                    .replaceAll("{1}", amount + "")
+                    .build(superiorPlayer);
+
+            itemStack.setAmount(Math.max(1, Math.min(64, amount)));
+
+            return itemStack;
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of block: " + block.getKey());
+            throw ex;
         }
-
-        ItemMeta currentMeta = clickedItem.getItemMeta();
-        ItemBuilder itemBuilder;
-
-        if(blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1){
-            itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(
-                    new ItemStack(Materials.PLAYER_HEAD.toBukkitType()),
-                    HeadUtils.getTexture(keySections[1])));
-            materialName = keySections[1] + "_SPAWNER";
-        }
-
-        else {
-            itemBuilder = new ItemBuilder(blockMaterial);
-            if(materialName == null)
-                materialName = blockMaterial.name();
-        }
-
-        ItemStack itemStack = itemBuilder
-                .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
-                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
-                .replaceAll("{0}", StringUtils.format(materialName))
-                .replaceAll("{1}", amount + "")
-                .build(superiorPlayer);
-
-        itemStack.setAmount(Math.max(1, Math.min(64, amount)));
-
-        return itemStack;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -42,10 +43,15 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
-        return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
-                .replaceAll("{0}", island.getOwner().getName())
-                .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                .replaceAll("{2}", island.getAllWarps().size() + "").build(superiorPlayer);
+        try {
+            return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
+                    .replaceAll("{0}", island.getOwner().getName())
+                    .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
+                    .replaceAll("{2}", island.getAllWarps().size() + "").build(superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
+            throw ex;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -65,11 +66,16 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandFlag islandFlag) {
-        String settingsName = islandFlag.getName().toLowerCase();
-        return (containsData(settingsName + "-settings-enabled") ?
-                (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
-                new ItemBuilder(Material.AIR)
-        ).clone().build(superiorPlayer);
+        try {
+            String settingsName = islandFlag.getName().toLowerCase();
+            return (containsData(settingsName + "-settings-enabled") ?
+                    (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
+                    new ItemBuilder(Material.AIR)
+            ).clone().build(superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
+            throw ex;
+        }
     }
 
     @Override

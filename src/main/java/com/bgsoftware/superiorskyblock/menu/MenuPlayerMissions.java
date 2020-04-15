@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -50,31 +51,36 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
-        Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
+        try {
+            Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
-        if(!missionDataOptional.isPresent())
-            return clickedItem;
+            if (!missionDataOptional.isPresent())
+                return clickedItem;
 
-        MissionsHandler.MissionData missionData = missionDataOptional.get();
-        boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
-        int percentage = getPercentage(mission.getProgress(superiorPlayer));
-        int progressValue = mission.getProgressValue(superiorPlayer);
-        int amountCompleted = superiorPlayer.getAmountMissionCompleted(mission);
+            MissionsHandler.MissionData missionData = missionDataOptional.get();
+            boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
+            int percentage = getPercentage(mission.getProgress(superiorPlayer));
+            int progressValue = mission.getProgressValue(superiorPlayer);
+            int amountCompleted = superiorPlayer.getAmountMissionCompleted(mission);
 
-        ItemStack itemStack = completed ? missionData.completed.build(superiorPlayer) :
-                plugin.getMissions().canComplete(superiorPlayer, mission) ?
-                        missionData.canComplete.clone()
-                                .replaceAll("{0}", percentage + "")
-                                .replaceAll("{1}", progressValue + "")
-                                .replaceAll("{2}", amountCompleted + "").build(superiorPlayer) :
-                        missionData.notCompleted.clone()
-                                .replaceAll("{0}", percentage + "")
-                                .replaceAll("{1}", progressValue + "")
-                                .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);
+            ItemStack itemStack = completed ? missionData.completed.build(superiorPlayer) :
+                    plugin.getMissions().canComplete(superiorPlayer, mission) ?
+                            missionData.canComplete.clone()
+                                    .replaceAll("{0}", percentage + "")
+                                    .replaceAll("{1}", progressValue + "")
+                                    .replaceAll("{2}", amountCompleted + "").build(superiorPlayer) :
+                            missionData.notCompleted.clone()
+                                    .replaceAll("{0}", percentage + "")
+                                    .replaceAll("{1}", progressValue + "")
+                                    .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);
 
-        mission.formatItem(superiorPlayer, itemStack);
+            mission.formatItem(superiorPlayer, itemStack);
 
-        return itemStack;
+            return itemStack;
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of mission: " + mission.getName());
+            throw ex;
+        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -44,13 +45,18 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, String warpName) {
-        return new ItemBuilder(clickedItem)
-                .replaceAll("{0}", warpName)
-                .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString())
-                .replaceAll("{2}", island.isWarpPrivate(warpName) ?
-                        ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
-                        ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
-                .build(superiorPlayer);
+        try {
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", warpName)
+                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString())
+                    .replaceAll("{2}", island.isWarpPrivate(warpName) ?
+                            ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
+                            ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
+                    .build(superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of warp: " + warpName);
+            throw ex;
+        }
     }
 
     @Override

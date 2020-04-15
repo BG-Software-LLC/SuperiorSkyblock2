@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
@@ -134,24 +135,28 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandPrivilege islandPermission) {
-        ItemBuilder permissionItem = new ItemBuilder(Material.AIR);
-        String permissionName = islandPermission.getName().toLowerCase();
+        try {
+            ItemBuilder permissionItem = new ItemBuilder(Material.AIR);
+            String permissionName = islandPermission.getName().toLowerCase();
 
-        if(permissionHolder instanceof PlayerRole){
-            if (containsData(permissionName + "-role-permission")) {
-                PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
-                permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).clone()
-                        .replaceAll("{}", requiredRole.toString());
+            if (permissionHolder instanceof PlayerRole) {
+                if (containsData(permissionName + "-role-permission")) {
+                    PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
+                    permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).clone()
+                            .replaceAll("{}", requiredRole.toString());
+                }
+            } else {
+                if (containsData(permissionName + "-permission-enabled")) {
+                    boolean hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(islandPermission);
+                    permissionItem = ((ItemBuilder) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"))).clone();
+                }
             }
-        }
-        else{
-            if (containsData(permissionName + "-permission-enabled")) {
-                boolean hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(islandPermission);
-                permissionItem = ((ItemBuilder) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"))).clone();
-            }
-        }
 
-        return permissionItem.build(superiorPlayer);
+            return permissionItem.build(superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of permission: " + islandPermission.getName());
+            throw ex;
+        }
     }
 
     @Override

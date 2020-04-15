@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -37,11 +38,16 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, UUID uuid, Rating rating) {
-        SuperiorPlayer _superiorPlayer = SSuperiorPlayer.of(uuid);
-        return new ItemBuilder(clickedItem)
-                .replaceAll("{0}", _superiorPlayer.getName())
-                .replaceAll("{1}", StringUtils.formatRating(_superiorPlayer.getUserLocale(), rating.getValue()))
-                .asSkullOf(_superiorPlayer).build(superiorPlayer);
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
+        try {
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", superiorPlayer.getName())
+                    .replaceAll("{1}", StringUtils.formatRating(superiorPlayer.getUserLocale(), rating.getValue()))
+                    .asSkullOf(superiorPlayer).build(this.superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            throw ex;
+        }
     }
 
     @Override

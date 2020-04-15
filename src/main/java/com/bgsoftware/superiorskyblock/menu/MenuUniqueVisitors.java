@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -39,14 +40,19 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
-        Island island = superiorPlayer.getIsland();
-        String islandOwner = island != null ? island.getOwner().getName() : "None";
-        String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
-        return new ItemBuilder(clickedItem)
-                .replaceAll("{0}", superiorPlayer.getName())
-                .replaceAll("{1}", islandOwner)
-                .replaceAll("{2}", islandName)
-                .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+        try {
+            Island island = superiorPlayer.getIsland();
+            String islandOwner = island != null ? island.getOwner().getName() : "None";
+            String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", superiorPlayer.getName())
+                    .replaceAll("{1}", islandOwner)
+                    .replaceAll("{2}", islandName)
+                    .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            throw ex;
+        }
     }
 
     @Override

@@ -60,70 +60,74 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
         SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
-        int place = island == null ? 0 : plugin.getGrid().getIslandPosition(island, sortingType) + 1;
+        try {
+            int place = island == null ? 0 : plugin.getGrid().getIslandPosition(island, sortingType) + 1;
 
-        ItemBuilder itemBuilder = ((ItemBuilder) getData(islandOwner == null ? "no-island-item" : "island-item")).clone()
-                .asSkullOf(islandOwner);
+            ItemBuilder itemBuilder = ((ItemBuilder) getData(islandOwner == null ? "no-island-item" : "island-item")).clone()
+                    .asSkullOf(islandOwner);
 
-        if(island != null && islandOwner != null) {
-            String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
-                    islandOwner.getName() : plugin.getSettings().islandNamesColorSupport ?
-                    ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+            if (island != null && islandOwner != null) {
+                String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
+                        islandOwner.getName() : plugin.getSettings().islandNamesColorSupport ?
+                        ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
 
-            itemBuilder.replaceName("{0}", islandName)
-                    .replaceName("{1}", String.valueOf(place))
-                    .replaceName("{2}", island.getIslandLevel().toString())
-                    .replaceName("{3}", island.getWorth().toString())
-                    .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
-                    .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
-                    .replaceName("{7}", StringUtils.format(island.getTotalRating()))
-                    .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
-                    .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
-                    .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
+                itemBuilder.replaceName("{0}", islandName)
+                        .replaceName("{1}", String.valueOf(place))
+                        .replaceName("{2}", island.getIslandLevel().toString())
+                        .replaceName("{3}", island.getWorth().toString())
+                        .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
+                        .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
+                        .replaceName("{7}", StringUtils.format(island.getTotalRating()))
+                        .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                        .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
+                        .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
 
-            if(itemBuilder.getItemMeta().hasLore()){
-                List<String> lore = new ArrayList<>();
+                if (itemBuilder.getItemMeta().hasLore()) {
+                    List<String> lore = new ArrayList<>();
 
-                for(String line : itemBuilder.getItemMeta().getLore()){
-                    if(line.contains("{4}")){
-                        List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().islandTopIncludeLeader);
-                        String memberFormat = line.split("\\{4}:")[1];
-                        if(members.size() == 0){
-                            lore.add(memberFormat.replace("{}", "None"));
+                    for (String line : itemBuilder.getItemMeta().getLore()) {
+                        if (line.contains("{4}")) {
+                            List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().islandTopIncludeLeader);
+                            String memberFormat = line.split("\\{4}:")[1];
+                            if (members.size() == 0) {
+                                lore.add(memberFormat.replace("{}", "None"));
+                            } else {
+                                members.forEach(member -> {
+                                    String onlineMessage = member.isOnline() ?
+                                            Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
+                                            Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
+
+                                    lore.add(PlaceholderHook.parse(member, memberFormat
+                                            .replace("{}", member.getName())
+                                            .replace("{0}", member.getName())
+                                            .replace("{1}", onlineMessage == null ? "" : onlineMessage))
+                                    );
+                                });
+                            }
+                        } else {
+                            lore.add(line
+                                    .replace("{0}", island.getOwner().getName())
+                                    .replace("{1}", String.valueOf(place))
+                                    .replace("{2}", island.getIslandLevel().toString())
+                                    .replace("{3}", island.getWorth().toString())
+                                    .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
+                                    .replace("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
+                                    .replace("{7}", StringUtils.format(island.getTotalRating()))
+                                    .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                                    .replace("{9}", StringUtils.format(island.getRatingAmount()))
+                                    .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                         }
-                        else {
-                            members.forEach(member -> {
-                                String onlineMessage = member.isOnline() ?
-                                        Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
-                                        Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
-
-                                lore.add(PlaceholderHook.parse(member, memberFormat
-                                        .replace("{}", member.getName())
-                                        .replace("{0}", member.getName())
-                                        .replace("{1}", onlineMessage == null ? "" : onlineMessage))
-                                );
-                            });
-                        }
-                    }else{
-                        lore.add(line
-                                .replace("{0}", island.getOwner().getName())
-                                .replace("{1}", String.valueOf(place))
-                                .replace("{2}", island.getIslandLevel().toString())
-                                .replace("{3}", island.getWorth().toString())
-                                .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
-                                .replace("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
-                                .replace("{7}", StringUtils.format(island.getTotalRating()))
-                                .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
-                                .replace("{9}", StringUtils.format(island.getRatingAmount()))
-                                .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                     }
+
+                    itemBuilder.withLore(lore);
                 }
-
-                itemBuilder.withLore(lore);
             }
-        }
 
-        return itemBuilder.build(superiorPlayer);
+            return itemBuilder.build(superiorPlayer);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Failed to load menu because of the island of: " + islandOwner == null ? "null" : islandOwner.getName());
+            throw ex;
+        }
     }
 
     @Override
