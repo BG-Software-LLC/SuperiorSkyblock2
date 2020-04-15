@@ -39,6 +39,7 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
     private static final Pattern TOP_RATING_PLACEHOLDER_PATTERN = Pattern.compile("rating_(.+)");
     private static final Pattern TOP_PLAYERS_PLACEHOLDER_PATTERN = Pattern.compile("players_(.+)");
+    private static final Pattern TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN = Pattern.compile("value_format_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
@@ -152,10 +153,15 @@ public abstract class PlaceholderHook {
                         return String.valueOf(plugin.getGrid().getIslandPosition(island, sortingType) + 1);
                     }
                     else {
-                        boolean value = false;
-                        boolean leader = false;
+                        boolean value = false, formattedValue = false, leader = false;
 
-                        if((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(matcherValue)).matches()){
+                        if((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(matcherValue)).matches()){
+                            value = true;
+                            formattedValue = true;
+                            matcherValue = matcher.group(1);
+                        }
+
+                        else if((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(matcherValue)).matches()){
                             value = true;
                             matcherValue = matcher.group(1);
                         }
@@ -173,10 +179,10 @@ public abstract class PlaceholderHook {
 
                                 if(value){
                                     if(sortingType.equals(SortingTypes.BY_WORTH)){
-                                        return _island.getWorth().toString();
+                                        return formattedValue ? StringUtils.fancyFormat(_island.getWorth(), superiorPlayer.getUserLocale()) : _island.getWorth().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_LEVEL)){
-                                        return _island.getIslandLevel().toString();
+                                        return formattedValue ? StringUtils.fancyFormat(_island.getIslandLevel(), superiorPlayer.getUserLocale()) : _island.getIslandLevel().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_RATING)){
                                         return StringUtils.format(_island.getTotalRating());
