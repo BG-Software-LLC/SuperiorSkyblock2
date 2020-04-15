@@ -77,10 +77,10 @@ public final class MenuIslandRate extends SuperiorMenu {
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
         oneStarSlot = getSlots(cfg, "one-star", charSlots);
-        twoStarsSlot = getSlots(cfg, "two-star", charSlots);
-        threeStarsSlot = getSlots(cfg, "three-star", charSlots);
-        fourStarsSlot = getSlots(cfg, "four-star", charSlots);
-        fiveStarsSlot = getSlots(cfg, "five-star", charSlots);
+        twoStarsSlot = getSlots(cfg, "two-stars", charSlots);
+        threeStarsSlot = getSlots(cfg, "three-stars", charSlots);
+        fourStarsSlot = getSlots(cfg, "four-stars", charSlots);
+        fiveStarsSlot = getSlots(cfg, "five-stars", charSlots);
 
         charSlots.delete();
 
