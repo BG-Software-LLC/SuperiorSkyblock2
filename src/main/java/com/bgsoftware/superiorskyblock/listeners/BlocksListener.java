@@ -145,6 +145,17 @@ public final class BlocksListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onDragonEggDrop(BlockPistonExtendEvent e){
+        for(Block block : e.getBlocks()){
+            if(block.getType() == Material.DRAGON_EGG){
+                Island island = plugin.getGrid().getIslandAt(block.getLocation());
+                if(island != null)
+                    island.handleBlockBreak(Key.of("DRAGON_EGG"), 1);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
