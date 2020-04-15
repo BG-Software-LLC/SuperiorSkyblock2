@@ -1016,7 +1016,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                         blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
                                     }catch(ArrayIndexOutOfBoundsException ignored){ }
 
-                                    if(blockKey.toString().split(":")[0].equals("AIR"))
+                                    if(blockKey.toString().contains("AIR:"))
                                         continue;
 
                                     Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
