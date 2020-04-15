@@ -29,7 +29,7 @@ public final class CmdSetWarp implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         return "setwarp <" +
                 Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "> [" +
-                Locale.COMMAND_ARGUMENT_PRIVATE.getMessage(locale) + "]";
+                Locale.COMMAND_ARGUMENT_PRIVATE.getMessage(locale) + "=true/false]";
     }
 
     @Override
