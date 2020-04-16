@@ -191,11 +191,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         if(!isOnline())
             return;
 
-        Block islandTeleportBlock = island.getTeleportLocation(World.Environment.NORMAL).getBlock();
+        Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
+        Block islandTeleportBlock = islandTeleportLocation.getBlock();
         Block islandCenterBlock = island.getCenter(World.Environment.NORMAL).getBlock();
 
         if(island instanceof SpawnIsland){
-            teleport(islandTeleportBlock.getLocation().add(0, 0.5, 0));
+            teleport(islandTeleportLocation.add(0, 0.5, 0));
             if(result != null)
                 result.accept(true);
             return;
@@ -205,7 +206,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         //We check if the island's teleport location is safe.
         if(LocationUtils.isSafeBlock(islandTeleportBlock)){
-            toTeleport = islandTeleportBlock.getLocation();
+            toTeleport = islandTeleportLocation;
         }
 
         //We check if the island's center location is safe.
