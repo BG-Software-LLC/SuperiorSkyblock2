@@ -65,7 +65,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
     private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean fromInventory){
         String permission = (String) menu.getData(schematic + "-permission", "");
         if (menu.superiorPlayer.hasPermission(permission)) {
-            BigDecimal bonusWorth = new BigDecimal((long) menu.getData(schematic + "-bonus", 0));
+            BigDecimal bonusWorth = new BigDecimal((long) menu.getData(schematic + "-bonus", 0L));
             boolean offset = (boolean) menu.getData(schematic + "-offset", false);
 
             Biome biome = Biome.valueOf((String) menu.getData(schematic + "-biome", "PLAINS"));
