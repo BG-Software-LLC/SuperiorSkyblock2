@@ -115,7 +115,7 @@ public final class CmdInvite implements ISuperiorCommand {
                 TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(targetLocal, superiorPlayer.getName()));
                 if(!Locale.GOT_INVITE_TOOLTIP.isEmpty(targetLocal))
                     textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(targetLocal))}));
-                textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + superiorPlayer.getName()));
+                textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + superiorPlayer.getName()));
                 targetPlayer.asPlayer().spigot().sendMessage(textComponent);
             }
         }
