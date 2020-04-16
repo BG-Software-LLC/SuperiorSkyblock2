@@ -165,9 +165,10 @@ public final class SQLHelper {
     }
 
     private static void close(AutoCloseable closeable){
-        if(closeable != null && plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")){
+        if(closeable != null){
             try {
-                closeable.close();
+                if(!(closeable instanceof Connection) || plugin.getSettings().databaseType.equalsIgnoreCase("MySQL"))
+                    closeable.close();
             } catch (Exception ignored) {}
         }
     }
