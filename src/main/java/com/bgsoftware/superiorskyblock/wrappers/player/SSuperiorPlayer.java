@@ -323,6 +323,9 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public PlayerRole getPlayerRole() {
+        if(playerRole == null)
+            setPlayerRole(SPlayerRole.guestRole());
+
         return playerRole;
     }
 
