@@ -33,6 +33,7 @@ import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -63,25 +64,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
-        if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())){
-                Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
-                e.setCancelled(true);
-            }
-
-            return;
-        }
-
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
+        if(!handleBlockPlace(island, superiorPlayer, e.getBlock(), true))
             e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-            return;
-        }
-
-        if(!island.isInsideRange(e.getBlock().getLocation())){
-            e.setCancelled(true);
-            Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
-        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -156,6 +140,18 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onFrostWalker(EntityBlockFormEvent e){
+        if(!(e.getEntity() instanceof Player))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getEntity());
+
+        if(!handleBlockPlace(island, superiorPlayer, e.getBlock(), false))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -527,6 +523,32 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
+    }
+
+    private boolean handleBlockPlace(Island island, SuperiorPlayer superiorPlayer, Block block, boolean sendMessages){
+        if(island == null) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())){
+                if(sendMessages)
+                    Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+                return false;
+            }
+
+            return true;
+        }
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
+            if(sendMessages)
+                Locale.sendProtectionMessage(superiorPlayer);
+            return false;
+        }
+
+        if(!island.isInsideRange(block.getLocation())){
+            if(sendMessages)
+                Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
     }
 
     class PlayerArrowPickup implements Listener{
