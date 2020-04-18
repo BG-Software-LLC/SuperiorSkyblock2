@@ -35,6 +35,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -151,6 +152,18 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getEntity());
 
         if(!handleBlockPlace(island, superiorPlayer, e.getBlock(), false))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEntityTarget(EntityTargetEvent e){
+        if(!(e.getTarget() instanceof Player))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getTarget());
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.MONSTER_DAMAGE))
             e.setCancelled(true);
     }
 
