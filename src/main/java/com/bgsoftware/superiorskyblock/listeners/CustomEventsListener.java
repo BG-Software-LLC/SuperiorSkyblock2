@@ -290,6 +290,8 @@ public final class CustomEventsListener implements Listener {
                 }
             }
 
+            Player player = superiorPlayer.asPlayer();
+
             if((toIsland == null || !toIsland.equals(fromIsland) || !toIsland.isInsideRange(toLocation)) && fromIsland.isInsideRange(fromLocation)){
                 if(plugin.getSettings().stopLeaving && toLocation != null && !superiorPlayer.hasBypassModeEnabled() &&
                         fromLocation.getWorld().equals(toLocation.getWorld()) && (toIsland == null || toIsland.equals(fromIsland)) &&
@@ -304,15 +306,10 @@ public final class CustomEventsListener implements Listener {
                         ((Cancellable) event).setCancelled(true);
                     return false;
                 }
-                else{
-                    if(superiorPlayer.hasIslandFlyEnabled()){
-                        Player player = superiorPlayer.asPlayer();
-                        if(player.getGameMode() != GameMode.CREATIVE) {
-                            player.setAllowFlight(false);
-                            player.setFlying(false);
-                        }
-                        Locale.ISLAND_FLY_DISABLED.send(player);
-                    }
+                else if(superiorPlayer.hasIslandFlyEnabled() && toIsland == null && player.getGameMode() != GameMode.CREATIVE){
+                    player.setAllowFlight(false);
+                    player.setFlying(false);
+                    Locale.ISLAND_FLY_DISABLED.send(player);
                 }
             }
 
@@ -396,21 +393,29 @@ public final class CustomEventsListener implements Listener {
                 }
             }
 
+            Player player = superiorPlayer.asPlayer();
+
             if((fromIsland == null || !fromIsland.equals(toIsland) || !fromIsland.isInsideRange(fromLocation)) && toIsland.isInsideRange(toLocation)){
                 if (!EventsCaller.callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
                     if (event instanceof Cancellable)
                         ((Cancellable) event).setCancelled(true);
                 }
 
-                else {
-                    if(toIsland.hasPermission(superiorPlayer, IslandPrivileges.FLY) && superiorPlayer.hasIslandFlyEnabled()) {
-                        Executor.sync(() -> {
-                            Player player = superiorPlayer.asPlayer();
-                            player.setAllowFlight(true);
-                            player.setFlying(true);
-                            Locale.ISLAND_FLY_ENABLED.send(player);
-                        }, 5L);
-                    }
+                else if(superiorPlayer.hasIslandFlyEnabled() && player.getGameMode() != GameMode.CREATIVE){
+                    Executor.sync(() -> {
+                        if(toIsland.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                            if(!player.isFlying()) {
+                                player.setAllowFlight(true);
+                                player.setFlying(true);
+                                Locale.ISLAND_FLY_ENABLED.send(player);
+                            }
+                        }
+                        else if(player.isFlying()){
+                            player.setAllowFlight(false);
+                            player.setFlying(false);
+                            Locale.ISLAND_FLY_DISABLED.send(player);
+                        }
+                    }, 5L);
                 }
             }
         }

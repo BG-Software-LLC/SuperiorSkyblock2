@@ -35,7 +35,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -146,19 +145,6 @@ public final class PlayersListener implements Listener {
                 _island.removeCoop(superiorPlayer);
                 ((SIsland) _island).sendMessage(Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
             }
-        }
-    }
-
-    @EventHandler
-    public void onWorldSwitch(PlayerChangedWorldEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(island != null && island.hasPermission(e.getPlayer(), IslandPrivileges.FLY) && superiorPlayer.hasIslandFlyEnabled()){
-            Executor.sync(() -> {
-                e.getPlayer().setAllowFlight(true);
-                e.getPlayer().setFlying(true);
-            }, 2L);
         }
     }
 
@@ -396,10 +382,8 @@ public final class PlayersListener implements Listener {
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
-                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                        superiorPlayer.teleport(((BaseSchematic) schematic).getTeleportLocation(toTeleport));
-                        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
-                    });
+                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () ->
+                            handleTeleport(superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport)));
                     island.setSchematicGenerate(environment);
                 }
                 else{
@@ -409,10 +393,23 @@ public final class PlayersListener implements Listener {
             }
 
             else {
-                superiorPlayer.teleport(toTeleport);
-                plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
+                handleTeleport(superiorPlayer, island, toTeleport);
             }
         }
+    }
+
+    private void handleTeleport(SuperiorPlayer superiorPlayer, Island island, Location toTeleport){
+        superiorPlayer.teleport(toTeleport);
+        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
+        Executor.sync(() -> {
+            if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                Player player = superiorPlayer.asPlayer();
+                if(player != null) {
+                    player.setAllowFlight(true);
+                    player.setFlying(true);
+                }
+            }
+        }, 2L);
     }
 
     private Location getLocationNoException(Island island, World.Environment environment){
