@@ -163,7 +163,7 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getTarget());
 
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.MONSTER_DAMAGE))
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.MONSTER_DAMAGE))
             e.setCancelled(true);
     }
 
