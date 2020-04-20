@@ -470,8 +470,13 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onVehicleSpawn(PlayerInteractEvent e){
-        if(e.getClickedBlock() == null || !e.getClickedBlock().getType().name().contains("RAIL") ||
-                e.getItem() == null || !e.getItem().getType().name().contains("MINECART"))
+        if(e.getClickedBlock() == null || e.getItem() == null)
+            return;
+
+        if(!e.getItem().getType().name().contains("MINECART") && !e.getItem().getType().name().contains("BOAT"))
+            return;
+
+        if(e.getItem().getType().name().contains("MINECART") && !e.getClickedBlock().getType().name().contains("RAIL"))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
