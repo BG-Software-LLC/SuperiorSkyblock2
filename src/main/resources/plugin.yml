@@ -136,6 +136,8 @@ permissions:
             description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
+          superior.admin.cleargenerator:
+            description: Clear generator rates for a specific island.
           superior.admin.close:
             description: Close an island to the public.
           superior.admin.demote:

@@ -124,6 +124,7 @@ COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các command của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Chuyển đổi chế độ bypass.
+COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Đóng một hòn đảo thành công cộng.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Hạ cấp thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Gửi tiền vào ngân hàng đảo của người chơi khác.
@@ -267,6 +268,9 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
+GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
+GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
 GENERATOR_UPDATED: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo của {1}.'
 GENERATOR_UPDATED_NAME: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho đảo {1}.'
 GENERATOR_UPDATED_ALL: '&e&lĐảo Thần | &7Cập nhật thành công số lượng máy tạo quặng của {0} cho tất cả các đảo.'

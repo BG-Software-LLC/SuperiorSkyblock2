@@ -106,6 +106,7 @@ COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
 COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
 COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: רחא יאב ןקחש הגרדב דירוהל.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: רחא יא לש קנב לא ףסכ ריבעהל.
@@ -231,6 +232,9 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
+GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
+GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
 GENERATOR_UPDATED: '&e&lיא | &7החלצהב ןכדוע {1} לש יאה לש רוטארנגב {0} רמוחה לש
   תומכה.'
 GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש רוטארנגב {0} רמוחה

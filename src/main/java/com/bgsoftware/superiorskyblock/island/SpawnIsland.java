@@ -1011,6 +1011,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void clearGeneratorAmounts() {
+
+    }
+
+    @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         return true;
     }

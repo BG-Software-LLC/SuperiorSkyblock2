@@ -2269,6 +2269,16 @@ public final class SIsland extends DatabaseObject implements Island {
         return newCobbleGenerator;
     }
 
+    @Override
+    public void clearGeneratorAmounts() {
+        cobbleGeneratorValues.write(KeyMap::clear);
+
+        Query.ISLAND_SET_GENERATOR.getStatementHolder()
+                .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
     /*
      *  Schematic methods
      */

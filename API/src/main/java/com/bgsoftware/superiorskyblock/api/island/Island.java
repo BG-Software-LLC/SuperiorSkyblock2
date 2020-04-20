@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public interface Island extends Comparable<Island> {
 
@@ -1146,6 +1145,11 @@ public interface Island extends Comparable<Island> {
      * Get an array of materials for the cobblestone generator.
      */
     String[] getGeneratorArray();
+
+    /**
+     * Clear all the custom generator amounts for this island.
+     */
+    void clearGeneratorAmounts();
 
     /*
      *  Schematic methods

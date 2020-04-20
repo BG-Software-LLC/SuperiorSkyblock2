@@ -98,6 +98,7 @@ COMMAND_DESCRIPTION_ACCEPT: 同意玩家的岛屿邀请.
 COMMAND_DESCRIPTION_ADMIN: 查看管理员命令.
 COMMAND_DESCRIPTION_ADMIN_BONUS: 给玩家岛屿奖励.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: 打开管理员忽略模式.
+COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: 将一个岛屿向公众关闭.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: 降级其他岛屿上的成员.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: 往一个岛屿银行中存款.
@@ -219,6 +220,9 @@ FORMAT_TRILLION: T
 FORMAT_BILLION: B
 FORMAT_MILLION: M
 FORMAT_THOUSANDS: K
+GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
+GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
+GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
 GENERATOR_UPDATED: '&e&l岛屿 | &7成功升级 &b{1} &7岛屿矿机的 &e{0} &7概率.'
 GENERATOR_UPDATED_NAME: '&e&l岛屿 | &7成功将 &b{1} &7的岛屿矿机升级至 &e{0}级&7.'
 GENERATOR_UPDATED_ALL: '&e&l岛屿 | &7成功将所有岛屿的矿机升级至 &e{0}级&7.'

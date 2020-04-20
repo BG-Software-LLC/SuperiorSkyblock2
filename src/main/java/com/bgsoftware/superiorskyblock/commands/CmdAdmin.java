@@ -26,6 +26,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         this.commandsHandler = commandsHandler;
         registerCommand(new CmdAdminBonus(), false);
         registerCommand(new CmdAdminBypass(), false);
+        registerCommand(new CmdAdminClearGenerator(), false);
         registerCommand(new CmdAdminClose(), false);
         registerCommand(new CmdAdminDemote(), false);
         registerCommand(new CmdAdminDeposit(), false);

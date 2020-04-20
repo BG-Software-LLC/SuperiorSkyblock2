@@ -101,6 +101,7 @@ COMMAND_DESCRIPTION_ADMIN_PURGE: Purger les îles.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Améliorer la mise à niveau d''une île.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Octroyer un bonus à un joueur.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Activer/Désactiver le mode bypass.
+COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
@@ -219,6 +220,9 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
+GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
+GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
 GENERATOR_UPDATED: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_ALL: '&e&lIle | &7Taux du générateur modifié sur {0} pour toutes les îles.'
