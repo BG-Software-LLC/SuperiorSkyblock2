@@ -568,6 +568,7 @@ SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'
+TELEPORT_OUTSIDE_ISLAND: '&c&lError | &7You cannot teleport outside of your protection range.'
 TELEPORT_WARMUP: '&7&oBạn sẽ được dịch chuyển trong {0}... Đừng di chuyển!'
 TELEPORT_WARMUP_CANCEL: '&7&oBạn đã di chuyển và do đó dịch chuyển tức thời đã bị
   hủy.'

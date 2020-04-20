@@ -8,10 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public final class ItemUtils {
@@ -58,6 +60,17 @@ public final class ItemUtils {
         Map<Integer, ItemStack> additionalItems = playerInventory.addItem(itemStack);
         for(ItemStack additionalItem : additionalItems.values())
             toDrop.getWorld().dropItemNaturally(toDrop, additionalItem);
+    }
+
+    public static int countItems(Inventory inventory, Material type){
+        int counter = 0;
+
+        for(ItemStack itemStack : inventory.getContents()){
+            if(itemStack != null && itemStack.getType() == type)
+                counter += itemStack.getAmount();
+        }
+
+        return counter;
     }
 
 }

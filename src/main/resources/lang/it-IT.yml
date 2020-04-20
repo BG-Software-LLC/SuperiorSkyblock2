@@ -598,6 +598,7 @@ SPAWN_SET_SUCCESS: '&e&lSpawn | &7La posizione di spawn è stata aggiornata corr
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErrore | &7Non sei nella tua isola.'
+TELEPORT_OUTSIDE_ISLAND: '&c&lError | &7You cannot teleport outside of your protection range.'
 TELEPORT_WARMUP: '&7&oVerrai teletrasportato in {0}... Non muoverti!'
 TELEPORT_WARMUP_CANCEL: '&7&oTi sei mosso e quindi il teletrasporto è stato cancellato.'
 TELEPORTED_FAILED: '&e&lIsola | &7Sembra che quest''isola non abbia blocchi sicuri.

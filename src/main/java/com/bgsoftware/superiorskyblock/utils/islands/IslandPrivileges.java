@@ -22,6 +22,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege DISBAND_ISLAND = IslandPrivilege.getByName("DISBAND_ISLAND");
     public static IslandPrivilege DISCORD_SHOW = IslandPrivilege.getByName("DISCORD_SHOW");
     public static IslandPrivilege DROP_ITEMS = IslandPrivilege.getByName("DROP_ITEMS");
+    public static IslandPrivilege ENDER_PEARL = IslandPrivilege.getByName("ENDER_PEARL");
     public static IslandPrivilege EXPEL_BYPASS = IslandPrivilege.getByName("EXPEL_BYPASS");
     public static IslandPrivilege EXPEL_PLAYERS = IslandPrivilege.getByName("EXPEL_PLAYERS");
     public static IslandPrivilege FARM_TRAMPING = IslandPrivilege.getByName("FARM_TRAMPING");

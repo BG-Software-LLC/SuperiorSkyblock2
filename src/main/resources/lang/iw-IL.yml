@@ -501,6 +501,7 @@ SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאב אצמנ אל התא.'
+TELEPORT_OUTSIDE_ISLAND: '&c&lError | &7You cannot teleport outside of your protection range.'
 TELEPORT_WARMUP: '&7&oזוזת לא {0}... ב רגושת התא!'
 TELEPORT_WARMUP_CANCEL: '&7&oלטוב רוגישה ןכלו תזז.'
 TELEPORTED_FAILED: '&e&lיא | &7תרשה תווצל הנפת אנא .יאב חוטב םוקמ ןיא יכ הארנ.'

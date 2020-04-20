@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -46,9 +47,11 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
@@ -540,6 +543,34 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_OPEN)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPearlTeleport(PlayerTeleportEvent e){
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL)
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getTo());
+
+        if(island == null){
+            e.setCancelled(true);
+            Locale.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
+        }
+
+        else if(!island.hasPermission(superiorPlayer, IslandPrivileges.ENDER_PEARL)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+
+        else if(!island.isInsideRange(e.getTo())){
+            e.setCancelled(true);
+            Locale.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
+        }
+
+        if(e.isCancelled() && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+            e.getPlayer().getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
         }
     }
 
