@@ -613,6 +613,36 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  ender_pearl:
+    permission-enabled:
+      type: ENDER_PEARL
+      name: '&6Ender Pearl'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: FEATHER
+      name: '&6Expel Bypass'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: FEATHER
+      name: '&6Expel Bypass'
+      lore:
+        - '&7Access to use ender pearls inside the island.'
+        - '&7Role: &e{}&7.'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   expel_bypass:
     permission-enabled:
       type: FEATHER
