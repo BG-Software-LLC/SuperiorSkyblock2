@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -422,7 +423,8 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
-        return !plugin.getSettings().spawnProtection || superiorPlayer.hasBypassModeEnabled() ||
+        boolean checkForProtection = islandPrivilege != IslandPrivileges.FLY;
+        return (checkForProtection && !plugin.getSettings().spawnProtection) || superiorPlayer.hasBypassModeEnabled() ||
                 superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
                 hasPermission(SPlayerRole.guestRole(), islandPrivilege);
     }
