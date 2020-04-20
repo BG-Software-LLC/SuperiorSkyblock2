@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.registry;
 
 import com.bgsoftware.superiorskyblock.utils.maps.SynchronizedLinkedHashMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
+import com.google.common.collect.Iterators;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +97,7 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     @Override
     public Iterator<V> iterator() {
-        return registry.values().iterator();
+        return Iterators.unmodifiableIterator(registry.values().iterator());
     }
 
     @Override

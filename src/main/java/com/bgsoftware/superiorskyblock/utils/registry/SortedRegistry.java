@@ -59,10 +59,12 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
 
         ensureType(sortingType);
 
-        Set<V> sortedTree = sortedValues.get(sortingType);
         Set<V> newSortedTree = new ConcurrentSkipListSet<>(sortingType);
-        sortedTree.stream().filter(s -> predicate == null || predicate.test(s)).forEach(newSortedTree::add);
-        sortedTree.clear();
+
+        for (V element : this) {
+            if (predicate == null || predicate.test(element))
+                newSortedTree.add(element);
+        }
 
         sortedValues.add(sortingType, newSortedTree);
 
