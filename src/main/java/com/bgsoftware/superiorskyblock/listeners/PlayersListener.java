@@ -402,7 +402,7 @@ public final class PlayersListener implements Listener {
         superiorPlayer.teleport(toTeleport);
         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
         Executor.sync(() -> {
-            if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+            if(island != null && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 Player player = superiorPlayer.asPlayer();
                 if(player != null) {
                     player.setAllowFlight(true);
