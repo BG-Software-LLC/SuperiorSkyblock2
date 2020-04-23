@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.entities;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
@@ -34,16 +36,36 @@ public final class EntityUtils {
         else if(livingEntity instanceof Horse){
             HorseInventory horseInventory = ((Horse) livingEntity).getInventory();
             List<ItemStack> itemStacks = Arrays.stream(horseInventory.getContents()).filter(Objects::nonNull).collect(Collectors.toList());
+
+            itemStacks.add(new ItemStack(Material.CHEST));
+
             if(horseInventory.getSaddle() != null)
                 itemStacks.add(horseInventory.getSaddle());
             if(horseInventory.getArmor() != null)
                 itemStacks.add(horseInventory.getArmor());
+
             return itemStacks.contains(itemStack);
         }
         else if(livingEntity instanceof ArmorStand){
             if(armorStandsContent.containsKey(livingEntity.getUniqueId()))
                 return contains(armorStandsContent.get(livingEntity.getUniqueId()), itemStack);
         }
+
+        try{
+            if(livingEntity instanceof AbstractHorse){
+                AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
+                List<ItemStack> itemStacks = Arrays.stream(horseInventory.getContents()).filter(Objects::nonNull).collect(Collectors.toList());
+
+                itemStacks.add(new ItemStack(Material.CHEST));
+
+                if(horseInventory.getSaddle() != null)
+                    itemStacks.add(horseInventory.getSaddle());
+                if(horseInventory instanceof HorseInventory && ((HorseInventory) horseInventory).getArmor() != null)
+                    itemStacks.add(((HorseInventory) horseInventory).getArmor());
+
+                return itemStacks.contains(itemStack);
+            }
+        }catch(Throwable ignored){}
 
         EntityEquipment entityEquipment = livingEntity.getEquipment();
 

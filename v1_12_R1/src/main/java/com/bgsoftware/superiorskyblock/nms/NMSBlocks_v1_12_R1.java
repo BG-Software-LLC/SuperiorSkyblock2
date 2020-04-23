@@ -301,7 +301,7 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
             double islandCropGrowthMultiplier = island == null ? 0 : island.getCropGrowthMultiplier() - 1;
 
             for(org.bukkit.Chunk bukkitChunk : chunkPair.getValue()) {
-                if(bukkitChunk.getWorld().isChunkLoaded(bukkitChunk.getX(), bukkitChunk.getZ()))
+                if(!bukkitChunk.getWorld().isChunkLoaded(bukkitChunk.getX(), bukkitChunk.getZ()))
                     continue;
 
                 Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
