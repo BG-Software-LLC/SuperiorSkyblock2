@@ -12,12 +12,15 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -35,6 +38,7 @@ public final class SettingsHandler {
     public final String islandCommand;
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
+    public final Map<EntityType, Integer> defaultEntityLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCropGrowth;
@@ -153,6 +157,13 @@ public final class SettingsHandler {
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
+        }
+        defaultEntityLimits = new HashMap<>();
+        for(String line : cfg.getStringList("default-entity-limits")){
+            String[] sections = line.split(":");
+            try {
+                defaultEntityLimits.put(EntityType.valueOf(sections[0]), Integer.parseInt(sections[1]));
+            }catch(Exception ignored){}
         }
         defaultTeamLimit = cfg.getInt("default-team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-warps-limit", 3);

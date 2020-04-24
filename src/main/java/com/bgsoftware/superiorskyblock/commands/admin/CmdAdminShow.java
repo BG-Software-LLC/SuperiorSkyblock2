@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -136,6 +137,14 @@ public final class CmdAdminShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.getMessage(locale, island.getMobDropsMultiplier())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.getMessage(locale, island.getCropGrowthMultiplier())).append("\n");
+
+        if(!Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.isEmpty(locale)){
+            StringBuilder entitiesString = new StringBuilder();
+            for(Map.Entry<EntityType, Integer> entry : island.getEntitiesLimits().entrySet()){
+                entitiesString.append(Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().name()), entry.getValue())).append("\n");
+            }
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.getMessage(locale, entitiesString));
+        }
 
         if(!Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.isEmpty(locale)){
             StringBuilder blocksString = new StringBuilder();

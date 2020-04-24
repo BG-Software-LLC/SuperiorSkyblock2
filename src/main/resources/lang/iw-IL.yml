@@ -39,6 +39,9 @@ CHANGED_CROP_GROWTH: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש י
 CHANGED_CROP_GROWTH_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש הלידגה סונוב..'
 CHANGED_CROP_GROWTH_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש הלידגה סונוב.'
 CHANGED_DISCORD: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש דרוקסידה.'
+CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לדוג.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לדוג.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
@@ -70,6 +73,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EMAIL: ליימיא
+COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_ISLAND_NAME: יאה םש
 COMMAND_ARGUMENT_ISLAND_ROLE: הגרד
 COMMAND_ARGUMENT_LEADER: גיהנמ
@@ -129,6 +133,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: רחא ןקחשל יא לע תוגיהנמה תא ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: רחא ןקחש לש יא לש םיבומ לש םיטירפה סונוב
   תא תונשל.
@@ -259,6 +264,7 @@ IGNORED_ISLAND_NAME: '&e&lיא | &7םיבוטה םייאה תמישר ןמ דר�
 INTERACT_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ םירבד םע היצקרטניא עצבל לוכי
   אל התא.'
 INVALID_AMOUNT: '&c&lהאיגש | &7{0} תיקוח אל תומכ.'
+INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
 INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'
 INVALID_ISLAND_LOCATION: '&c&lהאיגש | &7ךלש םוקימב יא ןיא.'
@@ -314,6 +320,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lיא | &7םיקולב תלבגה:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lיא | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+  &e&lIsland | &7Entities Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lיא | &7הלידג סונוב: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סונוב: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |

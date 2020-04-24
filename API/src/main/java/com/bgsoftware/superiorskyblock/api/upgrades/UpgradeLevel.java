@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import org.bukkit.entity.EntityType;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,12 @@ public interface UpgradeLevel {
      * @param key The block to check.
      */
     int getExactBlockLimit(Key key);
+
+    /**
+     * Get the limit of an entity for this level.
+     * @param entityType The entity's type to check.
+     */
+    int getEntityLimit(EntityType entityType);
 
     /**
      * Get the team limit of this level.

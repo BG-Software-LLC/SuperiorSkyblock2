@@ -224,3 +224,31 @@ upgrades:
         EMERALD_ORE: 1
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for generator.'
+  minecarts-limit:
+    '1':
+      price: 1000000.0
+      entity-limits:
+        MINECART: 4
+      commands:
+        - 'island admin setupgrade %player% minecarts-limit 2'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 8!'
+    '2':
+      price: 3000000.0
+      entity-limits:
+        MINECART: 8
+      commands:
+        - 'island admin setupgrade %player% minecarts-limit 3'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 16!'
+    '3':
+      price: 9000000.0
+      entity-limits:
+        MINECART: 16
+      commands:
+        - 'island admin setupgrade %player% minecarts-limit 4'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 32!'
+    '4':
+      price: 0.0
+      entity-limits:
+        MINECART: 32
+      commands:
+        - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for minecarts limit.'

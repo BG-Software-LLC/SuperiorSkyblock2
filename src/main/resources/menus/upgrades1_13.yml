@@ -8,19 +8,16 @@
 title: '&lIsland Upgrades'
 
 pattern:
-  - '$ $ % % & % % $ $'
-  - '$ % @ & # & ^ % $'
-  - '$ * % ~ & ! % + $'
-  - '$ $ $ % & % $ $ $'
+  - '$ $ $ $ $ $ $ $ $'
+  - '% @ % # % ^ % * %'
+  - '% ~ % ! % + % & %'
+  - '$ $ $ $ $ $ $ $ $'
 
 items:
   '$':
-    type: CYAN_STAINED_GLASS_PANE
-    name: '&f'
-  '%':
     type: BLUE_STAINED_GLASS_PANE
     name: '&f'
-  '&':
+  '%':
     type: LIGHT_BLUE_STAINED_GLASS_PANE
     name: '&f'
 
@@ -1043,3 +1040,143 @@ upgrades:
         lore:
           - '&7You have reached the maxmimum'
           - '&7level of the generator rates!'
+  minecarts-limit:
+    item: '&'
+    '1':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lMinecart Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f8x Minecarts'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e2'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f8x Minecarts'
+          - '&dPrice: &f$1,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '2':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f16x Minecarts'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e3'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f16x Minecarts'
+          - '&dPrice: &f$3,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '3':
+      has-next-level:
+        sound:
+          type: ENTITY_EXPERIENCE_ORB_PICKUP
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &a(Available)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f32x Minecarts'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&d&lHopper Increase &c(Unavailable)'
+        lore:
+          - '&7'
+          - '&dNext Level: &e4'
+          - '&7'
+          - '&7Purchasing the minecart upgrade'
+          - '&7will increase your island''s'
+          - '&7max minecarts limit.'
+          - '&7'
+          - '&dAmount: &f32x Minecarts'
+          - '&dPrice: &f$9,000,000'
+          - '&7'
+          - '&aLeft-click to purchase upgrade.'
+    '4':
+      has-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the minecarts limit!'
+      no-next-level:
+        sound:
+          type: BLOCK_ANVIL_PLACE
+          volume: 0.2
+          pitch: 0.2
+        type: MINECART
+        name: '&c&lMAX LEVEL'
+        lore:
+          - '&7You have reached the maxmimum'
+          - '&7level of the minecarts limit!'

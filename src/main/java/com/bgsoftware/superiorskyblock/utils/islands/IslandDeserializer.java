@@ -20,8 +20,10 @@ import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 public final class IslandDeserializer {
@@ -99,6 +101,17 @@ public final class IslandDeserializer {
                 try {
                     String[] sections = limit.split("=");
                     blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                }catch(Exception ignored){}
+            }
+        });
+    }
+
+    public static void deserializeEntityLimits(String entities, SyncedObject<Map<EntityType, Integer>> entityLimitsSync){
+        entityLimitsSync.write(entityLimits -> {
+            for(String limit : entities.split(",")){
+                try {
+                    String[] sections = limit.split("=");
+                    entityLimits.put(EntityType.valueOf(sections[0]), Integer.parseInt(sections[1]));
                 }catch(Exception ignored){}
             }
         });

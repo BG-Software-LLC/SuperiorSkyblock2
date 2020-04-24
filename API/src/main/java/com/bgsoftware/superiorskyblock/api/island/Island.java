@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -898,6 +899,37 @@ public interface Island extends Comparable<Island> {
      * @param amount Amount of the block to be placed.
      */
     boolean hasReachedBlockLimit(Key key, int amount);
+
+    /**
+     * Get the entity limit of an entity.
+     * @param entityType The entity's type to check.
+     */
+    int getEntityLimit(EntityType entityType);
+
+    /**
+     * Get all the entities limits for the island.
+     */
+    Map<EntityType, Integer> getEntitiesLimits();
+
+    /**
+     * Set the entity limit of an entity.
+     * @param entityType The entity's type to set the limit to.
+     * @param limit The limit to set.
+     */
+    void setEntityLimit(EntityType entityType, int limit);
+
+    /**
+     * A method to check if a specific entity has reached the limit.
+     * @param entityType The entity's type to check.
+     */
+    CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType);
+
+    /**
+     * A method to check if a specific entity has reached the limit.
+     * @param amount The amount of entities that were added.
+     * @param entityType The entity's type to check.
+     */
+    CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount);
 
     /**
      * Get the team limit of the island.

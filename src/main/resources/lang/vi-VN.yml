@@ -49,6 +49,9 @@ CHANGED_CROP_GROWTH_ALL: '&e&lNâng cấp | &7Thay thành công hệ số tăng 
 CHANGED_CROP_GROWTH_NAME: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây
   trồng của đảo {0}.'
 CHANGED_DISCORD: '&e&lĐảo Thần | &7Thay đổi thành công discord của đảo thành {0}.'
+CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lNâng cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo của
   {0}.'
@@ -88,6 +91,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
+COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_ISLAND_NAME: ten-dao
 COMMAND_ARGUMENT_ISLAND_ROLE: vai-tro-dao
 COMMAND_ARGUMENT_LEADER: lang-dao
@@ -153,6 +157,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây trồng cho đảo
   của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Đặt số lượng người cho đảo của người chơi.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Chuyển một hòn đảo cho người khác.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Đặt số lượng mob drop cho đảo của người chơi
   khác.
@@ -296,6 +301,7 @@ IGNORED_ISLAND_NAME: '&e&lNâng cấp | &7Đảo {0} bây giờ bị bỏ qua tr
 INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài sự bảo vệ phạm
   vi   đảo của bạn.'
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
+INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
@@ -353,6 +359,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lNâng cấp | &7Blocks Limits:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lNâng cấp | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+  &e&lIsland | &7Entities Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lNâng cấp | &7Cây trồng đa cấp: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lNâng cấp | &7Drops đa cấp: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |

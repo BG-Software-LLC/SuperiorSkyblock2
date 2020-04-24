@@ -50,6 +50,9 @@ CHANGED_CROP_GROWTH_ALL: '&e&lAggiornamenti | &7Aggiornato con successo il molti
 CHANGED_CROP_GROWTH_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore
   della crescita delle colture dell''isola di {0}.'
 CHANGED_DISCORD: '&e&lIsola | &7Discord dell''isola cambiata con successo in {0}.'
+CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lAggiornamenti | &7Aggiornata correttamente la dimensione
   dell''isola di {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAggiornamenti | &7Aggiornato con successo la dimensione
@@ -91,6 +94,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
+COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_ISLAND_NAME: nome-isola
 COMMAND_ARGUMENT_ISLAND_ROLE: ruolo-isola
 COMMAND_ARGUMENT_LEADER: capo
@@ -161,7 +165,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della cresc
   delle colture per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Imposta la quantità di reset dell'isola di
   un giocatore.
-                                                                                
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Trasferisci un'isola a qualcun altro.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Imposta il moltiplicatore di drops dei mob
   per l'isola di un giocatore.
@@ -311,6 +315,7 @@ IGNORED_ISLAND_NAME: '&e&lIsola | &7L''isola {0} da ora in poi verrà ignorata d
 INTERACT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi interagire al di fuori del tuo raggio
   di protezione.'
 INVALID_AMOUNT: '&c&lErrore | &7Importo non valido {0}.'
+INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Mondo non valido {0}.'
 INVALID_ISLAND: '&c&lErrore | &7Non hai un''isola.'
 INVALID_ISLAND_LOCATION: '&c&lErrore | &7Non c''è un isola nella tua posizione.'
@@ -370,6 +375,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIsola | &7Limite dei blocchi:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsola | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+  &e&lIsland | &7Entities Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore delle colture: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore dei drops dei mob:
   {0}'

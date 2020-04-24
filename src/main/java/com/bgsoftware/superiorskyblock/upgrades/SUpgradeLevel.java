@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +22,11 @@ public final class SUpgradeLevel implements UpgradeLevel {
     private final double cropGrowth, spawnerRates, mobDrops;
     private final int teamLimit, warpsLimit, borderSize;
     private final KeyMap<Integer> blockLimits, generatorRates;
+    private final Map<EntityType, Integer> entityLimits;
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int borderSize, KeyMap<Integer> blockLimits, KeyMap<Integer> generatorRates){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -36,6 +38,7 @@ public final class SUpgradeLevel implements UpgradeLevel {
         this.warpsLimit = warpsLimit;
         this.borderSize = borderSize;
         this.blockLimits = blockLimits;
+        this.entityLimits = entityLimits;
         this.generatorRates = generatorRates;
     }
 
@@ -76,12 +79,17 @@ public final class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getBlockLimit(Key key) {
-        return blockLimits.getOrDefault(key, SIsland.NO_BLOCK_LIMIT);
+        return blockLimits.getOrDefault(key, SIsland.NO_LIMIT);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return blockLimits.getRaw(key, SIsland.NO_BLOCK_LIMIT);
+        return blockLimits.getRaw(key, SIsland.NO_LIMIT);
+    }
+
+    @Override
+    public int getEntityLimit(EntityType entityType) {
+        return entityLimits.getOrDefault(entityType, SIsland.NO_LIMIT);
     }
 
     @Override

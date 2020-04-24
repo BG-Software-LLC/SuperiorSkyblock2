@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Pig;
@@ -89,6 +90,15 @@ public final class EntityUtils {
         }
 
         return false;
+    }
+
+    public static EntityType getLimitEntityType(EntityType entityType){
+        return entityType.name().contains("MINECART") ? EntityType.MINECART : entityType;
+    }
+
+    public static boolean canHaveLimit(EntityType entityType){
+        Class<?> entityClass = entityType.getEntityClass();
+        return entityType.name().contains("MINECART") || (entityClass != null && LivingEntity.class.isAssignableFrom(entityClass));
     }
 
     private static <T> boolean contains(T[] arr, T val){

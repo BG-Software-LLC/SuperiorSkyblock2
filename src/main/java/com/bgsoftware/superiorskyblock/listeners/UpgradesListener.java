@@ -4,12 +4,20 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,15 +27,18 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class UpgradesListener implements Listener {
@@ -109,7 +120,7 @@ public final class UpgradesListener implements Listener {
     }
 
     /*
-     *   HOPPERS LIMIT
+     *   BLOCK LIMIT
      */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -232,6 +243,95 @@ public final class UpgradesListener implements Listener {
         if(island.hasReachedBlockLimit(blockKey)){
             e.setCancelled(true);
             Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+        }
+    }
+
+    /*
+     *   ENTITY LIMIT
+     */
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntitySpawn(EntitySpawnEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getLocation());
+
+        if(island == null)
+            return;
+
+        EntityType entityType = e.getEntityType();
+
+        if(!EntityUtils.canHaveLimit(entityType))
+            return;
+
+        island.hasReachedEntityLimit(entityType).whenComplete((result, ex) -> {
+            if(result)
+                e.getEntity().remove();
+        });
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private final Cache<Location, UUID> vehiclesOwners = CacheBuilder.newBuilder()
+            .expireAfterWrite(2, TimeUnit.SECONDS).build();
+
+    @EventHandler
+    public void onVehicleSpawn(PlayerInteractEvent e) {
+        if(e.getAction() != Action.RIGHT_CLICK_BLOCK || noRightClickTwice.contains(e.getPlayer().getUniqueId()) ||
+                e.getPlayer().getGameMode() == GameMode.CREATIVE || e.getItem() == null ||
+                !e.getClickedBlock().getType().name().contains("RAIL") ||
+                !e.getItem().getType().name().contains("MINECART"))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+        if(island == null)
+            return;
+
+        //noinspection UnstableApiUsage
+        vehiclesOwners.put(e.getClickedBlock().getLocation(), e.getPlayer().getUniqueId());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onVehicleSpawn(VehicleCreateEvent e){
+        if(!(e.getVehicle() instanceof Minecart))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+
+        if(island == null)
+            return;
+
+        EntityType entityType = EntityUtils.getLimitEntityType(e.getVehicle().getType());
+        //noinspection UnstableApiUsage
+        UUID placedVehicle = vehiclesOwners.asMap().get(LocationUtils.getBlockLocation(e.getVehicle().getLocation()));
+
+        if(!EntityUtils.canHaveLimit(entityType))
+            return;
+
+        island.hasReachedEntityLimit(entityType).whenComplete((result, ex) -> {
+            if(result) {
+                e.getVehicle().remove();
+                if(placedVehicle != null)
+                    Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack((Minecart) e.getVehicle()));
+            }
+        });
+    }
+
+    private ItemStack asItemStack(Minecart minecart){
+        Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock(minecart).toString().split(":")[0]);
+        switch (material.name()){
+            case "HOPPER":
+                return new ItemStack(Material.HOPPER_MINECART);
+            case "COMMAND_BLOCK":
+                return new ItemStack(Material.valueOf("COMMAND_BLOCK_MINECART"));
+            case "COMMAND":
+                return new ItemStack(Material.COMMAND_MINECART);
+            case "TNT":
+                return new ItemStack(ServerVersion.isLegacy() ? Material.EXPLOSIVE_MINECART : Material.valueOf("TNT_MINECART"));
+            case "FURNACE":
+                return new ItemStack(ServerVersion.isLegacy() ? Material.POWERED_MINECART : Material.valueOf("FURNACE_MINECART"));
+            case "CHEST":
+                return new ItemStack(ServerVersion.isLegacy() ? Material.STORAGE_MINECART : Material.valueOf("CHEST_MINECART"));
+            default:
+                return new ItemStack(Material.MINECART);
         }
     }
 

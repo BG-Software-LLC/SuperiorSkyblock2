@@ -33,6 +33,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.EntityType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -796,12 +797,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return Integer.MAX_VALUE;
+        return SIsland.NO_LIMIT;
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return Integer.MAX_VALUE;
+        return SIsland.NO_LIMIT;
     }
 
     @Override
@@ -822,6 +823,31 @@ public final class SpawnIsland implements Island {
     @Override
     public boolean hasReachedBlockLimit(Key key, int amount) {
         return false;
+    }
+
+    @Override
+    public int getEntityLimit(EntityType entityType) {
+        return SIsland.NO_LIMIT;
+    }
+
+    @Override
+    public Map<EntityType, Integer> getEntitiesLimits() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public void setEntityLimit(EntityType entityType, int limit) {
+
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
+        return hasReachedEntityLimit(entityType, 1);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+        return CompletableFuture.completedFuture(false);
     }
 
     @Override

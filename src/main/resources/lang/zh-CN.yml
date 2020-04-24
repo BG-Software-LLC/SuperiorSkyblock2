@@ -36,6 +36,9 @@ CHANGED_CROP_GROWTH: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速�
 CHANGED_CROP_GROWTH_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新农作物生长速度.'
 CHANGED_CROP_GROWTH_NAME: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速度为 &b{0} &7倍.'
 CHANGED_DISCORD: '&e&l岛屿 | &7岛屿Discord频道已设置为 &b{0}.'
+CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
 CHANGED_ISLAND_SIZE: '&e&l岛屿升级 | &7成功升级{0}的岛屿边界范围！'
 CHANGED_ISLAND_SIZE_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的边界范围！'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&o玩家可以在岛外建造，所以岛屿的大小没有影响，你可以在配置文件中关闭此功能，这样岛屿的大小会再次受到影响.'
@@ -62,6 +65,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: 数量
 COMMAND_ARGUMENT_DISCORD: Discord频道...
 COMMAND_ARGUMENT_EMAIL: 邮箱
+COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_ISLAND_NAME: 岛屿名
 COMMAND_ARGUMENT_ISLAND_ROLE: 岛屿职位
 COMMAND_ARGUMENT_LEADER: 领导者
@@ -121,6 +125,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 更新其他玩家岛屿的农作物生长速度.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 更新其他玩家的岛屿解散次数.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 把一个岛屿转让给他人.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 更新其他玩家岛屿的怪物掉落倍率.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 为所有岛屿更新职位的权限.
@@ -243,6 +248,7 @@ IGNORED_ISLAND: '&e&l岛屿 | &b{0} &7的岛屿现在不再被统计进入排行
 IGNORED_ISLAND_NAME: '&e&l岛屿 | &7岛屿 &b{0} 不再被统计进入排行榜.'
 INTERACT_OUTSIDE_ISLAND: '&c&l错误 | &7你无法对边界范围外的东西操作.'
 INVALID_AMOUNT: '&c&l错误 | &7未知数量 &b{0}.'
+INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&l错误 | &7未知世界 &b{0}.'
 INVALID_ISLAND: '&c&l错误 | &7你还没有岛屿哦！'
 INVALID_ISLAND_LOCATION: '&c&l错误 | &7他还没有岛屿.'
@@ -296,6 +302,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&l岛屿 | &7岛屿方块限制:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+  &e&lIsland | &7Entities Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&l岛屿 | &7农作物生长速度: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&l岛屿 | &7掉落物概率: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |

@@ -44,6 +44,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
@@ -94,7 +95,7 @@ import java.util.stream.Collectors;
 public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
-    public static final int NO_BLOCK_LIMIT = -1;
+    public static final int NO_LIMIT = -1;
     public static final int BLOCKS_UPDATE_AMOUNT = 100;
     private static int blocksUpdateCounter = 0;
 
@@ -129,6 +130,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
+    private final SyncedObject<Map<EntityType, Integer>> entityLimits = SyncedObject.of(new HashMap<>(plugin.getSettings().defaultEntityLimits));
     private final Registry<String, WarpData> warps = Registry.createRegistry();
     private final SyncedObject<BigDecimalFormatted> islandBank = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
@@ -181,6 +183,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
+        IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -1745,7 +1748,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getOrDefault(key, NO_BLOCK_LIMIT));
+        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getOrDefault(key, NO_LIMIT));
 
         for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
             blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getBlockLimit(key));
@@ -1755,7 +1758,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getExactBlockLimit(Key key) {
-        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getRaw(key, NO_BLOCK_LIMIT));
+        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getRaw(key, NO_LIMIT));
 
         for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
             blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getExactBlockLimit(key));
@@ -1771,7 +1774,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setBlockLimit(Key key, int limit) {
         blockLimits.write(blockLimits -> {
-            if(limit <= NO_BLOCK_LIMIT)
+            if(limit <= NO_LIMIT)
                 blockLimits.removeRaw(key);
             else
                 blockLimits.put(key, limit);
@@ -1793,14 +1796,84 @@ public final class SIsland extends DatabaseObject implements Island {
         int blockLimit = getExactBlockLimit(key);
 
         //Checking for the specific provided key.
-        if(blockLimit > SIsland.NO_BLOCK_LIMIT)
+        if(blockLimit > SIsland.NO_LIMIT)
             return getBlockCount(key) + amount > blockLimit;
 
         //Getting the global key values.
         key = Key.of(key.toString().split(":")[0]);
         blockLimit = getBlockLimit(key);
 
-        return blockLimit > SIsland.NO_BLOCK_LIMIT && getBlockCount(key) + amount > blockLimit;
+        return blockLimit > SIsland.NO_LIMIT && getBlockCount(key) + amount > blockLimit;
+    }
+
+    @Override
+    public int getEntityLimit(EntityType entityType) {
+        int entityLimit = entityLimits.readAndGet(entityLimits -> entityLimits.getOrDefault(entityType, NO_LIMIT));
+
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            entityLimit = Math.max(entityLimit, getUpgradeLevel(upgrade).getEntityLimit(entityType));
+
+        return entityLimit;
+    }
+
+    @Override
+    public Map<EntityType, Integer> getEntitiesLimits() {
+        return this.entityLimits.readAndGet(_entitiesLimits -> _entitiesLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getEntityLimit)));
+    }
+
+    @Override
+    public void setEntityLimit(EntityType entityType, int limit) {
+        entityLimits.write(entityLimits -> {
+            if(limit <= NO_LIMIT)
+                entityLimits.remove(entityType);
+            else
+                entityLimits.put(entityType, limit);
+        });
+
+        Query.ISLAND_SET_ENTITY_LIMITS.getStatementHolder()
+                .setString(IslandSerializer.serializeEntityLimits(entityLimits))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
+        return hasReachedEntityLimit(entityType, 1);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+        int entityLimit = getEntityLimit(entityType);
+
+        for(World.Environment environment : World.Environment.values()){
+            try{
+                chunks.addAll(getAllChunksAsync(environment, true, true, (Consumer<Chunk>) null));
+            }catch(Exception ignored){}
+        }
+
+        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
+
+        Executor.async(() -> {
+            int amountOfEntities = 0;
+
+            if(entityLimit <= SIsland.NO_LIMIT){
+                completableFuture.complete(false);
+                return;
+            }
+
+            for(CompletableFuture<Chunk> completableChunk : chunks){
+                try{
+                    Chunk chunk = completableChunk.get();
+                    amountOfEntities += Arrays.stream(chunk.getEntities())
+                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType())).count();
+                }catch(Exception ignored){}
+            }
+
+            completableFuture.complete(amountOfEntities + amount - 1 > entityLimit);
+        });
+
+        return completableFuture;
     }
 
     @Override
@@ -2346,6 +2419,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
+                .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2395,6 +2469,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
+                .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .execute(async);
     }
 

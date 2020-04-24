@@ -36,6 +36,9 @@ CHANGED_CROP_GROWTH: '&e&lAméliorations | &7Vous avez changé le multiplicateur
 CHANGED_CROP_GROWTH_ALL: '&e&lAméliorations | &7Vous avez changé le multiplicateur de croissance des cultures de toutes les îles.'
 CHANGED_CROP_GROWTH_NAME: '&e&lAméliorations | &7Vous avez changé le multiplicateur de croissance des cultures de {0}.'
 CHANGED_DISCORD: '&e&lIle | &7Vous avez changé le Discord de l''île sur {0}.'
+CHANGED_ENTITY_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}''s island.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for all the islands.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of {0} entities for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lAméliorations | &7Vous avez changé la taille de l''île de {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAméliorations | &7Vous avez changé la taille des îles {0}.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oLes joueurs peuvent construire à l''extérieur de leurs îles, la taille de l''île n''a donc aucune utilité. Vous pouvez activer ou désactiver cette fonctionnalité dans les configurations afin que la taille de l''île soit de nouveau utile.'
@@ -62,6 +65,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
+COMMAND_ARGUMENT_ENTITY: entity
 COMMAND_ARGUMENT_TIME: 'temps'
 COMMAND_ARGUMENT_ISLAND_NAME: nom-de-l'ile
 COMMAND_ARGUMENT_ISLAND_ROLE: rôle-sur-l'île
@@ -122,6 +126,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Définir une limite de blocs pour l''île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Définir le multiplicateur de croissance des cultures de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Définir le nombre de suppression d'îles d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Transferer une île à quelqu'un d'autre.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Définir le multiplicateur de drops de mobs de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Définir un rôle nécéssaire à une permission pour toutes les îles.
@@ -243,6 +248,7 @@ IGNORED_ISLAND: '&e&lIle | &7L''île de {0} est désormais masquée du top des �
 IGNORED_ISLAND_NAME: '&e&lIle | &7L''île {0} est désormais masquée du top des îles.'
 INTERACT_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas interagir en dehors de votre île.'
 INVALID_AMOUNT: '&c&lErreur | &7Nombre invalide {0}.'
+INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_SCHEMATIC: '&c&lErrEUR | &7Il n''existe aucun schematic portant le nom {0}.'
 INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'
 INVALID_ISLAND: '&c&lErreur | &7Vous n''avez pas d''île.'
@@ -296,6 +302,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIle | &7Limite de blocs:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIle | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
+  &e&lIsland | &7Entities Limits:
+  {0}
+ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Cultures: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Drops: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |

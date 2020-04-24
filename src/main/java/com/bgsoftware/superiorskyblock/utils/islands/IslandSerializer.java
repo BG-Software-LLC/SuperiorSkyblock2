@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -75,6 +76,17 @@ public final class IslandSerializer {
         blocks.keySet().forEach(blockKey ->
                 blockLimits.append(",").append(blockKey).append("=").append(blocks.get(blockKey)));
         return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
+    }
+
+    public static String serializeEntityLimits(SyncedObject<Map<EntityType, Integer>> entities){
+        return entities.readAndGet(IslandSerializer::serializeEntityLimits);
+    }
+
+    public static String serializeEntityLimits(Map<EntityType, Integer> entities){
+        StringBuilder entityLimits = new StringBuilder();
+        entities.keySet().forEach(entityType ->
+                entityLimits.append(",").append(entityType).append("=").append(entities.get(entityType)));
+        return entityLimits.length() == 0 ? "" : entityLimits.toString().substring(1);
     }
 
     public static String serializeUpgrades(Registry<String, Integer> upgrades){
