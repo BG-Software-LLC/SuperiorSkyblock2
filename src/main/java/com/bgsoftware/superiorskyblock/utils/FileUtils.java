@@ -24,7 +24,7 @@ import java.util.List;
 
 public final class FileUtils {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static ItemBuilder getItemStack(String fileName, ConfigurationSection section){
         if(section == null || !section.contains("type"))
@@ -37,7 +37,7 @@ public final class FileUtils {
             type = Material.valueOf(section.getString("type"));
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
-            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & database sections!");
+            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
             return null;
         }
 
