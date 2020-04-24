@@ -36,7 +36,6 @@ public final class CmdAdminSetBlockLimit implements ISuperiorCommand {
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
     }
