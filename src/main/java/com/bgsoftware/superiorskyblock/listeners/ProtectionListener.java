@@ -548,7 +548,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPearlTeleport(PlayerTeleportEvent e){
-        if(e.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL)
+        if(e.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL || !plugin.getGrid().isIslandsWorld(e.getTo().getWorld()))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
