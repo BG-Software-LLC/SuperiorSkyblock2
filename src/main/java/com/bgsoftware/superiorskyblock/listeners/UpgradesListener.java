@@ -4,14 +4,15 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,7 +33,9 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public final class UpgradesListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final Set<UUID> alreadySet = new HashSet<>();
+    private final Set<UUID> noRightClickTwice = new HashSet<>();
+    private final SuperiorSkyblockPlugin plugin;
 
     public UpgradesListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -41,8 +44,6 @@ public final class UpgradesListener implements Listener {
     /*
      *   SPAWNER RATES
      */
-
-    private Set<UUID> alreadySet = new HashSet<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(SpawnerSpawnEvent e) {
@@ -112,12 +113,10 @@ public final class UpgradesListener implements Listener {
      *   HOPPERS LIMIT
      */
 
-    private Set<UUID> noRightClickTwice = new HashSet<>();
-
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHopperCartPlaceMonitor(PlayerInteractEvent e){
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || noRightClickTwice.contains(e.getPlayer().getUniqueId()) ||
-                !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null || e.getItem().getType() != Material.HOPPER_MINECART)
+                !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null || !e.getItem().getType().name().contains("MINECART"))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
@@ -128,12 +127,32 @@ public final class UpgradesListener implements Listener {
         noRightClickTwice.add(e.getPlayer().getUniqueId());
         Executor.sync(() -> noRightClickTwice.remove(e.getPlayer().getUniqueId()), 2L);
 
-        island.handleBlockPlace(Key.of("HOPPER"), 1);
+        switch (e.getItem().getType().name()){
+            case "HOPPER_MINECART":
+                island.handleBlockPlace(Key.of("HOPPER"), 1);
+                break;
+            case "COMMAND_MINECART":
+            case "COMMAND_BLOCK_MINECART":
+                island.handleBlockPlace(Key.of(ServerVersion.isAtLeast(ServerVersion.v1_13) ? "COMMAND_BLOCK" : "COMMAND"), 1);
+                break;
+            case "EXPLOSIVE_MINECART":
+            case "TNT_MINECART":
+                island.handleBlockPlace(Key.of("TNT"), 1);
+                break;
+            case "POWERED_MINECART":
+            case "FURNACE_MINECART":
+                island.handleBlockPlace(Key.of("FURNACE"), 1);
+                break;
+            case "STORAGE_MINECART":
+            case "CHEST_MINECART":
+                island.handleBlockPlace(Key.of("CHEST"), 1);
+                break;
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onHopperCartBreakMonitor(VehicleDestroyEvent e){
-        if(!(e.getVehicle() instanceof HopperMinecart))
+        if(!(e.getVehicle() instanceof Minecart))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
@@ -141,7 +160,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(Key.of("HOPPER"), 1);
+        island.handleBlockBreak(plugin.getNMSBlocks().getMinecartBlock((Minecart) e.getVehicle()), 1);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

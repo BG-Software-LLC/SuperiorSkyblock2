@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
@@ -9,7 +10,9 @@ import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import java.util.List;
 
@@ -50,6 +53,11 @@ public interface NMSBlocks {
 
     default byte getData(int combinedId) {
         return (byte) (combinedId >> 12 & 15);
+    }
+
+    default Key getMinecartBlock(Minecart minecart){
+        MaterialData materialData = minecart.getDisplayBlock();
+        return Key.of(materialData.getItemType(), materialData.getData());
     }
 
 }

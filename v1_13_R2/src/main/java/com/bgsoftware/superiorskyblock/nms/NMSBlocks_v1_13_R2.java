@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
@@ -53,6 +54,7 @@ import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -169,9 +171,14 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
     @Override
     public int compareMaterials(Material o1, Material o2) {
-        int firstMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData());
-        int secondMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o2).getBlockData());
-        return Integer.compare(firstMaterial, secondMaterial);
+        if(o1.isBlock() && o2.isBlock()) {
+            int firstMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData());
+            int secondMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o2).getBlockData());
+            return Integer.compare(firstMaterial, secondMaterial);
+        }
+        else{
+            return o1.name().compareTo(o2.name());
+        }
     }
 
     @Override
@@ -293,6 +300,11 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     @Override
     public byte getData(int combinedId) {
         return 0;
+    }
+
+    @Override
+    public Key getMinecartBlock(Minecart minecart) {
+        return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
     }
 
     private NonNullList<ItemStack> getItems(Object tileEntityInventoryHolder){
