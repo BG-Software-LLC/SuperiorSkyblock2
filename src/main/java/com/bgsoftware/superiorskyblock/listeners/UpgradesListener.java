@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
-import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -114,9 +113,10 @@ public final class UpgradesListener implements Listener {
      */
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onHopperCartPlaceMonitor(PlayerInteractEvent e){
+    public void onCartPlaceMonitor(PlayerInteractEvent e){
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || noRightClickTwice.contains(e.getPlayer().getUniqueId()) ||
-                !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null || !e.getItem().getType().name().contains("MINECART"))
+                !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null ||
+                !e.getItem().getType().name().contains("MINECART"))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
@@ -151,7 +151,7 @@ public final class UpgradesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onHopperCartBreakMonitor(VehicleDestroyEvent e){
+    public void onCartBreakMonitor(VehicleDestroyEvent e){
         if(!(e.getVehicle() instanceof Minecart))
             return;
 
@@ -179,10 +179,10 @@ public final class UpgradesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onHopperCartPlace(PlayerInteractEvent e) {
+    public void onCartPlace(PlayerInteractEvent e) {
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || noRightClickTwice.contains(e.getPlayer().getUniqueId()) ||
                 !e.getClickedBlock().getType().name().contains("RAIL") || e.getItem() == null ||
-                e.getItem().getType() != Material.HOPPER_MINECART)
+                !e.getItem().getType().name().contains("MINECART"))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
@@ -190,9 +190,33 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        if(island.hasReachedBlockLimit(Key.of("HOPPER"))){
+        Key key = null;
+
+        switch (e.getItem().getType().name()){
+            case "HOPPER_MINECART":
+                key = Key.of("HOPPER");
+                break;
+            case "COMMAND_MINECART":
+            case "COMMAND_BLOCK_MINECART":
+                key = Key.of(ServerVersion.isAtLeast(ServerVersion.v1_13) ? "COMMAND_BLOCK" : "COMMAND");
+                break;
+            case "EXPLOSIVE_MINECART":
+            case "TNT_MINECART":
+                key = Key.of("TNT");
+                break;
+            case "POWERED_MINECART":
+            case "FURNACE_MINECART":
+                key = Key.of("FURNACE");
+                break;
+            case "STORAGE_MINECART":
+            case "CHEST_MINECART":
+                key = Key.of("CHEST");
+                break;
+        }
+
+        if(key != null && island.hasReachedBlockLimit(key)){
             e.setCancelled(true);
-            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format("hopper"));
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(key.toString().split(":")[0]));
         }
     }
 
