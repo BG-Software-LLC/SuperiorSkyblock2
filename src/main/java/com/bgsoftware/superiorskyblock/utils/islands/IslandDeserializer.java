@@ -31,6 +31,9 @@ public final class IslandDeserializer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static void deserializePlayers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync){
+        if(members == null)
+            return;
+
         membersSetSync.write(membersSet -> {
             for(String uuid : members.split(",")) {
                 try {
@@ -41,6 +44,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializePermissions(String permissions, Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> rolePermissions, Island island){
+        if(permissions == null)
+            return;
+
         for(String entry : permissions.split(",")) {
             try {
                 String[] sections = entry.split("=");
@@ -68,6 +74,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeUpgrades(String upgrades, Registry<String, Integer> upgradesMap){
+        if(upgrades == null)
+            return;
+
         for(String entry : upgrades.split(",")) {
             try {
                 String[] sections = entry.split("=");
@@ -77,6 +86,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeWarps(String warps, Registry<String, SIsland.WarpData> warpsMap){
+        if(warps == null)
+            return;
+
         for(String entry : warps.split(";")) {
             try {
                 String[] sections = entry.split("=");
@@ -87,6 +99,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeBlockCounts(String blocks, Island island){
+        if(blocks == null)
+            return;
+
         for(String entry : blocks.split(";")){
             try{
                 String[] sections = entry.split("=");
@@ -96,6 +111,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeBlockLimits(String blocks, SyncedObject<KeyMap<Integer>> blockLimitsSync){
+        if(blocks == null)
+            return;
+
         blockLimitsSync.write(blockLimits -> {
             for(String limit : blocks.split(",")){
                 try {
@@ -107,6 +125,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeEntityLimits(String entities, SyncedObject<Map<EntityType, Integer>> entityLimitsSync){
+        if(entities == null)
+            return;
+
         entityLimitsSync.write(entityLimits -> {
             for(String limit : entities.split(",")){
                 try {
@@ -118,6 +139,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeRatings(String ratings, Registry<UUID, Rating> ratingsMap){
+        if(ratings == null)
+            return;
+
         for(String entry : ratings.split(";")){
             try{
                 String[] sections = entry.split("=");
@@ -127,6 +151,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeMissions(String missions, Registry<Mission, Integer> completedMissions){
+        if(missions == null)
+            return;
+
         for(String mission : missions.split(";")){
             String[] missionSections = mission.split("=");
             int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
@@ -137,6 +164,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeSettings(String settings, Registry<IslandFlag, Byte> islandSettings){
+        if(settings == null)
+            return;
+
         for(String setting : settings.split(";")){
             try {
                 if (setting.contains("=")) {
@@ -151,6 +181,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeGenerators(String generator, SyncedObject<KeyMap<Integer>> cobbleGeneratorSync){
+        if(generator == null)
+            return;
+
         cobbleGeneratorSync.write(cobbleGenerator -> {
             for(String limit : generator.split(",")){
                 try {
@@ -162,6 +195,9 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeLocations(String locationParam, Registry<World.Environment, Location> locations){
+        if(locationParam == null)
+            return;
+        
         if(!locationParam.contains("=")){
             locationParam = "normal=" + locationParam;
         }
