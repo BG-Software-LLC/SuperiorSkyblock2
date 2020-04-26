@@ -85,4 +85,8 @@ public final class ProvidersHandler implements ProvidersManager {
         return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
     }
 
+    public boolean isWildStacker(){
+        return spawnersProvider instanceof BlocksProvider_SilkSpawners;
+    }
+
 }
