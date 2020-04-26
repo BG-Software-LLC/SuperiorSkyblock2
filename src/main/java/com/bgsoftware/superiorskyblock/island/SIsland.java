@@ -973,7 +973,7 @@ public final class SIsland extends DatabaseObject implements Island {
         beingRecalculated.set(true);
 
         List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
-        BlocksProvider_WildStacker.WildStackerSnapshot snapshot = Bukkit.getPluginManager().isPluginEnabled("WildStacker") ?
+        BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
                 new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
         Consumer<Chunk> onChunkLoad = snapshot == null ? null : snapshot::cacheChunk;
