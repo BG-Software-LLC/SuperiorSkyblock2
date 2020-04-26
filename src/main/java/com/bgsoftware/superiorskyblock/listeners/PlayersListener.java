@@ -40,6 +40,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -51,6 +52,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -75,6 +77,22 @@ public final class PlayersListener implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, () ->
                     sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion() + buildName), 5L);
         }
+    }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent e){
+        SuperiorPlayer duplicatePlayer = SSuperiorPlayer.of(e.getPlayer().getName());
+        SSuperiorPlayer superiorPlayer = (SSuperiorPlayer) SSuperiorPlayer.of(e.getPlayer());
+        if(duplicatePlayer != null && duplicatePlayer != superiorPlayer) {
+            SuperiorSkyblockPlugin.log("Changing UUID of " + e.getPlayer().getName() + " to " + superiorPlayer.getUniqueId());
+            plugin.getPlayers().replacePlayers(duplicatePlayer, superiorPlayer);
+        }
+    }
+
+    private String parseNames(List<SuperiorPlayer> players){
+        StringBuilder stringBuilder = new StringBuilder();
+        players.forEach(superiorPlayer -> stringBuilder.append(", ").append(superiorPlayer.getName()));
+        return stringBuilder.length() <= 1 ? "" : stringBuilder.substring(2);
     }
 
     @EventHandler

@@ -53,6 +53,7 @@ public enum Query {
     PLAYER_SET_TOGGLED_BORDER("UPDATE {prefix}players SET toggledBorder=? WHERE player=?;"),
     PLAYER_UPDATE("UPDATE {prefix}players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=?,missions=?,language=?,toggledBorder=? WHERE player=?;"),
     PLAYER_INSERT("INSERT INTO {prefix}players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions,language,toggledBorder) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);"),
+    PLAYER_DELETE("DELETE FROM {prefix}players WHERE player=?;"),
 
     STACKED_BLOCKS_UPDATE("UPDATE {prefix}stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
     STACKED_BLOCKS_INSERT("INSERT INTO {prefix}stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),

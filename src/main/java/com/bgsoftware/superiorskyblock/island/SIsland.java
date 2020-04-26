@@ -1244,6 +1244,34 @@ public final class SIsland extends DatabaseObject implements Island {
         return true;
     }
 
+    public void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer){
+        boolean executeUpdate = false;
+
+        if(owner == originalPlayer) {
+            executeDeleteStatement(true);
+            owner = newPlayer;
+            getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
+            executeInsertStatement(true);
+            plugin.getGrid().transferIsland(originalPlayer.getUniqueId(), owner.getUniqueId());
+        }
+        else if(isMember(originalPlayer)){
+            members.write(members -> {
+                members.remove(originalPlayer);
+                members.add(newPlayer);
+            });
+            executeUpdate = true;
+        }
+
+        PlayerPermissionNode playerPermissionNode = playerPermissions.remove(originalPlayer);
+        if(playerPermissionNode != null){
+            playerPermissions.add(newPlayer, playerPermissionNode);
+            executeUpdate = true;
+        }
+
+        if(executeUpdate)
+            executeUpdateStatement(true);
+    }
+
     @Override
     public void sendMessage(String message, UUID... ignoredMembers){
         List<UUID> ignoredList = Arrays.asList(ignoredMembers);

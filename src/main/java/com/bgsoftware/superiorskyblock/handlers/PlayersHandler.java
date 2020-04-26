@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -23,13 +25,12 @@ public final class PlayersHandler implements PlayersManager {
 
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
+    private static final Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
+    private static final Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
+    private static final Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
 
-    private static Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
-    private static Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
-    private static Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
-
-    private static Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
     private static int lastRole = Integer.MIN_VALUE;
 
     public PlayersHandler(){
@@ -113,6 +114,15 @@ public final class PlayersHandler implements PlayersManager {
         UUID player = UUID.fromString(resultSet.getString("player"));
         SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         players.add(player, superiorPlayer);
+    }
+
+    public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer){
+        players.remove(originPlayer.getUniqueId());
+
+        for(Island island : plugin.getGrid().getIslands())
+            ((SIsland) island).replacePlayers(originPlayer, newPlayer);
+
+        ((SSuperiorPlayer) originPlayer).merge((SSuperiorPlayer) newPlayer);
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPlayer {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Registry<Mission, Integer> completedMissions = Registry.createRegistry();
     private final UUID player;
@@ -621,6 +621,25 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         this.immuneToTeleport = immuneToTeleport;
     }
 
+    public void merge(SSuperiorPlayer other){
+        other.name = name;
+        other.playerRole = playerRole;
+        other.userLocale = userLocale;
+        other.worldBorderEnabled |= worldBorderEnabled;
+        other.blocksStackerEnabled |= worldBorderEnabled;
+        other.schematicModeEnabled |= schematicModeEnabled;
+        other.bypassModeEnabled |= bypassModeEnabled;
+        other.teamChatEnabled |= teamChatEnabled;
+        other.toggledPanel |= toggledPanel;
+        other.islandFly |= islandFly;
+        other.adminSpyEnabled |= adminSpyEnabled;
+        other.disbands = disbands;
+        other.borderColor = borderColor;
+        other.lastTimeStatus = lastTimeStatus;
+        other.executeUpdateStatement(true);
+        executeDeleteStatement(true);
+    }
+
     @Override
     public void executeUpdateStatement(boolean async) {
         Query.PLAYER_UPDATE.getStatementHolder()
@@ -661,7 +680,9 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void executeDeleteStatement(boolean async) {
-        throw new UnsupportedOperationException("You cannot use delete statement on superior players.");
+        Query.PLAYER_DELETE.getStatementHolder()
+                .setString(player.toString())
+                .execute(async);
     }
 
     @Override
