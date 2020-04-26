@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.utils;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,19 +18,24 @@ public final class LocationUtils {
     }
 
     public static Location getLocation(String location){
-        if(location == null || location.isEmpty())
-            return null;
+        try {
+            if (location == null || location.isEmpty())
+                return null;
 
-        String[] sections = location.split(",");
+            String[] sections = location.split(",");
 
-        World world = Bukkit.getWorld(sections[0]);
-        double x = Double.parseDouble(sections[1]);
-        double y = Double.parseDouble(sections[2]);
-        double z = Double.parseDouble(sections[3]);
-        float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
-        float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
+            World world = Bukkit.getWorld(sections[0]);
+            double x = Double.parseDouble(sections[1]);
+            double y = Double.parseDouble(sections[2]);
+            double z = Double.parseDouble(sections[3]);
+            float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
+            float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
 
-        return new Location(world, x, y, z, yaw, pitch);
+            return new Location(world, x, y, z, yaw, pitch);
+        }catch(Exception ex){
+            SuperiorSkyblockPlugin.log("Error while parsing location: " + location);
+            throw ex;
+        }
     }
 
     public static String getLocation(Location location){
@@ -57,6 +62,10 @@ public final class LocationUtils {
 
     public static Location getRelative(Location location, BlockFace face){
         return location.clone().add(face.getModX(), face.getModY(), face.getModZ());
+    }
+
+    public static Location getBlockLocation(Location location){
+        return new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
 }
