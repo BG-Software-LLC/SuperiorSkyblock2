@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -34,6 +35,9 @@ public final class ProvidersHandler implements ProvidersManager {
 
             if(Bukkit.getPluginManager().isPluginEnabled("JetsMinions"))
                 JetsMinionsHook.register(plugin);
+
+            if(Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer"))
+                SkinsRestorerHook.register(plugin);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
@@ -56,7 +57,8 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final Set<UUID> noFallDamage = new HashSet<>();
+    private final SuperiorSkyblockPlugin plugin;
     private final String buildName;
 
     public PlayersListener(SuperiorSkyblockPlugin plugin){
@@ -87,7 +89,13 @@ public final class PlayersListener implements Listener {
         if(!superiorPlayer.getName().equals(e.getPlayer().getName())){
             superiorPlayer.updateName();
         }
-        plugin.getNMSAdapter().setSkinTexture(superiorPlayer);
+
+        if(SkinsRestorerHook.isEnabled()){
+            SkinsRestorerHook.setSkinTexture(superiorPlayer);
+        }
+        else {
+            plugin.getNMSAdapter().setSkinTexture(superiorPlayer);
+        }
 
         Island island = superiorPlayer.getIsland();
 
@@ -310,8 +318,6 @@ public final class PlayersListener implements Listener {
         if(superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null)
             Locale.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
     }
-
-    private Set<UUID> noFallDamage = new HashSet<>();
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e){

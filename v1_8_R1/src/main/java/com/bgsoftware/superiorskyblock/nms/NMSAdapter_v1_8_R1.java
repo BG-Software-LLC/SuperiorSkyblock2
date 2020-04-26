@@ -48,7 +48,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
-    private SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -114,7 +114,7 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     public void setSkinTexture(SuperiorPlayer superiorPlayer) {
         EntityPlayer entityPlayer = ((CraftPlayer) superiorPlayer.asPlayer()).getHandle();
         Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
-        optional.ifPresent(property -> superiorPlayer.setTextureValue(property.getValue()));
+        optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
     }
 
     @Override

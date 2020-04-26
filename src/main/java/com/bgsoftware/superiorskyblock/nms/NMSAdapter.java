@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.mojang.authlib.properties.Property;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -29,6 +30,10 @@ public interface NMSAdapter {
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);
+
+    default void setSkinTexture(SuperiorPlayer superiorPlayer, Property property){
+        superiorPlayer.setTextureValue(property.getValue());
+    }
 
     default Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title){
         return defaultHolder;
