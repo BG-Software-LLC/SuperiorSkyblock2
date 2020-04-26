@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -57,7 +58,7 @@ public final class CmdAdminPurge implements ISuperiorCommand {
         }
 
         else {
-            long timeToPurge = Long.parseLong(args[2]), currentTime = System.currentTimeMillis() / 1000;
+            long timeToPurge = StringUtils.parseLong(args[2]), currentTime = System.currentTimeMillis() / 1000;
 
             List<Island> islands = plugin.getGrid().getIslands().stream().filter(island -> {
                 long lastTimeUpdate = island.getLastTimeUpdate();

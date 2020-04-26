@@ -209,4 +209,12 @@ public final class StringUtils {
         return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
     }
 
+    public static long parseLong(String str){
+        try{
+            return Long.parseLong(str);
+        }catch(Exception ex){
+            return 0;
+        }
+    }
+
 }
