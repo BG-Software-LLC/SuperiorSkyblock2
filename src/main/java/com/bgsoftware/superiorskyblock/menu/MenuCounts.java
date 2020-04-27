@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,6 +84,10 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
                     .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
                     .replaceAll("{0}", StringUtils.format(materialName))
                     .replaceAll("{1}", amount + "")
+                    .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockWorth(blockKey).multiply(BigDecimal.valueOf(amount))))
+                    .replaceAll("{3}", StringUtils.format(plugin.getBlockValues().getBlockLevel(blockKey).multiply(BigDecimal.valueOf(amount))))
+                    .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(blockKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                    .replaceAll("{5}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(blockKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
                     .build(superiorPlayer);
 
             itemStack.setAmount(Math.max(1, Math.min(64, amount)));
