@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -47,10 +48,12 @@ public final class ChunksProvider {
 
                 Chunk chunk = pair.getX().loadChunk();
 
-                if(pair.getZ() != null)
-                    pair.getZ().accept(chunk);
-
-                pair.getY().complete(chunk);
+                if(!Bukkit.isPrimaryThread()){
+                    Executor.sync(() -> finishLoad(pair, chunk));
+                }
+                else{
+                    finishLoad(pair, chunk);
+                }
             }
         };
 
@@ -61,6 +64,13 @@ public final class ChunksProvider {
         else{
             return Bukkit.getScheduler().runTaskTimer(plugin, loadChunks, 1L, 1L);
         }
+    }
+
+    private static void finishLoad(BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>> pair, Chunk chunk){
+        if(pair.getZ() != null)
+            pair.getZ().accept(chunk);
+
+        pair.getY().complete(chunk);
     }
 
 }
