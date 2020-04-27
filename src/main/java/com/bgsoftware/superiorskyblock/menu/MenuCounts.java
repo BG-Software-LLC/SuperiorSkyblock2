@@ -26,14 +26,14 @@ import java.util.stream.Collectors;
 
 public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
-    private static Map<String, String> blocksToItems = new HashMap<>();
+    private static final Map<String, String> blocksToItems = new HashMap<>();
 
     static {
         blocksToItems.put("SIGN_POST", "SIGN");
         blocksToItems.put("SUGAR_CANE_BLOCK", "SUGAR_CANE");
     }
 
-    private Island island;
+    private final Island island;
 
     private MenuCounts(SuperiorPlayer superiorPlayer, Island island){
         super("menuCounts", superiorPlayer);
@@ -69,8 +69,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
             ItemBuilder itemBuilder;
 
             if (blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1) {
-                itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(
-                        new ItemStack(Materials.PLAYER_HEAD.toBukkitType()),
+                itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(),
                         HeadUtils.getTexture(keySections[1])));
                 materialName = keySections[1] + "_SPAWNER";
             } else {
