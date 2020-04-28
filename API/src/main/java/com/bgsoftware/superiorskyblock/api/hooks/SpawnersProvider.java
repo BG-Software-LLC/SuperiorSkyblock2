@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 public interface SpawnersProvider {
 
-    Pair<Integer, EntityType> getSpawner(Location location);
+    Pair<Integer, String> getSpawner(Location location);
 
-    EntityType getSpawnerType(ItemStack itemStack);
+    String getSpawnerType(ItemStack itemStack);
 
 }

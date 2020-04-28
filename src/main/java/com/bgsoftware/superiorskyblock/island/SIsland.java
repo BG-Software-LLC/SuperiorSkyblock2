@@ -1031,7 +1031,7 @@ public final class SIsland extends DatabaseObject implements Island {
                                     int blockCount = plugin.getGrid().getBlockAmount(location);
 
                                     if(blockKey.toString().contains("SPAWNER")){
-                                        Pair<Integer, EntityType> entry = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
+                                        Pair<Integer, String> entry = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
                                         blockCount = entry.getKey();
                                         if(entry.getValue() == null){
                                             spawnersToCheck.add(new Pair<>(location, blockCount));

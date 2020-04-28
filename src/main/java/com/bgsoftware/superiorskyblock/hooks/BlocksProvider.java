@@ -10,13 +10,13 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 public interface BlocksProvider extends SpawnersProvider {
 
-    default EntityType getSpawnerType(ItemStack itemStack){
+    default String getSpawnerType(ItemStack itemStack){
         if(itemStack.getItemMeta() instanceof BlockStateMeta){
             CreatureSpawner creatureSpawner = (CreatureSpawner) ((BlockStateMeta) itemStack.getItemMeta()).getBlockState();
-            return creatureSpawner.getSpawnedType();
+            return creatureSpawner.getSpawnedType().name();
         }
 
-        return EntityType.PIG;
+        return "PIG";
     }
 
     default Pair<Integer, ItemStack> getBlock(Location location){

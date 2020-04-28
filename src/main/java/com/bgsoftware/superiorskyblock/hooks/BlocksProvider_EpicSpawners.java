@@ -14,7 +14,6 @@ import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
 import com.songoda.epicspawners.api.events.SpawnerPlaceEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,7 +33,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
     }
 
     @Override
-    public Pair<Integer, EntityType> getSpawner(Location location) {
+    public Pair<Integer, String> getSpawner(Location location) {
         int blockCount = -1;
         if(Bukkit.isPrimaryThread()){
             blockCount = instance.getSpawnerManager().getSpawnerFromWorld(location).getFirstStack().getStackSize();
@@ -43,8 +42,8 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
     }
 
     @Override
-    public EntityType getSpawnerType(ItemStack itemStack) {
-        return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0);
+    public String getSpawnerType(ItemStack itemStack) {
+        return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0).name();
     }
 
     @SuppressWarnings("unused")

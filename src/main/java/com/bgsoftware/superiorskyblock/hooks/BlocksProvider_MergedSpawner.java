@@ -8,7 +8,6 @@ import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -26,7 +25,7 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
     }
 
     @Override
-    public Pair<Integer, EntityType> getSpawner(Location location) {
+    public Pair<Integer, String> getSpawner(Location location) {
         int blockCount = -1;
         if(Bukkit.isPrimaryThread()){
             MergedSpawnerAPI spawnerAPI = MergedSpawnerAPI.getInstance();
@@ -36,8 +35,8 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
     }
 
     @Override
-    public EntityType getSpawnerType(ItemStack itemStack) {
-        return MergedSpawnerAPI.getInstance().getEntityType(itemStack);
+    public String getSpawnerType(ItemStack itemStack) {
+        return MergedSpawnerAPI.getInstance().getEntityType(itemStack).name();
     }
 
     @SuppressWarnings("unused")

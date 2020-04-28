@@ -42,7 +42,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
     }
 
     @Override
-    public Pair<Integer, EntityType> getSpawner(Location location) {
+    public Pair<Integer, String> getSpawner(Location location) {
         throw new UnsupportedOperationException("Unsupported Operation");
     }
 
@@ -74,10 +74,12 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             chunkSnapshots.delete();
         }
 
-        public Pair<Integer, EntityType> getSpawner(Location location) {
+        public Pair<Integer, String> getSpawner(Location location) {
             String id = getId(location);
-            if(chunkSnapshots.containsKey(id))
-                return new Pair<>(chunkSnapshots.get(id).getStackedSpawner(location));
+            if(chunkSnapshots.containsKey(id)) {
+                Map.Entry<Integer, EntityType> entry = chunkSnapshots.get(id).getStackedSpawner(location);
+                return new Pair<>(entry.getKey(), entry.getValue().name());
+            }
 
             throw new RuntimeException("Chunk " + id + " is not cached.");
         }

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,7 +18,7 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
 
     private static boolean registered = false;
 
-    private Main main;
+    private final Main main;
 
     public BlocksProvider_PvpingSpawners(){
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
@@ -30,7 +29,7 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
     }
 
     @Override
-    public Pair<Integer, EntityType> getSpawner(Location location) {
+    public Pair<Integer, String> getSpawner(Location location) {
         int blockCount = -1;
         if(Bukkit.isPrimaryThread()){
             StackedSpawner stackedSpawner = main.getProps().getStackedSpawner(main, (CreatureSpawner) location.getBlock().getState());

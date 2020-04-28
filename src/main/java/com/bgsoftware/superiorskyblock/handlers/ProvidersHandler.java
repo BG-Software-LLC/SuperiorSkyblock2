@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
@@ -21,7 +22,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 public final class ProvidersHandler implements ProvidersManager {
@@ -58,6 +58,9 @@ public final class ProvidersHandler implements ProvidersManager {
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
                     setSpawnersProvider(new BlocksProvider_EpicSpawners());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
+                        (spawnersProvider.equalsIgnoreCase("AdvancedSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_AdvancedSpawners());
                 } else {
                     setSpawnersProvider(new BlocksProvider_Default());
                 }
@@ -73,7 +76,7 @@ public final class ProvidersHandler implements ProvidersManager {
         this.spawnersProvider = spawnersProvider;
     }
 
-    public Pair<Integer, EntityType> getSpawner(Location location){
+    public Pair<Integer, String> getSpawner(Location location){
         return spawnersProvider.getSpawner(location);
     }
 

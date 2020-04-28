@@ -7,7 +7,7 @@ import org.bukkit.entity.EntityType;
 public class BlocksProvider_Default implements BlocksProvider {
 
     @Override
-    public Pair<Integer, EntityType> getSpawner(Location location) {
+    public Pair<Integer, String> getSpawner(Location location) {
         return new Pair<>(1, null);
     }
 

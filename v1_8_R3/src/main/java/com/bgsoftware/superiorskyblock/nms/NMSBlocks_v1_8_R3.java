@@ -52,7 +52,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
 public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
@@ -326,7 +325,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         }
 
         Executor.sync(() -> blocksToTick.forEach(pair ->
-                pair.getZ().getBlock().a(pair.getX(), pair.getY(), pair.getZ(), ThreadLocalRandom.current())));
+                pair.getZ().getBlock().a(pair.getX(), pair.getY(), pair.getZ(), pair.getX().random)));
 
         return random;
     }
