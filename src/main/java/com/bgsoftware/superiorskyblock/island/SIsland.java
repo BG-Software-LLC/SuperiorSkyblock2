@@ -1796,7 +1796,17 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return this.blockLimits.readAndGet(_blockLimits -> _blockLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getBlockLimit)));
+        KeyMap<Integer> blockLimits = new KeyMap<>();
+
+        this.blockLimits.read(_blockLimits -> _blockLimits.forEach(blockLimits::put));
+
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
+            for(Map.Entry<Key, Integer> entry : getUpgradeLevel(upgrade).getBlockLimits().entrySet()) {
+                blockLimits.put(entry.getKey(), Math.max(entry.getValue(), blockLimits.getOrDefault(entry.getKey(), 0)));
+            }
+        }
+
+        return blockLimits;
     }
 
     @Override
@@ -1846,7 +1856,17 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<EntityType, Integer> getEntitiesLimits() {
-        return this.entityLimits.readAndGet(_entitiesLimits -> _entitiesLimits.keySet().stream().collect(Collectors.toMap(key -> key, this::getEntityLimit)));
+        Map<EntityType, Integer> entityLimits = new HashMap<>();
+
+        this.entityLimits.read(_entityLimits -> _entityLimits.forEach(entityLimits::put));
+
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
+            for(Map.Entry<EntityType, Integer> entry : getUpgradeLevel(upgrade).getEntityLimits().entrySet()) {
+                entityLimits.put(entry.getKey(), Math.max(entry.getValue(), entityLimits.getOrDefault(entry.getKey(), 0)));
+            }
+        }
+
+        return entityLimits;
     }
 
     @Override

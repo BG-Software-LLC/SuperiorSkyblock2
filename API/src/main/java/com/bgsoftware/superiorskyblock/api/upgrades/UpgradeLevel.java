@@ -56,10 +56,20 @@ public interface UpgradeLevel {
     int getExactBlockLimit(Key key);
 
     /**
+     * Get all the block limits for this level.
+     */
+    Map<Key, Integer> getBlockLimits();
+
+    /**
      * Get the limit of an entity for this level.
      * @param entityType The entity's type to check.
      */
     int getEntityLimit(EntityType entityType);
+
+    /**
+     * Get all the entity limits for this level.
+     */
+    Map<EntityType, Integer> getEntityLimits();
 
     /**
      * Get the team limit of this level.

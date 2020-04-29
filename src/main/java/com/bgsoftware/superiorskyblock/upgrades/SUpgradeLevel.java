@@ -88,8 +88,18 @@ public final class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
+    public Map<Key, Integer> getBlockLimits() {
+        return blockLimits;
+    }
+
+    @Override
     public int getEntityLimit(EntityType entityType) {
         return entityLimits.getOrDefault(entityType, SIsland.NO_LIMIT);
+    }
+
+    @Override
+    public Map<EntityType, Integer> getEntityLimits() {
+        return entityLimits;
     }
 
     @Override
