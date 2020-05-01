@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -87,6 +88,8 @@ public final class GridHandler implements GridManager {
             return;
         }
 
+        SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus: " + bonus + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
+
         if(EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName)) {
             Location islandLocation = getNextLocation();
             SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
@@ -123,6 +126,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void deleteIsland(Island island){
+        SuperiorSkyblockPlugin.debug("Action: Disband Island, Island: " + island.getOwner().getName());
         island.getAllPlayersInside().forEach(superiorPlayer -> {
             SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
@@ -275,6 +279,8 @@ public final class GridHandler implements GridManager {
             return getNextLocation();
         }
 
+        SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(location));
+
         return location;
     }
 
@@ -294,6 +300,7 @@ public final class GridHandler implements GridManager {
     }
 
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
+        SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
         islands.sort(sortingType, onFinish);
     }
 
@@ -334,6 +341,8 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void setBlockAmount(Block block, int amount){
+        SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
+
         boolean insert = !stackedBlocks.stackedBlocks.containsKey(SBlockPosition.of(block.getLocation()));
 
         stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount);
@@ -374,6 +383,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void calcAllIslands(Runnable callback) {
+        SuperiorSkyblockPlugin.debug("Action: Calculate All Islands");
         Iterator<Island> islandIterator = islands.iterator();
         while (islandIterator.hasNext()){
             islandIterator.next().calcIslandWorth(null, islandIterator.hasNext() ? null : callback);
@@ -387,11 +397,13 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void addIslandToPurge(Island island) {
+        SuperiorSkyblockPlugin.debug("Action: Purge Island, Island: " + island.getOwner().getName());
         islandsToPurge.add(island.getOwner().getUniqueId());
     }
 
     @Override
     public void removeIslandFromPurge(Island island) {
+        SuperiorSkyblockPlugin.debug("Action: Remove From Purge, Island: " + island.getOwner().getName());
         islandsToPurge.remove(island.getOwner().getUniqueId());
     }
 
@@ -407,6 +419,7 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void registerSortingType(SortingType sortingType) {
+        SuperiorSkyblockPlugin.debug("Action: Register Sorting Type, Sorting Type: " + sortingType.getName());
         islands.registerSortingType(sortingType, true);
     }
 
@@ -482,6 +495,7 @@ public final class GridHandler implements GridManager {
     }
 
     private void setLastIsland(SBlockPosition blockPosition){
+        SuperiorSkyblockPlugin.debug("Action: Set Last Island, Location: " + blockPosition);
         this.lastIsland = blockPosition;
         Query.GRID_UPDATE_LAST_ISLAND.getStatementHolder()
                 .setString(blockPosition.toString())

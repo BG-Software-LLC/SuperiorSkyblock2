@@ -141,6 +141,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
             e.getWhoClicked().closeInventory();
         }
 
+        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " + e.getCurrentItem() + ", Slot: " + e.getRawSlot());
+
         onPlayerClick(e);
     }
 
@@ -203,6 +205,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected abstract void cloneAndOpen(SuperiorMenu previousMenu);
 
     public void open(SuperiorMenu previousMenu){
+        if(Bukkit.isPrimaryThread()){
+            Executor.async(() -> open(previousMenu));
+            return;
+        }
+
         if(!superiorPlayer.isOnline())
             return;
 
@@ -211,13 +218,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
             return;
         }
 
+        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
+
         if(!(this instanceof SuperiorMenuBlank) && !isCompleted()){
             SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
-            return;
-        }
-
-        if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> open(previousMenu));
             return;
         }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.tasks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -22,8 +23,10 @@ public final class CropsTask {
 
         int interval = plugin.getSettings().cropsInterval;
         CropsTask.random = ThreadLocalRandom.current().nextInt();
-        CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () ->
-                random = plugin.getNMSBlocks().tickIslands(random), interval, interval);
+        CropsTask.task = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+            SuperiorSkyblockPlugin.debug("Action: Grow Crops");
+            random = plugin.getNMSBlocks().tickIslands(random);
+        }, interval, interval);
     }
 
     public static void cancelTask(){

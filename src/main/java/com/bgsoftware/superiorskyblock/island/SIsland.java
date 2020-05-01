@@ -314,6 +314,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer){
+        SuperiorSkyblockPlugin.debug("Action: Invite, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         invitedPlayers.write(invitedPlayers -> invitedPlayers.add(superiorPlayer));
         //Revoke the invite after 5 minutes
         Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
@@ -321,6 +322,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void revokeInvite(SuperiorPlayer superiorPlayer){
+        SuperiorSkyblockPlugin.debug("Action: Invite Revoke, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         invitedPlayers.write(invitedPlayers -> invitedPlayers.remove(superiorPlayer));
     }
 
@@ -336,6 +338,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
+        SuperiorSkyblockPlugin.debug("Action: Add Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Role: " + playerRole);
         members.write(members -> members.add(superiorPlayer));
 
         superiorPlayer.setIslandLeader(owner);
@@ -351,6 +354,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
+        SuperiorSkyblockPlugin.debug("Action: Kick Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         members.write(members -> members.remove(superiorPlayer));
 
         superiorPlayer.setIslandLeader(superiorPlayer);
@@ -389,6 +393,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
+        SuperiorSkyblockPlugin.debug("Action: Ban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         banned.write(banned -> banned.add(superiorPlayer));
 
         if (isMember(superiorPlayer))
@@ -405,6 +410,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
+        SuperiorSkyblockPlugin.debug("Action: Unban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         banned.write(banned -> banned.remove(superiorPlayer));
         Query.ISLAND_SET_BANNED.getStatementHolder()
                 .setString(IslandSerializer.serializePlayers(banned))
@@ -419,11 +425,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void addCoop(SuperiorPlayer superiorPlayer) {
+        SuperiorSkyblockPlugin.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         coop.write(coop -> coop.add(superiorPlayer));
     }
 
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
+        SuperiorSkyblockPlugin.debug("Action: Uncoop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         coop.write(coop -> coop.remove(superiorPlayer));
 
         if (isLocked() && superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation())) {
@@ -445,6 +453,13 @@ public final class SIsland extends DatabaseObject implements Island {
             else
                 playersInside.remove(superiorPlayer);
         });
+
+        if(inside){
+            SuperiorSkyblockPlugin.debug("Action: Entered Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+        }
+        else{
+            SuperiorSkyblockPlugin.debug("Action: Left Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+        }
 
         if(inside && !isMember(superiorPlayer)){
             boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors -> uniqueVisitors.add(superiorPlayer));
@@ -511,6 +526,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
+        SuperiorSkyblockPlugin.debug("Action: Change Teleport Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(teleportLocation));
         teleportLocations.add(teleportLocation.getWorld().getEnvironment(), teleportLocation.clone());
         Query.ISLAND_SET_TELEPORT_LOCATION.getStatementHolder()
                 .setString(IslandSerializer.serializeLocations(teleportLocations))
@@ -524,9 +540,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(visitorsLocation == null){
             deleteWarp(VISITORS_WARP_NAME);
+            SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
         }
         else{
             setWarpLocation(VISITORS_WARP_NAME, visitorsLocation, false);
+            SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
         }
 
         Query.ISLAND_SET_VISITORS_LOCATION.getStatementHolder()
@@ -739,9 +757,11 @@ public final class SIsland extends DatabaseObject implements Island {
         int unlockedWorlds = this.unlockedWorlds.get();
 
         if(enabled){
+            SuperiorSkyblockPlugin.debug("Action: Enable Nether, Island: " + owner.getName());
             unlockedWorlds |= 1;
         }
         else {
+            SuperiorSkyblockPlugin.debug("Action: Disable Nether, Island: " + owner.getName());
             unlockedWorlds &= 2;
         }
 
@@ -763,9 +783,11 @@ public final class SIsland extends DatabaseObject implements Island {
         int unlockedWorlds = this.unlockedWorlds.get();
 
         if(enabled){
+            SuperiorSkyblockPlugin.debug("Action: Enable End, Island: " + owner.getName());
             unlockedWorlds |= 2;
         }
         else {
+            SuperiorSkyblockPlugin.debug("Action: Disable End, Island: " + owner.getName());
             unlockedWorlds &= 1;
         }
 
@@ -824,6 +846,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
+        SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
         if(value) {
             rolePermissions.add(islandPrivilege, playerRole);
             savePermissionNodes();
@@ -832,6 +855,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
+        SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
+
         if(!playerPermissions.containsKey(superiorPlayer))
             playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
 
@@ -900,6 +925,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setName(String islandName) {
+        SuperiorSkyblockPlugin.debug("Action: Set Name, Island: " + owner.getName() + ", Name: " + islandName);
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         Query.ISLAND_SET_NAME.getStatementHolder()
@@ -915,6 +941,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setDescription(String description) {
+        SuperiorSkyblockPlugin.debug("Action: Set Desrciption, Island: " + owner.getName() + ", Description: " + description);
         this.description.set(description);
         Query.ISLAND_SET_DESCRIPTION.getStatementHolder()
                 .setString(description)
@@ -971,6 +998,8 @@ public final class SIsland extends DatabaseObject implements Island {
         }
 
         beingRecalculated.set(true);
+
+        SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + asker.getName());
 
         List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
         BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
@@ -1108,6 +1137,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void updateBorder() {
+        SuperiorSkyblockPlugin.debug("Action: Update Border, Island: " + owner.getName());
         getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
     }
 
@@ -1126,6 +1156,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setIslandSize(int islandSize) {
+        SuperiorSkyblockPlugin.debug("Action: Set Size, Island: " + owner.getName() + ", Size: " + islandSize);
         this.islandSize.set(islandSize);
         Query.ISLAND_SET_SIZE.getStatementHolder()
                 .setInt(islandSize)
@@ -1140,6 +1171,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setDiscord(String discord) {
+        SuperiorSkyblockPlugin.debug("Action: Set Discord, Island: " + owner.getName() + ", Discord: " + discord);
         this.discord.set(discord);
         Query.ISLAND_SET_DISCORD.getStatementHolder()
                 .setString(discord)
@@ -1154,6 +1186,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPaypal(String paypal) {
+        SuperiorSkyblockPlugin.debug("Action: Set Paypal, Island: " + owner.getName() + ", Paypal: " + paypal);
         this.paypal.set(paypal);
         Query.ISLAND_SET_PAYPAL.getStatementHolder()
                 .setString(paypal)
@@ -1168,6 +1201,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBiome(Biome biome){
+        SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
         getAllChunksAsync(World.Environment.NORMAL, false, false, chunk -> plugin.getNMSAdapter().setBiome(chunk, biome));
         this.biome.set(biome);
     }
@@ -1179,6 +1213,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setLocked(boolean locked) {
+        SuperiorSkyblockPlugin.debug("Action: Set Locked, Island: " + owner.getName() + ", Locked: " + locked);
         this.locked.set(locked);
         if(locked){
             for(SuperiorPlayer victimPlayer : getAllPlayersInside()){
@@ -1202,6 +1237,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setIgnored(boolean ignored) {
+        SuperiorSkyblockPlugin.debug("Action: Set Ignored, Island: " + owner.getName() + ", Ignored: " + ignored);
         this.ignored.set(ignored);
 
         Query.ISLAND_SET_IGNORED.getStatementHolder()
@@ -1219,6 +1255,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(!EventsCaller.callIslandTransferEvent(this, previousOwner, superiorPlayer))
             return false;
+
+        SuperiorSkyblockPlugin.debug("Action: Transfer Owner, Island: " + owner.getName() + ", New Owner: " + superiorPlayer.getName());
 
         executeDeleteStatement(true);
 
@@ -1274,6 +1312,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void sendMessage(String message, UUID... ignoredMembers){
+        SuperiorSkyblockPlugin.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + Arrays.asList(ignoredMembers) + ", Message: " + message);
+
         List<UUID> ignoredList = Arrays.asList(ignoredMembers);
 
         getIslandMembers(true).stream()
@@ -1295,8 +1335,9 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void updateLastTime() {
         this.lastTimeUpdate.write(lastTimeUpdate -> {
-            if(lastTimeUpdate != -1)
+            if(lastTimeUpdate != -1) {
                 setLastTimeUpdate(System.currentTimeMillis() / 1000);
+            }
         });
     }
 
@@ -1306,6 +1347,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void setLastTimeUpdate(long lastTimeUpdate){
+        SuperiorSkyblockPlugin.debug("Action: Update Last Time, Island: " + owner.getName() + ", Last Time: " + lastTimeUpdate);
         this.lastTimeUpdate.set(lastTimeUpdate);
         if(lastTimeUpdate != -1){
             Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder()
@@ -1339,6 +1381,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void depositMoney(double amount){
+        SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + owner.getName() + ", Money: " + amount);
+
         String islandBankString = this.islandBank.writeAndGet(islandBank -> {
             islandBank = islandBank.add(BigDecimalFormatted.of(amount));
             this.islandBank.set(islandBank);
@@ -1353,6 +1397,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void withdrawMoney(double amount){
+        SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + owner.getName() + ", Money: " + amount);
+
         String islandBankString = islandBank.writeAndGet(islandBank -> {
             islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
             this.islandBank.set(islandBank);
@@ -1416,6 +1462,8 @@ public final class SIsland extends DatabaseObject implements Island {
         boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
 
         if(increaseAmount || hasBlockLimit) {
+            SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key);
+
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             syncedBlockCounts.write(blockCounts -> {
@@ -1474,6 +1522,8 @@ public final class SIsland extends DatabaseObject implements Island {
             boolean hasBlockLimit = blockLimits.containsKey(entry.getKey());
 
             if(increaseAmount || hasBlockLimit) {
+                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey());
+
                 Key _key = plugin.getBlockValues().getBlockKey(entry.getKey());
 
                 int currentAmount = blockCounts.getRaw(_key, 0);
@@ -1544,6 +1594,8 @@ public final class SIsland extends DatabaseObject implements Island {
         boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
 
         if(decreaseAmount || hasBlockLimit){
+            SuperiorSkyblockPlugin.debug("Action: Block Break, Island: " + owner.getName() + ", Block: " + key);
+
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             blockCounts.write(blockCounts -> {
@@ -1628,6 +1680,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
+        SuperiorSkyblockPlugin.debug("Action: Set Bonus, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
+
         BigDecimalFormatted newBonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
         this.bonusWorth.set(newBonusWorth);
 
@@ -1698,6 +1752,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setUpgradeLevel(Upgrade upgrade, int level) {
+        SuperiorSkyblockPlugin.debug("Action: Set Upgrade, Island: " + owner.getName() + ", Upgrade: " + upgrade.getName() + ", Level: " + level);
+
         upgrades.add(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
         Query.ISLAND_SET_UPGRADES.getStatementHolder()
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
@@ -1729,6 +1785,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
+        SuperiorSkyblockPlugin.debug("Action: Set Crop Growth, Island: " + owner.getName() + ", Crop Growth: " + cropGrowth);
         this.cropGrowth.set(cropGrowth);
         Query.ISLAND_SET_CROP_GROWTH.getStatementHolder()
                 .setDouble(cropGrowth)
@@ -1748,6 +1805,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setSpawnerRatesMultiplier(double spawnerRates) {
+        SuperiorSkyblockPlugin.debug("Action: Set Spawner Rates, Island: " + owner.getName() + ", Spawner Rates: " + spawnerRates);
         this.spawnerRates.set(spawnerRates);
         Query.ISLAND_SET_SPAWNER_RATES.getStatementHolder()
                 .setDouble(spawnerRates)
@@ -1767,6 +1825,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setMobDropsMultiplier(double mobDrops) {
+        SuperiorSkyblockPlugin.debug("Action: Set Mob Drops, Island: " + owner.getName() + ", Mob Drops: " + mobDrops);
         this.mobDrops.set(mobDrops);
         Query.ISLAND_SET_MOB_DROPS.getStatementHolder()
                 .setDouble(mobDrops)
@@ -1811,6 +1870,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBlockLimit(Key key, int limit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + limit);
+
         blockLimits.write(blockLimits -> {
             if(limit <= NO_LIMIT)
                 blockLimits.removeRaw(key);
@@ -1871,6 +1932,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + entityType + ", Limit: " + limit);
+
         entityLimits.write(entityLimits -> {
             if(limit <= NO_LIMIT)
                 entityLimits.remove(entityType);
@@ -1936,6 +1999,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setTeamLimit(int teamLimit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Team Limit, Island: " + owner.getName() + ", Team Limit: " + teamLimit);
         this.teamLimit.set(teamLimit);
         Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
                 .setInt(teamLimit)
@@ -1955,6 +2019,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setWarpsLimit(int warpsLimit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Warps Limit, Island: " + owner.getName() + ", Warps Limit: " + warpsLimit);
+
         this.warpsLimit.set(warpsLimit);
         Query.ISLAND_SET_WARPS_LIMIT.getStatementHolder()
                 .setInt(warpsLimit)
@@ -1978,6 +2044,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
+        SuperiorSkyblockPlugin.debug("Action: Set Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location) + ", Private: " + privateFlag);
+
         warps.add(name.toLowerCase(), new WarpData(location.clone(), privateFlag));
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
@@ -2034,6 +2102,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void deleteWarp(String name){
+        SuperiorSkyblockPlugin.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
+
         warps.remove(name);
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
@@ -2066,6 +2136,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
+        SuperiorSkyblockPlugin.debug("Action: Set Rating, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Rating: " + rating);
+
         if(rating == Rating.UNKNOWN)
             ratings.remove(superiorPlayer.getUniqueId());
         else
@@ -2105,6 +2177,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void completeMission(Mission mission) {
+        SuperiorSkyblockPlugin.debug("Action: Complete Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
+
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
 
         Query.ISLAND_SET_MISSIONS.getStatementHolder()
@@ -2117,6 +2191,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void resetMission(Mission mission) {
+        SuperiorSkyblockPlugin.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
+
         if(completedMissions.get(mission, 0) > 0) {
             completedMissions.add(mission, completedMissions.get(mission) - 1);
         }
@@ -2185,6 +2261,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void enableSettings(IslandFlag settings) {
+        SuperiorSkyblockPlugin.debug("Action: Enable Settings, Island: " + owner.getName() + ", Settings: " + settings.getName());
+
         islandSettings.add(settings, (byte) 1);
 
         boolean disableTime = false, disableWeather = false;
@@ -2250,6 +2328,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void disableSettings(IslandFlag settings) {
+        SuperiorSkyblockPlugin.debug("Action: Disable Settings, Island: " + owner.getName() + ", Settings: " + settings.getName());
+
         islandSettings.add(settings, (byte) 0);
 
         saveSettings();
@@ -2283,6 +2363,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setGeneratorPercentage(Key key, int percentage) {
+        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Percentage: " + percentage);
+
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
 
         if(percentage == 0){
@@ -2325,6 +2407,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setGeneratorAmount(Key key, int amount) {
+        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
+
         cobbleGeneratorValues.write(cobbleGenerator -> {
             if(amount <= 0)
                 cobbleGenerator.remove(key);
@@ -2392,6 +2476,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void clearGeneratorAmounts() {
+        SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName());
+
         cobbleGeneratorValues.write(KeyMap::clear);
 
         Query.ISLAND_SET_GENERATOR.getStatementHolder()
@@ -2412,6 +2498,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setSchematicGenerate(World.Environment environment) {
+        SuperiorSkyblockPlugin.debug("Action: Set Schematic, Island: " + owner.getName() + ", Environment: " + environment);
         int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
         int generatedSchematics = this.generatedSchematics.get() | n;
         this.generatedSchematics.set(generatedSchematics);

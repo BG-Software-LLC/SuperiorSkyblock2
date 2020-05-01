@@ -227,6 +227,8 @@ public final class MissionsHandler implements MissionsManager {
         if(!missionDataOptional.isPresent())
             return;
 
+        SuperiorSkyblockPlugin.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
+
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();
             Island playerIsland = superiorPlayer.getIsland();

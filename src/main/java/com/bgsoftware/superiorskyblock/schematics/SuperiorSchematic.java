@@ -180,6 +180,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             return;
         }
 
+        SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
+
         schematicProgress = true;
 
         Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);

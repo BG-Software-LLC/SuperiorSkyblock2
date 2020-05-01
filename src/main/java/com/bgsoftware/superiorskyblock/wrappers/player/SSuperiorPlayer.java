@@ -129,6 +129,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setTextureValue(String textureValue) {
+        SuperiorSkyblockPlugin.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
         this.textureValue = textureValue;
         Query.PLAYER_SET_TEXTURE.getStatementHolder()
                 .setString(textureValue)
@@ -155,6 +156,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void setUserLocale(java.util.Locale userLocale) {
         Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
+
+        SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
 
         this.userLocale = userLocale;
 
@@ -196,6 +199,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         Block islandCenterBlock = island.getCenter(World.Environment.NORMAL).getBlock();
 
         if(island instanceof SpawnIsland){
+            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
             teleport(islandTeleportLocation.add(0, 0.5, 0));
             if(result != null)
                 result.accept(true);
@@ -223,6 +227,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         //Checking if one of the options above is safe.
         if(toTeleport != null){
+            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
             teleport(toTeleport.add(0, 0.5, 0));
             if(result != null)
                 result.accept(true);
@@ -271,6 +276,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
                             Executor.sync(() -> {
                                 island.setTeleportLocation(islandLocation);
+                                SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandLocation));
                                 teleport(islandLocation.add(0.5, 0.5, 0.5));
                                 if(result != null)
                                     result.accept(true);
@@ -309,6 +315,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setIslandLeader(SuperiorPlayer superiorPlayer) {
+        SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + superiorPlayer.getName());
         this.islandLeader = superiorPlayer;
         Query.PLAYER_SET_LEADER.getStatementHolder()
                 .setString(islandLeader.getUniqueId().toString())
@@ -331,6 +338,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
+        SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
         Query.PLAYER_SET_ROLE.getStatementHolder()
                 .setString(playerRole.getId() + "")
@@ -346,6 +354,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
         Query.PLAYER_SET_TOGGLED_BORDER.getStatementHolder()
                 .setBoolean(worldBorderEnabled)
                 .setString(player.toString())
@@ -360,6 +369,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleBlocksStacker() {
         blocksStackerEnabled = !blocksStackerEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + blocksStackerEnabled);
     }
 
     @Override
@@ -370,6 +380,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleSchematicMode() {
         schematicModeEnabled = !schematicModeEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + schematicModeEnabled);
     }
 
     @Override
@@ -380,6 +391,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleBypassMode(){
         bypassModeEnabled = !bypassModeEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
     }
 
     @Override
@@ -393,6 +405,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleTeamChat() {
         teamChatEnabled = !teamChatEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
     }
 
     @Override
@@ -407,6 +420,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setDisbands(int disbands) {
+        SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
         this.disbands = Math.max(disbands, 0);
         Query.PLAYER_SET_DISBANDS.getStatementHolder()
                 .setInt(disbands)
@@ -417,6 +431,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
         Query.PLAYER_SET_TOGGLED_PANEL.getStatementHolder()
                 .setBoolean(toggledPanel)
                 .setString(player.toString())
@@ -439,6 +454,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleIslandFly(){
         islandFly = !islandFly;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
         Query.PLAYER_SET_ISLAND_FLY.getStatementHolder()
                 .setBoolean(islandFly)
                 .setString(player.toString())
@@ -453,6 +469,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void toggleAdminSpy() {
         adminSpyEnabled = !adminSpyEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + adminSpyEnabled);
     }
 
     @Override
@@ -467,6 +484,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void setBorderColor(BorderColor borderColor) {
+        SuperiorSkyblockPlugin.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
+
         this.borderColor = borderColor;
 
         Query.PLAYER_SET_BORDER.getStatementHolder()
@@ -478,6 +497,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void updateLastTimeStatus() {
         lastTimeStatus = System.currentTimeMillis() / 1000;
+
+        SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
 
         Query.PLAYER_SET_LAST_STATUS.getStatementHolder()
                 .setString(lastTimeStatus + "")
@@ -492,8 +513,9 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void completeMission(Mission mission) {
-        completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
+        SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
+        completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
         Query.PLAYER_SET_MISSIONS.getStatementHolder()
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(player.toString())
@@ -502,6 +524,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void resetMission(Mission mission) {
+        SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
+
         if(completedMissions.get(mission, 0) > 0) {
             completedMissions.add(mission, completedMissions.get(mission) - 1);
         }
@@ -546,6 +570,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void setSchematicPos1(Block block) {
         this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
+        SuperiorSkyblockPlugin.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
     }
 
     @Override
@@ -556,6 +581,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void setSchematicPos2(Block block) {
         this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
+        SuperiorSkyblockPlugin.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
     }
 
     @Override
@@ -603,6 +629,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public void setImmunedToPvP(boolean immunedToPvP){
         this.immuneToPvP = immunedToPvP;
+        SuperiorSkyblockPlugin.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
     }
 
     public void setTeleportTask(BukkitTask teleportTask){
@@ -619,6 +646,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     public void setImmunedToTeleport(boolean immuneToTeleport){
         this.immuneToTeleport = immuneToTeleport;
+        SuperiorSkyblockPlugin.debug("Action: Set Teleport Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
     }
 
     public void merge(SSuperiorPlayer other){
