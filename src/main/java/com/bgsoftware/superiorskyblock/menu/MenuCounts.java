@@ -104,7 +104,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
         return island.getBlockCounts().entrySet().stream().sorted((o1, o2) -> {
             Material firstMaterial = Material.valueOf(o1.getKey().toString().split(":")[0]);
             Material secondMaterial = Material.valueOf(o2.getKey().toString().split(":")[0]);
-            return plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);
+            int compare = plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);
+            return compare != 0 ? compare : o1.getKey().toString().compareTo(o2.getKey().toString());
         }).map(Pair::new).collect(Collectors.toList());
     }
 
