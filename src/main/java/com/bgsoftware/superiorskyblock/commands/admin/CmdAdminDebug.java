@@ -56,6 +56,7 @@ public final class CmdAdminDebug implements ISuperiorCommand {
         if(plugin.isDebugMode() && args.length == 2){
             Locale.DEBUG_MODE_DISABLED.send(sender);
             plugin.toggleDebugMode();
+            plugin.setDebugFilter("");
             return;
         }
 
