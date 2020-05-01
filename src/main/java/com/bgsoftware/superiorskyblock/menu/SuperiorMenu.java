@@ -141,7 +141,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
             e.getWhoClicked().closeInventory();
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " + e.getCurrentItem() + ", Slot: " + e.getRawSlot());
+        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " +
+                (e.getCurrentItem() == null ? "AIR" : e.getCurrentItem().getType()) + ", Slot: " + e.getRawSlot());
 
         onPlayerClick(e);
     }
