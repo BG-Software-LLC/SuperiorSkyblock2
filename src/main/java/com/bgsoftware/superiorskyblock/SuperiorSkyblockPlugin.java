@@ -507,7 +507,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public static void debug(String message){
         if(plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).matches()))
-            plugin.getLogger().info("[SuperiorSkyblock2-DEBUG] " + message);
+            System.out.println("[SuperiorSkyblock2-DEBUG] " + message);
     }
 
     public static SuperiorSkyblockPlugin getPlugin(){
