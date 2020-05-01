@@ -24,8 +24,10 @@ public final class ChunksProvider {
     private static BukkitTask chunksLoaderId;
 
     public static CompletableFuture<Chunk> loadChunk(World world, int x, int z, Consumer<Chunk> onLoadConsumer){
+        SuperiorSkyblockPlugin.debug("Action: Load Chunk, Chunk: " + world + ", " + x + ", " + z);
         CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
         pendingChunks.add(new BiPair<>(ChunkPosition.of(world, x, z), completableFuture, onLoadConsumer));
+        SuperiorSkyblockPlugin.debug("Action: Pending Chunk Requests, Amount: " + pendingChunks.size());
         return completableFuture;
     }
 
