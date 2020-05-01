@@ -22,7 +22,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
     private static List<Integer> uniqueVisitorsSlot;
 
-    private Island island;
+    private final Island island;
 
     private MenuVisitors(SuperiorPlayer superiorPlayer, Island island){
         super("menuVisitors", superiorPlayer, true);
@@ -42,6 +42,11 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
                 CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + targetPlayer.getName());
             }
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

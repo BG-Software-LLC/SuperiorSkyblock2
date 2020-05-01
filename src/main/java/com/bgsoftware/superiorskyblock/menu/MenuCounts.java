@@ -46,6 +46,11 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Pair<Key, Integer> block) {
         try {
             Key blockKey = block.getKey();

@@ -58,6 +58,11 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, sortingType);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
         SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
         try {

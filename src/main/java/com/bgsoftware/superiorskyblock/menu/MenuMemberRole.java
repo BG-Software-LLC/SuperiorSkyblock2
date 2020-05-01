@@ -23,9 +23,9 @@ import java.util.List;
 
 public final class MenuMemberRole extends SuperiorMenu {
 
-    private static Registry<Integer, PlayerRole> roleSlots = Registry.createRegistry();
+    private static final Registry<Integer, PlayerRole> roleSlots = Registry.createRegistry();
 
-    private SuperiorPlayer targetPlayer;
+    private final SuperiorPlayer targetPlayer;
 
     private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         super("menuMemberRole", superiorPlayer);
@@ -46,6 +46,11 @@ public final class MenuMemberRole extends SuperiorMenu {
         else{
             CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "setrole " + targetPlayer.getName() + " " + playerRole.toString());
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, targetPlayer);
     }
 
     @Override

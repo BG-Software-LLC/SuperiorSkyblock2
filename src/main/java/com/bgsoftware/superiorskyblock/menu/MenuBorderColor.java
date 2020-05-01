@@ -48,6 +48,11 @@ public final class MenuBorderColor extends SuperiorMenu {
         }, 1L);
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
     public static void init(){
         MenuBorderColor menuBorderColor = new MenuBorderColor(null);
 

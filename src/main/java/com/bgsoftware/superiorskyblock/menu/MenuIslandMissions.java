@@ -53,6 +53,11 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
         try {
             Island island = superiorPlayer.getIsland();

@@ -65,6 +65,11 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandFlag islandFlag) {
         try {
             String settingsName = islandFlag.getName().toLowerCase();

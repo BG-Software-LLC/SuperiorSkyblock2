@@ -25,7 +25,7 @@ import java.util.function.Function;
 
 public final class MenuIslandCreation extends SuperiorMenu {
 
-    private String islandName;
+    private final String islandName;
 
     private MenuIslandCreation(SuperiorPlayer superiorPlayer, String islandName){
         super("menuIslandCreation", superiorPlayer);
@@ -43,6 +43,11 @@ public final class MenuIslandCreation extends SuperiorMenu {
                 }
             }
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, islandName);
     }
 
     @Override

@@ -20,7 +20,7 @@ public final class MenuMemberManage extends SuperiorMenu {
 
     private static List<Integer> rolesSlot, banSlot, kickSlot;
 
-    private SuperiorPlayer targetPlayer;
+    private final SuperiorPlayer targetPlayer;
 
     private MenuMemberManage(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         super("menuMemberManage", superiorPlayer);
@@ -41,6 +41,11 @@ public final class MenuMemberManage extends SuperiorMenu {
         else if(kickSlot.contains(e.getRawSlot())){
             CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, targetPlayer);
     }
 
     @Override

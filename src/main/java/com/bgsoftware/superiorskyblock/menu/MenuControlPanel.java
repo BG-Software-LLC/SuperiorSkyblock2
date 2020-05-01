@@ -46,6 +46,11 @@ public final class MenuControlPanel extends SuperiorMenu {
         }
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
     public static void init(){
         MenuControlPanel menuControlPanel = new MenuControlPanel(null);
 

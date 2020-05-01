@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public final class MenuWarps extends PagedSuperiorMenu<String> {
 
-    private Island island;
+    private final Island island;
 
     private MenuWarps(SuperiorPlayer superiorPlayer, Island island){
         super("menuWarps", superiorPlayer);
@@ -41,6 +41,11 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
                 island.warpPlayer(superiorPlayer, warpName);
             }, 1L);
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

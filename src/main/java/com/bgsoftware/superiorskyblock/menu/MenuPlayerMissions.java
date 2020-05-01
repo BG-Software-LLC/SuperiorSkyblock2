@@ -50,6 +50,11 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
         try {
             Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);

@@ -78,6 +78,11 @@ public final class MenuBiomes extends SuperiorMenu {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
+    @Override
     protected Inventory buildInventory(Function<String, String> titleReplacer) {
         Inventory inv = super.buildInventory(titleReplacer);
 

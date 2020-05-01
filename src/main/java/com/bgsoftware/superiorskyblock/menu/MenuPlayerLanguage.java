@@ -31,6 +31,11 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
         Executor.sync(() -> superiorPlayer.asPlayer().closeInventory(), 1L);
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
     public static void init(){
         MenuPlayerLanguage menuPlayerLanguage = new MenuPlayerLanguage(null);
 

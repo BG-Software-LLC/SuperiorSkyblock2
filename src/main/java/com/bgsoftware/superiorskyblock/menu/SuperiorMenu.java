@@ -200,6 +200,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected abstract void onPlayerClick(InventoryClickEvent e);
 
+    protected abstract void cloneAndOpen(SuperiorMenu previousMenu);
+
     public void open(SuperiorMenu previousMenu){
         if(!superiorPlayer.isOnline())
             return;
@@ -268,7 +270,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
             else if(previousMenu != null) {
                 if (previousMove)
-                    previousMenu.open(previousMenu.previousMenu);
+                    previousMenu.cloneAndOpen(previousMenu.previousMenu);
                 else
                     previousMove = true;
             }

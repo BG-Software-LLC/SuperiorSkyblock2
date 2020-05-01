@@ -22,6 +22,11 @@ public final class SuperiorMenuBlank extends SuperiorMenu {
 
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        open(previousMenu);
+    }
+
     public static void init(){
         SuperiorMenuBlank superiorMenuBlank = new SuperiorMenuBlank(null);
 

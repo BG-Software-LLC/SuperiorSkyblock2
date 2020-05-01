@@ -134,6 +134,11 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island, permissionHolder);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandPrivilege islandPermission) {
         try {
             ItemBuilder permissionItem = new ItemBuilder(Material.AIR);

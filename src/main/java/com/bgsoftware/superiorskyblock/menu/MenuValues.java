@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 public final class MenuValues extends SuperiorMenu {
 
-    private Island island;
+    private final Island island;
 
     private MenuValues(SuperiorPlayer superiorPlayer, Island island){
         super("menuValues", superiorPlayer);
@@ -38,6 +38,11 @@ public final class MenuValues extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

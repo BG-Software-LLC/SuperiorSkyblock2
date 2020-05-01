@@ -33,6 +33,11 @@ public final class MenuMissions extends SuperiorMenu {
         }
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
     public static void init(){
         MenuMissions menuMissions = new MenuMissions(null);
 

@@ -60,6 +60,11 @@ public final class MenuIslandRate extends SuperiorMenu {
         }, 1L);
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, island, previousMenu);
+    }
+
     public static void init(){
         MenuIslandRate menuIslandRate = new MenuIslandRate(null, null);
 

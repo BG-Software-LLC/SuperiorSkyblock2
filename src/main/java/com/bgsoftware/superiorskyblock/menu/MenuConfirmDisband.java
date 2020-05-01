@@ -50,6 +50,11 @@ public final class MenuConfirmDisband extends SuperiorMenu {
         }
     }
 
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
     public static void init(){
         MenuConfirmDisband menuConfirmDisband = new MenuConfirmDisband(null);
 

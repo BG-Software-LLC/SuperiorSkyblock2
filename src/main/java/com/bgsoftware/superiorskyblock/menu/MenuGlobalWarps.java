@@ -42,6 +42,11 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
     }
 
     @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
+    }
+
+    @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
         try {
             return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())

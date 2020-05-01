@@ -19,7 +19,7 @@ import java.util.List;
 
 public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
 
-    private Island island;
+    private final Island island;
 
     private MenuMembers(SuperiorPlayer superiorPlayer, Island island){
         super("menuMembers", superiorPlayer);
@@ -30,6 +30,11 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
     protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
         previousMove = false;
         MenuMemberManage.openInventory(superiorPlayer, this, targetPlayer);
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

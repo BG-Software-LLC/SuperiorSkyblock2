@@ -24,7 +24,7 @@ import java.util.UUID;
 
 public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Rating> {
 
-    private Island island;
+    private final Island island;
 
     private MenuIslandRatings(SuperiorPlayer superiorPlayer, Island island){
         super("menuIslandRatings", superiorPlayer);
@@ -34,6 +34,11 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
     @Override
     protected void onPlayerClick(InventoryClickEvent event, UUID clickedObjectKey, Rating clickedObjectValue) {
 
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

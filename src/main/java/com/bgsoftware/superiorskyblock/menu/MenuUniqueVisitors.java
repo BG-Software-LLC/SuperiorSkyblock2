@@ -17,7 +17,7 @@ import java.util.List;
 
 public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
-    private Island island;
+    private final Island island;
 
     private MenuUniqueVisitors(SuperiorPlayer superiorPlayer, Island island){
         super("menuUniqueVisitors", superiorPlayer);
@@ -36,6 +36,11 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
         } else if (event.getClick().name().contains("LEFT")) {
             CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + targetPlayer.getName());
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override

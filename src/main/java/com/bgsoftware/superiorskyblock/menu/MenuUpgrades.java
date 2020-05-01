@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
 
-    private Island island;
+    private final Island island;
 
     private MenuUpgrades(SuperiorPlayer superiorPlayer, Island island){
         super("menuUpgrades", superiorPlayer);
@@ -42,6 +42,11 @@ public final class MenuUpgrades extends SuperiorMenu {
             previousMove = false;
             open(previousMenu);
         }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
     @Override
