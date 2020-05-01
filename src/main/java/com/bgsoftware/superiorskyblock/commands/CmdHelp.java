@@ -90,7 +90,7 @@ public final class CmdHelp implements ISuperiorCommand {
         java.util.Locale locale = LocaleUtils.getLocale(sender);
 
         for(SuperiorCommand _subCommand : subCommands) {
-            if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
+            if(_subCommand.displayCommand() && (_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission()))) {
                 String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
@@ -110,7 +110,7 @@ public final class CmdHelp implements ISuperiorCommand {
 
         if(args.length == 2){
             List<SuperiorCommand> subCommands = plugin.getCommands().getSubCommands().stream()
-                    .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
+                    .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())))
                     .collect(Collectors.toList());
 
             int lastPage = subCommands.size() / 7;

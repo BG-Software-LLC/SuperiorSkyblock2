@@ -28,6 +28,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminBypass(), false);
         registerCommand(new CmdAdminClearGenerator(), false);
         registerCommand(new CmdAdminClose(), false);
+        registerCommand(new CmdAdminDebug(), false);
         registerCommand(new CmdAdminDemote(), false);
         registerCommand(new CmdAdminDeposit(), false);
         registerCommand(new CmdAdminDisband(), false);
@@ -168,7 +169,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         Locale.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
 
         for(SuperiorCommand _subCommand : subCommands) {
-            if(_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission())) {
+            if(_subCommand.displayCommand() && (_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission()))) {
                 String description = _subCommand.getDescription(locale);
                 if(description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
@@ -196,7 +197,7 @@ public final class CmdAdmin implements ISuperiorCommand {
 
         if(args.length != 1) {
             for (SuperiorCommand subCommand : subCommands.values()) {
-                if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
+                if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
                     for (String aliases : subCommand.getAliases()) {
                         if (aliases.startsWith(args[1].toLowerCase())) {
                             list.add(aliases);

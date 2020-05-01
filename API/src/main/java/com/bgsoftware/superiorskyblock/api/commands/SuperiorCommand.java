@@ -49,6 +49,12 @@ public interface SuperiorCommand {
      */
     boolean canBeExecutedByConsole();
 
+
+    /**
+     * Should the command be displayed in /is help (or /is admin for admin commands)?
+     */
+    boolean displayCommand();
+
     /**
      * The method to be executed when the command is running.
      * @param plugin The instance of the plugin.

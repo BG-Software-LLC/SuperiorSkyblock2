@@ -62,6 +62,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -87,6 +88,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSBlocks nmsBlocks;
 
     private boolean shouldEnable = true;
+    private boolean debugMode = false;
+    private Pattern debugFilter = null;
 
     @Override
     public void onLoad() {
@@ -220,6 +223,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }finally {
             CalcTask.cancelTask();
             Executor.close();
+            System.out.println("Closing database...");
             dataHandler.closeConnection();
             Registry.clearCache();
         }
@@ -390,6 +394,21 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return getFile().getName();
     }
 
+    public boolean isDebugMode(){
+        return debugMode;
+    }
+
+    public void toggleDebugMode(){
+        debugMode = !debugMode;
+    }
+
+    public void setDebugFilter(String debugFilter){
+        if(debugFilter.isEmpty())
+            this.debugFilter = null;
+        else
+            this.debugFilter = Pattern.compile(debugFilter.toUpperCase());
+    }
+
     private void loadSortingTypes(){
         try { SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR, false); }catch(NullPointerException ignored) {}
         try { SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR, false); }catch(NullPointerException ignored) {}
@@ -484,6 +503,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
         else
             plugin.getLogger().info(message);
+    }
+
+    public static void debug(String message){
+        if(plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message).matches()))
+            log(message);
     }
 
     public static SuperiorSkyblockPlugin getPlugin(){

@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler {
@@ -68,44 +69,7 @@ public final class DataHandler {
     @SuppressWarnings("WeakerAccess")
     public void loadDatabase(){
         //Creating default islands table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands (" +
-                "owner VARCHAR(36) PRIMARY KEY, " +
-                "center TEXT, " +
-                "teleportLocation TEXT, " +
-                "members TEXT, " +
-                "banned TEXT, " +
-                "permissionNodes TEXT, " +
-                "upgrades TEXT, " +
-                "warps TEXT, " +
-                "islandBank TEXT, " +
-                "islandSize INTEGER, " +
-                "blockLimits TEXT, " +
-                "teamLimit INTEGER, " +
-                "cropGrowth DECIMAL, " +
-                "spawnerRates DECIMAL," +
-                "mobDrops DECIMAL, " +
-                "discord TEXT, " +
-                "paypal TEXT, " +
-                "warpsLimit INTEGER, " +
-                "bonusWorth TEXT, " +
-                "locked BOOLEAN, " +
-                "blockCounts TEXT, " +
-                "name TEXT, " +
-                "visitorsLocation TEXT, " +
-                "description TEXT, " +
-                "ratings TEXT, " +
-                "missions TEXT, " +
-                "settings TEXT, " +
-                "ignored BOOLEAN, " +
-                "generator TEXT, " +
-                "generatedSchematics TEXT, " +
-                "schemName TEXT, " +
-                "uniqueVisitors TEXT, " +
-                "unlockedWorlds TEXT," +
-                "lastTimeUpdate INTEGER," +
-                "dirtyChunks TEXT," +
-                "entityLimits TEXT" +
-                ");");
+        createIslandsTable();
 
         //Creating default players table
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players (" +
@@ -173,6 +137,11 @@ public final class DataHandler {
         addColumnIfNotExists("dirtyChunks", "grid", "''", "TEXT");
         addColumnIfNotExists("dirtyChunks", "islands", "''", "TEXT");
         addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
+
+        editColumn("members", "islands", "LONGTEXT");
+        editColumn("banned", "islands", "LONGTEXT");
+        editColumn("ratings", "islands", "LONGTEXT");
+        editColumn("uniqueVisitors", "islands", "LONGTEXT");
 
         SuperiorSkyblockPlugin.log("Starting to load players...");
 
@@ -245,6 +214,47 @@ public final class DataHandler {
 
     }
 
+    private void createIslandsTable(){
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands (" +
+                "owner VARCHAR(36) PRIMARY KEY, " +
+                "center TEXT, " +
+                "teleportLocation TEXT, " +
+                "members LONGTEXT, " +
+                "banned LONGTEXT, " +
+                "permissionNodes TEXT, " +
+                "upgrades TEXT, " +
+                "warps TEXT, " +
+                "islandBank TEXT, " +
+                "islandSize INTEGER, " +
+                "blockLimits TEXT, " +
+                "teamLimit INTEGER, " +
+                "cropGrowth DECIMAL, " +
+                "spawnerRates DECIMAL," +
+                "mobDrops DECIMAL, " +
+                "discord TEXT, " +
+                "paypal TEXT, " +
+                "warpsLimit INTEGER, " +
+                "bonusWorth TEXT, " +
+                "locked BOOLEAN, " +
+                "blockCounts TEXT, " +
+                "name TEXT, " +
+                "visitorsLocation TEXT, " +
+                "description TEXT, " +
+                "ratings LONGTEXT, " +
+                "missions TEXT, " +
+                "settings TEXT, " +
+                "ignored BOOLEAN, " +
+                "generator TEXT, " +
+                "generatedSchematics TEXT, " +
+                "schemName TEXT, " +
+                "uniqueVisitors LONGTEXT, " +
+                "unlockedWorlds TEXT," +
+                "lastTimeUpdate INTEGER," +
+                "dirtyChunks TEXT," +
+                "entityLimits TEXT" +
+                ");");
+    }
+
     private String getDefaultSettings() {
         StringBuilder stringBuilder = new StringBuilder();
         plugin.getSettings().defaultSettings.forEach(setting -> stringBuilder.append(";").append(setting));
@@ -312,6 +322,57 @@ public final class DataHandler {
                 ex.printStackTrace();
             }
         });
+    }
+
+    @SuppressWarnings("all")
+    private void editColumn(String column, String table, String newType) {
+        if(!isType(column, table, newType)){
+            if(database == DatabaseType.SQLite){
+                String tmpTable = "__tmp" + table;
+                SQLHelper.buildStatement("ALTER TABLE {prefix}" + table + " RENAME TO " + tmpTable + ";", PreparedStatement::executeQuery, Throwable::printStackTrace);
+                createIslandsTable();
+                SQLHelper.buildStatement("INSERT INTO {prefix}" + table + "  SELECT * FROM " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
+                SQLHelper.buildStatement("DROP TABLE " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
+            }
+            else {
+                String statementStr = "ALTER TABLE {prefix}" + table + " MODIFY COLUMN " + column + " " + newType + ";";
+                SQLHelper.buildStatement(statementStr, PreparedStatement::executeUpdate, Throwable::printStackTrace);
+            }
+        }
+    }
+
+    private boolean isType(String column, String table, String type){
+        AtomicBoolean sameType = new AtomicBoolean(false);
+        if(database == DatabaseType.SQLite){
+            SQLHelper.buildStatement("PRAGMA table_info({prefix}" + table + ");", preparedStatement -> {
+                try(ResultSet resultSet = preparedStatement.executeQuery()){
+                    while(resultSet.next()){
+                        if(column.equals(resultSet.getString(2))){
+                            sameType.set(type.equals(resultSet.getString(3)));
+                            break;
+                        }
+                    }
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+            }, Throwable::printStackTrace);
+        }
+        else{
+            //SQLHelper.buildStatement("SELECT data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{prefix}" + table + "' AND column_name = '" + column + "';", preparedStatement -> {
+            SQLHelper.buildStatement("SHOW FIELDS FROM {prefix}" + table + ";", preparedStatement -> {
+                try(ResultSet resultSet = preparedStatement.executeQuery()){
+                    while (resultSet.next()){
+                        if(column.equals(resultSet.getString("Field"))){
+                            sameType.set(type.equals(resultSet.getString("Type")));
+                            break;
+                        }
+                    }
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+            }, Throwable::printStackTrace);
+        }
+        return sameType.get();
     }
 
     private enum DatabaseType{

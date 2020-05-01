@@ -71,12 +71,12 @@ public final class UpgradesListener implements Listener {
             Executor.sync(() -> {
                 if(!alreadySet.contains(island.getOwner().getUniqueId())) {
                     alreadySet.add(island.getOwner().getUniqueId());
-                    e.getSpawner().setDelay((int) (
-                            plugin.getNMSAdapter().getSpawnerDelay(e.getSpawner()) / spawnerRatesMultiplier));
+                    e.getSpawner().setDelay((int)
+                            Math.round(plugin.getNMSAdapter().getSpawnerDelay(e.getSpawner()) / spawnerRatesMultiplier));
                     e.getSpawner().update();
                     Executor.sync(() -> alreadySet.remove(island.getOwner().getUniqueId()), 10L);
                 }
-            }, 1L);
+            }, 5L);
         }
     }
 

@@ -17,6 +17,11 @@ public interface ISuperiorCommand extends SuperiorCommand {
         return tabComplete((SuperiorSkyblockPlugin) plugin, sender, args);
     }
 
+    @Override
+    default boolean displayCommand() {
+        return true;
+    }
+
     void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args);
 
     List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args);

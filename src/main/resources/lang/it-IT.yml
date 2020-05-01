@@ -257,6 +257,9 @@ COOP_ANNOUNCEMENT: '&e&lIsola | &7{0} ha aggiunto {1} come membro co-op dell''is
 COOP_BANNED_PLAYER: '&c&lErrore | &7Questo giocatore è bannato dall''isola e non può
   essere un mebro co-op.'
 CREATE_ISLAND: '&e&lIsola | &7Creata una nuova isola a {0} in {1}ms.'
+DEBUG_MODE_DISABLED: '&e&lDebug | &7Toggled debug mode &cOFF&7.'
+DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
+DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'
 DELETE_WARP: '&e&lIsola | &7Hai eliminato la warp {0}.'
 DELETE_WARP_SIGN_BROKE: '&7&oC''era un cartello per quel warp, è stato rimosso....'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi degradare solo i giocatori con
