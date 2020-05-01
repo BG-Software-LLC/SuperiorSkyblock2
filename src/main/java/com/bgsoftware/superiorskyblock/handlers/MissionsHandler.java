@@ -29,15 +29,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 
 public final class MissionsHandler implements MissionsManager {
@@ -87,7 +83,7 @@ public final class MissionsHandler implements MissionsManager {
 
                 if(mission == null) {
                     File missionJar = new File(missionsDict, missionSection.getString("mission-file") + ".jar");
-                    Optional<Class<?>> missionClass = getMissionClasses(missionJar.toURL()).stream().findFirst();
+                    Optional<Class<?>> missionClass = FileUtils.getClasses(missionJar.toURL(), Mission.class).stream().findFirst();
 
                     if (!missionClass.isPresent())
                         throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
@@ -381,32 +377,6 @@ public final class MissionsHandler implements MissionsManager {
                 .sorted(Comparator.comparingInt(o -> o.index))
                 .map(missionData -> missionData.mission)
                 .collect(Collectors.toList());
-    }
-
-    private List<Class<?>> getMissionClasses(URL jar) {
-        List<Class<?>> list = new ArrayList<>();
-
-        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, Mission.class.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
-            JarEntry jarEntry;
-            while ((jarEntry = jis.getNextJarEntry()) != null){
-                String name = jarEntry.getName();
-
-                if (name == null || name.isEmpty() || !name.endsWith(".class")) {
-                    continue;
-                }
-
-                name = name.replace("/", ".");
-                String clazzName = name.substring(0, name.lastIndexOf(".class"));
-
-                Class<?> c = cl.loadClass(clazzName);
-
-                if (Mission.class.isAssignableFrom(c)) {
-                    list.add(c);
-                }
-            }
-        } catch (Throwable ignored) { }
-
-        return list;
     }
 
     private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{

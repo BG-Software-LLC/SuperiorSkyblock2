@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
-import com.bgsoftware.superiorskyblock.grid.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
@@ -58,10 +59,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -86,6 +89,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
+
+    private ChunkGenerator worldGenerator = null;
 
     private boolean shouldEnable = true;
     private boolean debugMode = false;
@@ -242,6 +247,35 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
     }
 
+    @SuppressWarnings("all")
+    private ChunkGenerator getGenerator(){
+        if(worldGenerator == null) {
+            File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
+
+            if (!generatorFolder.exists()) {
+                generatorFolder.mkdirs();
+            } else {
+                try {
+                    for (File file : generatorFolder.listFiles()) {
+                        Optional<Class<?>> generatorClass = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
+                        if (generatorClass.isPresent()) {
+                            worldGenerator = (ChunkGenerator) generatorClass.get().newInstance();
+                            break;
+                        }
+                    }
+                } catch (Exception ex) {
+                    log("An error occurred while loading the generator:");
+                    ex.printStackTrace();
+                }
+            }
+
+            if (worldGenerator == null)
+                worldGenerator = new WorldGenerator();
+        }
+
+        return worldGenerator;
+    }
+
     private void loadWorld(){
         String worldName = (settingsHandler = new SettingsHandler(this)).islandWorldName;
         loadWorld(worldName, World.Environment.NORMAL);
@@ -252,7 +286,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadWorld(String worldName, World.Environment environment){
-        WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(new WorldGenerator()).createWorld();
+        WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(getGenerator()).createWorld();
 
         if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core")){
             getServer().dispatchCommand(getServer().getConsoleSender(), "mv import " + worldName + " normal -g " + getName());
@@ -271,7 +305,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        return new WorldGenerator();
+        return getGenerator();
     }
 
     public void reloadPlugin(boolean loadGrid){

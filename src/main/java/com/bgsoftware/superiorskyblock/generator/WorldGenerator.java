@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.grid;
+package com.bgsoftware.superiorskyblock.generator;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Location;

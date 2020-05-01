@@ -18,9 +18,13 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 public final class FileUtils {
 
@@ -203,6 +207,32 @@ public final class FileUtils {
             return null;
 
         return new SoundWrapper(sound, (float) section.getDouble("volume"), (float) section.getDouble("pitch"));
+    }
+
+    public static List<Class<?>> getClasses(URL jar, Class<?> clazz) {
+        List<Class<?>> list = new ArrayList<>();
+
+        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, clazz.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
+            JarEntry jarEntry;
+            while ((jarEntry = jis.getNextJarEntry()) != null){
+                String name = jarEntry.getName();
+
+                if (name == null || name.isEmpty() || !name.endsWith(".class")) {
+                    continue;
+                }
+
+                name = name.replace("/", ".");
+                String clazzName = name.substring(0, name.lastIndexOf(".class"));
+
+                Class<?> c = cl.loadClass(clazzName);
+
+                if (clazz.isAssignableFrom(c)) {
+                    list.add(c);
+                }
+            }
+        } catch (Throwable ignored) { }
+
+        return list;
     }
 
 }
