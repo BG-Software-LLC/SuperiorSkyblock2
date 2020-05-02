@@ -7,8 +7,8 @@
 
 # Here you can set the amount of time between auto calculations of all islands.
 # If you want to disable this feature, set interval to 0
-# It's recommended to set the task to a high interval, as it might cause lag.
-calc-interval: 6000
+# It's recommended to set the task to have a low interval, as it might cause lag.
+calc-interval: 0
 
 # All settings related to the database of the plugin.
 database:
