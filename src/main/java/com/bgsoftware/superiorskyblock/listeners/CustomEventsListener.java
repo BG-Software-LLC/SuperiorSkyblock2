@@ -294,8 +294,8 @@ public final class CustomEventsListener implements Listener {
 
             if((toIsland == null || !toIsland.equals(fromIsland) || !toIsland.isInsideRange(toLocation)) && fromIsland.isInsideRange(fromLocation)){
                 if(plugin.getSettings().stopLeaving && toLocation != null && !superiorPlayer.hasBypassModeEnabled() &&
-                        fromLocation.getWorld().equals(toLocation.getWorld()) && (toIsland == null || toIsland.equals(fromIsland)) &&
-                        !fromIsland.isInsideRange(toLocation)) {
+                        !fromIsland.isSpawn() && fromLocation.getWorld().equals(toLocation.getWorld()) &&
+                        (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(toLocation)) {
                     if(event instanceof Cancellable)
                         ((Cancellable) event).setCancelled(true);
                     return false;
