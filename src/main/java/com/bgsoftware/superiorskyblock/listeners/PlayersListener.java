@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -26,6 +28,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -47,6 +50,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -420,6 +424,34 @@ public final class PlayersListener implements Listener {
                 handleTeleport(superiorPlayer, island, toTeleport);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onObsidianClick(PlayerInteractEvent e){
+        if(!plugin.getSettings().obsidianToLava || e.getItem() == null || e.getClickedBlock() == null ||
+                e.getItem().getType() != Material.BUCKET || e.getClickedBlock().getType() != Material.OBSIDIAN)
+            return;
+
+
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+        if(island == null)
+            return;
+
+        if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) != 1)
+            return;
+
+        e.setCancelled(true);
+
+        ItemStack inHandItem = e.getItem().clone();
+        inHandItem.setAmount(inHandItem.getAmount() - 1);
+        ItemUtils.setItem(inHandItem.getAmount() == 0 ? new ItemStack(Material.AIR) : inHandItem, e, e.getPlayer());
+
+        e.getPlayer().getInventory().addItem(new ItemStack(Material.LAVA_BUCKET));
+
+        island.handleBlockBreak(Key.of("OBSIDIAN"), 1);
+
+        e.getClickedBlock().setType(Material.AIR);
     }
 
     private void handleTeleport(SuperiorPlayer superiorPlayer, Island island, Location toTeleport){

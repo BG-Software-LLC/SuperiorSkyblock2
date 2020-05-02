@@ -528,3 +528,6 @@ default-border-color: BLUE
 
 # Should the custom generators be handled by SuperiorSkyblock?
 generators: true
+
+# Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
+obsidian-to-lava: false

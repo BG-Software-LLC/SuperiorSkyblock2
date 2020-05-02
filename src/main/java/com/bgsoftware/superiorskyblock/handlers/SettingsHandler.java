@@ -124,6 +124,7 @@ public final class SettingsHandler {
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
     public final boolean generators;
+    public final boolean obsidianToLava;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -283,6 +284,7 @@ public final class SettingsHandler {
         defaultIslandFly = cfg.getBoolean("default-island-fly", false);
         defaultBorderColor = cfg.getString("default-border-color", "BLUE");
         generators = cfg.getBoolean("generators", true);
+        obsidianToLava = cfg.getBoolean("obsidian-to-lava", false);
     }
 
     public void updateValue(String path, Object value){

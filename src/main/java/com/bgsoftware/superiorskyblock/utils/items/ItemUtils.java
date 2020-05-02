@@ -7,13 +7,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
-import java.util.Arrays;
 import java.util.Map;
 
 public final class ItemUtils {
@@ -34,6 +34,19 @@ public final class ItemUtils {
         }catch(Exception ignored){}
 
         player.getInventory().removeItem(itemStack);
+    }
+
+    @SuppressWarnings("JavaReflectionMemberAccess")
+    public static void setItem(ItemStack itemStack, Event event, Player player){
+        try{
+            EquipmentSlot equipmentSlot = (EquipmentSlot) PlayerInteractEvent.class.getMethod("getHand").invoke(event);
+            if(equipmentSlot.name().equals("OFF_HAND")){
+                player.getInventory().setItem(40, itemStack);
+                return;
+            }
+        }catch(Exception ignored){}
+
+        player.getInventory().setItemInHand(itemStack);
     }
 
     public static EntityType getEntityType(ItemStack itemStack){
