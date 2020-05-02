@@ -61,7 +61,7 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
 
         else if(args.length == 3){
             targetPlayer = SSuperiorPlayer.of(args[2]);
-            if(!targetPlayer.isOnline())
+            if(targetPlayer != null && !targetPlayer.isOnline())
                 targetPlayer = null;
         }
 
