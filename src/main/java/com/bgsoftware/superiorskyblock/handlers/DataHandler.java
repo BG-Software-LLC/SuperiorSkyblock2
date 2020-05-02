@@ -329,7 +329,14 @@ public final class DataHandler {
         if(!isType(column, table, newType)){
             if(database == DatabaseType.SQLite){
                 String tmpTable = "__tmp" + table;
-                SQLHelper.buildStatement("ALTER TABLE {prefix}" + table + " RENAME TO " + tmpTable + ";", PreparedStatement::executeQuery, Throwable::printStackTrace);
+                SQLHelper.buildStatement("ALTER TABLE {prefix}" + table + " RENAME TO " + tmpTable + ";", preparedStatement -> {
+                    if(preparedStatement.getMetaData().getColumnCount() == 0){
+                        preparedStatement.executeUpdate();
+                    }
+                    else{
+                        preparedStatement.executeQuery();
+                    }
+                }, Throwable::printStackTrace);
                 createIslandsTable();
                 SQLHelper.buildStatement("INSERT INTO {prefix}" + table + "  SELECT * FROM " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
                 SQLHelper.buildStatement("DROP TABLE " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
