@@ -999,7 +999,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         beingRecalculated.set(true);
 
-        SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + asker.getName());
+        SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + (asker == null ? "Null" : asker.getName()));
 
         List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
         BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
