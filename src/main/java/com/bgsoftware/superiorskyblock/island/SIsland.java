@@ -244,8 +244,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
         //assignPermissionNodes();
         checkMembersDuplication();
-
-        Executor.sync(() -> biome.set(getCenter(World.Environment.NORMAL).getBlock().getBiome()));
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName, String schemName){
@@ -1205,6 +1203,10 @@ public final class SIsland extends DatabaseObject implements Island {
     public void setBiome(Biome biome){
         SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
         getAllChunksAsync(World.Environment.NORMAL, false, false, chunk -> plugin.getNMSAdapter().setBiome(chunk, biome));
+        setBiomeRaw(biome);
+    }
+
+    public void setBiomeRaw(Biome biome){
         this.biome.set(biome);
     }
 
