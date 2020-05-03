@@ -137,7 +137,7 @@ public final class DataHandler {
         addColumnIfNotExists("dirtyChunks", "grid", "''", "TEXT");
         addColumnIfNotExists("dirtyChunks", "islands", "''", "TEXT");
         addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
-        addColumnIfNotExists("bonusLevel", "islands", "''", "TEXT");
+        addColumnIfNotExists("bonusLevel", "islands", "'0'", "TEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
