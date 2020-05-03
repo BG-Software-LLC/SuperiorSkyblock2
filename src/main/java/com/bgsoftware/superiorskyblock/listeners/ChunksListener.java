@@ -74,9 +74,6 @@ public final class ChunksListener implements Listener {
 
         ((SIsland) island).setBiomeRaw(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()));
 
-        if(island.getBiome() != null && !island.getBiome().equals(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ())))
-            plugin.getNMSAdapter().setBiome(e.getChunk(), island.getBiome());
-
         plugin.getNMSAdapter().injectChunkSections(e.getChunk());
 
         if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
