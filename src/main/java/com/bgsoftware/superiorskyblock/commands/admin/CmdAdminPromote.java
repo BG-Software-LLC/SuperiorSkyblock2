@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -67,12 +68,14 @@ public final class CmdAdminPromote implements ISuperiorCommand {
             return;
         }
 
-        if(targetPlayer.getPlayerRole().isLastRole()){
+        PlayerRole currentRole = targetPlayer.getPlayerRole(), nextRole = currentRole.getNextRole();
+
+        if(currentRole.isLastRole() || nextRole.isLastRole()){
             Locale.LAST_ROLE_PROMOTE.send(sender);
             return;
         }
 
-        targetPlayer.setPlayerRole(targetPlayer.getPlayerRole().getNextRole());
+        targetPlayer.setPlayerRole(nextRole);
 
         Locale.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
         Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());

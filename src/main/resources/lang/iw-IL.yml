@@ -218,6 +218,7 @@ DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'
 DELETE_WARP: '&e&lיא | &7{0} םוקימה תא תקחמ.'
 DELETE_WARP_SIGN_BROKE: '&7&o...רבשנ אוה ,טלש הזה םוקימל היה.'
+DEMOTE_LEADER: '&c&lError | &7You cannot demote island leaders.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7ךלשמ הכומנ הגרד ילעב םינקחש קר הגרדב
   דירוהל לוכי התא.'
 DEMOTED_MEMBER: '&e&lיא | &7ולש יאב {1} הגרדל {0} תא הגרדב תדרוה.'

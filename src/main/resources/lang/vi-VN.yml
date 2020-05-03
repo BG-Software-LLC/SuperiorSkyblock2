@@ -252,6 +252,7 @@ DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'
 DELETE_WARP: '&e&lĐảo Thần | &7Bạn đã xóa khu vực {0}.'
 DELETE_WARP_SIGN_BROKE: '&7&oChỗ đó từng có một bản hiệu khu vực, nhưng nó đã hư...'
+DEMOTE_LEADER: '&c&lError | &7You cannot demote island leaders.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể hạ cấp người chơi với
   vai trò đảo thấp hơn của bạn.'
 DEMOTED_MEMBER: '&e&lĐảo Thần | &7Bạn đã hạ cấp {0} thành {1} trong đảo của họ.'

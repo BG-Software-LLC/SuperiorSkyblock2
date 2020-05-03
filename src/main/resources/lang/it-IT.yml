@@ -262,6 +262,7 @@ DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'
 DELETE_WARP: '&e&lIsola | &7Hai eliminato la warp {0}.'
 DELETE_WARP_SIGN_BROKE: '&7&oC''era un cartello per quel warp, è stato rimosso....'
+DEMOTE_LEADER: '&c&lError | &7You cannot demote island leaders.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi degradare solo i giocatori con
   un ruolo dell''isola inferiore al tuo.'
 DEMOTED_MEMBER: '&e&lIsola | &7Hai degradato {0} a {1}.'
