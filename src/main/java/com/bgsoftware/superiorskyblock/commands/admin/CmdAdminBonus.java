@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class CmdAdminBonus implements ISuperiorCommand {
 
@@ -35,7 +37,7 @@ public final class CmdAdminBonus implements ISuperiorCommand {
         return "admin bonus <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <worth/level> <" +
                 Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
@@ -46,12 +48,12 @@ public final class CmdAdminBonus implements ISuperiorCommand {
 
     @Override
     public int getMinArgs() {
-        return 4;
+        return 5;
     }
 
     @Override
     public int getMaxArgs() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -84,18 +86,25 @@ public final class CmdAdminBonus implements ISuperiorCommand {
             islands.add(island);
         }
 
-        BigDecimal bonusWorth;
+        boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
+
+        BigDecimal bonus;
 
         try{
-            bonusWorth = BigDecimalFormatted.of(args[3]);
+            bonus = BigDecimalFormatted.of(args[4]);
         }catch(NumberFormatException ex){
             Locale.INVALID_AMOUNT.send(sender);
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setBonusWorth(bonusWorth)));
+        Executor.data(() -> islands.forEach(island -> {
+            if(isWorthBonus)
+                island.setBonusWorth(bonus);
+            else
+                island.setBonusLevel(bonus);
+        }));
 
-        Locale.BONUS_SET_SUCCESS.send(sender, bonusWorth.toString());
+        Locale.BONUS_SET_SUCCESS.send(sender, bonus.toString());
     }
 
     @Override
@@ -113,6 +122,9 @@ public final class CmdAdminBonus implements ISuperiorCommand {
                         list.add(playerIsland.getName());
                 }
             }
+        }
+        else if(args.length == 4){
+            list.addAll(Stream.of("worth", "level").filter(arg -> arg.startsWith(args[3].toLowerCase())).collect(Collectors.toSet()));
         }
 
         return list;

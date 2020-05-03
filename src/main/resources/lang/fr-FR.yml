@@ -323,7 +323,8 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIle | &7  {0}: {1}'
 ISLAND_INFO_BANK: '&e&lIle | &7Banque: {0}'
-ISLAND_INFO_BONUS: '&e&lIle | &7Bonus: {0}'
+ISLAND_INFO_BONUS: '&e&lIsland | &7Worth Bonus: {0}'
+ISLAND_INFO_BONUS_LEVEL: '&e&lIsland | &7Level Bonus: {0}'
 ISLAND_INFO_DISCORD: '&e&lIle | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''

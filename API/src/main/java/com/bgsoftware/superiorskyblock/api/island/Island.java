@@ -762,7 +762,7 @@ public interface Island extends Comparable<Island> {
     BigDecimal getRawWorthAsBigDecimal();
 
     /**
-     * Get the worth value of the island, excluding the money in the bank.
+     * Get the worth value of the island, excluding bonus worth and the money in the bank.
      */
     BigDecimal getRawWorth();
 
@@ -778,6 +778,17 @@ public interface Island extends Comparable<Island> {
     void setBonusWorth(BigDecimal bonusWorth);
 
     /**
+     * Get the bonus level of the island.
+     */
+    BigDecimal getBonusLevel();
+
+    /**
+     * Set a bonus level for the island.
+     * @param bonusLevel The bonus to give.
+     */
+    void setBonusLevel(BigDecimal bonusLevel);
+
+    /**
      * Get the level of the island.
      *
      * @deprecated See getIslandLevel()
@@ -789,6 +800,11 @@ public interface Island extends Comparable<Island> {
      * Get the level of the island.
      */
     BigDecimal getIslandLevel();
+
+    /**
+     * Get the level value of the island, excluding the bonus level.
+     */
+    BigDecimal getRawLevel();
 
     /*
      *  Upgrades related methods

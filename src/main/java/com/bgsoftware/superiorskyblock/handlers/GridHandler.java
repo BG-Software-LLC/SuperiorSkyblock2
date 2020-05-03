@@ -52,11 +52,11 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class GridHandler implements GridManager {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
 
-    private IslandRegistry islands = new IslandRegistry();
-    private StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
-    private Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
+    private final IslandRegistry islands = new IslandRegistry();
+    private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
+    private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -83,12 +83,17 @@ public final class GridHandler implements GridManager {
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName, boolean offset) {
+        createIsland(superiorPlayer, schemName, bonus, BigDecimal.ZERO, biome, islandName, false);
+    }
+
+    @Override
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset) {
         if(!Bukkit.isPrimaryThread()){
-            Executor.sync(() -> createIsland(superiorPlayer, schemName, bonus, biome, islandName, offset));
+            Executor.sync(() -> createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset));
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus: " + bonus + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
+        SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
 
         if(EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName)) {
             Location islandLocation = getNextLocation();
@@ -104,7 +109,8 @@ public final class GridHandler implements GridManager {
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                    island.setBonusWorth(offset ? island.getRawWorth().negate() : bonus);
+                    island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
+                    island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                     island.setBiome(biome);
                     island.getAllChunksAsync(World.Environment.NORMAL, true, true,
                             chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
@@ -504,7 +510,7 @@ public final class GridHandler implements GridManager {
 
     private class StackedBlocksHandler {
 
-        private Map<SBlockPosition, Integer> stackedBlocks = Maps.newHashMap();
+        private final Map<SBlockPosition, Integer> stackedBlocks = Maps.newHashMap();
 
         void put(SBlockPosition location, int amount){
             stackedBlocks.put(location, amount);

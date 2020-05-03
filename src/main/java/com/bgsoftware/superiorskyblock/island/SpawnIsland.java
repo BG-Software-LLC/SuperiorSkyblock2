@@ -735,6 +735,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public BigDecimal getBonusLevel() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public void setBonusLevel(BigDecimal bonusLevel) {
+
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getIslandLevelAsBigDecimal() {
         return getIslandLevel();
@@ -742,6 +752,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public BigDecimal getIslandLevel() {
+        return getRawLevel();
+    }
+
+    @Override
+    public BigDecimal getRawLevel() {
         return BigDecimal.ZERO;
     }
 

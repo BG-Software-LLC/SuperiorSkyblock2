@@ -136,6 +136,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> bonusWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
+    private final SyncedObject<BigDecimalFormatted> bonusLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
     private final SyncedObject<Integer> islandSize = SyncedObject.of(plugin.getSettings().defaultIslandSize);
@@ -200,6 +201,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
         this.description.set(resultSet.getString("description"));
         this.ignored.set(resultSet.getBoolean("ignored"));
+        this.bonusLevel.set(BigDecimalFormatted.of(resultSet.getString("bonusLevel")));
 
         String generatedSchematics = resultSet.getString("generatedSchematics");
         try{
@@ -1680,7 +1682,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
-        SuperiorSkyblockPlugin.debug("Action: Set Bonus, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
+        SuperiorSkyblockPlugin.debug("Action: Set Bonus Worth, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
 
         BigDecimalFormatted newBonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
         this.bonusWorth.set(newBonusWorth);
@@ -1696,6 +1698,28 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public BigDecimal getBonusLevel() {
+        return bonusLevel.get();
+    }
+
+    @Override
+    public void setBonusLevel(BigDecimal bonusLevel) {
+        SuperiorSkyblockPlugin.debug("Action: Set Bonus Level, Island: " + owner.getName() + ", Bonus: " + bonusLevel);
+
+        BigDecimalFormatted newBonusLevel = bonusLevel instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusLevel : BigDecimalFormatted.of(bonusLevel);
+        this.bonusLevel.set(newBonusLevel);
+
+        plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+        plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
+        MenuTopIslands.refreshMenus();
+
+        Query.ISLAND_SET_BONUS_LEVEL.getStatementHolder()
+                .setString(newBonusLevel.getAsString())
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getIslandLevelAsBigDecimal() {
         return getIslandLevel();
@@ -1703,10 +1727,18 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public BigDecimalFormatted getIslandLevel() {
-        BigDecimalFormatted islandLevel = this.islandLevel.get(), bonusWorth = this.bonusWorth.get();
+        BigDecimalFormatted bonusLevel = this.bonusLevel.get(), islandLevel = this.islandLevel.get().add(bonusLevel);
 
-        if(plugin.getSettings().bonusAffectLevel)
-            islandLevel = islandLevel.add(new BigDecimal(plugin.getBlockValues().convertValueToLevel(bonusWorth)));
+        if(plugin.getSettings().roundedIslandLevel) {
+            islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
+        }
+
+        return islandLevel;
+    }
+
+    @Override
+    public BigDecimal getRawLevel() {
+        BigDecimalFormatted islandLevel = this.islandLevel.get();
 
         if(plugin.getSettings().roundedIslandLevel) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);

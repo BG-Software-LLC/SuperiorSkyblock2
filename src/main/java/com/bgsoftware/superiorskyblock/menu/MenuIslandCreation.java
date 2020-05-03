@@ -70,7 +70,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
     private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean fromInventory){
         String permission = (String) menu.getData(schematic + "-permission", "");
         if (menu.superiorPlayer.hasPermission(permission)) {
-            BigDecimal bonusWorth = new BigDecimal((long) menu.getData(schematic + "-bonus", 0L));
+            BigDecimal bonusWorth = BigDecimal.valueOf((double) menu.getData(schematic + "-bonus-worth", 0D));
+            BigDecimal bonusLevel = BigDecimal.valueOf((double) menu.getData(schematic + "-bonus-level", 0D));
             boolean offset = (boolean) menu.getData(schematic + "-offset", false);
 
             Biome biome = Biome.valueOf((String) menu.getData(schematic + "-biome", "PLAINS"));
@@ -90,7 +91,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             }
 
             Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
-            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, biome, menu.islandName, offset);
+            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, bonusLevel, biome, menu.islandName, offset);
         }
         else{
             SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-no-access-item-sound");
@@ -162,7 +163,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
                         menuIslandCreation.addData(schematic + "-slot", slot);
                         menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission", ""));
                         menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
-                        menuIslandCreation.addData(schematic + "-bonus", itemSection.getLong("bonus", itemSection.getLong("bonus-worth", 0)));
+                        menuIslandCreation.addData(schematic + "-bonus-worth", itemSection.getDouble("bonus", itemSection.getDouble("bonus-worth", 0D)));
+                        menuIslandCreation.addData(schematic + "-bonus-level", itemSection.getDouble("bonus-level", 0D));
                         menuIslandCreation.addData(schematic + "-offset", itemSection.getBoolean("offset", false));
                         menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("access")));
                         menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("no-access")));

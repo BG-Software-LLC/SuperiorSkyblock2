@@ -137,6 +137,7 @@ public final class DataHandler {
         addColumnIfNotExists("dirtyChunks", "grid", "''", "TEXT");
         addColumnIfNotExists("dirtyChunks", "islands", "''", "TEXT");
         addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
+        addColumnIfNotExists("bonusLevel", "islands", "''", "TEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -251,7 +252,8 @@ public final class DataHandler {
                 "unlockedWorlds TEXT," +
                 "lastTimeUpdate INTEGER," +
                 "dirtyChunks TEXT," +
-                "entityLimits TEXT" +
+                "entityLimits TEXT," +
+                "bonusLevel TEXT" +
                 ");");
     }
 
