@@ -2587,6 +2587,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
+                .setString(bonusLevel.get().getAsString())
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2637,6 +2638,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
+                .setString(bonusLevel.get().getAsString())
                 .execute(async);
     }
 
