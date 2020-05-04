@@ -32,6 +32,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     static {
         blocksToItems.put("SIGN_POST", "SIGN");
         blocksToItems.put("SUGAR_CANE_BLOCK", "SUGAR_CANE");
+        blocksToItems.put("WALL_SIGN", "SIGN");
     }
 
     private final Island island;
