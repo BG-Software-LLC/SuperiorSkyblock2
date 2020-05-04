@@ -69,7 +69,7 @@ public final class ChunksListener implements Listener {
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
         Island island = plugin.getGrid().getIslandAt(firstBlock);
 
-        if(island == null)
+        if(island == null || island.isSpawn())
             return;
 
         ((SIsland) island).setBiomeRaw(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()));
