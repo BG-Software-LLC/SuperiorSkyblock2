@@ -332,10 +332,9 @@ public final class DataHandler {
             if(database == DatabaseType.SQLite){
                 String tmpTable = "__tmp" + table;
                 SQLHelper.buildStatement("ALTER TABLE {prefix}" + table + " RENAME TO " + tmpTable + ";", preparedStatement -> {
-                    if(preparedStatement.getMetaData().getColumnCount() == 0){
+                    try{
                         preparedStatement.executeUpdate();
-                    }
-                    else{
+                    }catch(Throwable ex){
                         preparedStatement.executeQuery();
                     }
                 }, Throwable::printStackTrace);
