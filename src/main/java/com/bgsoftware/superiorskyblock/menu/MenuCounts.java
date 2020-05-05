@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -33,6 +34,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
         blocksToItems.put("SIGN_POST", "SIGN");
         blocksToItems.put("SUGAR_CANE_BLOCK", "SUGAR_CANE");
         blocksToItems.put("WALL_SIGN", "SIGN");
+        blocksToItems.put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS");
     }
 
     private final Island island;
@@ -59,14 +61,30 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
             String[] keySections = blockKey.toString().split(":");
 
-            if (blocksToItems.containsKey(keySections[0]))
-                keySections[0] = blocksToItems.get(keySections[0]);
+            if (blocksToItems.containsKey(keySections[0])) {
+                String[] item = blocksToItems.get(keySections[0]).split(":");
+                String itemType = item[0];
+                try {
+                    //Checking if the material is valid
+                    Material.valueOf(itemType);
+                    if (item.length == 2)
+                        keySections = item;
+                    else
+                        keySections[0] = itemType;
+                }catch(Throwable ignored){}
+            }
 
             Material blockMaterial;
+            byte damage = 0;
             String materialName = null;
 
             try {
                 blockMaterial = Material.valueOf(keySections[0]);
+                if(keySections.length == 2) {
+                    try {
+                        damage = Byte.parseByte(keySections[1]);
+                    }catch(Throwable ignored){}
+                }
             } catch (Exception ex) {
                 blockMaterial = Material.BEDROCK;
                 materialName = keySections[0];
@@ -80,7 +98,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
                         HeadUtils.getTexture(keySections[1])));
                 materialName = keySections[1] + "_SPAWNER";
             } else {
-                itemBuilder = new ItemBuilder(blockMaterial);
+                itemBuilder = new ItemBuilder(blockMaterial, damage);
                 if (materialName == null)
                     materialName = blockMaterial.name();
             }
