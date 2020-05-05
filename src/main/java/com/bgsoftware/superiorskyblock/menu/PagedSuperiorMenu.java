@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Material;
@@ -13,9 +14,9 @@ import java.util.function.Function;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
+    private final boolean acceptNull;
     private List<T> objects;
     protected int currentPage = 1;
-    private boolean acceptNull;
 
     public PagedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
         this(identifier, superiorPlayer, false);
@@ -42,9 +43,12 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             if(slot >= 0) {
                 if (objectIndex < objects.size()) {
                     inventory.setItem(slot, getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex)));
+                    if(inventory.getItem(slot) == null)
+                        SuperiorSkyblockPlugin.log("Warning: Cannot get item-type of " + objects.get(objectIndex));
                 } else {
                     inventory.setItem(slot, getNullItem());
                 }
+
             }
         }
 
