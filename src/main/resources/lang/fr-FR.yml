@@ -150,6 +150,7 @@ COMMAND_DESCRIPTION_BIOME: Changeer le biome de l'île.
 COMMAND_DESCRIPTION_BORDER: Changer la couleur de la bordure de l'île.
 COMMAND_DESCRIPTION_CLOSE: Fermer l'île au public.
 COMMAND_DESCRIPTION_COOP: Ajouter un joueur en tant que coopérateur de votre île.
+COMMAND_DESCRIPTION_COOPS: 'Open the coops menu.'
 COMMAND_DESCRIPTION_COUNTS: Voir le nombre de blocs sur vôtre île.
 COMMAND_DESCRIPTION_CREATE: Créer une nouvelle île.
 COMMAND_DESCRIPTION_DEL_WARP: Supprimer un warp de son île.

@@ -169,6 +169,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public List<SuperiorPlayer> getCoopPlayers() {
+        return new ArrayList<>();
+    }
+
+    @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         if(inside)
             playersInside.add(superiorPlayer);

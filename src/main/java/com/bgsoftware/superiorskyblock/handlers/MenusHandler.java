@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuBiomes;
 import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
+import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
@@ -44,6 +45,7 @@ public final class MenusHandler implements MenusManager {
         loadMenu(MenuBorderColor::init);
         loadMenu(MenuConfirmDisband::init);
         loadMenu(MenuControlPanel::init);
+        loadMenu(MenuCoops::init);
         loadMenu(MenuCounts::init);
         loadMenu(MenuGlobalWarps::init);
         loadMenu(MenuIslandCreation::init);

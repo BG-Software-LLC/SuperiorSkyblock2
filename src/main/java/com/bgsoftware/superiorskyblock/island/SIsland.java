@@ -446,6 +446,11 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public List<SuperiorPlayer> getCoopPlayers() {
+        return coop.readAndGet(ArrayList::new);
+    }
+
+    @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         playersInside.write(playersInside -> {
             if (inside)
