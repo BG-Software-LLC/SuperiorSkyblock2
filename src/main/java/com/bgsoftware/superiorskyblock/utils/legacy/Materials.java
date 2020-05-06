@@ -5,9 +5,12 @@ import org.bukkit.inventory.ItemStack;
 
 public enum Materials {
 
+    CLOCK("WATCH"),
     PLAYER_HEAD("SKULL_ITEM", 3),
     GOLDEN_AXE("GOLD_AXE"),
-    SPAWNER("MOB_SPAWNER");
+    SPAWNER("MOB_SPAWNER"),
+    SUNFLOWER("DOUBLE_PLANT"),
+    BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 15);
 
     Materials(String bukkitType){
         this(bukkitType, 0);

@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuBlank;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 import java.io.File;
@@ -41,6 +42,8 @@ public final class MenusHandler implements MenusManager {
     public MenusHandler(SuperiorSkyblockPlugin plugin){
         //Reload all menus
         loadMenu(SuperiorMenuBlank::init);
+        loadMenu(SuperiorMenuSettings::init);
+
         loadMenu(MenuBiomes::init);
         loadMenu(MenuBorderColor::init);
         loadMenu(MenuConfirmDisband::init);

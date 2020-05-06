@@ -139,6 +139,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: Définir le multiplicateur de taux 
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Définir une limite de membres pour l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Définir le niveau d'une amélioration de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Définir la limite de warps d'une île.
+COMMAND_DESCRIPTION_ADMIN_SETTINGS: 'Open the plugin settings editor.'
 COMMAND_DESCRIPTION_ADMIN_SHOW: Obtenir des informations sur une île.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Se téléporter à l''emplacement de spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Activer/Désactiver le mode espion du chat

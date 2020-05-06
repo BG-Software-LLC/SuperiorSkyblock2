@@ -175,6 +175,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: Đặt giới hạn thành viên cho �
   chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: Đặt mức nâng cấp cho đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: Đặt giới hạn hu vực của một hòn đảo.
+COMMAND_DESCRIPTION_ADMIN_SETTINGS: 'Open the plugin settings editor.'
 COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Dịch chuyển đến vị trí trung tâm.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện

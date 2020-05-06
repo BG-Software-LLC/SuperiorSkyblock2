@@ -149,6 +149,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: רחא ןקחש לש יא לש םי
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: רחא ןקחש לש יא לש םינקחש תלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: רחא ןקחש לש יא לש גורדש לש המרה תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: רחא ןקחש לש יא לש םימוקימה תלבגה תא תונשל.
+COMMAND_DESCRIPTION_ADMIN_SETTINGS: 'Open the plugin settings editor.'
 COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.

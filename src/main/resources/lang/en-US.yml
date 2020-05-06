@@ -138,6 +138,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES: 'Set the spawner rates multiplier f
 COMMAND_DESCRIPTION_ADMIN_SET_TEAM_LIMIT: 'Set members limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE: 'Set the level of an upgrade for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_WARPS_LIMIT: 'Set the warps limit of an island.'
+COMMAND_DESCRIPTION_ADMIN_SETTINGS: 'Open the plugin settings editor.'
 COMMAND_DESCRIPTION_ADMIN_SHOW: 'Get information about an island.'
 COMMAND_DESCRIPTION_ADMIN_SPAWN: 'Teleport to the spawn location.'
 COMMAND_DESCRIPTION_ADMIN_SPY: 'Toggle chat spy mode'
