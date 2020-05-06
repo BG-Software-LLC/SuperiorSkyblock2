@@ -61,7 +61,7 @@ public final class SpawnIsland implements Island {
         SpawnIsland.plugin = plugin;
 
         center = LocationUtils.getLocation(plugin.getSettings().spawnLocation.replace(" ", "")).add(0.5, 0, 0.5);
-        islandSize = plugin.getSettings().maxIslandSize;
+        islandSize = plugin.getSettings().spawnSize;
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
         if(center.getWorld() == null){

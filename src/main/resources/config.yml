@@ -269,6 +269,10 @@ spawn:
   # Should a world border be displayed in the spawn?
   world-border: false
 
+  # Set the radius of the spawn island.
+  # This can exceed the max island size, but be aware that it doesn't overlap other islands.
+  size: 200
+
 # When enabled, players will get teleported upon void fall.
 # If they fall not in an island, they will be teleported to spawn.
 void-teleport: true

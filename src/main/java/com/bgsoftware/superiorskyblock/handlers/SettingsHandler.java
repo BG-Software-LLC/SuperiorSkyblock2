@@ -74,6 +74,7 @@ public final class SettingsHandler {
     public final List<String> spawnSettings;
     public final List<String> spawnPermissions;
     public final boolean spawnWorldBorder;
+    public final int spawnSize;
     public final boolean voidTeleport;
     public final List<String> interactables;
     public final boolean visitorsDamage;
@@ -209,6 +210,7 @@ public final class SettingsHandler {
         spawnSettings = cfg.getStringList("spawn.settings");
         spawnPermissions = cfg.getStringList("spawn.permissions");
         spawnWorldBorder = cfg.getBoolean("spawn.world-border", false);
+        spawnSize = cfg.getInt("spawn.size", 200);
         voidTeleport = cfg.getBoolean("void-teleport", true);
         interactables = loadInteractables(plugin);
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
