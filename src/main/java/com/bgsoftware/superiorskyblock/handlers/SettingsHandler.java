@@ -44,7 +44,7 @@ public final class SettingsHandler {
     public final int defaultCropGrowth;
     public final int defaultSpawnerRates;
     public final int defaultMobDrops;
-    public final int defaultIslandHeight;
+    public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
     public final KeySet whitelistedStackedBlocks;
@@ -152,27 +152,27 @@ public final class SettingsHandler {
         calcInterval = cfg.getLong("calc-interval", 6000);
         islandCommand = cfg.getString("island-command", "island,is,islands");
         maxIslandSize = cfg.getInt("max-island-size", 200);
-        defaultIslandSize = cfg.getInt("default-island-size", 20);
+        defaultIslandSize = cfg.getInt("default-values.island-size", 20);
         defaultBlockLimits = new KeyMap<>();
-        for(String line : cfg.getStringList("default-limits")){
+        for(String line : cfg.getStringList("default-values.block-limits")){
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
         }
         defaultEntityLimits = new HashMap<>();
-        for(String line : cfg.getStringList("default-entity-limits")){
+        for(String line : cfg.getStringList("default-values.entity-limits")){
             String[] sections = line.split(":");
             try {
                 defaultEntityLimits.put(EntityType.valueOf(sections[0]), Integer.parseInt(sections[1]));
             }catch(Exception ignored){}
         }
-        defaultTeamLimit = cfg.getInt("default-team-limit", 4);
-        defaultWarpsLimit = cfg.getInt("default-warps-limit", 3);
-        defaultCropGrowth = cfg.getInt("default-crop-growth", 1);
-        defaultSpawnerRates = cfg.getInt("default-spawner-rates", 1);
-        defaultMobDrops = cfg.getInt("default-mob-drops", 1);
-        defaultIslandHeight = cfg.getInt("default-island-height", 100);
+        defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
+        defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
+        defaultCropGrowth = cfg.getInt("default-values.crop-growth", 1);
+        defaultSpawnerRates = cfg.getInt("default-values.spawner-rates", 1);
+        defaultMobDrops = cfg.getInt("default-values.mob-drops", 1);
+        islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
@@ -353,6 +353,24 @@ public final class SettingsHandler {
                     cfg.set("island-roles.ladder." + name + ".id", cfg.getInt("island-roles.ladder." + name + ".weight"));
             }
         }
+        if(cfg.contains("default-island-size"))
+            cfg.set("default-values.island-size", cfg.getInt("default-island-size"));
+        if(cfg.contains("default-limits"))
+            cfg.set("default-values.block-limits", cfg.getStringList("default-limits"));
+        if(cfg.contains("default-entity-limits"))
+            cfg.set("default-values.entity-limits", cfg.getStringList("default-entity-limits"));
+        if(cfg.contains("default-warps-limit"))
+            cfg.set("default-values.warps-limit", cfg.getInt("default-warps-limit"));
+        if(cfg.contains("default-team-limit"))
+            cfg.set("default-values.team-limit", cfg.getInt("default-team-limit"));
+        if(cfg.contains("default-crop-growth"))
+            cfg.set("default-values.crop-growth", cfg.getInt("default-crop-growth"));
+        if(cfg.contains("default-spawner-rates"))
+            cfg.set("default-values.spawner-rates", cfg.getInt("default-spawner-rates"));
+        if(cfg.contains("default-mob-drops"))
+            cfg.set("default-values.mob-drops", cfg.getInt("default-mob-drops"));
+        if(cfg.contains("default-island-height"))
+            cfg.set("islands-height", cfg.getInt("default-island-height"));
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){

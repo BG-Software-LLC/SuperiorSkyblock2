@@ -32,44 +32,50 @@ island-command: 'island,is,islands'
 # Please, do not change it while you have a running islands world!
 max-island-size: 200
 
-# The default island size of all islands.
-# This island size can be expanded by using the /is admin setsize command.
-default-island-size: 20
+# All the default values for new islands that are created.
+# Please note: Upgrades with built-in values (upgrades that don't run commands to update values),
+# will override all the values here. For example, if I set an upgrade that changes generator rates,
+# there's no need to touch the default generator rates here, as new islands will get the rates from
+# the upgrade, and not from here.
+default-values:
+  # The default island size of all islands.
+  # This island size can be expanded by using the /is admin setsize command.
+  island-size: 20
 
-# Set the default block limits of islands.
-# This limit can be expanded by using the /is admin setblocklimit command.
-# You can find a list of materials here: https://bg-software.com/materials/
-default-limits:
-- 'HOPPER:8'
+  # Set the default block limits of islands.
+  # This limit can be expanded by using the /is admin setblocklimit command.
+  # You can find a list of materials here: https://bg-software.com/materials/
+  block-limits:
+    - 'HOPPER:8'
 
-# Set the default entity limits of islands.
-# This limit can be expanded by using the /is admin setentitylimit command.
-# You can find a list of entities here: https://bg-software.com/entities/
-default-entity-limits:
-- 'MINECART:4'
+  # Set the default entity limits of islands.
+  # This limit can be expanded by using the /is admin setentitylimit command.
+  # You can find a list of entities here: https://bg-software.com/entities/
+  entity-limits:
+    - 'MINECART:4'
 
-# The amount of warps an island can have
-# This limit can be expanded by using the /is admin setwarpslimit command.
-default-warps-limit: 3
+  # The amount of warps an island can have
+  # This limit can be expanded by using the /is admin setwarpslimit command.
+  warps-limit: 3
 
-# Set the default team limit of islands.
-# This limit can be expanded by using the /is admin setteamlimit command.
-default-team-limit: 4
+  # Set the default team limit of islands.
+  # This limit can be expanded by using the /is admin setteamlimit command.
+  team-limit: 4
 
-# Set the default crop-growth multiplier of islands.
-# This multiplier can be expanded by using the /is admin setcropgrowth command.
-default-crop-growth: 1
+  # Set the default crop-growth multiplier of islands.
+  # This multiplier can be expanded by using the /is admin setcropgrowth command.
+  crop-growth: 1
 
-# Set the default spawner-rates multiplier of islands.
-# This multiplier can be expanded by using the /is admin setspawnerrates command.
-default-spawner-rates: 1
+  # Set the default spawner-rates multiplier of islands.
+  # This multiplier can be expanded by using the /is admin setspawnerrates command.
+  spawner-rates: 1
 
-# Set the default mob-drops multiplier of islands.
-# This multiplier can be expanded by using the /is admin setmobdrops command.
-default-mob-drops: 1
+  # Set the default mob-drops multiplier of islands.
+  # This multiplier can be expanded by using the /is admin setmobdrops command.
+  mob-drops: 1
 
-# Set the default island height generation for islands.
-default-island-height: 100
+# Set the islands height generation for islands.
+islands-height: 100
 
 # Feature that adds per player world border in islands.
 # If you want to globally disable it, set this section to false.
