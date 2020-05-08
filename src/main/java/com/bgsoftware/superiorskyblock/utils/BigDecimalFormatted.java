@@ -68,7 +68,7 @@ public final class BigDecimalFormatted extends BigDecimal {
     }
 
     public static BigDecimalFormatted of(String str){
-        return new BigDecimalFormatted(str.isEmpty() ? "0" : str);
+        return new BigDecimalFormatted(str == null || str.isEmpty() ? "0" : str);
     }
 
     public static BigDecimalFormatted of(BigDecimal bigDecimal){
