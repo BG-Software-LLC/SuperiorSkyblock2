@@ -50,6 +50,12 @@ public interface GridManager {
     void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset);
 
     /**
+     * Checks if a player has an active request for creating an island.
+     * @param superiorPlayer The player to check.
+     */
+    boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer);
+
+    /**
      * Delete an island.
      * @param island The island to delete.
      */

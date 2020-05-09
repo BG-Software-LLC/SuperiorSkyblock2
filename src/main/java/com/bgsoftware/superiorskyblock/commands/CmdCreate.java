@@ -64,6 +64,11 @@ public final class CmdCreate implements ISuperiorCommand {
             return;
         }
 
+        if(plugin.getGrid().hasActiveCreateRequest(superiorPlayer)){
+            Locale.ISLAND_CREATE_PROCESS_FAIL.send(superiorPlayer);
+            return;
+        }
+
         String islandName = "", schematicName = null;
 
         if(plugin.getSettings().islandNamesRequiredForCreation) {

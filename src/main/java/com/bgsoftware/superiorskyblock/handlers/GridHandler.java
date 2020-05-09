@@ -57,6 +57,7 @@ public final class GridHandler implements GridManager {
     private final IslandRegistry islands = new IslandRegistry();
     private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
+    private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -100,6 +101,7 @@ public final class GridHandler implements GridManager {
             SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
             EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
             if(!event.isCancelled()) {
+                pendingCreationTasks.add(superiorPlayer.getUniqueId());
                 island.getAllChunks(World.Environment.NORMAL, true, false)
                         .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(island, chunk));
 
@@ -108,6 +110,9 @@ public final class GridHandler implements GridManager {
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                     islands.add(superiorPlayer.getUniqueId(), island);
                     setLastIsland(SBlockPosition.of(islandLocation));
+                    plugin.getDataHandler().insertIsland(island);
+
+                    pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
                     island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
                     island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
@@ -123,13 +128,17 @@ public final class GridHandler implements GridManager {
                         }
                     }
                 }, ex -> {
+                    pendingCreationTasks.remove(superiorPlayer.getUniqueId());
                     ex.printStackTrace();
                     Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
                 });
-
-                plugin.getDataHandler().insertIsland(island);
             }
         }
+    }
+
+    @Override
+    public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
+        return pendingCreationTasks.contains(superiorPlayer.getUniqueId());
     }
 
     @Override
