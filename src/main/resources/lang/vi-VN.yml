@@ -249,6 +249,7 @@ COOP_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thêm {1} là thành viên co-op.'
 COOP_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này bị cấm từ đảo và không thể    được
   co-op.'
 CREATE_ISLAND: '&e&lĐảo Thần | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
+CREATE_ISLAND_FAILURE: '&c&lError | &7An error occurred while creating your island. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Toggled debug mode &cOFF&7.'
 DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'

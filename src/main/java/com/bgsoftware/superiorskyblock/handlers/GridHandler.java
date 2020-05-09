@@ -100,21 +100,20 @@ public final class GridHandler implements GridManager {
             SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
             EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
             if(!event.isCancelled()) {
-                islands.add(superiorPlayer.getUniqueId(), island);
-                setLastIsland(SBlockPosition.of(islandLocation));
-
                 island.getAllChunks(World.Environment.NORMAL, true, false)
                         .forEach(chunk -> plugin.getNMSAdapter().regenerateChunk(island, chunk));
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schemName);
                 long startTime = System.currentTimeMillis();
                 schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                    islands.add(superiorPlayer.getUniqueId(), island);
+                    setLastIsland(SBlockPosition.of(islandLocation));
+
                     island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
                     island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                     island.setBiome(biome);
-                    island.getAllChunksAsync(World.Environment.NORMAL, true, true,
-                            chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
                     island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
+
                     if (superiorPlayer.isOnline()) {
                         Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                         if (event.getResult()) {
@@ -123,6 +122,9 @@ public final class GridHandler implements GridManager {
                                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
                         }
                     }
+                }, ex -> {
+                    ex.printStackTrace();
+                    Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
                 });
 
                 plugin.getDataHandler().insertIsland(island);

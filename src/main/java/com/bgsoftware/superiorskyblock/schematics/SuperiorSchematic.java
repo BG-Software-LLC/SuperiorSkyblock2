@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
 
@@ -165,59 +166,68 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     @Override
     public void pasteSchematic(Location location, Runnable callback){
-        pasteSchematic(null, location, callback);
+        pasteSchematic(null, location, callback, null);
     }
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback) {
+        pasteSchematic(island, location, callback, null);
+    }
+
+    @Override
+    public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         if(!Bukkit.isPrimaryThread()){
-            Executor.sync(() -> pasteSchematic(island, location, callback));
+            Executor.sync(() -> pasteSchematic(island, location, callback, onFailure));
             return;
         }
 
-        if(schematicProgress) {
-            pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback));
-            return;
-        }
-
-        SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
-
-        schematicProgress = true;
-
-        Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
-
-        BlockChangeTask blockChangeTask = new BlockChangeTask();
-
-        for(int y = 0; y <= sizes[1]; y++){
-            for(int x = 0; x <= sizes[0]; x++){
-                for(int z = 0; z <= sizes[2]; z++) {
-                    if (blocks[x][y][z].getCombinedId() > 0)
-                        blocks[x][y][z].applyBlock(blockChangeTask, min.clone().add(x, y, z), island);
-                }
-            }
-        }
-
-        blockChangeTask.submitUpdate(() -> {
-            for(SchematicEntity entity : entities) {
-                entity.spawnEntity(min);
+        try {
+            if (schematicProgress) {
+                pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback, onFailure));
+                return;
             }
 
-            ((SIsland) island).handleBlocksPlace(cachedCounts);
-            ((SIsland) island).saveDirtyChunks();
+            SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
 
-            EventsCaller.callIslandSchematicPasteEvent(island, name, location);
+            schematicProgress = true;
 
-            callback.run();
+            Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 
-            Executor.sync(() -> {
-                schematicProgress = false;
+            BlockChangeTask blockChangeTask = new BlockChangeTask(island);
 
-                if (pasteSchematicQueue.size() != 0) {
-                    PasteSchematicData data = pasteSchematicQueue.pop();
-                    data.schematic.pasteSchematic(data.island, data.location, data.callback);
+            for (int y = 0; y <= sizes[1]; y++) {
+                for (int x = 0; x <= sizes[0]; x++) {
+                    for (int z = 0; z <= sizes[2]; z++) {
+                        if (blocks[x][y][z].getCombinedId() > 0)
+                            blocks[x][y][z].applyBlock(blockChangeTask, min.clone().add(x, y, z), island);
+                    }
                 }
-            }, 10L);
-        });
+            }
+
+            blockChangeTask.submitUpdate(() -> {
+                try {
+                    for (SchematicEntity entity : entities) {
+                        entity.spawnEntity(min);
+                    }
+
+                    ((SIsland) island).handleBlocksPlace(cachedCounts);
+                    ((SIsland) island).saveDirtyChunks();
+
+                    EventsCaller.callIslandSchematicPasteEvent(island, name, location);
+
+                    callback.run();
+                }catch(Throwable ex) {
+                    if(onFailure != null)
+                        onFailure.accept(ex);
+                }finally {
+                    Executor.sync(this::onSchematicFinish, 10L);
+                }
+            });
+        }catch (Throwable ex){
+            onSchematicFinish();
+            if(onFailure != null)
+                onFailure.accept(ex);
+        }
     }
 
     @Override

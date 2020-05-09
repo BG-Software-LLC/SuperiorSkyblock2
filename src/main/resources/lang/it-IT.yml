@@ -259,6 +259,7 @@ COOP_ANNOUNCEMENT: '&e&lIsola | &7{0} ha aggiunto {1} come membro co-op dell''is
 COOP_BANNED_PLAYER: '&c&lErrore | &7Questo giocatore è bannato dall''isola e non può
   essere un mebro co-op.'
 CREATE_ISLAND: '&e&lIsola | &7Creata una nuova isola a {0} in {1}ms.'
+CREATE_ISLAND_FAILURE: '&c&lError | &7An error occurred while creating your island. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Toggled debug mode &cOFF&7.'
 DEBUG_MODE_ENABLED: '&e&lDebug | &7Toggled debug mode &aON&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Successfully updated the debug filter!'

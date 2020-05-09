@@ -411,7 +411,7 @@ public final class PlayersListener implements Listener {
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
                     schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () ->
-                            handleTeleport(superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport)));
+                            handleTeleport(superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport)), Throwable::printStackTrace);
                     island.setSchematicGenerate(environment);
                 }
                 else{

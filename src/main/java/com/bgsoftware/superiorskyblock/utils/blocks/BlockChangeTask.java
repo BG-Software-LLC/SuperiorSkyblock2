@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.google.common.base.Preconditions;
@@ -20,8 +21,13 @@ public final class BlockChangeTask {
 
     private final Map<ChunkPosition, List<BlockData>> blocksCache = Maps.newConcurrentMap();
     private final List<Chunk> chunksToUpdate = new ArrayList<>();
+    private final Island island;
 
     private boolean submitted = false;
+
+    public BlockChangeTask(Island island){
+        this.island = island;
+    }
 
     public void setBlock(Location location, int combinedId, BlockType blockType, Object... args){
         Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
@@ -30,35 +36,36 @@ public final class BlockChangeTask {
     }
 
     public void submitUpdate(Runnable onFinish){
-        Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
+        try {
+            Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
 
-        submitted = true;
+            submitted = true;
 
-        for(Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()){
-            Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
-            chunksToUpdate.add(chunk);
-            plugin.getNMSBlocks().refreshLight(chunk);
-            ChunksTracker.markDirty(null, chunk, false);
+            for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
+                Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
+                chunksToUpdate.add(chunk);
+                plugin.getNMSBlocks().refreshLight(chunk);
+                ChunksTracker.markDirty(island, chunk, false);
 
-            for(BlockData blockData : entry.getValue()){
-                plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args);
+                for (BlockData blockData : entry.getValue()) {
+                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.blockType, blockData.args);
+                }
             }
+
+            chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
+
+            if (onFinish != null)
+                onFinish.run();
+        }finally {
+            blocksCache.clear();
+            chunksToUpdate.clear();
         }
-
-        blocksCache.clear();
-
-        chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
-
-        chunksToUpdate.clear();
-
-        if(onFinish != null)
-            onFinish.run();
     }
 
     private static class ChunkPosition{
 
-        private String world;
-        private int x, z;
+        private final String world;
+        private final int x, z;
 
         ChunkPosition(String world, int x, int z){
             this.world = world;
