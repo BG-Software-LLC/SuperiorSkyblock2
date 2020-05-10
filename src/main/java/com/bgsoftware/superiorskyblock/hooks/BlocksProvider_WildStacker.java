@@ -78,7 +78,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             String id = getId(location);
             if(chunkSnapshots.containsKey(id)) {
                 Map.Entry<Integer, EntityType> entry = chunkSnapshots.get(id).getStackedSpawner(location);
-                return new Pair<>(entry.getKey(), entry.getValue().name());
+                return new Pair<>(entry.getKey(), entry.getValue() + "");
             }
 
             throw new RuntimeException("Chunk " + id + " is not cached.");
