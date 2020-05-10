@@ -11,21 +11,16 @@ import java.lang.reflect.Method;
 
 public final class ReflectionUtils {
 
-    private static String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    private static final String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
 
-    private static Registry<Fields, Field> fieldsMap = Registry.createRegistry();
-    private static Registry<Methods, Method> methodsMap = Registry.createRegistry();
+    private static final Registry<Fields, Field> fieldsMap = Registry.createRegistry();
 
     public static boolean init() {
         try {
-            Class<?> chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
-                    blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
+            Class<?> blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
                     craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
                     biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid"),
-                    chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection"),
-                    worldClass = getClass("net.minecraft.server.VERSION.World"),
-                    playerChunkMapClass = getClass("net.minecraft.server.VERSION.PlayerChunkMap"),
-                    chunkCoordIntPairClass = getClass("net.minecraft.server.VERSION.ChunkCoordIntPair");
+                    chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection");
 
             if (ServerVersion.isAtLeast(ServerVersion.v1_15)) {
                 Class<?> biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage");
@@ -43,10 +38,6 @@ public final class ReflectionUtils {
                 fieldsMap.add(Fields.BIOME_STORAGE_BIOME_BASES, field);
             }
 
-            if (ServerVersion.isAtLeast(ServerVersion.v1_14)) {
-                methodsMap.add(Methods.PLAYER_CHUNK_MAP_IS_OUTSIDE_OF_RANGE, getMethod(playerChunkMapClass, "isOutsideOfRange", chunkCoordIntPairClass));
-            }
-
             if (ServerVersion.isAtLeast(ServerVersion.v1_13)) {
                 fieldsMap.add(Fields.BLOCK_FLOWER_POT_CONTENT, getField(blockFlowerPotClass, "c"));
                 fieldsMap.add(Fields.CRAFT_INVENTORY_INVENTORY, getField(craftInventoryClass, "inventory"));
@@ -58,17 +49,6 @@ public final class ReflectionUtils {
                 fieldsMap.add(Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT, getField(chunkSectionClass, "nonEmptyBlockCount"));
                 fieldsMap.add(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
                 fieldsMap.add(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
-            }
-
-            if (ServerVersion.isEquals(ServerVersion.v1_8)) {
-                try {
-                    fieldsMap.add(Fields.CHUNK_PROVIDER_UNLOAD_QUEUE, getField(chunkProviderClass, "unloadQueue"));
-                } catch (Exception ignored) {
-                }
-                try {
-                    fieldsMap.add(Fields.WORLD_CHUNK_TICK_LIST, getField(worldClass, "chunkTickList"));
-                } catch (Exception ignored) {
-                }
             }
 
             return true;
@@ -116,10 +96,6 @@ public final class ReflectionUtils {
         return fieldsMap.get(fields);
     }
 
-    static Method getFromMethod(Methods methods){
-        return methodsMap.get(methods);
-    }
-
     private static Field getField(Class<?> clazz, String fieldName){
         try{
             Field field =  clazz.getDeclaredField(fieldName);
@@ -127,18 +103,6 @@ public final class ReflectionUtils {
             return field;
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("&cCouldn't find the field " + fieldName + " - Please contact Ome_R!");
-            throw new RuntimeException();
-        }
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static Method getMethod(Class<?> clazz, String methodName, Class<?> parameterTypes){
-        try{
-            Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
-            method.setAccessible(true);
-            return method;
-        }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("&cCouldn't find the method " + methodName + " - Please contact Ome_R!");
             throw new RuntimeException();
         }
     }
