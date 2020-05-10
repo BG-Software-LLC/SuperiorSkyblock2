@@ -1,16 +1,20 @@
 package com.bgsoftware.superiorskyblock.utils.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 
@@ -18,17 +22,33 @@ public final class ChunksProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ConcurrentLinkedQueue<BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>>>
-            pendingChunks = new ConcurrentLinkedQueue<>();
+    private static final ConcurrentLinkedQueue<ChunkPosition> pendingChunks = new ConcurrentLinkedQueue<>();
+
+    private static final Map<ChunkPosition, Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>>>
+            chunksInfo = new ConcurrentHashMap<>();
 
     private static BukkitTask chunksLoaderId;
 
     public static CompletableFuture<Chunk> loadChunk(World world, int x, int z, Consumer<Chunk> onLoadConsumer){
-        //SuperiorSkyblockPlugin.debug("Action: Load Chunk, Chunk: " + world + ", " + x + ", " + z);
-        CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
-        pendingChunks.add(new BiPair<>(ChunkPosition.of(world, x, z), completableFuture, onLoadConsumer));
-        //SuperiorSkyblockPlugin.debug("Action: Pending Chunk Requests, Amount: " + pendingChunks.size());
-        return completableFuture;
+        ChunkPosition chunkPosition = ChunkPosition.of(world, x, z);
+        Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);
+
+        if(chunkInfo != null){
+            if(onLoadConsumer != null)
+                chunkInfo.getValue().add(onLoadConsumer);
+            return chunkInfo.getKey();
+        }
+        else {
+            CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
+            Set<Consumer<Chunk>> chunkConsumers = new HashSet<>();
+
+            if(onLoadConsumer != null)
+                chunkConsumers.add(onLoadConsumer);
+
+            chunksInfo.put(chunkPosition, new Pair<>(completableFuture, chunkConsumers));
+            pendingChunks.add(chunkPosition);
+            return completableFuture;
+        }
     }
 
     public static void stop(){
@@ -43,18 +63,18 @@ public final class ChunksProvider {
     private static BukkitTask runChunksLoader(){
         Runnable loadChunks = () -> {
             for(int i = 0; i < plugin.getSettings().chunksPerTick; i++) {
-                BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>> pair = pendingChunks.poll();
+                ChunkPosition chunkPosition = pendingChunks.poll();
 
-                if (pair == null)
+                if (chunkPosition == null)
                     return;
 
-                Chunk chunk = pair.getX().loadChunk();
+                Chunk chunk = chunkPosition.loadChunk();
 
                 if(!Bukkit.isPrimaryThread()){
-                    Executor.sync(() -> finishLoad(pair, chunk));
+                    Executor.sync(() -> finishLoad(chunkPosition, chunk));
                 }
                 else{
-                    finishLoad(pair, chunk);
+                    finishLoad(chunkPosition, chunk);
                 }
             }
         };
@@ -68,11 +88,12 @@ public final class ChunksProvider {
         }
     }
 
-    private static void finishLoad(BiPair<ChunkPosition, CompletableFuture<Chunk>, Consumer<Chunk>> pair, Chunk chunk){
-        if(pair.getZ() != null)
-            pair.getZ().accept(chunk);
-
-        pair.getY().complete(chunk);
+    private static void finishLoad(ChunkPosition chunkPosition, Chunk chunk){
+        Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.remove(chunkPosition);
+        if(chunkInfo != null) {
+            chunkInfo.getValue().forEach(chunkConsumer -> chunkConsumer.accept(chunk));
+            chunkInfo.getKey().complete(chunk);
+        }
     }
 
 }
