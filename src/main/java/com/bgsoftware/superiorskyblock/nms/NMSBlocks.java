@@ -7,6 +7,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
+import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
@@ -43,6 +44,8 @@ public interface NMSBlocks {
     void setTileEntitySign(Object tileEntitySign, String[] lines);
 
     void setTileEntityMobSpawner(Object tileEntityMobSpawner, EntityType spawnedType);
+
+    Chunk getChunkIfLoaded(World world, int x, int z);
 
     int tickIslands(int random);
 

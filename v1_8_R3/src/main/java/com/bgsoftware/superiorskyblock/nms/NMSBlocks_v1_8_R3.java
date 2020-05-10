@@ -275,6 +275,12 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     }
 
     @Override
+    public org.bukkit.Chunk getChunkIfLoaded(org.bukkit.World bukkitWorld, int x, int z) {
+        Chunk chunk = ((CraftWorld) bukkitWorld).getHandle().chunkProviderServer.getChunkIfLoaded(x, z);
+        return chunk == null ? null : chunk.bukkitChunk;
+    }
+
+    @Override
     public int tickIslands(int random) {
         List<Pair<Island, List<org.bukkit.Chunk>>> activeChunks = new ArrayList<>();
         List<BiPair<WorldServer, BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();

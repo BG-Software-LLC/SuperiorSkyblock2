@@ -656,8 +656,10 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
             for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
-                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))){
-                    chunks.add(world.getChunkAt(chunkX, chunkZ));
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ)){
+                    Chunk chunk = plugin.getNMSBlocks().getChunkIfLoaded(world, chunkX, chunkZ);
+                    if(chunk != null)
+                        chunks.add(chunk);
                 }
             }
         }
