@@ -226,9 +226,6 @@ visitors-sign:
   # The line that will be displayed when the sign is inactive.
   inactive: '&c[Welcome]'
 
-# Set the line to create the welcome sign.
-welcome-sign-line: '[Welcome]'
-
 # Set the divider for the island bank money in the total island worth.
 # You can set it to 0 to disable island bank money to be calculated in island worth.
 bank-worth-rate: 1000
