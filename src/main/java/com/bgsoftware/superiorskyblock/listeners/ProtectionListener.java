@@ -463,11 +463,18 @@ public final class ProtectionListener implements Listener {
         if(spawnType == EntityType.UNKNOWN)
             return;
 
-        IslandPrivilege islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPrivileges.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.MONSTER_SPAWN;
+        try {
+            IslandPrivilege islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPrivileges.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.MONSTER_SPAWN;
 
-        if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
+            if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
+                e.setCancelled(true);
+                Locale.sendProtectionMessage(superiorPlayer);
+            }
+        }catch(Exception ex){
+            System.out.println("Item: " + e.getItem());
+            System.out.println("Entity: " + spawnType);
+            System.out.println("Entity Class: " + spawnType.getEntityClass());
+         ex.printStackTrace();
         }
     }
 

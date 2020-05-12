@@ -206,6 +206,8 @@ permissions:
             description: Get information about an island.
           superior.admin.spy:
             description: Toggle chat spy mode.
+          superior.admin.stats:
+            description: Show stats about the plugin.
           superior.admin.teleport:
             description: Teleport to other islands.
           superior.admin.unignore:

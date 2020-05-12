@@ -51,6 +51,10 @@ public final class ChunksProvider {
         }
     }
 
+    public static int getSize(){
+        return pendingChunks.size();
+    }
+
     public static void stop(){
         if(chunksLoaderId != null)
             chunksLoaderId.cancel();
