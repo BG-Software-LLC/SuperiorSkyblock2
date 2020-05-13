@@ -18,6 +18,7 @@ public final class JetsMinionsHook implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMinionBreak(MinerBlockBreakEvent e){
+        SuperiorSkyblockPlugin.debug("Action: Jets Minion Break, Block: " + e.getBlock().getLocation());
         if(BlocksListener.tryUnstack(null, e.getBlock(), plugin))
             e.setCancelled(true);
         else
