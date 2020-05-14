@@ -45,12 +45,7 @@ public final class Executor {
     }
 
     public static void async(Runnable runnable){
-        if(Bukkit.isPrimaryThread()){
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
-        }
-        else{
-            runnable.run();
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
     public static void async(Runnable runnable, long delay){
