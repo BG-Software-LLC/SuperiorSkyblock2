@@ -76,6 +76,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -856,6 +857,23 @@ public final class SIsland extends DatabaseObject implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
         if(value) {
             rolePermissions.add(islandPrivilege, playerRole);
+
+            if(islandPrivilege == IslandPrivileges.FLY){
+                for(SuperiorPlayer targetPlayer : getAllPlayersInside()){
+                    Player player = targetPlayer.asPlayer();
+                    if(!player.isFlying() && targetPlayer.hasIslandFlyEnabled() && hasPermission(targetPlayer, IslandPrivileges.FLY)){
+                        player.setAllowFlight(true);
+                        player.setFlying(true);
+                        Locale.ISLAND_FLY_ENABLED.send(player);
+                    }
+                    else if(player.isFlying() && !hasPermission(targetPlayer, IslandPrivileges.FLY)){
+                        player.setAllowFlight(false);
+                        player.setFlying(false);
+                        Locale.ISLAND_FLY_DISABLED.send(player);
+                    }
+                }
+            }
+
             savePermissionNodes();
         }
     }
@@ -868,6 +886,20 @@ public final class SIsland extends DatabaseObject implements Island {
             playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
+
+        if(islandPrivilege == IslandPrivileges.FLY){
+            Player player = superiorPlayer.asPlayer();
+            if(!player.isFlying() && value){
+                player.setAllowFlight(true);
+                player.setFlying(true);
+                Locale.ISLAND_FLY_ENABLED.send(player);
+            }
+            else if(player.isFlying() && !value){
+                player.setAllowFlight(false);
+                player.setFlying(false);
+                Locale.ISLAND_FLY_DISABLED.send(player);
+            }
+        }
 
         savePermissionNodes();
 
