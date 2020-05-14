@@ -597,8 +597,6 @@ TELEPORTED_FAILED: '&e&lNâng cấp | &7Có vẻ như hòn đảo này không c�
 TELEPORTED_SUCCESS: '&e&lĐảo Thần | &7Bạn đã được dịch chuyển đến hòn đảo của bạn.'
 TELEPORTED_TO_WARP: '&e&lĐảo Thần | &7Dịch chuyển thành công đến khu vực của hòn đảo
   này.'
-TOGGLE_FLY_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể bật chế độ bay ngoài đảo của
-  bạn.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7TChuyển đổi chế độ bypass : &cTẮT&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass : &aBẬT&7.'
 TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo : &cTẮT&7.'

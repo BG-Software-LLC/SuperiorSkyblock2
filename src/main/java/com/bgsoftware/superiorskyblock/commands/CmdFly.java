@@ -63,13 +63,10 @@ public final class CmdFly implements ISuperiorCommand {
             Locale.TOGGLED_FLY_OFF.send(superiorPlayer);
         }
         else{
-            if(island == null || island.isSpawn() || !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
-                Locale.TOGGLE_FLY_OUTSIDE_ISLAND.send(superiorPlayer);
-                return;
+            if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+                player.setAllowFlight(true);
+                player.setFlying(true);
             }
-
-            player.setAllowFlight(true);
-            player.setFlying(true);
 
             Locale.TOGGLED_FLY_ON.send(superiorPlayer);
         }

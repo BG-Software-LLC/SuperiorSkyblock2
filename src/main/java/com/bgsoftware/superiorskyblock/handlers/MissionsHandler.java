@@ -318,7 +318,9 @@ public final class MissionsHandler implements MissionsManager {
         YamlConfiguration data = new YamlConfiguration();
 
         for(Mission mission : getAllMissions()){
-            mission.saveProgress(data.createSection(mission.getName()));
+            ConfigurationSection section = data.createSection(mission.getName());
+            mission.saveProgress(section);
+            data.set(mission.getName(), section);
         }
 
         try{
