@@ -24,6 +24,7 @@ BAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} vừa bị&c&n Cấm&7 trong đảo
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể cấm người chơi có vai trò
   trong đảo thấp hơn bạn.'
 BANNED_FROM_ISLAND: '&c&lLỗi | &7Bạn đã bị cấm trong hòn đảo này.'
+BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_LEVEL: '&e&lCấp Độ | &7Khối {0} có giá trị cấp độ là {1}.'
 BLOCK_VALUE: '&e&lĐáng giá | &7Khối {0} được đánh giá với {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lĐáng giá | &7Khối {0} là vô giá trị.'
@@ -130,6 +131,7 @@ COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Chuyển đổi chế độ bypass.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Đóng một hòn đảo thành công cộng.
+COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Hạ cấp thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Gửi tiền vào ngân hàng đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Giải tán vĩnh viễn hòn đảo của người chơi khác.

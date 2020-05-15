@@ -21,6 +21,7 @@ BAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ קחרוה. {0}'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7םכלשמ הכומנ הגרד ילעב םינקחש קר קיחרהל
   םילוכי םתא.'
 BANNED_FROM_ISLAND: '&c&lהאיגש | &7יאהמ קחרומ התא.'
+BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_LEVEL: '&e&lתודוקנ | &7{1} אוה {0} קולבה לש תודוקנה רפסמ.'
 BLOCK_VALUE: '&e&lיווש | &7{1} אוה {0} קולבה לש יוושה.'
 BLOCK_VALUE_WORTHLESS: '&e&lיווש | &7םולכ הווש אל {0} קולבה.'
@@ -112,6 +113,7 @@ COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
+COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: רחא יאב ןקחש הגרדב דירוהל.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: רחא יא לש קנב לא ףסכ ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.

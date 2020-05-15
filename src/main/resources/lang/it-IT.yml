@@ -24,6 +24,7 @@ BAN_ANNOUNCEMENT: '&e&lIsola | &7{0} è stato bannato dall''isola di {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi bannare solo i giocatori aventi
   un ruolo inferiore al tuo.'
 BANNED_FROM_ISLAND: '&c&lErrore | &7Sei stato bannato da questa isola.'
+BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_LEVEL: '&e&lLevel | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE: '&e&lWorth | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7Il blocco {0} non ha valore.'
@@ -134,6 +135,7 @@ COMMAND_DESCRIPTION_ADMIN_BONUS: Concedi un bonus a un giocatore.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Attiva/disattiva la modalità bypass.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Chiudi un'isola al pubblico.
+COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Diminuisci il ruolo di un membro dell'isola di un
   giocatore.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Depositare denaro nella banca dell'isola di un

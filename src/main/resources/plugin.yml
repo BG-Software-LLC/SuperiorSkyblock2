@@ -140,6 +140,8 @@ permissions:
             description: Clear generator rates for a specific island.
           superior.admin.close:
             description: Close an island to the public.
+          superior.admin.count:
+            description: Check a block count on a specific island.
           superior.admin.demote:
             description: Demote a member in another player's island.
           superior.admin.deposit:
