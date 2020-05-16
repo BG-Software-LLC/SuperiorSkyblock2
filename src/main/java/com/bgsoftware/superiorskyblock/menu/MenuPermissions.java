@@ -32,6 +32,7 @@ import java.util.List;
 public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
     private static List<IslandPrivilege> islandPermissions = new ArrayList<>();
+    private static String noRolePermission = "", exactRolePermission = "", higherRolePermission = "";
 
     private final Island island;
     private final Object permissionHolder;
@@ -149,6 +150,38 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                     PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
                     permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).clone()
                             .replaceAll("{}", requiredRole.toString());
+
+                    if(!noRolePermission.isEmpty() && !exactRolePermission.isEmpty() && !higherRolePermission.isEmpty()) {
+                        List<String> roleString = new ArrayList<>();
+
+                        int roleWeight = requiredRole.getWeight();
+                        PlayerRole currentRole;
+
+                        for (int i = -2; (currentRole = SPlayerRole.of(i)) != null; i++) {
+                            if (i < roleWeight) {
+                                roleString.add(noRolePermission.replace("{}", currentRole + ""));
+                            } else if (i == roleWeight) {
+                                roleString.add(exactRolePermission.replace("{}", currentRole + ""));
+                            } else {
+                                roleString.add(higherRolePermission.replace("{}", currentRole + ""));
+                            }
+                        }
+
+                        List<String> lore = permissionItem.getItemMeta().getLore();
+
+                        for (int i = 0; i < lore.size(); i++) {
+                            String line = lore.get(i);
+                            if (line.equals("{0}")) {
+                                lore.set(i, roleString.get(0));
+                                for (int j = 1; j < roleString.size(); j++) {
+                                    lore.add(i + j, roleString.get(j));
+                                }
+                                i += roleString.size();
+                            }
+                        }
+
+                        permissionItem.withLore(lore);
+                    }
                 }
             } else {
                 if (containsData(permissionName + "-permission-enabled")) {
@@ -182,6 +215,10 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         if(convertOldGUI(cfg)){
             cfg.save(file);
         }
+
+        noRolePermission = cfg.getString("messages.no-role-permission", "");
+        exactRolePermission = cfg.getString("messages.exact-role-permission", "");
+        higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
 

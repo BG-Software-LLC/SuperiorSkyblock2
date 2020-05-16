@@ -19,6 +19,11 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
+messages:
+  no-role-permission: '&8 - &c{}'
+  exact-role-permission: '&8 - &2{}'
+  higher-role-permission: '&8 - &a{}'
+
 items:
   '$':
     type: STAINED_GLASS_PANE
@@ -56,6 +61,8 @@ permissions:
       lore:
         - '&7Access to all the abilities of the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -86,6 +93,8 @@ permissions:
       lore:
         - '&7Access to breed animals inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -116,6 +125,8 @@ permissions:
       lore:
         - '&7Access to damage animals inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -149,6 +160,8 @@ permissions:
       lore:
         - '&7Access to spawn animals inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -179,6 +192,8 @@ permissions:
       lore:
         - '&7Access to ban members from the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -209,6 +224,8 @@ permissions:
       lore:
         - '&7Access to break blocks inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -239,6 +256,8 @@ permissions:
       lore:
         - '&7Access to place blocks inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -269,6 +288,8 @@ permissions:
       lore:
         - '&7Access to change the island''s name.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -299,6 +320,8 @@ permissions:
       lore:
         - '&7Access to check other members'' permissions.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -329,6 +352,8 @@ permissions:
       lore:
         - '&7Access to open chests inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -359,6 +384,8 @@ permissions:
       lore:
         - '&7Access to bypass the island''s lock.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -389,6 +416,8 @@ permissions:
       lore:
         - '&7Access to lock the island from public.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -419,6 +448,8 @@ permissions:
       lore:
         - '&7Access to add a player as a co-op member.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -449,6 +480,8 @@ permissions:
       lore:
         - '&7Access to delete island warps.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -479,6 +512,8 @@ permissions:
       lore:
         - '&7Access to demote members inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -509,6 +544,8 @@ permissions:
       lore:
         - '&7Access to deposit money into the island''s bank.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -539,6 +576,8 @@ permissions:
       lore:
         - '&7Access to disband the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -572,6 +611,8 @@ permissions:
       lore:
         - '&7Access to check the island''s linked discord.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -602,6 +643,8 @@ permissions:
       lore:
         - '&7Access to drop items inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -632,6 +675,8 @@ permissions:
       lore:
         - '&7Access to use ender pearls inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -662,6 +707,8 @@ permissions:
       lore:
         - '&7Access to bypass from being expelled.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -692,6 +739,8 @@ permissions:
       lore:
         - '&7Access to expel players from the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -722,6 +771,8 @@ permissions:
       lore:
         - '&7Access to tramp farmlands inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -752,6 +803,8 @@ permissions:
       lore:
         - '&7Access fly around the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -782,6 +835,8 @@ permissions:
       lore:
         - '&7Access to interact with blocks inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -815,6 +870,8 @@ permissions:
       lore:
         - '&7Access to invite new members to the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -845,6 +902,8 @@ permissions:
       lore:
         - '&7Access to interact with item frames inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -875,6 +934,8 @@ permissions:
       lore:
         - '&7Access to kick members from the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -908,6 +969,8 @@ permissions:
       lore:
         - '&7Access to damage monsters inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -938,6 +1001,8 @@ permissions:
       lore:
         - '&7Access to damage minecarts inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -968,6 +1033,8 @@ permissions:
       lore:
         - '&7Access to enter minecarts inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -998,6 +1065,8 @@ permissions:
       lore:
         - '&7Access to open minecarts inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1031,6 +1100,8 @@ permissions:
       lore:
         - '&7Access to spawn monsters inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1061,6 +1132,8 @@ permissions:
       lore:
         - '&7Access to open the island to the public.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1091,6 +1164,8 @@ permissions:
       lore:
         - '&7Access to interact with paintings inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1124,6 +1199,8 @@ permissions:
       lore:
         - '&7Access to check the island''s linked paypal.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1154,6 +1231,8 @@ permissions:
       lore:
         - '&7Access to pickup items inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1184,6 +1263,8 @@ permissions:
       lore:
         - '&7Access to promote members inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1214,6 +1295,8 @@ permissions:
       lore:
         - '&7Access to rankup island''s upgrades.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1244,6 +1327,8 @@ permissions:
       lore:
         - '&7Access to see all island''s ratings.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1274,6 +1359,8 @@ permissions:
       lore:
         - '&7Access to change the island''s biome.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1307,6 +1394,8 @@ permissions:
       lore:
         - '&7Access to change the discord linked to the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1337,6 +1426,8 @@ permissions:
       lore:
         - '&7Access to change the home location of the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1370,6 +1461,8 @@ permissions:
       lore:
         - '&7Access to change the paypal linked to the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1400,6 +1493,8 @@ permissions:
       lore:
         - '&7Access to change permissions for island members.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1430,6 +1525,8 @@ permissions:
       lore:
         - '&7Access to change roles for island members.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1460,6 +1557,8 @@ permissions:
       lore:
         - '&7Access to change settings for islands.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1490,6 +1589,8 @@ permissions:
       lore:
         - '&7Access to set new warps for the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1520,6 +1621,8 @@ permissions:
       lore:
         - '&7Access to remove co-op members from the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1550,6 +1653,8 @@ permissions:
       lore:
         - '&7Access to interact with signs inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1580,6 +1685,8 @@ permissions:
       lore:
         - '&7Access to break spawners inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1610,6 +1717,8 @@ permissions:
       lore:
         - '&7Access to use different blocks inside the island.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
@@ -1640,6 +1749,8 @@ permissions:
       lore:
         - '&7Access to withdraw money from the island''s bank.'
         - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
     has-access:
       sound:
         type: ENTITY_EXPERIENCE_ORB_PICKUP
