@@ -565,7 +565,7 @@ public enum Locale {
     public void send(CommandSender sender, java.util.Locale locale, Object... objects){
         String message = getMessage(locale, objects);
         if(message != null && sender != null)
-            sender.sendMessage(message);
+            sendMessage(sender, message);
     }
 
     private void setMessage(java.util.Locale locale, String message){
