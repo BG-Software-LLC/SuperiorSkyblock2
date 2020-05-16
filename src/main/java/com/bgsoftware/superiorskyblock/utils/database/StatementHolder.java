@@ -62,8 +62,6 @@ public final class StatementHolder {
     }
 
     public void addBatch(){
-        if(batches.isEmpty())
-            SQLHelper.setAutoCommit(false);
         batches.add(Registry.createRegistry(new HashMap<>(values)));
         values.clear();
         currentIndex = 1;
@@ -82,41 +80,46 @@ public final class StatementHolder {
         SQLHelper.waitForConnection();
 
         try {
-            SQLHelper.waitForLock();
-
             StringHolder errorQuery = new StringHolder(query);
 
-            SQLHelper.buildStatement(query, preparedStatement -> {
-                if (isBatch) {
-                    if(batches.isEmpty()){
-                        isBatch = false;
-                        return;
-                    }
+            synchronized (SQLHelper.getMutex()) {
+                SQLHelper.buildStatement(query, preparedStatement -> {
+                    if (isBatch) {
+                        if (batches.isEmpty()) {
+                            isBatch = false;
+                            return;
+                        }
 
-                    for (Registry<Integer, Object> values : batches) {
-                        for (Map.Entry<Integer, Object> entry : values.entries()) {
+                        try {
+                            SQLHelper.setAutoCommit(false);
+
+                            for (Registry<Integer, Object> values : batches) {
+                                for (Map.Entry<Integer, Object> entry : values.entries()) {
+                                    preparedStatement.setObject(entry.getKey(), entry.getValue());
+                                    errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
+                                }
+                                preparedStatement.addBatch();
+                                values.delete();
+                            }
+
+                            preparedStatement.executeBatch();
+                            SQLHelper.commit();
+                        } finally {
+                            SQLHelper.setAutoCommit(true);
+                        }
+                    } else {
+                        for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                             preparedStatement.setObject(entry.getKey(), entry.getValue());
                             errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                         }
-                        preparedStatement.addBatch();
-                        values.delete();
+                        preparedStatement.executeUpdate();
                     }
-                    preparedStatement.executeBatch();
-                    SQLHelper.commit();
-                    SQLHelper.setAutoCommit(true);
-                } else {
-                    for (Map.Entry<Integer, Object> entry : values.entrySet()) {
-                        preparedStatement.setObject(entry.getKey(), entry.getValue());
-                        errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
-                    }
-                    preparedStatement.executeUpdate();
-                }
-            }, ex -> {
-                SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-                ex.printStackTrace();
-            });
+                }, ex -> {
+                    SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
+                    ex.printStackTrace();
+                });
+            }
         } finally {
-            SQLHelper.releaseLock();
             values.clear();
         }
     }
