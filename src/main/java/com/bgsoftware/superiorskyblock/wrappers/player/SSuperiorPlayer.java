@@ -615,7 +615,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public boolean hasPermissionWithoutOP(String permission) {
         Player player = asPlayer();
-        return player != null && player.getEffectivePermissions().stream().anyMatch(permissionAttachmentInfo -> permissionAttachmentInfo.getPermission().equalsIgnoreCase(permission));
+        return player != null && plugin.getProviders().hasPermission(player, permission);
     }
 
     @Override

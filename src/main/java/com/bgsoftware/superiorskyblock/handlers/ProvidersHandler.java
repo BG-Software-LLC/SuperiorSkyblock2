@@ -13,6 +13,9 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
+import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider;
+import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider_LuckPerms;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
@@ -23,11 +26,13 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public final class ProvidersHandler implements ProvidersManager {
 
     private SpawnersProvider spawnersProvider;
+    private PermissionsProvider permissionsProvider;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -69,6 +74,12 @@ public final class ProvidersHandler implements ProvidersManager {
                     setSpawnersProvider(new BlocksProvider_Default());
                 }
             }
+
+            if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms"))
+                permissionsProvider = new PermissionsProvider_LuckPerms();
+            else
+                permissionsProvider = new PermissionsProvider_Default();
+
         });
 
         PlaceholderHook.register(plugin);
@@ -94,6 +105,10 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public boolean isWildStacker(){
         return spawnersProvider instanceof BlocksProvider_WildStacker;
+    }
+
+    public boolean hasPermission(Player player, String permission){
+        return permissionsProvider.hasPermission(player, permission.toLowerCase());
     }
 
 }
