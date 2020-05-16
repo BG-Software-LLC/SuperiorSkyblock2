@@ -19,6 +19,11 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
+messages:
+  no-role-permission: '&8 - &c{}'
+  exact-role-permission: '&8 - &2{}'
+  higher-role-permission: '&8 - &a{}'
+
 items:
   '$':
     type: CYAN_STAINED_GLASS_PANE
