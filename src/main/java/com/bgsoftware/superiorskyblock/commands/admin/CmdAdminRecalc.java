@@ -75,6 +75,11 @@ public final class CmdAdminRecalc implements ISuperiorCommand {
                 return;
             }
 
+            if(island.isBeingRecalculated()){
+                Locale.RECALC_ALREADY_RUNNING_OTHER.send(sender);
+                return;
+            }
+
             Locale.RECALC_PROCCESS_REQUEST.send(sender);
             island.calcIslandWorth(sender instanceof Player ? SSuperiorPlayer.of(sender) : null);
         }

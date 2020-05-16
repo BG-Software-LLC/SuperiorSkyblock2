@@ -58,6 +58,11 @@ public final class CmdRecalc implements ISuperiorCommand {
             return;
         }
 
+        if(island.isBeingRecalculated()){
+            Locale.RECALC_ALREADY_RUNNING.send(superiorPlayer);
+            return;
+        }
+
         Locale.RECALC_PROCCESS_REQUEST.send(superiorPlayer);
         island.calcIslandWorth(superiorPlayer);
     }

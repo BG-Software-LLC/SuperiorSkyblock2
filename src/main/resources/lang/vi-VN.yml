@@ -555,6 +555,8 @@ RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của b�
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
+RECALC_ALREADY_RUNNING: '&c&lError | &7Your island is already being recalculated.'
+RECALC_ALREADY_RUNNING_OTHER: '&c&lError | &7This island is already being recalculated.'
 RECALC_ALL_ISLANDS: '&e&lNâng cấp | &7Recalculating all islands...'
 RECALC_ALL_ISLANDS_DONE: '&e&lĐảo Thần | &7Thành công tính toán lại tất cả các đảo.'
 RECALC_PROCCESS_REQUEST: '&e&lĐảo Thần | &7Đang xử lý yêu cầu của bạn...'

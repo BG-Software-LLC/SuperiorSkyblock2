@@ -42,7 +42,7 @@ import org.bukkit.entity.Entity;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -401,9 +401,17 @@ public final class GridHandler implements GridManager {
     @Override
     public void calcAllIslands(Runnable callback) {
         SuperiorSkyblockPlugin.debug("Action: Calculate All Islands");
-        Iterator<Island> islandIterator = islands.iterator();
-        while (islandIterator.hasNext()){
-            islandIterator.next().calcIslandWorth(null, islandIterator.hasNext() ? null : callback);
+        List<Island> islands = new ArrayList<>();
+
+        {
+            for (Island island : this.islands) {
+                if(!island.isBeingRecalculated())
+                    islands.add(island);
+            }
+        }
+
+        for(int i = 0; i < islands.size(); i++){
+            islands.get(i).calcIslandWorth(null, i + 1 < islands.size() ? null : callback);
         }
     }
 
