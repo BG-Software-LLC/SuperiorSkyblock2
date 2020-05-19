@@ -306,7 +306,8 @@ public final class CustomEventsListener implements Listener {
                         ((Cancellable) event).setCancelled(true);
                     return false;
                 }
-                else if(superiorPlayer.hasIslandFlyEnabled() && toIsland == null && player.getGameMode() != GameMode.CREATIVE){
+                else if(superiorPlayer.hasIslandFlyEnabled() && toIsland == null &&
+                        player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR){
                     player.setAllowFlight(false);
                     player.setFlying(false);
                     Locale.ISLAND_FLY_DISABLED.send(player);
@@ -401,7 +402,8 @@ public final class CustomEventsListener implements Listener {
                         ((Cancellable) event).setCancelled(true);
                 }
 
-                else if(superiorPlayer.hasIslandFlyEnabled() && player.getGameMode() != GameMode.CREATIVE){
+                else if(superiorPlayer.hasIslandFlyEnabled() && player.getGameMode() != GameMode.CREATIVE &&
+                        player.getGameMode() != GameMode.SPECTATOR){
                     Executor.sync(() -> {
                         if(toIsland.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                             if(!player.isFlying()) {
