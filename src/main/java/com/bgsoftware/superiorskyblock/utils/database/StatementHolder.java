@@ -90,23 +90,23 @@ public final class StatementHolder {
                             return;
                         }
 
-                        try {
-                            SQLHelper.setAutoCommit(false);
+                        SQLHelper.setAutoCommit(false);
 
-                            for (Registry<Integer, Object> values : batches) {
-                                for (Map.Entry<Integer, Object> entry : values.entries()) {
-                                    preparedStatement.setObject(entry.getKey(), entry.getValue());
-                                    errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
-                                }
-                                preparedStatement.addBatch();
-                                values.delete();
+                        for (Registry<Integer, Object> values : batches) {
+                            for (Map.Entry<Integer, Object> entry : values.entries()) {
+                                preparedStatement.setObject(entry.getKey(), entry.getValue());
+                                errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                             }
-
-                            preparedStatement.executeBatch();
-                            SQLHelper.commit();
-                        } finally {
-                            SQLHelper.setAutoCommit(true);
+                            preparedStatement.addBatch();
+                            values.delete();
                         }
+
+                        preparedStatement.executeBatch();
+                        try {
+                            SQLHelper.commit();
+                        }catch(Throwable ignored){}
+
+                        SQLHelper.setAutoCommit(true);
                     } else {
                         for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                             preparedStatement.setObject(entry.getKey(), entry.getValue());
