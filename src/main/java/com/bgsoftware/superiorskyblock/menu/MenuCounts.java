@@ -240,8 +240,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     @Override
     protected List<Pair<Key, Integer>> requestObjects() {
         return island.getBlockCounts().entrySet().stream().sorted((o1, o2) -> {
-            Material firstMaterial = Material.valueOf(o1.getKey().toString().split(":")[0]);
-            Material secondMaterial = Material.valueOf(o2.getKey().toString().split(":")[0]);
+            Material firstMaterial = getSafeMaterial(o1.getKey().toString().split(":")[0]);
+            Material secondMaterial = getSafeMaterial(o2.getKey().toString().split(":")[0]);
             int compare = plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);
             return compare != 0 ? compare : o1.getKey().toString().compareTo(o2.getKey().toString());
         }).map(Pair::new).collect(Collectors.toList());
@@ -276,6 +276,14 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
 
     public static void refreshMenus(){
         refreshMenus(MenuCounts.class);
+    }
+
+    private static Material getSafeMaterial(String value){
+        try{
+            return Material.valueOf(value);
+        }catch(Exception ex){
+            return Material.BEDROCK;
+        }
     }
 
 }
