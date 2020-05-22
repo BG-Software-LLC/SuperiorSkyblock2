@@ -1003,6 +1003,8 @@ public final class SIsland extends DatabaseObject implements Island {
             }).forEach(superiorPlayer::resetMission);
         });
 
+        plugin.getMissions().getAllMissions().forEach(this::resetMission);
+
         getAllChunksAsync(World.Environment.NORMAL, true, true,
                 chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
 
