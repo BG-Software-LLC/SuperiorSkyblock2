@@ -152,6 +152,15 @@ public abstract class Mission {
     }
 
     /**
+     * A function that is called when islands are transferred.
+     * @param oldPlayer The old owner of the player.
+     * @param newPlayer The new owner of the player.
+     */
+    public void transferData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer){
+
+    }
+
+    /**
      * A function that is called on every item of the menu.
      * This is used to inject custom placeholders into items.
      * The method is called async.

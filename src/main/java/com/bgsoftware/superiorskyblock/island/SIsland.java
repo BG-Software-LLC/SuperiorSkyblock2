@@ -1324,6 +1324,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner.getUniqueId());
 
+        plugin.getMissions().getAllMissions().forEach(mission -> mission.transferData(previousOwner, owner));
+
         return true;
     }
 
