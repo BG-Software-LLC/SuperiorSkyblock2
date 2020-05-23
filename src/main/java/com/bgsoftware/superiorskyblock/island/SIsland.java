@@ -1706,7 +1706,7 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimalFormatted islandWorth = this.islandWorth.get(), islandBank = this.islandBank.get(), bonusWorth = this.bonusWorth.get();
         //noinspection BigDecimalMethodWithoutRoundingCalled
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
-        return islandWorth.add(bonusWorth);
+        return finalIslandWorth.add(bonusWorth);
     }
 
     @Override
