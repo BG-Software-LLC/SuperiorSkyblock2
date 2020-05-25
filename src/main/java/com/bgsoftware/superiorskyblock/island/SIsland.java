@@ -97,7 +97,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
     public static final String VISITORS_WARP_NAME = "visit";
     public static final int NO_LIMIT = -1;
-    public static final int BLOCKS_UPDATE_AMOUNT = 100;
     private static int blocksUpdateCounter = 0;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -1529,14 +1528,14 @@ public final class SIsland extends DatabaseObject implements Island {
             updateLastTime();
 
             if(save){
-                MenuValues.refreshMenus();
-                MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
-                if(++blocksUpdateCounter >= BLOCKS_UPDATE_AMOUNT){
+                if(++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
                     MenuTopIslands.refreshMenus();
+                    MenuValues.refreshMenus();
+                    MenuCounts.refreshMenus();
                 }
             }
         }
@@ -1666,14 +1665,14 @@ public final class SIsland extends DatabaseObject implements Island {
             updateLastTime();
 
             if(save) {
-                MenuValues.refreshMenus();
-                MenuCounts.refreshMenus();
                 saveBlockCounts(oldWorth, oldLevel);
-                if(++blocksUpdateCounter >= BLOCKS_UPDATE_AMOUNT){
+                if(++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
                     MenuTopIslands.refreshMenus();
+                    MenuValues.refreshMenus();
+                    MenuCounts.refreshMenus();
                 }
             }
         }
