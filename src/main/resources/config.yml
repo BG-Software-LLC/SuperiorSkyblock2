@@ -337,6 +337,9 @@ island-names:
 # Should players get teleported to the island after they accept an invite?
 teleport-on-join: false
 
+# Should players get teleported to spawn when they are kicked from their island?
+teleport-on-kick: true
+
 # Should the inventory of the players get cleared after they accept an invite?
 clear-on-join: false
 

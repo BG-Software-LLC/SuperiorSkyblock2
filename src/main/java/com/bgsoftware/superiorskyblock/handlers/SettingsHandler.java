@@ -92,6 +92,7 @@ public final class SettingsHandler {
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
     public final boolean teleportOnJoin;
+    public final boolean teleportOnKick;
     public final boolean clearOnJoin;
     public final boolean rateOwnIsland;
     public final boolean bonusAffectLevel;
@@ -231,6 +232,7 @@ public final class SettingsHandler {
         islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
         teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
+        teleportOnKick = cfg.getBoolean("teleport-on-kick", false);
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
