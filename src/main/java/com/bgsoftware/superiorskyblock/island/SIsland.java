@@ -361,7 +361,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if (superiorPlayer.isOnline()) {
             SuperiorMenu.killMenu(superiorPlayer);
-            if(plugin.getSettings().teleportOnKick)
+            if(plugin.getSettings().teleportOnKick && getAllPlayersInside().contains(superiorPlayer))
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
 
