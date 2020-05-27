@@ -33,6 +33,9 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lהאיגש | &7םינקחשל ךלשמ �
   תונשל לושכי התא.'
 CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
   ל החלצהב הנוש יאה לש םויבה.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
@@ -72,6 +75,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lםיגורדש | &7החלצהב הנכדוע {0} 
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
+COMMAND_ARGUMENT_BIOME: 'biome'
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EMAIL: ליימיא
 COMMAND_ARGUMENT_ENTITY: entity
@@ -132,6 +136,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: יא לש יווש שדחמ בשחל.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא שדחמ ןועטל.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
+COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
@@ -274,6 +279,7 @@ IGNORED_ISLAND_NAME: '&e&lיא | &7םיבוטה םייאה תמישר ןמ דר�
 INTERACT_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ םירבד םע היצקרטניא עצבל לוכי
   אל התא.'
 INVALID_AMOUNT: '&c&lהאיגש | &7{0} תיקוח אל תומכ.'
+INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
 INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'

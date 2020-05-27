@@ -30,6 +30,9 @@ BUILD_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas construire en dehors de
 CANNOT_SET_ROLE: '&c&lErreur | &7Vous ne pouvez pas définir le rôle de ce joueur sur {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lErreur | &7Vous pouvez uniquement changer les permissions des rôles d''île inférieurs au votre.'
 CHANGED_BIOME: '&e&lIle | &7Le biome a été modifié sur {0}. Vous devez vous reconnecter au serveur afin de voir les modifications.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
 CHANGED_BLOCK_LIMIT: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour l''île de {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour toutes les îles.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour {1}.'
@@ -64,6 +67,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lAméliorations | &7Vous avez changé la limite de
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
+COMMAND_ARGUMENT_BIOME: 'biome'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: entity
@@ -125,6 +129,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
+COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Définir une limite de blocs pour l''île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Définir le multiplicateur de croissance des cultures de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Définir le nombre de suppression d'îles d'un joueur.
@@ -258,6 +263,7 @@ IGNORED_ISLAND: '&e&lIle | &7L''île de {0} est désormais masquée du top des �
 IGNORED_ISLAND_NAME: '&e&lIle | &7L''île {0} est désormais masquée du top des îles.'
 INTERACT_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas interagir en dehors de votre île.'
 INVALID_AMOUNT: '&c&lErreur | &7Nombre invalide {0}.'
+INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_SCHEMATIC: '&c&lErrEUR | &7Il n''existe aucun schematic portant le nom {0}.'
 INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'

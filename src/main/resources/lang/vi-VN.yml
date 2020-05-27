@@ -38,6 +38,9 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thay đ�
   vai trò trong đảo thấp hơn vai trò của bạn.'
 CHANGED_BIOME: '&e&lĐảo Thần | &7Thay đổi thành công quần xã thành {0}. Bạn có thể
   cần kết nối lại với máy chủ để xem các thay đổi.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
 CHANGED_BLOCK_LIMIT: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
   {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
@@ -90,6 +93,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công gi�
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
+COMMAND_ARGUMENT_BIOME: 'biome'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: entity
@@ -154,6 +158,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác v�
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
+COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
   khác.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây trồng cho đảo
@@ -311,6 +316,7 @@ IGNORED_ISLAND_NAME: '&e&lNâng cấp | &7Đảo {0} bây giờ bị bỏ qua tr
 INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài sự bảo vệ phạm
   vi   đảo của bạn.'
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
+INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'

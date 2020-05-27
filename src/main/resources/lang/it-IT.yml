@@ -38,6 +38,9 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lErrore | &7Puoi modificare le autorizzaz
   solo per i ruoli dell''isola inferiori rispetto al tuo.'
 CHANGED_BIOME: '&e&lIsola | &7Bioma modificato con successo in {0}. Potrebbe essere
   necessario riconnettersi al server per vedere le modifiche.'
+CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
+CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
+CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
 CHANGED_BLOCK_LIMIT: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0} dell''isola
   {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0}
@@ -93,6 +96,7 @@ CHANGED_WARPS_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il mite
 COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
+COMMAND_ARGUMENT_BIOME: 'biome'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: entity
@@ -161,6 +165,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite d
   un giocatore.
                                                                               
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
+COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola
   di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della crescita
@@ -325,6 +330,7 @@ IGNORED_ISLAND_NAME: '&e&lIsola | &7L''isola {0} da ora in poi verrà ignorata d
 INTERACT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi interagire al di fuori del tuo raggio
   di protezione.'
 INVALID_AMOUNT: '&c&lErrore | &7Importo non valido {0}.'
+INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Mondo non valido {0}.'
 INVALID_ISLAND: '&c&lErrore | &7Non hai un''isola.'
