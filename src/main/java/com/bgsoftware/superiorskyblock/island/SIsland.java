@@ -1243,7 +1243,8 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setBiome(Biome biome){
         SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
-        getAllChunksAsync(World.Environment.NORMAL, false, false, chunk -> plugin.getNMSAdapter().setBiome(chunk, biome));
+        List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
+        getAllChunksAsync(World.Environment.NORMAL, false, false, chunk -> plugin.getNMSAdapter().setBiome(chunk, biome, playersToUpdate));
         setBiomeRaw(biome);
     }
 

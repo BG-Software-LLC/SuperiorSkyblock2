@@ -13,11 +13,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public interface NMSAdapter {
 
@@ -43,7 +46,7 @@ public interface NMSAdapter {
 
     void playGeneratorSound(Location location);
 
-    void setBiome(Chunk chunk, Biome biome);
+    void setBiome(Chunk chunk, Biome biome, List<Player> playersToUpdate);
 
     default void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome){
         for(int x = 0; x < 16; x++){

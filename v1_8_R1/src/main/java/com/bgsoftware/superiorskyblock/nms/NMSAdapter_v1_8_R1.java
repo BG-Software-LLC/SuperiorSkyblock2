@@ -42,6 +42,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -156,7 +157,7 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     }
 
     @Override
-    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome) {
+    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome, List<Player> playersToUpdate) {
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Arrays.fill(chunk.getBiomeIndex(), biomeBase);

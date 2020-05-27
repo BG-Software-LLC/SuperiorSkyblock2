@@ -16,8 +16,11 @@ import net.minecraft.server.v1_13_R2.DimensionManager;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
+import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_13_R2.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_13_R2.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_13_R2.Particles;
+import net.minecraft.server.v1_13_R2.PlayerConnection;
 import net.minecraft.server.v1_13_R2.PlayerInteractManager;
 import net.minecraft.server.v1_13_R2.SoundCategory;
 import net.minecraft.server.v1_13_R2.SoundEffects;
@@ -52,6 +55,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -164,11 +168,21 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
-    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome) {
+    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome, List<Player> playersToUpdate) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         Arrays.fill(chunk.getBiomeIndex(), biomeBase);
         chunk.markDirty();
+
+        PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(bukkitChunk.getX(), bukkitChunk.getZ());
+        PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+
+        playersToUpdate.forEach(player -> {
+            PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+            playerConnection.sendPacket(unloadChunkPacket);
+            playerConnection.sendPacket(mapChunkPacket);
+        });
+
     }
 
     @Override
