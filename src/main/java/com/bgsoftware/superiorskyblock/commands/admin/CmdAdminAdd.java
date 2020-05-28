@@ -97,11 +97,11 @@ public final class CmdAdminAdd implements ISuperiorCommand {
 
         if(playerIsland == null) {
             Locale.JOINED_ISLAND_NAME.send(targetPlayer, island.getName());
-            Locale.ADMIN_ADD_PLAYER_NAME.send(sender, island.getName());
+            Locale.ADMIN_ADD_PLAYER_NAME.send(sender, targetPlayer.getName(), island.getName());
         }
         else {
             Locale.JOINED_ISLAND.send(targetPlayer, playerIsland.getName());
-            Locale.ADMIN_ADD_PLAYER.send(sender, playerIsland.getName());
+            Locale.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), playerIsland.getName());
         }
 
         if(plugin.getSettings().teleportOnJoin && targetPlayer.isOnline())
