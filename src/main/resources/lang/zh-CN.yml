@@ -119,6 +119,7 @@ COMMAND_DESCRIPTION_ADMIN_DISBAND: 强制解散一个玩家的岛屿.
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: 给与一个玩家解散岛屿次数.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: 将岛屿从岛屿排行榜中忽略.
 COMMAND_DESCRIPTION_ADMIN_JOIN: 不需要允许强制加入岛屿.
+COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: 更改玩家的任务状态.
 COMMAND_DESCRIPTION_ADMIN_MSG: 向玩家发送一条不带前缀的消息.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: 向一个岛屿的全部玩家发送一条不带前缀的消息.
@@ -387,6 +388,7 @@ JOINED_ISLAND_NAME: '&e&l岛屿 | &7你加入了岛屿 &b{0}.'
 JOINED_ISLAND_AS_COOP: '&e&l岛屿 | &7你现在成为了 &b{0} &7的岛屿临时成员，下线后失效.'
 JOINED_ISLAND_AS_COOP_NAME: '&e&l岛屿 | &7你现在成为了 &b{0} &7岛屿的临时成员，下线后失效..'
 KICK_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 被 &b{1} &7踢出了岛屿.'
+KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能踢出比你岛屿职位更低的玩家.'
 LACK_CHANGE_PERMISSION: '&c&l错误 | &7无法更换为其他职位.'
 LAST_ROLE_DEMOTE: '&c&l错误 | &7他已经是最低的成员职位了，不能再降职了.'

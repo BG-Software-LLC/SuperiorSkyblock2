@@ -145,6 +145,7 @@ COMMAND_DESCRIPTION_ADMIN_DISBAND: Giải tán vĩnh viễn hòn đảo của ng
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Giải tán cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Bỏ qua một hòn đảo từ những hòn đảo hàng đầu.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Tham gia một hòn đảo mà không cần lời mời.
+COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Thay đổi trạng thái của một nhiệm vụ cho người
   chơi.
 COMMAND_DESCRIPTION_ADMIN_MSG: Gửi cho người chơi một tin nhắn mà không có bất kỳ
@@ -446,6 +447,7 @@ JOINED_ISLAND_AS_COOP: '&e&lĐảo thần | &7Bây giờ bạn là thành viên 
 JOINED_ISLAND_AS_COOP_NAME: '&e&lĐảo thần | &7Bây giờ bạn là thành viên co-op đảo
   {0}.'
 KICK_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã bị kick khỏi đảo bởi {1}.'
+KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể kick người chơi có vai trò
   đảo thấp hơn bạn.'
 LACK_CHANGE_PERMISSION: '&c&Lỗi | &7Bạn phải có quyền này để thay đổi nó thành các

@@ -152,6 +152,7 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Aumenta la quantità di reset disponibi
   di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Rimuovi un giocatore dal menu delle migliori isole.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Unisciti a un'isola senza un invito.
+COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Cambia lo stato di una missione per un giocatore.
 COMMAND_DESCRIPTION_ADMIN_MSG: Invia a un giocatore un messaggio senza prefissi.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Invia a tutti i membri dell'isola un messaggio
@@ -464,6 +465,7 @@ JOINED_ISLAND_NAME: '&e&lIsola | &7Ti sei unito all''isola {0}.'
 JOINED_ISLAND_AS_COOP: '&e&lIsola | &7Ora sei un membro co-op dell''isola di {0}.'
 JOINED_ISLAND_AS_COOP_NAME: '&e&lIsola | &7Ora sei un membro co-op dell''isola {0}.'
 KICK_ANNOUNCEMENT: '&e&lIsola | &7{0} è stato cacciato dall''isola da {1}.'
+KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi cacciare solo giocatori con un
   ruolo insulare inferiore al tuo.'
 LACK_CHANGE_PERMISSION: '&c&lErrore | &7È necessario disporre di questa autorizzazione

@@ -12,7 +12,7 @@ public class IslandKickEvent extends IslandEvent {
 
     /**
      * The constructor of the event.
-     * @param superiorPlayer The player who kicked the other player.
+     * @param superiorPlayer The player who kicked the other player. If null, it means console kicked the player.
      * @param targetPlayer The player that was kicked.
      * @param island The island that the player was kicked from.
      */

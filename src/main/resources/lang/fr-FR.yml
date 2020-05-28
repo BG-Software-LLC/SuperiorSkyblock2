@@ -122,6 +122,7 @@ COMMAND_DESCRIPTION_ADMIN_DISBAND: Supprimer l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un joueur.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
+COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Changer le statut d'une mission pour un joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG: Envoyer un message sans aucun préfixe au joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Envoyer un message sans aucun préfixe à tous les membres de lîle.
@@ -387,6 +388,7 @@ JOINED_ISLAND_NAME: '&e&lIle | &7Vous avez rejoint l''île {0}.'
 JOINED_ISLAND_AS_COOP: '&e&lIle | &7Vous êtes désormais un coopérateur de l''île de {0}.'
 JOINED_ISLAND_AS_COOP_NAME: '&e&lIle | &7Vous êtes désormais un coopérateur de l''île {0}.'
 KICK_ANNOUNCEMENT: '&e&lIle | &7{0} a été éjecté de l''île par {1}.'
+KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lErreur | &7Vous ne pouvez éjécter que les membres ayant un rôle d''île inférieur au votre.'
 LACK_CHANGE_PERMISSION: '&c&lErreur | &7Vous devez avoir cette permission afin de pouvoir la modifier pour les autres rôles.'
 LAST_ROLE_DEMOTE: '&c&lErreur | &7Vous ne pouvez plus rétrograder ce joueur.'

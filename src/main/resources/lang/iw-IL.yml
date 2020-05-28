@@ -127,6 +127,7 @@ COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: ןקחשל םייא תוקיחמ תתל.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: רתויב םיבוטה םייאה תמישרמ יא דירוהל.
 COMMAND_DESCRIPTION_ADMIN_JOIN: הנמזה אלל יאל סנכיהל.
+COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: ןקחש רובע המישמ לש סוטטס תונשל.
 COMMAND_DESCRIPTION_ADMIN_MSG: העדוה ןקחשל חולשל.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: העדוה יא לש םינקחשה לכל חולשל.
@@ -405,6 +406,7 @@ JOINED_ISLAND_NAME: '&e&lיא | &7{0} יאה לא תסנכנ.'
 JOINED_ISLAND_AS_COOP: '&e&lיא | &7{0} לש יאל הלועפ ףתשמכ תסנכנ.'
 JOINED_ISLAND_AS_COOP_NAME: '&e&lיא | &7{0} יאל הלועפ ףתשמכ תסנכנ.'
 KICK_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ ףעוה {0}.'
+KICK_ISLAND_LEADER: '&c&lError | &7You cannot kick the leader of the island, use /is admin disband instead.'
 KICK_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7ךלשמ הכומנ רתוי הגרד ילעב קר םינקחש ףיעהל
   לוכי התא.'
 LACK_CHANGE_PERMISSION: '&c&lהאיגש | &7תורחא תוגרדל התוא תונשל תנמ לע האשרהה תא ךל
