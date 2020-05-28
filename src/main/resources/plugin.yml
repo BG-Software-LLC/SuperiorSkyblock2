@@ -132,6 +132,8 @@ permissions:
         children:
           superior.admin:
             description: Use the admin commands.
+          superior.admin.add:
+            description: Add a user to an island.
           superior.admin.bonus:
             description: Grant a bonus to a player.
           superior.admin.bypass:

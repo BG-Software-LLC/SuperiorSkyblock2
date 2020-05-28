@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lBanque | &7Vous avez déposé {0}$ à la banque d''île de {1}.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanque | &7Vous avez déposé {0}$ sur la banque de l''île {1}.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Développé par Ome_R'
@@ -105,6 +107,7 @@ COMMAND_COOLDOWN_DAYS_NAME: jours
 COMMAND_COOLDOWN_DAY_NAME: jour
 COMMAND_DESCRIPTION_ACCEPT: Accepter l'invitation d'un joueur.
 COMMAND_DESCRIPTION_ADMIN: Utiliser les commandes admin.
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Se téléporter sur l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_PURGE: Purger les îles.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Améliorer la mise à niveau d''une île.
@@ -455,6 +458,7 @@ PERMISSION_CHANGED_NAME: '&e&lIle | &7Permission {0} de l''île {1} mise à jour
 PERMISSION_CHANGED_ALL: '&e&lIle | &7Permission {0} mise à jour pour toutes les îles.'
 PLAYER_ALREADY_BANNED: '&c&lErreur | &7Ce joueur est déjà banni.'
 PLAYER_ALREADY_COOP: '&c&lErreur | &7Ce joueur est déjà coopérateur.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&lErreur | &7{0} est déjà {1}.'
 PLAYER_EXPEL_BYPASS: '&c&lErreur | &7Ce joueur ne peut pas être exclu de l''île.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&lIle | &7{0} a rejoint le serveur.'

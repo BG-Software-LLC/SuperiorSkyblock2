@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lNgân Hàng | &7Bạn đã gửi ${0} gửi vào ngân hàng đảo của
   {1}.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo tên
@@ -132,6 +134,7 @@ COMMAND_COOLDOWN_DAY_NAME: ngày
 COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các command của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Chuyển đổi chế độ bypass.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Đóng một hòn đảo thành công cộng.
@@ -537,6 +540,7 @@ PERMISSION_CHANGED_ALL: '&e&lNâng cấp | &7Thay đổi thành công quyền {0
   các đảo.'
 PLAYER_ALREADY_BANNED: '&c&lLỗi | &7Người chơi này đã bị cấm.'
 PLAYER_ALREADY_COOP: '&c&lLỗi | &7Người chơi này đã hợp tác.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&lLỗi | &7{0} đã là một {1}.'
 PLAYER_EXPEL_BYPASS: '&c&lLỗi | &7Người chơi này không thể bị trục xuất khỏi đảo.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã vào server.'

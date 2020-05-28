@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lBank | &7You deposited ${0} into {1}''s island bank.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBank | &7You deposited ${0} into the bank of the island {1}.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
@@ -105,6 +107,7 @@ COMMAND_COOLDOWN_DAYS_NAME: 'days'
 COMMAND_COOLDOWN_DAY_NAME: 'day'
 COMMAND_DESCRIPTION_ACCEPT: 'Accept an invitation from a player.'
 COMMAND_DESCRIPTION_ADMIN: 'Use the admin commands.'
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_BONUS: 'Grant a bonus to a player.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: 'Toggle bypass mode.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: 'Clear generator rates for a specific island.'
@@ -455,6 +458,7 @@ PERMISSION_CHANGED_NAME: '&e&lIsland | &7Successfully updated the permission {0}
 PERMISSION_CHANGED_ALL: '&e&lIsland | &7Successfully updated the permission {0} for all the islands.'
 PLAYER_ALREADY_BANNED: '&c&lError | &7This player is already banned.'
 PLAYER_ALREADY_COOP: '&c&lError | &7This player is already coop.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&lError | &7{0} is already a {1}.'
 PLAYER_EXPEL_BYPASS: '&c&lError | &7This user cannot be expelled from the island.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&lIsland | &7{0} joined the server.'

@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lקנב | &7.{1} לש יאה לש קנבל ${0} תרבעה'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lקנב | &7.{1} יאה לש קנבל ${0} תרבעה'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Ome_R י"ע תנכות'
@@ -114,6 +116,7 @@ COMMAND_COOLDOWN_DAY_NAME: םוי
 COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
 COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
 COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
@@ -477,6 +480,7 @@ PERMISSION_CHANGED_NAME: '&e&lיא | &7החלצהב {1} יאב {0} האשרהה 
 PERMISSION_CHANGED_ALL: '&e&lיא | &7החלצהב םייאה לכב {0} האשרהה תא תיניש.'
 PLAYER_ALREADY_BANNED: '&c&lהאיגש | &7יאהמ קחרומ רבכ הזה ןקחשה.'
 PLAYER_ALREADY_COOP: '&c&lהאיגש | &7יאה לש הלועפ ףתשמ רבכ הזה ןקחשה.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&lהאיגש | &7{1} הגרדב אצמנ רבכ {0}.'
 PLAYER_EXPEL_BYPASS: '&c&lהאיגש | &7יאהמ שרוגמ תויהל לוכי אל הזה ןקחשה.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&lיא | &7תרשה לא רבחתה {0}.'

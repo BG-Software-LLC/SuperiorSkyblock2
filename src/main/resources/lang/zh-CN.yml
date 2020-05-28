@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&l岛屿银行 | &7你向岛屿银行存入了 &6${0} &7金币.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&l岛屿银行 | &7你向 &b{1} 的岛屿银行存入了 &6${0} 金币.'
 ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7开发 &bby Ome_R'
@@ -106,6 +108,7 @@ COMMAND_COOLDOWN_DAY_NAME: 天
 COMMAND_DESCRIPTION_ACCEPT: 同意玩家的岛屿邀请.
 COMMAND_DESCRIPTION_ADMIN: 查看管理员命令.
 COMMAND_DESCRIPTION_ADMIN_BONUS: 给玩家岛屿奖励.
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: 打开管理员忽略模式.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: 将一个岛屿向公众关闭.
@@ -457,6 +460,7 @@ PERMISSION_CHANGED_NAME: '&e&l岛屿 | &7成功更新 &b{1} &7岛屿的 &b{0} &7
 PERMISSION_CHANGED_ALL: '&e&l岛屿 | &7成功为所有岛屿更新 &b{0} &7权限.'
 PLAYER_ALREADY_BANNED: '&c&l错误 | &7这个玩家已经被岛屿禁封了.'
 PLAYER_ALREADY_COOP: '&c&l错误 | &7这个玩家已经是岛屿的临时成员了.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&l错误 | &7成员 &b{0} &7已经是 &b{1} &7职位了.'
 PLAYER_EXPEL_BYPASS: '&c&l错误 | &7你无法将这个玩家从岛屿团队中踢出.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7进入了服务器.'

@@ -9,6 +9,8 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
+ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
+ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lBanca | &7Hai depositato ${0} nella banca dell''isola di
   {1}'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lBanca | &7Hai depositato &e${0}&f nella banca dell''isola
@@ -135,6 +137,7 @@ COMMAND_COOLDOWN_DAYS_NAME: giorni
 COMMAND_COOLDOWN_DAY_NAME: giorno
 COMMAND_DESCRIPTION_ACCEPT: Accetta un invito da un giocatore.
 COMMAND_DESCRIPTION_ADMIN: Utilizzare i comandi di amministrazione.
+COMMAND_DESCRIPTION_ADMIN_ADD: 'Add a user to an island.'
 COMMAND_DESCRIPTION_ADMIN_BONUS: Concedi un bonus a un giocatore.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Attiva/disattiva la modalità bypass.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
@@ -564,6 +567,7 @@ PERMISSION_CHANGED_ALL: '&e&lIsola | &7Aggiornata correttamente l''autorizzazion
   {0} di tutte le isola.'
 PLAYER_ALREADY_BANNED: '&c&lErrore | &7Questo giocatore è già stato bannato.'
 PLAYER_ALREADY_COOP: '&c&lErrore | &7Questo giocatore è già un membro co-op.'
+PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
 PLAYER_ALREADY_IN_ROLE: '&c&lErrore | &7{0} è già un {1}.'
 PLAYER_EXPEL_BYPASS: '&c&lErrore | &7Questo utente non può essere espulso dall''isola.'
 PLAYER_JOIN_ANNOUNCEMENT: '&e&lIsola | &7{0} è entrato nel server.'
