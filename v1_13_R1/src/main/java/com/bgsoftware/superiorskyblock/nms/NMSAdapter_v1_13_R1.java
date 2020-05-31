@@ -271,9 +271,14 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
         return itemStacks;
     }
 
+    @Override
+    public double[] getTPS() {
+        return MinecraftServer.getServer().recentTps;
+    }
+
     private static class CustomTileEntityHopper extends TileEntityHopper{
 
-        private InventoryHolder holder;
+        private final InventoryHolder holder;
 
         CustomTileEntityHopper(InventoryHolder holder, String title){
             this.holder = holder;

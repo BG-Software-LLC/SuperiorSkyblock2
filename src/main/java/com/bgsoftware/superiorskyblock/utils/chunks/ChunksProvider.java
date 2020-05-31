@@ -65,8 +65,16 @@ public final class ChunksProvider {
     }
 
     private static BukkitTask runChunksLoader(){
+        boolean asyncLoading = PaperHook.isUsingPaper() && ServerVersion.isAtLeast(ServerVersion.v1_13);
+
         Runnable loadChunks = () -> {
             for(int i = 0; i < plugin.getSettings().chunksPerTick; i++) {
+                double[] tps = plugin.getNMSAdapter().getTPS();
+                double averageTPS = (tps[0] + tps[1] + tps[2]) / 3;
+
+                if(tps[0] < averageTPS)
+                    return;
+
                 ChunkPosition chunkPosition = pendingChunks.poll();
 
                 if (chunkPosition == null)
@@ -74,7 +82,7 @@ public final class ChunksProvider {
 
                 Chunk chunk = chunkPosition.loadChunk();
 
-                if(!Bukkit.isPrimaryThread()){
+                if(asyncLoading){
                     Executor.sync(() -> finishLoad(chunkPosition, chunk));
                 }
                 else{
@@ -83,7 +91,7 @@ public final class ChunksProvider {
             }
         };
 
-        if(PaperHook.isUsingPaper() && ServerVersion.isAtLeast(ServerVersion.v1_13)) {
+        if(asyncLoading) {
             return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, loadChunks, 1L, 1L);
         }
 

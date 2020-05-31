@@ -252,5 +252,10 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
         return itemStacks;
     }
 
+    @Override
+    public double[] getTPS() {
+        return MinecraftServer.getServer().recentTps;
+    }
+
 
 }

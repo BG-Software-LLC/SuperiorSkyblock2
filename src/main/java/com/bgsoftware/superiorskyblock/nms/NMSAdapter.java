@@ -72,4 +72,6 @@ public interface NMSAdapter {
 
     ItemStack[] getEquipment(EntityEquipment entityEquipment);
 
+    double[] getTPS();
+
 }
