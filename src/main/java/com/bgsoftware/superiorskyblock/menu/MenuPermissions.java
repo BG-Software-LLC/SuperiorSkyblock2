@@ -26,12 +26,11 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
-    private static List<IslandPrivilege> islandPermissions = new ArrayList<>();
+    private static final List<IslandPrivilege> islandPermissions = new ArrayList<>();
     private static String noRolePermission = "", exactRolePermission = "", higherRolePermission = "";
 
     private final Island island;
@@ -226,9 +225,10 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
         islandPermissions.clear();
 
-        for(IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
-            String permission = islandPrivilege.getName().toLowerCase();
-            if (permissionsSection.contains(permission)) {
+        for(String key : permissionsSection.getKeys(false)){
+            try {
+                String permission = key.toLowerCase();
+                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permission);
                 ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
                 menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
                 menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
@@ -240,7 +240,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                     menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
                 }
                 islandPermissions.add(islandPrivilege);
-            }
+            }catch(Exception ignored){}
         }
 
         menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
