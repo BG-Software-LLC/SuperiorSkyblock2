@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
 
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -262,7 +262,7 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
     }
 
-    private Set<UUID> recentlyClicked = new HashSet<>();
+    private final Set<UUID> recentlyClicked = new HashSet<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(PlayerInteractEvent e){
@@ -497,7 +497,8 @@ public final class BlocksListener implements Listener {
         }
 
         else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
-            String description = e.getLine(1) + "\n" + e.getLine(2) + "\n" + e.getLine(3);
+            String description = ChatColor.RESET + e.getLine(1) + "\n" + ChatColor.RESET + e.getLine(2) +
+                    "\n" + ChatColor.RESET + e.getLine(3);
             e.setLine(0, plugin.getSettings().visitorsSignActive);
 
             for (int i = 1; i <= 3; i++)
