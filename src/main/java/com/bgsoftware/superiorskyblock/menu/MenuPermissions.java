@@ -224,11 +224,11 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
 
-        islandPermissions = new ArrayList<>();
+        islandPermissions.clear();
 
-        for(IslandPrivilege islandPrivilege : IslandPrivilege.values()){
+        for(IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
             String permission = islandPrivilege.getName().toLowerCase();
-            if(permissionsSection.contains(permission)){
+            if (permissionsSection.contains(permission)) {
                 ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
                 menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
                 menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
@@ -236,14 +236,12 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                 menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
                 menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
                 menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
-                if(permissionSection.contains("role-permission")) {
+                if (permissionSection.contains("role-permission")) {
                     menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
                 }
                 islandPermissions.add(islandPrivilege);
             }
         }
-
-        islandPermissions.sort(Comparator.comparing(IslandPrivilege::getName));
 
         menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuPermissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
