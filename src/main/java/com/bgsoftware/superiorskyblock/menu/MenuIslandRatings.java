@@ -48,7 +48,7 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
             return new ItemBuilder(clickedItem)
                     .replaceAll("{0}", superiorPlayer.getName())
                     .replaceAll("{1}", StringUtils.formatRating(superiorPlayer.getUserLocale(), rating.getValue()))
-                    .asSkullOf(superiorPlayer).build(this.superiorPlayer);
+                    .asSkullOf(superiorPlayer).build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
             throw ex;

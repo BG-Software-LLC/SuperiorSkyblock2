@@ -52,7 +52,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
                     .replaceAll("{0}", island.getOwner().getName())
                     .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                    .replaceAll("{2}", island.getAllWarps().size() + "").build(superiorPlayer);
+                    .replaceAll("{2}", island.getAllWarps().size() + "").build(island.getOwner());
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
             throw ex;

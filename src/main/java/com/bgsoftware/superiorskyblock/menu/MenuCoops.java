@@ -37,7 +37,7 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
             return new ItemBuilder(clickedItem)
                     .replaceAll("{0}", superiorPlayer.getName())
                     .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
-                    .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+                    .asSkullOf(superiorPlayer).build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
             throw ex;

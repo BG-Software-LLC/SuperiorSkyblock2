@@ -53,7 +53,7 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
                     .replaceAll("{0}", superiorPlayer.getName())
                     .replaceAll("{1}", islandOwner)
                     .replaceAll("{2}", islandName)
-                    .asSkullOf(superiorPlayer).build(super.superiorPlayer);
+                    .asSkullOf(superiorPlayer).build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
             throw ex;

@@ -126,6 +126,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
                     itemBuilder.withLore(lore);
                 }
+
+                return itemBuilder.build(islandOwner);
             }
 
             return itemBuilder.build(superiorPlayer);
