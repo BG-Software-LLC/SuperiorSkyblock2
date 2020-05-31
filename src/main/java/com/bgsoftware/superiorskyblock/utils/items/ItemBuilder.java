@@ -144,10 +144,13 @@ public final class ItemBuilder implements Cloneable {
             return this;
 
         List<String> loreList = new ArrayList<>();
+        List<String> linesToAdd = Arrays.asList(lines);
+        boolean isEmpty = linesToAdd.isEmpty() || linesToAdd.stream().allMatch(String::isEmpty);
 
         for(String line : itemMeta.getLore()){
             if(line.contains(regex)){
-                loreList.addAll(Arrays.asList(lines));
+                if(!isEmpty)
+                    loreList.addAll(linesToAdd);
             }
             else{
                 loreList.add(line);

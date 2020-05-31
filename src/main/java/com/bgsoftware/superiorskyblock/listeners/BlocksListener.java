@@ -497,8 +497,16 @@ public final class BlocksListener implements Listener {
         }
 
         else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
-            String description = ChatColor.RESET + e.getLine(1) + "\n" + ChatColor.RESET + e.getLine(2) +
-                    "\n" + ChatColor.RESET + e.getLine(3);
+            StringBuilder descriptionBuilder = new StringBuilder();
+
+            for(int i = 1; i < 4; i++){
+                String line = e.getLine(i);
+                if(!line.isEmpty())
+                    descriptionBuilder.append("\n").append(ChatColor.RESET).append(line);
+            }
+
+            String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
+
             e.setLine(0, plugin.getSettings().visitorsSignActive);
 
             for (int i = 1; i <= 3; i++)
