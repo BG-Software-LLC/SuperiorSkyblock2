@@ -2182,7 +2182,7 @@ public final class SIsland extends DatabaseObject implements Island {
     public void deleteWarp(String name){
         SuperiorSkyblockPlugin.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
 
-        warps.remove(name);
+        warps.remove(name.toLowerCase());
 
         Query.ISLAND_SET_WARPS.getStatementHolder()
                 .setString(IslandSerializer.serializeWarps(warps))
