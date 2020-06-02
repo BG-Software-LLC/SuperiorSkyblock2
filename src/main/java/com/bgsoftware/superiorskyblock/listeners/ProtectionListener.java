@@ -20,6 +20,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FishHook;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
@@ -37,6 +38,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -52,11 +54,12 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -578,6 +581,28 @@ public final class ProtectionListener implements Listener {
 
         if(e.isCancelled() && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
             e.getPlayer().getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerFish(ProjectileLaunchEvent e){
+        if(!(e.getEntity() instanceof FishHook))
+            return;
+
+        ProjectileSource projectileSource = e.getEntity().getShooter();
+
+        if(!(projectileSource instanceof Player))
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) projectileSource);
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.FISH)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
         }
     }
 

@@ -135,6 +135,7 @@ island-roles:
     - DROP_ITEMS
     - EXPEL_BYPASS
     - FARM_TRAMPING
+    - FISH
     - INTERACT
     - ITEM_FRAME
     - MINECART_DAMAGE
