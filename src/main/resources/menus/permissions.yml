@@ -43,6 +43,7 @@ items:
 
 permissions:
   all:
+    display-menu: true
     permission-enabled:
       type: BEDROCK
       name: '&6All'
@@ -75,6 +76,7 @@ permissions:
         pitch: 0.2
 
   animal_breed:
+    display-menu: true
     permission-enabled:
       type: WHEAT
       name: '&6Animal Breed'
@@ -107,6 +109,7 @@ permissions:
         pitch: 0.2
 
   animal_damage:
+    display-menu: true
     permission-enabled:
       type: DIAMOND_SWORD
       name: '&6Animal Damage'
@@ -139,6 +142,7 @@ permissions:
         pitch: 0.2
 
   animal_spawn:
+    display-menu: true
     permission-enabled:
       type: MONSTER_EGG
       data: 93
@@ -174,6 +178,7 @@ permissions:
         pitch: 0.2
 
   ban_member:
+    display-menu: true
     permission-enabled:
       type: SKULL_ITEM
       name: '&6Ban Member'
@@ -206,6 +211,7 @@ permissions:
         pitch: 0.2
 
   break:
+    display-menu: true
     permission-enabled:
       type: DIAMOND_PICKAXE
       name: '&6Break'
@@ -238,6 +244,7 @@ permissions:
         pitch: 0.2
 
   build:
+    display-menu: true
     permission-enabled:
       type: COBBLESTONE
       name: '&6Build'
@@ -270,6 +277,7 @@ permissions:
         pitch: 0.2
 
   change_name:
+    display-menu: true
     permission-enabled:
       type: NAME_TAG
       name: '&6Change Name'
@@ -302,6 +310,7 @@ permissions:
         pitch: 0.2
 
   check_permission:
+    display-menu: true
     permission-enabled:
       type: COMPASS
       name: '&6Check Permission'
@@ -334,6 +343,7 @@ permissions:
         pitch: 0.2
 
   chest_access:
+    display-menu: true
     permission-enabled:
       type: CHEST
       name: '&6Chest Access'
@@ -366,6 +376,7 @@ permissions:
         pitch: 0.2
 
   close_bypass:
+    display-menu: true
     permission-enabled:
       type: TRIPWIRE_HOOK
       name: '&6Locked Bypass'
@@ -398,6 +409,7 @@ permissions:
         pitch: 0.2
 
   close_island:
+    display-menu: true
     permission-enabled:
       type: BARRIER
       name: '&6Lock Island'
@@ -430,6 +442,7 @@ permissions:
         pitch: 0.2
 
   coop_member:
+    display-menu: true
     permission-enabled:
       type: GOLDEN_APPLE
       name: '&6Coop Member'
@@ -462,6 +475,7 @@ permissions:
         pitch: 0.2
 
   delete_warp:
+    display-menu: true
     permission-enabled:
       type: ENDER_PEARL
       name: '&6Delete Warp'
@@ -494,6 +508,7 @@ permissions:
         pitch: 0.2
 
   demote_members:
+    display-menu: true
     permission-enabled:
       type: IRON_INGOT
       name: '&6Demote Members'
@@ -526,6 +541,7 @@ permissions:
         pitch: 0.2
 
   deposit_money:
+    display-menu: true
     permission-enabled:
       type: MAP
       name: '&6Deposit Money'
@@ -558,6 +574,7 @@ permissions:
         pitch: 0.2
 
   disband_island:
+    display-menu: true
     permission-enabled:
       type: TNT
       name: '&6Disband Island'
@@ -590,6 +607,7 @@ permissions:
         pitch: 0.2
 
   discord_show:
+    display-menu: true
     permission-enabled:
       type: STAINED_CLAY
       data: 3
@@ -625,6 +643,7 @@ permissions:
         pitch: 0.2
 
   drop_items:
+    display-menu: true
     permission-enabled:
       type: ARROW
       name: '&6Drop Items'
@@ -657,6 +676,7 @@ permissions:
         pitch: 0.2
 
   ender_pearl:
+    display-menu: true
     permission-enabled:
       type: ENDER_PEARL
       name: '&6Ender Pearl'
@@ -689,6 +709,7 @@ permissions:
         pitch: 0.2
 
   expel_bypass:
+    display-menu: true
     permission-enabled:
       type: FEATHER
       name: '&6Expel Bypass'
@@ -721,6 +742,7 @@ permissions:
         pitch: 0.2
 
   expel_players:
+    display-menu: true
     permission-enabled:
       type: DISPENSER
       name: '&6Expel Players'
@@ -753,6 +775,7 @@ permissions:
         pitch: 0.2
 
   farm_tramping:
+    display-menu: true
     permission-enabled:
       type: SOIL
       name: '&6Farm Tramping'
@@ -785,6 +808,7 @@ permissions:
         pitch: 0.2
 
   fish:
+    display-menu: true
     permission-enabled:
       type: FISHING_ROD
       name: '&6Fish'
@@ -817,6 +841,7 @@ permissions:
         pitch: 0.2
 
   fly:
+    display-menu: true
     permission-enabled:
       type: FEATHER
       name: '&6Fly'
@@ -849,6 +874,7 @@ permissions:
         pitch: 0.2
 
   interact:
+    display-menu: true
     permission-enabled:
       type: PISTON_BASE
       name: '&6Interact'
@@ -881,6 +907,7 @@ permissions:
         pitch: 0.2
 
   invite_member:
+    display-menu: true
     permission-enabled:
       type: SKULL_ITEM
       data: 3
@@ -916,6 +943,7 @@ permissions:
         pitch: 0.2
 
   item_frame:
+    display-menu: true
     permission-enabled:
       type: ITEM_FRAME
       name: '&6Item Frame'
@@ -948,6 +976,7 @@ permissions:
         pitch: 0.2
 
   kick_member:
+    display-menu: true
     permission-enabled:
       type: SKULL_ITEM
       name: '&6Kick Member'
@@ -980,6 +1009,7 @@ permissions:
         pitch: 0.2
 
   monster_damage:
+    display-menu: true
     permission-enabled:
       type: SKULL_ITEM
       data: 2
@@ -1015,6 +1045,7 @@ permissions:
         pitch: 0.2
 
   minecart_damage:
+    display-menu: true
     permission-enabled:
       type: EXPLOSIVE_MINECART
       name: '&6Minecart Damage'
@@ -1047,6 +1078,7 @@ permissions:
         pitch: 0.2
 
   minecart_enter:
+    display-menu: true
     permission-enabled:
       type: HOPPER_MINECART
       name: '&6Minecart Enter'
@@ -1079,6 +1111,7 @@ permissions:
         pitch: 0.2
 
   minecart_open:
+    display-menu: true
     permission-enabled:
       type: STORAGE_MINECART
       name: '&6Minecart Open'
@@ -1111,6 +1144,7 @@ permissions:
         pitch: 0.2
 
   monster_spawn:
+    display-menu: true
     permission-enabled:
       type: MONSTER_EGG
       data: 59
@@ -1146,6 +1180,7 @@ permissions:
         pitch: 0.2
 
   open_island:
+    display-menu: true
     permission-enabled:
       type: REDSTONE_TORCH_ON
       name: '&6Open Island'
@@ -1178,6 +1213,7 @@ permissions:
         pitch: 0.2
 
   painting:
+    display-menu: true
     permission-enabled:
       type: PAINTING
       name: '&6Painting'
@@ -1210,6 +1246,7 @@ permissions:
         pitch: 0.2
 
   paypal_show:
+    display-menu: true
     permission-enabled:
       type: WOOL
       data: 11
@@ -1245,6 +1282,7 @@ permissions:
         pitch: 0.2
 
   pickup_drops:
+    display-menu: true
     permission-enabled:
       type: HOPPER
       name: '&6Pickup Drops'
@@ -1277,6 +1315,7 @@ permissions:
         pitch: 0.2
 
   promote_members:
+    display-menu: true
     permission-enabled:
       type: DIAMOND
       name: '&6Promote Members'
@@ -1309,6 +1348,7 @@ permissions:
         pitch: 0.2
 
   rankup:
+    display-menu: true
     permission-enabled:
       type: GOLD_INGOT
       name: '&6Upgrades Rankup'
@@ -1341,6 +1381,7 @@ permissions:
         pitch: 0.2
 
   ratings_show:
+    display-menu: true
     permission-enabled:
       type: NETHER_STAR
       name: '&6Ratings Show'
@@ -1373,6 +1414,7 @@ permissions:
         pitch: 0.2
 
   set_biome:
+    display-menu: true
     permission-enabled:
       type: GRASS
       name: '&6Set Biome'
@@ -1405,6 +1447,7 @@ permissions:
         pitch: 0.2
 
   set_discord:
+    display-menu: true
     permission-enabled:
       type: STAINED_CLAY
       data: 3
@@ -1440,6 +1483,7 @@ permissions:
         pitch: 0.2
 
   set_home:
+    display-menu: true
     permission-enabled:
       type: BED
       name: '&6Set Home'
@@ -1472,6 +1516,7 @@ permissions:
         pitch: 0.2
 
   set_paypal:
+    display-menu: true
     permission-enabled:
       type: WOOL
       data: 11
@@ -1507,6 +1552,7 @@ permissions:
         pitch: 0.2
 
   set_permission:
+    display-menu: true
     permission-enabled:
       type: DIODE
       name: '&6Set Permission'
@@ -1539,6 +1585,7 @@ permissions:
         pitch: 0.2
 
   set_role:
+    display-menu: true
     permission-enabled:
       type: DIAMOND_CHESTPLATE
       name: '&6Set Role'
@@ -1571,6 +1618,7 @@ permissions:
         pitch: 0.2
 
   set_settings:
+    display-menu: true
     permission-enabled:
       type: LEVER
       name: '&6Set Settings'
@@ -1603,6 +1651,7 @@ permissions:
         pitch: 0.2
 
   set_warp:
+    display-menu: true
     permission-enabled:
       type: EYE_OF_ENDER
       name: '&6Set Warp'
@@ -1635,6 +1684,7 @@ permissions:
         pitch: 0.2
 
   uncoop_member:
+    display-menu: true
     permission-enabled:
       type: GOLDEN_APPLE
       name: '&6Uncoop Member'
@@ -1667,6 +1717,7 @@ permissions:
         pitch: 0.2
 
   sign_interact:
+    display-menu: true
     permission-enabled:
       type: SIGN
       name: '&6Sign Interact'
@@ -1699,6 +1750,7 @@ permissions:
         pitch: 0.2
 
   spawner_break:
+    display-menu: true
     permission-enabled:
       type: MOB_SPAWNER
       name: '&6Spawner Break'
@@ -1731,6 +1783,7 @@ permissions:
         pitch: 0.2
 
   use:
+    display-menu: true
     permission-enabled:
       type: STONE_BUTTON
       name: '&6Use'
@@ -1763,6 +1816,7 @@ permissions:
         pitch: 0.2
 
   withdraw_money:
+    display-menu: true
     permission-enabled:
       type: EMERALD
       name: '&6Withdraw Money'

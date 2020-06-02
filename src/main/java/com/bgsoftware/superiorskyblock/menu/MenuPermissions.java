@@ -210,10 +210,10 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             FileUtils.saveResource("menus/permissions.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), "permissions.yml");
 
-        if(convertOldGUI(cfg)){
+        if(convertOldGUI(cfg))
             cfg.save(file);
-        }
 
         noRolePermission = cfg.getString("messages.no-role-permission", "");
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
@@ -226,21 +226,24 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         islandPermissions.clear();
 
         for(String key : permissionsSection.getKeys(false)){
-            try {
-                String permission = key.toLowerCase();
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permission);
-                ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
-                menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
-                menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
-                menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
-                menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
-                menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
-                menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
-                if (permissionSection.contains("role-permission")) {
-                    menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
+            if(permissionsSection.getBoolean(key + ".display-menu", false)) {
+                try {
+                    String permission = key.toLowerCase();
+                    IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permission);
+                    ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
+                    menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
+                    menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
+                    menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
+                    menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
+                    menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
+                    menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
+                    if (permissionSection.contains("role-permission")) {
+                        menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
+                    }
+                    islandPermissions.add(islandPrivilege);
+                } catch (Exception ignored) {
                 }
-                islandPermissions.add(islandPrivilege);
-            }catch(Exception ignored){}
+            }
         }
 
         menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));

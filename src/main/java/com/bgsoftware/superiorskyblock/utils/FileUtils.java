@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -193,6 +194,28 @@ public final class FileUtils {
             }
         }catch(Exception ex){
             ex.printStackTrace();
+        }
+    }
+
+    public static InputStream getResource(String resourcePath){
+        try {
+            for(ServerVersion serverVersion : ServerVersion.getByOrder()){
+                String version = serverVersion.name().substring(1);
+                if(resourcePath.endsWith(".yml") && plugin.getResource(resourcePath.replace(".yml", version + ".yml")) != null) {
+                    resourcePath = resourcePath.replace(".yml", version + ".yml");
+                    break;
+                }
+
+                else if(resourcePath.endsWith(".schematic") && plugin.getResource(resourcePath.replace(".schematic", version + ".schematic")) != null) {
+                    resourcePath = resourcePath.replace(".schematic", version + ".schematic");
+                    break;
+                }
+            }
+
+            return plugin.getResource(resourcePath);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
         }
     }
 
