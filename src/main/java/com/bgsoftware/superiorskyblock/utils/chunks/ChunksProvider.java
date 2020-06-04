@@ -72,7 +72,7 @@ public final class ChunksProvider {
                 double[] tps = plugin.getNMSAdapter().getTPS();
                 double averageTPS = (tps[0] + tps[1] + tps[2]) / 3;
 
-                if(tps[0] < averageTPS)
+                if(tps[0] < averageTPS * 0.8)
                     return;
 
                 ChunkPosition chunkPosition = pendingChunks.poll();
