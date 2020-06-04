@@ -44,7 +44,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     private final int[] offsets = new int[3];
     private final float yaw, pitch;
-    private final byte[] sizes = new byte[3];
+    private final int[] sizes = new int[3];
     private final SchematicBlock[][][] blocks;
     private final SchematicEntity[] entities;
 
@@ -52,9 +52,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         super(name);
         this.compoundTag = compoundTag;
 
-        sizes[0] = ((ByteTag) compoundTag.getValue().get("xSize")).getValue();
-        sizes[1] = ((ByteTag) compoundTag.getValue().get("ySize")).getValue();
-        sizes[2] = ((ByteTag) compoundTag.getValue().get("zSize")).getValue();
+        sizes[0] = parseTag(compoundTag.getValue().get("xSize"));
+        sizes[1] = parseTag(compoundTag.getValue().get("ySize"));
+        sizes[2] = parseTag(compoundTag.getValue().get("zSize"));
 
         offsets[0] = ((IntTag) compoundTag.getValue().getOrDefault("offsetX", new IntTag(sizes[0] / 2))).getValue();
         offsets[1] = ((IntTag) compoundTag.getValue().getOrDefault("offsetY", new IntTag(sizes[1] / 2))).getValue();
@@ -247,11 +247,18 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 
-    private <T extends Enum<T>> T getOrNull(Class<T> enumType, String name){
+    private static int parseTag(Tag<?> tag){
+        if(tag instanceof ByteTag)
+            return ((ByteTag) tag).getValue();
+        else
+            return ((IntTag) tag).getValue();
+    }
+
+    private static <T extends Enum<T>> T getOrNull(Class<T> enumType, String name){
         return getOrValue(enumType, name, null);
     }
 
-    private <T extends Enum<T>> T getOrValue(Class<T> enumType, String name, T value){
+    private static <T extends Enum<T>> T getOrValue(Class<T> enumType, String name, T value){
         try {
             return Enum.valueOf(enumType, name);
         }catch(IllegalArgumentException ex){

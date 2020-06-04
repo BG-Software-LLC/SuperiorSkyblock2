@@ -106,6 +106,8 @@ public final class SIsland extends DatabaseObject implements Island {
      */
     private SuperiorPlayer owner;
     private final BlockPosition center;
+    private final long creationTime;
+    private final String creationTimeDate;
 
     /*
      * Island flags
@@ -167,9 +169,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
-
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-        this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
+        this.creationTime = resultSet.getLong("creationTime");
+        this.creationTimeDate = new Date(creationTime * 1000).toString();
 
         IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
         IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
@@ -196,6 +198,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.mobDrops.set(resultSet.getDouble("mobDrops"));
         this.discord.set(resultSet.getString("discord"));
         this.paypal.set(resultSet.getString("paypal"));
+        this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
         this.locked.set(resultSet.getBoolean("locked"));
         this.islandName.set(resultSet.getString("name"));
         this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
@@ -259,6 +262,8 @@ public final class SIsland extends DatabaseObject implements Island {
             this.owner = null;
         }
         this.center = wrappedLocation;
+        this.creationTime = System.currentTimeMillis() / 1000;
+        this.creationTimeDate = new Date(creationTime * 1000).toString();
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
@@ -273,6 +278,16 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public SuperiorPlayer getOwner() {
         return owner;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    @Override
+    public String getCreationTimeDate() {
+        return creationTimeDate;
     }
 
     /*
@@ -2634,6 +2649,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(ChunksTracker.serialize(this))
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(bonusLevel.get().getAsString())
+                .setLong(creationTime)
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2685,6 +2701,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(ChunksTracker.serialize(this))
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(bonusLevel.get().getAsString())
+                .setLong(creationTime)
                 .execute(async);
     }
 

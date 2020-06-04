@@ -79,6 +79,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public long getCreationTime() {
+        return -1;
+    }
+
+    @Override
+    public String getCreationTimeDate() {
+        return "";
+    }
+
+    @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
         return new ArrayList<>();
     }

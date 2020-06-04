@@ -105,6 +105,8 @@ public final class CmdShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(locale, SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
+        if(!Locale.ISLAND_INFO_CREATION_TIME.isEmpty(locale))
+            infoMessage.append(Locale.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty(locale)) {
             double rating = island.getTotalRating();
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");

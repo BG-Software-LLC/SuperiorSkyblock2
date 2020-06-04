@@ -13,13 +13,21 @@ public final class Executor {
 
     private static SuperiorSkyblockPlugin plugin;
     private static ExecutorService databaseExecutor;
+    private static boolean shutdown = false;
 
     public static void init(SuperiorSkyblockPlugin plugin){
         Executor.plugin = plugin;
         databaseExecutor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
     }
 
+    public static void shutdown(){
+        shutdown = true;
+    }
+
     public static void ensureMain(Runnable runnable){
+        if(shutdown)
+            return;
+
         if(!Bukkit.isPrimaryThread()){
             sync(runnable);
         }
@@ -29,14 +37,23 @@ public final class Executor {
     }
 
     public static BukkitTask sync(Runnable runnable){
+        if(shutdown)
+            return null;
+
         return sync(runnable, 0);
     }
 
     public static BukkitTask sync(Runnable runnable, long delay){
+        if(shutdown)
+            return null;
+
         return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
     }
 
     public static void data(Runnable runnable){
+        if(shutdown)
+            return;
+
         databaseExecutor.execute(runnable);
     }
 
@@ -45,10 +62,16 @@ public final class Executor {
     }
 
     public static void async(Runnable runnable){
+        if(shutdown)
+            return;
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
     public static void async(Runnable runnable, long delay){
+        if(shutdown)
+            return;
+
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
     }
 

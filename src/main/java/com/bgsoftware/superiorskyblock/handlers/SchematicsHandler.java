@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.schematics.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.schematics.TagBuilder;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
@@ -56,9 +55,8 @@ import java.util.Map;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler implements SchematicManager {
 
-    private SuperiorSkyblockPlugin plugin;
-
-    private Registry<String, Schematic> schematics = Registry.createRegistry();
+    private final Registry<String, Schematic> schematics = Registry.createRegistry();
+    private final SuperiorSkyblockPlugin plugin;
 
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -201,9 +199,9 @@ public final class SchematicsHandler implements SchematicManager {
         }
 
         Map<String, Tag<?>> compoundValue = new HashMap<>();
-        compoundValue.put("xSize", new ByteTag((byte) xSize));
-        compoundValue.put("ySize", new ByteTag((byte) ySize));
-        compoundValue.put("zSize", new ByteTag((byte) zSize));
+        compoundValue.put("xSize", new IntTag(xSize));
+        compoundValue.put("ySize", new IntTag(ySize));
+        compoundValue.put("zSize", new IntTag(zSize));
         compoundValue.put("blocks", new ListTag(CompoundTag.class, blocks));
         compoundValue.put("entities", new ListTag(CompoundTag.class, entities));
         compoundValue.put("offsetX", new IntTag(offsetX));

@@ -33,6 +33,16 @@ public interface Island extends Comparable<Island> {
      */
     SuperiorPlayer getOwner();
 
+    /**
+     * Get the creation time of the island.
+     */
+    long getCreationTime();
+
+    /**
+     * Get the creation time of the island, in a formatted string.
+     */
+    String getCreationTimeDate();
+
     /*
      *  Player related methods
      */

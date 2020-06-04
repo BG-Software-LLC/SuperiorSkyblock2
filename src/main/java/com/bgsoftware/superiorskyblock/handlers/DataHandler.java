@@ -138,6 +138,7 @@ public final class DataHandler {
         addColumnIfNotExists("dirtyChunks", "islands", "''", "TEXT");
         addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
         addColumnIfNotExists("bonusLevel", "islands", "'0'", "TEXT");
+        addColumnIfNotExists("creationTime", "islands", (System.currentTimeMillis() / 1000) + "", "INTEGER");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -253,7 +254,8 @@ public final class DataHandler {
                 "lastTimeUpdate INTEGER," +
                 "dirtyChunks TEXT," +
                 "entityLimits TEXT," +
-                "bonusLevel TEXT" +
+                "bonusLevel TEXT," +
+                "creationTime INTEGER" +
                 ");");
     }
 
