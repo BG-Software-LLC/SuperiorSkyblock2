@@ -170,6 +170,13 @@ public interface GridManager {
     boolean isIslandsWorld(World world);
 
     /**
+     * Register a world as a islands world.
+     * This will add all protections to that world, however - no islands will by physically there.
+     * @param world The world to register as an islands world.
+     */
+    void registerIslandWorld(World world);
+
+    /**
      * Get the next location for a new island.
      */
     Location getNextLocation();

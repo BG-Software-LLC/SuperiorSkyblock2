@@ -62,6 +62,7 @@ public final class GridHandler implements GridManager {
     private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
+    private final Set<UUID> customWorlds = Sets.newHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -285,8 +286,16 @@ public final class GridHandler implements GridManager {
 
     @Override
     public boolean isIslandsWorld(World world) {
+        if(customWorlds.contains(world.getUID()))
+            return true;
+
         World islandsWorld = getIslandsWorld(world.getEnvironment());
         return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
+    }
+
+    @Override
+    public void registerIslandWorld(World world) {
+        customWorlds.add(world.getUID());
     }
 
     @Override
