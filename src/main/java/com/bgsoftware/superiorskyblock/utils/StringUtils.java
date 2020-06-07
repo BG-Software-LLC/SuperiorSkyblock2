@@ -217,4 +217,8 @@ public final class StringUtils {
         }
     }
 
+    public static String format(java.util.Locale locale){
+        return locale.getLanguage() + "-" + locale.getCountry();
+    }
+
 }

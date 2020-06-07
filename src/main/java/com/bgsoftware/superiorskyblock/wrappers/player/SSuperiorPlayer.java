@@ -458,6 +458,10 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return islandFly;
     }
 
+    public boolean hasIslandFlyEnabledRaw(){
+        return islandFly;
+    }
+
     @Override
     public void toggleIslandFly(){
         islandFly = !islandFly;

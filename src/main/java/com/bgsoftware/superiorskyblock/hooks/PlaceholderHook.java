@@ -31,6 +31,7 @@ public abstract class PlaceholderHook {
     private static boolean PlaceholderAPI = false;
 
     private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
+    private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
@@ -80,16 +81,38 @@ public abstract class PlaceholderHook {
 
             placeholder = placeholder.toLowerCase();
 
-            if(placeholder.equals("panel_toggle")){
-                return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
-            }
-
-            else if(placeholder.equals("player_texture")){
-                return superiorPlayer.getTextureValue();
-            }
-
-            else if(placeholder.equals("player_role")){
-                return superiorPlayer.getPlayerRole() + "";
+            if((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()){
+                String subPlaceholder = matcher.group(1).toLowerCase();
+                switch (subPlaceholder){
+                    case "texture":
+                        return superiorPlayer.getTextureValue();
+                    case "role":
+                        return superiorPlayer.getPlayerRole().toString();
+                    case "locale":
+                        return StringUtils.format(superiorPlayer.getUserLocale());
+                    case "world_border":
+                        return superiorPlayer.hasWorldBorderEnabled() ? "Yes" : "No";
+                    case "blocks_stacker":
+                        return superiorPlayer.hasBlocksStackerEnabled() ? "Yes" : "No";
+                    case "schematics":
+                        return superiorPlayer.hasSchematicModeEnabled() ? "Yes" : "No";
+                    case "team_chat":
+                        return superiorPlayer.hasTeamChatEnabled() ? "Yes" : "No";
+                    case "bypass":
+                        return superiorPlayer.hasBypassModeEnabled() ? "Yes" : "No";
+                    case "disbands":
+                        return String.valueOf(superiorPlayer.getDisbands());
+                    case "panel":
+                        return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
+                    case "fly":
+                        return ((SSuperiorPlayer) superiorPlayer).hasIslandFlyEnabledRaw() ? "Yes" : "No";
+                    case "chat_spy":
+                        return superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No";
+                    case "border_color":
+                        return superiorPlayer.getBorderColor().name();
+                    case "missions_completed":
+                        return String.valueOf(superiorPlayer.getCompletedMissions().size());
+                }
             }
 
             else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
@@ -253,12 +276,16 @@ public abstract class PlaceholderHook {
                         return ((BigDecimalFormatted) island.getIslandLevel()).getAsString();
                     case "level_format":
                         return StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale());
+                    case "level_int":
+                        return island.getIslandLevel().toBigInteger().toString();
                     case "worth":
                         return island.getWorth().toString();
                     case "worth_raw":
                         return ((BigDecimalFormatted) island.getWorth()).getAsString();
                     case "worth_format":
                         return StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale());
+                    case "worth_int":
+                        return island.getWorth().toBigInteger().toString();
                     case "raw_worth":
                         return island.getRawWorth().toString();
                     case "raw_worth_format":
@@ -293,10 +320,18 @@ public abstract class PlaceholderHook {
                         return island.getName().isEmpty() ? island.getOwner().getName() : plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
+                    case "is_member":
+                        return island.isMember(superiorPlayer) ? "Yes" : "No";
+                    case "is_coop":
+                        return island.isCoop(superiorPlayer) ? "Yes" : "No";
                     case "rating":
                         return StringUtils.format(island.getTotalRating());
                     case "rating_stars":
                         return StringUtils.formatRating(superiorPlayer.getUserLocale(), island.getTotalRating());
+                    case "warps_limit":
+                        return String.valueOf(island.getWarpsLimit());
+                    case "warps":
+                        return String.valueOf(island.getAllWarps().size());
                 }
 
             }

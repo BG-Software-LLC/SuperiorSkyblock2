@@ -26,7 +26,20 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
             registerPlaceholder("superior_island_location_upgrade_" + upgrade.getName());
         }
 
-        registerPlaceholder("superior_panel_toggle");
+        registerPlaceholder("superior_player_texture");
+        registerPlaceholder("superior_player_role");
+        registerPlaceholder("superior_player_locale");
+        registerPlaceholder("superior_player_world_border");
+        registerPlaceholder("superior_player_blocks_stacker");
+        registerPlaceholder("superior_player_schematics");
+        registerPlaceholder("superior_player_team_chat");
+        registerPlaceholder("superior_player_bypass");
+        registerPlaceholder("superior_player_disbands");
+        registerPlaceholder("superior_player_panel");
+        registerPlaceholder("superior_player_fly");
+        registerPlaceholder("superior_player_chat_spy");
+        registerPlaceholder("superior_player_border_color");
+        registerPlaceholder("superior_player_missions_completed");
 
         registerPlaceholder("superior_island_center");
         registerPlaceholder("superior_island_x");
@@ -41,9 +54,13 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_radius");
         registerPlaceholder("superior_island_biome");
         registerPlaceholder("superior_island_level");
+        registerPlaceholder("superior_island_level_raw");
         registerPlaceholder("superior_island_level_format");
+        registerPlaceholder("superior_island_level_int");
         registerPlaceholder("superior_island_worth");
+        registerPlaceholder("superior_island_worth_raw");
         registerPlaceholder("superior_island_worth_format");
+        registerPlaceholder("superior_island_worth_int");
         registerPlaceholder("superior_island_raw_worth");
         registerPlaceholder("superior_island_raw_worth_format");
         registerPlaceholder("superior_island_bank");
@@ -61,8 +78,12 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_name");
         registerPlaceholder("superior_island_name_leader");
         registerPlaceholder("superior_island_is_leader");
+        registerPlaceholder("superior_island_is_member");
+        registerPlaceholder("superior_island_is_coop");
         registerPlaceholder("superior_island_rating");
         registerPlaceholder("superior_island_rating_stars");
+        registerPlaceholder("superior_island_warps_limit");
+        registerPlaceholder("superior_island_warps");
 
         registerPlaceholder("superior_island_location_center");
         registerPlaceholder("superior_island_location_x");
@@ -77,9 +98,13 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_radius");
         registerPlaceholder("superior_island_location_biome");
         registerPlaceholder("superior_island_location_level");
+        registerPlaceholder("superior_island_location_level_raw");
         registerPlaceholder("superior_island_location_level_format");
+        registerPlaceholder("superior_island_location_level_int");
         registerPlaceholder("superior_island_location_worth");
+        registerPlaceholder("superior_island_location_worth_raw");
         registerPlaceholder("superior_island_location_worth_format");
+        registerPlaceholder("superior_island_location_worth_int");
         registerPlaceholder("superior_island_location_raw_worth");
         registerPlaceholder("superior_island_location_raw_worth_format");
         registerPlaceholder("superior_island_location_bank");
@@ -97,8 +122,12 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_name");
         registerPlaceholder("superior_island_location_name_leader");
         registerPlaceholder("superior_island_location_is_leader");
+        registerPlaceholder("superior_island_location_is_member");
+        registerPlaceholder("superior_island_location_is_coop");
         registerPlaceholder("superior_island_location_rating");
         registerPlaceholder("superior_island_location_rating_stars");
+        registerPlaceholder("superior_island_location_warps_limit");
+        registerPlaceholder("superior_island_location_warps");
     }
 
     //Register placeholder without logging to console
