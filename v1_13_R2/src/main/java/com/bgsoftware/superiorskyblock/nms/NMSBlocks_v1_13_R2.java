@@ -20,6 +20,7 @@ import net.minecraft.server.v1_13_R2.EntityTypes;
 import net.minecraft.server.v1_13_R2.EnumColor;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
+import net.minecraft.server.v1_13_R2.INamableTileEntity;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
 import net.minecraft.server.v1_13_R2.MobSpawnerAbstract;
@@ -103,7 +104,7 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
                     setTileEntityBanner(tileEntity, (DyeColor) args[0], (List<Pattern>) args[1]);
                     break;
                 case INVENTORY_HOLDER:
-                    setTileEntityInventoryHolder(tileEntity, (org.bukkit.inventory.ItemStack[]) args[0]);
+                    setTileEntityInventoryHolder(tileEntity, (org.bukkit.inventory.ItemStack[]) args[0], (String) args[1]);
                     break;
                 case SKULL:
                     setTileEntitySkull(tileEntity, null, (BlockFace) args[1], (String) args[2]);
@@ -198,11 +199,12 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     }
 
     @Override
-    public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
+    public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents, String name) {
         NonNullList<ItemStack> items = getItems(tileEntityInventoryHolder);
         for(int i = 0; i < items.size() && i < contents.length; i++){
             items.set(i, CraftItemStack.asNMSCopy(contents[i]));
         }
+        setName(tileEntityInventoryHolder, name);
     }
 
     @Override
@@ -313,6 +315,14 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
     }
 
+    @Override
+    public String getTileName(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        return tileEntity instanceof INamableTileEntity && ((INamableTileEntity) tileEntity).hasCustomName() ?
+                ((INamableTileEntity) tileEntity).getCustomName().getText() : "";
+    }
+
     private NonNullList<ItemStack> getItems(Object tileEntityInventoryHolder){
         if(tileEntityInventoryHolder instanceof TileEntityChest){
             return (NonNullList<ItemStack>) ((TileEntityChest) tileEntityInventoryHolder).getContents();
@@ -336,6 +346,27 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
 
         return NonNullList.a();
+    }
+
+    private void setName(Object tileEntityInventoryHolder, String name){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            ((TileEntityChest) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            ((TileEntityDispenser) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            ((TileEntityBrewingStand) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            ((TileEntityFurnace) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            ((TileEntityHopper) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityShulkerBox){
+            ((TileEntityShulkerBox) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
+        }
     }
 
 }

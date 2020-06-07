@@ -35,7 +35,7 @@ public interface NMSBlocks {
 
     void setTileEntityBanner(Object tileEntityBanner, DyeColor dyeColor, List<Pattern> patterns);
 
-    void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, ItemStack[] contents);
+    void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, ItemStack[] contents, String name);
 
     void setTileEntityFlowerPot(Object tileEntityFlowerPot, ItemStack flower);
 
@@ -48,6 +48,8 @@ public interface NMSBlocks {
     Chunk getChunkIfLoaded(World world, int x, int z);
 
     int tickIslands(int random);
+
+    String getTileName(Location location);
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

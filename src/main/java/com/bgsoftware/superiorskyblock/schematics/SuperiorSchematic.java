@@ -106,7 +106,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                             contents[entry.getKey()] = entry.getValue().clone();
                     }
 
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, contents);
+                    String containerName = ((StringTag) compoundValue.getOrDefault("name", new StringTag(""))).getValue();
+
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, contents, containerName);
                 }
 
                 else if(compoundValue.containsKey("flower")){

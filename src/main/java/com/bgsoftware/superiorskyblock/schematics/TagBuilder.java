@@ -12,12 +12,14 @@ import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.Location;
 import org.bukkit.block.Banner;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -27,8 +29,8 @@ import java.util.Map;
 @SuppressWarnings("UnusedReturnValue")
 public final class TagBuilder {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private Registry<String, Tag<?>> compoundValue = Registry.createRegistry();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final Registry<String, Tag<?>> compoundValue = Registry.createRegistry();
 
     public TagBuilder withBlockPosition(SchematicPosition blockPosition){
         compoundValue.add("blockPosition", new StringTag(blockPosition.toString()));
@@ -46,8 +48,9 @@ public final class TagBuilder {
         return this;
     }
 
-    public TagBuilder applyContents(ItemStack[] contents){
-        compoundValue.add("contents", TagUtils.inventoryToCompound(contents));
+    public TagBuilder applyContents(BlockState blockState){
+        compoundValue.add("contents", TagUtils.inventoryToCompound(((InventoryHolder) blockState).getInventory().getContents()));
+        compoundValue.add("name", new StringTag(plugin.getNMSBlocks().getTileName(blockState.getLocation())));
         return this;
     }
 

@@ -55,15 +55,17 @@ public class SchematicBlock {
     private static class SchematicInventoryHolder extends SchematicBlock{
 
         private final ItemStack[] contents;
+        private final String name;
 
-        private SchematicInventoryHolder(int combinedId, ItemStack[] contents){
+        private SchematicInventoryHolder(int combinedId, ItemStack[] contents, String name){
             super(combinedId);
             this.contents = contents;
+            this.name = name;
         }
 
         @Override
         public void applyBlock(BlockChangeTask blockChangeTask, Location location, Island island) {
-            super.applyBlock(blockChangeTask, location, BlockType.INVENTORY_HOLDER, (Object) contents);
+            super.applyBlock(blockChangeTask, location, BlockType.INVENTORY_HOLDER, contents, name);
         }
     }
 
@@ -147,8 +149,8 @@ public class SchematicBlock {
         return new SchematicBanner(combinedId, baseColor, patterns);
     }
 
-    public static SchematicInventoryHolder of(int combinedId, ItemStack[] contents){
-        return new SchematicInventoryHolder(combinedId, contents);
+    public static SchematicInventoryHolder of(int combinedId, ItemStack[] contents, String name){
+        return new SchematicInventoryHolder(combinedId, contents, name);
     }
 
     public static SchematicFlowerPot of(int combinedId, ItemStack flower){

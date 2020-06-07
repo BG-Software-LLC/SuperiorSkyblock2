@@ -173,7 +173,7 @@ public final class SchematicsHandler implements SchematicManager {
                             tagBuilder.applyBanner((Banner) block.getState());
                         }
                         else if(block.getState() instanceof InventoryHolder){
-                            tagBuilder.applyContents(((InventoryHolder) block.getState()).getInventory().getContents());
+                            tagBuilder.applyContents(block.getState());
                         }
                         else if(block.getType() == Material.FLOWER_POT){
                             tagBuilder.applyFlower(getFlower(block));

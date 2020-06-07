@@ -14,6 +14,7 @@ import net.minecraft.server.v1_9_R2.Chunk;
 import net.minecraft.server.v1_9_R2.ChunkSection;
 import net.minecraft.server.v1_9_R2.IBlockData;
 import net.minecraft.server.v1_9_R2.IChatBaseComponent;
+import net.minecraft.server.v1_9_R2.INamableTileEntity;
 import net.minecraft.server.v1_9_R2.ItemStack;
 import net.minecraft.server.v1_9_R2.MinecraftServer;
 import net.minecraft.server.v1_9_R2.MobSpawnerAbstract;
@@ -95,7 +96,7 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
                     setTileEntityBanner(tileEntity, (DyeColor) args[0], (List<Pattern>) args[1]);
                     break;
                 case INVENTORY_HOLDER:
-                    setTileEntityInventoryHolder(tileEntity, (org.bukkit.inventory.ItemStack[]) args[0]);
+                    setTileEntityInventoryHolder(tileEntity, (org.bukkit.inventory.ItemStack[]) args[0], (String) args[1]);
                     break;
                 case FLOWER_POT:
                     setTileEntityFlowerPot(tileEntity, (org.bukkit.inventory.ItemStack) args[0]);
@@ -178,11 +179,12 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
     }
 
     @Override
-    public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents) {
+    public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents, String name) {
         ItemStack[] items = getItems(tileEntityInventoryHolder);
         for(int i = 0; i < items.length && i < contents.length; i++){
             items[i] = CraftItemStack.asNMSCopy(contents[i]);
         }
+        setName(tileEntityInventoryHolder, name);
     }
 
     @Override
@@ -337,6 +339,13 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
         return random;
     }
 
+    @Override
+    public String getTileName(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        return tileEntity instanceof INamableTileEntity && ((INamableTileEntity) tileEntity).hasCustomName() ? ((INamableTileEntity) tileEntity).getName() : "";
+    }
+
     private ItemStack[] getItems(Object tileEntityInventoryHolder){
         if(tileEntityInventoryHolder instanceof TileEntityChest){
             return ((TileEntityChest) tileEntityInventoryHolder).getContents();
@@ -357,6 +366,24 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
         SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
 
         return new ItemStack[0];
+    }
+
+    private void setName(Object tileEntityInventoryHolder, String name){
+        if(tileEntityInventoryHolder instanceof TileEntityChest){
+            ((TileEntityChest) tileEntityInventoryHolder).a(name);
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
+            ((TileEntityDispenser) tileEntityInventoryHolder).a(name);
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
+            ((TileEntityBrewingStand) tileEntityInventoryHolder).a(name);
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
+            ((TileEntityFurnace) tileEntityInventoryHolder).a(name);
+        }
+        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
+            ((TileEntityHopper) tileEntityInventoryHolder).a(name);
+        }
     }
 
 }
