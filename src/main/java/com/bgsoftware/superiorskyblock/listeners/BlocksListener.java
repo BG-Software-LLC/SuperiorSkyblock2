@@ -480,12 +480,20 @@ public final class BlocksListener implements Listener {
         warpLocation.setYaw(e.getPlayer().getLocation().getYaw());
 
         if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().signWarpLine)){
+            if (!island.hasMoreWarpSlots()) {
+                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                for (int i = 0; i < 4; i++)
+                    e.setLine(i, "");
+                return;
+            }
+
             String warpName = e.getLine(1);
             boolean privateFlag = e.getLine(2).equalsIgnoreCase("private");
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
                 Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
-                e.setLine(0, "");
+                for (int i = 0; i < 4; i++)
+                    e.setLine(i, "");
             }
             else {
                 List<String> signWarp = plugin.getSettings().signWarp;
@@ -497,6 +505,13 @@ public final class BlocksListener implements Listener {
         }
 
         else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
+            if (!island.hasMoreWarpSlots()) {
+                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                for (int i = 0; i < 4; i++)
+                    e.setLine(i, "");
+                return;
+            }
+
             StringBuilder descriptionBuilder = new StringBuilder();
 
             for(int i = 1; i < 4; i++){
