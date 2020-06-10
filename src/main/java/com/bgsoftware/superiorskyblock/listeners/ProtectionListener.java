@@ -15,6 +15,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
@@ -129,11 +130,14 @@ public final class ProtectionListener implements Listener {
 
         IslandPrivilege islandPermission;
 
-        if(clickedBlock.getState() instanceof Chest || clickedBlock.getType().name().contains("SHULKER_BOX")) islandPermission = IslandPrivileges.CHEST_ACCESS;
-        else if(clickedBlock.getState() instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
-        else if(clickedBlock.getState() instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
-        else if(clickedBlock.getType() == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
-        else if(clickedBlock.getType().name().equals("SOIL") || clickedBlock.getType().name().equals("FARMLAND"))
+        BlockState blockState = clickedBlock.getState();
+        Material blockType = clickedBlock.getType();
+
+        if(blockState instanceof Chest || blockType.name().contains("SHULKER_BOX") || blockType.name().contains("BARREL")) islandPermission = IslandPrivileges.CHEST_ACCESS;
+        else if(blockState instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
+        else if(blockState instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
+        else if(blockType == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
+        else if(blockType.name().equals("SOIL") || blockType.name().equals("FARMLAND"))
             islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
         else islandPermission = IslandPrivileges.INTERACT;
 
