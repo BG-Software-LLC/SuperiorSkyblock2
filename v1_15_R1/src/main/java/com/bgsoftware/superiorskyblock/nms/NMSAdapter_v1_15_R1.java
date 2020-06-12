@@ -91,23 +91,31 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
             boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
-            WorldBorder worldBorder = new WorldBorder();
+            WorldBorder worldBorder;
 
-            worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
-            worldBorder.setSize(disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn()) ? Integer.MAX_VALUE : (island.getIslandSize() * 2) + 1);
+            if(disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())){
+                worldBorder = ((CraftWorld) superiorPlayer.getWorld()).getHandle().getWorldBorder();
+            }
+            
+            else {
+                worldBorder = new WorldBorder();
 
-            org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
+                worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+                worldBorder.setSize((island.getIslandSize() * 2) + 1);
 
-            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter(environment);
-            worldBorder.setCenter(center.getX(), center.getZ());
+                org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
 
-            switch (superiorPlayer.getBorderColor()){
-                case GREEN:
-                    worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
-                    break;
-                case RED:
-                    worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
-                    break;
+                Location center = island.getCenter(environment);
+                worldBorder.setCenter(center.getX(), center.getZ());
+
+                switch (superiorPlayer.getBorderColor()) {
+                    case GREEN:
+                        worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                        break;
+                    case RED:
+                        worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                        break;
+                }
             }
 
             PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);

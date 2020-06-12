@@ -78,32 +78,36 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
             if (!plugin.getSettings().worldBordersEnabled)
                 return;
 
-            boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
+            WorldBorder worldBorder;
 
-            WorldBorder worldBorder = new WorldBorder();
-
-            worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
-            double size = disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn()) ? Integer.MAX_VALUE : island.getIslandSize() + 1;
-            worldBorder.a(size, size, 0L);
-
-            org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
-
-            Location center = island == null ? superiorPlayer.getLocation() : island.getCenter(environment);
-
-            if(environment == org.bukkit.World.Environment.NETHER){
-                worldBorder.c(center.getX() * 8, center.getZ() * 8);
+            if(!superiorPlayer.hasWorldBorderEnabled() || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())){
+                worldBorder = ((CraftWorld) superiorPlayer.getWorld()).getHandle().af();
             }
-            else{
-                worldBorder.c(center.getX(), center.getZ());
-            }
+            else {
+                worldBorder = new WorldBorder();
 
-            switch (superiorPlayer.getBorderColor()){
-                case GREEN:
-                    worldBorder.a(worldBorder.h() - 0.1D, worldBorder.h(), Long.MAX_VALUE);
-                    break;
-                case RED:
-                    worldBorder.a(worldBorder.h(), worldBorder.h() - 1.0D, Long.MAX_VALUE);
-                    break;
+                worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+                double size = island.getIslandSize() + 1;
+                worldBorder.a(size, size, 0L);
+
+                org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
+
+                Location center = island.getCenter(environment);
+
+                if (environment == org.bukkit.World.Environment.NETHER) {
+                    worldBorder.c(center.getX() * 8, center.getZ() * 8);
+                } else {
+                    worldBorder.c(center.getX(), center.getZ());
+                }
+
+                switch (superiorPlayer.getBorderColor()) {
+                    case GREEN:
+                        worldBorder.a(worldBorder.h() - 0.1D, worldBorder.h(), Long.MAX_VALUE);
+                        break;
+                    case RED:
+                        worldBorder.a(worldBorder.h(), worldBorder.h() - 1.0D, Long.MAX_VALUE);
+                        break;
+                }
             }
 
             PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, EnumWorldBorderAction.INITIALIZE);
