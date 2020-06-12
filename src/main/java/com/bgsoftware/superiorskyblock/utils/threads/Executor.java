@@ -20,10 +20,6 @@ public final class Executor {
         databaseExecutor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
     }
 
-    public static void shutdown(){
-        shutdown = true;
-    }
-
     public static void ensureMain(Runnable runnable){
         if(shutdown)
             return;
@@ -77,6 +73,7 @@ public final class Executor {
 
     public static void close(){
         try{
+            shutdown = true;
             System.out.println("Shutting down database executor");
             databaseExecutor.shutdown();
             System.out.println("Waiting for database executor...");
