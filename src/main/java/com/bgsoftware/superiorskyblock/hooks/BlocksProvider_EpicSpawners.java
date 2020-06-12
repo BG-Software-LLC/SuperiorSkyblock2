@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
@@ -80,22 +79,20 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
             Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName().toUpperCase().replace(' ', '_'));
 
-            Executor.sync(() -> {
-                int increaseAmount = e.getSpawner().getFirstStack().getStackSize() - e.getOldStackSize();
+            int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
-                if(increaseAmount < 0){
-                    island.handleBlockBreak(blockKey, -increaseAmount);
-                }
+            if(increaseAmount < 0){
+                island.handleBlockBreak(blockKey, -increaseAmount);
+            }
 
-                else if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
-                    e.setCancelled(true);
-                    Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-                }
+            else if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                e.setCancelled(true);
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+            }
 
-                else{
-                    island.handleBlockPlace(blockKey, increaseAmount);
-                }
-            }, 1L);
+            else{
+                island.handleBlockPlace(blockKey, increaseAmount);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
