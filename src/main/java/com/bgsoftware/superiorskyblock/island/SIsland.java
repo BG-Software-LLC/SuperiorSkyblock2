@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
@@ -119,9 +120,9 @@ public final class SIsland extends DatabaseObject implements Island {
      * Island data
      */
 
-    private final SyncedObject<PriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new PriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
-    private final SyncedObject<PriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<PriorityQueue<SuperiorPlayer>> uniqueVisitors = SyncedObject.of(new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
+    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> uniqueVisitors = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
     private final SyncedObject<Set<SuperiorPlayer>> banned = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
@@ -483,7 +484,8 @@ public final class SIsland extends DatabaseObject implements Island {
         }
 
         if(inside && !isMember(superiorPlayer)){
-            boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors -> uniqueVisitors.add(superiorPlayer));
+            boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors ->
+                    !uniqueVisitors.contains(superiorPlayer) && uniqueVisitors.add(superiorPlayer));
 
             if(newVisitor){
                 Query.ISLAND_SET_VISITORS.getStatementHolder()
@@ -2070,7 +2072,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 try{
                     Chunk chunk = completableChunk.get();
                     amountOfEntities += Arrays.stream(chunk.getEntities())
-                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType())).count();
+                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType()) &&
+                                    !EntityUtils.canBypassEntityLimit(entity)).count();
                 }catch(Exception ignored){}
             }
 
