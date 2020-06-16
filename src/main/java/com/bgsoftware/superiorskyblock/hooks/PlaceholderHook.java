@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -35,7 +36,8 @@ public abstract class PlaceholderHook {
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
-    private static final Pattern LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_limit_(.+)");
+    private static final Pattern BLOCK_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_limit_(.+)");
+    private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
     private static final Pattern TOP_WORTH_PLACEHOLDER_PATTERN = Pattern.compile("worth_(.+)");
     private static final Pattern TOP_LEVEL_PLACEHOLDER_PATTERN = Pattern.compile("level_(.+)");
@@ -152,9 +154,14 @@ public abstract class PlaceholderHook {
                     return String.valueOf(island.getBlockCount(Key.of(keyName)));
                 }
 
-                else if ((matcher = LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1).toUpperCase();
                     return String.valueOf(island.getBlockLimit(Key.of(keyName)));
+                }
+
+                else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                    String keyName = matcher.group(1).toUpperCase();
+                    return String.valueOf(island.getEntityLimit(EntityType.valueOf(keyName)));
                 }
 
                 else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
