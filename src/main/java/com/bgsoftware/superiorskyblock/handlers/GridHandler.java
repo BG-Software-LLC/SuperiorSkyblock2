@@ -305,7 +305,10 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Location getNextLocation(){
-        Location location = lastIsland.parse().clone();
+        return getNextLocation(lastIsland.parse().clone());
+    }
+
+    private Location getNextLocation(Location location){
         location.setY(plugin.getSettings().islandsHeight);
         BlockFace islandFace = getIslandFace();
 
@@ -333,8 +336,7 @@ public final class GridHandler implements GridManager {
         }
 
         if(servedPositions.contains(location) || getIslandAt(location) != null){
-            setLastIsland(SBlockPosition.of(location));
-            return getNextLocation();
+            return getNextLocation(location);
         }
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(location));
