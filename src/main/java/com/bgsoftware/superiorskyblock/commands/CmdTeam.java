@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
@@ -103,6 +104,7 @@ public final class CmdTeam implements ISuperiorCommand {
                 Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
                 plugin.getPlayers().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.add(playerRole, new StringBuilder()));
+                rolesStrings.add(SPlayerRole.lastRole(), new StringBuilder());
 
                 String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(locale),
                         offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage(locale);
