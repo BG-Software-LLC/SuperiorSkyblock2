@@ -335,7 +335,8 @@ public final class CustomEventsListener implements Listener {
     private void handlePlayerEnter(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
                                    Island fromIsland, Island toIsland, IslandEnterEvent.EnterCause enterCause, Event event){
         if (toIsland != null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && toIsland.isBanned(superiorPlayer)){
+            if(toIsland.isBanned(superiorPlayer) && !superiorPlayer.hasBypassModeEnabled() &&
+                    !superiorPlayer.hasPermissionWithoutOP("superior.admin.ban.bypass")){
                 if(event instanceof Cancellable)
                     ((Cancellable) event).setCancelled(true);
                 Locale.BANNED_FROM_ISLAND.send(superiorPlayer);
