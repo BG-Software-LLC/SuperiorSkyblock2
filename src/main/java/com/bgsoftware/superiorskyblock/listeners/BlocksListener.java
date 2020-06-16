@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -287,8 +288,20 @@ public final class BlocksListener implements Listener {
         if(againstBlock.getType().name().equals("GLOWING_REDSTONE_ORE"))
             againstBlock.setType(Material.REDSTONE_ORE);
 
+
         //noinspection deprecation
-        if(againstBlock.getType() != placeItem.getType() || againstBlock.getData() != placeItem.getDurability() ||
+        byte blockData = againstBlock.getData();
+        Material blockType = againstBlock.getType();
+
+        if(blockType.name().contains("PORTAL_FRAME")) {
+            blockData = 0;
+        }
+
+        else if(placeItem.getType().name().equals("CAULDRON_ITEM")){
+            blockType = Material.valueOf("CAULDRON_ITEM");
+        }
+
+        if(blockType != placeItem.getType() || blockData != placeItem.getDurability() ||
                 (replaceState != null && replaceState.getType() != Material.AIR))
             return false;
 
@@ -347,8 +360,13 @@ public final class BlocksListener implements Listener {
 
         ItemStack blockItem = block.getState().getData().toItemStack(amount);
 
-        if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE"))
+        if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE")) {
             blockItem.setType(Material.REDSTONE_ORE);
+        }
+
+        else if(ServerVersion.isLegacy() && blockItem.getType().name().equals("CAULDRON")) {
+            blockItem.setType(Material.valueOf("CAULDRON_ITEM"));
+        }
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
         if(island != null){
