@@ -21,6 +21,8 @@ public interface NMSBlocks {
 
     void setBlock(Chunk chunk, Location location, int combinedId, BlockType blockType, Object... args);
 
+    void setBlock(Location location, Material material, byte data);
+
     void refreshChunk(Chunk chunk);
 
     void refreshLight(Chunk chunk);

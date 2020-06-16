@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_15_R1.AxisAlignedBB;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockFlowerPot;
 import net.minecraft.server.v1_15_R1.BlockLeaves;
@@ -17,6 +18,8 @@ import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_15_R1.ChunkProviderServer;
 import net.minecraft.server.v1_15_R1.ChunkSection;
+import net.minecraft.server.v1_15_R1.Entity;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.EnumColor;
 import net.minecraft.server.v1_15_R1.GameRules;
@@ -29,6 +32,7 @@ import net.minecraft.server.v1_15_R1.MobSpawnerAbstract;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.NonNullList;
+import net.minecraft.server.v1_15_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.TileEntityBanner;
@@ -53,13 +57,10 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftSign;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +124,23 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         }
     }
 
+    @Override
+    public void setBlock(Location location, Material material, byte data) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Chunk chunk = ((CraftChunk) location.getChunk()).getHandle();
+        chunk.setType(blockPosition, CraftMagicNumbers.getBlock(material, data), false);
+
+        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
+                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
+
+        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
+
+        for(Entity entity : world.getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+        }
+    }
 
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
@@ -130,12 +148,13 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
         PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, 65535);
 
-        Location location = new Location(bukkitChunk.getWorld(), bukkitChunk.getX() << 4, 128, bukkitChunk.getZ() << 4);
+        AxisAlignedBB bb = new AxisAlignedBB((bukkitChunk.getX() << 4) - 60, 0, (bukkitChunk.getZ() << 4) - 60,
+                (bukkitChunk.getX() << 4) + 60, 256, (bukkitChunk.getZ() << 4) + 60);
 
         Executor.ensureMain(() -> {
-            for(Entity player : bukkitChunk.getWorld().getNearbyEntities(location, 60, 128, 60)) {
-                if(player instanceof Player)
-                    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutMapChunk);
+            for(Entity entity : chunk.getWorld().getEntities(null, bb)){
+                if(entity instanceof EntityPlayer)
+                    ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
             }
         });
     }

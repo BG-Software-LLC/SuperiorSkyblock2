@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -18,7 +17,11 @@ import java.util.concurrent.ThreadLocalRandom;
 @SuppressWarnings("unused")
 public final class GeneratorsListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private static final BlockFace[] nearbyFaces = new BlockFace[] {
+            BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
+    };
+
+    private final SuperiorSkyblockPlugin plugin;
 
     public GeneratorsListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -64,24 +67,19 @@ public final class GeneratorsListener implements Listener {
 
         e.setCancelled(true);
 
-        block.setType(Material.valueOf(typeSections[0]));
 
-        if(typeSections.length == 2)
-            //noinspection deprecation
-            block.setData(Byte.parseByte(typeSections[1]));
+        byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
+
+        plugin.getNMSBlocks().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
 
         plugin.getNMSAdapter().playGeneratorSound(block.getLocation());
     }
 
     private boolean hasWaterNearby(Block block){
-        if(block.getRelative(BlockFace.WEST).getType().name().contains("WATER"))
-            return true;
-        if(block.getRelative(BlockFace.EAST).getType().name().contains("WATER"))
-            return true;
-        if(block.getRelative(BlockFace.NORTH).getType().name().contains("WATER"))
-            return true;
-        if(block.getRelative(BlockFace.SOUTH).getType().name().contains("WATER"))
-            return true;
+        for(BlockFace blockFace : nearbyFaces) {
+            if (block.getRelative(blockFace).getType().name().contains("WATER"))
+                return true;
+        }
 
         return false;
     }

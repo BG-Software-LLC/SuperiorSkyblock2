@@ -23,6 +23,7 @@ import net.minecraft.server.v1_8_R1.MinecraftServer;
 import net.minecraft.server.v1_8_R1.MobSpawnerAbstract;
 import net.minecraft.server.v1_8_R1.NBTTagCompound;
 import net.minecraft.server.v1_8_R1.NBTTagList;
+import net.minecraft.server.v1_8_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_8_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R1.TileEntity;
 import net.minecraft.server.v1_8_R1.TileEntityBanner;
@@ -116,8 +117,28 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
     }
 
     @Override
+    public void setBlock(Location location, Material material, byte data) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        //noinspection deprecation
+        int combinedId = material.getId() + (data << 12);
+        Chunk chunk = ((CraftChunk) location.getChunk()).getHandle();
+        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
+
+        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
+                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
+
+        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
+
+        //noinspection unchecked
+        for(Entity entity : (List<Entity>) world.getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+        }
+    }
+
+    @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
         PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, true, 65535);
@@ -126,7 +147,7 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
                 (bukkitChunk.getX() << 4) + 60, 256, (bukkitChunk.getZ() << 4) + 60);
 
         //noinspection unchecked
-        for(Entity entity : (List<Entity>) ((CraftWorld) bukkitChunk.getWorld()).getHandle().getEntities(null, bb)){
+        for(Entity entity : (List<Entity>) chunk.getWorld().getEntities(null, bb)){
             if(entity instanceof EntityPlayer)
                 ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
         }
