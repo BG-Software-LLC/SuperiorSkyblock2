@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
@@ -28,6 +29,7 @@ import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -97,13 +99,20 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
 
                 else if(compoundValue.containsKey("contents")){
-                    ItemStack[] contents = TagUtils.compoundToInventory((CompoundTag) compoundValue.get("contents"));
+                    ItemStack[] contents = null;
 
-                    if(plugin.getSettings().starterChestEnabled){
-                        contents = new ItemStack[27];
+                    if(plugin.getSettings().defaultContainersEnabled){
+                        InventoryType containerType = InventoryType.valueOf(((StringTag) compoundValue.getOrDefault("inventoryType", new StringTag("CHEST"))).getValue());
+                        Registry<Integer, ItemStack> containerContents = plugin.getSettings().defaultContainersContents.get(containerType);
+                        if(containerContents != null) {
+                            contents = new ItemStack[27];
+                            for (Map.Entry<Integer, ItemStack> entry : containerContents.entries())
+                                contents[entry.getKey()] = entry.getValue().clone();
+                        }
+                    }
 
-                        for(Map.Entry<Integer, ItemStack> entry : plugin.getSettings().starterChestContents.entries())
-                            contents[entry.getKey()] = entry.getValue().clone();
+                    if(contents == null){
+                        contents = TagUtils.compoundToInventory((CompoundTag) compoundValue.get("contents"));
                     }
 
                     String containerName = ((StringTag) compoundValue.getOrDefault("name", new StringTag(""))).getValue();

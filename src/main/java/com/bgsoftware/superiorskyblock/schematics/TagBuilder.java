@@ -51,6 +51,7 @@ public final class TagBuilder {
     public TagBuilder applyContents(BlockState blockState){
         compoundValue.add("contents", TagUtils.inventoryToCompound(((InventoryHolder) blockState).getInventory().getContents()));
         compoundValue.add("name", new StringTag(plugin.getNMSBlocks().getTileName(blockState.getLocation())));
+        compoundValue.add("inventoryType", new StringTag(((InventoryHolder) blockState).getInventory().getType().name()));
         return this;
     }
 

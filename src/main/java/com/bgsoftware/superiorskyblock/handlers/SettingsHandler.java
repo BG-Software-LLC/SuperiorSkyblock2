@@ -13,6 +13,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -105,8 +106,8 @@ public final class SettingsHandler {
     public final boolean teleportOnPVPEnable;
     public final boolean immuneToPVPWhenTeleport;
     public final List<String> blockedVisitorsCommands;
-    public final boolean starterChestEnabled;
-    public final Registry<Integer, ItemStack> starterChestContents;
+    public final boolean defaultContainersEnabled;
+    public final Registry<InventoryType, Registry<Integer, ItemStack>> defaultContainersContents;
     public final Registry<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final long homeWarmup;
@@ -139,7 +140,7 @@ public final class SettingsHandler {
         convertInteractables(plugin, cfg);
 
         cfg.syncWithConfig(file, plugin.getResource("config.yml"),  "config.yml",
-                "ladder", "commands-cooldown", "contents", "event-commands");
+                "ladder", "commands-cooldown", "containers", "event-commands");
 
         databaseType = cfg.getString("database.type");
         databaseMySQLAddress = cfg.getString("database.address");
@@ -257,14 +258,24 @@ public final class SettingsHandler {
         teleportOnPVPEnable = cfg.getBoolean("teleport-on-pvp-enable", true);
         immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);
         blockedVisitorsCommands = cfg.getStringList("blocked-visitors-commands");
-        starterChestEnabled = cfg.getBoolean("starter-chest.enabled", false);
-        starterChestContents = Registry.createRegistry();
-        for(String slot : cfg.getConfigurationSection("starter-chest.contents").getKeys(false)){
+        defaultContainersEnabled = cfg.getBoolean("default-containers.enabled", false);
+        defaultContainersContents = Registry.createRegistry();
+        for(String container : cfg.getConfigurationSection("default-containers.containers").getKeys(false)){
             try {
-                ItemStack itemStack = FileUtils.getItemStack("config.yml", cfg.getConfigurationSection("starter-chest.contents." + slot)).build();
-                itemStack.setAmount(cfg.getInt("starter-chest.contents." + slot + ".amount", 1));
-                starterChestContents.add(Integer.parseInt(slot), itemStack);
-            }catch(Exception ignored){}
+                InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
+                Registry<Integer, ItemStack>  containerContents = Registry.createRegistry();
+                ConfigurationSection containerSection = cfg.getConfigurationSection("default-containers.containers." + container);
+                for(String slot : containerSection.getKeys(false)) {
+                    try {
+                        ItemStack itemStack = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot)).build();
+                        itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
+                        containerContents.add(Integer.parseInt(slot), itemStack);
+                    } catch (Exception ignored) { }
+                }
+                defaultContainersContents.add(containerType, containerContents);
+            }catch (IllegalArgumentException ex){
+                SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
+            }
         }
         eventCommands = Registry.createRegistry();
         for(String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)){
@@ -300,7 +311,7 @@ public final class SettingsHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "contents", "event-commands");
+                "ladder", "commands-cooldown", "containers", "event-commands");
 
         cfg.set(path, value);
 
@@ -373,6 +384,10 @@ public final class SettingsHandler {
             cfg.set("default-values.mob-drops", cfg.getInt("default-mob-drops"));
         if(cfg.contains("default-island-height"))
             cfg.set("islands-height", cfg.getInt("default-island-height"));
+        if(cfg.contains("starter-chest")){
+            cfg.set("default-containers.enabled", cfg.getBoolean("starter-chest.enabled"));
+            cfg.set("default-containers.containers.chest", cfg.getConfigurationSection("starter-chest.contents"));
+        }
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){

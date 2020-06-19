@@ -409,46 +409,48 @@ immune-to-pvp-when-teleport: true
 # A list of commands that cannot be executed by visitors.
 blocked-visitors-commands: []
 
-# Set items for the starter chest for islands.
-starter-chest:
-  # Should this settings be enabled?
+# Set items for containers inside island schematics.
+default-containers:
+  # Should this setting be enabled?
   enabled: false
-  # The contents of the chest.
-  contents:
-    '0':
-      type: ICE
-      amount: 2
-    '1':
-      type: MELON
-    '2':
-      type: TORCH
-      amount: 2
-    '3':
-      type: BONE
-    '4':
-      type: LAVA_BUCKET
-    '5':
-      type: PUMPKIN_SEEDS
-    '6':
-      type: SUGAR_CANE
-    '7':
-      type: RED_MUSHROOM
-    '8':
-      type: BROWN_MUSHROOM
-    '9':
-      type: CACTUS
-    '10':
-      type: BREAD
-    '11':
-      type: WHEAT
-    '12':
-      type: LEATHER_BOOTS
-    '13':
-      type: LEATHER_LEGGINGS
-    '14':
-      type: LEATHER_CHESTPLATE
-    '15':
-      type: LEATHER_HELMET
+  containers:
+    # The type of the container.
+    chest:
+      # The contents of the container.
+      '0':
+        type: ICE
+        amount: 2
+      '1':
+        type: MELON
+      '2':
+        type: TORCH
+        amount: 2
+      '3':
+        type: BONE
+      '4':
+        type: LAVA_BUCKET
+      '5':
+        type: PUMPKIN_SEEDS
+      '6':
+        type: SUGAR_CANE
+      '7':
+        type: RED_MUSHROOM
+      '8':
+        type: BROWN_MUSHROOM
+      '9':
+        type: CACTUS
+      '10':
+        type: BREAD
+      '11':
+        type: WHEAT
+      '12':
+        type: LEATHER_BOOTS
+      '13':
+        type: LEATHER_LEGGINGS
+      '14':
+        type: LEATHER_CHESTPLATE
+      '15':
+        type: LEATHER_HELMET
 
 # A list of commands that will be executed when an event is called.
 # You can find a list of events here:
