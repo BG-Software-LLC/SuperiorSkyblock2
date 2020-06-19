@@ -1728,19 +1728,19 @@ permissions:
   sign_interact:
     display-menu: true
     permission-enabled:
-      type: SIGN
+      type: OAK_SIGN
       name: '&6Sign Interact'
       lore:
         - '&7Access to interact with signs inside the island.'
         - '&7Currently &aENABLED&7.'
     permission-disabled:
-      type: SIGN
+      type: OAK_SIGN
       name: '&6Sign Interact'
       lore:
         - '&7Access to interact with signs inside the island.'
         - '&7Currently &cDISABLED&7.'
     role-permission:
-      type: SIGN
+      type: OAK_SIGN
       name: '&6Sign Interact'
       lore:
         - '&7Access to interact with signs inside the island.'
