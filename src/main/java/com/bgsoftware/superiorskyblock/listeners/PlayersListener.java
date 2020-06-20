@@ -387,7 +387,8 @@ public final class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
-        World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+        World.Environment environment = e.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER ?
+                World.Environment.NORMAL : e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
 
         if(((SSuperiorPlayer) superiorPlayer).isImmunedToTeleport())
             return;
@@ -400,10 +401,10 @@ public final class PlayersListener implements Listener {
         }
 
         String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
-        Location toTeleport = getLocationNoException(island, environment);
+        Location toTeleport = environment == World.Environment.NORMAL ? island.getTeleportLocation(environment) : getLocationNoException(island, environment);
 
         if(toTeleport != null) {
-            if(!island.wasSchematicGenerated(environment)){
+            if(environment != World.Environment.NORMAL && !island.wasSchematicGenerated(environment)){
                 String schematicName = island.getSchematicName();
                 if(schematicName.isEmpty())
                     schematicName = plugin.getSchematics().getDefaultSchematic(environment);
