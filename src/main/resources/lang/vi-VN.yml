@@ -123,14 +123,6 @@ COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
 COMMAND_COOLDOWN_FORMAT: '&c&lLỗi | &7Bạn chỉ có thể sử dụng lệnh trong {0}.'
-COMMAND_COOLDOWN_SECONDS_NAME: giây
-COMMAND_COOLDOWN_SECOND_NAME: giây
-COMMAND_COOLDOWN_MINUTES_NAME: phút
-COMMAND_COOLDOWN_MINUTE_NAME: phút
-COMMAND_COOLDOWN_HOURS_NAME: tiếng
-COMMAND_COOLDOWN_HOUR_NAME: tiếng
-COMMAND_COOLDOWN_DAYS_NAME: ngày
-COMMAND_COOLDOWN_DAY_NAME: ngày
 COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các command của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
@@ -294,6 +286,14 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+FORMAT_SECONDS_NAME: giây
+FORMAT_SECOND_NAME: giây
+FORMAT_MINUTES_NAME: phút
+FORMAT_MINUTE_NAME: phút
+FORMAT_HOURS_NAME: tiếng
+FORMAT_HOUR_NAME: tiếng
+FORMAT_DAYS_NAME: ngày
+FORMAT_DAY_NAME: ngày
 GENERATOR_CLEARED: '&e&lĐảo Thần | &7Xóa thành công số lượng máy tạo quặng cho đảo của {0}.'
 GENERATOR_CLEARED_NAME: '&e&lĐảo Thần | &7Xóa thành công số lượng máy tạo quặng cho đảo {0}.'
 GENERATOR_CLEARED_ALL: '&e&lĐảo Thần | &7Xóa thành công số lượng máy tạo quặng cho tất cả các đảo.'

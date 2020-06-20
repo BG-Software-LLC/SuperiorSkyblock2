@@ -81,10 +81,6 @@ public final class StringUtils {
         return s;
     }
 
-    public static String fancyFormat(double d, java.util.Locale locale){
-        return fancyFormat(BigDecimal.valueOf(d), locale);
-    }
-
     public static String fancyFormat(BigDecimal bigDecimal, java.util.Locale locale){
         double d = bigDecimal.doubleValue();
         if(d > Q)
@@ -145,12 +141,12 @@ public final class StringUtils {
         if(time > D){
             timeUnitValue = time / D;
             if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
             }
             else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_DAY_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_DAYS_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
             }
             time %= D;
         }
@@ -158,12 +154,12 @@ public final class StringUtils {
         if(time > H){
             timeUnitValue = time / H;
             if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
             }
             else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_HOUR_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_HOURS_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
             }
             time %= H;
         }
@@ -171,12 +167,12 @@ public final class StringUtils {
         if(time > MIN){
             timeUnitValue = time / MIN;
             if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
             }
             else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_MINUTE_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_MINUTES_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
             }
             time %= MIN;
         }
@@ -184,21 +180,21 @@ public final class StringUtils {
         if(time > S){
             timeUnitValue = time / S;
             if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
+                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
             }
             else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale) :
-                        Locale.COMMAND_COOLDOWN_SECONDS_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
             }
         }
 
         if(timeBuilder.length() == 0){
             if(RTL){
-                timeBuilder.insert(0, "1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale)).insert(0, " ,");
+                timeBuilder.insert(0, "1 ").append(Locale.FORMAT_SECOND_NAME.getMessage(locale)).insert(0, " ,");
             }
             else {
-                timeBuilder.append("1 ").append(Locale.COMMAND_COOLDOWN_SECOND_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append("1 ").append(Locale.FORMAT_SECOND_NAME.getMessage(locale)).append(", ");
             }
         }
 

@@ -97,14 +97,6 @@ COMMAND_ARGUMENT_UPGRADE_NAME: nom-de-l'upgrade
 COMMAND_ARGUMENT_VALUE: valeur
 COMMAND_ARGUMENT_WARP_NAME: nom-du-warp
 COMMAND_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez attendre {0} avant de réutiliser cette commande.'
-COMMAND_COOLDOWN_SECONDS_NAME: secondes
-COMMAND_COOLDOWN_SECOND_NAME: seconde
-COMMAND_COOLDOWN_MINUTES_NAME: minutes
-COMMAND_COOLDOWN_MINUTE_NAME: minute
-COMMAND_COOLDOWN_HOURS_NAME: heures
-COMMAND_COOLDOWN_HOUR_NAME: heure
-COMMAND_COOLDOWN_DAYS_NAME: jours
-COMMAND_COOLDOWN_DAY_NAME: jour
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 'Activer ou désactiver les informations de débogage.'
 COMMAND_DESCRIPTION_ACCEPT: Accepter l'invitation d'un joueur.
 COMMAND_DESCRIPTION_ADMIN: Utiliser les commandes admin.
@@ -246,6 +238,14 @@ FORMAT_TRILLION: T
 FORMAT_BILLION: B
 FORMAT_MILLION: M
 FORMAT_THOUSANDS: K
+FORMAT_SECONDS_NAME: secondes
+FORMAT_SECOND_NAME: seconde
+FORMAT_MINUTES_NAME: minutes
+FORMAT_MINUTE_NAME: minute
+FORMAT_HOURS_NAME: heures
+FORMAT_HOUR_NAME: heure
+FORMAT_DAYS_NAME: jours
+FORMAT_DAY_NAME: jour
 GENERATOR_CLEARED: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île de {0}.'
 GENERATOR_CLEARED_NAME: '&e&lIle | &7Nettoyage des taux des générateurs pour l''île {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIle | &7Nettoyage des taux des générateurs de toutes les îles.'

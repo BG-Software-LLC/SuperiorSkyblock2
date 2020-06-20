@@ -113,7 +113,7 @@ public final class CmdTeam implements ISuperiorCommand {
                     PlayerRole playerRole = islandMember.getPlayerRole();
                     long time = islandMember.getLastTimeStatus() == -1 ? -1 : (System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus();
                     rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
-                            islandMember.getName(), islandMember.isOnline() ? onlineStatus : offlineStatus, getTime(time))).append("\n");
+                            islandMember.getName(), islandMember.isOnline() ? onlineStatus : offlineStatus, StringUtils.formatTime(locale, time))).append("\n");
                 });
 
                 rolesStrings.keys().stream()
@@ -151,36 +151,6 @@ public final class CmdTeam implements ISuperiorCommand {
         }
 
         return list;
-    }
-
-    private String getTime(long timeLeft){
-        String time = "";
-
-        if(timeLeft == -1)
-            return time;
-
-        if(timeLeft >= 3600) {
-            if (timeLeft / 3600 == 1)
-                time += "1 hour, ";
-            else time += (timeLeft / 3600) + " hours, ";
-            timeLeft %= 3600;
-        }
-
-        if(timeLeft >= 60){
-            if (timeLeft / 60 == 1)
-                time += "1 minute, ";
-            else time += (timeLeft / 60) + " minutes, ";
-            timeLeft %= 60;
-        }
-
-        if(timeLeft != 0) {
-            if (timeLeft == 1)
-                time += timeLeft + " second";
-            else time += timeLeft + " seconds";
-            return time;
-        }
-
-        return time.substring(0, time.length() - 2);
     }
 
 }

@@ -127,14 +127,6 @@ COMMAND_ARGUMENT_VALUE: valore
 COMMAND_ARGUMENT_WARP_NAME: nome-warp
 COMMAND_COOLDOWN_FORMAT: '&c&lErrore | &7È possibile utilizzare questo comando tra
   {0}.'
-COMMAND_COOLDOWN_SECONDS_NAME: secondi
-COMMAND_COOLDOWN_SECOND_NAME: secondo
-COMMAND_COOLDOWN_MINUTES_NAME: minuti
-COMMAND_COOLDOWN_MINUTE_NAME: minuto
-COMMAND_COOLDOWN_HOURS_NAME: ore
-COMMAND_COOLDOWN_HOUR_NAME: ora
-COMMAND_COOLDOWN_DAYS_NAME: giorni
-COMMAND_COOLDOWN_DAY_NAME: giorno
 COMMAND_DESCRIPTION_ACCEPT: Accetta un invito da un giocatore.
 COMMAND_DESCRIPTION_ADMIN: Utilizzare i comandi di amministrazione.
 COMMAND_DESCRIPTION_ADMIN_ADD: Aggiungi un utente a un'isola.
@@ -304,6 +296,14 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+FORMAT_SECONDS_NAME: secondi
+FORMAT_SECOND_NAME: secondo
+FORMAT_MINUTES_NAME: minuti
+FORMAT_MINUTE_NAME: minuto
+FORMAT_HOURS_NAME: ore
+FORMAT_HOUR_NAME: ora
+FORMAT_DAYS_NAME: giorni
+FORMAT_DAY_NAME: giorno
 GENERATOR_CLEARED: '&e&lIsola | &7Cancellati con successo gli importi del generatore per l''isola di {0}.'
 GENERATOR_CLEARED_NAME: '&e&lIsola | &7Cancellati con successo gli importi del generatore per l''isola {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIsola | &7Cancellati con successo gli importi del generatore per tutte le isole.'

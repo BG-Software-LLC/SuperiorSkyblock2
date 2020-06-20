@@ -105,14 +105,6 @@ COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
 COMMAND_ARGUMENT_VALUE: יווש
 COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
 COMMAND_COOLDOWN_FORMAT: '&c&lהאיגש | &7{0} ב הדוקפב בוש שמתשהל לוכי התא.'
-COMMAND_COOLDOWN_SECONDS_NAME: תוינש
-COMMAND_COOLDOWN_SECOND_NAME: היינש
-COMMAND_COOLDOWN_MINUTES_NAME: תוקד
-COMMAND_COOLDOWN_MINUTE_NAME: הקד
-COMMAND_COOLDOWN_HOURS_NAME: תועש
-COMMAND_COOLDOWN_HOUR_NAME: העש
-COMMAND_COOLDOWN_DAYS_NAME: םימי
-COMMAND_COOLDOWN_DAY_NAME: םוי
 COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
 COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
 COMMAND_DESCRIPTION_ADMIN_BONUS: יאל סונוב תתל.
@@ -258,6 +250,14 @@ FORMAT_TRILLION: 'T'
 FORMAT_BILLION: 'B'
 FORMAT_MILLION: 'M'
 FORMAT_THOUSANDS: 'K'
+FORMAT_SECONDS_NAME: תוינש
+FORMAT_SECOND_NAME: היינש
+FORMAT_MINUTES_NAME: תוקד
+FORMAT_MINUTE_NAME: הקד
+FORMAT_HOURS_NAME: תועש
+FORMAT_HOUR_NAME: העש
+FORMAT_DAYS_NAME: םימי
+FORMAT_DAY_NAME: םוי
 GENERATOR_CLEARED: '&e&lIsland | &7Successfully cleared the generator amounts for {0}''s island.'
 GENERATOR_CLEARED_NAME: '&e&lIsland | &7Successfully cleared the generator amounts for the island of {0}.'
 GENERATOR_CLEARED_ALL: '&e&lIsland | &7Successfully cleared the generator amounts for all the islands.'
