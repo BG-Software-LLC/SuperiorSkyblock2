@@ -80,11 +80,11 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
         double amount = -1;
 
         try{
-            amount = Double.parseDouble(args[1]);
+            amount = Double.parseDouble(args[3]);
         }catch(IllegalArgumentException ignored){}
 
         if(amount < 0){
-            Locale.INVALID_AMOUNT.send(sender, args[1]);
+            Locale.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
 
