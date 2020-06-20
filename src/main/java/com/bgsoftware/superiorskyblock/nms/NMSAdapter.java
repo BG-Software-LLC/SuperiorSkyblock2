@@ -19,6 +19,8 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.List;
 
@@ -73,5 +75,9 @@ public interface NMSAdapter {
     ItemStack[] getEquipment(EntityEquipment entityEquipment);
 
     double[] getTPS();
+
+    default void addPotion(PotionMeta potionMeta, PotionEffect potionEffect){
+        potionMeta.addCustomEffect(potionEffect, true);
+    }
 
 }

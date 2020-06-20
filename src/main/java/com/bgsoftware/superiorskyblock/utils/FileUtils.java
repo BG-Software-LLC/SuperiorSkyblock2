@@ -16,6 +16,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.io.InputStream;
@@ -90,6 +92,30 @@ public final class FileUtils {
 
         if(section.getBoolean("unbreakable", false)){
             itemBuilder.setUnbreakable();
+        }
+
+        if(section.contains("effects")){
+            ConfigurationSection effectsSection = section.getConfigurationSection("effects");
+            for(String _effect : effectsSection.getKeys(false)) {
+                PotionEffectType potionEffectType;
+
+                try {
+                    potionEffectType = PotionEffectType.getByName(_effect);
+                } catch (Exception ex) {
+                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + effectsSection.getCurrentPath() + "." + _effect + " into a potion effect, skipping...");
+                    continue;
+                }
+
+                int duration = effectsSection.getInt(_effect + ".duration", -1);
+                int amplifier = effectsSection.getInt(_effect + ".amplifier", 0);
+
+                if(duration == -1){
+                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Potion effect " + effectsSection.getCurrentPath() + "." + _effect + " is missing duration, skipping...");
+                    continue;
+                }
+
+                itemBuilder.withPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
+            }
         }
 
         return itemBuilder;

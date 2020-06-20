@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -12,6 +13,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public final class ItemBuilder implements Cloneable {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private ItemStack itemStack;
     private ItemMeta itemMeta;
@@ -179,6 +184,12 @@ public final class ItemBuilder implements Cloneable {
 
     public ItemBuilder setUnbreakable(){
         itemMeta.spigot().setUnbreakable(true);
+        return this;
+    }
+
+    public ItemBuilder withPotionEffect(PotionEffect potionEffect){
+        if(itemMeta instanceof PotionMeta)
+            plugin.getNMSAdapter().addPotion((PotionMeta) itemMeta, potionEffect);
         return this;
     }
 

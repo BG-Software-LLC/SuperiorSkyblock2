@@ -49,6 +49,8 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -273,6 +275,13 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public double[] getTPS() {
         return MinecraftServer.getServer().recentTps;
+    }
+
+    @Override
+    public void addPotion(PotionMeta potionMeta, PotionEffect potionEffect) {
+        if(!potionMeta.hasCustomEffects())
+            potionMeta.setColor(potionEffect.getType().getColor());
+        potionMeta.addCustomEffect(potionEffect, true);
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {
