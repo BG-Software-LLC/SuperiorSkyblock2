@@ -159,6 +159,7 @@ COMMAND_DESCRIPTION_ADMIN_TELEPORT: 传送到其他玩家的岛屿.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: 取消岛屿在排行榜的忽略.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 为岛屿解锁新维度
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 从一个岛屿银行中取款.
+COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: 在岛屿上禁封一个玩家.
 COMMAND_DESCRIPTION_BIOME: 改变岛屿群系.
 COMMAND_DESCRIPTION_BORDER: 更新岛屿边界颜色.
@@ -308,6 +309,9 @@ INVITE_BANNED_PLAYER: '&c&l错误 | &7这个玩家被岛屿禁封了，无法邀
 INVITE_TO_FULL_ISLAND: '&c&l错误 | &7你的岛屿成员数量已达上限，不能再邀请更多成员了！'
 ISLAND_ALREADY_EXIST: '&c&l错误 | &7已经有一个岛屿叫这个名字了.'
 ISLAND_BANK_EMPTY: '&e&l岛屿银行 | &7岛屿银行是空的.'
+ISLAND_BANK_SHOW: '&e&lBank | &7Your island has ${0}.'
+ISLAND_BANK_SHOW_OTHER: '&e&lBank | &7{0}''s island has ${1}.'
+ISLAND_BANK_SHOW_OTHER_NAME: '&e&lBank | &7The island {0} has ${1}.'
 ISLAND_BEING_CALCULATED: '&c&l错误 | &7正在计算岛屿等级！请稍后.'
 ISLAND_CLOSED: '&e&l岛屿 | &7已将岛屿设置为对公众关闭.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&l错误 | &7已经有一个正在进行的岛屿创建任务.'

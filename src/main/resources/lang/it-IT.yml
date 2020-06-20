@@ -207,6 +207,7 @@ COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle m
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Sblocca un mondo per un'isola.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Prelevare denaro dalla banca dell'isola di un
   giocatore.
+COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: Bandisci un giocatore dalla tua isola.
 COMMAND_DESCRIPTION_BIOME: Cambia il bioma dell'isola.
 COMMAND_DESCRIPTION_BORDER: Cambia il colore del bordo delle isole.
@@ -377,6 +378,9 @@ INVITE_BANNED_PLAYER: '&c&lErrore | &7Questo giocatore è bannato dall''isola e 
 INVITE_TO_FULL_ISLAND: '&c&lErrore | &7Non puoi invitare altri membri sulla tua isola.'
 ISLAND_ALREADY_EXIST: '&c&lErrore | &7Un''isola con quel nome esiste già.'
 ISLAND_BANK_EMPTY: '&e&lBanca | &7La banca dell''isola è vuota.'
+ISLAND_BANK_SHOW: '&e&lBank | &7Your island has ${0}.'
+ISLAND_BANK_SHOW_OTHER: '&e&lBank | &7{0}''s island has ${1}.'
+ISLAND_BANK_SHOW_OTHER_NAME: '&e&lBank | &7The island {0} has ${1}.'
 ISLAND_BEING_CALCULATED: '&c&lErrore | &7Non è possibile interagire con i blocchi durante il ricalcolo dell''isola!'
 ISLAND_CLOSED: '&e&lIsola | &7Chiusa con successo l''isola al pubblico.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lErrore | &7Hai un''attività di creazione dell''isola già in corso.'

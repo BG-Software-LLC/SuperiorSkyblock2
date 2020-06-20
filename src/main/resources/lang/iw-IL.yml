@@ -170,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_TELEPORT: רחא יא לא רגתשהל.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.
+COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
@@ -324,6 +325,9 @@ INVITE_BANNED_PLAYER: '&c&lהאיגש | &7הנמזה לבקל לוכי אל ןכ
 INVITE_TO_FULL_ISLAND: '&c&lהאיגש | &7ךלש יאל םישנא דוע ןימזהל לוכי אל התא.'
 ISLAND_ALREADY_EXIST: '&c&lהאיגש | &7םייק רבכ {0} םשה םע יא.'
 ISLAND_BANK_EMPTY: '&e&lקנב | &7קיר יאה קנב.'
+ISLAND_BANK_SHOW: '&e&lBank | &7Your island has ${0}.'
+ISLAND_BANK_SHOW_OTHER: '&e&lBank | &7{0}''s island has ${1}.'
+ISLAND_BANK_SHOW_OTHER_NAME: '&e&lBank | &7The island {0} has ${1}.'
 ISLAND_BEING_CALCULATED: '&c&lהאיגש | &7שדחמ בשוחמ יאהש ןמזב םיקולב תונשל לוכי אל התא!'
 ISLAND_CLOSED: '&e&lיא | &7החלצהב רוביצל רגסנ יאה.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lError | &7You have an already ongoing island creation task.'

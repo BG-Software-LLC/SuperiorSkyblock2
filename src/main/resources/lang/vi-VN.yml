@@ -197,6 +197,7 @@ COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ nh�
   đầu.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Mở khóa một thế giới cho một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Rút tiền từ ngân hàng đảo của người chơi khác.
+COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
@@ -363,6 +364,9 @@ INVITE_TO_FULL_ISLAND: '&c&lLỗi | &7Bạn không thể mời thêm thành viê
   bạn.'
 ISLAND_ALREADY_EXIST: '&c&lLỗi | &7Một hòn đảo với tên đó đã tồn tại.'
 ISLAND_BANK_EMPTY: '&e&lNgân Hàng | &7Đảo ngân hàng trống rỗng.'
+ISLAND_BANK_SHOW: '&e&lBank | &7Your island has ${0}.'
+ISLAND_BANK_SHOW_OTHER: '&e&lBank | &7{0}''s island has ${1}.'
+ISLAND_BANK_SHOW_OTHER_NAME: '&e&lBank | &7The island {0} has ${1}.'
 ISLAND_BEING_CALCULATED: '&c&lLỗi | &7Bạn không thể tương tác với các khối khi đảo đang tính toán lại!'
 ISLAND_CLOSED: '&e&lĐảo Thần | &7Thành công đóng cửa đảo cho công cộng.'
 ISLAND_CREATE_PROCESS_FAIL: '&c&lLỗi | &7Bạn đã có một nhiệm vụ tạo đảo đang diễn ra.'
