@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 
 public final class BlockValuesHandler implements BlockValuesManager {
 
-    private static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final KeyMap<String> blockValues = new KeyMap<>(), blockLevels = new KeyMap<>();
     private final SuperiorSkyblockPlugin plugin;
@@ -28,7 +28,8 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockWorth(Key key) {
-        return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
+        return plugin.getSettings().syncWorth ? BigDecimalFormatted.of(plugin.getProviders().getPrice(key)) :
+                BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
     public void setBlockWorth(Key key, BigDecimal worth){
@@ -54,13 +55,13 @@ public final class BlockValuesHandler implements BlockValuesManager {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void loadBlockValues(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "block-values/worth.yml");
         File blockValuesFile = new File(plugin.getDataFolder(), "blockvalues.yml");
 
         if(blockValuesFile.exists()){
             file.getParentFile().mkdirs();
-            //noinspection ResultOfMethodCallIgnored
             blockValuesFile.renameTo(file);
             file = new File(plugin.getDataFolder(), "block-values/worth.yml");
         }

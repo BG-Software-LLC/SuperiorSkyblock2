@@ -20,6 +20,8 @@ import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.hooks.PricesProvider;
+import com.bgsoftware.superiorskyblock.hooks.PricesProvider_ShopGUIPlus;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -29,10 +31,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
+
 public final class ProvidersHandler implements ProvidersManager {
+
+    private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
 
     private SpawnersProvider spawnersProvider;
     private PermissionsProvider permissionsProvider;
+    private PricesProvider pricesProvider;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -80,6 +87,10 @@ public final class ProvidersHandler implements ProvidersManager {
             else
                 permissionsProvider = new PermissionsProvider_Default();
 
+            if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
+                pricesProvider = new PricesProvider_ShopGUIPlus();
+            else
+                pricesProvider = itemStack -> INVALID_WORTH;
         });
 
         PlaceholderHook.register(plugin);
@@ -109,6 +120,10 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public boolean hasPermission(Player player, String permission){
         return permissionsProvider.hasPermission(player, permission.toLowerCase());
+    }
+
+    public BigDecimal getPrice(Key key){
+        return pricesProvider.getPrice(key);
     }
 
 }

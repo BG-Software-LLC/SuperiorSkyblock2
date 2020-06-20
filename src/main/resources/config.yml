@@ -544,3 +544,7 @@ generators: true
 
 # Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
 obsidian-to-lava: false
+
+# Should the worth values be synced with other prices providers?
+# Supported Providers: ShopGUIPlus
+sync-worth: false
