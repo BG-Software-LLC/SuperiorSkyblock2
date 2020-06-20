@@ -648,7 +648,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void depositMoney(BigDecimal amount) {
+
+    }
+
+    @Override
     public void withdrawMoney(double amount) {
+
+    }
+
+    @Override
+    public void withdrawMoney(BigDecimal amount) {
 
     }
 

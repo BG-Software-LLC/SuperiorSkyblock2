@@ -77,13 +77,17 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
             return;
         }
 
-        double amount = -1;
+        BigDecimal amount = BigDecimal.valueOf(-1);
 
-        try{
-            amount = Double.parseDouble(args[3]);
+        if(args[3].equalsIgnoreCase("all") || args[3].equals("*")){
+            amount = island.getMoneyInBank();
+        }
+
+        else try{
+            amount = new BigDecimal(args[3]);
         }catch(IllegalArgumentException ignored){}
 
-        if(amount < 0){
+        if(amount.compareTo(BigDecimal.ZERO) < 0){
             Locale.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
@@ -93,9 +97,9 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
             return;
         }
 
-        if(island.getMoneyInBank().compareTo(new BigDecimal(amount)) < 0){
+        if(island.getMoneyInBank().compareTo(amount) < 0){
             Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBank().toString());
-            amount = island.getMoneyInBank().doubleValue();
+            amount = island.getMoneyInBank();
         }
 
         island.withdrawMoney(amount);

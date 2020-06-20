@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,18 +73,23 @@ public final class CmdDeposit implements ISuperiorCommand {
             return;
         }
 
-        double amount = -1;
+        BigDecimal moneyInBank = BigDecimal.valueOf(EconomyHook.getMoneyInBank(superiorPlayer.asPlayer()));
+        BigDecimal amount = BigDecimal.valueOf(-1);
 
-        try{
-            amount = Double.parseDouble(args[1]);
+        if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
+            amount = moneyInBank;
+        }
+
+        else try{
+            amount = BigDecimal.valueOf(Double.parseDouble(args[1]));
         }catch(IllegalArgumentException ignored){}
 
-        if(amount <= 0){
+        if(amount.compareTo(BigDecimal.ZERO) <= 0){
             Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
             return;
         }
 
-        if(EconomyHook.getMoneyInBank(superiorPlayer.asPlayer()) < amount){
+        if(moneyInBank.compareTo(amount) < 0){
             Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, amount);
             return;
         }

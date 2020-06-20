@@ -1447,10 +1447,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void depositMoney(double amount){
+        depositMoney(BigDecimal.valueOf(amount));
+    }
+
+    @Override
+    public void depositMoney(BigDecimal amount) {
         SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + owner.getName() + ", Money: " + amount);
 
         String islandBankString = this.islandBank.writeAndGet(islandBank -> {
-            islandBank = islandBank.add(BigDecimalFormatted.of(amount));
+            islandBank = islandBank.add(amount);
             this.islandBank.set(islandBank);
             return islandBank.getAsString();
         });
@@ -1463,10 +1468,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void withdrawMoney(double amount){
+        withdrawMoney(BigDecimal.valueOf(amount));
+    }
+
+    @Override
+    public void withdrawMoney(BigDecimal amount) {
         SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + owner.getName() + ", Money: " + amount);
 
         String islandBankString = islandBank.writeAndGet(islandBank -> {
-            islandBank = islandBank.subtract(BigDecimalFormatted.of(amount));
+            islandBank = islandBank.subtract(amount);
             this.islandBank.set(islandBank);
             return islandBank.getAsString();
         });

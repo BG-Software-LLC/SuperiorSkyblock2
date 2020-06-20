@@ -655,10 +655,22 @@ public interface Island extends Comparable<Island> {
     void depositMoney(double amount);
 
     /**
+     * Deposit money into the bank.
+     * @param amount The amount to deposit.
+     */
+    void depositMoney(BigDecimal amount);
+
+    /**
      * Withdraw money from the bank.
      * @param amount The amount to withdraw.
      */
     void withdrawMoney(double amount);
+
+    /**
+     * Withdraw money from the bank.
+     * @param amount The amount to withdraw.
+     */
+    void withdrawMoney(BigDecimal amount);
 
     /*
      *  Worth related methods
