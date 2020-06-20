@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
@@ -74,9 +73,6 @@ public final class ProvidersHandler implements ProvidersManager {
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
                     setSpawnersProvider(new BlocksProvider_EpicSpawners());
-                } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
-                        (spawnersProvider.equalsIgnoreCase("AdvancedSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_AdvancedSpawners());
                 } else {
                     setSpawnersProvider(new BlocksProvider_Default());
                 }
