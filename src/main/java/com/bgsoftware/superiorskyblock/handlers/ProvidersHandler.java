@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
 import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
@@ -53,6 +54,9 @@ public final class ProvidersHandler implements ProvidersManager {
 
             if(Bukkit.getPluginManager().isPluginEnabled("ChangeSkin"))
                 ChangeSkinHook.register(plugin);
+
+            if(Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
+                SlimefunHook.register(plugin);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
