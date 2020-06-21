@@ -1091,10 +1091,10 @@ public final class SIsland extends DatabaseObject implements Island {
         //noinspection all
         chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, true, onChunkLoad).stream()
                 .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
-        if(wasSchematicGenerated(World.Environment.NETHER))
+        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER))
             chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, true, onChunkLoad).stream()
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
-        if(wasSchematicGenerated(World.Environment.THE_END))
+        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END))
             chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, true, onChunkLoad).stream()
                     .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
 
