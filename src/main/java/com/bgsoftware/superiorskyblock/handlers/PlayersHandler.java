@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
@@ -50,6 +51,10 @@ public final class PlayersHandler implements PlayersManager {
         }
 
         return null;
+    }
+
+    public List<SuperiorPlayer> matchAllPlayers(Predicate<? super SuperiorPlayer> predicate){
+        return players.values().stream().filter(predicate).collect(Collectors.toList());
     }
 
     @Override

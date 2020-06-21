@@ -85,11 +85,14 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent e){
-        SuperiorPlayer duplicatePlayer = SSuperiorPlayer.of(e.getPlayer().getName());
         SSuperiorPlayer superiorPlayer = (SSuperiorPlayer) SSuperiorPlayer.of(e.getPlayer());
-        if(duplicatePlayer != null && duplicatePlayer != superiorPlayer) {
-            SuperiorSkyblockPlugin.log("Changing UUID of " + e.getPlayer().getName() + " to " + superiorPlayer.getUniqueId());
-            plugin.getPlayers().replacePlayers(duplicatePlayer, superiorPlayer);
+        List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(_superiorPlayer ->
+                _superiorPlayer != superiorPlayer && _superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
+        if(!duplicatedPlayers.isEmpty()) {
+            SuperiorSkyblockPlugin.log("Changing UUID of " + superiorPlayer.getName() + " to " + superiorPlayer.getUniqueId());
+            for(SuperiorPlayer duplicatePlayer : duplicatedPlayers) {
+                plugin.getPlayers().replacePlayers(duplicatePlayer, superiorPlayer);
+            }
         }
     }
 
