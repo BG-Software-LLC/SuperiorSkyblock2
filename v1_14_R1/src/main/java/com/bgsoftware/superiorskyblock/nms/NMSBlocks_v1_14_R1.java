@@ -128,8 +128,7 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
     public void setBlock(Location location, Material material, byte data) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        Chunk chunk = ((CraftChunk) location.getChunk()).getHandle();
-        chunk.setType(blockPosition, CraftMagicNumbers.getBlock(material, data), false);
+        setBlock(location.getChunk(), location, Block.getCombinedId(CraftMagicNumbers.getBlock(material, data)), BlockType.BLOCK);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);

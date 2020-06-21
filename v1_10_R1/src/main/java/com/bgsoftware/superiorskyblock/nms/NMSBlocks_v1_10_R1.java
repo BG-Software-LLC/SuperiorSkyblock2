@@ -121,8 +121,7 @@ public final class NMSBlocks_v1_10_R1 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         //noinspection deprecation
         int combinedId = material.getId() + (data << 12);
-        Chunk chunk = ((CraftChunk) location.getChunk()).getHandle();
-        chunk.a(blockPosition, Block.getByCombinedId(combinedId));
+        setBlock(location.getChunk(), location, combinedId, BlockType.BLOCK);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
