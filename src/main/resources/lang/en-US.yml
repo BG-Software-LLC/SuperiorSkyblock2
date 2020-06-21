@@ -38,6 +38,9 @@ CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''
 CHANGED_BLOCK_LIMIT: '&e&lUpgrades | &7Successfully updated the {0} Block limit of {1}''s island.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the {0} Block limit of all the islands.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the {0} Block limit of {1}.'
+CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
+CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
+CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
 CHANGED_CROP_GROWTH: '&e&lUpgrades | &7Successfully updated the crop growth multiplier of {0}''s island.'
 CHANGED_CROP_GROWTH_ALL: '&e&lUpgrades | &7Successfully updated the crop growth multiplier of all the islands.'
 CHANGED_CROP_GROWTH_NAME: '&e&lUpgrades | &7Successfully updated the crop growth multiplier of {0}.'
@@ -127,6 +130,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 'Remove all ratings given by a player.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 'Create schematics for the plugin.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 'Set block limit for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 'Set the crop growth multiplier for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 'Set a player''s amount of island disbands.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: 'Set entity limit for another player''s island.'
@@ -209,6 +213,7 @@ COMMAND_DESCRIPTION_WITHDRAW: 'Withdraw money from your island''s bank into your
 COMMAND_USAGE: '&cUsage: /{0}'
 COOP_ANNOUNCEMENT: '&e&lIsland | &7{0} added {1} as a co-op member.'
 COOP_BANNED_PLAYER: '&c&lError | &7This player is banned from the island and cannot be coop.'
+COOP_LIMIT_EXCEED: '&c&lError | &7You reached the maximum amount of coop players the island can have.'
 CREATE_ISLAND: '&e&lIsland | &7Created a new island at {0} in {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lError | &7An error occurred while creating your island. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Toggled debug mode &cOFF&7.'
@@ -328,6 +333,7 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIsland | &7Blocks Limits:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsland | &7Crops Multiplier: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsland | &7Drops Multiplier: {0}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |

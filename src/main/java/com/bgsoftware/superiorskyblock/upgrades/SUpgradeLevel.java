@@ -20,13 +20,13 @@ public final class SUpgradeLevel implements UpgradeLevel {
     private final List<String> commands;
     private final String permission;
     private final double cropGrowth, spawnerRates, mobDrops;
-    private final int teamLimit, warpsLimit, borderSize;
+    private final int teamLimit, warpsLimit, coopLimit, borderSize;
     private final KeyMap<Integer> blockLimits, generatorRates;
     private final Map<EntityType, Integer> entityLimits;
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -36,6 +36,7 @@ public final class SUpgradeLevel implements UpgradeLevel {
         this.mobDrops = mobDrops;
         this.teamLimit = teamLimit;
         this.warpsLimit = warpsLimit;
+        this.coopLimit = coopLimit;
         this.borderSize = borderSize;
         this.blockLimits = blockLimits;
         this.entityLimits = entityLimits;
@@ -110,6 +111,11 @@ public final class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getWarpsLimit() {
         return warpsLimit;
+    }
+
+    @Override
+    public int getCoopLimit() {
+        return coopLimit;
     }
 
     @Override

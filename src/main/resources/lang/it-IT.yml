@@ -49,6 +49,9 @@ CHANGED_BLOCK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato il limite del blocco 
   in tutte le isole.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0}
   nell''isola di {1}.'
+CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
+CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
+CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
 CHANGED_CROP_GROWTH: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore
   della crescita delle colture dell'' isola di {0}.'
 CHANGED_CROP_GROWTH_ALL: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore
@@ -165,6 +168,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola
   di un giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della crescita
   delle colture per l'isola di un giocatore.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Imposta la quantità di reset dell'isola di
@@ -264,6 +268,7 @@ COMMAND_USAGE: '&cUso: /{0}'
 COOP_ANNOUNCEMENT: '&e&lIsola | &7{0} ha aggiunto {1} come membro co-op dell''isola.'
 COOP_BANNED_PLAYER: '&c&lErrore | &7Questo giocatore è bannato dall''isola e non può
   essere un mebro co-op.'
+COOP_LIMIT_EXCEED: '&c&lError | &7You reached the maximum amount of coop players the island can have.'
 CREATE_ISLAND: '&e&lIsola | &7Creata una nuova isola a {0} in {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lErrore | &7ASi è verificato un errore durante la creazione della tua isola. Si prega di contattare l''amministratore per indagare sul problema.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Debug mode &cOFF&7.'
@@ -401,6 +406,7 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIsola | &7Limite dei blocchi:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIsola | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lIsola | &7Limite Entità:
   {0}

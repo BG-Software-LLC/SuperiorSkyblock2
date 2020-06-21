@@ -48,6 +48,9 @@ CHANGED_BLOCK_LIMIT: '&e&lNâng cấp | &7Thay đổi thành công giới hạn 
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0}
   đảo của {1}.'
+CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
+CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
+CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
 CHANGED_CROP_GROWTH: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây trồng
   của đảo {0}.'
 CHANGED_CROP_GROWTH_ALL: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây trồng
@@ -158,6 +161,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
   khác.
+COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây trồng cho đảo
   của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Đặt số lượng người cho đảo của người chơi.
@@ -254,6 +258,7 @@ COMMAND_USAGE: '&cSử dụng: /{0}'
 COOP_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thêm {1} là thành viên co-op.'
 COOP_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này bị cấm từ đảo và không thể    được
   co-op.'
+COOP_LIMIT_EXCEED: '&c&lError | &7You reached the maximum amount of coop players the island can have.'
 CREATE_ISLAND: '&e&lĐảo Thần | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo đảo của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
 DEBUG_MODE_DISABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &cTẮT&7.'
@@ -385,6 +390,7 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lNâng cấp | &7Blocks Limits:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lNâng cấp | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lĐảo Thần | &7Giới hạn các vật thẻe:
   {0}

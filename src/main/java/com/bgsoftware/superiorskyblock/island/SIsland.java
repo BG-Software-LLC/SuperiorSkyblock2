@@ -164,6 +164,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private final SyncedObject<Integer> warpsLimit = SyncedObject.of(plugin.getSettings().defaultWarpsLimit);
     private final SyncedObject<Integer> teamLimit = SyncedObject.of(plugin.getSettings().defaultTeamLimit);
+    private final SyncedObject<Integer> coopLimit = SyncedObject.of(plugin.getSettings().defaultCoopLimit);
     private final SyncedObject<Double> cropGrowth = SyncedObject.of((double) plugin.getSettings().defaultCropGrowth);
     private final SyncedObject<Double> spawnerRates = SyncedObject.of((double) plugin.getSettings().defaultSpawnerRates);
     private final SyncedObject<Double> mobDrops = SyncedObject.of((double) plugin.getSettings().defaultMobDrops);
@@ -240,6 +241,7 @@ public final class SIsland extends DatabaseObject implements Island {
         }
 
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
+        this.coopLimit.set(resultSet.getInt("coopLimit"));
 
         if(blockCounts.readAndGet(Map::isEmpty))
             calcIslandWorth(null);
@@ -465,6 +467,26 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<SuperiorPlayer> getCoopPlayers() {
         return coop.readAndGet(ArrayList::new);
+    }
+
+    @Override
+    public int getCoopLimit() {
+        int coopLimit = this.coopLimit.get();
+
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            coopLimit = Math.max(coopLimit, getUpgradeLevel(upgrade).getCoopLimit());
+
+        return coopLimit;
+    }
+
+    @Override
+    public void setCoopLimit(int coopLimit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Coop Limit, Island: " + owner.getName() + ", Coop Limit: " + coopLimit);
+        this.coopLimit.set(coopLimit);
+        Query.ISLAND_SET_TEAM_LIMIT.getStatementHolder()
+                .setInt(coopLimit)
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
@@ -2664,6 +2686,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(bonusLevel.get().getAsString())
                 .setLong(creationTime)
+                .setInt(coopLimit.get())
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2716,6 +2739,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(bonusLevel.get().getAsString())
                 .setLong(creationTime)
+                .setInt(coopLimit.get())
                 .execute(async);
     }
 

@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lIsland Coop Players'
+title: '&lIsland Coop Players ({0}/{1})'
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

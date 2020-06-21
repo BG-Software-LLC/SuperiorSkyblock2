@@ -133,6 +133,8 @@ public final class CmdAdminShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_SIZE.getMessage(locale, island.getIslandSize())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_TEAM_LIMIT.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_TEAM_LIMIT.getMessage(locale, island.getTeamLimit())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_COOP_LIMIT.isEmpty(locale))
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_COOP_LIMIT.getMessage(locale, island.getCoopLimit())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(locale, island.getSpawnerRatesMultiplier())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty(locale))

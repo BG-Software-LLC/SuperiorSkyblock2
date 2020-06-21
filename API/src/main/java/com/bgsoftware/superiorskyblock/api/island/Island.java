@@ -156,6 +156,18 @@ public interface Island extends Comparable<Island> {
     List<SuperiorPlayer> getCoopPlayers();
 
     /**
+     * Get the coop players limit of the island.
+     */
+    int getCoopLimit();
+
+    /**
+     * Set the coop players limit of the island.
+     * @param coopLimit The coop players limit to set.
+     */
+    void setCoopLimit(int coopLimit);
+
+
+    /**
      * Update status of a player if he's inside the island or not.
      * @param superiorPlayer The player to add.
      */

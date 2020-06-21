@@ -271,6 +271,8 @@ public abstract class PlaceholderHook {
                         return String.valueOf(island.getIslandMembers(true).size());
                     case "team_limit":
                         return String.valueOf(island.getTeamLimit());
+                    case "coop_limit":
+                        return String.valueOf(island.getCoopLimit());
                     case "leader":
                         return island.getOwner().getName();
                     case "size_format":

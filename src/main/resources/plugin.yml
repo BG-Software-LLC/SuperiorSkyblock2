@@ -182,6 +182,8 @@ permissions:
             description: Set the biome of an island.
           superior.admin.setblocklimit:
             description: Set block limit for another player's island.
+          superior.admin.setcooplimit:
+            description: Set coop players limit for another player''s island.
           superior.admin.setcropgrowth:
             description: Set the crop growth multiplier for another player's island.
           superior.admin.setdisbands:

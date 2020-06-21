@@ -62,6 +62,10 @@ default-values:
   # This limit can be expanded by using the /is admin setteamlimit command.
   team-limit: 4
 
+  # Set the default coop limit of islands.
+  # This limit can be expanded by using the /is admin setcooplimit command.
+  coop-limit: 8
+
   # Set the default crop-growth multiplier of islands.
   # This multiplier can be expanded by using the /is admin setcropgrowth command.
   crop-growth: 1

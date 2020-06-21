@@ -82,6 +82,11 @@ public interface UpgradeLevel {
     int getWarpsLimit();
 
     /**
+     * Get the coop players limit of this level.
+     */
+    int getCoopLimit();
+
+    /**
      * Get the border size of this level.
      */
     int getBorderSize();

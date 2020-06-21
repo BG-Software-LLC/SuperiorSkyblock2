@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -47,6 +48,14 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
     @Override
     protected List<SuperiorPlayer> requestObjects() {
         return island.getCoopPlayers();
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return buildInventory(title -> title
+                .replace("{0}", String.valueOf(island.getCoopPlayers().size()))
+                .replace("{1}", String.valueOf(island.getCoopLimit()))
+        );
     }
 
     public static void init(){

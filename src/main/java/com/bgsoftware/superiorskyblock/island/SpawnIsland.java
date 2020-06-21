@@ -184,6 +184,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public int getCoopLimit() {
+        return 0;
+    }
+
+    @Override
+    public void setCoopLimit(int coopLimit) {
+
+    }
+
+    @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         if(inside)
             playersInside.add(superiorPlayer);

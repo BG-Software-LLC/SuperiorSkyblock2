@@ -72,6 +72,7 @@ public final class UpgradesHandler implements UpgradesManager {
                 double mobDrops = levelSection.getDouble("mob-drops", -1D);
                 int teamLimit = levelSection.getInt("team-limit", -1);
                 int warpsLimit = levelSection.getInt("warps-limit", -1);
+                int coopLimit = levelSection.getInt("coop-limit", -1);
                 int borderSize = levelSection.getInt("border-size", -1);
                 KeyMap<Integer> blockLimits = new KeyMap<>();
                 if(levelSection.contains("block-limits")){
@@ -92,7 +93,7 @@ public final class UpgradesHandler implements UpgradesManager {
                         generatorRates.put(block, levelSection.getInt("generator-rates." + block));
                 }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, cropGrowth,
-                        spawnerRates, mobDrops, teamLimit, warpsLimit, borderSize, blockLimits, entityLimits, generatorRates));
+                        spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits, entityLimits, generatorRates));
             }
             this.upgrades.add(upgradeName, upgrade);
         }

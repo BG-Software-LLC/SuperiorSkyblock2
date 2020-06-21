@@ -38,6 +38,9 @@ CHANGED_BIOME_OTHER: '&e&l岛屿 | &7成功将 {1} 的岛屿生物群系改变�
 CHANGED_BLOCK_LIMIT: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿将 {0} &7方块数量限制提升.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
+CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
+CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
+CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
 CHANGED_CROP_GROWTH: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速度为 &b{0} &7倍.'
 CHANGED_CROP_GROWTH_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新农作物生长速度.'
 CHANGED_CROP_GROWTH_NAME: '&e&l岛屿升级 | &7成功升级岛屿农作物生长速度为 &b{0} &7倍.'
@@ -127,6 +130,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛�
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 给一个岛屿设置生物群系.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
+COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 更新其他玩家岛屿的农作物生长速度.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 更新其他玩家的岛屿解散次数.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: 为一个岛屿设置实体限制.
@@ -209,6 +213,7 @@ COMMAND_DESCRIPTION_WITHDRAW: 从岛屿银行中取款.
 COMMAND_USAGE: '&c正确用法: /{0}'
 COOP_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将 &b{1} &7设置为岛屿临时成员.'
 COOP_BANNED_PLAYER: '&c&l错误 | &7这个玩家被岛屿禁封了，不能成为临时成员.'
+COOP_LIMIT_EXCEED: '&c&lError | &7You reached the maximum amount of coop players the island can have.'
 CREATE_ISLAND: '&e&l岛屿 | &7已为你创建新岛屿，耗时 &b{1}ms &7开始冒险吧！'
 CREATE_ISLAND_FAILURE: '&c&l错误 | &7在为你创建岛屿时出现了问题，请联系管理员.'
 DEBUG_MODE_DISABLED: '&e&l调试 | &7除错模式 &c关闭&7.'
@@ -328,6 +333,7 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&l岛屿 | &7岛屿方块限制:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&l岛屿 | &7实体限制:
   {0}

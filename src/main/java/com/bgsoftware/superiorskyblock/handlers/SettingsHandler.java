@@ -42,6 +42,7 @@ public final class SettingsHandler {
     public final Map<EntityType, Integer> defaultEntityLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
+    public final int defaultCoopLimit;
     public final int defaultCropGrowth;
     public final int defaultSpawnerRates;
     public final int defaultMobDrops;
@@ -172,6 +173,7 @@ public final class SettingsHandler {
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
+        defaultCoopLimit = cfg.getInt("default-values.coop-limit", 8);
         defaultCropGrowth = cfg.getInt("default-values.crop-growth", 1);
         defaultSpawnerRates = cfg.getInt("default-values.spawner-rates", 1);
         defaultMobDrops = cfg.getInt("default-values.mob-drops", 1);

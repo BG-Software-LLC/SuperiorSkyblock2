@@ -41,6 +41,9 @@ CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
+CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
+CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
 CHANGED_CROP_GROWTH: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לש הלידגה סונוב.'
 CHANGED_CROP_GROWTH_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש הלידגה סונוב..'
 CHANGED_CROP_GROWTH_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לש הלידגה סונוב.'
@@ -135,6 +138,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיג
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Set entity limit for another player''s island.
@@ -220,6 +224,7 @@ COMMAND_DESCRIPTION_WITHDRAW: ךלש יטרפה ןובשחל יאה קנבמ ף�
 COMMAND_USAGE: '&cשומיש: /{0}'
 COOP_ANNOUNCEMENT: '&e&lיא | &7יאה לש הלועפ ףתשמכ {1} תא ףיסוה {0}.'
 COOP_BANNED_PLAYER: '&c&lהאיגש | &7הלועפ ףתשמכ ףסוותהל לוכי אלו יאהמ קחרומ הזה ןקחשה.'
+COOP_LIMIT_EXCEED: '&c&lError | &7You reached the maximum amount of coop players the island can have.'
 CREATE_ISLAND: '&e&lיא | &7היינשה תופילא {1} ךות {0} ב שדח יא תרצי.'
 CREATE_ISLAND_FAILURE: '&c&lError | &7An error occurred while creating your island. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Toggled debug mode &cOFF&7.'
@@ -346,6 +351,7 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lיא | &7םיקולב תלבגה:
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lיא | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lIsland | &7Entities Limits:
   {0}

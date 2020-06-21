@@ -139,6 +139,7 @@ public final class DataHandler {
         addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
         addColumnIfNotExists("bonusLevel", "islands", "'0'", "TEXT");
         addColumnIfNotExists("creationTime", "islands", (System.currentTimeMillis() / 1000) + "", "INTEGER");
+        addColumnIfNotExists("coopLimit", "islands", String.valueOf(plugin.getSettings().defaultCoopLimit), "INTEGER");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -255,7 +256,8 @@ public final class DataHandler {
                 "dirtyChunks TEXT," +
                 "entityLimits TEXT," +
                 "bonusLevel TEXT," +
-                "creationTime INTEGER" +
+                "creationTime INTEGER," +
+                "coopLimit INTEGER" +
                 ");");
     }
 

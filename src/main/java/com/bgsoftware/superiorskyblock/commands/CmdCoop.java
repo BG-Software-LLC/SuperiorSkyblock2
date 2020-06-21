@@ -89,6 +89,11 @@ public final class CmdCoop implements ISuperiorCommand {
             return;
         }
 
+        if(island.getCoopPlayers().size() >= island.getCoopLimit()){
+            Locale.COOP_LIMIT_EXCEED.send(superiorPlayer);
+            return;
+        }
+
         island.addCoop(targetPlayer);
 
         ((SIsland) island).sendMessage(Locale.COOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
