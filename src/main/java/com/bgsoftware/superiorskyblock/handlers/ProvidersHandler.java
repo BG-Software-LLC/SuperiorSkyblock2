@@ -37,9 +37,9 @@ public final class ProvidersHandler implements ProvidersManager {
 
     private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
 
-    private SpawnersProvider spawnersProvider;
-    private PermissionsProvider permissionsProvider;
-    private PricesProvider pricesProvider;
+    private SpawnersProvider spawnersProvider = new BlocksProvider_Default();
+    private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
+    private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -77,20 +77,14 @@ public final class ProvidersHandler implements ProvidersManager {
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
                     setSpawnersProvider(new BlocksProvider_EpicSpawners());
-                } else {
-                    setSpawnersProvider(new BlocksProvider_Default());
                 }
             }
 
             if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms"))
                 permissionsProvider = new PermissionsProvider_LuckPerms();
-            else
-                permissionsProvider = new PermissionsProvider_Default();
 
             if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
                 pricesProvider = new PricesProvider_ShopGUIPlus();
-            else
-                pricesProvider = itemStack -> INVALID_WORTH;
         });
 
         PlaceholderHook.register(plugin);
