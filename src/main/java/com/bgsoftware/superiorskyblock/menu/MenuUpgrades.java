@@ -11,9 +11,12 @@ import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,6 +28,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
+
+    private static final ItemBuilder INVALID_ITEM = new ItemBuilder(Material.BEDROCK).withName("&c&lInvalid Item");
 
     private final Island island;
 
@@ -108,14 +113,25 @@ public final class MenuUpgrades extends SuperiorMenu {
                         SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(Integer.parseInt(level));
 
                         if(upgradeLevel != null) {
-                            upgradeLevel.setItemData(
-                                    FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level")),
-                                    FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level")),
-                                    FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound")),
-                                    FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound")),
-                                    upgradeSection.getStringList(level + ".has-next-level.commands"),
-                                    upgradeSection.getStringList(level + ".no-next-level.commands")
-                            );
+                            ItemBuilder hasNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level"));
+
+                            if(hasNextLevel == null){
+                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing has-next-level item.");
+                                hasNextLevel = INVALID_ITEM.clone();
+                            }
+
+                            ItemBuilder noNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
+
+                            if(noNextLevel == null){
+                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing no-next-level item.");
+                                noNextLevel = INVALID_ITEM.clone();
+                            }
+
+                            SoundWrapper hasNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
+                            SoundWrapper noNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound"));
+                            List<String> hasNextLevelCommands = upgradeSection.getStringList(level + ".has-next-level.commands");
+                            List<String> noNextLevelCommands = upgradeSection.getStringList(level + ".no-next-level.commands");
+                            upgradeLevel.setItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
                         }
                     }
                 }
