@@ -281,26 +281,37 @@ public final class PlayersListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = superiorPlayer.getIsland();
+
+        if(!superiorPlayer.hasTeamChatEnabled())
+            return;
+
+        if (superiorPlayer.getIsland() == null) {
+            superiorPlayer.toggleTeamChat();
+        }
+
+        else {
+            e.setCancelled(true);
+            ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+            Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+            for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
+                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
+                if(onlinePlayer.hasAdminSpyEnabled())
+                    Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
-        if(superiorPlayer.hasTeamChatEnabled()){
-            if (superiorPlayer.getIsland() == null)
-                superiorPlayer.toggleTeamChat();
-            else {
-                e.setCancelled(true);
-                ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-                Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-                for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
-                    SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
-                    if(onlinePlayer.hasAdminSpyEnabled())
-                        Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-                }
-                return;
-            }
-        }
+        if(superiorPlayer.hasTeamChatEnabled())
+            return;
 
         String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
                 plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
