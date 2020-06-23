@@ -13,30 +13,32 @@ import org.bukkit.inventory.ItemStack;
  */
 public final class Key {
 
-    private String key;
+    private final String globalKey;
+    private final String subKey;
 
     private Key(String key){
-        this.key = key;
+        String[] keySections = key.replace(";", ":").split(":");
+        this.globalKey = keySections[0];
+        this.subKey = keySections.length == 2 ? keySections[1] : "";
+    }
+
+    public String getGlobalKey() {
+        return globalKey;
+    }
+
+    public String getSubKey() {
+        return subKey;
     }
 
     @Override
     public String toString() {
-        return key;
+        return subKey.isEmpty() ? globalKey : globalKey + ":" + subKey;
     }
 
     @Override
     @SuppressWarnings("all")
     public boolean equals(Object obj) {
-        if(obj instanceof Key){
-            String key = obj.toString();
-            if(this.key.equals(key))
-                return true;
-            else if(key.contains(":") && this.key.equals(key.split(":")[0]))
-                return true;
-            else if(key.contains(";") && this.key.equals(key.split(";")[0]))
-                return true;
-        }
-        return false;
+        return obj instanceof Key && toString().equals(obj.toString());
     }
 
     /**

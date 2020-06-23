@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
 
-    private Registry<String, V> registry;
+    private final Registry<String, V> registry;
 
     public KeyMap(){
         this.registry = Registry.createRegistry();
@@ -47,27 +47,16 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     public Key getKey(Key key){
-        String keyStr = key.toString();
-        if(keyStr.contains(":") && registry.containsKey(keyStr.split(":")[0]))
-            keyStr = keyStr.split(":")[0];
-        else if(keyStr.contains(";") && registry.containsKey(keyStr.split(";")[0]))
-            keyStr = keyStr.split(";")[0];
-        return Key.of(keyStr);
+        return registry.containsKey(key.getGlobalKey()) ? Key.of(key.getGlobalKey()) : key;
     }
 
     @Override
     public V remove(Object key) {
-        if(key instanceof Key) {
-            String keyStr = key.toString();
-            registry.remove(keyStr);
-            registry.remove(keyStr.split(":")[0]);
-            registry.remove(keyStr.split(";")[0]);
-        }
         return registry.remove(key + "");
     }
 
     public void removeRaw(Key key){
-        registry.remove(key.toString());
+        remove(key);
     }
 
     public V get(ItemStack itemStack) {
@@ -83,25 +72,18 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     @Override
-    public V get(Object o) {
-        if(registry.containsKey("all"))
-            return registry.get("all");
-
-        if(o instanceof Key) {
-            String key = o.toString();
-            if(registry.containsKey(key))
-                return registry.get(key);
-            else if(key.contains(":") && registry.containsKey(key.split(":")[0]))
-                return registry.get(key.split(":")[0]);
-            else if(key.contains(";") && registry.containsKey(key.split(";")[0]))
-                return registry.get(key.split(";")[0]);
+    public V get(Object obj) {
+        if(obj instanceof Key){
+            V returnValue = registry.get(obj.toString());
+            return returnValue == null && !((Key) obj).getSubKey().isEmpty() ? registry.get(((Key) obj).getGlobalKey()) : returnValue;
         }
 
-        return registry.get(o.toString());
+        return null;
     }
 
     public V getRaw(Key key, V defaultValue){
-        return registry.get(key.toString(), defaultValue);
+        V returnValue = registry.get(key.toString());
+        return returnValue == null ? defaultValue : returnValue;
     }
 
     @Override
@@ -111,7 +93,8 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
 
     @Override
     public V getOrDefault(Object key, V defaultValue) {
-        return key instanceof Key ? containsKey(key) ? get(key) : defaultValue : registry.get(key + "", defaultValue);
+        V value = get(key);
+        return value == null? defaultValue : value;
     }
 
     @Override
