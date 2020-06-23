@@ -215,7 +215,7 @@ public final class MissionsHandler implements MissionsManager {
     @Override
     public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
+            Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward));
             return;
         }
 
