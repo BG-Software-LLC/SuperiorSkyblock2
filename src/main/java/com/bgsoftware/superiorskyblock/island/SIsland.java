@@ -1564,29 +1564,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
-            syncedBlockCounts.write(blockCounts -> {
-                Key valueKey = plugin.getBlockValues().getBlockKey(key);
-
-                int currentAmount = blockCounts.getRaw(valueKey, 0);
-                blockCounts.put(valueKey, currentAmount + amount);
-
-                Key limitKey = blockLimits.getKey(valueKey);
-                Key globalKey = Key.of(valueKey.getGlobalKey());
-                boolean limitCount = false;
-
-                if (!limitKey.equals(valueKey)) {
-                    currentAmount = blockCounts.getRaw(limitKey, 0);
-                    blockCounts.put(limitKey, currentAmount + amount);
-                    limitCount = true;
-                }
-
-                if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
-                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
-                    currentAmount = blockCounts.getRaw(globalKey, 0);
-                    blockCounts.put(globalKey, currentAmount + amount);
-                }
-            });
+            syncedBlockCounts.write(blockCounts -> addCounts(blockCounts, blockLimits, key, amount));
 
             updateLastTime();
 
@@ -1632,28 +1610,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             if(increaseAmount || hasBlockLimit) {
                 SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey());
-
-                Key valueKey = plugin.getBlockValues().getBlockKey(entry.getKey());
-
-                int currentAmount = blockCounts.getRaw(valueKey, 0);
-                blockCounts.put(valueKey, currentAmount + entry.getValue());
-
-                Key limitKey = blockLimits.getKey(valueKey);
-                Key globalKey = Key.of(valueKey.getGlobalKey());
-                boolean limitCount = false;
-
-                if (!limitKey.equals(valueKey)) {
-                    currentAmount = blockCounts.getRaw(limitKey, 0);
-                    blockCounts.put(limitKey, currentAmount + entry.getValue());
-                    limitCount = true;
-                }
-
-                if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
-                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
-                    currentAmount = blockCounts.getRaw(globalKey, 0);
-                    blockCounts.put(globalKey, currentAmount + entry.getValue());
-                }
+                addCounts(blockCounts, blockLimits, entry.getKey(), entry.getValue());
             }
         }
 
@@ -1664,6 +1621,30 @@ public final class SIsland extends DatabaseObject implements Island {
         this.blockCounts.write(_blockCounts -> _blockCounts.putAll(blockCounts));
 
         saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
+    }
+
+    private void addCounts(KeyMap<Integer> blockCounts, KeyMap<Integer> blockLimits, Key key, int amount){
+        Key valueKey = plugin.getBlockValues().getBlockKey(key);
+
+        int currentAmount = blockCounts.getRaw(valueKey, 0);
+        blockCounts.put(valueKey, currentAmount + amount);
+
+        Key limitKey = blockLimits.getKey(valueKey);
+        Key globalKey = Key.of(valueKey.getGlobalKey());
+        boolean limitCount = false;
+
+        if (!limitKey.equals(valueKey)) {
+            currentAmount = blockCounts.getRaw(limitKey, 0);
+            blockCounts.put(limitKey, currentAmount + amount);
+            limitCount = true;
+        }
+
+        if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
+                        plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+            currentAmount = blockCounts.getRaw(globalKey, 0);
+            blockCounts.put(globalKey, currentAmount + amount);
+        }
     }
 
     @Override
