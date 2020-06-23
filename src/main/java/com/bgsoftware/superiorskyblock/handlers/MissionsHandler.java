@@ -42,8 +42,8 @@ public final class MissionsHandler implements MissionsManager {
 
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
-    private final static Registry<String, Mission> missionMap = Registry.createRegistry();
-    private final static Registry<Mission, MissionData> missionDataMap = Registry.createRegistry();
+    private final static Registry<String, Mission<?>> missionMap = Registry.createRegistry();
+    private final static Registry<Mission<?>, MissionData> missionDataMap = Registry.createRegistry();
 
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
@@ -74,12 +74,12 @@ public final class MissionsHandler implements MissionsManager {
             cfg = YamlConfiguration.loadConfiguration(file);
         }
 
-        List<Mission> missionsToLoad = new ArrayList<>();
+        List<Mission<?>> missionsToLoad = new ArrayList<>();
 
         for(String missionName : cfg.getConfigurationSection("").getKeys(false)){
             ConfigurationSection missionSection = cfg.getConfigurationSection(missionName);
             try {
-                Mission mission = missionMap.get(missionName.toLowerCase());
+                Mission<?> mission = missionMap.get(missionName.toLowerCase());
 
                 if(mission == null) {
                     File missionJar = new File(missionsDict, missionSection.getString("mission-file") + ".jar");
@@ -88,13 +88,14 @@ public final class MissionsHandler implements MissionsManager {
                     if (!missionClass.isPresent())
                         throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
 
+                    boolean islandMission = missionSection.getBoolean("island", false);
                     List<String> requiredMissions = missionSection.getStringList("required-missions");
                     List<String> requiredChecks = missionSection.getStringList("required-checks");
 
                     boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
                             missionSection.getBoolean("only-show-if-required-completed");
 
-                    mission = createInstance(missionClass.get(), missionName, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
+                    mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                     mission.load(plugin, missionSection);
                     missionMap.add(missionName.toLowerCase(), mission);
                     missionsToLoad.add(mission);
@@ -114,27 +115,27 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
-    public Mission getMission(String name) {
+    public Mission<?> getMission(String name) {
         return missionMap.get(name.toLowerCase());
     }
 
     @Override
-    public List<Mission> getAllMissions() {
+    public List<Mission<?>> getAllMissions() {
         return getFilteredMissions(missionData -> true);
     }
 
     @Override
-    public List<Mission> getPlayerMissions() {
+    public List<Mission<?>> getPlayerMissions() {
         return getFilteredMissions(missionData -> !missionData.islandMission);
     }
 
     @Override
-    public List<Mission> getIslandMissions() {
+    public List<Mission<?>> getIslandMissions() {
         return getFilteredMissions(missionData -> missionData.islandMission);
     }
 
     @Override
-    public boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission mission) {
+    public boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
         if(!missionDataOptional.isPresent())
@@ -156,7 +157,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
-    public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission mission) {
+    public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
         if(!missionDataOptional.isPresent())
@@ -178,24 +179,24 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
-    public boolean canComplete(SuperiorPlayer superiorPlayer, Mission mission) {
+    public boolean canComplete(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         return canCompleteNoProgress(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0;
     }
 
     @Override
-    public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission mission) {
+    public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         return canCompleteAgain(superiorPlayer, mission) && hasAllRequiredMissions(superiorPlayer, mission) &&
                 canPassAllChecks(superiorPlayer, mission);
     }
 
     @Override
-    public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission mission){
+    public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission){
         return mission.getRequiredMissions().stream().allMatch(_mission ->
                 _mission != null && hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
     }
 
     @Override
-    public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission mission){
+    public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission<?> mission){
         return mission.getRequiredChecks().stream().allMatch(check -> {
             check = PlaceholderHook.parse(superiorPlayer, check);
             try {
@@ -207,12 +208,12 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @Override
-    public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
+    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
         rewardMission(mission, superiorPlayer, checkAutoReward, false);
     }
 
     @Override
-    public void rewardMission(Mission mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
+    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward));
             return;
@@ -317,7 +318,7 @@ public final class MissionsHandler implements MissionsManager {
 
         YamlConfiguration data = new YamlConfiguration();
 
-        for(Mission mission : getAllMissions()){
+        for(Mission<?> mission : getAllMissions()){
             ConfigurationSection section = data.createSection(mission.getName());
             mission.saveProgress(section);
             data.set(mission.getName(), section);
@@ -336,7 +337,7 @@ public final class MissionsHandler implements MissionsManager {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void loadMissionsData(List<Mission> missionsList) {
+    public void loadMissionsData(List<Mission<?>> missionsList) {
         File file = new File(plugin.getDataFolder(), "missions/_data.yml");
 
         if(!file.exists()){
@@ -350,13 +351,13 @@ public final class MissionsHandler implements MissionsManager {
 
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
 
-        for(Mission mission : missionsList){
+        for(Mission<?> mission : missionsList){
             if(data.contains(mission.getName()))
                 mission.loadProgress(data.getConfigurationSection(mission.getName()));
         }
     }
 
-    public Optional<MissionData> getMissionData(Mission mission){
+    public Optional<MissionData> getMissionData(Mission<?> mission){
         MissionData missionData = missionDataMap.get(mission);
 
         if(missionData == null){
@@ -369,19 +370,19 @@ public final class MissionsHandler implements MissionsManager {
         return Optional.of(missionData);
     }
 
-    private boolean isAutoReward(Mission mission){
+    private boolean isAutoReward(Mission<?> mission){
         Optional<MissionData> missionDataOptional = getMissionData(mission);
         return missionDataOptional.isPresent() && missionDataOptional.get().autoReward;
     }
 
-    private List<Mission> getFilteredMissions(Predicate<MissionData> predicate) {
+    private List<Mission<?>> getFilteredMissions(Predicate<MissionData> predicate) {
         return missionDataMap.values().stream().filter(predicate)
                 .sorted(Comparator.comparingInt(o -> o.index))
                 .map(missionData -> missionData.mission)
                 .collect(Collectors.toList());
     }
 
-    private Mission createInstance(Class<?> clazz, String name, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{
+    private Mission<?> createInstance(Class<?> clazz, String name, boolean islandMission, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{
         Preconditions.checkArgument(Mission.class.isAssignableFrom(clazz), "Class " + clazz + " is not a Mission.");
 
         for(Constructor<?> constructor : clazz.getConstructors()){
@@ -389,8 +390,9 @@ public final class MissionsHandler implements MissionsManager {
                 if(!constructor.isAccessible())
                     constructor.setAccessible(true);
 
-                Mission mission = (Mission) constructor.newInstance();
+                Mission<?> mission = (Mission<?>) constructor.newInstance();
                 mission.setName(name);
+                mission.setIslandMission(islandMission);
                 mission.addRequiredMission(requiredMissions.toArray(new String[0]));
                 mission.addRequiredCheck(requiredChecks.toArray(new String[0]));
                 if(onlyShowIfRequiredCompleted)
@@ -408,7 +410,7 @@ public final class MissionsHandler implements MissionsManager {
     public static class MissionData{
 
         private final int index;
-        private final Mission mission;
+        private final Mission<?> mission;
         private final List<ItemStack> itemRewards = new ArrayList<>();
         private final List<String> commandRewards = new ArrayList<>();
         private final boolean autoReward, islandMission;
@@ -416,7 +418,7 @@ public final class MissionsHandler implements MissionsManager {
         public final ItemBuilder notCompleted, canComplete, completed;
         public final int resetAmount;
 
-        MissionData(Mission mission, ConfigurationSection section){
+        MissionData(Mission<?> mission, ConfigurationSection section){
             this.index = currentIndex++;
             this.mission = mission;
             this.islandMission = section.getBoolean("island", false);

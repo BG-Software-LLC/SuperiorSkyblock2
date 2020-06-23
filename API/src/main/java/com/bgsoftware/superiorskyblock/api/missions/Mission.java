@@ -8,15 +8,24 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-public abstract class Mission {
+public abstract class Mission<V> {
+
+    private final List<String> requiredMissions = new ArrayList<>();
+    private final List<String> requiredChecks = new ArrayList<>();
+    private final Map<SuperiorPlayer, V> missionData = new HashMap<>();
 
     private String name = null;
-    private List<String> requiredMissions = new ArrayList<>();
-    private List<String> requiredChecks = new ArrayList<>();
+    private Consumer<V> clearMethod = null;
     private boolean onlyShowIfRequiredCompleted = false;
+    private boolean islandMission = false;
 
     /**
      * Set the name of the mission.
@@ -32,6 +41,28 @@ public abstract class Mission {
      */
     public String getName(){
         return name;
+    }
+
+    /**
+     * Set whether or not this mission is an island mission or not.
+     * @param islandMission The island-mission status.
+     */
+    public void setIslandMission(boolean islandMission){
+        this.islandMission = islandMission;
+    }
+
+    /**
+     * Get the island-mission of the mission.
+     */
+    public boolean getIslandMission(){
+        return islandMission;
+    }
+
+    /**
+     * Set the clear method for the data object.
+     */
+    public void setClearMethod(Consumer<V> clearMethod){
+        this.clearMethod = clearMethod;
     }
 
     /**
@@ -148,7 +179,12 @@ public abstract class Mission {
      * @param superiorPlayer The player to clear the data of.
      */
     public void clearData(SuperiorPlayer superiorPlayer){
-
+        SuperiorPlayer dataKey = getDataKey(superiorPlayer);
+        if(dataKey != null) {
+            V data = missionData.remove(dataKey);
+            if(data != null && clearMethod != null)
+                clearMethod.accept(data);
+        }
     }
 
     /**
@@ -157,7 +193,62 @@ public abstract class Mission {
      * @param newPlayer The new owner of the player.
      */
     public void transferData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer){
+        V data = missionData.remove(oldPlayer);
+        if(data != null)
+            missionData.put(newPlayer, data);
+    }
 
+    /**
+     * Get they data-key for the provided player.
+     * @param superiorPlayer The player to check.
+     */
+    protected SuperiorPlayer getDataKey(SuperiorPlayer superiorPlayer){
+        return islandMission ? superiorPlayer.getIsland() == null ? null : superiorPlayer.getIsland().getOwner() : superiorPlayer;
+    }
+
+    /**
+     * Insert data to the mission data.
+     * @param superiorPlayer The player to change it's data.
+     * @param value The data to insert.
+     */
+    protected void insertData(SuperiorPlayer superiorPlayer, V value){
+        SuperiorPlayer dataKey = getDataKey(superiorPlayer);
+        if(dataKey != null)
+            missionData.put(dataKey, value);
+    }
+
+    /**
+     * Get or create data for a player.
+     * @param superiorPlayer The player to get data from.
+     * @param createFunction The function that will be run when data doesn't exist yet.
+     */
+    protected V getOrCreate(SuperiorPlayer superiorPlayer, Function<SuperiorPlayer, ? extends V> createFunction){
+        SuperiorPlayer dataKey = getDataKey(superiorPlayer);
+
+        if(dataKey == null)
+            return null;
+
+        return missionData.computeIfAbsent(dataKey, createFunction);
+    }
+
+    /**
+     * Get data for a player.
+     * @param superiorPlayer The player to get data from.
+     */
+    protected V get(SuperiorPlayer superiorPlayer){
+        SuperiorPlayer dataKey = getDataKey(superiorPlayer);
+
+        if(dataKey == null)
+            return null;
+
+        return missionData.get(dataKey);
+    }
+
+    /**
+     * Get the entry set of the data map.
+     */
+    protected Set<Map.Entry<SuperiorPlayer,V>> entrySet(){
+        return missionData.entrySet();
     }
 
     /**
