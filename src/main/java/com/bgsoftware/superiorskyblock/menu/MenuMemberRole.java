@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -55,7 +56,7 @@ public final class MenuMemberRole extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        return buildInventory(title -> title.replace("{}", targetPlayer.getName()));
+        return buildInventory(title -> PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName())));
     }
 
     public static void init(){

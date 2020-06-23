@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -50,7 +51,7 @@ public final class MenuMemberManage extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        return buildInventory(title -> title.replace("{}", targetPlayer.getName()));
+        return buildInventory(title -> PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName())));
     }
 
     public static void init(){
