@@ -1565,15 +1565,26 @@ public final class SIsland extends DatabaseObject implements Island {
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             syncedBlockCounts.write(blockCounts -> {
-                Key _key = plugin.getBlockValues().getBlockKey(key);
+                Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
-                int currentAmount = blockCounts.getRaw(_key, 0);
-                blockCounts.put(_key, currentAmount + amount);
+                int currentAmount = blockCounts.getRaw(valueKey, 0);
+                blockCounts.put(valueKey, currentAmount + amount);
 
-                if (!_key.toString().equals(blockLimits.getKey(_key).toString())) {
-                    _key = blockLimits.getKey(_key);
-                    currentAmount = blockCounts.getRaw(_key, 0);
-                    blockCounts.put(_key, currentAmount + amount);
+                Key limitKey = blockLimits.getKey(valueKey);
+                Key globalKey = Key.of(valueKey.getGlobalKey());
+                boolean limitCount = false;
+
+                if (!limitKey.equals(valueKey)) {
+                    currentAmount = blockCounts.getRaw(limitKey, 0);
+                    blockCounts.put(limitKey, currentAmount + amount);
+                    limitCount = true;
+                }
+
+                if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
+                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                    currentAmount = blockCounts.getRaw(globalKey, 0);
+                    blockCounts.put(globalKey, currentAmount + amount);
                 }
             });
 
@@ -1622,15 +1633,26 @@ public final class SIsland extends DatabaseObject implements Island {
             if(increaseAmount || hasBlockLimit) {
                 SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey());
 
-                Key _key = plugin.getBlockValues().getBlockKey(entry.getKey());
+                Key valueKey = plugin.getBlockValues().getBlockKey(entry.getKey());
 
-                int currentAmount = blockCounts.getRaw(_key, 0);
-                blockCounts.put(_key, currentAmount + entry.getValue());
+                int currentAmount = blockCounts.getRaw(valueKey, 0);
+                blockCounts.put(valueKey, currentAmount + entry.getValue());
 
-                if (!_key.toString().equals(blockLimits.getKey(_key).toString())) {
-                    _key = blockLimits.getKey(_key);
-                    currentAmount = blockCounts.getRaw(_key, 0);
-                    blockCounts.put(_key, currentAmount + entry.getValue());
+                Key limitKey = blockLimits.getKey(valueKey);
+                Key globalKey = Key.of(valueKey.getGlobalKey());
+                boolean limitCount = false;
+
+                if (!limitKey.equals(valueKey)) {
+                    currentAmount = blockCounts.getRaw(limitKey, 0);
+                    blockCounts.put(limitKey, currentAmount + entry.getValue());
+                    limitCount = true;
+                }
+
+                if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
+                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                    currentAmount = blockCounts.getRaw(globalKey, 0);
+                    blockCounts.put(globalKey, currentAmount + entry.getValue());
                 }
             }
         }
@@ -1697,20 +1719,22 @@ public final class SIsland extends DatabaseObject implements Island {
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             blockCounts.write(blockCounts -> {
-                Key _key = plugin.getBlockValues().getBlockKey(key);
-                int currentAmount = blockCounts.getRaw(_key, 0);
-                if(currentAmount <= amount)
-                    blockCounts.removeRaw(_key);
-                else
-                    blockCounts.put(_key, currentAmount - amount);
+                Key valueKey = plugin.getBlockValues().getBlockKey(key);
+                removeCounts(blockCounts, key, amount);
 
-                if(!_key.toString().equals(blockLimits.getKey(_key).toString())){
-                    _key = blockLimits.getKey(_key);
-                    currentAmount = blockCounts.getRaw(_key, 0);
-                    if(currentAmount <= amount)
-                        blockCounts.removeRaw(_key);
-                    else
-                        blockCounts.put(_key, currentAmount - amount);
+                Key limitKey = blockLimits.getKey(valueKey);
+                Key globalKey = Key.of(valueKey.getGlobalKey());
+                boolean limitCount = false;
+
+                if (!limitKey.equals(valueKey)) {
+                    removeCounts(blockCounts, limitKey, amount);
+                    limitCount = true;
+                }
+
+                if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
+                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                    removeCounts(blockCounts, globalKey, amount);
                 }
             });
 
@@ -1728,6 +1752,14 @@ public final class SIsland extends DatabaseObject implements Island {
                 }
             }
         }
+    }
+
+    private void removeCounts(KeyMap<Integer> blockCounts, Key key, int amount){
+        int currentAmount = blockCounts.getRaw(key, 0);
+        if(currentAmount <= amount)
+            blockCounts.removeRaw(key);
+        else
+            blockCounts.put(key, currentAmount - amount);
     }
 
     @Override
