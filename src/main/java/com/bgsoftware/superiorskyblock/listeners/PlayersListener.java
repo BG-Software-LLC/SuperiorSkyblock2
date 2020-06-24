@@ -38,6 +38,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -388,6 +389,16 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler
+    public void simulateEndPortalEvent(EntityPortalEnterEvent e){
+        if(e.getLocation().getWorld().getEnvironment() == World.Environment.THE_END &&
+                plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())){
+            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            if(island != null)
+                Executor.sync(() -> e.getEntity().teleport(island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+        }
+    }
+
+    @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
@@ -401,7 +412,7 @@ public final class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
-        World.Environment environment = e.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER ?
+        World.Environment environment = e.getPlayer().getWorld().getEnvironment() != World.Environment.NORMAL ?
                 World.Environment.NORMAL : e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
 
         if(((SSuperiorPlayer) superiorPlayer).isImmunedToTeleport())
