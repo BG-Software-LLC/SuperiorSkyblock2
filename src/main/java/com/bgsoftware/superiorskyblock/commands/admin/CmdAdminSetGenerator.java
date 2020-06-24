@@ -128,11 +128,11 @@ public final class CmdAdminSetGenerator implements ISuperiorCommand {
         }));
 
         if(islands.size() != 1)
-            Locale.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.toString().split(":")[0]));
+            Locale.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
         else if(targetPlayer == null)
-            Locale.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.toString().split(":")[0]), islands.get(0).getName());
+            Locale.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
         else
-            Locale.GENERATOR_UPDATED.send(sender, StringUtils.format(material.toString().split(":")[0]), targetPlayer.getName());
+            Locale.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

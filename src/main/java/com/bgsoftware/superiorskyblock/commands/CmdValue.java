@@ -70,14 +70,14 @@ public final class CmdValue implements ISuperiorCommand {
             toCheck = Key.of(inHand);
 
             if(inHand.getType() == Materials.SPAWNER.toBukkitType())
-                keyName = StringUtils.format(toCheck.toString().split(":")[1] + "_Spawner");
+                keyName = StringUtils.format(toCheck.getSubKey() + "_Spawner");
         }
         else{
             toCheck = Key.of(args[1].toUpperCase());
         }
 
         if(keyName.isEmpty())
-            keyName = StringUtils.format(toCheck.toString().split(":")[0]);
+            keyName = StringUtils.format(toCheck.getGlobalKey());
 
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck),
                 blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);

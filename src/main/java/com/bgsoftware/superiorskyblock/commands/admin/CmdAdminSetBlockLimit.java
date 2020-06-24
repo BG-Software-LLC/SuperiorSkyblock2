@@ -99,11 +99,11 @@ public final class CmdAdminSetBlockLimit implements ISuperiorCommand {
         Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, limit)));
 
         if(islands.size() > 1)
-            Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.toString().split(":")[0]));
+            Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.getGlobalKey()));
         else if(targetPlayer == null)
-            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.toString().split(":")[0]), islands.get(0).getName());
+            Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.getGlobalKey()), islands.get(0).getName());
         else
-            Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.toString().split(":")[0]), targetPlayer.getName());
+            Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

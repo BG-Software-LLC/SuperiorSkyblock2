@@ -173,18 +173,16 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
             Key blockKey = block.getKey();
             int amount = block.getValue();
 
-            String[] keySections = blockKey.toString().split(":");
-
-            if (blocksToItems.containsKey(keySections[0])) {
-                String[] item = blocksToItems.get(keySections[0]).split(":");
+            if (blocksToItems.containsKey(blockKey.getGlobalKey())) {
+                String[] item = blocksToItems.get(blockKey.getGlobalKey()).split(":");
                 String itemType = item[0];
                 try {
                     //Checking if the material is valid
                     Material.valueOf(itemType);
                     if (item.length == 2)
-                        keySections = item;
+                        blockKey = Key.of(item[0] + ":" + item[1]);
                     else
-                        keySections[0] = itemType;
+                        blockKey = Key.of(itemType);
                 }catch(Throwable ignored){}
             }
 
@@ -193,24 +191,24 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
             String materialName = null;
 
             try {
-                blockMaterial = Material.valueOf(keySections[0]);
-                if(keySections.length == 2) {
+                blockMaterial = Material.valueOf(blockKey.getGlobalKey());
+                if(!blockKey.getSubKey().isEmpty()) {
                     try {
-                        damage = Byte.parseByte(keySections[1]);
+                        damage = Byte.parseByte(blockKey.getSubKey());
                     }catch(Throwable ignored){}
                 }
             } catch (Exception ex) {
                 blockMaterial = Material.BEDROCK;
-                materialName = keySections[0];
+                materialName = blockKey.getGlobalKey();
             }
 
             ItemMeta currentMeta = clickedItem.getItemMeta();
             ItemBuilder itemBuilder;
 
-            if (blockMaterial == Materials.SPAWNER.toBukkitType() && keySections.length > 1) {
+            if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty()) {
                 itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(),
-                        HeadUtils.getTexture(keySections[1])));
-                materialName = keySections[1] + "_SPAWNER";
+                        HeadUtils.getTexture(blockKey.getSubKey())));
+                materialName = blockKey.getSubKey() + "_SPAWNER";
             } else {
                 itemBuilder = new ItemBuilder(blockMaterial, damage);
                 if (materialName == null)
@@ -240,10 +238,10 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     @Override
     protected List<Pair<Key, Integer>> requestObjects() {
         return island.getBlockCounts().entrySet().stream().sorted((o1, o2) -> {
-            Material firstMaterial = getSafeMaterial(o1.getKey().toString().split(":")[0]);
-            Material secondMaterial = getSafeMaterial(o2.getKey().toString().split(":")[0]);
+            Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
+            Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());
             int compare = plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);
-            return compare != 0 ? compare : o1.getKey().toString().compareTo(o2.getKey().toString());
+            return compare != 0 ? compare : o1.getKey().compareTo(o2.getKey());
         }).map(Pair::new).collect(Collectors.toList());
     }
 

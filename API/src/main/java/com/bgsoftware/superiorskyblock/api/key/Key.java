@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Used as a wrapper for objects into material & data object.
  */
-public final class Key {
+public final class Key implements Comparable<Key> {
 
     private final String globalKey;
     private final String subKey;
@@ -39,6 +39,11 @@ public final class Key {
     @SuppressWarnings("all")
     public boolean equals(Object obj) {
         return obj instanceof Key && toString().equals(obj.toString());
+    }
+
+    @Override
+    public int compareTo(Key o) {
+        return toString().compareTo(o.toString());
     }
 
     /**

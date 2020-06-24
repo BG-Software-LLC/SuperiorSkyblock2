@@ -227,7 +227,7 @@ public final class UpgradesListener implements Listener {
 
         if(key != null && island.hasReachedBlockLimit(key)){
             e.setCancelled(true);
-            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(key.toString().split(":")[0]));
+            Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(key.getGlobalKey()));
         }
     }
 
@@ -316,7 +316,7 @@ public final class UpgradesListener implements Listener {
     }
 
     private ItemStack asItemStack(Minecart minecart){
-        Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock(minecart).toString().split(":")[0]);
+        Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock(minecart).getGlobalKey());
         switch (material.name()){
             case "HOPPER":
                 return new ItemStack(Material.HOPPER_MINECART);

@@ -264,8 +264,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                         Material blockType, belowType;
 
                         try {
-                            blockType = Material.valueOf(blockKey.toString().split(":")[0]);
-                            belowType = Material.valueOf(belowKey.toString().split(":")[0]);
+                            blockType = Material.valueOf(blockKey.getGlobalKey());
+                            belowType = Material.valueOf(belowKey.getGlobalKey());
                         }catch(IllegalArgumentException ex){
                             continue;
                         }

@@ -17,10 +17,8 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
     public BigDecimal getPrice(Key key) {
         double price = 0;
 
-        String[] keySections = key.toString().split(":");
-
-        Material material = Material.matchMaterial(keySections[0]);
-        short data = keySections.length == 2 ? Short.parseShort(keySections[1]) : 0;
+        Material material = Material.matchMaterial(key.getGlobalKey());
+        short data = !key.getSubKey().isEmpty() ? Short.parseShort(key.getSubKey()) : 0;
 
         Map<String, Shop> shops = plugin.getShopManager().shops;
         for(Shop shop : shops.values()){

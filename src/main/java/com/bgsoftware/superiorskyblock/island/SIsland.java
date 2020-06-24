@@ -1134,13 +1134,13 @@ public final class SIsland extends DatabaseObject implements Island {
                                         blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
                                     }catch(ArrayIndexOutOfBoundsException ignored){ }
 
-                                    if(blockKey.toString().contains("AIR:"))
+                                    if(blockKey.getGlobalKey().equals("AIR"))
                                         continue;
 
                                     Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
                                     int blockCount = plugin.getGrid().getBlockAmount(location);
 
-                                    if(blockKey.toString().contains("SPAWNER")){
+                                    if(blockKey.getGlobalKey().contains("SPAWNER")){
                                         Pair<Integer, String> entry = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
                                         blockCount = entry.getKey();
                                         if(entry.getValue() == null){
@@ -2040,7 +2040,7 @@ public final class SIsland extends DatabaseObject implements Island {
             return getBlockCount(key) + amount > blockLimit;
 
         //Getting the global key values.
-        key = Key.of(key.toString().split(":")[0]);
+        key = Key.of(key.getGlobalKey());
         blockLimit = getBlockLimit(key);
 
         return blockLimit > SIsland.NO_LIMIT && getBlockCount(key) + amount > blockLimit;
