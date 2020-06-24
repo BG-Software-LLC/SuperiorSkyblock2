@@ -13,7 +13,7 @@ import java.util.Set;
 
 public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
-    private Set<String> set;
+    private final Set<String> set;
 
     public KeySet(List<String> keys){
         this.set = new HashSet<>(keys);
@@ -31,7 +31,7 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
 
     public boolean contains(Block block) {
-        return contains(block.getState().getData().toItemStack());
+        return contains(Key.of(block));
     }
     public boolean contains(ItemStack itemStack) {
         return contains(Key.of(itemStack));
@@ -47,16 +47,7 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
     @Override
     public boolean contains(Object o) {
-        if(o instanceof Key){
-            String key = o.toString();
-            if(set.contains(key))
-                return true;
-            else if(key.contains(":") && set.contains(key.split(":")[0]))
-                return true;
-            else if(key.contains(";") && set.contains(key.split(";")[0]))
-                return true;
-        }
-        return super.contains(o);
+        return o instanceof Key && (set.contains(o.toString()) || (!((Key) o).getSubKey().isEmpty() && set.contains(((Key) o).getGlobalKey())));
     }
 
     @Override
@@ -66,7 +57,7 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
     @Override
     public boolean remove(Object o) {
-        return set.remove(o);
+        return o instanceof Key ? set.remove(o.toString()) : set.remove(o);
     }
 
     private Set<Key> asKeySet(){
