@@ -47,8 +47,12 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     public Key getKey(Key key){
-        V returnValue = registry.get(key.getGlobalKey());
-        return returnValue == null && !key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey()) : key;
+        if(registry.containsKey(key.toString()))
+            return key;
+        else if(registry.containsKey(key.getGlobalKey()))
+            return Key.of(key.getGlobalKey());
+        else
+            return key;
     }
 
     @Override
