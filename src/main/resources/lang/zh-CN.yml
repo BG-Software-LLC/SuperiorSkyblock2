@@ -23,6 +23,11 @@ BAN_ANNOUNCEMENT: '&e&l岛屿 | &b{1} &7将 &b{0} 从你的岛屿中禁封了,�
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能禁封岛屿中职位比你低的玩家.'
 BANNED_FROM_ISLAND: '&c&l错误 | &7你被这个岛屿禁封了！'
 BLOCK_COUNT_CHECK: '&e&l岛屿 | &7这个岛屿有 {0}个 {1}.'
+BLOCK_COUNTS_CHECK: |
+  &e&lIsland | &7This island has the following blocks:
+  &7{0}
+BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
+BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&l岛屿等级 | &7方块 &b{0} &7的等级为 &a{1}.'
 BLOCK_VALUE: '&e&l岛屿价值 | &7方块 &b{0} &7的价值为 &a{1}.'
 BLOCK_VALUE_WORTHLESS: '&e&l岛屿价值 | &7方块 &b{0} &7一文不值.'

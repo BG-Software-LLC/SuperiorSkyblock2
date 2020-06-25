@@ -23,6 +23,11 @@ BAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was BANNED from the island by {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only ban players with a lower island role than yours.'
 BANNED_FROM_ISLAND: '&c&lError | &7You are banned from this island.'
 BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
+BLOCK_COUNTS_CHECK: |
+  &e&lIsland | &7This island has the following blocks:
+  &7{0}
+BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
+BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lLevel | &7The block {0}''s level is {1}.'
 BLOCK_VALUE: '&e&lWorth | &7The block {0} worth {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7The block {0} is worthless.'

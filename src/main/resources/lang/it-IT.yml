@@ -1,3 +1,4 @@
+
 ######################################################
 ##                                                  ##
 ##                SuperiorSkyblock 2                ##
@@ -27,6 +28,11 @@ BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi bannare solo i giocatori avent
   un ruolo inferiore al tuo.'
 BANNED_FROM_ISLAND: '&c&lErrore | &7Sei stato bannato da questa isola.'
 BLOCK_COUNT_CHECK: '&e&lIsola | &7Quest''isola ha x{0} {1}.'
+BLOCK_COUNTS_CHECK: |
+  &e&lIsland | &7This island has the following blocks:
+  &7{0}
+BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
+BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lLevel | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE: '&e&lWorth | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7Il blocco {0} non ha valore.'

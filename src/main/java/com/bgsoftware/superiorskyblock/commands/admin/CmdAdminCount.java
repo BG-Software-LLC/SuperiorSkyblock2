@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
+import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public final class CmdAdminCount implements ISuperiorCommand {
 
@@ -85,19 +87,40 @@ public final class CmdAdminCount implements ISuperiorCommand {
 
         String materialName = args[3].toUpperCase();
 
-        try{
-            Material.valueOf(materialName);
-        }catch(Exception ex){
-            Locale.INVALID_MATERIAL.send(sender, args[3]);
-            return;
+        if(materialName.equals("*")){
+            StringBuilder materialsBuilder = new StringBuilder();
+
+            java.util.Locale locale = LocaleUtils.getLocale(sender);
+
+            if(!Locale.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)){
+                for(Map.Entry<Key, Integer> entry : island.getBlockCounts().entrySet()){
+                    materialsBuilder.append(", ").append(Locale.BLOCK_COUNTS_CHECK_MATERIAL.getMessage(locale, entry.getValue(), StringUtils.format(entry.getKey().toString())));
+                }
+            }
+
+            if(materialsBuilder.length() == 0){
+                Locale.BLOCK_COUNTS_CHECK_EMPTY.send(sender);
+            }
+            else {
+                Locale.BLOCK_COUNTS_CHECK.send(sender, materialsBuilder.substring(1));
+            }
         }
 
-        int blockCount = island.getBlockCount(Key.of(materialName));
+        else {
+            try {
+                Material.valueOf(materialName);
+            } catch (Exception ex) {
+                Locale.INVALID_MATERIAL.send(sender, args[3]);
+                return;
+            }
 
-        if(blockCount > 1)
-            materialName = materialName + "s";
+            int blockCount = island.getBlockCount(Key.of(materialName));
 
-        Locale.BLOCK_COUNT_CHECK.send(sender, blockCount, StringUtils.format(materialName));
+            if (blockCount > 1)
+                materialName = materialName + "s";
+
+            Locale.BLOCK_COUNT_CHECK.send(sender, blockCount, StringUtils.format(materialName));
+        }
     }
 
     @Override
@@ -121,10 +144,13 @@ public final class CmdAdminCount implements ISuperiorCommand {
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
             if(island != null){
+                String materialArgument = args[3].toLowerCase();
                 for(Material material : Material.values()){
-                    if(material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().startsWith(args[3].toLowerCase()))
+                    if(material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().startsWith(materialArgument))
                         list.add(material.name().toLowerCase());
                 }
+                if("*".startsWith(materialArgument))
+                    list.add("*");
             }
         }
 

@@ -23,6 +23,11 @@ BAN_ANNOUNCEMENT: '&e&lIle | &7{0} a été BANNI de l''île par {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErreur | &7Vous ne pouvez bannir que les joueurs d''un rôle d''île inférieur au votre.'
 BANNED_FROM_ISLAND: '&c&lErreur | &7Vous êtes banni de cette île.'
 BLOCK_COUNT_CHECK: '&e&lIle | &7Cette île possède x{0} {1}.'
+BLOCK_COUNTS_CHECK: |
+  &e&lIsland | &7This island has the following blocks:
+  &7{0}
+BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
+BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lNiveau | &7Le le niveau du bloc {0} est de {1}.'
 BLOCK_VALUE: '&e&lValeur | &7La valeur du bloc {0} est de {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lValeur | &7Le bloc {0} n''a pas de valeur.'
