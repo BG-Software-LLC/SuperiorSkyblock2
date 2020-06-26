@@ -64,7 +64,7 @@ public final class CmdAdminMission implements ISuperiorCommand {
             return;
         }
 
-        Mission mission = plugin.getMissions().getMission(args[4]);
+        Mission<?> mission = plugin.getMissions().getMission(args[4]);
 
         if(mission == null){
             Locale.INVALID_MISSION.send(sender, args[4]);
@@ -105,7 +105,7 @@ public final class CmdAdminMission implements ISuperiorCommand {
             list.addAll(Stream.of("complete", "reset").filter(subCommand -> subCommand.startsWith(args[3].toLowerCase())).collect(Collectors.toList()));
         }
         else if(args.length == 5 && (args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset"))){
-            for(Mission mission : plugin.getMissions().getAllMissions()){
+            for(Mission<?> mission : plugin.getMissions().getAllMissions()){
                 if (mission.getName().toLowerCase().startsWith(args[4].toLowerCase()))
                     list.add(mission.getName());
             }

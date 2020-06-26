@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
+public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
 
-    private List<Mission> missions;
+    private List<Mission<?>> missions;
 
     private MenuPlayerMissions(SuperiorPlayer superiorPlayer){
         super("menuPlayerMissions", superiorPlayer);
@@ -34,7 +34,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event, Mission mission) {
+    protected void onPlayerClick(InventoryClickEvent event, Mission<?> mission) {
         boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
         boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
 
@@ -55,7 +55,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Mission mission) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, Mission<?> mission) {
         try {
             Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
@@ -89,7 +89,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission> {
     }
 
     @Override
-    protected List<Mission> requestObjects() {
+    protected List<Mission<?>> requestObjects() {
         return missions;
     }
 

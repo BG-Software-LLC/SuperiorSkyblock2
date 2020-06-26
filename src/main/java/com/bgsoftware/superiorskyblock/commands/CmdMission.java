@@ -61,7 +61,7 @@ public final class CmdMission implements ISuperiorCommand {
             return;
         }
 
-        Mission mission = plugin.getMissions().getMission(args[2]);
+        Mission<?> mission = plugin.getMissions().getMission(args[2]);
 
         if(mission == null){
             Locale.INVALID_MISSION.send(superiorPlayer, args[2]);
@@ -73,7 +73,7 @@ public final class CmdMission implements ISuperiorCommand {
         if(!requiredMissions.isEmpty()){
             StringBuilder stringBuilder = new StringBuilder();
             requiredMissions.forEach(requiredMission -> {
-                Mission _mission = plugin.getMissions().getMission(requiredMission);
+                Mission<?> _mission = plugin.getMissions().getMission(requiredMission);
                 if(_mission != null && plugin.getMissions().canCompleteAgain(superiorPlayer, _mission))
                     stringBuilder.append(_mission.getName()).append(", ");
             });

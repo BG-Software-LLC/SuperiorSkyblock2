@@ -150,14 +150,14 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeMissions(String missions, Registry<Mission, Integer> completedMissions){
+    public static void deserializeMissions(String missions, Registry<Mission<?>, Integer> completedMissions){
         if(missions == null)
             return;
 
         for(String mission : missions.split(";")){
             String[] missionSections = mission.split("=");
             int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
-            Mission _mission = plugin.getMissions().getMission(missionSections[0]);
+            Mission<?> _mission = plugin.getMissions().getMission(missionSections[0]);
             if(_mission != null)
                 completedMissions.add(_mission, completeAmount);
         }

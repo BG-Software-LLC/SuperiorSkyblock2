@@ -17,11 +17,11 @@ public class MissionCompleteEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
-    private final Mission mission;
+    private final Mission<?> mission;
     private final boolean islandMission;
 
-    private List<ItemStack> itemRewards;
-    private List<String> commandRewards;
+    private final List<ItemStack> itemRewards;
+    private final List<String> commandRewards;
     private boolean cancelled = false;
 
     /**
@@ -32,7 +32,7 @@ public class MissionCompleteEvent extends Event implements Cancellable {
      * @param itemRewards The list of items that will be given as a reward.
      * @param commandRewards The list of commands that will be ran as a reward.
      */
-    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
+    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
         super(true);
         this.superiorPlayer = superiorPlayer;
         this.mission = mission;
@@ -51,7 +51,7 @@ public class MissionCompleteEvent extends Event implements Cancellable {
     /**
      * Get the mission that was completed.
      */
-    public Mission getMission() {
+    public Mission<?> getMission() {
         return mission;
     }
 

@@ -266,7 +266,7 @@ public abstract class Mission<V> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Mission mission = (Mission) o;
+        Mission<?> mission = (Mission<?>) o;
         return Objects.equals(name, mission.name);
     }
 

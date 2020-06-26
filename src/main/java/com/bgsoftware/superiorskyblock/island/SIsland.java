@@ -150,7 +150,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<String> islandRawName = SyncedObject.of("");
     private final SyncedObject<String> description = SyncedObject.of("");
     private final Registry<UUID, Rating> ratings = Registry.createRegistry();
-    private final Registry<Mission, Integer> completedMissions = Registry.createRegistry();
+    private final Registry<Mission<?>, Integer> completedMissions = Registry.createRegistry();
     private final SyncedObject<Biome> biome = SyncedObject.of(null);
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
     private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(8);
@@ -2318,7 +2318,7 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public void completeMission(Mission mission) {
+    public void completeMission(Mission<?> mission) {
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
@@ -2332,7 +2332,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public void resetMission(Mission mission) {
+    public void resetMission(Mission<?> mission) {
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
         if(completedMissions.get(mission, 0) > 0) {
@@ -2354,23 +2354,23 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
-    public boolean hasCompletedMission(Mission mission) {
+    public boolean hasCompletedMission(Mission<?> mission) {
         return completedMissions.containsKey(mission);
     }
 
     @Override
-    public boolean canCompleteMissionAgain(Mission mission) {
+    public boolean canCompleteMissionAgain(Mission<?> mission) {
         Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
         return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) < missionDataOptional.get().resetAmount;
     }
 
     @Override
-    public int getAmountMissionCompleted(Mission mission) {
+    public int getAmountMissionCompleted(Mission<?> mission) {
         return completedMissions.get(mission, 0);
     }
 
     @Override
-    public List<Mission> getCompletedMissions() {
+    public List<Mission<?>> getCompletedMissions() {
         return new ArrayList<>(completedMissions.keys());
     }
 

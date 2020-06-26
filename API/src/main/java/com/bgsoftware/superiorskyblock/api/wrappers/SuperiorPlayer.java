@@ -316,35 +316,35 @@ public interface SuperiorPlayer {
      * Complete a mission.
      * @param mission The mission to complete.
      */
-    void completeMission(Mission mission);
+    void completeMission(Mission<?> mission);
 
     /**
      * Reset a mission.
      * @param mission The mission to reset.
      */
-    void resetMission(Mission mission);
+    void resetMission(Mission<?> mission);
 
     /**
      * Check whether the player has completed the mission before.
      * @param mission The mission to check.
      */
-    boolean hasCompletedMission(Mission mission);
+    boolean hasCompletedMission(Mission<?> mission);
 
     /**
      * Check whether the player can complete a mission again.
      * @param mission The mission to check.
      */
-    boolean canCompleteMissionAgain(Mission mission);
+    boolean canCompleteMissionAgain(Mission<?> mission);
 
     /**
      * Get the amount of times mission was completed.
      * @param mission The mission to check.
      */
-    int getAmountMissionCompleted(Mission mission);
+    int getAmountMissionCompleted(Mission<?> mission);
 
     /**
      * Get the list of the completed missions of the player.
      */
-    List<Mission> getCompletedMissions();
+    List<Mission<?>> getCompletedMissions();
 
 }

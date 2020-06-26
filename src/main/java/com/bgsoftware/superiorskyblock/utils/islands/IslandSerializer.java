@@ -113,7 +113,7 @@ public final class IslandSerializer {
     }
 
 
-    public static String serializeMissions(Registry<Mission, Integer> missions){
+    public static String serializeMissions(Registry<Mission<?>, Integer> missions){
         StringBuilder missionsBuilder = new StringBuilder();
         missions.entries().forEach(entry ->
                 missionsBuilder.append(";").append(entry.getKey()).append("=").append(entry.getValue()));
