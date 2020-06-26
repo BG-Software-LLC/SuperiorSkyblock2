@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.queue.Queue;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Lists;
@@ -52,9 +51,6 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class GridHandler implements GridManager {
-
-    private final Queue<IslandCreationData> islandCreationQueue = new Queue<>();
-    private boolean creationProcess = false;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -99,13 +95,6 @@ public final class GridHandler implements GridManager {
             Executor.sync(() -> createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset));
             return;
         }
-
-//        if (creationProcess) {
-//            islandCreationQueue.push(new IslandCreationData(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset));
-//            return;
-//        }
-
-        creationProcess = true;
 
         SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
 
@@ -159,14 +148,8 @@ public final class GridHandler implements GridManager {
     }
 
     private void onCreationIslandFinish(Location location){
-        creationProcess = false;
         if(location != null)
             servedPositions.remove(location);
-
-        if (islandCreationQueue.size() != 0) {
-            IslandCreationData data = islandCreationQueue.pop();
-            createIsland(data.superiorPlayer, data.schemName, data.bonusWorth, data.bonusLevel, data.biome, data.islandName, data.offset);
-        }
     }
 
     @Override
@@ -634,28 +617,6 @@ public final class GridHandler implements GridManager {
             }
 
             return stringBuilder.toString().substring(1);
-        }
-
-    }
-
-    private static final class IslandCreationData{
-
-        private final SuperiorPlayer superiorPlayer;
-        private final String schemName;
-        private final BigDecimal bonusWorth;
-        private final BigDecimal bonusLevel;
-        private final Biome biome;
-        private final String islandName;
-        private final boolean offset;
-
-        IslandCreationData(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset){
-            this.superiorPlayer = superiorPlayer;
-            this.schemName = schemName;
-            this.bonusWorth = bonusWorth;
-            this.bonusLevel = bonusLevel;
-            this.biome = biome;
-            this.islandName = islandName;
-            this.offset = offset;
         }
 
     }
