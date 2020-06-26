@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -554,8 +554,8 @@ public enum Locale {
     private static Set<java.util.Locale> locales = new HashSet<>();
     private static java.util.Locale defaultLocale = null;
 
-    private String defaultMessage;
-    private Registry<java.util.Locale, String> messages = Registry.createRegistry();
+    private final String defaultMessage;
+    private final Registry<java.util.Locale, String> messages = Registry.createRegistry();
 
     Locale(){
         this(null);
@@ -593,7 +593,7 @@ public enum Locale {
     public void send(CommandSender sender, java.util.Locale locale, Object... objects){
         String message = getMessage(locale, objects);
         if(message != null && sender != null)
-            sendMessage(sender, message);
+            sendMessage(sender, message, false);
     }
 
     private void setMessage(java.util.Locale locale, String message){
@@ -602,7 +602,9 @@ public enum Locale {
         messages.add(locale, message);
     }
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Set<UUID> noInteractMessages = new HashSet<>();
+    private static final Set<UUID> noSchematicMessages = new HashSet<>();
 
     public static void reload(){
         SuperiorSkyblockPlugin.log("Loading messages started...");
@@ -646,7 +648,7 @@ public enum Locale {
             cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
 
             for(Locale locale : values()){
-                locale.setMessage(fileLocale, ChatColor.translateAlternateColorCodes('&', cfg.getString(locale.name(), "")));
+                locale.setMessage(fileLocale, StringUtils.translateColors(cfg.getString(locale.name(), "")));
 
                 if(countMessages)
                     messagesAmount++;
@@ -663,16 +665,13 @@ public enum Locale {
         SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
-    public static void sendMessage(SuperiorPlayer superiorPlayer, String message){
-        sendMessage(superiorPlayer.asPlayer(), message);
+    public static void sendMessage(SuperiorPlayer superiorPlayer, String message, boolean translateColors){
+        sendMessage(superiorPlayer.asPlayer(), message, translateColors);
     }
 
-    public static void sendMessage(CommandSender sender, String message){
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+    public static void sendMessage(CommandSender sender, String message, boolean translateColors){
+        sender.sendMessage(translateColors ? StringUtils.translateColors(message) : message);
     }
-
-    private static Set<UUID> noInteractMessages = new HashSet<>();
-    private static Set<UUID> noSchematicMessages = new HashSet<>();
 
     public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
         sendProtectionMessage(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale());
@@ -693,7 +692,7 @@ public enum Locale {
     public static void sendSchematicMessage(SuperiorPlayer superiorPlayer, String message){
         if(!noSchematicMessages.contains(superiorPlayer.getUniqueId())){
             noSchematicMessages.add(superiorPlayer.getUniqueId());
-            Locale.sendMessage(superiorPlayer, message);
+            Locale.sendMessage(superiorPlayer, message,  false);
             Executor.sync(() -> noSchematicMessages.remove(superiorPlayer.getUniqueId()), 60L);
         }
     }

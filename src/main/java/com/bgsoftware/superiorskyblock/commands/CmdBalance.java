@@ -58,7 +58,7 @@ public final class CmdBalance implements ISuperiorCommand {
 
         if(args.length == 1){
             if(!(sender instanceof Player)){
-                Locale.sendMessage(sender, "&cYou must specify a player's name.");
+                Locale.sendMessage(sender, "&cYou must specify a player's name.", true);
                 return;
             }
 

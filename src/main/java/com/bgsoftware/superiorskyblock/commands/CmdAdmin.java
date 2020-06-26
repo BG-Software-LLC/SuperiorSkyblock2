@@ -122,7 +122,7 @@ public final class CmdAdmin implements ISuperiorCommand {
             SuperiorCommand command = getCommand(args[1]);
             if(command != null){
                 if(!(sender instanceof Player) && !command.canBeExecutedByConsole()){
-                    Locale.sendMessage(sender, "&cCan be executed only by players!");
+                    Locale.sendMessage(sender, "&cCan be executed only by players!", true);
                     return;
                 }
 

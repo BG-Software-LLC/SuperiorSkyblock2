@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import org.bukkit.inventory.ItemStack;
@@ -20,13 +21,42 @@ public final class HeadUtils {
     }
 
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture){
+//        SkullMeta headMeta = (SkullMeta) itemStack.getItemMeta();
+//        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+//        profile.getProperties().put("textures", new Property("textures", String.valueOf(texture)));
+//        Field profileField;
+//        try
+//        {
+//            profileField = headMeta.getClass().getDeclaredField("profile");
+//            profileField.setAccessible(true);
+//            profileField.set(headMeta, profile);
+//        }
+//        catch (Exception ex){}
+//
+//        itemStack.setItemMeta(headMeta);
+//
+//        net.minecraft.server.v1_16_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+//        NBTTagCompound tagCompound = nmsItem.getOrCreateTag();
+//
+//        Bukkit.broadcastMessage(tagCompound + "");
+//
+//        return itemStack;
+
+
         CompoundTag compoundTag = TagUtils.itemToCompound(itemStack);
 
         CompoundTag nbtTag = (CompoundTag) compoundTag.getValue().getOrDefault("NBT", new CompoundTag());
 
         CompoundTag skullOwner = (CompoundTag) nbtTag.getValue().getOrDefault("SkullOwner", new CompoundTag());
 
-        skullOwner.setString("Id", new UUID(texture.hashCode(), texture.hashCode()).toString());
+        UUID ownerUUID = new UUID(texture.hashCode(), texture.hashCode());
+
+        if(ServerVersion.isAtLeast(ServerVersion.v1_16)){
+            skullOwner.setTag("Id", IntArrayTag.fromUUID(ownerUUID));
+        }
+        else {
+            skullOwner.setString("Id", ownerUUID.toString());
+        }
 
         CompoundTag properties = new CompoundTag();
 

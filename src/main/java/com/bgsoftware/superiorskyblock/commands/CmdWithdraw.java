@@ -59,7 +59,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
         Island island = superiorPlayer.getIsland();
 
         if(!EconomyHook.isVaultEnabled()){
-            Locale.sendMessage(superiorPlayer, "&cServer doesn't have vault installed so island banks are disabled.");
+            Locale.sendMessage(superiorPlayer, "&cServer doesn't have vault installed so island banks are disabled.", true);
             return;
         }
 

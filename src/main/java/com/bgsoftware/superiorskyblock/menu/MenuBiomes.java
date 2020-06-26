@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -12,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -121,7 +121,7 @@ public final class MenuBiomes extends SuperiorMenu {
 
         menuBiomes.resetData();
 
-        menuBiomes.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menuBiomes.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuBiomes.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");

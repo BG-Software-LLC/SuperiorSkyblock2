@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -101,8 +100,7 @@ public final class CmdAdminName implements ISuperiorCommand {
         String oldName = island.getName();
         island.setName(islandName);
 
-        String coloredName = plugin.getSettings().islandNamesColorSupport ?
-                ChatColor.translateAlternateColorCodes('&', islandName) : islandName;
+        String coloredName = plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(islandName) : islandName;
 
         for(Player player : Bukkit.getOnlinePlayers())
             Locale.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);

@@ -77,7 +77,7 @@ public final class CmdAdminCount implements ISuperiorCommand {
 
         if(args.length == 3){
             if(!(sender instanceof Player)){
-                Locale.sendMessage(sender, "&cYou must be a player in order to open the counts menu.");
+                Locale.sendMessage(sender, "&cYou must be a player in order to open the counts menu.", true);
                 return;
             }
 

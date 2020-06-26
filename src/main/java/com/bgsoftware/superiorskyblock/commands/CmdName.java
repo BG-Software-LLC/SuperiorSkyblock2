@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -68,8 +68,10 @@ public final class CmdName implements ISuperiorCommand {
         }
 
         String islandName = args[1];
+        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+                StringUtils.translateColors(islandName) : islandName;
         String strippedName = plugin.getSettings().islandNamesColorSupport ?
-                ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', islandName)) : islandName;
+                StringUtils.stripColors(coloredName) : islandName;
 
         if(strippedName.length() > plugin.getSettings().islandNamesMaxLength){
             Locale.NAME_TOO_LONG.send(superiorPlayer);
@@ -97,9 +99,6 @@ public final class CmdName implements ISuperiorCommand {
         }
 
         island.setName(islandName);
-
-        String coloredName = plugin.getSettings().islandNamesColorSupport ?
-                ChatColor.translateAlternateColorCodes('&', islandName) : islandName;
 
         for(Player player : Bukkit.getOnlinePlayers())
             Locale.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);

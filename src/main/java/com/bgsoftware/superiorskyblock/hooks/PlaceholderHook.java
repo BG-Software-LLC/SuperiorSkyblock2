@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -332,9 +331,10 @@ public abstract class PlaceholderHook {
                     case "locked":
                         return island.isLocked() ? "Yes" : "No";
                     case "name":
-                        return plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+                        return plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName();
                     case "name_leader":
-                        return island.getName().isEmpty() ? island.getOwner().getName() : plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+                        return island.getName().isEmpty() ? island.getOwner().getName() : plugin.getSettings().islandNamesColorSupport ?
+                                StringUtils.translateColors(island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
                     case "is_member":

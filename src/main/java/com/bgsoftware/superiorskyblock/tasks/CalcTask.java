@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public final class CalcTask extends BukkitRunnable {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static int id = -1;
 
     private CalcTask(){
@@ -30,9 +30,9 @@ public final class CalcTask extends BukkitRunnable {
     private void announceToOps(String message){
         for(Player player : Bukkit.getOnlinePlayers()){
             if(player.isOp())
-                Locale.sendMessage(player, message);
+                Locale.sendMessage(player, message, true);
         }
-        Locale.sendMessage(Bukkit.getConsoleSender(), message);
+        Locale.sendMessage(Bukkit.getConsoleSender(), message, true);
     }
 
     private void announceToPlayers(boolean done){

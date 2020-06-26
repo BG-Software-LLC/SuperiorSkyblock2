@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -93,7 +92,7 @@ public final class MenuValues extends SuperiorMenu {
 
         menuValues.resetData();
 
-        menuValues.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menuValues.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuValues.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");

@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.UUID;
 
 //@formatter:off
 
@@ -132,6 +133,11 @@ public final class IntArrayTag extends Tag<int[]> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static IntArrayTag fromUUID(UUID uuid){
+        long MSB = uuid.getMostSignificantBits(), LSB = uuid.getLeastSignificantBits();
+        return new IntArrayTag(new int[]{(int)(MSB >> 32), (int)MSB, (int)(LSB >> 32), (int)LSB});
     }
 
 }

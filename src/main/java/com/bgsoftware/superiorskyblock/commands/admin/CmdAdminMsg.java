@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -72,9 +72,9 @@ public final class CmdAdminMsg implements ISuperiorCommand {
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = 3; i < args.length; i++)
-            stringBuilder.append(" ").append(ChatColor.translateAlternateColorCodes('&', args[i]));
+            stringBuilder.append(" ").append(StringUtils.translateColors(args[i]));
 
-        Locale.sendMessage(targetPlayer, stringBuilder.toString().substring(1));
+        Locale.sendMessage(targetPlayer, stringBuilder.toString().substring(1), false);
         Locale.MESSAGE_SENT.send(sender, targetPlayer.getName());
     }
 

@@ -57,7 +57,7 @@ public final class CmdMission implements ISuperiorCommand {
             String description = getDescription(LocaleUtils.getLocale(sender));
             if(description == null)
                 new NullPointerException("The description of the command " + getAliases().get(0) + " is null.").printStackTrace();
-            Locale.sendMessage(sender, description);
+            Locale.sendMessage(sender, description, false);
             return;
         }
 

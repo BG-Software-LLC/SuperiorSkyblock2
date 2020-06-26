@@ -9,7 +9,9 @@ import org.bukkit.ChatColor;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,14 +21,19 @@ public final class StringUtils {
     private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
     private static final char SPACE_ASCII = 160;
 
+    @SuppressWarnings("all")
     private static final Pattern STRIP_COLOR_PATTERN = Pattern.compile("(?i)(&|" + ChatColor.COLOR_CHAR + ")[0-9A-FK-OR]");
+    @SuppressWarnings("all")
+    private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("(&|§)(\\{HEX:([0-9A-Fa-f]*)\\})");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
+    private static final Pattern DECIMAL_PATTERN = Pattern.compile("(.*)\\.(\\d)0");
 
     private static NumberFormat numberFormatter;
 
     public static void setNumberFormatter(String numberFormat){
         numberFormat = numberFormat.replace("_", "-");
 
-        if(!Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$").matcher(numberFormat).matches()){
+        if(!NUMBER_PATTERN.matcher(numberFormat).matches()){
             SuperiorSkyblockPlugin.log("&cThe number format \"" + numberFormat + "\" is invalid. Using default one: en-US.");
             numberFormat = "en-US";
         }
@@ -74,7 +81,7 @@ public final class StringUtils {
             return s.replace(".00", "");
         }
 
-        else if((matcher = Pattern.compile("(.*)\\.(\\d)0").matcher(s)).matches()){
+        else if((matcher = DECIMAL_PATTERN.matcher(s)).matches()){
             return s.replaceAll("\\.(\\d)0", "." + matcher.group(2));
         }
 
@@ -201,10 +208,6 @@ public final class StringUtils {
         return RTL ? timeBuilder.substring(2) : timeBuilder.substring(0, timeBuilder.length() - 2);
     }
 
-    public static String stripColors(String str){
-        return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
-    }
-
     public static long parseLong(String str){
         try{
             return Long.parseLong(str);
@@ -215,6 +218,48 @@ public final class StringUtils {
 
     public static String format(java.util.Locale locale){
         return locale.getLanguage() + "-" + locale.getCountry();
+    }
+
+    public static String translateColors(String string){
+        String output = ChatColor.translateAlternateColorCodes('&', string);
+
+        if(ServerVersion.isLessThan(ServerVersion.v1_16))
+            return output;
+
+        Matcher matcher = HEX_COLOR_PATTERN.matcher(output);
+
+        if(matcher.find())
+            return matcher.replaceAll(parseHexColor(matcher.group(3)));
+
+        return output;
+    }
+
+    public static List<String> translateColors(List<String> list){
+        List<String> newList = new ArrayList<>(list.size());
+
+        for(String line : list)
+            newList.add(translateColors(line));
+
+        return newList;
+    }
+
+    public static String stripColors(String str){
+        return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
+    }
+
+    private static String parseHexColor(String hexColor){
+        if(hexColor.length() != 6 && hexColor.length() != 3)
+            return hexColor;
+
+        StringBuilder magic = new StringBuilder(ChatColor.COLOR_CHAR + "x");
+        int multiplier = hexColor.length() == 3 ? 2 : 1;
+
+        for(char ch : hexColor.toCharArray()) {
+            for(int i = 0; i < multiplier; i++)
+                magic.append(ChatColor.COLOR_CHAR).append(ch);
+        }
+
+        return magic.toString();
     }
 
 }

@@ -13,11 +13,12 @@ public enum ServerVersion {
     v1_12(112),
     v1_13(113),
     v1_14(114),
-    v1_15(115);
+    v1_15(115),
+    v1_16(116);
 
-    private static ServerVersion currentVersion;
-    private static String bukkitVersion;
-    private static boolean legacy;
+    private static final ServerVersion currentVersion;
+    private static final String bukkitVersion;
+    private static final boolean legacy;
 
     static {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
@@ -27,7 +28,7 @@ public enum ServerVersion {
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
-    private int code;
+    private final int code;
 
     ServerVersion(int code){
         this.code = code;

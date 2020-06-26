@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -543,7 +544,7 @@ public final class BlocksListener implements Listener {
             e.setLine(0, plugin.getSettings().visitorsSignActive);
 
             for (int i = 1; i <= 3; i++)
-                e.setLine(i, ChatColor.translateAlternateColorCodes('&', e.getLine(i)));
+                e.setLine(i, StringUtils.translateColors(e.getLine(i)));
 
             Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
             if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {

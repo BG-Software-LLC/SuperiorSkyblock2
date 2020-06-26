@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -17,7 +16,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -182,7 +180,7 @@ public final class SettingsHandler {
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = new KeySet(cfg.getStringList("stacked-blocks.whitelisted"));
-        stackedBlocksName = ChatColor.translateAlternateColorCodes('&', cfg.getString("stacked-blocks.custom-name"));
+        stackedBlocksName = StringUtils.translateColors(cfg.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = new KeyMap<>();
         cfg.getStringList("stacked-blocks.limits").forEach(line -> {
             String[] sections = line.split(":");
@@ -199,10 +197,10 @@ public final class SettingsHandler {
         islandTopOrder = cfg.getString("island-top-order", "WORTH");
         islandRolesSection = cfg.getConfigurationSection("island-roles");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
-        signWarp = colorize(cfg.getStringList("sign-warp"));
+        signWarp = StringUtils.translateColors(cfg.getStringList("sign-warp"));
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
-        visitorsSignActive = ChatColor.translateAlternateColorCodes('&', cfg.getString("visitors-sign.active", "&a[Welcome]"));
-        visitorsSignInactive = ChatColor.translateAlternateColorCodes('&', cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
+        visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
@@ -322,15 +320,6 @@ public final class SettingsHandler {
         cfg.save(file);
 
         plugin.setSettings(new SettingsHandler(plugin));
-    }
-
-    private List<String> colorize(List<String> list){
-        List<String> newList = new ArrayList<>();
-
-        for(String line : list)
-            newList.add(ChatColor.translateAlternateColorCodes('&', line));
-
-        return newList;
     }
 
     private void convertData(YamlConfiguration cfg){

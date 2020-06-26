@@ -1406,7 +1406,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message));
+                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message, false));
     }
 
     public void sendMessage(Locale message, List<UUID> ignoredMembers, Object... args){

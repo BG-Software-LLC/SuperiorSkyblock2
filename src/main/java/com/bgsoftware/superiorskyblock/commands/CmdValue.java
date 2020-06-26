@@ -105,7 +105,7 @@ public final class CmdValue implements ISuperiorCommand {
                 stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel))).append("\n");
         }
 
-        Locale.sendMessage(superiorPlayer, stringBuilder.toString());
+        Locale.sendMessage(superiorPlayer, stringBuilder.toString(), false);
     }
 
     @Override

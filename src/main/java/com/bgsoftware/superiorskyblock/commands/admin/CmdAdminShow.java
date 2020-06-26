@@ -190,7 +190,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
         if(!Locale.ISLAND_INFO_FOOTER.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_FOOTER.getMessage(locale));
 
-        Locale.sendMessage(sender, infoMessage.toString());
+        Locale.sendMessage(sender, infoMessage.toString(), false);
     }
 
     @Override

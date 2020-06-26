@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -51,16 +50,10 @@ public final class FileUtils {
         ItemBuilder itemBuilder = new ItemBuilder(type, data);
 
         if(section.contains("name"))
-            itemBuilder.withName(ChatColor.translateAlternateColorCodes('&', section.getString("name")));
+            itemBuilder.withName(StringUtils.translateColors(section.getString("name")));
 
-        if(section.contains("lore")){
-            List<String> lore = new ArrayList<>();
-
-            for(String line : section.getStringList("lore"))
-                lore.add(ChatColor.translateAlternateColorCodes('&', line));
-
-            itemBuilder.withLore(lore);
-        }
+        if(section.contains("lore"))
+            itemBuilder.withLore(section.getStringList("lore"));
 
         if(section.contains("enchants")){
             for(String _enchantment : section.getConfigurationSection("enchants").getKeys(false)) {
@@ -126,7 +119,7 @@ public final class FileUtils {
 
         menu.resetData();
 
-        menu.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menu.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menu.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");

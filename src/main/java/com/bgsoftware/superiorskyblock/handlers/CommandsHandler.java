@@ -180,7 +180,7 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
             SuperiorCommand command = getCommand(args[0]);
             if(command != null){
                 if(!(sender instanceof Player) && !command.canBeExecutedByConsole()){
-                    Locale.sendMessage(sender, "&cCan be executed only by players!");
+                    Locale.sendMessage(sender, "&cCan be executed only by players!", true);
                     return false;
                 }
 

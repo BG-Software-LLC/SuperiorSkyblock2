@@ -26,7 +26,6 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -80,7 +79,7 @@ public final class PlayersListener implements Listener {
     public void onPlayerJoinAdmin(PlayerJoinEvent e){
         if(e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")){
             Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion() + buildName), 5L);
+                    Locale.sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion() + buildName, true), 5L);
         }
     }
 
@@ -315,7 +314,7 @@ public final class PlayersListener implements Listener {
             return;
 
         String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
-                plugin.getSettings().islandNamesColorSupport ? ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName());
+                plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName());
 
         e.setFormat(e.getFormat()
                 .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
@@ -534,10 +533,6 @@ public final class PlayersListener implements Listener {
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 
-    }
-
-    private void sendMessage(Player player, String message){
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
 }

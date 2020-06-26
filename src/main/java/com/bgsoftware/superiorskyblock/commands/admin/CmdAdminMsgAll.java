@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -86,7 +85,7 @@ public final class CmdAdminMsgAll implements ISuperiorCommand {
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = 3; i < args.length; i++)
-            stringBuilder.append(" ").append(ChatColor.translateAlternateColorCodes('&', args[i]));
+            stringBuilder.append(" ").append(StringUtils.translateColors(args[i]));
 
         String message = stringBuilder.toString().substring(1);
 

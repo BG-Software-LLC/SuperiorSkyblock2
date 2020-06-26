@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryAction;
@@ -74,7 +73,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             if (island != null && islandOwner != null) {
                 String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
                         islandOwner.getName() : plugin.getSettings().islandNamesColorSupport ?
-                        ChatColor.translateAlternateColorCodes('&', island.getName()) : island.getName();
+                        StringUtils.translateColors(island.getName()) : island.getName();
 
                 itemBuilder.replaceName("{0}", islandName)
                         .replaceName("{1}", String.valueOf(place))
@@ -243,7 +242,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
         menuTopIslands.resetData();
 
-        menuTopIslands.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menuTopIslands.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuTopIslands.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");

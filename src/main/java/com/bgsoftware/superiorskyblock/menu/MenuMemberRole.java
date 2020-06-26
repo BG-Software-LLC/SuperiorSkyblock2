@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -77,7 +76,7 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         menuMemberRole.resetData();
 
-        menuMemberRole.setTitle(ChatColor.translateAlternateColorCodes('&', cfg.getString("title", "")));
+        menuMemberRole.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuMemberRole.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
 
         List<String> pattern = cfg.getStringList("pattern");

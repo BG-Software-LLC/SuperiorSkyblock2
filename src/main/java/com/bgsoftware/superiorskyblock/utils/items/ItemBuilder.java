@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 import org.bukkit.ChatColor;
@@ -57,7 +58,7 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withName(String name){
-        itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        itemMeta.setDisplayName(StringUtils.translateColors(name));
         return this;
     }
 
@@ -68,36 +69,22 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withLore(List<String> lore){
-        List<String> loreList = new ArrayList<>();
-
-        for(String line : lore){
-            loreList.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-
-        itemMeta.setLore(loreList);
+        itemMeta.setLore(StringUtils.translateColors(lore));
         return this;
     }
 
     public ItemBuilder withLore(String... lore){
-        List<String> loreList = new ArrayList<>();
-
-        for(String line : lore){
-            loreList.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-
-        itemMeta.setLore(loreList);
-        return this;
+        return withLore(Arrays.asList(lore));
     }
 
     public ItemBuilder withLore(String firstLine, List<String> listLine){
         List<String> loreList = new ArrayList<>();
 
-        firstLine = ChatColor.translateAlternateColorCodes('&', firstLine);
+        firstLine = StringUtils.translateColors(firstLine);
         loreList.add(firstLine);
 
-        for(String line : listLine){
-            loreList.add(ChatColor.getLastColors(firstLine) + ChatColor.translateAlternateColorCodes('&', line));
-        }
+        for(String line : listLine)
+            loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(line));
 
         if(loreList.size() > 10){
             for(int i = 10; i < loreList.size(); i++){
@@ -113,12 +100,12 @@ public final class ItemBuilder implements Cloneable {
     public ItemBuilder withLore(String firstLine, ConfigurationSection configurationSection){
         List<String> loreList = new ArrayList<>();
 
-        firstLine = ChatColor.translateAlternateColorCodes('&', firstLine);
+        firstLine = StringUtils.translateColors(firstLine);
         loreList.add(firstLine);
 
         for(String section : configurationSection.getKeys(false)){
             section = section + ": " + configurationSection.get(section).toString();
-            loreList.add(ChatColor.getLastColors(firstLine) + ChatColor.translateAlternateColorCodes('&', section));
+            loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(section));
         }
 
         if(loreList.size() > 16){

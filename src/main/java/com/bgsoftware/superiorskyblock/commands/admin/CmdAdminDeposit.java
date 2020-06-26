@@ -62,7 +62,7 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if(!EconomyHook.isVaultEnabled()){
-            Locale.sendMessage(sender, "&cServer doesn't have vault installed so island banks are disabled.");
+            Locale.sendMessage(sender, "&cServer doesn't have vault installed so island banks are disabled.", true);
             return;
         }
 

@@ -68,7 +68,7 @@ public final class CmdTeam implements ISuperiorCommand {
 
         if(args.length == 1){
             if(!(sender instanceof Player)){
-                Locale.sendMessage(sender, "&cYou must specify a player's name.");
+                Locale.sendMessage(sender, "&cYou must specify a player's name.", true);
                 return;
             }
 
@@ -126,7 +126,7 @@ public final class CmdTeam implements ISuperiorCommand {
             if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage(locale));
 
-            Locale.sendMessage(sender, infoMessage.toString());
+            Locale.sendMessage(sender, infoMessage.toString(), false);
         });
     }
 
