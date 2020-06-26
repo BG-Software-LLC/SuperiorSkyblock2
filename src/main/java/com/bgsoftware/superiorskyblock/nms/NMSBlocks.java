@@ -31,6 +31,10 @@ public interface NMSBlocks {
 
     int getCombinedId(Location location);
 
+    default int getCombinedId(Material material, byte data){
+        return 0;
+    }
+
     default int compareMaterials(Material o1, Material o2){
         return Integer.compare(o1.ordinal(), o2.ordinal());
     }

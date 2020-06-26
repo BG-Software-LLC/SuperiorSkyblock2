@@ -193,6 +193,11 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
     }
 
     @Override
+    public int getCombinedId(Material material, byte data) {
+        return Block.getCombinedId(CraftMagicNumbers.getBlock(material, data));
+    }
+
+    @Override
     public int compareMaterials(Material o1, Material o2) {
         if(o1.isBlock() && o2.isBlock()) {
             int firstMaterial = Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData());

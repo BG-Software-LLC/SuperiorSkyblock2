@@ -165,9 +165,15 @@ public final class SchematicsHandler implements SchematicManager {
                 for(int y = 0; y <= ySize; y++){
                     int _x = x + min.getBlockX(), _y = y + min.getBlockY(),  _z = z + min.getBlockZ();
                     Block block = world.getBlockAt(_x, _y, _z);
+                    Material blockType = block.getType();
 
-                    if(block.getType() != Material.AIR) {
-                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z)).withCombinedId(getCombinedId(block));
+                    if(blockType != Material.AIR) {
+                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z));
+
+                        if(ServerVersion.isLegacy())
+                            tagBuilder.withCombinedId(getCombinedId(block));
+                        else
+                            tagBuilder.withMaterialAndData(blockType, block.getData());
 
                         if(block.getState() instanceof Banner){
                             tagBuilder.applyBanner((Banner) block.getState());

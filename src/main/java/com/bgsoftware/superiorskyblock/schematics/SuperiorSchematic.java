@@ -85,6 +85,19 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     int data = ((IntTag) compoundValue.get("data")).getValue();
                     combinedId = id + (data << 12);
                 }
+                else if(compoundValue.containsKey("type")){
+                    Material type;
+
+                    try{
+                        type = Material.valueOf(((StringTag) compoundValue.get("type")).getValue());
+                    }catch (Exception ignored){
+                        continue;
+                    }
+
+                    int data = ((IntTag) compoundValue.getOrDefault("data", new IntTag(0))).getValue();
+
+                    combinedId = plugin.getNMSBlocks().getCombinedId(type, (byte) data);
+                }
                 else{
                     SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + x + ", " + y + ", " + z + " - skipping...");
                     continue;

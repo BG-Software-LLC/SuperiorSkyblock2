@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Banner;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
@@ -39,6 +40,18 @@ public final class TagBuilder {
 
     public TagBuilder withCombinedId(int combinedId){
         compoundValue.add("combinedId", new IntTag(combinedId));
+        return this;
+    }
+
+    public TagBuilder withMaterialAndData(Material material, byte data){
+        compoundValue.add("type", new StringTag(material.name()));
+        if(data > 0)
+            compoundValue.add("data", new IntTag(data));
+        return this;
+    }
+
+    public TagBuilder applyTileEntity(CompoundTag tileEntity){
+        compoundValue.add("tileEntity", tileEntity);
         return this;
     }
 
