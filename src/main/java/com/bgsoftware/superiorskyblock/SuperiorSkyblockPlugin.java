@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -208,10 +209,22 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         .filter(Objects::nonNull).collect(Collectors.toList());
 
                 if(!islandList.isEmpty()) {
-                    StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
-                    islandStatusHolder.prepareBatch();
-                    islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
-                    islandStatusHolder.execute(false);
+                    {
+                        StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
+                        islandStatusHolder.prepareBatch();
+                        islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
+                        islandStatusHolder.execute(false);
+                    }
+                    {
+                        StatementHolder islandCountsHolder = Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder();
+                        islandCountsHolder.prepareBatch();
+                        islandList.forEach(island -> islandCountsHolder
+                                .setString(IslandSerializer.serializeBlockCounts(((SIsland) island).getRawBlockCounts()))
+                                .setString(island.getOwner().getUniqueId() + "")
+                                .addBatch()
+                        );
+                        islandCountsHolder.execute(false);
+                    }
                 }
 
                 players.forEach(player -> {
