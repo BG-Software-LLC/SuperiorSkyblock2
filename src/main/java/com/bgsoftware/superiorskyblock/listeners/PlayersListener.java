@@ -411,8 +411,11 @@ public final class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
-        World.Environment environment = e.getPlayer().getWorld().getEnvironment() != World.Environment.NORMAL ?
-                World.Environment.NORMAL : e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? World.Environment.NETHER : World.Environment.THE_END;
+        World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
+                World.Environment.NETHER : World.Environment.THE_END;
+
+        if(environment == e.getPlayer().getWorld().getEnvironment())
+            environment = World.Environment.NORMAL;
 
         if(((SSuperiorPlayer) superiorPlayer).isImmunedToTeleport())
             return;
