@@ -1779,7 +1779,13 @@ public final class SIsland extends DatabaseObject implements Island {
         BigDecimalFormatted islandWorth = this.islandWorth.get(), islandBank = this.islandBank.get(), bonusWorth = this.bonusWorth.get();
         //noinspection BigDecimalMethodWithoutRoundingCalled
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
-        return finalIslandWorth.add(bonusWorth);
+
+        finalIslandWorth = finalIslandWorth.add(bonusWorth);
+
+        if(!plugin.getSettings().negativeWorth && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
+            finalIslandWorth = BigDecimalFormatted.of(0);
+
+        return finalIslandWorth;
     }
 
     @Override
@@ -1851,6 +1857,9 @@ public final class SIsland extends DatabaseObject implements Island {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
 
+        if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
+            islandLevel = BigDecimalFormatted.of(0);
+
         return islandLevel;
     }
 
@@ -1861,6 +1870,9 @@ public final class SIsland extends DatabaseObject implements Island {
         if(plugin.getSettings().roundedIslandLevel) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
+
+        if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
+            islandLevel = BigDecimalFormatted.of(0);
 
         return islandLevel;
     }

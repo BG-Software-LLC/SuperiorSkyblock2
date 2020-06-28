@@ -128,6 +128,8 @@ public final class SettingsHandler {
     public final boolean generators;
     public final boolean obsidianToLava;
     public final boolean syncWorth;
+    public final boolean negativeWorth;
+    public final boolean negativeLevel;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -302,6 +304,8 @@ public final class SettingsHandler {
         generators = cfg.getBoolean("generators", true);
         obsidianToLava = cfg.getBoolean("obsidian-to-lava", false);
         syncWorth = cfg.getBoolean("sync-worth", false);
+        negativeWorth = cfg.getBoolean("negative-worth", true);
+        negativeLevel = cfg.getBoolean("negative-level", true);
     }
 
     public void updateValue(String path, Object value){

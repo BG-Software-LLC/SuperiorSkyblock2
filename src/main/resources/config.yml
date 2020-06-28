@@ -552,3 +552,9 @@ obsidian-to-lava: false
 # Should the worth values be synced with other prices providers?
 # Supported Providers: ShopGUIPlus
 sync-worth: false
+
+# Can the worth value of the island be negative?
+negative-worth: true
+
+# Can the level of the island be negative?
+negative-level: true
