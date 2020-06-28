@@ -115,6 +115,7 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     private final SyncedObject<Boolean> beingRecalculated = SyncedObject.of(false);
+    private boolean rawKeyPlacements = true;
 
     /*
      * Island data
@@ -189,6 +190,8 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
+
+        rawKeyPlacements = false;
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -1629,21 +1632,23 @@ public final class SIsland extends DatabaseObject implements Island {
         int currentAmount = blockCounts.getRaw(valueKey, 0);
         blockCounts.put(valueKey, currentAmount + amount);
 
-        Key limitKey = blockLimits.getKey(valueKey);
-        Key globalKey = Key.of(valueKey.getGlobalKey());
-        boolean limitCount = false;
+        if(!rawKeyPlacements) {
+            Key limitKey = blockLimits.getKey(valueKey);
+            Key globalKey = Key.of(valueKey.getGlobalKey());
+            boolean limitCount = false;
 
-        if (!limitKey.equals(valueKey)) {
-            currentAmount = blockCounts.getRaw(limitKey, 0);
-            blockCounts.put(limitKey, currentAmount + amount);
-            limitCount = true;
-        }
+            if (!limitKey.equals(valueKey)) {
+                currentAmount = blockCounts.getRaw(limitKey, 0);
+                blockCounts.put(limitKey, currentAmount + amount);
+                limitCount = true;
+            }
 
-        if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
-                        plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
-            currentAmount = blockCounts.getRaw(globalKey, 0);
-            blockCounts.put(globalKey, currentAmount + amount);
+            if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
+                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                currentAmount = blockCounts.getRaw(globalKey, 0);
+                blockCounts.put(globalKey, currentAmount + amount);
+            }
         }
     }
 
@@ -1751,6 +1756,10 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public Map<Key, Integer> getBlockCounts() {
         return blockCounts.readAndGet(blockCounts -> new HashMap<>(blockCounts.asKeyMap()));
+    }
+
+    public KeyMap<Integer> getRawBlockCounts(){
+        return blockCounts.readAndGet(KeyMap::new);
     }
 
     @Override
