@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -78,6 +79,12 @@ public interface MenusManager {
      * @param playerRole The target role to see their permissions.
      */
     void openIslandPermissionsMenu(SuperiorPlayer superiorPlayer, Island island, PlayerRole playerRole);
+
+    /**
+     * Update the island permission in the menu.
+     * @param islandPrivilege The permission to update.
+     */
+    void updatePermission(IslandPrivilege islandPrivilege);
 
     /**
      * Open the island permissions menu for a player.

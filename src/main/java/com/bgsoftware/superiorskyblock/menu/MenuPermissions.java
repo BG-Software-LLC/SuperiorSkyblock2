@@ -229,20 +229,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             if(permissionsSection.getBoolean(key + ".display-menu", false)) {
                 try {
                     String permission = key.toLowerCase();
-                    IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permission);
-                    ConfigurationSection permissionSection = permissionsSection.getConfigurationSection(permission);
-                    menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
-                    menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
-                    menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
-                    menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
-                    menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
-                    menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
-                    if (permissionSection.contains("role-permission")) {
-                        menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
-                    }
-                    islandPermissions.add(islandPrivilege);
-                } catch (Exception ignored) {
-                }
+                    updatePermission(IslandPrivilege.getByName(permission), cfg);
+                }catch (Exception ignored){}
             }
         }
 
@@ -262,6 +250,29 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
     public static void refreshMenus(){
         SuperiorMenu.refreshMenus(MenuPermissions.class);
+    }
+
+    public static void updatePermission(IslandPrivilege islandPrivilege){
+        File file = new File(plugin.getDataFolder(), "menus/permissions.yml");
+        updatePermission(islandPrivilege, CommentedConfiguration.loadConfiguration(file));
+    }
+
+    public static void updatePermission(IslandPrivilege islandPrivilege, YamlConfiguration cfg){
+        if(!islandPermissions.contains(islandPrivilege)) {
+            MenuPermissions menuPermissions = new MenuPermissions(null, null, null);
+            String permission = islandPrivilege.getName().toLowerCase();
+            ConfigurationSection permissionSection = cfg.getConfigurationSection("permissions." + permission);
+            menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
+            menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
+            menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
+            menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
+            menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
+            menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
+            if (permissionSection.contains("role-permission")) {
+                menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
+            }
+            islandPermissions.add(islandPrivilege);
+        }
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){
