@@ -356,6 +356,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   &e&lIle | &7Améliorations:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIle | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lIsland | &7Warps Limit: {0}'
 ISLAND_INFO_BANK: '&e&lIle | &7Banque: {0}'
 ISLAND_INFO_BONUS: '&e&lIle | &7Bonus de Valeur: {0}'
 ISLAND_INFO_BONUS_LEVEL: '&e&lIle | &7Bonus de Niveau: {0}'

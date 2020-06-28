@@ -413,6 +413,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   &e&lNâng cấp | &7Các Nâng Cấp:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lNâng cấp | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lIsland | &7Warps Limit: {0}'
 ISLAND_INFO_BANK: '&e&lĐảo Thần | &7Ngân hàng: {0}'
 ISLAND_INFO_BONUS: '&e&lĐảo Thần | &7Giá trị đi kèm: {0}'
 ISLAND_INFO_BONUS_LEVEL: '&e&lĐảo Thần | &7Cấp độ đi kèm: {0}'
