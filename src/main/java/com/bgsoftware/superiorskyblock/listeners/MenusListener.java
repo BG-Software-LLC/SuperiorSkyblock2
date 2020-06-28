@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -168,7 +169,11 @@ public final class MenusListener implements Listener {
         }
 
         Executor.sync(() -> {
-            int page = SuperiorMenuSettings.lastPage.remove(e.getPlayer().getUniqueId());
+            Integer page = SuperiorMenuSettings.lastPage.remove(e.getPlayer().getUniqueId());
+
+            if(page == null)
+                page = 1;
+
             SuperiorMenuSettings.openInventory(SSuperiorPlayer.of(e.getPlayer()), null, Math.max(1, page));
             SuperiorMenuSettings.configValues.remove(e.getPlayer().getUniqueId());
         });

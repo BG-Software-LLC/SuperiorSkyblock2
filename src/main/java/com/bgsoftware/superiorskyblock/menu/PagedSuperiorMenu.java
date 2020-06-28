@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -17,6 +18,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     private final boolean acceptNull;
     private List<T> objects;
     protected int currentPage = 1;
+    protected Consumer<SuperiorPlayer> onPageMove = null;
 
     public PagedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
         this(identifier, superiorPlayer, false);
@@ -92,6 +94,9 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
             currentPage = isNextSlot ? currentPage + 1 : currentPage - 1;
 
+            if(onPageMove != null)
+                onPageMove.accept(superiorPlayer);
+
             previousMove = false;
             open(previousMenu);
         }
@@ -125,6 +130,10 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     }
 
     protected abstract List<T> requestObjects();
+
+    protected void setPageMoveRunnable(Consumer<SuperiorPlayer> onPageMove){
+        this.onPageMove = onPageMove;
+    }
 
     public void setCurrentSlot(List<Integer> currentSlot){
         addData("currentSlot", currentSlot);

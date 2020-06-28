@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,11 +35,13 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
             "worlds.normal-world", "commands-cooldown", "starter-chest", "event-commands" };
     public static final Map<UUID, String> configValues = new HashMap<>();
     public static final Map<UUID, Integer> lastPage = new HashMap<>();
+    public static final Set<UUID> pageMove = new HashSet<>();
 
     public static CommentedConfiguration config;
 
     private SuperiorMenuSettings(SuperiorPlayer superiorPlayer){
         super("menuConfigSettings", superiorPlayer, true);
+        setPageMoveRunnable(_superiorPlayer -> pageMove.add(_superiorPlayer.getUniqueId()));
     }
 
     @Override
@@ -48,7 +52,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
             Executor.async(() -> {
                 saveConfiguration();
                 player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Saved configuration successfully.");
-                player.closeInventory();
+                Executor.sync(player::closeInventory);
             });
             return;
         }
@@ -79,7 +83,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     @Override
     public void closeInventory(SuperiorPlayer superiorPlayer) {
         super.closeInventory(superiorPlayer);
-        if(!configValues.containsKey(superiorPlayer.getUniqueId())) {
+        if(!pageMove.remove(superiorPlayer.getUniqueId()) && !configValues.containsKey(superiorPlayer.getUniqueId())) {
             reloadConfiguration();
             lastPage.remove(superiorPlayer.getUniqueId());
         }
