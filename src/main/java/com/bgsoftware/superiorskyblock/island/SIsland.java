@@ -2285,7 +2285,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasMoreWarpSlots() {
-        return warps.size() < this.warpsLimit.get();
+        return warps.size() < getWarpsLimit();
     }
 
     /*
