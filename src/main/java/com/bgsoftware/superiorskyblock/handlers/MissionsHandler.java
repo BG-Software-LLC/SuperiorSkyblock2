@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -214,15 +215,23 @@ public final class MissionsHandler implements MissionsManager {
 
     @Override
     public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
+        rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, null);
+    }
+
+    @Override
+    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, Consumer<Boolean> result) {
         if(Bukkit.isPrimaryThread()){
-            Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward));
+            Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
             return;
         }
 
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
-        if(!missionDataOptional.isPresent())
+        if(!missionDataOptional.isPresent()) {
+            if(result != null)
+                result.accept(false);
             return;
+        }
 
         SuperiorSkyblockPlugin.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
 
@@ -233,20 +242,29 @@ public final class MissionsHandler implements MissionsManager {
             if (!forceReward) {
                 if (!canCompleteAgain(superiorPlayer, mission)) {
                     mission.onCompleteFail(superiorPlayer);
+                    if(result != null)
+                        result.accept(false);
                     return;
                 }
 
-                if (!canComplete(superiorPlayer, mission))
+                if (!canComplete(superiorPlayer, mission)) {
+                    if(result != null)
+                        result.accept(false);
                     return;
+                }
 
                 if (missionData.islandMission && playerIsland == null) {
                     mission.onCompleteFail(superiorPlayer);
+                    if(result != null)
+                        result.accept(false);
                     throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
                 }
 
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
                         Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        if(result != null)
+                            result.accept(false);
                         return;
                     }
                 }
@@ -267,6 +285,8 @@ public final class MissionsHandler implements MissionsManager {
             if (event.isCancelled()) {
                 if (!forceReward)
                     mission.onCompleteFail(superiorPlayer);
+                if(result != null)
+                    result.accept(false);
                 return;
             }
 
@@ -279,6 +299,9 @@ public final class MissionsHandler implements MissionsManager {
             } else {
                 superiorPlayer.completeMission(mission);
             }
+
+            if(result != null)
+                result.accept(true);
 
             for (ItemStack itemStack : event.getResult().getKey()) {
                 ItemStack toGive = new ItemBuilder(itemStack)

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public interface MissionsManager {
 
@@ -93,6 +94,16 @@ public interface MissionsManager {
      * @param forceReward Should the plugin force the reward to the player (no checks will be ran)
      */
     void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward);
+
+    /**
+     * Reward a player for completing a specific mission.
+     * @param mission The mission that was completed.
+     * @param superiorPlayer The player to reward.
+     * @param checkAutoReward Whether or not the auto reward flag should be checked.
+     * @param forceReward Should the plugin force the reward to the player (no checks will be ran)
+     * @param result The result of the reward.
+     */
+    void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, Consumer<Boolean> result);
 
     /**
      * Save all data related to missions.

@@ -46,9 +46,12 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
             sound.playSound(superiorPlayer.asPlayer());
 
         if(canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)){
-            plugin.getMissions().rewardMission(mission, superiorPlayer, false);
-            previousMove = false;
-            open(previousMenu);
+            plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {
+               if(result){
+                   previousMove = false;
+                   openInventory(superiorPlayer, previousMenu);
+               }
+            });
         }
     }
 
