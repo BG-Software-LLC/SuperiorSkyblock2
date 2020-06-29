@@ -2376,7 +2376,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
-        return completedMissions.containsKey(mission);
+        return completedMissions.get(mission, 0) > 0;
     }
 
     @Override
