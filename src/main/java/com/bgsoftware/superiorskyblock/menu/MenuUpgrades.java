@@ -62,11 +62,15 @@ public final class MenuUpgrades extends SuperiorMenu {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
             if(upgradeLevel != null){
+                UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
+
                 double nextLevelPrice = upgradeLevel.getPrice();
+                String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
+
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice ?
-                            itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
+                    boolean nextLevel = EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice && (permission.isEmpty() || superiorPlayer.hasPermission(permission));
+                    inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }
             }
         }
