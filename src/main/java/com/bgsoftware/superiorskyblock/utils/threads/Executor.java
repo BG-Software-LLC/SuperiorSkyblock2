@@ -75,11 +75,30 @@ public final class Executor {
         try{
             shutdown = true;
             System.out.println("Shutting down database executor");
-            databaseExecutor.shutdown();
-            System.out.println("Waiting for database executor...");
-            databaseExecutor.awaitTermination(1, TimeUnit.MINUTES);
+//            databaseExecutor.shutdown();
+//            System.out.println("Waiting for database executor...");
+//            databaseExecutor.awaitTermination(1, TimeUnit.MINUTES);
+            shutdownAndAwaitTermination();
         }catch(Exception ex){
             ex.printStackTrace();
+        }
+    }
+
+    private static void shutdownAndAwaitTermination() {
+        databaseExecutor.shutdown(); // Disable new tasks from being submitted
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!databaseExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                databaseExecutor.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!databaseExecutor.awaitTermination(60, TimeUnit.SECONDS))
+                    System.err.println("Pool did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            databaseExecutor.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
         }
     }
 

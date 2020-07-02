@@ -179,13 +179,11 @@ public final class SQLHelper {
         }
     }
 
-    public static void commit(){
+    public static void commit() throws SQLException{
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
             conn.commit();
-        }catch(SQLException ex){
-            ex.printStackTrace();
         } finally {
             close(conn);
         }
