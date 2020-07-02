@@ -1259,4 +1259,10 @@ public interface Island extends Comparable<Island> {
      */
     String getSchematicName();
 
+    /*
+     *  Island top methods
+     */
+
+    int getPosition(SortingType sortingType);
+
 }

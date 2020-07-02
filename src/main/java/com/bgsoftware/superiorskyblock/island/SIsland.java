@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -2675,6 +2676,15 @@ public final class SIsland extends DatabaseObject implements Island {
     public String getSchematicName() {
         String schemName = this.schemName.get();
         return schemName == null ? "" : schemName;
+    }
+
+    /*
+     *  Island top methods
+     */
+
+    @Override
+    public int getPosition(SortingType sortingType) {
+        return plugin.getGrid().getIslandPosition(this, sortingType);
     }
 
     /*

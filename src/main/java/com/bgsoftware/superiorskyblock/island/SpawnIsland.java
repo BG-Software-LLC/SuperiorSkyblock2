@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -1106,6 +1107,11 @@ public final class SpawnIsland implements Island {
     @Override
     public String getSchematicName() {
         return "";
+    }
+
+    @Override
+    public int getPosition(SortingType sortingType) {
+        return -1;
     }
 
     @SuppressWarnings("NullableProblems")
