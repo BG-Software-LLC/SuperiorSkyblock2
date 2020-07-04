@@ -288,14 +288,13 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
                     for (ChunkSection chunkSection : chunk.getSections()) {
                         if (chunkSection != Chunk.a && chunkSection.d()) {
                             for (int i = 0; i < chunkRandomTickSpeed; i++) {
-                                random = random * 3 + 1013904223;
-                                int factor = random >> 2;
-                                int x = factor & 15;
-                                int z = factor >> 8 & 15;
-                                int y = factor >> 16 & 15;
-                                IBlockData blockData = chunkSection.getType(x, y, z);
+                                BlockPosition blockPosition = chunkWorld.a(chunkX, chunkSection.getYPosition(),chunkZ, 15);
+                                IBlockData blockData = chunkSection.getType(
+                                        blockPosition.getX() - chunkX,
+                                        blockPosition.getY() - chunkSection.getYPosition(),
+                                        blockPosition.getZ() - chunkZ);
                                 if (blockData.q() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(blockData.getBlock()).name())) {
-                                    blocksToTick.add(new BiPair<>(chunkWorld, new BlockPosition(x + chunkX, y + chunkSection.getYPosition(), z + chunkZ), blockData));
+                                    blocksToTick.add(new BiPair<>(chunkWorld, blockPosition, blockData));
                                 }
                             }
                         }
@@ -304,8 +303,14 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             }
         }
 
-        Executor.sync(() -> blocksToTick.forEach(pair ->
-                pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current())));
+        Executor.sync(() -> blocksToTick.forEach(pair -> {
+            Block block = pair.getZ().getBlock();
+            if(!Fields.BLOCK_RANDOM_TICK.isNull())
+                Fields.BLOCK_RANDOM_TICK.set(block, true);
+            pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current());
+            if(!Fields.BLOCK_RANDOM_TICK.isNull())
+                Fields.BLOCK_RANDOM_TICK.set(block, false);
+        }));
 
         return random;
     }

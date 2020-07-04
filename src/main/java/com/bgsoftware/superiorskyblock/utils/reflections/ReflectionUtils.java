@@ -18,6 +18,7 @@ public final class ReflectionUtils {
     public static boolean init() {
         try {
             Class<?> blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
+                    blockClass = getClass("net.minecraft.server.VERSION.Block"),
                     craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
                     biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid"),
                     chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection");
@@ -50,6 +51,10 @@ public final class ReflectionUtils {
                 fieldsMap.add(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
                 fieldsMap.add(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
             }
+
+            try{
+                fieldsMap.add(Fields.BLOCK_RANDOM_TICK, getField(blockClass, "randomTick"));
+            }catch (Throwable ignored){}
 
             return true;
         }catch(RuntimeException ex){

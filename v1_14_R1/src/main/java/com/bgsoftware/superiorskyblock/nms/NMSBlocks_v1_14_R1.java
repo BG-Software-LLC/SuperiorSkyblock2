@@ -309,8 +309,14 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
             }
         }
 
-        Executor.sync(() -> blocksToTick.forEach(pair ->
-                pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current())));
+        Executor.sync(() -> blocksToTick.forEach(pair -> {
+            Block block = pair.getZ().getBlock();
+            if(!Fields.BLOCK_RANDOM_TICK.isNull())
+                Fields.BLOCK_RANDOM_TICK.set(block, true);
+            pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current());
+            if(!Fields.BLOCK_RANDOM_TICK.isNull())
+                Fields.BLOCK_RANDOM_TICK.set(block, false);
+        }));
 
         return random;
     }

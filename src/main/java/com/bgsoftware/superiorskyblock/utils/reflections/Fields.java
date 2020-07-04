@@ -8,6 +8,7 @@ public enum Fields {
     BIOME_GRID_BIOME_STORAGE,
 
     BLOCK_FLOWER_POT_CONTENT,
+    BLOCK_RANDOM_TICK,
 
     CHUNK_SECTION_BLOCK_IDS,
     CHUNK_SECTION_EMITTED_LIGHT,
@@ -41,6 +42,11 @@ public enum Fields {
     private void ensureNotNull(){
         if(field == null)
             field = ReflectionUtils.getFromFields(this);
+    }
+
+    public boolean isNull(){
+        ensureNotNull();
+        return field == null;
     }
 
 }
