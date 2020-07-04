@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,6 +41,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -213,6 +213,19 @@ public final class BlocksListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityChangeBlockMonitor(EntityChangeBlockEvent e){
+        if(plugin != null && plugin.getGrid() != null) {
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            if(island != null) {
+                island.handleBlockBreak(e.getBlock(), 1);
+                if(e.getTo() != Material.AIR)
+                    //noinspection deprecation
+                    island.handleBlockPlace(Key.of(e.getTo(), e.getData()), 1);
+            }
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockRedstone(BlockRedstoneEvent e){
         if(!plugin.getSettings().disableRedstoneOffline)
@@ -276,6 +289,12 @@ public final class BlocksListener implements Listener {
         Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
         if(tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockUnstack(EntityChangeBlockEvent e){
+        if(tryUnstack(null, e.getBlock(), plugin))
             e.setCancelled(true);
     }
 
