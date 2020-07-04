@@ -47,8 +47,9 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(MergedSpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null && e.getPlayer().isSneaking())
-                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), e.getPlayer().getItemInHand().getAmount() - 1);
+            int increaseAmount = e.getAmount() - e.getSpawnerCount();
+            if(island != null && increaseAmount > 1)
+                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), increaseAmount - 1);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
