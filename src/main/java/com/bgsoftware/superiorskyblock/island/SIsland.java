@@ -1707,7 +1707,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
             blockCounts.write(blockCounts -> {
                 Key valueKey = plugin.getBlockValues().getBlockKey(key);
-                removeCounts(blockCounts, key, amount);
+                removeCounts(blockCounts, valueKey, amount);
 
                 Key limitKey = blockLimits.getKey(valueKey);
                 Key globalKey = Key.of(valueKey.getGlobalKey());
