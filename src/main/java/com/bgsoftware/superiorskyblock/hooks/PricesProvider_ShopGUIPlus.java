@@ -18,7 +18,11 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
         double price = 0;
 
         Material material = Material.matchMaterial(key.getGlobalKey());
-        short data = !key.getSubKey().isEmpty() ? Short.parseShort(key.getSubKey()) : 0;
+        short data = 0;
+
+        try{
+            data = Short.parseShort(key.getSubKey());
+        }catch (Throwable ignored){}
 
         Map<String, Shop> shops = plugin.getShopManager().shops;
         for(Shop shop : shops.values()){
