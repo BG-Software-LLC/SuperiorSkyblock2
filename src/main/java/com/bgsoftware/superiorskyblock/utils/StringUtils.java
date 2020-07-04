@@ -90,15 +90,15 @@ public final class StringUtils {
 
     public static String fancyFormat(BigDecimal bigDecimal, java.util.Locale locale){
         double d = bigDecimal.doubleValue();
-        if(d > Q)
+        if(d >= Q)
             return format((d / Q)) + Locale.FORMAT_QUAD.getMessage(locale);
-        else if(d > T)
+        else if(d >= T)
             return format((d / T)) + Locale.FORMAT_TRILLION.getMessage(locale);
-        else if(d > B)
+        else if(d >= B)
             return format((d / B)) + Locale.FORMAT_BILLION.getMessage(locale);
-        else if(d > M)
+        else if(d >= M)
             return format((d / M)) + Locale.FORMAT_MILLION.getMessage(locale);
-        else if(d > K)
+        else if(d >= K)
             return format((d / K)) + Locale.FORMAT_THOUSANDS.getMessage(locale);
         else
             return format(d);
