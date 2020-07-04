@@ -53,7 +53,7 @@ public final class ReflectionUtils {
             }
 
             try{
-                fieldsMap.add(Fields.BLOCK_RANDOM_TICK, getField(blockClass, "randomTick"));
+                fieldsMap.add(Fields.BLOCK_RANDOM_TICK, getFieldWithError(blockClass, "randomTick"));
             }catch (Throwable ignored){}
 
             return true;
@@ -103,13 +103,17 @@ public final class ReflectionUtils {
 
     private static Field getField(Class<?> clazz, String fieldName){
         try{
-            Field field =  clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field;
+            return getFieldWithError(clazz, fieldName);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("&cCouldn't find the field " + fieldName + " - Please contact Ome_R!");
             throw new RuntimeException();
         }
+    }
+
+    private static Field getFieldWithError(Class<?> clazz, String fieldName) throws Exception{
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field;
     }
 
 }
