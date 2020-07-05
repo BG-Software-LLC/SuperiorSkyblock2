@@ -25,7 +25,18 @@ public final class CmdAdmin implements ISuperiorCommand {
     public CmdAdmin(CommandsHandler commandsHandler){
         this.commandsHandler = commandsHandler;
         registerCommand(new CmdAdminAdd(), false);
-        registerCommand(new CmdAdminBonus(), false);
+        registerCommand(new CmdAdminAddBlockLimit(), false);
+        registerCommand(new CmdAdminAddBonus(), false);
+        registerCommand(new CmdAdminAddCoopLimit(), false);
+        registerCommand(new CmdAdminAddCropGrowth(), false);
+        registerCommand(new CmdAdminAddDisbands(), false);
+        registerCommand(new CmdAdminAddEntityLimit(), false);
+        registerCommand(new CmdAdminAddGenerator(), false);
+        registerCommand(new CmdAdminAddMobDrops(), false);
+        registerCommand(new CmdAdminAddSize(), false);
+        registerCommand(new CmdAdminAddSpawnerRates(), false);
+        registerCommand(new CmdAdminAddTeamLimit(), false);
+        registerCommand(new CmdAdminAddWarpsLimit(), false);
         registerCommand(new CmdAdminBypass(), false);
         registerCommand(new CmdAdminClearGenerator(), false);
         registerCommand(new CmdAdminClose(), false);
@@ -34,7 +45,6 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminDemote(), false);
         registerCommand(new CmdAdminDeposit(), false);
         registerCommand(new CmdAdminDisband(), false);
-        registerCommand(new CmdAdminGiveDisbands(), false);
         registerCommand(new CmdAdminIgnore(), false);
         registerCommand(new CmdAdminJoin(), false);
         registerCommand(new CmdAdminKick(), false);
@@ -52,6 +62,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminSchematic(), false);
         registerCommand(new CmdAdminSetBiome(), false);
         registerCommand(new CmdAdminSetBlockLimit(), false);
+        registerCommand(new CmdAdminSetBonus(), false);
         registerCommand(new CmdAdminSetCoopLimit(), false);
         registerCommand(new CmdAdminSetCropGrowth(), false);
         registerCommand(new CmdAdminSetDisbands(), false);

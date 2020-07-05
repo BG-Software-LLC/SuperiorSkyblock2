@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -15,27 +15,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminGiveDisbands implements ISuperiorCommand {
+public final class CmdAdminAddSize implements ISuperiorCommand {
+
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("givedisbands");
+        return Collections.singletonList("addsize");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.givedisbands";
+        return "superior.admin.addsize";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin givedisbands <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+        return "admin addsize <" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_SIZE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_SIZE.getMessage(locale);
     }
 
     @Override
@@ -55,44 +57,44 @@ public final class CmdAdminGiveDisbands implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<SuperiorPlayer> superiorPlayers = new ArrayList<>();
+        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
-        if(args[2].equalsIgnoreCase("*")){
-            superiorPlayers.addAll(plugin.getPlayers().getAllPlayers());
-        }
-
-        else {
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-
-            if (targetPlayer == null) {
-                Locale.INVALID_PLAYER.send(sender, args[2]);
-                return;
-            }
-
-            superiorPlayers.add(targetPlayer);
-        }
-
-        int amount;
-        try {
-            amount = Integer.parseInt(args[3]);
-        } catch (Exception e) {
-            Locale.INVALID_AMOUNT.send(sender);
+        if(island == null){
+            if(args[2].equalsIgnoreCase(sender.getName()))
+                Locale.INVALID_ISLAND.send(sender);
+            else if(targetPlayer == null)
+                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
+            else
+                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
-        Executor.data(() -> superiorPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(superiorPlayer.getDisbands() + amount)));
+        int size;
 
-        if(superiorPlayers.size() > 1){
-            Locale.DISBAND_GIVE_ALL.send(sender, amount);
+        try{
+            size = Integer.parseInt(args[3]);
+        }catch(IllegalArgumentException ex){
+            Locale.INVALID_SIZE.send(sender, args[3]);
+            return;
         }
-        else if (!sender.equals(superiorPlayers.get(0).asPlayer()))
-            Locale.DISBAND_GIVE_OTHER.send(sender, superiorPlayers.get(0).getName(), amount);
 
-        superiorPlayers.forEach(superiorPlayer -> {
-            if(superiorPlayer.isOnline()){
-                Locale.DISBAND_GIVE.send(superiorPlayer, amount);
-            }
-        });
+        if(size > plugin.getSettings().maxIslandSize){
+            Locale.SIZE_BIGGER_MAX.send(sender);
+            return;
+        }
+
+        island.setIslandSize(island.getIslandSize() + size);
+
+        if(targetPlayer == null)
+            Locale.CHANGED_ISLAND_SIZE_NAME.send(sender, island.getName());
+        else
+            Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
+
+        if(plugin.getSettings().buildOutsideIsland)
+            Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
+
+        island.updateBorder();
     }
 
     @Override

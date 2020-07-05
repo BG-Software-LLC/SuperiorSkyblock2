@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -13,47 +12,44 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public final class CmdAdminBonus implements ISuperiorCommand {
+public final class CmdAdminAddCropGrowth implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("bonus");
+        return Collections.singletonList("addcropgrowth");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.bonus";
+        return "superior.admin.addcropgrowth";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin bonus <" +
+        return "admin addcropgrowth <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <worth/level> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_BONUS.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH.getMessage(locale);
     }
 
     @Override
     public int getMinArgs() {
-        return 5;
+        return 4;
     }
 
     @Override
     public int getMaxArgs() {
-        return 5;
+        return 4;
     }
 
     @Override
@@ -66,11 +62,11 @@ public final class CmdAdminBonus implements ISuperiorCommand {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
         List<Island> islands = new ArrayList<>();
 
-        if(args[2].equalsIgnoreCase("*")) {
+        if(args[2].equalsIgnoreCase("*")){
             islands.addAll(plugin.getGrid().getIslands());
         }
 
-        else{
+        else {
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
             if (island == null) {
@@ -86,25 +82,23 @@ public final class CmdAdminBonus implements ISuperiorCommand {
             islands.add(island);
         }
 
-        boolean isWorthBonus = !args[3].equalsIgnoreCase("level");
-
-        BigDecimal bonus;
+        double multiplier;
 
         try{
-            bonus = BigDecimalFormatted.of(args[4]);
-        }catch(NumberFormatException ex){
-            Locale.INVALID_AMOUNT.send(sender);
+            multiplier = Double.parseDouble(args[3]);
+        }catch(IllegalArgumentException ex){
+            Locale.INVALID_MULTIPLIER.send(sender, args[3]);
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> {
-            if(isWorthBonus)
-                island.setBonusWorth(bonus);
-            else
-                island.setBonusLevel(bonus);
-        }));
+        Executor.data(() -> islands.forEach(island -> island.setCropGrowthMultiplier(island.getCropGrowthMultiplier() + multiplier)));
 
-        Locale.BONUS_SET_SUCCESS.send(sender, bonus.toString());
+        if(islands.size() > 1)
+            Locale.CHANGED_CROP_GROWTH_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
+        else
+            Locale.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
     }
 
     @Override
@@ -122,9 +116,6 @@ public final class CmdAdminBonus implements ISuperiorCommand {
                         list.add(playerIsland.getName());
                 }
             }
-        }
-        else if(args.length == 4){
-            list.addAll(Stream.of("worth", "level").filter(arg -> arg.startsWith(args[3].toLowerCase())).collect(Collectors.toSet()));
         }
 
         return list;
