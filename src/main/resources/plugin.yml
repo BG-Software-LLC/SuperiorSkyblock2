@@ -4,7 +4,7 @@ author: Ome_R
 description: Feature packed Skyblock core.
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 website: https://bg-software.com/
-api-version: 1.13
+api-version: '1.13'
 softdepend: [ChangeSkin, EpicSpawners, JetsMinions, LeaderHeads, MergedSpawner, MVdWPlaceholderAPI, PlaceholderAPI, PvpingSpawners, SilkSpawners, SkinsRestorer, Vault, WildStacker, WorldEdit]
 loadbefore: [Multiverse-Core]
 permissions:
@@ -134,6 +134,28 @@ permissions:
             description: Use the admin commands.
           superior.admin.add:
             description: Add a user to an island.
+          superior.admin.addblocklimit:
+            description: Increase block limit for another player's island.
+          superior.admin.addbonus:
+            description: Add a bonus to a player.
+          superior.admin.addcooplimit:
+            description: Increase coop players limit for another player's island.
+          superior.admin.addcropgrowth:
+            description: Increase the crop growth multiplier for another player's island.
+          superior.admin.addentitylimit:
+            description: Increase entity limit for another player's island.
+          superior.admin.addgenerator:
+            description: Add percentage of a material for the cobblestone generator.
+          superior.admin.addmobdrops:
+            description: Increase the mob drops multiplier for another player's island.
+          superior.admin.addsize:
+            description: Expand another player's island size.
+          superior.admin.addspawnerrates:
+            description: Increase the spawner rates multiplier for another player's island.
+          superior.admin.addteamlimit:
+            description: Increase members limit for another player's island.
+          superior.admin.addwarpslimit:
+            description: Increase the warps limit of an island.
           superior.admin.bonus:
             description: Grant a bonus to a player.
           superior.admin.bypass:
