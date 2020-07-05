@@ -298,6 +298,11 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockUnstack(EntityExplodeEvent e){
+        e.blockList().removeIf(block -> tryUnstack(null, block, plugin));
+    }
+
     private boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
         if(!plugin.getSettings().stackedBlocksEnabled)
             return false;
