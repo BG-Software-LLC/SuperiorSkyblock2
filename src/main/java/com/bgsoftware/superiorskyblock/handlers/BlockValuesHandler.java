@@ -34,15 +34,8 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        if(((Key) key).isAPIKey())
-            return BigDecimalFormatted.of(0);
-
-        if(plugin.getSettings().syncWorth)
-            return BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key));
-
-        String customWorth = customBlockValues.get(key);
-
-        return customWorth != null ? BigDecimalFormatted.of(customWorth) :
+        return ((Key) key).isAPIKey() ? BigDecimalFormatted.of(customBlockValues.getOrDefault(key, "0")) :
+                plugin.getSettings().syncWorth ? BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key)) :
                 BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
@@ -52,12 +45,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        if(((Key) key).isAPIKey())
-            return BigDecimalFormatted.of(0);
-
-        String customLevel = customBlockLevels.get(key);
-
-        return customLevel != null ? BigDecimalFormatted.of(customLevel) :
+        return ((Key) key).isAPIKey() ? BigDecimalFormatted.of(customBlockLevels.getOrDefault(key, "0")) :
                 BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
     }
 
