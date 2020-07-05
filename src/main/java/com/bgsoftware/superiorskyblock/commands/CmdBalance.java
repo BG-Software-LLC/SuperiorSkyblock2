@@ -53,7 +53,7 @@ public final class CmdBalance implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = null;
+        SuperiorPlayer targetPlayer;
         Island island;
 
         if(args.length == 1){
@@ -62,11 +62,11 @@ public final class CmdBalance implements ISuperiorCommand {
                 return;
             }
 
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+            targetPlayer = SSuperiorPlayer.of(sender);
 
-            Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+            Island locationIsland = plugin.getGrid().getIslandAt(targetPlayer.getLocation());
 
-            island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
+            island = locationIsland == null || locationIsland.isSpawn() ? targetPlayer.getIsland() : locationIsland;
         }
         else{
             targetPlayer = SSuperiorPlayer.of(args[1]);
