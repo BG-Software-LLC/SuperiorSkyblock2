@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -11,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public final class KeySet extends AbstractSet<Key> implements Set<Key> {
+public final class KeySet extends AbstractSet<com.bgsoftware.superiorskyblock.api.key.Key> implements Set<com.bgsoftware.superiorskyblock.api.key.Key> {
 
     private final Set<String> set;
 
@@ -20,7 +19,7 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
     }
 
     @Override
-    public Iterator<Key> iterator() {
+    public Iterator<com.bgsoftware.superiorskyblock.api.key.Key> iterator() {
         return asKeySet().iterator();
     }
 
@@ -31,18 +30,18 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
 
 
     public boolean contains(Block block) {
-        return contains(Key.of(block));
+        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(block));
     }
     public boolean contains(ItemStack itemStack) {
-        return contains(Key.of(itemStack));
+        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(itemStack));
     }
 
     public boolean contains(Material material, short data) {
-        return contains(Key.of(material, data));
+        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(material, data));
     }
 
     public boolean contains(String key) {
-        return contains(Key.of(key));
+        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(key));
     }
 
     @Override
@@ -51,7 +50,7 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
     }
 
     @Override
-    public boolean add(Key key) {
+    public boolean add(com.bgsoftware.superiorskyblock.api.key.Key key) {
         return set.add(key.toString());
     }
 
@@ -60,8 +59,8 @@ public final class KeySet extends AbstractSet<Key> implements Set<Key> {
         return o instanceof Key ? set.remove(o.toString()) : set.remove(o);
     }
 
-    private Set<Key> asKeySet(){
-        Set<Key> set = new HashSet<>();
+    private Set<com.bgsoftware.superiorskyblock.api.key.Key> asKeySet(){
+        Set<com.bgsoftware.superiorskyblock.api.key.Key> set = new HashSet<>();
         this.set.forEach(string -> set.add(Key.of(string)));
         return set;
     }

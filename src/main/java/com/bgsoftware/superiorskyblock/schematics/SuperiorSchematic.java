@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -267,7 +267,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     private void readBlock(SchematicBlock block){
         int combinedId = block.getCombinedId();
-        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId), plugin.getNMSBlocks().getData(combinedId));
+        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId) + ":" + plugin.getNMSBlocks().getData(combinedId));
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 

@@ -1,22 +1,15 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 public final class KeysHandler implements KeysManager {
-
-    private final SuperiorSkyblockPlugin plugin;
-
-    public KeysHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
-    }
 
     @Override
     public boolean isSpawner(Material type) {
@@ -24,22 +17,48 @@ public final class KeysHandler implements KeysManager {
     }
 
     @Override
-    public Key getSpawnerKey(ItemStack itemStack) {
-        return plugin.getProviders().getSpawnerKey(itemStack);
+    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(ItemStack itemStack) {
+        return Key.of(itemStack).markAPIKey();
     }
 
     @Override
-    public Key getSpawnerKey(Block block) {
-        return getSpawnerKey(block.getState());
+    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(Block block) {
+        return Key.of(block).markAPIKey();
     }
 
     @Override
-    public Key getSpawnerKey(BlockState blockState) {
-        if(blockState instanceof CreatureSpawner){
-            CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-            return Key.of(Materials.SPAWNER.toBukkitType() + ":" + creatureSpawner.getSpawnedType());
-        }
-
-        return Key.of(blockState.getData().toItemStack());
+    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(BlockState blockState) {
+        return Key.of(blockState).markAPIKey();
     }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(EntityType entityType) {
+        return Key.of(entityType).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Block block) {
+        return Key.of(block).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(BlockState blockState) {
+        return Key.of(blockState).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(ItemStack itemStack) {
+        return Key.of(itemStack).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Material material, short data) {
+        return Key.of(material, data).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(String key) {
+        return Key.of(key).markAPIKey();
+    }
+
 }

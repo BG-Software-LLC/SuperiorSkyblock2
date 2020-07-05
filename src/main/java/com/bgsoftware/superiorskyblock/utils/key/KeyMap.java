@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> {
+public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock.api.key.Key, V> implements Map<com.bgsoftware.superiorskyblock.api.key.Key, V> {
 
     private final Registry<String, V> registry;
 
@@ -23,13 +22,17 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     @Override
-    public Set<Entry<Key, V>> entrySet() {
+    public Set<Entry<com.bgsoftware.superiorskyblock.api.key.Key, V>> entrySet() {
         return asKeyMap().entrySet();
     }
 
     @Override
     public int size() {
         return registry.size();
+    }
+
+    public boolean containsKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return containsKey((Object) key);
     }
 
     @Override
@@ -42,7 +45,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     }
 
     @Override
-    public V put(Key key, V value) {
+    public V put(com.bgsoftware.superiorskyblock.api.key.Key key, V value) {
         return registry.add(key.toString(), value);
     }
 
@@ -60,20 +63,16 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         return registry.remove(key + "");
     }
 
-    public void removeRaw(Key key){
-        remove(key);
-    }
-
     public V get(ItemStack itemStack) {
-        return get(Key.of(itemStack));
+        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(itemStack));
     }
 
     public V get(Material material, short data) {
-        return get(Key.of(material, data));
+        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(material, data));
     }
 
     public V get(String key) {
-        return get(Key.of(key));
+        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(key));
     }
 
     @Override
@@ -86,6 +85,10 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         return null;
     }
 
+    public V getRaw(com.bgsoftware.superiorskyblock.api.key.Key key, V defaultValue){
+        return getRaw((Key) key, defaultValue);
+    }
+
     public V getRaw(Key key, V defaultValue){
         V returnValue = registry.get(key.toString());
         return returnValue == null ? defaultValue : returnValue;
@@ -94,6 +97,10 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
     @Override
     public String toString() {
         return registry.toString();
+    }
+
+    public V getOrDefault(com.bgsoftware.superiorskyblock.api.key.Key key, V defaultValue) {
+        return getOrDefault((Object) key, defaultValue);
     }
 
     @Override
@@ -107,7 +114,7 @@ public final class KeyMap<V> extends AbstractMap<Key, V> implements Map<Key, V> 
         registry.clear();
     }
 
-    public Map<Key, V> asKeyMap(){
+    public Map<com.bgsoftware.superiorskyblock.api.key.Key, V> asKeyMap(){
         return registry.toMap().entrySet().stream().collect(Collectors.toMap(entry -> Key.of(entry.getKey()), Entry::getValue));
     }
 

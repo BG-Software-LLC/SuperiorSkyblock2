@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_14_R1.BiomeBase;
@@ -72,7 +72,15 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
         IBlockData blockData = ((CraftBlockData) chunkSnapshot.getBlockData(x, y, z)).getState();
         Material type = chunkSnapshot.getBlockType(x, y, z);
         short data = (short) (Block.getCombinedId(blockData) >> 12 & 15);
-        return Key.of(type, data);
+
+        Location location = new Location(
+                Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                (chunkSnapshot.getX() << 4) + x,
+                y,
+                (chunkSnapshot.getZ() << 4) + z
+        );
+
+        return Key.of(Key.of(type, data), location);
     }
 
     @Override

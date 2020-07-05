@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;

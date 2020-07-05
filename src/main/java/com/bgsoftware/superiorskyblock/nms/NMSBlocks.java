@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;

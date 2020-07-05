@@ -3,10 +3,10 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import net.minecraft.server.v1_8_R1.BlockPosition;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
@@ -17,7 +17,6 @@ import net.minecraft.server.v1_8_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_8_R1.PlayerInteractManager;
 import net.minecraft.server.v1_8_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R1.World;
-
 import net.minecraft.server.v1_8_R1.WorldBorder;
 import net.minecraft.server.v1_8_R1.WorldServer;
 import org.bukkit.Bukkit;
@@ -61,7 +60,15 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
         Material type = Material.getMaterial(chunkSnapshot.getBlockTypeId(x, y, z));
         short data = (short) chunkSnapshot.getBlockData(x, y, z);
-        return Key.of(type, data);
+
+        Location location = new Location(
+                Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                (chunkSnapshot.getX() << 4) + x,
+                y,
+                (chunkSnapshot.getZ() << 4) + z
+        );
+
+        return Key.of(Key.of(type, data), location);
     }
 
     @Override

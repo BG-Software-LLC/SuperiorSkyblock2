@@ -346,7 +346,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         schematicsHandler = new SchematicsHandler(this);
         providersHandler = new ProvidersHandler(this);
         menusHandler = new MenusHandler(this);
-        keysHandler = new KeysHandler(this);
+        keysHandler = new KeysHandler();
 
         if (loadGrid) {
             try {

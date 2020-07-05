@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
@@ -11,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
+public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> {
 
     private static final Map<String, String> blocksToItems = new HashMap<>();
 
@@ -159,7 +159,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     }
 
     @Override
-    public void onPlayerClick(InventoryClickEvent event, Pair<Key, Integer> block) {
+    public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> block) {
     }
 
     @Override
@@ -168,9 +168,11 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<Key, Integer> block) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> block) {
         try {
-            Key blockKey = block.getKey();
+            Key rawKey = (Key) block.getKey();
+            Key blockKey = plugin.getBlockValues().convertKey(rawKey);
+
             int amount = block.getValue();
 
             if (blocksToItems.containsKey(blockKey.getGlobalKey())) {
@@ -205,14 +207,14 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
             ItemMeta currentMeta = clickedItem.getItemMeta();
             ItemBuilder itemBuilder;
 
-            if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty()) {
+            if (rawKey != blockKey && blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty()) {
                 itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(),
                         HeadUtils.getTexture(blockKey.getSubKey())));
                 materialName = blockKey.getSubKey() + "_SPAWNER";
             } else {
                 itemBuilder = new ItemBuilder(blockMaterial, damage);
                 if (materialName == null)
-                    materialName = blockMaterial.name();
+                    materialName = rawKey.getGlobalKey();
             }
 
             ItemStack itemStack = itemBuilder
@@ -220,10 +222,10 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
                     .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
                     .replaceAll("{0}", StringUtils.format(materialName))
                     .replaceAll("{1}", amount + "")
-                    .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockWorth(blockKey).multiply(BigDecimal.valueOf(amount))))
-                    .replaceAll("{3}", StringUtils.format(plugin.getBlockValues().getBlockLevel(blockKey).multiply(BigDecimal.valueOf(amount))))
-                    .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(blockKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
-                    .replaceAll("{5}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(blockKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                    .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockWorth(rawKey).multiply(BigDecimal.valueOf(amount))))
+                    .replaceAll("{3}", StringUtils.format(plugin.getBlockValues().getBlockLevel(rawKey).multiply(BigDecimal.valueOf(amount))))
+                    .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(rawKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                    .replaceAll("{5}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(rawKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
                     .build(superiorPlayer);
 
             itemStack.setAmount(Math.max(1, Math.min(64, amount)));
@@ -236,7 +238,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<Key, Integer>> {
     }
 
     @Override
-    protected List<Pair<Key, Integer>> requestObjects() {
+    protected List<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> requestObjects() {
         return island.getBlockCounts().entrySet().stream().sorted((o1, o2) -> {
             Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
             Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());

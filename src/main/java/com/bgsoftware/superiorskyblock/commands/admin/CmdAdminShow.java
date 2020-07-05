@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -154,7 +154,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
 
         if(!Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.isEmpty(locale)){
             StringBuilder blocksString = new StringBuilder();
-            for(Map.Entry<Key, Integer> entry : island.getBlocksLimits().entrySet()){
+            for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getBlocksLimits().entrySet()){
                 blocksString.append(Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue())).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.getMessage(locale, blocksString));

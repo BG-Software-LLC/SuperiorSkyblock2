@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -93,7 +93,7 @@ public final class CmdAdminCount implements ISuperiorCommand {
             java.util.Locale locale = LocaleUtils.getLocale(sender);
 
             if(!Locale.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)){
-                for(Map.Entry<Key, Integer> entry : island.getBlockCounts().entrySet()){
+                for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getBlockCounts().entrySet()){
                     materialsBuilder.append(", ").append(Locale.BLOCK_COUNTS_CHECK_MATERIAL.getMessage(locale, entry.getValue(), StringUtils.format(entry.getKey().toString())));
                 }
             }

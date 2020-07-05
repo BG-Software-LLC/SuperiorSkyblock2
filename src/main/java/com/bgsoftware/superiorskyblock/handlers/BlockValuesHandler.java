@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
-import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -12,10 +14,14 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.Map;
 
 public final class BlockValuesHandler implements BlockValuesManager {
 
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+
+    private static final KeyMap<String> customBlockValues = new KeyMap<>(), customBlockLevels = new KeyMap<>();
+    private static final KeyMap<CustomKeyParser> customKeyParsers = new KeyMap<>();
 
     private final KeyMap<String> blockValues = new KeyMap<>(), blockLevels = new KeyMap<>();
     private final SuperiorSkyblockPlugin plugin;
@@ -27,8 +33,16 @@ public final class BlockValuesHandler implements BlockValuesManager {
     }
 
     @Override
-    public BigDecimal getBlockWorth(Key key) {
-        return plugin.getSettings().syncWorth ? BigDecimalFormatted.of(plugin.getProviders().getPrice(key)) :
+    public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        if(((Key) key).isAPIKey())
+            return BigDecimalFormatted.of(0);
+
+        if(plugin.getSettings().syncWorth)
+            return BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key));
+
+        String customWorth = customBlockValues.get(key);
+
+        return customWorth != null ? BigDecimalFormatted.of(customWorth) :
                 BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
@@ -37,13 +51,53 @@ public final class BlockValuesHandler implements BlockValuesManager {
     }
 
     @Override
-    public BigDecimal getBlockLevel(Key key) {
-        return BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
+    public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        if(((Key) key).isAPIKey())
+            return BigDecimalFormatted.of(0);
+
+        String customLevel = customBlockLevels.get(key);
+
+        return customLevel != null ? BigDecimalFormatted.of(customLevel) :
+                BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
     }
 
     @Override
-    public Key getBlockKey(Key key) {
-        return blockValues.containsKey(key) ? blockValues.getKey(key) : blockLevels.getKey(key);
+    public Key getBlockKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return ((Key) key).isAPIKey() ? (Key) key : blockValues.containsKey(key) ? blockValues.getKey((Key) key) : blockLevels.getKey((Key) key);
+    }
+
+    @Override
+    public void registerCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key, BigDecimal worthValue, BigDecimal levelValue) {
+        if(worthValue != null && !customBlockValues.containsKey(key)){
+            customBlockValues.put(key, worthValue.toString());
+        }
+        if(levelValue != null && !customBlockLevels.containsKey(key)){
+            customBlockLevels.put(key, levelValue.toString());
+        }
+    }
+
+    @Override
+    public void registerKeyParser(CustomKeyParser customKeyParser, com.bgsoftware.superiorskyblock.api.key.Key... blockTypes) {
+        for(com.bgsoftware.superiorskyblock.api.key.Key blockType : blockTypes)
+            customKeyParsers.put(blockType, customKeyParser);
+    }
+
+    public Key convertKey(Key original, Location location){
+        CustomKeyParser customKeyParser = customKeyParsers.get(original);
+
+        if(customKeyParser == null)
+            return original;
+
+        return (Key) customKeyParser.getCustomKey(location);
+    }
+
+    public Key convertKey(Key original){
+        for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, CustomKeyParser> entry : customKeyParsers.entrySet()) {
+            if (entry.getValue().isCustomKey(original))
+                return (Key) entry.getKey();
+        }
+
+        return original;
     }
 
     public String convertValueToLevel(BigDecimalFormatted value){
@@ -73,7 +127,8 @@ public final class BlockValuesHandler implements BlockValuesManager {
         ConfigurationSection valuesSection = cfg.contains("block-values") ? cfg.getConfigurationSection("block-values") : cfg.getConfigurationSection("");
 
         for(String key : valuesSection.getKeys(false))
-            blockValues.put(getBlockKey(Key.of(key)), String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
+            blockValues.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)),
+                    String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
     }
 
     private void loadBlockLevels(SuperiorSkyblockPlugin plugin){
@@ -86,7 +141,8 @@ public final class BlockValuesHandler implements BlockValuesManager {
         ConfigurationSection valuesSection = cfg.getConfigurationSection("");
 
         for(String key : valuesSection.getKeys(false))
-            blockLevels.put(getBlockKey(Key.of(key)), String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
+            blockLevels.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)),
+                    String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
     }
 
 }

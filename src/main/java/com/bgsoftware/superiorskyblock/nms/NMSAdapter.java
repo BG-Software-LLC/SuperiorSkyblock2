@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
