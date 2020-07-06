@@ -59,6 +59,9 @@ public final class ChunksListener implements Listener {
                 ex.printStackTrace();
             }
         }
+
+        if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+            ChunksTracker.markDirty(island, e.getChunk(), true);
     }
 
     @EventHandler
