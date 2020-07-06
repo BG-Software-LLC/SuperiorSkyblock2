@@ -219,9 +219,16 @@ public final class BlocksListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             if(island != null) {
                 island.handleBlockBreak(e.getBlock(), 1);
-                if(e.getTo() != Material.AIR)
-                    //noinspection deprecation
-                    island.handleBlockPlace(Key.of(e.getTo(), e.getData()), 1);
+                if(e.getTo() != Material.AIR) {
+                    byte data = 0;
+
+                    try{
+                        //noinspection deprecation
+                        data = e.getData();
+                    }catch (Throwable ignored){}
+
+                    island.handleBlockPlace(Key.of(e.getTo(), data), 1);
+                }
             }
         }
     }
