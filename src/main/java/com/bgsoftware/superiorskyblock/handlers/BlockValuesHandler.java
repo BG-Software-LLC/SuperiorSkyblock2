@@ -10,8 +10,10 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.SimpleBindings;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.Map;
 public final class BlockValuesHandler implements BlockValuesManager {
 
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static final Bindings bindings = createBindings();
 
     private static final KeyMap<String> customBlockValues = new KeyMap<>(), customBlockLevels = new KeyMap<>();
     private static final KeyMap<CustomKeyParser> customKeyParsers = new KeyMap<>();
@@ -90,7 +93,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     public String convertValueToLevel(BigDecimalFormatted value){
         try {
-            return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.getAsString())).toString()).toString();
+            return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.getAsString()), bindings).toString()).toString();
         }catch(Exception ex){
             ex.printStackTrace();
             return value.toString();
@@ -131,6 +134,12 @@ public final class BlockValuesHandler implements BlockValuesManager {
         for(String key : valuesSection.getKeys(false))
             blockLevels.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)),
                     String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
+    }
+
+    private static Bindings createBindings() {
+        SimpleBindings bindings = new SimpleBindings();
+        bindings.put("Math", Math.class);
+        return bindings;
     }
 
 }
