@@ -91,6 +91,7 @@ public final class SettingsHandler {
     public final List<String> filteredIslandNames;
     public final boolean islandNamesColorSupport;
     public final boolean islandNamesIslandTop;
+    public final boolean islandNamesPreventPlayerNames;
     public final boolean teleportOnJoin;
     public final boolean teleportOnKick;
     public final boolean clearOnJoin;
@@ -235,6 +236,7 @@ public final class SettingsHandler {
         filteredIslandNames = cfg.getStringList("island-names.filtered-names");
         islandNamesColorSupport = cfg.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = cfg.getBoolean("island-names.island-top", true);
+        islandNamesPreventPlayerNames = cfg.getBoolean("island-names.prevent-player-names", true);
         teleportOnJoin = cfg.getBoolean("teleport-on-join", false);
         teleportOnKick = cfg.getBoolean("teleport-on-kick", false);
         clearOnJoin = cfg.getBoolean("clear-on-join", false);

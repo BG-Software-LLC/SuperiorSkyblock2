@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 
@@ -74,10 +75,8 @@ public final class CmdCreate implements ISuperiorCommand {
         if(plugin.getSettings().islandNamesRequiredForCreation) {
             if (args.length >= 2) {
                 islandName = args[1];
-                if (plugin.getGrid().getIsland(islandName) != null) {
-                    Locale.ISLAND_ALREADY_EXIST.send(superiorPlayer);
+                if(!StringUtils.isValidName(sender, null, islandName))
                     return;
-                }
             }
         }
 

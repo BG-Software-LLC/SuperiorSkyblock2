@@ -534,6 +534,7 @@ MISSION_STATUS_RESET: '&e&lMission | &7Ripristinato lo stato della missione {0} 
 NAME_ANNOUNCEMENT: '&e&lIsola | &7{0} ha cambiato il nome della sua isola in {1}.'
 NAME_BLACKLISTED: '&c&lErrore | &7Non puoi usare quel nome.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
+NAME_SAME_AS_PLAYER: '&c&lError | &7You cannot use player names as island names.'
 NAME_TOO_LONG: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza
   superiore a 16 caratteri.'
 NAME_TOO_SHORT: '&c&lErrore | &7I nomi delle isole non possono avere una lunghezza

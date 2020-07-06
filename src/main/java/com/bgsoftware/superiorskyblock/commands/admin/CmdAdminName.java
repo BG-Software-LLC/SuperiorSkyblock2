@@ -70,37 +70,16 @@ public final class CmdAdminName implements ISuperiorCommand {
             return;
         }
 
-        String islandName = args[3];
+        String islandName = args[1];
 
-        if(islandName.length() > plugin.getSettings().islandNamesMaxLength){
-            Locale.NAME_TOO_LONG.send(sender);
+        if(!StringUtils.isValidName(sender, island, islandName))
             return;
-        }
-
-        if(islandName.length() < plugin.getSettings().islandNamesMinLength){
-            Locale.NAME_TOO_SHORT.send(sender);
-            return;
-        }
-
-        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
-            Locale.NAME_BLACKLISTED.send(sender);
-            return;
-        }
-
-        if(island.getName().equals(islandName)){
-            Locale.SAME_NAME_CHANGE.send(sender);
-            return;
-        }
-
-        if(!island.getName().equalsIgnoreCase(islandName) && plugin.getGrid().getIsland(islandName) != null){
-            Locale.ISLAND_ALREADY_EXIST.send(sender);
-            return;
-        }
 
         String oldName = island.getName();
         island.setName(islandName);
 
-        String coloredName = plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(islandName) : islandName;
+        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+                StringUtils.translateColors(islandName) : islandName;
 
         for(Player player : Bukkit.getOnlinePlayers())
             Locale.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);

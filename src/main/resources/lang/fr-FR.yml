@@ -451,6 +451,7 @@ MISSION_STATUS_RESET: '&e&lMission | &7Le statu de la mission {0} a été réini
 NAME_ANNOUNCEMENT: '&e&lIle | &7{0} a changé le nom de son île sur {1}.'
 NAME_BLACKLISTED: '&c&lErreur | &7Vous ne pouvez pas utiliser ce nom.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
+NAME_SAME_AS_PLAYER: '&c&lError | &7You cannot use player names as island names.'
 NAME_TOO_LONG: '&c&lErreur | &7Les noms d''îles ne peuvent pas contenir plus de 16 caractères.'
 NAME_TOO_SHORT: '&c&lErreur | &7Les noms d''îles ne peuvent pas contenir moins de 2 caractères.'
 NO_ISLANDS_TO_PURGE: '&c&lErreur | &7Il n''y a aucune îles à purger.'

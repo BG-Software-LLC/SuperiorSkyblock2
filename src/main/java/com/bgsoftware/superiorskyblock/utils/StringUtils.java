@@ -2,9 +2,12 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -16,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
     private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
@@ -245,6 +250,45 @@ public final class StringUtils {
 
     public static String stripColors(String str){
         return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
+    }
+
+    public static boolean isValidName(CommandSender sender, Island currentIsland, String islandName){
+        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+                StringUtils.translateColors(islandName) : islandName;
+        String strippedName = plugin.getSettings().islandNamesColorSupport ?
+                StringUtils.stripColors(coloredName) : islandName;
+
+        if(strippedName.length() > plugin.getSettings().islandNamesMaxLength){
+            Locale.NAME_TOO_LONG.send(sender);
+            return false;
+        }
+
+        if(strippedName.length() < plugin.getSettings().islandNamesMinLength){
+            Locale.NAME_TOO_SHORT.send(sender);
+            return false;
+        }
+
+        if(plugin.getSettings().islandNamesPreventPlayerNames && SSuperiorPlayer.of(strippedName) != null){
+            Locale.NAME_SAME_AS_PLAYER.send(sender);
+            return false;
+        }
+
+        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
+            Locale.NAME_BLACKLISTED.send(sender);
+            return false;
+        }
+
+        if(currentIsland != null && currentIsland.getName().equalsIgnoreCase(islandName)){
+            Locale.SAME_NAME_CHANGE.send(sender);
+            return false;
+        }
+
+        if(plugin.getGrid().getIsland(islandName) != null){
+            Locale.ISLAND_ALREADY_EXIST.send(sender);
+            return false;
+        }
+
+        return true;
     }
 
     private static String parseHexColor(String hexColor){

@@ -516,6 +516,7 @@ MISSION_STATUS_RESET: '&e&lNhiệm Vụ | &7Đặt lại trạng thái của nhi
 NAME_ANNOUNCEMENT: '&e&lNâng cấp | &7{0} đã thay đổi tên đảo của anh/cô ấy thành {1}.'
 NAME_BLACKLISTED: '&c&lLỗi | &7Bạn không thể sử dụng tên này.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
+NAME_SAME_AS_PLAYER: '&c&lError | &7You cannot use player names as island names.'
 NAME_TOO_LONG: '&c&lLỗi | &7Tên đảo không thể dài hơn 16 kí tự.'
 NAME_TOO_SHORT: '&c&lLỗi | &7Tên đảo không thể ngắn hơn 3 ký tự.'
 NO_BAN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để cấm người chơi.'
