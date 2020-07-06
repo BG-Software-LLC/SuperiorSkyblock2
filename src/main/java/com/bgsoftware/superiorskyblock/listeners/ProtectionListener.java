@@ -32,6 +32,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -607,6 +608,35 @@ public final class ProtectionListener implements Listener {
         if(!island.hasPermission(superiorPlayer, IslandPrivileges.FISH)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBlockFertilize(BlockFertilizeEvent e){
+        if(e.getPlayer() == null)
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if(island == null) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+                e.setCancelled(true);
+            }
+
+            return;
+        }
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.FERTILIZE)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getBlock().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
     }
 
