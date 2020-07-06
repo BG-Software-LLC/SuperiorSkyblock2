@@ -30,6 +30,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminAddCoopLimit(), false);
         registerCommand(new CmdAdminAddCropGrowth(), false);
         registerCommand(new CmdAdminAddDisbands(), false);
+        registerCommand(new CmdAdminAddEffect(), false);
         registerCommand(new CmdAdminAddEntityLimit(), false);
         registerCommand(new CmdAdminAddGenerator(), false);
         registerCommand(new CmdAdminAddMobDrops(), false);
@@ -66,6 +67,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminSetCoopLimit(), false);
         registerCommand(new CmdAdminSetCropGrowth(), false);
         registerCommand(new CmdAdminSetDisbands(), false);
+        registerCommand(new CmdAdminSetEffect(), false);
         registerCommand(new CmdAdminSetEntityLimit(), false);
         registerCommand(new CmdAdminSetGenerator(), false);
         registerCommand(new CmdAdminSetLeader(), false);

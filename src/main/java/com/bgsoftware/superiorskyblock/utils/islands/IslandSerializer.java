@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -146,6 +147,17 @@ public final class IslandSerializer {
             locationsBuilder.append(";").append(entry.getKey().name().toLowerCase()).append("=").append(locationString);
         }
         return locationsBuilder.length() == 0 ? "" : locationsBuilder.substring(1);
+    }
+
+    public static String serializeEffects(SyncedObject<Map<PotionEffectType, Integer>> effects){
+        return effects.readAndGet(IslandSerializer::serializeEffects);
+    }
+
+    public static String serializeEffects(Map<PotionEffectType, Integer> effects){
+        StringBuilder islandEffects = new StringBuilder();
+        effects.forEach((potionEffectType, level) ->
+                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level));
+        return islandEffects.length() == 0 ? "" : islandEffects.toString().substring(1);
     }
 
 }

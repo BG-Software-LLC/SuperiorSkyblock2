@@ -11,7 +11,8 @@ import java.util.Objects;
 public final class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
-            -1, -1, -1, -1, -1, -1, -1, new KeyMap<>(), new HashMap<>(), new KeyMap<>());
+            -1, -1, -1, -1, -1, -1, -1,
+            new KeyMap<>(), new HashMap<>(), new KeyMap<>(), new HashMap<>());
 
     private final String name;
 

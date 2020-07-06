@@ -38,6 +38,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -480,6 +481,24 @@ public final class PlayersListener implements Listener {
         island.handleBlockBreak(Key.of("OBSIDIAN"), 1);
 
         e.getClickedBlock().setType(Material.AIR);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerEffect(EntityPotionEffectEvent e){
+        if(e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
+                e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null)
+            return;
+
+        int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
+
+        if(islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
+            e.setCancelled(true);
+        }
     }
 
     private void handleTeleport(SuperiorPlayer superiorPlayer, Island island, Location toTeleport){

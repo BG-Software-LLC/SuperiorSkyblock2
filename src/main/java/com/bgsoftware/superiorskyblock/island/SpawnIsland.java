@@ -35,6 +35,8 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -918,6 +920,36 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setWarpsLimit(int warpsLimit) {
+
+    }
+
+    @Override
+    public void setPotionEffect(PotionEffectType type, int level) {
+
+    }
+
+    @Override
+    public int getPotionEffectLevel(PotionEffectType type) {
+        return 0;
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getPotionEffects() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public void applyEffects(SuperiorPlayer superiorPlayer) {
+
+    }
+
+    @Override
+    public void removeEffects(SuperiorPlayer superiorPlayer) {
+
+    }
+
+    @Override
+    public void removeEffects() {
 
     }
 

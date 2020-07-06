@@ -140,6 +140,7 @@ public final class DataHandler {
         addColumnIfNotExists("bonusLevel", "islands", "'0'", "TEXT");
         addColumnIfNotExists("creationTime", "islands", (System.currentTimeMillis() / 1000) + "", "INTEGER");
         addColumnIfNotExists("coopLimit", "islands", String.valueOf(plugin.getSettings().defaultCoopLimit), "INTEGER");
+        addColumnIfNotExists("islandEffects", "islands", "''", "TEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -257,7 +258,8 @@ public final class DataHandler {
                 "entityLimits TEXT," +
                 "bonusLevel TEXT," +
                 "creationTime INTEGER," +
-                "coopLimit INTEGER" +
+                "coopLimit INTEGER," +
+                "islandEffects TEXT" +
                 ");");
     }
 

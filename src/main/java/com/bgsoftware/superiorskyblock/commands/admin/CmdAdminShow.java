@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,6 +168,14 @@ public final class CmdAdminShow implements ISuperiorCommand {
                         StringUtils.format(((SIsland) island).getGeneratorPercentageDecimal(Key.of(entry.getKey()))), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString));
+        }
+
+        if(!Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.isEmpty(locale)){
+            StringBuilder blocksString = new StringBuilder();
+            for(Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()){
+                blocksString.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale, StringUtils.format(entry.getKey().getName()), entry.getValue() + 1)).append("\n");
+            }
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
         }
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {

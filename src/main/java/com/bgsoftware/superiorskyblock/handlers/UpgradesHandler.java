@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.util.Collection;
@@ -92,8 +93,16 @@ public final class UpgradesHandler implements UpgradesManager {
                     for(String block : levelSection.getConfigurationSection("generator-rates").getKeys(false))
                         generatorRates.put(block, levelSection.getInt("generator-rates." + block));
                 }
+                Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+                if(levelSection.contains("island-effects")){
+                    for(String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
+                        try {
+                            islandEffects.put(PotionEffectType.getByName(effect), levelSection.getInt("island-effects." + effect) - 1);
+                        }catch(IllegalArgumentException ignored){}
+                    }
+                }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, cropGrowth,
-                        spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits, entityLimits, generatorRates));
+                        spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits, entityLimits, generatorRates, islandEffects));
             }
             this.upgrades.add(upgradeName, upgrade);
         }

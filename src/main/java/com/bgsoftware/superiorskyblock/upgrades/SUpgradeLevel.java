@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +24,11 @@ public final class SUpgradeLevel implements UpgradeLevel {
     private final int teamLimit, warpsLimit, coopLimit, borderSize;
     private final KeyMap<Integer> blockLimits, generatorRates;
     private final Map<EntityType, Integer> entityLimits;
+    private final Map<PotionEffectType, Integer> islandEffects;
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -41,6 +43,7 @@ public final class SUpgradeLevel implements UpgradeLevel {
         this.blockLimits = blockLimits;
         this.entityLimits = entityLimits;
         this.generatorRates = generatorRates;
+        this.islandEffects = islandEffects;
     }
 
     @Override
@@ -133,6 +136,11 @@ public final class SUpgradeLevel implements UpgradeLevel {
         return this.generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
+    }
+
+    @Override
+    public int getPotionEffect(PotionEffectType potionEffectType) {
+        return islandEffects.getOrDefault(potionEffectType, 0);
     }
 
     public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){

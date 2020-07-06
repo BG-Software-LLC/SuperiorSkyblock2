@@ -225,6 +225,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         );
                         islandCountsHolder.execute(false);
                     }
+
+                    islandList.forEach(Island::removeEffects);
                 }
 
                 players.forEach(player -> {
@@ -358,8 +360,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
 
         Executor.sync(() -> {
-            for(Player player : Bukkit.getOnlinePlayers())
-                nmsAdapter.setWorldBorder(SSuperiorPlayer.of(player), gridHandler.getIslandAt(player.getLocation()));
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                Island island = gridHandler.getIslandAt(player.getLocation());
+                nmsAdapter.setWorldBorder(superiorPlayer, island);
+                if(island != null)
+                    island.applyEffects(superiorPlayer);
+            }
             CropsTask.startTask();
         });
     }

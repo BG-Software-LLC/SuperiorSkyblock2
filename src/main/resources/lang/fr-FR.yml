@@ -53,6 +53,9 @@ CHANGED_DISCORD: '&e&lIle | &7Vous avez changé le Discord de l''île sur {0}.'
 CHANGED_ENTITY_LIMIT: '&e&lAméliorations | &7Limite de {0} entities modifiée pour l''île de {1}.'
 CHANGED_ENTITY_LIMIT_ALL: '&e&lAméliorations | &7Limite de {0} modifiée pour toutes les îles.'
 CHANGED_ENTITY_LIMIT_NAME: '&e&lAméliorations | &7Limite de {0} modifiée pour l''île {1}.'
+CHANGED_ISLAND_EFFECT_LEVEL: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}''s island.'
+CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for all the islands.'
+CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lAméliorations | &7Vous avez changé la taille de l''île de {0}.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAméliorations | &7Vous avez changé la taille des îles {0}.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oLes joueurs peuvent construire en dehors de leurs îles, la taille d''île n''est donc plus effective. Vous pouvez désactiver cette fonctionnalité dans le fichier de configuration, afin que la taille d''île soit de nouveau effective.'
@@ -79,6 +82,7 @@ COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome
 COMMAND_ARGUMENT_DISCORD: discord...
+COMMAND_ARGUMENT_EFFECT: 'potion-effect'
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: entité
 COMMAND_ARGUMENT_TIME: temps
@@ -113,6 +117,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Increase block limit for another pla
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Add a bonus to a player.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Increase coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH: 'Increase the crop growth multiplier for another player''s island.'
+COMMAND_DESCRIPTION_ADMIN_ADD_EFFECT: 'Add an island effect for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_ENTITY_LIMIT: 'Increase entity limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_GENERATOR: 'Add percentage of a material for the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS: 'Increase the mob drops multiplier for another player''s island.'
@@ -150,6 +155,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Définir une limite de blocs pour l''
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Définir le multiplicateur de croissance des cultures de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: Définir le nombre de suppression d'îles d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_SET_EFFECT: 'Set the island effect level of another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_ENTITY_LIMIT: Définir la limite d'entités pour l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Transferer une île à quelqu'un d'autre.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Définir le multiplicateur de drops de mobs de l'île d'un joueur.
@@ -291,6 +297,7 @@ IGNORED_ISLAND_NAME: '&e&lIle | &7L''île {0} est désormais masquée du top des
 INTERACT_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas interagir en dehors de votre île.'
 INVALID_AMOUNT: '&c&lErreur | &7Nombre invalide {0}.'
 INVALID_BIOME: '&c&lErreur | &7Biome invalide {0}.'
+INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lErreur | &7Entité invalide {0}.'
 INVALID_SCHEMATIC: '&c&lErrEUR | &7Il n''existe aucun schematic portant le nom {0}.'
 INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'
@@ -350,6 +357,10 @@ ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   {0}
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lIle | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lIsland | &7Coop Limit: {0}'
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
+  &e&lIsland | &7Island Effects:
+  {0}
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lIle | &7Limite d'Entitées:
   {0}

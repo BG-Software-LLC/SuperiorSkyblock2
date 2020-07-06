@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 import java.util.Map;
@@ -101,5 +102,11 @@ public interface UpgradeLevel {
      * Get all the generator rates for this level.
      */
     Map<String, Integer> getGeneratorAmounts();
+
+    /**
+     * Get the potion effect for this level.
+     * @param potionEffectType The potion effect to check.
+     */
+    int getPotionEffect(PotionEffectType potionEffectType);
 
 }

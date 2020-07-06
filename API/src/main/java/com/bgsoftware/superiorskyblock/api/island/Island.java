@@ -13,6 +13,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -1007,6 +1008,43 @@ public interface Island extends Comparable<Island> {
      * @param warpsLimit The limit to set.
      */
     void setWarpsLimit(int warpsLimit);
+
+    /**
+     * Add a potion effect to the island.
+     * @param type The potion effect to add.
+     * @param level The level of the potion effect.
+     *       If the level is 0 or below, then the effect will be removed.
+     */
+    void setPotionEffect(PotionEffectType type, int level);
+
+    /**
+     * Get the level of an island effect.
+     * @param type The potion to check.
+     * @return The level of the potion. If 0, it means that this is not an active effect on the island.
+     */
+    int getPotionEffectLevel(PotionEffectType type);
+
+    /**
+     * Get a list of all active island effects with their levels.
+     */
+    Map<PotionEffectType, Integer> getPotionEffects();
+
+    /**
+     * Give all the island effects to a player.
+     * @param superiorPlayer The player to give the effect to.
+     */
+    void applyEffects(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Remove all the island effects from a player.
+     * @param superiorPlayer The player to remove the effects to.
+     */
+    void removeEffects(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Remove all the island effects from the players inside the island.
+     */
+    void removeEffects();
 
     /*
      *  Warps related methods

@@ -54,7 +54,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public final class CustomEventsListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
 
     public CustomEventsListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -287,6 +287,7 @@ public final class CustomEventsListener implements Listener {
                     Player player = superiorPlayer.asPlayer();
                     player.resetPlayerTime();
                     player.resetPlayerWeather();
+                    fromIsland.removeEffects(superiorPlayer);
                 }
             }
 
@@ -392,6 +393,8 @@ public final class CustomEventsListener implements Listener {
                             player.setPlayerWeather(WeatherType.DOWNFALL);
                         }
                     }
+
+                    toIsland.applyEffects(superiorPlayer);
                 }
             }
 

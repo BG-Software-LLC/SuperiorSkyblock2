@@ -80,6 +80,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -136,6 +138,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
     private final SyncedObject<Map<EntityType, Integer>> entityLimits = SyncedObject.of(new HashMap<>(plugin.getSettings().defaultEntityLimits));
+    private final SyncedObject<Map<PotionEffectType, Integer>> islandEffects = SyncedObject.of(new HashMap<>());
     private final Registry<String, WarpData> warps = Registry.createRegistry();
     private final SyncedObject<BigDecimalFormatted> islandBank = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
@@ -191,6 +194,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
+        IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
 
         rawKeyPlacements = false;
 
@@ -2191,6 +2195,64 @@ public final class SIsland extends DatabaseObject implements Island {
                 .execute(true);
     }
 
+    @Override
+    public void setPotionEffect(PotionEffectType type, int level) {
+        if(level <= 0) {
+            islandEffects.write(islandEffects -> islandEffects.remove(type));
+            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().removePotionEffect(type)));
+        }
+        else {
+            PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
+            islandEffects.write(islandEffects -> islandEffects.put(type, level - 1));
+            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().addPotionEffect(potionEffect, true)));
+        }
+
+        Query.ISLAND_SET_ISLAND_EFFECTS.getStatementHolder()
+                .setString(IslandSerializer.serializeEffects(islandEffects))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
+    public int getPotionEffectLevel(PotionEffectType type) {
+        int effectLevel = islandEffects.readAndGet(islandEffects -> islandEffects.getOrDefault(type, -1)) + 1;
+
+        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
+            effectLevel = Math.max(effectLevel, getUpgradeLevel(upgrade).getPotionEffect(type));
+
+        return effectLevel;
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getPotionEffects() {
+        Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+
+        for(PotionEffectType potionEffectType : PotionEffectType.values()){
+            int level = getPotionEffectLevel(potionEffectType);
+            if(level > 0)
+                islandEffects.put(potionEffectType, level);
+        }
+
+        return islandEffects;
+    }
+
+    @Override
+    public void applyEffects(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level), true));
+    }
+
+    @Override
+    public void removeEffects(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+        getPotionEffects().keySet().forEach(player::removePotionEffect);
+    }
+
+    @Override
+    public void removeEffects() {
+        getAllPlayersInside().forEach(this::removeEffects);
+    }
+
     /*
      *  Warps related methods
      */
@@ -2730,6 +2792,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(bonusLevel.get().getAsString())
                 .setLong(creationTime)
                 .setInt(coopLimit.get())
+                .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2783,6 +2846,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(bonusLevel.get().getAsString())
                 .setLong(creationTime)
                 .setInt(coopLimit.get())
+                .setString(IslandSerializer.serializeEffects(islandEffects))
                 .execute(async);
     }
 

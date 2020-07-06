@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
 import java.util.Map;
@@ -209,6 +210,21 @@ public final class IslandDeserializer {
                 locations.add(World.Environment.valueOf(environment), LocationUtils.getLocation(locationSection[1]));
             }catch(Exception ignored){}
         }
+    }
+
+    public static void deserializeEffects(String effects, SyncedObject<Map<PotionEffectType, Integer>> islandEffectsSync){
+        if(effects == null)
+            return;
+
+        islandEffectsSync.write(islandEffects -> {
+            for(String effect : effects.split(",")){
+                try {
+                    String[] sections = effect.split("=");
+                    PotionEffectType potionEffectType = PotionEffectType.getByName(sections[0]);
+                    islandEffects.put(potionEffectType, Integer.parseInt(sections[1]));
+                }catch(Exception ignored){}
+            }
+        });
     }
 
 }
