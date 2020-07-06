@@ -18,11 +18,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
+
+    private static boolean sortByCompletion, removeCompleted;
 
     private List<Mission<?>> missions;
 
@@ -30,8 +33,11 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
         super("menuIslandMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getIslandMissions().stream()
-                    .filter(mission -> !mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission))
+                    .filter(mission -> (!mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission) &&
+                            (!removeCompleted || superiorPlayer.getIsland().canCompleteMissionAgain(mission))))
                     .collect(Collectors.toList());
+            if(sortByCompletion)
+                this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
         }
     }
 
@@ -109,6 +115,11 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
         return Math.round((float) progress * 100);
     }
 
+    private int getCompletionStatus(Mission<?> mission){
+        return !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
+                plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
+    }
+
     public static void init(){
         MenuIslandMissions menuIslandMissions = new MenuIslandMissions(null);
 
@@ -122,6 +133,9 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
         if(convertOldGUI(cfg)){
             cfg.save(file);
         }
+
+        sortByCompletion = cfg.getBoolean("sort-by-completion", false);
+        removeCompleted = cfg.getBoolean("remove-completed", false);
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandMissions, "island-missions.yml", cfg);
 

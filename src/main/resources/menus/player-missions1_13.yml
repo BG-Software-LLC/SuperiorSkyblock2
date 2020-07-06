@@ -20,6 +20,13 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
+# Should missions be sorted by their completion status?
+# Not completed -> Can complete -> Completed
+sort-by-completion: false
+
+# Should completed missions not be displayed in the menu?
+remove-completed: false
+
 items:
   '%':
     type: PAPER
