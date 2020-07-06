@@ -305,11 +305,6 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlockUnstack(EntityExplodeEvent e){
-        e.blockList().removeIf(block -> tryUnstack(null, block, plugin));
-    }
-
     private boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
         if(!plugin.getSettings().stackedBlocksEnabled)
             return false;
@@ -440,6 +435,10 @@ public final class BlocksListener implements Listener {
             e.blockList().remove(block);
 
             blockItem = block.getState().getData().toItemStack(amount);
+
+            Island island = plugin.getGrid().getIslandAt(block.getLocation());
+            if(island != null)
+                island.handleBlockBreak(block, amount);
 
             plugin.getGrid().setBlockAmount(block, 0);
             block.setType(Material.AIR);
