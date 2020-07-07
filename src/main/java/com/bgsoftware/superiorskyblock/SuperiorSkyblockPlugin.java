@@ -36,6 +36,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
@@ -536,7 +537,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("PAINTING");
         IslandPrivilege.register("PAYPAL_SHOW");
         IslandPrivilege.register("PICKUP_DROPS");
-        IslandPrivilege.register("PICKUP_FISH");
+        if(!ServerVersion.isLegacy())
+            IslandPrivilege.register("PICKUP_FISH");
         IslandPrivilege.register("PROMOTE_MEMBERS");
         IslandPrivilege.register("RANKUP");
         IslandPrivilege.register("RATINGS_SHOW");
