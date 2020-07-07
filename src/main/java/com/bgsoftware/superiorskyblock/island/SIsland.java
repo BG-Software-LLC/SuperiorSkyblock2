@@ -118,7 +118,7 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     private final SyncedObject<Boolean> beingRecalculated = SyncedObject.of(false);
-    private boolean rawKeyPlacements = true;
+    private boolean rawKeyPlacements = false;
 
     /*
      * Island data
@@ -179,6 +179,8 @@ public final class SIsland extends DatabaseObject implements Island {
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
         this.creationTime = resultSet.getLong("creationTime");
         this.creationTimeDate = new Date(creationTime * 1000).toString();
+
+        rawKeyPlacements = true;
 
         IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
         IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
