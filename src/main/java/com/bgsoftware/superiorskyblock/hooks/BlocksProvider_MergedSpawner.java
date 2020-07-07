@@ -3,10 +3,13 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -54,9 +57,10 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(MergedSpawnerBreakEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             if(island != null)
-                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getPlayer().isSneaking() ? e.getAmount() : 1);
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnerType()),
+                        e.getPlayer().isSneaking() || e.getPlayer().getGameMode() == GameMode.CREATIVE ? e.getAmount() : 1);
         }
 
     }
