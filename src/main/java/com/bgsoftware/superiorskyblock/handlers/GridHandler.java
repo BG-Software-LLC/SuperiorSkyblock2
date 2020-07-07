@@ -59,7 +59,7 @@ public final class GridHandler implements GridManager {
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Set<UUID> customWorlds = Sets.newHashSet();
-    private final Set<Location> servedPositions = Sets.newHashSet();
+    private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -104,7 +104,7 @@ public final class GridHandler implements GridManager {
         }
 
         Location islandLocation = getNextLocation();
-        servedPositions.add(islandLocation);
+        servedPositions.add(SBlockPosition.of(islandLocation));
 
         SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
         EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
@@ -149,7 +149,7 @@ public final class GridHandler implements GridManager {
 
     private void onCreationIslandFinish(Location location){
         if(location != null)
-            servedPositions.remove(location);
+            servedPositions.remove(SBlockPosition.of(location));
     }
 
     @Override
@@ -293,33 +293,33 @@ public final class GridHandler implements GridManager {
 
     private Location getNextLocation(Location location){
         location.setY(plugin.getSettings().islandsHeight);
-        BlockFace islandFace = getIslandFace();
+        BlockFace islandFace = getIslandFace(location);
 
         int islandRange = plugin.getSettings().maxIslandSize * 3;
 
         if(islandFace == BlockFace.NORTH){
             location.add(islandRange, 0, 0);
         }else if(islandFace == BlockFace.EAST){
-            if(lastIsland.getX() == -lastIsland.getZ())
+            if(location.getX() == -location.getZ())
                 location.add(islandRange, 0, 0);
-            else if(lastIsland.getX() == lastIsland.getZ())
+            else if(location.getX() == location.getZ())
                 location.subtract(islandRange, 0, 0);
             else
                 location.add(0, 0, islandRange);
         }else if(islandFace == BlockFace.SOUTH){
-            if(lastIsland.getX() == -lastIsland.getZ())
+            if(location.getX() == -location.getZ())
                 location.subtract(0, 0, islandRange);
             else
                 location.subtract(islandRange, 0, 0);
         }else if(islandFace == BlockFace.WEST){
-            if(lastIsland.getX() == lastIsland.getZ())
+            if(location.getX() == location.getZ())
                 location.add(islandRange, 0, 0);
             else
                 location.subtract(0, 0, islandRange);
         }
 
-        if(servedPositions.contains(location) || getIslandAt(location) != null){
-            return getNextLocation(location);
+        if(servedPositions.contains(SBlockPosition.of(location)) || getIslandAt(location) != null){
+            return getNextLocation(location.clone());
         }
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(location));
@@ -534,14 +534,14 @@ public final class GridHandler implements GridManager {
                 .execute(async);
     }
 
-    private BlockFace getIslandFace(){
+    private BlockFace getIslandFace(Location location){
         //Possibilities: North / East
-        if(lastIsland.getX() >= lastIsland.getZ()) {
-            return -lastIsland.getX() > lastIsland.getZ() ? BlockFace.NORTH : BlockFace.EAST;
+        if(location.getX() >= location.getZ()) {
+            return -location.getX() > location.getZ() ? BlockFace.NORTH : BlockFace.EAST;
         }
         //Possibilities: South / West
         else{
-            return -lastIsland.getX() > lastIsland.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
+            return -location.getX() > location.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
         }
     }
 
