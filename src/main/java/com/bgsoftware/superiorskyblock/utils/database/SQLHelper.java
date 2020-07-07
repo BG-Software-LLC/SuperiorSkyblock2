@@ -21,7 +21,9 @@ public final class SQLHelper {
 
     private static HikariDataSource dataSource;
 
-    private SQLHelper(){}
+    private SQLHelper(){
+
+    }
 
     public static void waitForConnection(){
         try {

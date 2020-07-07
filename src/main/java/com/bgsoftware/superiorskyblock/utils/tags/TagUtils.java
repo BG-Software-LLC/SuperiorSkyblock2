@@ -16,7 +16,11 @@ import java.util.Map;
 @SuppressWarnings("WeakerAccess")
 public final class TagUtils {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private TagUtils(){
+
+    }
 
     public static CompoundTag inventoryToCompound(ItemStack[] itemStacks){
         Map<String, Tag<?>> compoundValues = new HashMap<>();

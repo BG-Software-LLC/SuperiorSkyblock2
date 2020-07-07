@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.FileUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -31,6 +32,10 @@ import java.util.jar.JarInputStream;
 public final class FileUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private FileUtils(){
+
+    }
 
     public static ItemBuilder getItemStack(String fileName, ConfigurationSection section){
         if(section == null || !section.contains("type"))

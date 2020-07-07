@@ -8,6 +8,10 @@ public final class CommandUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private CommandUtils(){
+
+    }
+
     public static void dispatchSubCommand(CommandSender sender, String subCommand){
         dispatchSubCommand(sender, subCommand, "");
     }

@@ -12,6 +12,10 @@ import org.bukkit.block.BlockFace;
 
 public final class LocationUtils {
 
+    private LocationUtils(){
+
+    }
+
     public static boolean isSameBlock(Location loc1, Location loc2){
         return loc1.getWorld().getName().equals(loc2.getWorld().getName()) && loc1.getBlockX() == loc2.getBlockX() &&
                 loc1.getBlockY() == loc2.getBlockY() && loc1.getBlockZ() == loc2.getBlockZ();

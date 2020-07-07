@@ -15,6 +15,10 @@ public final class Executor {
     private static ExecutorService databaseExecutor;
     private static boolean shutdown = false;
 
+    private Executor(){
+
+    }
+
     public static void init(SuperiorSkyblockPlugin plugin){
         Executor.plugin = plugin;
         databaseExecutor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());

@@ -29,6 +29,10 @@ public final class ChunksProvider {
 
     private static BukkitTask chunksLoaderId;
 
+    private ChunksProvider(){
+
+    }
+
     public static CompletableFuture<Chunk> loadChunk(World world, int x, int z, Consumer<Chunk> onLoadConsumer){
         ChunkPosition chunkPosition = ChunkPosition.of(world, x, z);
         Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);

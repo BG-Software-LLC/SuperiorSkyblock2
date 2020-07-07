@@ -25,6 +25,10 @@ import java.util.UUID;
 
 public final class IslandSerializer {
 
+    private IslandSerializer(){
+
+    }
+
     public static String serializePlayers(SyncedObject<? extends Collection<SuperiorPlayer>> collection) {
         return collection.readAndGet(IslandSerializer::serializePlayers);
     }

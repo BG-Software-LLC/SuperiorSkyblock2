@@ -7,6 +7,10 @@ import java.util.Comparator;
 
 public final class SortingComparators {
 
+    private SortingComparators(){
+
+    }
+
     private final static Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
         String firstName = o1.getName().isEmpty() ? o1.getOwner().getName() : o1.getName();
         String secondName = o2.getName().isEmpty() ? o2.getOwner().getName() : o2.getName();

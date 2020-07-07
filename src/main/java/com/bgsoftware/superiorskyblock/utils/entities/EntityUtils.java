@@ -31,6 +31,10 @@ public final class EntityUtils {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Registry<UUID, ItemStack[]> armorStandsContent = Registry.createRegistry();
 
+    private EntityUtils(){
+
+    }
+
     public static boolean isEquipment(LivingEntity livingEntity, ItemStack itemStack){
         if(livingEntity instanceof Pig){
             return ((Pig) livingEntity).hasSaddle() && itemStack.getType() == Material.SADDLE;

@@ -4,6 +4,10 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 
 public final class IslandPrivileges {
 
+    private IslandPrivileges(){
+
+    }
+
     public static IslandPrivilege ALL = IslandPrivilege.getByName("ALL");
     public static IslandPrivilege ANIMAL_BREED = IslandPrivilege.getByName("ANIMAL_BREED");
     public static IslandPrivilege ANIMAL_DAMAGE = IslandPrivilege.getByName("ANIMAL_DAMAGE");

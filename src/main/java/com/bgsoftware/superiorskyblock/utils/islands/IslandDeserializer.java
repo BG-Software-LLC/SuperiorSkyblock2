@@ -31,6 +31,10 @@ public final class IslandDeserializer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private IslandDeserializer(){
+
+    }
+
     public static void deserializePlayers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync){
         if(members == null)
             return;

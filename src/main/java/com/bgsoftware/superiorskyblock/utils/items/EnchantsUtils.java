@@ -11,6 +11,10 @@ public final class EnchantsUtils {
 
     private static Enchantment glowEnchant;
 
+    private EnchantsUtils(){
+
+    }
+
     public static void registerGlowEnchantment(){
         glowEnchant = plugin.getNMSAdapter().getGlowEnchant();
 

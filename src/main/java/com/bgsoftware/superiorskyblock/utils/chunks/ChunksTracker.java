@@ -23,6 +23,10 @@ public final class ChunksTracker {
     private static final Registry<Island, Set<ChunkPosition>> dirtyChunks = Registry.createRegistry();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private ChunksTracker(){
+
+    }
+
     public static void markEmpty(Island island, Block block, boolean save){
         markEmpty(island, ChunkPosition.of(block.getWorld(), block.getX() >> 4, block.getZ() >> 4), save);
     }

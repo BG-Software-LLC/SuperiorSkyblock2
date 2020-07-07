@@ -8,6 +8,10 @@ import java.util.List;
 
 public final class MenuConverter {
 
+    private MenuConverter(){
+
+    }
+
     public static int convertFillItems(ConfigurationSection fillItemsSection, int charCounter, char[] patternChars, ConfigurationSection itemsSection,  ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
         for (String itemFill : fillItemsSection.getKeys(false)){
             ConfigurationSection section = fillItemsSection.getConfigurationSection(itemFill);

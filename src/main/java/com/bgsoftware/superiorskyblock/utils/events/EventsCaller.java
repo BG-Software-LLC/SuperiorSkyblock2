@@ -32,6 +32,10 @@ import java.util.List;
 
 public final class EventsCaller {
 
+    private EventsCaller(){
+
+    }
+
     public static boolean callIslandEnterEvent(SuperiorPlayer superiorPlayer, Island island, IslandEnterEvent.EnterCause enterCause){
         IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, island, enterCause);
         Bukkit.getPluginManager().callEvent(islandEnterEvent);
@@ -84,6 +88,7 @@ public final class EventsCaller {
         return !islandInviteEvent.isCancelled();
     }
 
+    @SuppressWarnings("all")
     public static boolean callIslandJoinEvent(SuperiorPlayer superiorPlayer, Island island){
         IslandJoinEvent islandJoinEvent = new IslandJoinEvent(superiorPlayer, island);
         Bukkit.getPluginManager().callEvent(islandJoinEvent);
@@ -128,7 +133,7 @@ public final class EventsCaller {
         Bukkit.getPluginManager().callEvent(islandWorthUpdateEvent);
     }
 
-    public static EventResult<Pair<List<ItemStack>, List<String>>> callMissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
+    public static EventResult<Pair<List<ItemStack>, List<String>>> callMissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
         MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, islandMission, itemRewards, commandRewards);
         Bukkit.getPluginManager().callEvent(missionCompleteEvent);
         return EventResult.of(missionCompleteEvent.isCancelled(), new Pair<>(missionCompleteEvent.getItemRewards(), missionCompleteEvent.getCommandRewards()));

@@ -16,33 +16,11 @@ public final class HeadUtils {
 
     private static final String NULL_PLAYER_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
 
-    public static String getMaterial() {
-        return ServerVersion.isLegacy() ? "SKULL_ITEM:3" : "PLAYER_HEAD";
+    private HeadUtils(){
+
     }
 
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture){
-//        SkullMeta headMeta = (SkullMeta) itemStack.getItemMeta();
-//        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-//        profile.getProperties().put("textures", new Property("textures", String.valueOf(texture)));
-//        Field profileField;
-//        try
-//        {
-//            profileField = headMeta.getClass().getDeclaredField("profile");
-//            profileField.setAccessible(true);
-//            profileField.set(headMeta, profile);
-//        }
-//        catch (Exception ex){}
-//
-//        itemStack.setItemMeta(headMeta);
-//
-//        net.minecraft.server.v1_16_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
-//        NBTTagCompound tagCompound = nmsItem.getOrCreateTag();
-//
-//        Bukkit.broadcastMessage(tagCompound + "");
-//
-//        return itemStack;
-
-
         CompoundTag compoundTag = TagUtils.itemToCompound(itemStack);
 
         CompoundTag nbtTag = (CompoundTag) compoundTag.getValue().getOrDefault("NBT", new CompoundTag());

@@ -35,6 +35,10 @@ public final class StringUtils {
 
     private static NumberFormat numberFormatter;
 
+    private StringUtils(){
+
+    }
+
     public static void setNumberFormatter(String numberFormat){
         numberFormat = numberFormat.replace("_", "-");
 

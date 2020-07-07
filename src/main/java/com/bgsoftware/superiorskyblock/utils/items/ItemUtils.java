@@ -18,6 +18,10 @@ import java.util.Map;
 
 public final class ItemUtils {
 
+    private ItemUtils(){
+
+    }
+
     @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, Event event, Player player){
         try{

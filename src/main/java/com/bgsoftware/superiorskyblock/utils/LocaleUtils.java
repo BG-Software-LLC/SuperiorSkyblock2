@@ -15,6 +15,10 @@ public final class LocaleUtils {
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
     private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
 
+    private LocaleUtils(){
+
+    }
+
     public static Locale getLocale(CommandSender sender){
         return sender instanceof Player ? SSuperiorPlayer.of(sender).getUserLocale() : com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
     }

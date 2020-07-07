@@ -15,6 +15,10 @@ public final class ReflectionUtils {
 
     private static final Registry<Fields, Field> fieldsMap = Registry.createRegistry();
 
+    private ReflectionUtils(){
+
+    }
+
     public static boolean init() {
         try {
             Class<?> blockFlowerPotClass = getClass("net.minecraft.server.VERSION.BlockFlowerPot"),
