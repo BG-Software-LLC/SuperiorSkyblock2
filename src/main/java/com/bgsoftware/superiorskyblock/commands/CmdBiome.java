@@ -17,7 +17,7 @@ public final class CmdBiome implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("setbiome", "biome");
+        return Arrays.asList("biome", "setbiome");
     }
 
     @Override
