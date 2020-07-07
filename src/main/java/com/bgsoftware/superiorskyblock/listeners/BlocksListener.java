@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -72,9 +73,9 @@ public final class BlocksListener implements Listener {
 
         if(island != null) {
             if(e.getBlockReplacedState().getType().name().contains("LAVA"))
-                island.handleBlockBreak(Key.of("LAVA"), 1);
+                island.handleBlockBreak(ConstantKeys.LAVA, 1);
             else if(e.getBlockReplacedState().getType().name().contains("WATER"))
-                island.handleBlockBreak(Key.of("WATER"), 1);
+                island.handleBlockBreak(ConstantKeys.WATER, 1);
             island.handleBlockPlace(e.getBlockPlaced());
 
             ChunksTracker.markDirty(island, e.getBlock(), true);
@@ -153,7 +154,7 @@ public final class BlocksListener implements Listener {
             if(block.getType() == Material.DRAGON_EGG){
                 Island island = plugin.getGrid().getIslandAt(block.getLocation());
                 if(island != null)
-                    island.handleBlockBreak(Key.of("DRAGON_EGG"), 1);
+                    island.handleBlockBreak(ConstantKeys.DRAGON_EGG, 1);
             }
         }
     }

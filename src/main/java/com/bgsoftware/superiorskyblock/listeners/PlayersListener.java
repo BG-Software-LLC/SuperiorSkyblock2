@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -478,7 +479,7 @@ public final class PlayersListener implements Listener {
 
         e.getPlayer().getInventory().addItem(new ItemStack(Material.LAVA_BUCKET));
 
-        island.handleBlockBreak(Key.of("OBSIDIAN"), 1);
+        island.handleBlockBreak(ConstantKeys.OBSIDIAN, 1);
 
         e.getClickedBlock().setType(Material.AIR);
     }

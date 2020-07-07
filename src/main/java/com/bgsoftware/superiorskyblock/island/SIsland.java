@@ -54,6 +54,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -1138,7 +1139,7 @@ public final class SIsland extends DatabaseObject implements Island {
                         for (int x = 0; x < 16; x++) {
                             for (int z = 0; z < 16; z++) {
                                 for (int y = 0; y < 256; y++) {
-                                    Key blockKey = Key.of("AIR");
+                                    Key blockKey = ConstantKeys.AIR;
 
                                     try{
                                         blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);

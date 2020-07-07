@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -311,7 +312,7 @@ public abstract class PlaceholderHook {
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getMoneyInBank(), superiorPlayer.getUserLocale());
                     case "hoppers_limit":
-                        return String.valueOf(island.getBlockLimit(Key.of("HOPPER")));
+                        return String.valueOf(island.getBlockLimit(ConstantKeys.HOPPER));
                     case "crops_multiplier":
                         return String.valueOf(island.getCropGrowthMultiplier());
                     case "spawners_multiplier":

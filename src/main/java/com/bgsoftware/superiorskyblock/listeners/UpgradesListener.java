@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
@@ -140,23 +141,24 @@ public final class UpgradesListener implements Listener {
 
         switch (e.getItem().getType().name()){
             case "HOPPER_MINECART":
-                island.handleBlockPlace(Key.of("HOPPER"), 1);
+                island.handleBlockPlace(ConstantKeys.HOPPER, 1);
                 break;
             case "COMMAND_MINECART":
             case "COMMAND_BLOCK_MINECART":
-                island.handleBlockPlace(Key.of(ServerVersion.isAtLeast(ServerVersion.v1_13) ? "COMMAND_BLOCK" : "COMMAND"), 1);
+                island.handleBlockPlace(ServerVersion.isAtLeast(ServerVersion.v1_13) ?
+                        ConstantKeys.COMMAND_BLOCK : ConstantKeys.COMMAND, 1);
                 break;
             case "EXPLOSIVE_MINECART":
             case "TNT_MINECART":
-                island.handleBlockPlace(Key.of("TNT"), 1);
+                island.handleBlockPlace(ConstantKeys.TNT, 1);
                 break;
             case "POWERED_MINECART":
             case "FURNACE_MINECART":
-                island.handleBlockPlace(Key.of("FURNACE"), 1);
+                island.handleBlockPlace(ConstantKeys.FURNACE, 1);
                 break;
             case "STORAGE_MINECART":
             case "CHEST_MINECART":
-                island.handleBlockPlace(Key.of("CHEST"), 1);
+                island.handleBlockPlace(ConstantKeys.CHEST, 1);
                 break;
         }
     }
@@ -205,23 +207,23 @@ public final class UpgradesListener implements Listener {
 
         switch (e.getItem().getType().name()){
             case "HOPPER_MINECART":
-                key = Key.of("HOPPER");
+                key = ConstantKeys.HOPPER;
                 break;
             case "COMMAND_MINECART":
             case "COMMAND_BLOCK_MINECART":
-                key = Key.of(ServerVersion.isAtLeast(ServerVersion.v1_13) ? "COMMAND_BLOCK" : "COMMAND");
+                key = ServerVersion.isAtLeast(ServerVersion.v1_13) ? ConstantKeys.COMMAND_BLOCK : ConstantKeys.COMMAND;
                 break;
             case "EXPLOSIVE_MINECART":
             case "TNT_MINECART":
-                key = Key.of("TNT");
+                key = ConstantKeys.TNT;
                 break;
             case "POWERED_MINECART":
             case "FURNACE_MINECART":
-                key = Key.of("FURNACE");
+                key = ConstantKeys.FURNACE;
                 break;
             case "STORAGE_MINECART":
             case "CHEST_MINECART":
-                key = Key.of("CHEST");
+                key = ConstantKeys.CHEST;
                 break;
         }
 
