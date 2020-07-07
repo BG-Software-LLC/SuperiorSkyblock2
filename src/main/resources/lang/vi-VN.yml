@@ -117,6 +117,7 @@ COMMAND_ARGUMENT_LEADER: lang-dao
 COMMAND_ARGUMENT_LEVEL: cap-do
 COMMAND_ARGUMENT_LIMIT: gioi-han
 COMMAND_ARGUMENT_MATERIAL: vat-lieu
+COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: tin-nha...
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
 COMMAND_ARGUMENT_MULTIPLIER: da-cap
@@ -171,6 +172,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Gửi cho tất cả các thành viên đảo
   mà không cần bất kỳ prefixes.
 COMMAND_DESCRIPTION_ADMIN_NAME: Thay đổi tên của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Mở một hòn đảo cho công cộng.
+COMMAND_DESCRIPTION_ADMIN_OPEN_MENU: 'Open a custom menu for a player.'
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Thăng chức thành viên ở đảo của người chơi khác.
 COMMAND_DESCRIPTION_ADMIN_PURGE: lọc đảo.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn đảo.

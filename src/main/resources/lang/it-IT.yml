@@ -120,6 +120,7 @@ COMMAND_ARGUMENT_LEADER: capo
 COMMAND_ARGUMENT_LEVEL: livello
 COMMAND_ARGUMENT_LIMIT: limite
 COMMAND_ARGUMENT_MATERIAL: materiale
+COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: messagio...
 COMMAND_ARGUMENT_MISSION_NAME: nome-missione
 COMMAND_ARGUMENT_MULTIPLIER: moltiplicatore
@@ -176,6 +177,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Invia a tutti i membri dell'isola un messaggi
   senza prefissi.
 COMMAND_DESCRIPTION_ADMIN_NAME: Cambia il nome di un'isola.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Apri un'isola al pubblico.
+COMMAND_DESCRIPTION_ADMIN_OPEN_MENU: 'Open a custom menu for a player.'
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promuovi un membro nell'isola di un altro giocatore.
 COMMAND_DESCRIPTION_ADMIN_PURGE: Elimina le isole.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Potenzia un upgrade per un isola.

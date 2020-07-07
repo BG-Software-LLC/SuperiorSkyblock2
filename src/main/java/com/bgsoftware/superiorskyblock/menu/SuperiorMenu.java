@@ -46,7 +46,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
             'X', 'Y', 'Z'
     };
 
-    private static final Registry<String, MenuData> dataMap = Registry.createRegistry();
+    protected static final Registry<String, MenuData> dataMap = Registry.createRegistry();
 
     private final String identifier;
     protected final SuperiorPlayer superiorPlayer;
@@ -391,10 +391,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static class MenuData{
 
-        private Registry<Integer, SoundWrapper> sounds = Registry.createRegistry();
-        private Registry<Integer, List<String>> commands = Registry.createRegistry();
-        private Registry<Integer, ItemBuilder> fillItems = Registry.createRegistry();
-        private Registry<String, Object> data = Registry.createRegistry();
+        private final Registry<Integer, SoundWrapper> sounds = Registry.createRegistry();
+        private final Registry<Integer, List<String>> commands = Registry.createRegistry();
+        private final Registry<Integer, ItemBuilder> fillItems = Registry.createRegistry();
+        private final Registry<String, Object> data = Registry.createRegistry();
         private String title = "";
         private InventoryType inventoryType = InventoryType.CHEST;
         private int rowsSize = 6;

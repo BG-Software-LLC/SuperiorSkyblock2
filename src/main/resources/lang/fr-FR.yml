@@ -92,6 +92,7 @@ COMMAND_ARGUMENT_LEADER: chef
 COMMAND_ARGUMENT_LEVEL: niveau
 COMMAND_ARGUMENT_LIMIT: limite
 COMMAND_ARGUMENT_MATERIAL: matériau
+COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: message...
 COMMAND_ARGUMENT_MISSION_NAME: nom-de-la-mission
 COMMAND_ARGUMENT_MULTIPLIER: multiplicateur
@@ -145,6 +146,7 @@ COMMAND_DESCRIPTION_ADMIN_MSG: Envoyer un message sans aucun préfixe au joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Envoyer un message sans aucun préfixe à tous les membres de lîle.
 COMMAND_DESCRIPTION_ADMIN_NAME: Changer le nom d'une île.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Ouvrir une île au public.
+COMMAND_DESCRIPTION_ADMIN_OPEN_MENU: 'Open a custom menu for a player.'
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.

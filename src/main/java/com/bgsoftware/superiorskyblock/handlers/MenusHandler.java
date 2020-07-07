@@ -33,6 +33,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuBlank;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
@@ -41,6 +42,8 @@ import java.io.File;
 public final class MenusHandler implements MenusManager {
 
     public MenusHandler(SuperiorSkyblockPlugin plugin){
+        SuperiorMenuCustom.resetMenus();
+
         //Reload all menus
         loadMenu(SuperiorMenuBlank::init);
         loadMenu(SuperiorMenuSettings::init);
@@ -77,6 +80,24 @@ public final class MenusHandler implements MenusManager {
             //noinspection ResultOfMethodCallIgnored
             guiFolder.renameTo(oldGuisFolder);
         }
+
+        File customMenusFolder = new File(plugin.getDataFolder(), "menus/custom");
+
+        if(!customMenusFolder.exists()){
+            //noinspection ResultOfMethodCallIgnored
+            customMenusFolder.mkdirs();
+            return;
+        }
+
+        //noinspection ConstantConditions
+        for (File menuFile : customMenusFolder.listFiles()) {
+            try{
+                SuperiorMenuCustom.createMenu(menuFile);
+            }catch(Exception ex){
+                new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+            }
+        }
+
     }
 
     @Override
