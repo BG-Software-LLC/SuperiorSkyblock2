@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
 import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -21,6 +22,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
@@ -48,6 +50,7 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -638,6 +641,37 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPickupFishBucket(PlayerInteractEntityEvent e){
+        //noinspection deprecation
+        if(!(e.getRightClicked() instanceof Fish) || ServerVersion.isLegacy())
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+
+        if(island == null) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
+                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+                e.setCancelled(true);
+            }
+
+            return;
+        }
+
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_FISH)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(!island.isInsideRange(e.getRightClicked().getLocation())){
+            e.setCancelled(true);
+            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+        }
+
     }
 
     private boolean handleBlockPlace(Island island, SuperiorPlayer superiorPlayer, Block block, boolean sendMessages){

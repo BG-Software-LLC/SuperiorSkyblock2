@@ -43,6 +43,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege PAINTING = IslandPrivilege.getByName("PAINTING");
     public static IslandPrivilege PAYPAL_SHOW = IslandPrivilege.getByName("PAYPAL_SHOW");
     public static IslandPrivilege PICKUP_DROPS = IslandPrivilege.getByName("PICKUP_DROPS");
+    public static IslandPrivilege PICKUP_FISH = IslandPrivilege.getByName("PICKUP_FISH");
     public static IslandPrivilege PROMOTE_MEMBERS = IslandPrivilege.getByName("PROMOTE_MEMBERS");
     public static IslandPrivilege RANKUP = IslandPrivilege.getByName("RANKUP");
     public static IslandPrivilege RATINGS_SHOW = IslandPrivilege.getByName("RATINGS_SHOW");
