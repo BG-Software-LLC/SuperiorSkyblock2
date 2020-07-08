@@ -39,7 +39,7 @@ public enum Query {
     ISLAND_SET_COOP_LIMIT("UPDATE {prefix}islands SET coopLimit=? WHERE owner=?;"),
     ISLAND_SET_ISLAND_EFFECTS("UPDATE {prefix}islands SET islandEffects=? WHERE owner=?;"),
     ISLAND_UPDATE("UPDATE {prefix}islands SET teleportLocation=?,visitorsLocation=?,members=?,banned=?,permissionNodes=?,upgrades=?,warps=?,islandBank=?,islandSize=?,blockLimits=?,teamLimit=?,cropGrowth=?,spawnerRates=?,mobDrops=?,discord=?,paypal=?,warpsLimit=?,bonusWorth=?,locked=?,blockCounts=?,name=?,description=?,ratings=?,missions=?,settings=?,ignored=?,generator=?,generatedSchematics=?,schemName=?,uniqueVisitors=?,unlockedWorlds=?,lastTimeUpdate=?,dirtyChunks=?,entityLimits=?,bonusLevel=?,creationTime=?,coopLimit=?,islandEffects=? WHERE owner=?;"),
-    ISLAND_INSERT("INSERT INTO {prefix}islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored,generator,generatedSchematics,schemName,uniqueVisitors,unlockedWorlds,lastTimeUpdate,dirtyChunks,entityLimits,bonusLevel,creationTime,coopLimit,islandEffects) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
+    ISLAND_INSERT("REPLACE INTO {prefix}islands (owner,center,teleportLocation,members,banned,permissionNodes,upgrades,warps,islandBank,islandSize,blockLimits,teamLimit,cropGrowth,spawnerRates,mobDrops,discord,paypal,warpsLimit,bonusWorth,locked,blockCounts,name,visitorsLocation,description,ratings,missions,settings,ignored,generator,generatedSchematics,schemName,uniqueVisitors,unlockedWorlds,lastTimeUpdate,dirtyChunks,entityLimits,bonusLevel,creationTime,coopLimit,islandEffects) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"),
     ISLAND_DELETE("DELETE FROM {prefix}islands WHERE owner=?;"),
 
     PLAYER_SET_LEADER("UPDATE {prefix}players SET teamLeader=? WHERE player=?;"),
@@ -55,17 +55,17 @@ public enum Query {
     PLAYER_SET_LANGUAGE("UPDATE {prefix}players SET language=? WHERE player=?;"),
     PLAYER_SET_TOGGLED_BORDER("UPDATE {prefix}players SET toggledBorder=? WHERE player=?;"),
     PLAYER_UPDATE("UPDATE {prefix}players SET teamLeader=?,name=?,islandRole=?,textureValue=?,disbands=?,toggledPanel=?,islandFly=?,borderColor=?,lastTimeStatus=?,missions=?,language=?,toggledBorder=? WHERE player=?;"),
-    PLAYER_INSERT("INSERT INTO {prefix}players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions,language,toggledBorder) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);"),
+    PLAYER_INSERT("REPLACE INTO {prefix}players (player,teamLeader,name,islandRole,textureValue,disbands,toggledPanel,islandFly,borderColor,lastTimeStatus,missions,language,toggledBorder) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);"),
     PLAYER_DELETE("DELETE FROM {prefix}players WHERE player=?;"),
 
     STACKED_BLOCKS_UPDATE("UPDATE {prefix}stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
-    STACKED_BLOCKS_INSERT("INSERT INTO {prefix}stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),
+    STACKED_BLOCKS_INSERT("REPLACE INTO {prefix}stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),
     STACKED_BLOCKS_DELETE("DELETE FROM {prefix}stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
 
     GRID_UPDATE_LAST_ISLAND("UPDATE {prefix}grid SET lastIsland=?;"),
-    GRID_INSERT("INSERT INTO {prefix}grid (lastIsland,stackedBlocks,maxIslandSize,world,dirtyChunks) VALUES(?,?,?,?,?);");
+    GRID_INSERT("REPLACE INTO {prefix}grid (lastIsland,stackedBlocks,maxIslandSize,world,dirtyChunks) VALUES(?,?,?,?,?);");
 
-    private String query;
+    private final String query;
 
     Query(String query) {
         this.query = query;
