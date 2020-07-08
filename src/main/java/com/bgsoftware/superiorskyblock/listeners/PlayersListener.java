@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -75,6 +74,11 @@ public final class PlayersListener implements Listener {
         String fileName = plugin.getFileName().split("\\.")[0];
         String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";
         this.buildName = buildName.isEmpty() ? "" : " (Build: " + buildName + ")";
+
+        try{
+            Class.forName("org.bukkit.event.entity.EntityPotionEffectEvent");
+            Bukkit.getPluginManager().registerEvents(new EffectsListener(), plugin);
+        }catch (Throwable ignored){}
     }
 
     @EventHandler
@@ -484,24 +488,6 @@ public final class PlayersListener implements Listener {
         e.getClickedBlock().setType(Material.AIR);
     }
 
-    @EventHandler(ignoreCancelled = true)
-    public void onPlayerEffect(EntityPotionEffectEvent e){
-        if(e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
-                e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        if(island == null)
-            return;
-
-        int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
-
-        if(islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
-            e.setCancelled(true);
-        }
-    }
-
     private void handleTeleport(SuperiorPlayer superiorPlayer, Island island, Location toTeleport){
         superiorPlayer.teleport(toTeleport);
         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
@@ -554,6 +540,28 @@ public final class PlayersListener implements Listener {
             teleportTask.cancel();
             ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
+        }
+
+    }
+
+    private final class EffectsListener implements Listener{
+
+        @EventHandler(ignoreCancelled = true)
+        public void onPlayerEffect(EntityPotionEffectEvent e){
+            if(e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
+                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+            if(island == null)
+                return;
+
+            int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
+
+            if(islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
+                e.setCancelled(true);
+            }
         }
 
     }
