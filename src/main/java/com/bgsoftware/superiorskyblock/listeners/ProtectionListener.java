@@ -618,7 +618,8 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFertilize(PlayerInteractEvent e){
-        if(e.getClickedBlock() == null || e.getItem() == null || !Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem()))
+        if(e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
+                !Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem()))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
