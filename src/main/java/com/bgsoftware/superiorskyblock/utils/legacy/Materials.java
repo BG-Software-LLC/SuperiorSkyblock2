@@ -10,7 +10,8 @@ public enum Materials {
     GOLDEN_AXE("GOLD_AXE"),
     SPAWNER("MOB_SPAWNER"),
     SUNFLOWER("DOUBLE_PLANT"),
-    BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 15);
+    BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 15),
+    BONE_MEAL("INK_SACK", 15);
 
     Materials(String bukkitType){
         this(bukkitType, 0);
@@ -21,8 +22,8 @@ public enum Materials {
         this.bukkitData = (short) bukkitData;
     }
 
-    private String bukkitType;
-    private short bukkitData;
+    private final String bukkitType;
+    private final short bukkitData;
 
     public Material toBukkitType(){
         try {

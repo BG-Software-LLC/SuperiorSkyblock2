@@ -35,7 +35,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFertilizeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -617,13 +616,13 @@ public final class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onBlockFertilize(BlockFertilizeEvent e){
-        if(e.getPlayer() == null)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockFertilize(PlayerInteractEvent e){
+        if(e.getClickedBlock() == null || e.getItem() == null || !Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem()))
             return;
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
 
         if(island == null) {
             if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
@@ -640,7 +639,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(!island.isInsideRange(e.getBlock().getLocation())){
+        if(!island.isInsideRange(e.getClickedBlock().getLocation())){
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
