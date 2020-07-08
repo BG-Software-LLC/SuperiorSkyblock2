@@ -280,17 +280,7 @@ public final class DataHandler {
     }
 
     public void insertIsland(Island island){
-        Executor.async(() -> {
-            if(!containsIsland(island)){
-                ((SIsland) island).executeInsertStatement(true);
-            }else {
-                ((SIsland) island).executeUpdateStatement(true);
-            }
-        });
-    }
-
-    private boolean containsIsland(Island island){
-        return SQLHelper.doesConditionExist(String.format("SELECT * FROM {prefix}islands WHERE owner = '%s';", island.getOwner().getUniqueId()));
+        ((SIsland) island).executeInsertStatement(true);
     }
 
     public void deleteIsland(Island island){
@@ -298,15 +288,7 @@ public final class DataHandler {
     }
 
     public void insertPlayer(SuperiorPlayer player){
-        if(!containsPlayer(player)) {
-            ((SSuperiorPlayer) player).executeInsertStatement(true);
-        }else{
-            ((SSuperiorPlayer) player).executeUpdateStatement(true);
-        }
-    }
-
-    private boolean containsPlayer(SuperiorPlayer player){
-        return SQLHelper.doesConditionExist(String.format("SELECT * FROM {prefix}players WHERE player = '%s';", player.getUniqueId()));
+        ((SSuperiorPlayer) player).executeInsertStatement(true);
     }
 
     private boolean containsGrid(){
