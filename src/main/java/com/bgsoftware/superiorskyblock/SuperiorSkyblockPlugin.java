@@ -59,6 +59,7 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -68,6 +69,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -104,11 +106,35 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         plugin = this;
         new Metrics(this);
 
+        initCustomFilter();
+
         loadAPI();
 
         if(!loadNMSAdapter() || !ReflectionUtils.init()) {
             shouldEnable = false;
         }
+    }
+
+    private static final Pattern LISTENER_REGISTER_FAILURE =
+            Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
+
+    private String listenerRegisterFailure = "";
+
+    private void initCustomFilter(){
+        getLogger().setFilter(record -> {
+            Matcher matcher = LISTENER_REGISTER_FAILURE.matcher(record.getMessage());
+            if(matcher.find())
+                listenerRegisterFailure = matcher.group(3);
+
+            return true;
+        });
+    }
+
+    private void safeEventsRegister(Listener listener){
+        listenerRegisterFailure = "";
+        getServer().getPluginManager().registerEvents(listener, this);
+        if(!listenerRegisterFailure.isEmpty())
+            throw new RuntimeException(listenerRegisterFailure);
     }
 
     @Override
@@ -119,15 +145,22 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
-            getServer().getPluginManager().registerEvents(new BlocksListener(this), this);
-            getServer().getPluginManager().registerEvents(new ChunksListener(this), this);
-            getServer().getPluginManager().registerEvents(new CustomEventsListener(this), this);
-            getServer().getPluginManager().registerEvents(new GeneratorsListener(this), this);
-            getServer().getPluginManager().registerEvents(new MenusListener(), this);
-            getServer().getPluginManager().registerEvents(new PlayersListener(this), this);
-            getServer().getPluginManager().registerEvents(new ProtectionListener(this), this);
-            getServer().getPluginManager().registerEvents(new SettingsListener(this), this);
-            getServer().getPluginManager().registerEvents(new UpgradesListener(this), this);
+            try {
+                safeEventsRegister(new BlocksListener(this));
+                safeEventsRegister(new ChunksListener(this));
+                safeEventsRegister(new CustomEventsListener(this));
+                safeEventsRegister(new GeneratorsListener(this));
+                safeEventsRegister(new MenusListener());
+                safeEventsRegister(new PlayersListener(this));
+                safeEventsRegister(new ProtectionListener(this));
+                safeEventsRegister(new SettingsListener(this));
+                safeEventsRegister(new UpgradesListener(this));
+            }catch (RuntimeException ex){
+                new HandlerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
+                        HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                Bukkit.shutdown();
+                return;
+            }
 
             Executor.init(this);
 

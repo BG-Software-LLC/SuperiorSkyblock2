@@ -47,7 +47,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege PAINTING = IslandPrivilege.getByName("PAINTING");
     public static IslandPrivilege PAYPAL_SHOW = IslandPrivilege.getByName("PAYPAL_SHOW");
     public static IslandPrivilege PICKUP_DROPS = IslandPrivilege.getByName("PICKUP_DROPS");
-    public static IslandPrivilege PICKUP_FISH = IslandPrivilege.getByName("PICKUP_FISH");
+    public static IslandPrivilege PICKUP_FISH = getSafe("PICKUP_FISH");
     public static IslandPrivilege PROMOTE_MEMBERS = IslandPrivilege.getByName("PROMOTE_MEMBERS");
     public static IslandPrivilege RANKUP = IslandPrivilege.getByName("RANKUP");
     public static IslandPrivilege RATINGS_SHOW = IslandPrivilege.getByName("RATINGS_SHOW");
@@ -64,5 +64,13 @@ public final class IslandPrivileges {
     public static IslandPrivilege UNCOOP_MEMBER = IslandPrivilege.getByName("UNCOOP_MEMBER");
     public static IslandPrivilege USE = IslandPrivilege.getByName("USE");
     public static IslandPrivilege WITHDRAW_MONEY = IslandPrivilege.getByName("WITHDRAW_MONEY");
+
+    private static IslandPrivilege getSafe(String name){
+        try{
+            return IslandPrivilege.getByName(name);
+        }catch (Exception ex){
+            return null;
+        }
+    }
 
 }
