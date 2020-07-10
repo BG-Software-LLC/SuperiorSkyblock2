@@ -31,7 +31,7 @@ public final class ChunksListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChunkUnload(ChunkUnloadEvent e){
-        if(plugin.getGrid() == null || !plugin.getSettings().optimizeWorlds || !plugin.getGrid().isIslandsWorld(e.getWorld()))
+        if(plugin.getGrid() == null || !plugin.getGrid().isIslandsWorld(e.getWorld()))
             return;
 
         Chunk chunk = e.getChunk();
@@ -45,22 +45,23 @@ public final class ChunksListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(chunk);
 
-        if(island == null || !island.isInsideRange(chunk)){
-            if(ServerVersion.isLessThan(ServerVersion.v1_14)){
-                e.setCancelled(true);
-                alreadyUnloadedChunks.add(hashedChunk);
-                chunk.unload(false);
-            }
-            else try{
-                //noinspection JavaReflectionMemberAccess
-                Method setSaveChunkMethod = ChunkUnloadEvent.class.getMethod("setSaveChunk", boolean.class);
-                setSaveChunkMethod.invoke(e, false);
-            }catch(Exception ex){
-                ex.printStackTrace();
+        if(plugin.getSettings().optimizeWorlds) {
+            if (island == null || !island.isInsideRange(chunk)) {
+                if (ServerVersion.isLessThan(ServerVersion.v1_14)) {
+                    e.setCancelled(true);
+                    alreadyUnloadedChunks.add(hashedChunk);
+                    chunk.unload(false);
+                } else try {
+                    //noinspection JavaReflectionMemberAccess
+                    Method setSaveChunkMethod = ChunkUnloadEvent.class.getMethod("setSaveChunk", boolean.class);
+                    setSaveChunkMethod.invoke(e, false);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
 
-        if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+        if(island != null && !island.isSpawn() && !plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
     }
 
