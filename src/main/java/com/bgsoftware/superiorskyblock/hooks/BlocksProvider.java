@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import org.bukkit.Location;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+
+import java.util.Collections;
+import java.util.Set;
 
 public interface BlocksProvider extends SpawnersProvider {
 
@@ -19,8 +22,8 @@ public interface BlocksProvider extends SpawnersProvider {
         return "PIG";
     }
 
-    default Pair<Integer, ItemStack> getBlock(Location location){
-        return null;
+    default Set<Pair<Integer, Key>> getBlocks(ChunkPosition chunkPosition){
+        return Collections.emptySet();
     }
 
 }

@@ -177,6 +177,11 @@ public interface GridManager {
     void registerIslandWorld(World world);
 
     /**
+     * Get all registered worlds.
+     */
+    List<World> getRegisteredWorlds();
+
+    /**
      * Get the next location for a new island.
      */
     Location getNextLocation();

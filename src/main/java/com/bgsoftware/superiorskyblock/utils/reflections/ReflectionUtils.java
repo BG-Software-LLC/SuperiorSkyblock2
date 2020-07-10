@@ -25,7 +25,9 @@ public final class ReflectionUtils {
                     blockClass = getClass("net.minecraft.server.VERSION.Block"),
                     craftInventoryClass = getClass("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory"),
                     biomeGridClass = getClass("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid"),
-                    chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection");
+                    chunkSectionClass = getClass("net.minecraft.server.VERSION.ChunkSection"),
+                    chunkProviderClass = getClass("net.minecraft.server.VERSION.ChunkProviderServer"),
+                    regionLoaderClass = getClass("net.minecraft.server.VERSION.ChunkRegionLoader");
 
             if (ServerVersion.isAtLeast(ServerVersion.v1_15)) {
                 Class<?> biomeStorageClass = getClass("net.minecraft.server.VERSION.BiomeStorage");
@@ -54,6 +56,11 @@ public final class ReflectionUtils {
                 fieldsMap.add(Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT, getField(chunkSectionClass, "nonEmptyBlockCount"));
                 fieldsMap.add(Fields.CHUNK_SECTION_SKY_LIGHT, getField(chunkSectionClass, "skyLight"));
                 fieldsMap.add(Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT, getField(chunkSectionClass, "tickingBlockCount"));
+            }
+
+            if(ServerVersion.isEquals(ServerVersion.v1_13) || ServerVersion.isLegacy()){
+                fieldsMap.add(Fields.REGION_HOLDER_CACHED_CHUNKS, getField(regionLoaderClass, "b"));
+                fieldsMap.add(Fields.CHUNK_PROVIDER_CHUNK_LOADER, getField(chunkProviderClass, "chunkLoader"));
             }
 
             try{

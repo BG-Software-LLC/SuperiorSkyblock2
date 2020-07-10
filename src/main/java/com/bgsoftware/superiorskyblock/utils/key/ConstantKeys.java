@@ -17,5 +17,6 @@ public final class ConstantKeys {
     public static final Key FURNACE = Key.of("FURNACE");
     public static final Key CHEST = Key.of("CHEST");
     public static final Key AIR = Key.of("AIR");
+    public static final Key CAULDRON = Key.of("CAULDRON");
 
 }

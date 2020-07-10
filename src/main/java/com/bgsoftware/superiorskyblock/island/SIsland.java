@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -58,6 +59,7 @@ import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -66,10 +68,8 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
@@ -90,9 +90,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -664,24 +661,9 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-
-        min.setWorld(world);
-        max.setWorld(world);
-
-        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
-
-        List<Chunk> chunks = new ArrayList<>();
-
-        for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
-            for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
-                    chunks.add(minChunk.getWorld().getChunkAt(x, z));
-            }
-        }
-
-        return chunks;
+        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
+                .map(pair -> world.getChunkAt(pair.getKey(), pair.getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -700,22 +682,10 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-
-        List<Chunk> chunks = new ArrayList<>();
-
-        for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
-            for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ)){
-                    Chunk chunk = plugin.getNMSBlocks().getChunkIfLoaded(world, chunkX, chunkZ);
-                    if(chunk != null)
-                        chunks.add(chunk);
-                }
-            }
-        }
-
-        return chunks;
+        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
+                .map(pair -> plugin.getNMSBlocks().getChunkIfLoaded(world, pair.getKey(), pair.getValue()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -730,45 +700,36 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
-        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
-
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
         World world = getCenter(environment).getWorld();
-
-        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
-            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
-                    if(whenComplete != null){
-                        chunks.add(ChunksProvider.loadChunk(world, x, z, null).whenComplete(whenComplete));
-                    }
-                    else{
-                        chunks.add(ChunksProvider.loadChunk(world, x, z, null));
-                    }
-                }
-            }
-        }
-
-        return chunks;
+        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream().map(pair -> {
+            CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(world, pair.getKey(), pair.getValue(), null);
+            return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
+        }).collect(Collectors.toList());
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
-        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+        World world = getCenter(environment).getWorld();
+        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
+                .map(pair -> ChunksProvider.loadChunk(world, pair.getKey(), pair.getValue(), onChunkLoad))
+                .collect(Collectors.toList());
+    }
+
+    public List<Pair<Integer, Integer>> getChunkCoords(World world, boolean onlyProtected, boolean noEmptyChunks){
+        List<Pair<Integer, Integer>> chunkCoords = new ArrayList<>();
 
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-        World world = getCenter(environment).getWorld();
 
         for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
             for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
                 if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
-                    chunks.add(ChunksProvider.loadChunk(world, x, z, onChunkLoad));
+                    chunkCoords.add(new Pair<>(x, z));
                 }
             }
         }
 
-        return chunks;
+        return chunkCoords;
     }
 
     @Override
@@ -1093,21 +1054,43 @@ public final class SIsland extends DatabaseObject implements Island {
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + (asker == null ? "Null" : asker.getName()));
 
-        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new ArrayList<>();
+        List<CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>>> chunksToLoad = new ArrayList<>();
         BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
                 new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
-        Consumer<Chunk> onChunkLoad = snapshot == null ? null : snapshot::cacheChunk;
+        BiConsumer<World, Pair<Integer, Integer>> onChunkLoad = snapshot == null ? (world, pair) -> {} : snapshot::cacheChunk;
 
-        //noinspection all
-        chunksToLoad.addAll(getAllChunksAsync(World.Environment.NORMAL, true, true, onChunkLoad).stream()
-                .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
-        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER))
-            chunksToLoad.addAll(getAllChunksAsync(World.Environment.NETHER, true, true, onChunkLoad).stream()
-                    .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
-        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END))
-            chunksToLoad.addAll(getAllChunksAsync(World.Environment.THE_END, true, true, onChunkLoad).stream()
-                    .map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList()));
+        {
+            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
+            //noinspection all
+            chunksToLoad.addAll(getChunkCoords(normalWorld, true, false).stream().map(pair -> {
+                onChunkLoad.accept(normalWorld, pair);
+                return plugin.getNMSBlocks().loadChunk(normalWorld, pair.getKey(), pair.getValue());
+            }).collect(Collectors.toList()));
+        }
+
+        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
+            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            chunksToLoad.addAll(getChunkCoords(netherWorld, true, false).stream().map(pair -> {
+                onChunkLoad.accept(netherWorld, pair);
+                return plugin.getNMSBlocks().loadChunk(netherWorld, pair.getKey(), pair.getValue());
+            }).collect(Collectors.toList()));
+        }
+
+        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
+            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            chunksToLoad.addAll(getChunkCoords(endWorld, true, false).stream().map(pair -> {
+                onChunkLoad.accept(endWorld, pair);
+                return plugin.getNMSBlocks().loadChunk(endWorld, pair.getKey(), pair.getValue());
+            }).collect(Collectors.toList()));
+        }
+
+        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
+            chunksToLoad.addAll(getChunkCoords(registeredWorld, true, false).stream().map(pair -> {
+                onChunkLoad.accept(registeredWorld, pair);
+                return plugin.getNMSBlocks().loadChunk(registeredWorld, pair.getKey(), pair.getValue());
+            }).collect(Collectors.toList()));
+        }
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
         SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
@@ -1116,73 +1099,49 @@ public final class SIsland extends DatabaseObject implements Island {
 
         Executor.async(() -> {
             Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
+            Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
 
-            if(chunksToLoad.size() > 0){
-                ExecutorService scanService = Executors.newFixedThreadPool(chunksToLoad.size(),
-                        new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Blocks Scanner %d").build());
-
-                for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
-                    ChunkSnapshot chunkSnapshot;
-
-                    try {
-                        chunkSnapshot = chunkToLoad.get();
-                    }catch(Exception ex){
-                        SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                        ex.printStackTrace();
-                        continue;
-                    }
-
-                    scanService.execute(() -> {
-                        if(LocationUtils.isChunkEmpty(this, chunkSnapshot))
-                            return;
-
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                for (int y = 0; y < 256; y++) {
-                                    Key blockKey = ConstantKeys.AIR;
-
-                                    try{
-                                        blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z);
-                                    }catch(ArrayIndexOutOfBoundsException ignored){ }
-
-                                    if(blockKey.getGlobalKey().equals("AIR"))
-                                        continue;
-
-                                    Location location = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()), (chunkSnapshot.getX() * 16) + x, y, (chunkSnapshot.getZ() * 16) + z);
-                                    int blockCount = plugin.getGrid().getBlockAmount(location);
-
-                                    if(blockKey.getGlobalKey().contains("SPAWNER")){
-                                        Pair<Integer, String> entry = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
-                                        blockCount = entry.getKey();
-                                        if(entry.getValue() == null){
-                                            spawnersToCheck.add(new Pair<>(location, blockCount));
-                                            continue;
-                                        }
-                                        else{
-                                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entry.getValue());
-                                        }
-                                    }
-
-                                    Pair<Integer, ItemStack> blockPair = snapshot != null ? snapshot.getBlock(location) : plugin.getProviders().getBlock(location);
-
-                                    if(blockPair != null){
-                                        blockCount = blockPair.getKey();
-                                        blockKey = Key.of(blockPair.getValue());
-                                    }
-
-                                    handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
-                                }
-                            }
-                        }
-                    });
-                }
+            for(CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> chunkInfoFuture : chunksToLoad){
+                BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>> chunkInfo;
 
                 try{
-                    scanService.shutdown();
-                    scanService.awaitTermination(1, TimeUnit.MINUTES);
-                }catch(Exception ex){
+                    chunkInfo = chunkInfoFuture.get();
+                }catch (Exception ex){
+                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                     ex.printStackTrace();
+                    continue;
                 }
+
+                if(snapshot != null)
+                    removeCounts(chunkInfo.getY(), ConstantKeys.CAULDRON, snapshot.getBlocks(chunkInfo.getX()).size());
+
+                // Load block counts
+                handleBlocksPlace(chunkInfo.getY(), false, blockCounts, islandWorth, islandLevel);
+
+                // Load spawners
+                for(Location location : chunkInfo.getZ()){
+                    Pair<Integer, String> spawnerInfo = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
+                    if(spawnerInfo.getValue() == null){
+                        spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
+                    }
+                    else{
+                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue());
+                        handleBlockPlace(spawnerKey, spawnerInfo.getKey(), false, blockCounts, islandWorth, islandLevel);
+                    }
+                }
+
+                // Load stacked blocks
+                if(snapshot == null){
+                    for(Pair<Integer, com.bgsoftware.superiorskyblock.api.key.Key> pair : plugin.getProviders().getBlocks(chunkInfo.getX()))
+                        handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
+                }
+                else for(Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(chunkInfo.getX())){
+                    handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey(), false,
+                            blockCounts, islandWorth, islandLevel);
+                }
+
+                for(Pair<Integer, Key> pair : plugin.getGrid().getBlockAmounts(chunkInfo.getX()))
+                    handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
             }
 
             Executor.sync(() -> {
@@ -1593,6 +1552,10 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void handleBlocksPlace(KeyMap<Integer> blocks){
+        handleBlocksPlace(blocks, true, this.blockCounts, this.islandWorth, this.islandLevel);
+    }
+
+    public void handleBlocksPlace(KeyMap<Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
         KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
         KeyMap<Integer> blockCounts = new KeyMap<>();
@@ -1626,11 +1589,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BigDecimal BLOCKS_VALUES = blocksValues, BLOCKS_LEVELS = blocksLevels;
 
-        this.islandWorth.set(islandWorth -> islandWorth.add(BLOCKS_VALUES));
-        this.islandLevel.set(islandLevel -> islandLevel.add(BLOCKS_LEVELS));
-        this.blockCounts.write(_blockCounts -> _blockCounts.putAll(blockCounts));
+        syncedIslandWorth.set(islandWorth -> islandWorth.add(BLOCKS_VALUES));
+        syncedIslandLevel.set(islandLevel -> islandLevel.add(BLOCKS_LEVELS));
+        syncedBlockCounts.write(_blockCounts -> _blockCounts.putAll(blockCounts));
 
-        saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
+        if(save)
+            saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
     private void addCounts(KeyMap<Integer> blockCounts, KeyMap<Integer> blockLimits, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){

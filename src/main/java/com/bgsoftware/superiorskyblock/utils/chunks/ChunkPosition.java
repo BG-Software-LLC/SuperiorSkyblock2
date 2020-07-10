@@ -1,8 +1,10 @@
 package com.bgsoftware.superiorskyblock.utils.chunks;
 
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import java.util.Objects;
 
@@ -55,6 +57,14 @@ public final class ChunkPosition {
                 ", x=" + x +
                 ", z=" + z +
                 '}';
+    }
+
+    public static ChunkPosition of(Block block){
+        return of(block.getWorld().getName(), block.getX() >> 4, block.getZ() >> 4);
+    }
+
+    public static ChunkPosition of(SBlockPosition blockPosition){
+        return of(blockPosition.getWorld().getName(), blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
     }
 
     public static ChunkPosition of(World world, int x, int z){

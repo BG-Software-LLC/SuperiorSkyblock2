@@ -4,16 +4,20 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.threads.MutableObject;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_13_R2.AxisAlignedBB;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockFlowerPot;
 import net.minecraft.server.v1_13_R2.BlockLeaves;
 import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.Blocks;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_13_R2.ChunkSection;
@@ -23,6 +27,7 @@ import net.minecraft.server.v1_13_R2.EntityTypes;
 import net.minecraft.server.v1_13_R2.EnumColor;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
+import net.minecraft.server.v1_13_R2.IChunkLoader;
 import net.minecraft.server.v1_13_R2.INamableTileEntity;
 import net.minecraft.server.v1_13_R2.ItemStack;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
@@ -32,6 +37,7 @@ import net.minecraft.server.v1_13_R2.NBTTagList;
 import net.minecraft.server.v1_13_R2.NonNullList;
 import net.minecraft.server.v1_13_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_13_R2.ProtoChunk;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntityBanner;
 import net.minecraft.server.v1_13_R2.TileEntityBrewingStand;
@@ -61,7 +67,10 @@ import org.bukkit.entity.Minecart;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -266,6 +275,53 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     public org.bukkit.Chunk getChunkIfLoaded(org.bukkit.World bukkitWorld, int x, int z) {
         Chunk chunk = ((CraftWorld) bukkitWorld).getHandle().getChunkProvider().chunks.get(ChunkCoordIntPair.a(x, z));
         return chunk == null ? null : chunk.bukkitChunk;
+    }
+
+    @Override
+    public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
+        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
+        IChunkLoader chunkLoader = world.getChunkProvider().chunkLoader;
+        ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunkX, chunkZ);
+
+        CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> completableFuture = new CompletableFuture<>();
+
+        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
+        MutableObject<ChunkSection[]> chunkSections = MutableObject.of(chunk == null ? new ChunkSection[0] : Arrays.copyOf(chunk.getSections(), chunk.getSections().length));
+
+        Executor.async(() -> {
+            KeyMap<Integer> blockCounts = new KeyMap<>();
+            Set<Location> spawnersLocations = new HashSet<>();
+
+            /* Load chunk from the files without actually loading it to the game. */
+            if(chunkSections.get().length == 0){
+                try{
+                    ProtoChunk protoChunk = chunkLoader.b(world, chunkX, chunkZ, null);
+                    chunkSections.set(protoChunk.getSections());
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+
+            for(ChunkSection chunkSection : chunkSections.get()){
+                if(chunkSection != null){
+                    for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                        if (blockData.getBlock() != Blocks.AIR) {
+                            Key blockKey = Key.of(CraftMagicNumbers.getMaterial(blockData.getBlock()).name());
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+                            if (blockKey.getGlobalKey().equals("SPAWNER")) {
+                                spawnersLocations.add(new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ()));
+                            }
+                        }
+                    }
+                }
+            }
+
+            completableFuture.complete(new BiPair<>(chunkPosition, blockCounts, spawnersLocations));
+        });
+
+        return completableFuture;
     }
 
     @Override

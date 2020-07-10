@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -21,7 +22,7 @@ import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,6 +30,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
 
@@ -46,16 +49,12 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         throw new UnsupportedOperationException("Unsupported Operation");
     }
 
-    @Override
-    public Pair<Integer, ItemStack> getBlock(Location location) {
-        throw new UnsupportedOperationException("Unsupported Operation");
-    }
-
     public static class WildStackerSnapshot {
 
         private final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
 
-        public void cacheChunk(Chunk chunk){
+        public void cacheChunk(World world, Pair<Integer, Integer> pair){
+            Chunk chunk = world.getChunkAt(pair.getKey(), pair.getValue());
             try {
                 StackedSnapshot stackedSnapshot;
                 try {
@@ -84,23 +83,20 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             throw new RuntimeException("Chunk " + id + " is not cached.");
         }
 
-        public Pair<Integer, ItemStack> getBlock(Location location) {
-            String id = getId(location);
-            if(chunkSnapshots.containsKey(id)) {
-                Pair<Integer, ItemStack> pair;
+        public Set<Pair<Integer, ItemStack>> getBlocks(ChunkPosition chunkPosition) {
+            String id = getId(chunkPosition);
+            StackedSnapshot stackedSnapshot = chunkSnapshots.get(id);
 
-                try{
-                    pair = new Pair<>(chunkSnapshots.get(id).getStackedBarrelItem(location));
-                }catch(Throwable ex){
-                    //noinspection deprecation
-                    Map.Entry<Integer, Material> entry = chunkSnapshots.get(id).getStackedBarrel(location);
-                    pair = new Pair<>(entry.getKey(), new ItemStack(entry.getValue()));
-                }
+            if(stackedSnapshot == null)
+                throw new RuntimeException("Chunk " + id + " is not cached.");
 
-                return pair.getValue().getType().name().contains("AIR") ? null : pair;
+            try {
+                return stackedSnapshot.getAllBarrelsItems().values().stream().map(Pair::new).collect(Collectors.toSet());
+            }catch (Throwable ex){
+                return stackedSnapshot.getAllBarrels().values().stream().map(
+                        entry -> new Pair<>(entry.getKey(), new ItemStack(entry.getValue())))
+                        .collect(Collectors.toSet());
             }
-
-            throw new RuntimeException("Chunk " + id + " is not cached. Location: " + location);
         }
     }
 
@@ -215,6 +211,10 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     private static String getId(Chunk chunk){
         return getId(chunk.getX(), chunk.getZ());
+    }
+
+    private static String getId(ChunkPosition chunkPosition){
+        return getId(chunkPosition.getX(), chunkPosition.getZ());
     }
 
     private static String getId(int x, int z){

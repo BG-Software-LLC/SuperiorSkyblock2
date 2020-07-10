@@ -4,19 +4,29 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
+import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.threads.MutableObject;
+import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_9_R1.AxisAlignedBB;
 import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockLeaves;
 import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.Blocks;
 import net.minecraft.server.v1_9_R1.Chunk;
+import net.minecraft.server.v1_9_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_9_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_9_R1.ChunkSection;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.IBlockData;
 import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.IChunkLoader;
 import net.minecraft.server.v1_9_R1.INamableTileEntity;
 import net.minecraft.server.v1_9_R1.ItemStack;
 import net.minecraft.server.v1_9_R1.MinecraftServer;
@@ -53,13 +63,19 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
 public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
@@ -302,6 +318,55 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
     public org.bukkit.Chunk getChunkIfLoaded(org.bukkit.World bukkitWorld, int x, int z) {
         Chunk chunk = ((CraftWorld) bukkitWorld).getHandle().getChunkProviderServer().getChunkIfLoaded(x, z);
         return chunk == null ? null : chunk.bukkitChunk;
+    }
+
+    @Override
+    public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
+        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
+        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.getChunkProvider()));
+        ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunkX, chunkZ);
+
+        CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> completableFuture = new CompletableFuture<>();
+
+        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
+        MutableObject<ChunkSection[]> chunkSections = MutableObject.of(chunk == null ? new ChunkSection[0] : Arrays.copyOf(chunk.getSections(), chunk.getSections().length));
+
+        Executor.async(() -> {
+            KeyMap<Integer> blockCounts = new KeyMap<>();
+            Set<Location> spawnersLocations = new HashSet<>();
+
+            /* Load chunk from the files without actually loading it to the game. */
+            if(chunkSections.get().length == 0){
+                try{
+                    assert chunkLoader != null;
+                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkX, chunkZ);
+                    if(chunkData != null)
+                        chunkSections.set(((Chunk) chunkData[0]).getSections());
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+
+            for(ChunkSection chunkSection : chunkSections.get()){
+                if(chunkSection != null){
+                    for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
+                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                        if (blockData.getBlock() != Blocks.AIR) {
+                            Key blockKey = Key.of(CraftMagicNumbers.getMaterial(blockData.getBlock()).name());
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+                            if (blockKey.getGlobalKey().equals("MOB_SPAWNER")) {
+                                spawnersLocations.add(new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ()));
+                            }
+                        }
+                    }
+                }
+            }
+
+            completableFuture.complete(new BiPair<>(chunkPosition, blockCounts, spawnersLocations));
+        });
+
+        return completableFuture;
     }
 
     @Override

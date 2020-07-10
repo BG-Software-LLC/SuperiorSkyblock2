@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -17,6 +19,7 @@ import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -43,6 +46,8 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -287,6 +292,11 @@ public final class GridHandler implements GridManager {
     }
 
     @Override
+    public List<World> getRegisteredWorlds() {
+        return customWorlds.stream().map(Bukkit::getWorld).collect(Collectors.toList());
+    }
+
+    @Override
     public Location getNextLocation(){
         return getNextLocation(lastIsland.parse().clone());
     }
@@ -382,13 +392,19 @@ public final class GridHandler implements GridManager {
         return stackedBlocks.getOrDefault(SBlockPosition.of(location), 1);
     }
 
+    public Set<Pair<Integer, Key>> getBlockAmounts(ChunkPosition chunkPosition){
+        return stackedBlocks.get(chunkPosition).values().stream()
+                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public void setBlockAmount(Block block, int amount){
         SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
 
-        boolean insert = !stackedBlocks.stackedBlocks.containsKey(SBlockPosition.of(block.getLocation()));
+        boolean insert = !stackedBlocks.containsKey(SBlockPosition.of(block.getLocation()));
 
-        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount);
+        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount, Key.of(block));
         stackedBlocks.updateName(block);
 
         if(amount > 1) {
@@ -399,6 +415,7 @@ public final class GridHandler implements GridManager {
                         .setInt(block.getY())
                         .setInt(block.getZ())
                         .setInt(amount)
+                        .setString(Key.of(block).toString())
                         .execute(true);
             } else {
                 Query.STACKED_BLOCKS_UPDATE.getStatementHolder()
@@ -480,7 +497,7 @@ public final class GridHandler implements GridManager {
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
-                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]));
+                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), Key.of("AIR"));
             }
         }
 
@@ -502,25 +519,31 @@ public final class GridHandler implements GridManager {
         ChunksTracker.deserialize(this, null, resultSet.getString("dirtyChunks"));
     }
 
-    public void loadStackedBlocks(ResultSet set) throws SQLException {
-        String world = set.getString("world");
-        int x = set.getInt("x");
-        int y = set.getInt("y");
-        int z = set.getInt("z");
-        int amount = set.getInt("amount");
+    public void loadStackedBlocks(ResultSet resultSet) throws SQLException {
+        String world = resultSet.getString("world");
+        int x = resultSet.getInt("x");
+        int y = resultSet.getInt("y");
+        int z = resultSet.getInt("z");
+        int amount = resultSet.getInt("amount");
 
-        stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount);
+        String item = resultSet.getString("item");
+        Key blockKey = item.isEmpty() ? Key.of(Bukkit.getWorld(world).getBlockAt(x, y, z)) : Key.of(item);
+
+        stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount, blockKey);
     }
 
     public void executeStackedBlocksInsertStatement(boolean async){
-        for (SBlockPosition position : stackedBlocks.stackedBlocks.keySet()) {
-            Query.STACKED_BLOCKS_INSERT.getStatementHolder()
-                    .setString(position.getWorld().getName())
-                    .setInt(position.getX())
-                    .setInt(position.getY())
-                    .setInt(position.getZ())
-                    .setInt(stackedBlocks.stackedBlocks.get(position))
-                    .execute(async);
+        for(Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks : this.stackedBlocks.values()) {
+            for (Map.Entry<SBlockPosition, Pair<Integer, Key>> entry : stackedBlocks.entrySet()) {
+                Query.STACKED_BLOCKS_INSERT.getStatementHolder()
+                        .setString(entry.getKey().getWorld().getName())
+                        .setInt(entry.getKey().getX())
+                        .setInt(entry.getKey().getY())
+                        .setInt(entry.getKey().getZ())
+                        .setInt(entry.getValue().getKey())
+                        .setString(entry.getValue().getValue().toString())
+                        .execute(async);
+            }
         }
     }
 
@@ -555,19 +578,30 @@ public final class GridHandler implements GridManager {
 
     private class StackedBlocksHandler {
 
-        private final Map<SBlockPosition, Integer> stackedBlocks = Maps.newHashMap();
+        private final Map<ChunkPosition, Map<SBlockPosition, Pair<Integer, Key>>> stackedBlocks = Maps.newHashMap();
 
-        void put(SBlockPosition location, int amount){
-            stackedBlocks.put(location, amount);
+        void put(SBlockPosition location, int amount, Key blockKey){
+            stackedBlocks.computeIfAbsent(ChunkPosition.of(location), m -> new HashMap<>())
+                    .put(location, new Pair<>(amount, blockKey));
         }
 
         @SuppressWarnings("SameParameterValue")
         int getOrDefault(SBlockPosition location, int def){
-            return stackedBlocks.getOrDefault(location, def);
+            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(location));
+            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(0, null)).getKey();
         }
 
-        Set<Map.Entry<SBlockPosition, Integer>> entrySet(){
-            return stackedBlocks.entrySet();
+        Map<SBlockPosition, Pair<Integer, Key>> get(ChunkPosition chunkPosition){
+            return stackedBlocks.getOrDefault(chunkPosition, new HashMap<>());
+        }
+
+        boolean containsKey(SBlockPosition blockPosition){
+            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(blockPosition));
+            return chunkStackedBlocks != null && chunkStackedBlocks.containsKey(blockPosition);
+        }
+
+        Collection<Map<SBlockPosition, Pair<Integer, Key>>> values(){
+            return stackedBlocks.values();
         }
 
         private void updateName(Block block){
@@ -575,7 +609,9 @@ public final class GridHandler implements GridManager {
             ArmorStand armorStand = getHologram(block);
 
             if(amount <= 1){
-                stackedBlocks.remove(SBlockPosition.of(block.getLocation()));
+                Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(block));
+                if(chunkStackedBlocks != null)
+                    chunkStackedBlocks.remove(SBlockPosition.of(block.getLocation()));
                 armorStand.remove();
             }else{
                 armorStand.setCustomName(plugin.getSettings().stackedBlocksName

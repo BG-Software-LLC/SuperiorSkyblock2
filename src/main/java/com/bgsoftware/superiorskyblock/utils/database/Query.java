@@ -59,7 +59,7 @@ public enum Query {
     PLAYER_DELETE("DELETE FROM {prefix}players WHERE player=?;"),
 
     STACKED_BLOCKS_UPDATE("UPDATE {prefix}stackedBlocks SET amount=? WHERE world=? AND x=? AND y=? AND z=?;"),
-    STACKED_BLOCKS_INSERT("REPLACE INTO {prefix}stackedBlocks (world,x,y,z,amount) VALUES(?,?,?,?,?);"),
+    STACKED_BLOCKS_INSERT("REPLACE INTO {prefix}stackedBlocks (world,x,y,z,amount,item) VALUES(?,?,?,?,?,?);"),
     STACKED_BLOCKS_DELETE("DELETE FROM {prefix}stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
 
     GRID_UPDATE_LAST_ISLAND("UPDATE {prefix}grid SET lastIsland=?;"),

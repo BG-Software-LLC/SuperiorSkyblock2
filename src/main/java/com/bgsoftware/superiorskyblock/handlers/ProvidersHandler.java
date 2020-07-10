@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.hooks.PricesProvider_ShopGUIPlus;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -32,6 +33,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
 
 public final class ProvidersHandler implements ProvidersManager {
 
@@ -104,8 +107,8 @@ public final class ProvidersHandler implements ProvidersManager {
         return spawnersProvider != null ? Key.of(Materials.SPAWNER.toBukkitType() + ":" + spawnersProvider.getSpawnerType(itemStack)) : Key.of(itemStack);
     }
 
-    public Pair<Integer, ItemStack> getBlock(Location location){
-        return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlock(location) : null;
+    public Set<Pair<Integer, com.bgsoftware.superiorskyblock.api.key.Key>> getBlocks(ChunkPosition chunkPosition){
+        return spawnersProvider instanceof BlocksProvider ? ((BlocksProvider) spawnersProvider).getBlocks(chunkPosition) : Collections.emptySet();
     }
 
     public boolean isWildStacker(){
