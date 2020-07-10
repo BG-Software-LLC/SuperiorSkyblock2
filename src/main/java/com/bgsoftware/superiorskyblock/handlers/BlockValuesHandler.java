@@ -37,9 +37,16 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return ((Key) key).isAPIKey() ? BigDecimalFormatted.of(customBlockValues.getOrDefault(key, "0")) :
-                plugin.getSettings().syncWorth ? BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key)) :
-                BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
+        if(((Key) key).isAPIKey()){
+            String customBlockValue = customBlockValues.get(key);
+            if(customBlockValue != null)
+                return BigDecimalFormatted.of(customBlockValue);
+        }
+
+        if(plugin.getSettings().syncWorth)
+            return BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key));
+
+        return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
 
     public void setBlockWorth(Key key, BigDecimal worth){
@@ -48,8 +55,13 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return ((Key) key).isAPIKey() ? BigDecimalFormatted.of(customBlockLevels.getOrDefault(key, "0")) :
-                BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
+        if(((Key) key).isAPIKey()){
+            String customBlockLevel = customBlockLevels.get(key);
+            if(customBlockLevel != null)
+                return BigDecimalFormatted.of(customBlockLevel);
+        }
+
+        return BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
     }
 
     @Override
