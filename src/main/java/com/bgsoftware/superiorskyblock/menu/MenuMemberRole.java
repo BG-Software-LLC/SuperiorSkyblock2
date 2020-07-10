@@ -30,6 +30,7 @@ public final class MenuMemberRole extends SuperiorMenu {
     private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         super("menuMemberRole", superiorPlayer);
         this.targetPlayer = targetPlayer;
+        updateTargetPlayer(targetPlayer);
     }
 
     @Override

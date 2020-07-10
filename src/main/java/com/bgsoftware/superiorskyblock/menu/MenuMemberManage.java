@@ -26,6 +26,7 @@ public final class MenuMemberManage extends SuperiorMenu {
     private MenuMemberManage(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
         super("menuMemberManage", superiorPlayer);
         this.targetPlayer = targetPlayer;
+        updateTargetPlayer(targetPlayer);
     }
 
     @Override

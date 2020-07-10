@@ -40,6 +40,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         super("menuPermissions", superiorPlayer);
         this.island = island;
         this.permissionHolder = permissionHolder;
+        if(permissionHolder instanceof SuperiorPlayer)
+            updateTargetPlayer((SuperiorPlayer) permissionHolder);
     }
 
     @Override

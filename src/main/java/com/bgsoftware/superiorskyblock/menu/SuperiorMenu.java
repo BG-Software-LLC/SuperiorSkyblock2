@@ -50,6 +50,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private final String identifier;
     protected final SuperiorPlayer superiorPlayer;
+    protected SuperiorPlayer targetPlayer = null;
 
     protected SuperiorMenu previousMenu;
     protected boolean previousMove = true, closeButton = false, nextMove = false;
@@ -58,6 +59,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
     public SuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
         this.identifier = identifier;
         this.superiorPlayer = superiorPlayer;
+    }
+
+    protected void updateTargetPlayer(SuperiorPlayer targetPlayer){
+        this.targetPlayer = targetPlayer;
     }
 
     public String getIdentifier() {
@@ -172,6 +177,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
 
         else {
+            if(targetPlayer != null)
+                command = PlaceholderHook.parse(targetPlayer, command);
+
             Bukkit.dispatchCommand(sender instanceof Player || command.startsWith("PLAYER:") ? e.getWhoClicked() : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", e.getWhoClicked().getName()));
         }
