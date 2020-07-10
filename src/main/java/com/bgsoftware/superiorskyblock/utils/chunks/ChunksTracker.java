@@ -82,9 +82,9 @@ public final class ChunksTracker {
         StringBuilder stringBuilder = new StringBuilder();
 
         for(Map.Entry<String, StringBuilder> entry : worlds.entrySet())
-            stringBuilder.append("|").append(entry.getKey()).append("=").append(entry.getValue().substring(1));
+            stringBuilder.append(entry.getKey()).append("=").append(entry.getValue().substring(1)).append("|");
 
-        return stringBuilder.length() <= 0 ? "" : stringBuilder.substring(1);
+        return stringBuilder.toString();
     }
 
     public static void deserialize(GridHandler grid, Island island, String serialized){

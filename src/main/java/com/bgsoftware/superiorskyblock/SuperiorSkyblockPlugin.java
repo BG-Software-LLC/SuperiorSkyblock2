@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
@@ -258,6 +259,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                                 .addBatch()
                         );
                         islandCountsHolder.execute(false);
+                    }
+                    {
+                        StatementHolder dirtyChunksHolder = Query.ISLAND_SET_DIRTY_CHUNKS.getStatementHolder();
+                        dirtyChunksHolder.prepareBatch();
+                        islandList.forEach(island -> dirtyChunksHolder
+                                .setString(ChunksTracker.serialize(island))
+                                .setString(island.getOwner().getUniqueId() + "")
+                                .addBatch()
+                        );
+                        dirtyChunksHolder.execute(false);
                     }
 
                     islandList.forEach(Island::removeEffects);

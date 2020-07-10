@@ -1063,7 +1063,7 @@ public final class SIsland extends DatabaseObject implements Island {
         {
             World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
             //noinspection all
-            chunksToLoad.addAll(getChunkCoords(normalWorld, true, false).stream().map(pair -> {
+            chunksToLoad.addAll(getChunkCoords(normalWorld, true, true).stream().map(pair -> {
                 onChunkLoad.accept(normalWorld, pair);
                 return plugin.getNMSBlocks().loadChunk(normalWorld, pair.getKey(), pair.getValue());
             }).collect(Collectors.toList()));
@@ -1071,7 +1071,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            chunksToLoad.addAll(getChunkCoords(netherWorld, true, false).stream().map(pair -> {
+            chunksToLoad.addAll(getChunkCoords(netherWorld, true, true).stream().map(pair -> {
                 onChunkLoad.accept(netherWorld, pair);
                 return plugin.getNMSBlocks().loadChunk(netherWorld, pair.getKey(), pair.getValue());
             }).collect(Collectors.toList()));
@@ -1079,14 +1079,14 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            chunksToLoad.addAll(getChunkCoords(endWorld, true, false).stream().map(pair -> {
+            chunksToLoad.addAll(getChunkCoords(endWorld, true, true).stream().map(pair -> {
                 onChunkLoad.accept(endWorld, pair);
                 return plugin.getNMSBlocks().loadChunk(endWorld, pair.getKey(), pair.getValue());
             }).collect(Collectors.toList()));
         }
 
         for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
-            chunksToLoad.addAll(getChunkCoords(registeredWorld, true, false).stream().map(pair -> {
+            chunksToLoad.addAll(getChunkCoords(registeredWorld, true, true).stream().map(pair -> {
                 onChunkLoad.accept(registeredWorld, pair);
                 return plugin.getNMSBlocks().loadChunk(registeredWorld, pair.getKey(), pair.getValue());
             }).collect(Collectors.toList()));
