@@ -9,7 +9,6 @@ import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerPlaceEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,6 +41,10 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         return MergedSpawnerAPI.getInstance().getEntityType(itemStack).name();
     }
 
+    public static boolean isRegistered(){
+        return registered;
+    }
+
     @SuppressWarnings("unused")
     private static class StackerListener implements Listener {
 
@@ -49,18 +52,18 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(MergedSpawnerPlaceEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            int increaseAmount = e.getAmount() - e.getSpawnerCount();
-            if(island != null && increaseAmount > 1)
-                island.handleBlockPlace(e.getSpawner().getLocation().getBlock(), increaseAmount - 1);
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            int increaseAmount = e.getNewCount() - e.getOldCount();
+            if(island != null)
+                island.handleBlockPlace(e.getBlock(), increaseAmount);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(MergedSpawnerBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+            int decreaseAmount = e.getOldCount() - e.getNewCount();
             if(island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnerType()),
-                        e.getPlayer().isSneaking() || e.getPlayer().getGameMode() == GameMode.CREATIVE ? e.getAmount() : 1);
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnerType()), decreaseAmount);
         }
 
     }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -76,7 +77,10 @@ public final class BlocksListener implements Listener {
                 island.handleBlockBreak(ConstantKeys.LAVA, 1);
             else if(e.getBlockReplacedState().getType().name().contains("WATER"))
                 island.handleBlockBreak(ConstantKeys.WATER, 1);
-            island.handleBlockPlace(e.getBlockPlaced());
+
+            Key blockKey = Key.of(e.getBlockPlaced());
+            if(!blockKey.getGlobalKey().contains("SPAWNER") || !BlocksProvider_MergedSpawner.isRegistered())
+                island.handleBlockPlace(e.getBlockPlaced());
 
             ChunksTracker.markDirty(island, e.getBlock(), true);
         }
