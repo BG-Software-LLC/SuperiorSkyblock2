@@ -527,7 +527,7 @@ public final class GridHandler implements GridManager {
         int amount = resultSet.getInt("amount");
 
         String item = resultSet.getString("item");
-        Key blockKey = item.isEmpty() ? Key.of(Bukkit.getWorld(world).getBlockAt(x, y, z)) : Key.of(item);
+        Key blockKey = item == null || item.isEmpty() ? Key.of(Bukkit.getWorld(world).getBlockAt(x, y, z)) : Key.of(item);
 
         stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount, blockKey);
     }
