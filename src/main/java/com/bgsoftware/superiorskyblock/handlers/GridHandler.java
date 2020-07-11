@@ -68,6 +68,7 @@ public final class GridHandler implements GridManager {
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
+    private boolean blockFailed = false;
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -402,13 +403,22 @@ public final class GridHandler implements GridManager {
     public void setBlockAmount(Block block, int amount){
         SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
 
-        boolean insert = !stackedBlocks.containsKey(SBlockPosition.of(block.getLocation()));
+        Key originalBlock = stackedBlocks.getOrDefault(SBlockPosition.of(block.getLocation()), null);
+        Key currentBlock = Key.of(block);
 
-        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount, Key.of(block));
+        blockFailed = false;
+
+        if(originalBlock != null && !currentBlock.equals(originalBlock)) {
+            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + SBlockPosition.of(block.getLocation()) + " - fixing it...");
+            amount = 0;
+            blockFailed = true;
+        }
+
+        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount, currentBlock);
         stackedBlocks.updateName(block);
 
         if(amount > 1) {
-            if (insert) {
+            if (originalBlock != null) {
                 Query.STACKED_BLOCKS_INSERT.getStatementHolder()
                         .setString(block.getWorld().getName())
                         .setInt(block.getX())
@@ -434,6 +444,10 @@ public final class GridHandler implements GridManager {
                     .setInt(block.getZ())
                     .execute(true);
         }
+    }
+
+    public boolean hasBlockFailed(){
+        return blockFailed;
     }
 
     @Override
@@ -588,7 +602,13 @@ public final class GridHandler implements GridManager {
         @SuppressWarnings("SameParameterValue")
         int getOrDefault(SBlockPosition location, int def){
             Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(location));
-            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(0, null)).getKey();
+            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(def, null)).getKey();
+        }
+
+        @SuppressWarnings("SameParameterValue")
+        Key getOrDefault(SBlockPosition location, Key def){
+            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(location));
+            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(null, def)).getValue();
         }
 
         Map<SBlockPosition, Pair<Integer, Key>> get(ChunkPosition chunkPosition){
