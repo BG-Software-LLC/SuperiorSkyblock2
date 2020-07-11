@@ -1529,7 +1529,7 @@ public final class SIsland extends DatabaseObject implements Island {
         boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
 
         if(increaseAmount || hasBlockLimit) {
-            SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key);
+            SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
 
             KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
@@ -1561,6 +1561,8 @@ public final class SIsland extends DatabaseObject implements Island {
         KeyMap<Integer> blockCounts = new KeyMap<>();
         BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
 
+        syncedBlockCounts.read(blockCounts::putAll);
+
         for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : blocks.entrySet()){
             BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
             BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
@@ -1582,7 +1584,7 @@ public final class SIsland extends DatabaseObject implements Island {
             boolean hasBlockLimit = blockLimits.containsKey(entry.getKey());
 
             if(increaseAmount || hasBlockLimit) {
-                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey());
+                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
                 addCounts(blockCounts, blockLimits, entry.getKey(), entry.getValue());
             }
         }

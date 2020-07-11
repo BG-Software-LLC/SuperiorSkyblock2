@@ -352,9 +352,11 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
                     for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
-                            Key blockKey = Key.of(CraftMagicNumbers.getMaterial(blockData.getBlock()).name());
+                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
+                            short data = (short) blockData.getBlock().toLegacyData(blockData);
+                            Key blockKey = Key.of(type, data);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
-                            if (blockKey.getGlobalKey().equals("MOB_SPAWNER")) {
+                            if (type == Material.MOB_SPAWNER) {
                                 spawnersLocations.add(new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ()));
                             }
                         }
