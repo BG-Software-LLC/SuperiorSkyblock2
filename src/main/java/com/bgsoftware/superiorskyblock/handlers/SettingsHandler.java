@@ -131,6 +131,7 @@ public final class SettingsHandler {
     public final boolean syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
+    public final List<String> disabledEvents;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -308,6 +309,7 @@ public final class SettingsHandler {
         syncWorth = cfg.getBoolean("sync-worth", false);
         negativeWorth = cfg.getBoolean("negative-worth", true);
         negativeLevel = cfg.getBoolean("negative-level", true);
+        disabledEvents = cfg.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
     }
 
     public void updateValue(String path, Object value){

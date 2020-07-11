@@ -561,3 +561,8 @@ negative-worth: true
 
 # Can the level of the island be negative?
 negative-level: true
+
+# A list of events that will not be fired. This can increase performance.
+# You can find a list of events here:
+# https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events
+disabled-events: []
