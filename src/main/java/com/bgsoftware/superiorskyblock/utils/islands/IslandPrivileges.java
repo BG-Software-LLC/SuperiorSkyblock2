@@ -37,6 +37,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege INVITE_MEMBER = IslandPrivilege.getByName("INVITE_MEMBER");
     public static IslandPrivilege ITEM_FRAME = IslandPrivilege.getByName("ITEM_FRAME");
     public static IslandPrivilege KICK_MEMBER = IslandPrivilege.getByName("KICK_MEMBER");
+    public static IslandPrivilege LEASH = IslandPrivilege.getByName("LEASH");
     public static IslandPrivilege MINECART_DAMAGE = IslandPrivilege.getByName("MINECART_DAMAGE");
     public static IslandPrivilege MINECART_ENTER = IslandPrivilege.getByName("MINECART_ENTER");
     public static IslandPrivilege MINECART_OPEN = IslandPrivilege.getByName("MINECART_OPEN");

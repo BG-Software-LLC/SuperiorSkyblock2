@@ -571,6 +571,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("INVITE_MEMBER");
         IslandPrivilege.register("ITEM_FRAME");
         IslandPrivilege.register("KICK_MEMBER");
+        IslandPrivilege.register("LEASH");
         IslandPrivilege.register("MINECART_DAMAGE");
         IslandPrivilege.register("MINECART_ENTER");
         IslandPrivilege.register("MINECART_OPEN");

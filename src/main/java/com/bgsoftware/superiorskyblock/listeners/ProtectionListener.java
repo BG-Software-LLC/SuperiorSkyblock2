@@ -42,6 +42,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -404,6 +405,17 @@ public final class ProtectionListener implements Listener {
 
         if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ?
                 IslandPrivileges.INTERACT : IslandPrivileges.ANIMAL_BREED)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerLeash(PlayerLeashEntityEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }

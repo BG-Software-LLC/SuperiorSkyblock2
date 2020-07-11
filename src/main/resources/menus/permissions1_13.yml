@@ -1032,6 +1032,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  leash:
+    display-menu: true
+    permission-enabled:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: LEAD
+      name: '&6Leash Mobs'
+      lore:
+        - '&7Access to leash mobs inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   monster_damage:
     display-menu: true
     permission-enabled:
