@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
-import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -65,10 +63,12 @@ import org.bukkit.projectiles.ProjectileSource;
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
+    public static ProtectionListener IMP;
     private final SuperiorSkyblockPlugin plugin;
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+        IMP = this;
         new PlayerArrowPickup();
     }
 
@@ -239,56 +239,56 @@ public final class ProtectionListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemFrameRotate(ItemFrameRotationEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
+    public boolean onItemFrameRotate(Player player, ItemFrame itemFrame){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
 
         if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
                 Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-                e.setCancelled(true);
+                return false;
             }
 
-            return;
+            return true;
         }
 
         if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-            return;
+            Locale.sendProtectionMessage(player);
+            return false;
         }
 
-        if(!island.isInsideRange(e.getItemFrame().getLocation())){
-            e.setCancelled(true);
+        if(!island.isInsideRange(itemFrame.getLocation())){
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+            return false;
         }
+
+        return true;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemFrameBreak(ItemFrameBreakEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getItemFrame().getLocation());
+    public boolean onItemFrameBreak(Player player, ItemFrame itemFrame){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
 
         if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
                 Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-                e.setCancelled(true);
+                return false;
             }
 
-            return;
+            return true;
         }
 
         if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-            return;
+            Locale.sendProtectionMessage(player);
+            return false;
         }
 
-        if(!island.isInsideRange(e.getItemFrame().getLocation())){
-            e.setCancelled(true);
+        if(!island.isInsideRange(itemFrame.getLocation())){
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+            return false;
         }
+
+        return true;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -64,10 +63,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
+    public static BlocksListener IMP;
     private final SuperiorSkyblockPlugin plugin;
 
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+        IMP = this;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -607,10 +608,8 @@ public final class BlocksListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onSignBreak(SignBreakEvent e){
-        SuperiorPlayer superiorPlayer = e.getPlayer();
-        Sign sign = e.getSign();
+    public void onSignBreak(Player player, Sign sign){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
         if(island == null)

@@ -12,12 +12,9 @@ import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.events.SignBreakEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameBreakEvent;
-import com.bgsoftware.superiorskyblock.listeners.events.ItemFrameRotationEvent;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
@@ -63,9 +60,7 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onItemFrameRotation(PlayerInteractEntityEvent e){
         if((e.getRightClicked() instanceof ItemFrame)){
-            ItemFrameRotationEvent itemFrameRotationEvent = new ItemFrameRotationEvent(e.getPlayer(), (ItemFrame) e.getRightClicked());
-            Bukkit.getPluginManager().callEvent(itemFrameRotationEvent);
-            if(itemFrameRotationEvent.isCancelled())
+            if(!ProtectionListener.IMP.onItemFrameRotate(e.getPlayer(), (ItemFrame) e.getRightClicked()))
                 e.setCancelled(true);
         }
     }
@@ -81,9 +76,7 @@ public final class CustomEventsListener implements Listener {
                 shooter = (Player) ((Projectile) e.getDamager()).getShooter();
             else return;
 
-            ItemFrameBreakEvent itemFrameBreakEvent = new ItemFrameBreakEvent(shooter, (ItemFrame) e.getEntity());
-            Bukkit.getPluginManager().callEvent(itemFrameBreakEvent);
-            if(itemFrameBreakEvent.isCancelled())
+            if(!ProtectionListener.IMP.onItemFrameBreak(shooter, (ItemFrame) e.getEntity()))
                 e.setCancelled(true);
         }
     }
@@ -171,8 +164,7 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSignBreak(BlockBreakEvent e){
         if(e.getBlock().getState() instanceof Sign){
-            SignBreakEvent signBreakEvent = new SignBreakEvent(SSuperiorPlayer.of(e.getPlayer()), (Sign) e.getBlock().getState());
-            Bukkit.getPluginManager().callEvent(signBreakEvent);
+            BlocksListener.IMP.onSignBreak(e.getPlayer(), (Sign) e.getBlock().getState());
         }else{
             for(BlockFace blockFace : BlockFace.values()){
                 Block faceBlock = e.getBlock().getRelative(blockFace);
@@ -192,10 +184,8 @@ public final class CustomEventsListener implements Listener {
                         }
                     }
 
-                    if(isSign) {
-                        SignBreakEvent signBreakEvent = new SignBreakEvent(SSuperiorPlayer.of(e.getPlayer()), (Sign) faceBlock.getState());
-                        Bukkit.getPluginManager().callEvent(signBreakEvent);
-                    }
+                    if(isSign)
+                        BlocksListener.IMP.onSignBreak(e.getPlayer(), (Sign) faceBlock.getState());
                 }
             }
         }
