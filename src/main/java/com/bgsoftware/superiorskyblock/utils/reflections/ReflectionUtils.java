@@ -59,7 +59,9 @@ public final class ReflectionUtils {
             }
 
             if(ServerVersion.isEquals(ServerVersion.v1_13) || ServerVersion.isLegacy()){
-                fieldsMap.add(Fields.REGION_HOLDER_CACHED_CHUNKS, getField(regionLoaderClass, "b"));
+                try {
+                    fieldsMap.add(Fields.REGION_HOLDER_CACHED_CHUNKS, getFieldWithError(regionLoaderClass, "b"));
+                }catch (Throwable ignored){}
                 fieldsMap.add(Fields.CHUNK_PROVIDER_CHUNK_LOADER, getField(chunkProviderClass, "chunkLoader"));
             }
 
