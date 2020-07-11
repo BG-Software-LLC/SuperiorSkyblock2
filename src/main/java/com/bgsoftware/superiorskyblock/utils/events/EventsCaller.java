@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.events;
 
+import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
+import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
@@ -25,6 +27,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -144,4 +147,17 @@ public final class EventsCaller {
         Bukkit.getPluginManager().callEvent(preIslandCreateEvent);
         return !preIslandCreateEvent.isCancelled();
     }
+
+    public static boolean callBlockStackEvent(Block block, int originalAmount, int newAmount){
+        BlockStackEvent blockStackEvent = new BlockStackEvent(block, originalAmount, newAmount);
+        Bukkit.getPluginManager().callEvent(blockStackEvent);
+        return !blockStackEvent.isCancelled();
+    }
+
+    public static boolean callBlockUnstackEvent(Block block, int originalAmount, int newAmount){
+        BlockUnstackEvent blockUnstackEvent = new BlockUnstackEvent(block, originalAmount, newAmount);
+        Bukkit.getPluginManager().callEvent(blockUnstackEvent);
+        return !blockUnstackEvent.isCancelled();
+    }
+
 }

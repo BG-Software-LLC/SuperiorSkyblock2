@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -11,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -362,6 +364,9 @@ public final class BlocksListener implements Listener {
         if(amount <= 0)
             return false;
 
+        if(!EventsCaller.callBlockStackEvent(againstBlock, blockAmount, blockAmount + amount))
+            return false;
+
         plugin.getGrid().setBlockAmount(againstBlock, blockAmount + amount);
 
         Island island = plugin.getGrid().getIslandAt(againstBlock.getLocation());
@@ -387,6 +392,9 @@ public final class BlocksListener implements Listener {
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
+
+        if(!EventsCaller.callBlockUnstackEvent(block, blockAmount, blockAmount - amount))
+            return false;
 
         plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
 
@@ -461,18 +469,23 @@ public final class BlocksListener implements Listener {
             if(!world.isChunkLoaded(chunkX, chunkZ))
                 return;
 
-            Registry<Location, Integer> blocksToChange = Registry.createRegistry();
+            Registry<Location, Pair<Key, Integer>> blocksToChange = Registry.createRegistry();
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             for(Block block : e.getBlocks()){
                 int blockAmount = plugin.getGrid().getBlockAmount(block);
                 if(blockAmount > 1){
-                    blocksToChange.add(block.getRelative(e.getDirection()).getLocation(), blockAmount);
-                    blocksToChange.add(block.getLocation(), 0);
+                    blocksToChange.add(block.getRelative(e.getDirection()).getLocation(), new Pair<>(Key.of(block), blockAmount));
+                    blocksToChange.add(block.getLocation(), new Pair<>(null, 0));
                 }
             }
 
             Executor.sync(() -> {
-                blocksToChange.entries().forEach(entry -> plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue()));
+                blocksToChange.entries().forEach(entry -> {
+                    Key requiredKey = entry.getValue().getKey();
+                    if(requiredKey == null || Key.of(entry.getKey().getBlock()).equals(requiredKey)){
+                        plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue().getValue());
+                    }
+                });
                 blocksToChange.delete();
             });
         }, 2L);
