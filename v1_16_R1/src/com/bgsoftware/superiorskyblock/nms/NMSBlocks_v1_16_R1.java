@@ -297,16 +297,18 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
                             world
                     );
 
-                    NBTTagCompound levelCompound = chunkCompound.getCompound("Level");
-                    NBTTagList sectionsList = levelCompound.getList("Sections", 10);
-                    chunkSections.set(new ChunkSection[sectionsList.size()]);
+                    if(chunkCompound.hasKeyOfType("Level", 10)) {
+                        NBTTagCompound levelCompound = chunkCompound.getCompound("Level");
+                        NBTTagList sectionsList = levelCompound.getList("Sections", 10);
+                        chunkSections.set(new ChunkSection[sectionsList.size()]);
 
-                    for(int i = 0; i < sectionsList.size(); ++i) {
-                        NBTTagCompound sectionCompound = sectionsList.getCompound(i);
-                        byte yPosition = sectionCompound.getByte("Y");
-                        if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
-                            chunkSections.get()[i] = new ChunkSection(yPosition << 4);
-                            chunkSections.get()[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                        for (int i = 0; i < sectionsList.size(); ++i) {
+                            NBTTagCompound sectionCompound = sectionsList.getCompound(i);
+                            byte yPosition = sectionCompound.getByte("Y");
+                            if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
+                                chunkSections.get()[i] = new ChunkSection(yPosition << 4);
+                                chunkSections.get()[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                            }
                         }
                     }
                 }catch (Exception ex){
