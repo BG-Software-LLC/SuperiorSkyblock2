@@ -61,7 +61,7 @@ public interface NMSBlocks {
 
     Chunk getChunkIfLoaded(World world, int x, int z);
 
-    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(World world, int x, int z);
+    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(World world, int x, int z);
 
     void deleteChunk(Island island, World world, int x, int z);
 

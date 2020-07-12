@@ -1079,7 +1079,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         getChunkCoords(true, true).forEach((world, list) -> chunksToLoad.addAll(list.stream().map(pair -> {
             onChunkLoad.accept(world, pair);
-            return plugin.getNMSBlocks().loadChunk(world, pair.getKey(), pair.getValue());
+            return plugin.getNMSBlocks().calculateChunk(world, pair.getKey(), pair.getValue());
         }).collect(Collectors.toList())));
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
