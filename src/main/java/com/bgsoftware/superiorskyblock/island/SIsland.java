@@ -1143,8 +1143,11 @@ public final class SIsland extends DatabaseObject implements Island {
                         CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
                         blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType());
                         blockCount = pair.getValue();
-                        if(blockCount <= 0)
-                            blockCount = plugin.getProviders().getSpawner(pair.getKey()).getKey();
+                        if(blockCount <= 0) {
+                            Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
+                            blockCount = spawnerInfo.getKey();
+                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue());
+                        }
                         handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
                     }catch(Throwable ignored){}
                 }
@@ -1500,6 +1503,8 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
+        Bukkit.broadcastMessage("Place Block: " + key);
+
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
