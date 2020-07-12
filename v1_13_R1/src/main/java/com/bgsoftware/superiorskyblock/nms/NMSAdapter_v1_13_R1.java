@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_13_R1.BiomeBase;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.ChatMessage;
@@ -14,11 +13,8 @@ import net.minecraft.server.v1_13_R1.Chunk;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
 import net.minecraft.server.v1_13_R1.IBlockData;
 import net.minecraft.server.v1_13_R1.MinecraftServer;
-import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_13_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_13_R1.Particles;
-import net.minecraft.server.v1_13_R1.PlayerConnection;
 import net.minecraft.server.v1_13_R1.PlayerInteractManager;
 import net.minecraft.server.v1_13_R1.SoundCategory;
 import net.minecraft.server.v1_13_R1.SoundEffects;
@@ -34,13 +30,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_13_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -54,7 +48,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
@@ -178,23 +171,6 @@ public final class NMSAdapter_v1_13_R1 implements NMSAdapter {
 
         for(int i = 0; i < 8; i++)
             world.addParticle(Particles.F, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
-    }
-
-    @Override
-    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome, List<Player> playersToUpdate) {
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-        chunk.markDirty();
-
-        PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
-
-        playersToUpdate.forEach(player -> {
-            PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-            playerConnection.sendPacket(unloadChunkPacket);
-            playerConnection.sendPacket(mapChunkPacket);
-        });
     }
 
     @Override

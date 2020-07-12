@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.threads.MutableObject;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
@@ -53,15 +52,18 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +73,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
@@ -323,33 +326,16 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
 
     @Override
     public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
-        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.chunkProviderServer));
-        ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunkX, chunkZ);
 
         CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> completableFuture = new CompletableFuture<>();
+        ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunkX, chunkZ);
 
-        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
-        MutableObject<ChunkSection[]> chunkSections = MutableObject.of(chunk == null ? new ChunkSection[0] : Arrays.copyOf(chunk.getSections(), chunk.getSections().length));
-
-        Executor.async(() -> {
+        runActionOnChunk(bukkitWorld, chunkCoords, false, chunk -> {
             KeyMap<Integer> blockCounts = new KeyMap<>();
             Set<Location> spawnersLocations = new HashSet<>();
 
-            /* Load chunk from the files without actually loading it to the game. */
-            if(chunkSections.get().length == 0){
-                try{
-                    assert chunkLoader != null;
-                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkX, chunkZ);
-                    if(chunkData != null)
-                        chunkSections.set(((Chunk) chunkData[0]).getSections());
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                }
-            }
-
-            for(ChunkSection chunkSection : chunkSections.get()){
+            for(ChunkSection chunkSection : chunk.getSections()){
                 if(chunkSection != null){
                     for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
@@ -367,49 +353,64 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
             }
 
             completableFuture.complete(new BiPair<>(chunkPosition, blockCounts, spawnersLocations));
-        });
+        }, null);
 
         return completableFuture;
     }
 
     @Override
     public void deleteChunk(Island island, org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
-        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.chunkProviderServer));
-
-        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
-
-        if(chunk != null){
+        runActionOnChunk(bukkitWorld, chunkCoords, true, chunk -> {
             Arrays.fill(chunk.getSections(), null);
             Arrays.fill(chunk.entitySlices, new UnsafeList<>());
 
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::t);
             chunk.tileEntities.clear();
 
-            refreshChunk(chunk.bukkitChunk);
+            ChunksTracker.markEmpty(island, ChunkPosition.of(bukkitWorld, chunkX, chunkZ), false);
+        }, chunk -> refreshChunk(chunk.bukkitChunk));
+    }
+
+    @Override
+    public void setChunkBiome(org.bukkit.World bukkitWorld, int chunkX, int chunkZ, Biome biome, List<Player> playersToUpdate) {
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
+        runActionOnChunk(bukkitWorld, chunkCoords, true, chunk -> {
+            byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
+            Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+        }, null);
+    }
+
+    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
+        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
+        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.chunkProviderServer));
+
+        Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
+
+        if(chunk != null){
+            chunkConsumer.accept(chunk);
+            if(updateChunk != null)
+                updateChunk.accept(chunk);
         }
 
         else{
             Executor.async(() -> {
                 try{
                     assert chunkLoader != null;
-                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkX, chunkZ);
+                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkCoords.x, chunkCoords.z);
 
                     if(chunkData == null)
                         return;
 
                     Chunk loadedChunk = (Chunk) chunkData[0];
-                    Arrays.fill(loadedChunk.getSections(), null);
-
-                    chunkLoader.a(world, loadedChunk);
+                    chunkConsumer.accept(loadedChunk);
+                    if(saveChunk)
+                        chunkLoader.a(world, loadedChunk);
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
             });
         }
-
-        ChunksTracker.markEmpty(island, ChunkPosition.of(bukkitWorld, chunkX, chunkZ), false);
     }
 
     @Override

@@ -22,13 +22,11 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -37,7 +35,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
@@ -160,13 +157,6 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
 
         for(int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
-    }
-
-    @Override
-    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome, List<Player> playersToUpdate) {
-        byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        Arrays.fill(chunk.getBiomeIndex(), biomeBase);
     }
 
     @Override

@@ -48,8 +48,6 @@ public interface NMSAdapter {
 
     void playGeneratorSound(Location location);
 
-    void setBiome(Chunk chunk, Biome biome, List<Player> playersToUpdate);
-
     default void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome){
         for(int x = 0; x < 16; x++){
             for(int z = 0; z < 16; z++){

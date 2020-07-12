@@ -16,10 +16,7 @@ import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
-import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_15_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_15_R1.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.minecraft.server.v1_15_R1.PlayerInteractManager;
 import net.minecraft.server.v1_15_R1.TileEntityHopper;
 import net.minecraft.server.v1_15_R1.TileEntityMobSpawner;
@@ -53,7 +50,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
@@ -175,29 +171,6 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         world.triggerEffect(1501, blockPosition, 0);
-    }
-
-    @Override
-    public void setBiome(org.bukkit.Chunk bukkitChunk, Biome biome, List<Player> playersToUpdate) {
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-
-        BiomeBase[] biomeBases = (BiomeBase[]) Fields.BIOME_STORAGE_BIOME_BASES.get(chunk.getBiomeIndex());
-
-        if(biomeBases == null)
-            throw new RuntimeException("Error while receiving biome bases of chunk (" + bukkitChunk.getX() + "," + bukkitChunk.getZ() + ").");
-
-        Arrays.fill(biomeBases, biomeBase);
-        chunk.markDirty();
-
-        PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(bukkitChunk.getX(), bukkitChunk.getZ());
-        PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
-
-        playersToUpdate.forEach(player -> {
-            PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-            playerConnection.sendPacket(unloadChunkPacket);
-            playerConnection.sendPacket(mapChunkPacket);
-        });
     }
 
     @Override

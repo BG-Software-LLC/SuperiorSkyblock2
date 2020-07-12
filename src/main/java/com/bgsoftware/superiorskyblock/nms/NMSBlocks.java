@@ -12,10 +12,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
@@ -62,6 +64,10 @@ public interface NMSBlocks {
     CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(World world, int x, int z);
 
     void deleteChunk(Island island, World world, int x, int z);
+
+    default void setChunkBiome(World world, int x, int z, Biome biome, List<Player> playersToUpdate){
+
+    }
 
     int tickIslands(int random);
 
