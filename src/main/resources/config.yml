@@ -250,6 +250,8 @@ worlds:
   # Should the plugin optimize the island worlds?
   # When enabled, only chunks of islands will be saved from the island worlds.
   optimize: false
+  # The difficulty of the island worlds.
+  difficulty: EASY
 
 # All settings related to the spawn island.
 spawn:

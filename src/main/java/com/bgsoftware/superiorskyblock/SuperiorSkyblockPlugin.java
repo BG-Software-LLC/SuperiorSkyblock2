@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
@@ -339,15 +340,17 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void loadWorld(){
         String worldName = (settingsHandler = new SettingsHandler(this)).islandWorldName;
-        loadWorld(worldName, World.Environment.NORMAL);
+        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty);
+        loadWorld(worldName, difficulty, World.Environment.NORMAL);
         if(settingsHandler.netherWorldEnabled)
-            loadWorld(worldName + "_nether", World.Environment.NETHER);
+            loadWorld(worldName + "_nether", difficulty, World.Environment.NETHER);
         if(settingsHandler.endWorldEnabled)
-            loadWorld(worldName + "_the_end", World.Environment.THE_END);
+            loadWorld(worldName + "_the_end", difficulty, World.Environment.THE_END);
     }
 
-    private void loadWorld(String worldName, World.Environment environment){
-        WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(getGenerator()).createWorld();
+    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){
+        World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(getGenerator()).createWorld();
+        world.setDifficulty(difficulty);
 
         if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core")){
             getServer().dispatchCommand(getServer().getConsoleSender(), "mv import " + worldName + " normal -g " + getName());
