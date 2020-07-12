@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.mojang.authlib.GameProfile;
@@ -42,7 +41,6 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.util.UnsafeList;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -55,7 +53,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -265,22 +262,6 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
                 return false;
             }
         };
-    }
-
-    @Override
-    public void regenerateChunk(Island island, org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-
-        for(int i = 0; i < 16; i++)
-            chunk.getSections()[i] = null;
-
-        for(int i = 0; i < 16; i++)
-            chunk.entitySlices[i] = new UnsafeList<>();
-
-        new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
-        chunk.tileEntities.clear();
-
-        ChunksTracker.markEmpty(island, bukkitChunk, false);
     }
 
     @Override

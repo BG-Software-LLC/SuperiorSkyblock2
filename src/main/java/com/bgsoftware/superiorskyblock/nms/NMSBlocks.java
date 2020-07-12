@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -59,7 +59,9 @@ public interface NMSBlocks {
 
     Chunk getChunkIfLoaded(World world, int x, int z);
 
-    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(org.bukkit.World bukkitWorld, int x, int z);
+    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> loadChunk(World world, int x, int z);
+
+    void deleteChunk(Island island, World world, int x, int z);
 
     int tickIslands(int random);
 
@@ -76,6 +78,7 @@ public interface NMSBlocks {
 
     default Key getMinecartBlock(Minecart minecart){
         MaterialData materialData = minecart.getDisplayBlock();
+        //noinspection deprecation
         return Key.of(materialData.getItemType(), materialData.getData());
     }
 

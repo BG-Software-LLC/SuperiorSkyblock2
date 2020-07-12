@@ -137,7 +137,7 @@ public final class ChunksTracker {
         return grid.getIslandAt(new Location(chunkPosition.getWorld(), chunkPosition.getX() << 4, 100, chunkPosition.getZ() << 4));
     }
 
-    private static void markEmpty(Island island, ChunkPosition chunkPosition, boolean save){
+    public static void markEmpty(Island island, ChunkPosition chunkPosition, boolean save){
         if(island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 

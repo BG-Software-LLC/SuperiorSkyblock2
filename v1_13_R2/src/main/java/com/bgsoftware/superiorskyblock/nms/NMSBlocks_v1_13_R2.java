@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
@@ -62,6 +63,7 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftSign;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_13_R2.util.UnsafeList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 
@@ -322,6 +324,43 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         });
 
         return completableFuture;
+    }
+
+    @Override
+    public void deleteChunk(Island island, org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
+        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
+        IChunkLoader chunkLoader = world.getChunkProvider().chunkLoader;
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
+
+        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
+
+        if(chunk != null){
+            Arrays.fill(chunk.getSections(), Chunk.a);
+            Arrays.fill(chunk.entitySlices, new UnsafeList<>());
+
+            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::n);
+            chunk.tileEntities.clear();
+
+            refreshChunk(chunk.bukkitChunk);
+        }
+
+        else{
+            Executor.async(() -> {
+                try{
+                    ProtoChunk protoChunk = chunkLoader.b(world, chunkX, chunkZ, null);
+
+                    Arrays.fill(protoChunk.getSections(), Chunk.a);
+                    protoChunk.r().clear();
+                    protoChunk.s().clear();
+
+                    chunkLoader.saveChunk(world, protoChunk);
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            });
+        }
+
+        ChunksTracker.markEmpty(island, ChunkPosition.of(bukkitWorld, chunkX, chunkZ), false);
     }
 
     @Override

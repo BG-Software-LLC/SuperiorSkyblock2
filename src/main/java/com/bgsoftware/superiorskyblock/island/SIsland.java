@@ -732,6 +732,31 @@ public final class SIsland extends DatabaseObject implements Island {
         return chunkCoords;
     }
 
+    public Map<World, List<Pair<Integer, Integer>>> getChunkCoords(boolean onlyProtected, boolean noEmptyChunks){
+        Map<World, List<Pair<Integer, Integer>>> chunkCoords = new HashMap<>();
+
+        {
+            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
+            chunkCoords.put(normalWorld, getChunkCoords(normalWorld, onlyProtected, noEmptyChunks));
+        }
+
+        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
+            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            chunkCoords.put(netherWorld, getChunkCoords(netherWorld, onlyProtected, noEmptyChunks));
+        }
+
+        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
+            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            chunkCoords.put(endWorld, getChunkCoords(endWorld, onlyProtected, noEmptyChunks));
+        }
+
+        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
+            chunkCoords.put(registeredWorld, getChunkCoords(registeredWorld, onlyProtected, noEmptyChunks));
+        }
+
+        return chunkCoords;
+    }
+
     @Override
     public boolean isInside(Location location){
         if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
@@ -1017,16 +1042,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
-        getAllChunksAsync(World.Environment.NORMAL, true, true,
-                chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
-
-        if(wasSchematicGenerated(World.Environment.NETHER))
-            getAllChunksAsync(World.Environment.NETHER, true, true,
-                    chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
-
-        if(wasSchematicGenerated(World.Environment.THE_END))
-            getAllChunksAsync(World.Environment.THE_END, true, true,
-                    chunk -> plugin.getNMSAdapter().regenerateChunk(this, chunk));
+        getChunkCoords(true, true).forEach((world, list) -> list.forEach(pair ->
+                plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue())));
 
         plugin.getGrid().deleteIsland(this);
     }
@@ -1060,37 +1077,10 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BiConsumer<World, Pair<Integer, Integer>> onChunkLoad = snapshot == null ? (world, pair) -> {} : snapshot::cacheChunk;
 
-        {
-            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
-            //noinspection all
-            chunksToLoad.addAll(getChunkCoords(normalWorld, true, true).stream().map(pair -> {
-                onChunkLoad.accept(normalWorld, pair);
-                return plugin.getNMSBlocks().loadChunk(normalWorld, pair.getKey(), pair.getValue());
-            }).collect(Collectors.toList()));
-        }
-
-        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
-            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            chunksToLoad.addAll(getChunkCoords(netherWorld, true, true).stream().map(pair -> {
-                onChunkLoad.accept(netherWorld, pair);
-                return plugin.getNMSBlocks().loadChunk(netherWorld, pair.getKey(), pair.getValue());
-            }).collect(Collectors.toList()));
-        }
-
-        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
-            World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            chunksToLoad.addAll(getChunkCoords(endWorld, true, true).stream().map(pair -> {
-                onChunkLoad.accept(endWorld, pair);
-                return plugin.getNMSBlocks().loadChunk(endWorld, pair.getKey(), pair.getValue());
-            }).collect(Collectors.toList()));
-        }
-
-        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
-            chunksToLoad.addAll(getChunkCoords(registeredWorld, true, true).stream().map(pair -> {
-                onChunkLoad.accept(registeredWorld, pair);
-                return plugin.getNMSBlocks().loadChunk(registeredWorld, pair.getKey(), pair.getValue());
-            }).collect(Collectors.toList()));
-        }
+        getChunkCoords(true, true).forEach((world, list) -> chunksToLoad.addAll(list.stream().map(pair -> {
+            onChunkLoad.accept(world, pair);
+            return plugin.getNMSBlocks().loadChunk(world, pair.getKey(), pair.getValue());
+        }).collect(Collectors.toList())));
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
         SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());

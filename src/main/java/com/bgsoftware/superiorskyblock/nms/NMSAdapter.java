@@ -64,8 +64,6 @@ public interface NMSAdapter {
 
     Enchantment getGlowEnchant();
 
-    void regenerateChunk(Island island, Chunk chunk);
-
     default void injectChunkSections(Chunk chunk){
 
     }
