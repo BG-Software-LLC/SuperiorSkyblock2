@@ -194,11 +194,20 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Finished grid!");
         SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
 
+        AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
+
         SQLHelper.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
             while (resultSet.next()) {
                 plugin.getGrid().loadStackedBlocks(resultSet);
+                String item = resultSet.getString("item");
+                if(item == null || item.isEmpty())
+                    updateBlockKeys.set(true);
             }
         });
+
+        if(updateBlockKeys.get()){
+            Executor.sync(() -> plugin.getGrid().updateStackedBlockKeys());
+        }
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
 

@@ -23,6 +23,10 @@ public final class SBlockPosition implements BlockPosition {
         return Bukkit.getWorld(world);
     }
 
+    public String getWorldName(){
+        return world;
+    }
+
     @Override
     public int getX() {
         return x;

@@ -64,7 +64,7 @@ public final class ChunkPosition {
     }
 
     public static ChunkPosition of(SBlockPosition blockPosition){
-        return of(blockPosition.getWorld().getName(), blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
+        return of(blockPosition.getWorldName(), blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
     }
 
     public static ChunkPosition of(World world, int x, int z){
