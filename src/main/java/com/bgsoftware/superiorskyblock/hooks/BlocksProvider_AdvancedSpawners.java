@@ -49,7 +49,7 @@ public final class BlocksProvider_AdvancedSpawners implements BlocksProvider {
             Island island = plugin.getGrid().getIslandAt(location);
 
             if(island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getEntityType().toUpperCase()), 1);
+                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getEntityType().toUpperCase()), e.getCountPlaced());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
