@@ -73,6 +73,7 @@ import org.bukkit.craftbukkit.v1_12_R1.util.UnsafeList;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -88,7 +89,16 @@ import java.util.function.Consumer;
 public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static Method chunkLoaderSaveChunkMethod = null;
+
     private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
+
+    static {
+        try{
+            //noinspection JavaReflectionMemberAccess
+            chunkLoaderSaveChunkMethod = IChunkLoader.class.getMethod("saveChunk", World.class, Chunk.class, boolean.class);
+        }catch (Exception ignored){}
+    }
 
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
@@ -423,8 +433,14 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
                     Chunk loadedChunk = (Chunk) chunkData[0];
                     chunkConsumer.accept(loadedChunk);
-                    if(saveChunk)
-                        chunkLoader.a(world, loadedChunk);
+                    if(saveChunk) {
+                        if(chunkLoaderSaveChunkMethod != null){
+                            chunkLoaderSaveChunkMethod.invoke(chunkLoader, world, loadedChunk, false);
+                        }
+                        else {
+                            chunkLoader.a(world, loadedChunk);
+                        }
+                    }
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
