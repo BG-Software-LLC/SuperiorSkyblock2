@@ -715,46 +715,17 @@ public final class SIsland extends DatabaseObject implements Island {
                 .collect(Collectors.toList());
     }
 
-    public List<Pair<Integer, Integer>> getChunkCoords(World world, boolean onlyProtected, boolean noEmptyChunks){
-        List<Pair<Integer, Integer>> chunkCoords = new ArrayList<>();
-
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-
-        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
-            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
-                    chunkCoords.add(new Pair<>(x, z));
-                }
-            }
-        }
-
-        return chunkCoords;
+    @Override
+    public void resetChunks(World.Environment environment, boolean onlyProtected) {
+        World world = getCenter(environment).getWorld();
+        getChunkCoords(world, onlyProtected, true)
+                .forEach(pair -> plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue()));
     }
 
-    public Map<World, List<Pair<Integer, Integer>>> getChunkCoords(boolean onlyProtected, boolean noEmptyChunks){
-        Map<World, List<Pair<Integer, Integer>>> chunkCoords = new HashMap<>();
-
-        {
-            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
-            chunkCoords.put(normalWorld, getChunkCoords(normalWorld, onlyProtected, noEmptyChunks));
-        }
-
-        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
-            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            chunkCoords.put(netherWorld, getChunkCoords(netherWorld, onlyProtected, noEmptyChunks));
-        }
-
-        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
-            World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            chunkCoords.put(endWorld, getChunkCoords(endWorld, onlyProtected, noEmptyChunks));
-        }
-
-        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
-            chunkCoords.put(registeredWorld, getChunkCoords(registeredWorld, onlyProtected, noEmptyChunks));
-        }
-
-        return chunkCoords;
+    @Override
+    public void resetChunks(boolean onlyProtected) {
+        getChunkCoords(onlyProtected, true).forEach((world, list) -> list.forEach(pair ->
+                plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue())));
     }
 
     @Override
@@ -1042,8 +1013,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
-        getChunkCoords(true, true).forEach((world, list) -> list.forEach(pair ->
-                plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue())));
+        resetChunks(true);
 
         plugin.getGrid().deleteIsland(this);
     }
@@ -2921,6 +2891,48 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(callback != null)
             callback.run();
+    }
+
+    private List<Pair<Integer, Integer>> getChunkCoords(World world, boolean onlyProtected, boolean noEmptyChunks){
+        List<Pair<Integer, Integer>> chunkCoords = new ArrayList<>();
+
+        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
+        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
+
+        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
+            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
+                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
+                    chunkCoords.add(new Pair<>(x, z));
+                }
+            }
+        }
+
+        return chunkCoords;
+    }
+
+    private Map<World, List<Pair<Integer, Integer>>> getChunkCoords(boolean onlyProtected, boolean noEmptyChunks){
+        Map<World, List<Pair<Integer, Integer>>> chunkCoords = new HashMap<>();
+
+        {
+            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
+            chunkCoords.put(normalWorld, getChunkCoords(normalWorld, onlyProtected, noEmptyChunks));
+        }
+
+        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
+            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            chunkCoords.put(netherWorld, getChunkCoords(netherWorld, onlyProtected, noEmptyChunks));
+        }
+
+        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
+            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            chunkCoords.put(endWorld, getChunkCoords(endWorld, onlyProtected, noEmptyChunks));
+        }
+
+        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
+            chunkCoords.put(registeredWorld, getChunkCoords(registeredWorld, onlyProtected, noEmptyChunks));
+        }
+
+        return chunkCoords;
     }
 
     public static class WarpData{

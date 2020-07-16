@@ -118,8 +118,7 @@ public final class GridHandler implements GridManager {
         if(!event.isCancelled()) {
             pendingCreationTasks.add(superiorPlayer.getUniqueId());
 
-            island.getChunkCoords(true, false).forEach((world, list) -> list.forEach(pair ->
-                    plugin.getNMSBlocks().deleteChunk(island, world, pair.getKey(), pair.getValue())));
+            island.resetChunks(true);
 
             Schematic schematic = plugin.getSchematics().getSchematic(schemName);
             long startTime = System.currentTimeMillis();

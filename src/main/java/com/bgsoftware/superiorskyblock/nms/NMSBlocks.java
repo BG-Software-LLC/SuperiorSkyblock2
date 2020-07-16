@@ -65,9 +65,7 @@ public interface NMSBlocks {
 
     void deleteChunk(Island island, World world, int x, int z);
 
-    default void setChunkBiome(World world, int x, int z, Biome biome, List<Player> playersToUpdate){
-
-    }
+    void setChunkBiome(World world, int x, int z, Biome biome, List<Player> playersToUpdate);
 
     int tickIslands(int random);
 

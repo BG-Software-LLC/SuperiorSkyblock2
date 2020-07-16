@@ -35,7 +35,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
@@ -381,6 +380,16 @@ public final class SpawnIsland implements Island {
         }
 
         return chunks;
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, boolean onlyProtected) {
+
+    }
+
+    @Override
+    public void resetChunks(boolean onlyProtected) {
+
     }
 
     @Override

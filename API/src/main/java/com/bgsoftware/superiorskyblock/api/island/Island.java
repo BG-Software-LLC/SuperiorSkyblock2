@@ -337,6 +337,19 @@ public interface Island extends Comparable<Island> {
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad);
 
     /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     * @param environment The environment to reset chunks in.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     */
+    void resetChunks(World.Environment environment, boolean onlyProtected);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     */
+    void resetChunks(boolean onlyProtected);
+
+    /**
      * Check if the location is inside the island's area.
      * @param location The location to check.
      */
