@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 public class RolePermissionNode extends PermissionNodeAbstract {
 
@@ -17,7 +18,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     public RolePermissionNode(PlayerRole playerRole, PermissionNodeAbstract previousNode, String permissions){
         this.playerRole = (SPlayerRole) playerRole;
         this.previousNode = (RolePermissionNode) previousNode;
-        setPermissions(permissions, playerRole != null);
+        Executor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
     private RolePermissionNode(Registry<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode){
