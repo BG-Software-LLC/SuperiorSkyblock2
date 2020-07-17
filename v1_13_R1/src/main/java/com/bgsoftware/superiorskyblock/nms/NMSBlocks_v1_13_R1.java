@@ -311,11 +311,12 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
                     for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
+                            Location location = new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ());
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name());
+                            Key blockKey = Key.of(type.name(), location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
                             if (type == Material.SPAWNER) {
-                                spawnersLocations.add(new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ()));
+                                spawnersLocations.add(location);
                             }
                         }
                     }

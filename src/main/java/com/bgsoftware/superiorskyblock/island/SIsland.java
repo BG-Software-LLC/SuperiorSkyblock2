@@ -55,7 +55,6 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -1072,9 +1071,6 @@ public final class SIsland extends DatabaseObject implements Island {
                     continue;
                 }
 
-                if(snapshot != null)
-                    removeCounts(chunkInfo.getY(), ConstantKeys.CAULDRON, snapshot.getBlocks(chunkInfo.getX()).size());
-
                 // Load block counts
                 handleBlocksPlace(chunkInfo.getY(), false, blockCounts, islandWorth, islandLevel);
 
@@ -1096,7 +1092,7 @@ public final class SIsland extends DatabaseObject implements Island {
                         handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
                 }
                 else for(Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(chunkInfo.getX())){
-                    handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey(), false,
+                    handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey() - 1, false,
                             blockCounts, islandWorth, islandLevel);
                 }
 

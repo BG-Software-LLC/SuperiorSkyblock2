@@ -91,6 +91,10 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
         return new Key(key.replace("LEGACY_", ""));
     }
 
+    public static Key of(Material material, short data, Location location){
+        return of(material + ":" + data, location);
+    }
+
     public static Key of(String key, Location location){
         return of(Key.of(key), location);
     }
