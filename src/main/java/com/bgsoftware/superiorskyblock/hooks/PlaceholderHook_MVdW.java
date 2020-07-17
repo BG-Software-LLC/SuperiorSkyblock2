@@ -47,6 +47,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_z");
         registerPlaceholder("superior_island_world");
         registerPlaceholder("superior_island_team_size");
+        registerPlaceholder("superior_island_team_size_online");
         registerPlaceholder("superior_island_team_limit");
         registerPlaceholder("superior_island_leader");
         registerPlaceholder("superior_island_size_format");
@@ -91,6 +92,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_z");
         registerPlaceholder("superior_island_location_world");
         registerPlaceholder("superior_island_location_team_size");
+        registerPlaceholder("superior_island_location_team_size_online");
         registerPlaceholder("superior_island_location_team_limit");
         registerPlaceholder("superior_island_location_leader");
         registerPlaceholder("superior_island_location_size_format");

@@ -269,6 +269,8 @@ public abstract class PlaceholderHook {
                         return island.getCenter(World.Environment.NORMAL).getWorld().getName();
                     case "team_size":
                         return String.valueOf(island.getIslandMembers(true).size());
+                    case "team_size_online":
+                        return String.valueOf(island.getIslandMembers(true).stream().filter(SuperiorPlayer::isOnline).count());
                     case "team_limit":
                         return String.valueOf(island.getTeamLimit());
                     case "coop_limit":
