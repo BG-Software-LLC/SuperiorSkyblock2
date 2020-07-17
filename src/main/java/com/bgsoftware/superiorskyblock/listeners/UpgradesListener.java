@@ -111,8 +111,6 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
-        Bukkit.broadcastMessage(e.getEntityType().name());
-
         if(!(e.getEntity() instanceof LivingEntity) || !cacheEntityTypes.contains(e.getEntityType().name()))
             return;
 
