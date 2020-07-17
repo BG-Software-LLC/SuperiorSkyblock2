@@ -15,7 +15,6 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.AbstractHorseInventory;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public final class EntityUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Registry<UUID, ItemStack[]> armorStandsContent = Registry.createRegistry();
+    private static final Registry<UUID, ItemStack[]> entityContent = Registry.createRegistry();
 
     private EntityUtils(){
 
@@ -52,10 +51,6 @@ public final class EntityUtils {
 
             return itemStacks.contains(itemStack);
         }
-        else if(livingEntity instanceof ArmorStand){
-            if(armorStandsContent.containsKey(livingEntity.getUniqueId()))
-                return contains(armorStandsContent.get(livingEntity.getUniqueId()), itemStack);
-        }
 
         try{
             if(livingEntity instanceof AbstractHorse){
@@ -73,13 +68,15 @@ public final class EntityUtils {
             }
         }catch(Throwable ignored){}
 
-        EntityEquipment entityEquipment = livingEntity.getEquipment();
+        ItemStack[] entityEquipment = entityContent.remove(livingEntity.getUniqueId());
+        if(entityEquipment == null)
+            entityEquipment = plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment());
 
-        return contains(plugin.getNMSAdapter().getEquipment(entityEquipment), itemStack);
+        return contains(entityEquipment, itemStack);
     }
 
-    public static void cacheArmorStandEquipment(ArmorStand armorStand){
-        armorStandsContent.add(armorStand.getUniqueId(), plugin.getNMSAdapter().getEquipment(armorStand.getEquipment()));
+    public static void cacheEntityEquipment(LivingEntity livingEntity){
+        entityContent.add(livingEntity.getUniqueId(), plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment()));
     }
 
     public static boolean isPlayerDamager(EntityDamageEvent e){

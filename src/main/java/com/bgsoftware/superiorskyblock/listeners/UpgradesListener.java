@@ -13,12 +13,13 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,6 +47,7 @@ public final class UpgradesListener implements Listener {
 
     private final Set<UUID> alreadySet = new HashSet<>();
     private final Set<UUID> noRightClickTwice = new HashSet<>();
+    private final Set<String> cacheEntityTypes = Sets.newHashSet("ARMOR_STAND", "FOX", "PIGLIN");
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradesListener(SuperiorSkyblockPlugin plugin){
@@ -108,8 +110,10 @@ public final class UpgradesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onLastDamageArmorStand(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof ArmorStand))
+    public void onLastDamageEntity(EntityDamageEvent e){
+        Bukkit.broadcastMessage(e.getEntityType().name());
+
+        if(!(e.getEntity() instanceof LivingEntity) || !cacheEntityTypes.contains(e.getEntityType().name()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
@@ -117,7 +121,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        EntityUtils.cacheArmorStandEquipment((ArmorStand) e.getEntity());
+        EntityUtils.cacheEntityEquipment((LivingEntity) e.getEntity());
     }
 
     /*
