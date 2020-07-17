@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
@@ -1213,8 +1214,33 @@ public final class SIsland extends DatabaseObject implements Island {
     public void setBiome(Biome biome){
         SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
         List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
-        getChunkCoords(false, false).forEach((world, list) -> list.forEach(pair ->
-                plugin.getNMSBlocks().setChunkBiome(world, pair.getKey(), pair.getValue(), biome, playersToUpdate)));
+
+        {
+            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
+            getChunkCoords(normalWorld, false, false).forEach(pair ->
+                    plugin.getNMSBlocks().setChunkBiome(normalWorld, pair.getKey(), pair.getValue(), biome, playersToUpdate));
+        }
+
+        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
+            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
+                    ServerVersion.isEquals(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
+            getChunkCoords(netherWorld, false, false).forEach(pair ->
+                    plugin.getNMSBlocks().setChunkBiome(netherWorld, pair.getKey(), pair.getValue(), netherBiome, playersToUpdate));
+        }
+
+        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
+            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
+            getChunkCoords(endWorld, false, false).forEach(pair ->
+                    plugin.getNMSBlocks().setChunkBiome(endWorld, pair.getKey(), pair.getValue(), endBiome, playersToUpdate));
+        }
+
+        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
+            getChunkCoords(registeredWorld, false, false).forEach(pair ->
+                    plugin.getNMSBlocks().setChunkBiome(registeredWorld, pair.getKey(), pair.getValue(), biome, playersToUpdate));
+        }
+
         setBiomeRaw(biome);
     }
 
