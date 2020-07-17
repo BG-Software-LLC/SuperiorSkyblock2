@@ -2,10 +2,13 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -18,6 +21,7 @@ import com.bgsoftware.wildstacker.api.events.SpawnerPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerStackEvent;
 import com.bgsoftware.wildstacker.api.events.SpawnerUnstackEvent;
+import com.bgsoftware.wildstacker.api.handlers.SystemManager;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -41,12 +45,32 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+
+            SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
+
+                @Override
+                public com.bgsoftware.superiorskyblock.api.key.Key getCustomKey(Location location) {
+                    return getSystemManager().isStackedBarrel(location) ?
+                            com.bgsoftware.superiorskyblock.api.key.Key.of(getSystemManager().getStackedBarrel(location).getBarrelItem(1)) :
+                            com.bgsoftware.superiorskyblock.api.key.Key.of("CAULDRON");
+                }
+
+                @Override
+                public boolean isCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+                    return false;
+                }
+
+            }, ConstantKeys.CAULDRON);
         }
     }
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
         throw new UnsupportedOperationException("Unsupported Operation");
+    }
+
+    private SystemManager getSystemManager(){
+        return WildStackerAPI.getWildStacker().getSystemManager();
     }
 
     public static class WildStackerSnapshot {
@@ -108,8 +132,9 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelPlace(BarrelPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-            if(island != null)
-                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getBarrel().getStackAmount());
+            int increaseAmount = e.getBarrel().getStackAmount();
+            if(island != null && increaseAmount > 1)
+                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), increaseAmount - 1);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
