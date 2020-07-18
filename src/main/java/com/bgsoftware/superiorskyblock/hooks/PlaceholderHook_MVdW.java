@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import org.bukkit.OfflinePlayer;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 
 public final class PlaceholderHook_MVdW extends PlaceholderHook {
@@ -142,11 +141,9 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         if(customPlaceholders == null || placeholderAddedHandlers == null)
             return;
 
-        Iterator var3 = placeholderAddedHandlers.iterator();
         PlaceholderReplacer replacer = e -> parsePlaceholder(e.getOfflinePlayer(), e.getPlaceholder().replace("superior_", ""));
 
-        while(var3.hasNext()) {
-            PlaceholderAddedEvent event = (PlaceholderAddedEvent)var3.next();
+        for(PlaceholderAddedEvent event : placeholderAddedHandlers){
             event.onPlaceholderAdded(plugin, placeholder.toLowerCase(), replacer);
         }
 
