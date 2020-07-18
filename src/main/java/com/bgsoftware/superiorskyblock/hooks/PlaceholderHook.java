@@ -352,6 +352,8 @@ public abstract class PlaceholderHook {
                         return String.valueOf(island.getWarpsLimit());
                     case "warps":
                         return String.valueOf(island.getAllWarps().size());
+                    case "creation_time":
+                        return island.getCreationTimeDate();
                 }
 
             }

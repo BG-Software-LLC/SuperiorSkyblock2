@@ -85,6 +85,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_rating_stars");
         registerPlaceholder("superior_island_warps_limit");
         registerPlaceholder("superior_island_warps");
+        registerPlaceholder("superior_island_creation_time");
 
         registerPlaceholder("superior_island_location_center");
         registerPlaceholder("superior_island_location_x");
@@ -130,6 +131,7 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
         registerPlaceholder("superior_island_location_rating_stars");
         registerPlaceholder("superior_island_location_warps_limit");
         registerPlaceholder("superior_island_location_warps");
+        registerPlaceholder("superior_island_location_creation_time");
     }
 
     //Register placeholder without logging to console
