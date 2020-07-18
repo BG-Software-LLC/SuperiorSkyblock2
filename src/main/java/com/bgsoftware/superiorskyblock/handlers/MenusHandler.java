@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -186,6 +187,11 @@ public final class MenusHandler implements MenusManager {
     @Override
     public void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island) {
         MenuSettings.openInventory(superiorPlayer, null, island);
+    }
+
+    @Override
+    public void updateSettings(IslandFlag islandFlag) {
+        MenuSettings.updateSettings(islandFlag);
     }
 
     @Override

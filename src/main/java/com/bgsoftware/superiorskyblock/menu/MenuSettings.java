@@ -22,7 +22,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
@@ -104,23 +103,16 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
 
-        islandSettings = new ArrayList<>();
-
         ConfigurationSection settingsSection = cfg.getConfigurationSection("settings");
 
-        for(IslandFlag islandFlag : IslandFlag.values()){
-            String settings = islandFlag.getName().toLowerCase();
-            if(settingsSection.contains(settings)){
-                ConfigurationSection section = settingsSection.getConfigurationSection(settings);
-                menuSettings.addData(settings + "-sound", FileUtils.getSound(section.getConfigurationSection("sound")));
-                menuSettings.addData(settings + "-commands", section.getStringList("commands"));
-                menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
-                menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
-                MenuSettings.islandSettings.add(islandFlag);
-            }
-        }
+        islandSettings = new ArrayList<>();
+        int position = 0;
 
-        islandSettings.sort(Comparator.comparing(IslandFlag::getName));
+        for(String key : settingsSection.getKeys(false)){
+            try {
+                updateSettings(IslandFlag.getByName(key.toLowerCase()), cfg, position++);
+            }catch (Exception ignored){}
+        }
 
         menuSettings.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuSettings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
@@ -138,6 +130,39 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
     public static void refreshMenus(){
         SuperiorMenu.refreshMenus(MenuSettings.class);
+    }
+
+    public static void updateSettings(IslandFlag islandFlag){
+        File file = new File(plugin.getDataFolder(), "menus/settings.yml");
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        int position = 0;
+
+        for(String key : cfg.getConfigurationSection("settings").getKeys(false)){
+            if(islandFlag.getName().equalsIgnoreCase(key))
+                break;
+
+            position++;
+        }
+
+        updateSettings(islandFlag, cfg, position);
+    }
+
+    public static void updateSettings(IslandFlag islandFlag, YamlConfiguration cfg, int position){
+        if(!islandSettings.contains(islandFlag)) {
+            String settings = islandFlag.getName().toLowerCase();
+            if (cfg.contains("settings." + settings)) {
+                ConfigurationSection section = cfg.getConfigurationSection("settings." + settings);
+                MenuSettings menuSettings = new MenuSettings(null, null);
+                menuSettings.addData(settings + "-sound", FileUtils.getSound(section.getConfigurationSection("sound")));
+                menuSettings.addData(settings + "-commands", section.getStringList("commands"));
+                menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
+                menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
+                if(position >= 0)
+                    islandSettings.add(position, islandFlag);
+                else
+                    islandSettings.add(islandFlag);
+            }
+        }
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

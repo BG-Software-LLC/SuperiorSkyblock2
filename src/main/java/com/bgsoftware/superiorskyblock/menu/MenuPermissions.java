@@ -226,12 +226,13 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
 
         islandPermissions.clear();
+        int position = 0;
 
         for(String key : permissionsSection.getKeys(false)){
             if(permissionsSection.getBoolean(key + ".display-menu", false)) {
                 try {
                     String permission = key.toLowerCase();
-                    updatePermission(IslandPrivilege.getByName(permission), cfg);
+                    updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                 }catch (Exception ignored){}
             }
         }
@@ -256,24 +257,39 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
     public static void updatePermission(IslandPrivilege islandPrivilege){
         File file = new File(plugin.getDataFolder(), "menus/permissions.yml");
-        updatePermission(islandPrivilege, CommentedConfiguration.loadConfiguration(file));
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        int position = 0;
+
+        for(String key : cfg.getConfigurationSection("permissions").getKeys(false)){
+            if(islandPrivilege.getName().equalsIgnoreCase(key))
+                break;
+
+            position++;
+        }
+
+        updatePermission(islandPrivilege, cfg, position);
     }
 
-    public static void updatePermission(IslandPrivilege islandPrivilege, YamlConfiguration cfg){
+    public static void updatePermission(IslandPrivilege islandPrivilege, YamlConfiguration cfg, int position){
         if(!islandPermissions.contains(islandPrivilege)) {
             MenuPermissions menuPermissions = new MenuPermissions(null, null, null);
             String permission = islandPrivilege.getName().toLowerCase();
-            ConfigurationSection permissionSection = cfg.getConfigurationSection("permissions." + permission);
-            menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
-            menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
-            menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
-            menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
-            menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
-            menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
-            if (permissionSection.contains("role-permission")) {
-                menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
+            if (cfg.contains("permissions." + permission)) {
+                ConfigurationSection permissionSection = cfg.getConfigurationSection("permissions." + permission);
+                menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
+                menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
+                menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
+                menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
+                menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
+                menuPermissions.addData(permission + "-permission-disabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-disabled")));
+                if (permissionSection.contains("role-permission")) {
+                    menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
+                }
+                if(position >= 0)
+                    islandPermissions.add(position, islandPrivilege);
+                else
+                    islandPermissions.add(islandPrivilege);
             }
-            islandPermissions.add(islandPrivilege);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -120,6 +121,12 @@ public interface MenusManager {
      * @param island The island to get the settings from.
      */
     void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island);
+
+    /**
+     * Update the island settings in the menu.
+     * @param islandFlag The settings to update.
+     */
+    void updateSettings(IslandFlag islandFlag);
 
     /**
      * Open the islands top menu for a player.
