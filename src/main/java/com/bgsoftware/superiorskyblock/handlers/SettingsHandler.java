@@ -103,6 +103,7 @@ public final class SettingsHandler {
     public final KeyMap<Integer> defaultGenerator;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
+    public final String dateFormat;
     public final boolean skipOneItemMenus;
     public final boolean teleportOnPVPEnable;
     public final boolean immuneToPVPWhenTeleport;
@@ -262,6 +263,8 @@ public final class SettingsHandler {
         }
         numberFormat = cfg.getString("number-format", "en-US");
         StringUtils.setNumberFormatter(numberFormat);
+        dateFormat = cfg.getString("date-format", "dd/MM/yyyy HH:mm:ss");
+        StringUtils.setDateFormatter(dateFormat);
         skipOneItemMenus = cfg.getBoolean("skip-one-item-menus", false);
         teleportOnPVPEnable = cfg.getBoolean("teleport-on-pvp-enable", true);
         immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);

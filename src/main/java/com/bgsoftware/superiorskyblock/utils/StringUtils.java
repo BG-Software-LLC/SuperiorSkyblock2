@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -12,8 +13,10 @@ import org.bukkit.command.CommandSender;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +37,7 @@ public final class StringUtils {
     private static final Pattern DECIMAL_PATTERN = Pattern.compile("(.*)\\.(\\d)0");
 
     private static NumberFormat numberFormatter;
+    private static SimpleDateFormat dateFormatter;
 
     private StringUtils(){
 
@@ -53,6 +57,15 @@ public final class StringUtils {
         numberFormatter.setMinimumFractionDigits(2);
         numberFormatter.setMaximumFractionDigits(2);
         numberFormatter.setRoundingMode(RoundingMode.FLOOR);
+    }
+
+    public static void setDateFormatter(String dateFormat){
+        dateFormatter = new SimpleDateFormat(dateFormat);
+        try {
+            for (Island island : plugin.getGrid().getIslands()) {
+                ((SIsland) island).updateCreationTimeDate();
+            }
+        }catch (Exception ignored){}
     }
 
     public static String format(String type){
@@ -293,6 +306,10 @@ public final class StringUtils {
         }
 
         return true;
+    }
+
+    public static String formatDate(long time){
+        return dateFormatter.format(new Date(time));
     }
 
     private static String parseHexColor(String hexColor){

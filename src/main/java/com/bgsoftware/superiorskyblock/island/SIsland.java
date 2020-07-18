@@ -109,7 +109,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private SuperiorPlayer owner;
     private final BlockPosition center;
     private final long creationTime;
-    private final String creationTimeDate;
+    private String creationTimeDate;
 
     /*
      * Island flags
@@ -176,7 +176,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
         this.creationTime = resultSet.getLong("creationTime");
-        this.creationTimeDate = new Date(creationTime * 1000).toString();
+        updateCreationTimeDate();
 
         rawKeyPlacements = true;
 
@@ -274,7 +274,7 @@ public final class SIsland extends DatabaseObject implements Island {
         }
         this.center = wrappedLocation;
         this.creationTime = System.currentTimeMillis() / 1000;
-        this.creationTimeDate = new Date(creationTime * 1000).toString();
+        updateCreationTimeDate();
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
@@ -299,6 +299,10 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public String getCreationTimeDate() {
         return creationTimeDate;
+    }
+
+    public void updateCreationTimeDate(){
+        this.creationTimeDate = StringUtils.formatDate(creationTime * 1000);
     }
 
     /*
