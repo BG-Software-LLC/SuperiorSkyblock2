@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class StringUtils {
 
@@ -257,12 +257,7 @@ public final class StringUtils {
     }
 
     public static List<String> translateColors(List<String> list){
-        List<String> newList = new ArrayList<>(list.size());
-
-        for(String line : list)
-            newList.add(translateColors(line));
-
-        return newList;
+        return list.stream().map(StringUtils::translateColors).collect(Collectors.toList());
     }
 
     public static String stripColors(String str){
