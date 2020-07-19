@@ -31,9 +31,15 @@ public final class CmdCreate implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return (plugin.getSettings().islandNamesRequiredForCreation ?
-                "create <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">" : "create") + " [" +
-                Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale) + "]";
+        StringBuilder usage = new StringBuilder("create");
+
+        if(plugin.getSettings().islandNamesRequiredForCreation)
+            usage.append(" <").append(Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale)).append(">");
+
+        if(plugin.getSettings().schematicNameArgument)
+            usage.append(" [").append(Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale)).append("]");
+
+        return usage.toString();
     }
 
     @Override
@@ -48,7 +54,15 @@ public final class CmdCreate implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2;
+        int args = 3;
+
+        if(!plugin.getSettings().islandNamesRequiredForCreation)
+            args--;
+
+        if(!plugin.getSettings().schematicNameArgument)
+            args--;
+
+        return args;
     }
 
     @Override
@@ -80,7 +94,7 @@ public final class CmdCreate implements ISuperiorCommand {
             }
         }
 
-        if(args.length == (plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2)){
+        if(plugin.getSettings().schematicNameArgument && args.length == (plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2)){
             schematicName = args[plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1];
             Schematic schematic = plugin.getSchematics().getSchematic(schematicName);
             if(schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")){
@@ -99,8 +113,9 @@ public final class CmdCreate implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length == (plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2)){
-            String argument = args[plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1].toLowerCase();
+        int argumentLength = plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2;
+        if(plugin.getSettings().schematicNameArgument && args.length == argumentLength){
+            String argument = args[argumentLength - 1].toLowerCase();
             return plugin.getSchematics().getSchematics().stream()
                     .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_the_end") &&
                             schematic.toLowerCase().startsWith(argument))

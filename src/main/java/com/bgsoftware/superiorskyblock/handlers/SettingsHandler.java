@@ -134,6 +134,7 @@ public final class SettingsHandler {
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
+    public final boolean schematicNameArgument;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -315,6 +316,7 @@ public final class SettingsHandler {
         negativeWorth = cfg.getBoolean("negative-worth", true);
         negativeLevel = cfg.getBoolean("negative-level", true);
         disabledEvents = cfg.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
+        schematicNameArgument = cfg.getBoolean("schematic-name-argument", true);
     }
 
     public void updateValue(String path, Object value){

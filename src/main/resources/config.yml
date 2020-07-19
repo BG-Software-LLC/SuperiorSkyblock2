@@ -573,3 +573,7 @@ negative-level: true
 # You can find a list of events here:
 # https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events
 disabled-events: []
+
+# Should there be a schematic-name argument in the create command?
+# When enabled, people will be able to skip the create menu and create islands directly with the command.
+schematic-name-argument: true
