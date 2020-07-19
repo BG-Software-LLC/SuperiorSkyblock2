@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
@@ -28,6 +30,14 @@ public interface UpgradeLevel {
      * Get the permission required to upgrade to this level.
      */
     String getPermission();
+
+    /**
+     * Check all the custom requirements of the upgrade.
+     * @param superiorPlayer The player to check the requirements on.
+     * @return The error message for the failed requirements.
+     *         If all the requirements were passed, an empty string will be returned.
+     */
+    String checkRequirements(SuperiorPlayer superiorPlayer);
 
     /**
      * Get the crop growth multiplier of this level.

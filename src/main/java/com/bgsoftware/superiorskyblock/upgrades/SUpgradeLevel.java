@@ -1,7 +1,10 @@
 package com.bgsoftware.superiorskyblock.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -9,17 +12,23 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class SUpgradeLevel implements UpgradeLevel {
+
+    private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final int level;
     private final double price;
     private final List<String> commands;
     private final String permission;
+    private final Set<Pair<String, String>> requirements;
     private final double cropGrowth, spawnerRates, mobDrops;
     private final int teamLimit, warpsLimit, coopLimit, borderSize;
     private final KeyMap<Integer> blockLimits, generatorRates;
@@ -28,11 +37,12 @@ public final class SUpgradeLevel implements UpgradeLevel {
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
         this.level = level;
         this.price = price;
         this.commands = commands;
         this.permission = permission;
+        this.requirements = requirements;
         this.cropGrowth = cropGrowth;
         this.spawnerRates = spawnerRates;
         this.mobDrops = mobDrops;
@@ -64,6 +74,19 @@ public final class SUpgradeLevel implements UpgradeLevel {
     @Override
     public String getPermission() {
         return permission;
+    }
+
+    @Override
+    public String checkRequirements(SuperiorPlayer superiorPlayer) {
+        for(Pair<String, String> requirement : requirements){
+            String check = PlaceholderHook.parse(superiorPlayer, requirement.getKey());
+            try {
+                if (!Boolean.parseBoolean(engine.eval(check) + ""))
+                    return requirement.getValue();
+            }catch (Exception ignored){}
+        }
+
+        return "";
     }
 
     @Override

@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,8 +19,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class UpgradesHandler implements UpgradesManager {
 
@@ -68,6 +72,11 @@ public final class UpgradesHandler implements UpgradesManager {
                 double price = levelSection.getDouble("price");
                 List<String> commands = levelSection.getStringList("commands");
                 String permission = levelSection.getString("permission", "");
+                Set<Pair<String, String>> requirements = new HashSet<>();
+                for(String line : levelSection.getStringList("required-checks")){
+                    String[] sections = line.split(";");
+                    requirements.add(new Pair<>(sections[0], StringUtils.translateColors(sections[1])));
+                }
                 double cropGrowth = levelSection.getDouble("crop-growth", -1D);
                 double spawnerRates = levelSection.getDouble("spawner-rates", -1D);
                 double mobDrops = levelSection.getDouble("mob-drops", -1D);
@@ -101,8 +110,9 @@ public final class UpgradesHandler implements UpgradesManager {
                         }catch(IllegalArgumentException ignored){}
                     }
                 }
-                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, cropGrowth,
-                        spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits, entityLimits, generatorRates, islandEffects));
+                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,
+                        cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
+                        entityLimits, generatorRates, islandEffects));
             }
             this.upgrades.add(upgradeName, upgrade);
         }

@@ -92,33 +92,38 @@ public final class CmdRankup implements ISuperiorCommand {
             return;
         }
 
+        String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
+
         boolean hasNextLevel;
 
-        EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
-
-        double nextUpgradePrice = event.getResult().getValue();
-
-        if(event.isCancelled()){
-            hasNextLevel = false;
-        }
-
-        else if(EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice){
-            Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
+        if(!requiredCheckFailure.isEmpty()){
+            Locale.sendMessage(superiorPlayer, requiredCheckFailure, false);
             hasNextLevel = false;
         }
 
         else {
-            if (nextUpgradePrice > 0)
-                EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
+            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
-            for (String command : event.getResult().getKey()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
-                        .replace("%player%", superiorPlayer.getName())
-                        .replace("%leader%", island.getOwner().getName()))
-                );
+            double nextUpgradePrice = event.getResult().getValue();
+
+            if (event.isCancelled()) {
+                hasNextLevel = false;
+            } else if (EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice) {
+                Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
+                hasNextLevel = false;
+            } else {
+                if (nextUpgradePrice > 0)
+                    EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
+
+                for (String command : event.getResult().getKey()) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
+                            .replace("%player%", superiorPlayer.getName())
+                            .replace("%leader%", island.getOwner().getName()))
+                    );
+                }
+
+                hasNextLevel = true;
             }
-
-            hasNextLevel = true;
         }
 
         SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();

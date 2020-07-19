@@ -66,10 +66,12 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                 double nextLevelPrice = upgradeLevel.getPrice();
                 String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
+                String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice && (permission.isEmpty() || superiorPlayer.hasPermission(permission));
+                    boolean nextLevel = EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice &&
+                            (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }
             }

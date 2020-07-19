@@ -6,12 +6,13 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 public final class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
-            -1, -1, -1, -1, -1, -1, -1,
+            new HashSet<>(), -1, -1, -1, -1, -1, -1, -1,
             new KeyMap<>(), new HashMap<>(), new KeyMap<>(), new HashMap<>());
 
     private final String name;
