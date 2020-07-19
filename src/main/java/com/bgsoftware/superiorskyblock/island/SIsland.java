@@ -1086,7 +1086,7 @@ public final class SIsland extends DatabaseObject implements Island {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
                     }
                     else{
-                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue());
+                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), location);
                         handleBlockPlace(spawnerKey, spawnerInfo.getKey(), false, blockCounts, islandWorth, islandLevel);
                     }
                 }
@@ -1112,12 +1112,12 @@ public final class SIsland extends DatabaseObject implements Island {
                 for(Pair<Location, Integer> pair : spawnersToCheck){
                     try {
                         CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType());
+                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType(), pair.getKey());
                         blockCount = pair.getValue();
                         if(blockCount <= 0) {
                             Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
                             blockCount = spawnerInfo.getKey();
-                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue());
+                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), pair.getKey());
                         }
                         handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
                     }catch(Throwable ignored){}
