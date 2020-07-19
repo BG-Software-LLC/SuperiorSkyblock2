@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -121,7 +122,7 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+        island.handleBlockBreak(Key.of(e.getBlockClicked()), 1);
 
         Executor.sync(() -> {
             Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
