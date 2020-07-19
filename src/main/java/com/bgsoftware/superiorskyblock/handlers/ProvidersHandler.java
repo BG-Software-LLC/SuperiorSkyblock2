@@ -23,6 +23,10 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.hooks.PricesProvider_ShopGUIPlus;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
+import com.bgsoftware.superiorskyblock.hooks.VanishProvider;
+import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
+import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
+import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -44,6 +48,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private SpawnersProvider spawnersProvider = new BlocksProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
+    private VanishProvider vanishProvider = player -> false;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -92,6 +97,13 @@ public final class ProvidersHandler implements ProvidersManager {
 
             if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
                 pricesProvider = new PricesProvider_ShopGUIPlus();
+
+            if(Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket"))
+                vanishProvider = new VanishProvider_VanishNoPacket();
+            else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
+                vanishProvider = new VanishProvider_Essentials();
+            else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
+                vanishProvider = new VanishProvider_CMI();
         });
 
         PlaceholderHook.register(plugin);
@@ -125,6 +137,10 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public BigDecimal getPrice(Key key){
         return pricesProvider.getPrice(key);
+    }
+
+    public boolean isVanished(Player player){
+        return vanishProvider.isVanished(player);
     }
 
 }

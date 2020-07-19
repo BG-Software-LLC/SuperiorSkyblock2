@@ -102,6 +102,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors() {
+        return getIslandVisitors(true);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
         return new ArrayList<>();
     }
 

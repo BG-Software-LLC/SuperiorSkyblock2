@@ -60,9 +60,15 @@ public interface Island extends Comparable<Island> {
     List<SuperiorPlayer> getBannedPlayers();
 
     /**
-     * Get the list of all visitors that are on the island.
+     * Get the list of all visitors that are on the island, including vanished ones.
      */
     List<SuperiorPlayer> getIslandVisitors();
+
+    /**
+     * Get the list of all visitors that are on the island.
+     * @param vanishPlayers Should vanish players be included?
+     */
+    List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers);
 
     /**
      * Get the list of all the players that are on the island.

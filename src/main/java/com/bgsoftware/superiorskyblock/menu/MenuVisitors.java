@@ -68,7 +68,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
     @Override
     protected List<SuperiorPlayer> requestObjects() {
-        return island.getIslandVisitors();
+        return island.getIslandVisitors(false);
     }
 
     public static void init(){

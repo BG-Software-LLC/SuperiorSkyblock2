@@ -287,19 +287,17 @@ public final class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
-        if(!superiorPlayer.hasTeamChatEnabled())
-            return;
+        if(superiorPlayer.hasTeamChatEnabled()){
+            if (island == null) {
+                superiorPlayer.toggleTeamChat();
+                return;
+            }
 
-        if (superiorPlayer.getIsland() == null) {
-            superiorPlayer.toggleTeamChat();
-        }
-
-        else {
             e.setCancelled(true);
             ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
@@ -309,30 +307,23 @@ public final class PlayersListener implements Listener {
                     Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             }
         }
-    }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-        Island island = superiorPlayer.getIsland();
+        else {
+            String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
+                    plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName());
 
-        if(superiorPlayer.hasTeamChatEnabled())
-            return;
-
-        String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
-                plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName());
-
-        e.setFormat(e.getFormat()
-                .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
-                .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale())))
-                .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
-                .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
-                .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
-                .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
-                .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")
-                .replace("{island-position-rating}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_RATING) + 1) + "")
-                .replace("{island-position-players}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_PLAYERS) + 1) + "")
-        );
+            e.setFormat(e.getFormat()
+                    .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
+                    .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale())))
+                    .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
+                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
+                    .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
+                    .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
+                    .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")
+                    .replace("{island-position-rating}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_RATING) + 1) + "")
+                    .replace("{island-position-players}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_PLAYERS) + 1) + "")
+            );
+        }
     }
 
     @EventHandler

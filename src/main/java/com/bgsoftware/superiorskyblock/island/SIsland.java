@@ -328,8 +328,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors() {
+        return getIslandVisitors(true);
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
         return playersInside.readAndGet(playersInside -> playersInside.stream()
-                .filter(superiorPlayer -> !isMember(superiorPlayer)).collect(Collectors.toList()));
+                .filter(superiorPlayer -> !isMember(superiorPlayer) &&
+                        (vanishPlayers || !plugin.getProviders().isVanished(superiorPlayer.asPlayer())))
+                .collect(Collectors.toList()));
     }
 
     @Override
