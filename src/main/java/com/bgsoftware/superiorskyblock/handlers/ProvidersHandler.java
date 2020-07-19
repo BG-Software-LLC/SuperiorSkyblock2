@@ -26,6 +26,7 @@ import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
+import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -100,6 +101,9 @@ public final class ProvidersHandler implements ProvidersManager {
 
             if(Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket"))
                 vanishProvider = new VanishProvider_VanishNoPacket();
+            else if(Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
+                    Bukkit.getPluginManager().isPluginEnabled("PremiumVanish"))
+                vanishProvider = new VanishProvider_SuperVanish();
             else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
                 vanishProvider = new VanishProvider_Essentials();
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
