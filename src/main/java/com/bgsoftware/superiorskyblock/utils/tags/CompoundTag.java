@@ -34,6 +34,7 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -42,6 +43,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ import java.util.Set;
  *
  * @author Graham Edgecombe
  */
-public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
+public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
     static final Class<?> CLASS;
     static final Constructor<?> CONSTRUCTOR;
@@ -77,11 +79,51 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
     }
 
     public void setString(String key, String value){
-        this.value.put(key, new StringTag(value));
+        setTag(key, new StringTag(value));
+    }
+
+    public void setInt(String key, int value){
+        setTag(key, new IntTag(value));
+    }
+
+    public void setByte(String key, byte value){
+        setTag(key, new ByteTag(value));
     }
 
     public void setTag(String key, Tag<?> value){
         this.value.put(key, value);
+    }
+
+    public String getString(String key){
+        Tag<?> tag = getTag(key);
+        return !(tag instanceof StringTag) ? null : ((StringTag) tag).value;
+    }
+
+    public int getInt(String key){
+        Tag<?> tag = getTag(key);
+        return !(tag instanceof IntTag) ? 0 : ((IntTag) tag).value;
+    }
+
+
+    public CompoundTag getCompound(String key){
+        Tag<?> tag = getTag(key);
+        return !(tag instanceof CompoundTag) ? null : (CompoundTag) tag;
+    }
+
+    public Tag<?> getTag(String key){
+        return this.value.get(key);
+    }
+
+    public boolean containsKey(String key){
+        return this.value.containsKey(key);
+    }
+
+    public int size(){
+        return value.size();
+    }
+
+    public Set<Map.Entry<String, Tag<?>>> entrySet(){
+        return value.entrySet();
     }
 
     @Override
@@ -111,6 +153,12 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Tag<?>> iterator() {
+        return value.values().iterator();
     }
 
     @Override

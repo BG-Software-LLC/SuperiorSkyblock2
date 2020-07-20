@@ -23,7 +23,7 @@ public final class TagUtils {
         compoundValues.put("type", new StringTag(itemStack.getType().name()));
         compoundValues.put("amount", new IntTag(itemStack.getAmount()));
         compoundValues.put("data", new ShortTag(itemStack.getDurability()));
-        compoundValues.put("NBT", nbtTagToCompound(itemStack));
+        compoundValues.put("NBT", plugin.getNMSTags().getNBTTag(itemStack));
 
         return new CompoundTag(compoundValues);
     }
@@ -37,15 +37,7 @@ public final class TagUtils {
 
         ItemStack itemStack = new ItemStack(type, amount, data);
 
-        return compoundToNBTTag(itemStack, (CompoundTag) compoundValues.get("NBT"));
-    }
-
-    public static CompoundTag nbtTagToCompound(ItemStack itemStack){
-        return plugin.getNMSTags().getNBTTag(itemStack);
-    }
-
-    public static ItemStack compoundToNBTTag(ItemStack itemStack, CompoundTag compoundTag){
-        return plugin.getNMSTags().getFromNBTTag(itemStack, compoundTag);
+        return plugin.getNMSTags().getFromNBTTag(itemStack, (CompoundTag) compoundValues.get("NBT"));
     }
 
 }

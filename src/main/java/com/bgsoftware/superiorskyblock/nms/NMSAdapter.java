@@ -76,4 +76,6 @@ public interface NMSAdapter {
         potionMeta.addCustomEffect(potionEffect, true);
     }
 
+    String getMinecraftKey(ItemStack itemStack);
+
 }

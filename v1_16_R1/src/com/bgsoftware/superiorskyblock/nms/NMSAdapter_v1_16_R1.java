@@ -14,6 +14,7 @@ import net.minecraft.server.v1_16_R1.ChatMessage;
 import net.minecraft.server.v1_16_R1.Chunk;
 import net.minecraft.server.v1_16_R1.EntityPlayer;
 import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.IRegistry;
 import net.minecraft.server.v1_16_R1.MinecraftServer;
 import net.minecraft.server.v1_16_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_16_R1.PlayerInteractManager;
@@ -37,6 +38,7 @@ import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -268,6 +270,11 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
         if(!potionMeta.hasCustomEffects())
             potionMeta.setColor(potionEffect.getType().getColor());
         potionMeta.addCustomEffect(potionEffect, true);
+    }
+
+    @Override
+    public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
+        return IRegistry.ITEM.getKey(CraftItemStack.asNMSCopy(itemStack).getItem()).toString();
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

@@ -17,16 +17,22 @@ import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
-
+import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.SkullType;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,6 +40,25 @@ import java.util.function.Consumer;
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final EnumMap<BlockFace, Byte> rotationToByte = Maps.newEnumMap(BlockFace.class);
+
+    static {
+        rotationToByte.put(BlockFace.EAST, (byte) 4);
+        rotationToByte.put(BlockFace.SOUTH, (byte) 8);
+        rotationToByte.put(BlockFace.WEST, (byte) 12);
+        rotationToByte.put(BlockFace.NORTH_EAST, (byte) 2);
+        rotationToByte.put(BlockFace.NORTH_WEST, (byte) 14);
+        rotationToByte.put(BlockFace.SOUTH_EAST, (byte) 6);
+        rotationToByte.put(BlockFace.SOUTH_WEST, (byte) 10);
+        rotationToByte.put(BlockFace.WEST_NORTH_WEST, (byte) 13);
+        rotationToByte.put(BlockFace.NORTH_NORTH_WEST, (byte) 15);
+        rotationToByte.put(BlockFace.NORTH_NORTH_EAST, (byte) 1);
+        rotationToByte.put(BlockFace.EAST_NORTH_EAST, (byte) 3);
+        rotationToByte.put(BlockFace.EAST_SOUTH_EAST, (byte) 5);
+        rotationToByte.put(BlockFace.SOUTH_SOUTH_EAST, (byte) 7);
+        rotationToByte.put(BlockFace.SOUTH_SOUTH_WEST, (byte) 9);
+        rotationToByte.put(BlockFace.WEST_SOUTH_WEST, (byte) 11);
+    }
 
     private final CompoundTag compoundTag;
 
@@ -95,6 +120,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + x + ", " + y + ", " + z + " - skipping...");
                     continue;
                 }
+
+                parseOldTileEntity((CompoundTag) tag);
 
                 CompoundTag statesTag = (CompoundTag) compoundValue.get("states");
                 CompoundTag tileEntity = (CompoundTag) compoundValue.get("tileEntity");
@@ -208,6 +235,129 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             return ((ByteTag) tag).getValue();
         else
             return ((IntTag) tag).getValue();
+    }
+
+    private static void parseOldTileEntity(CompoundTag compoundTag){
+        CompoundTag tileEntity = new CompoundTag();
+
+        {
+            String baseColor = compoundTag.getString("baseColor");
+            if(baseColor != null)
+                //noinspection deprecation
+                tileEntity.setInt("Base", DyeColor.valueOf(baseColor).getDyeData());
+        }
+
+        {
+            CompoundTag patterns = compoundTag.getCompound("patterns");
+            if(patterns != null) {
+                ListTag patternsList = new ListTag(CompoundTag.class, new ArrayList<>());
+
+                for(Tag<?> tag : patterns){
+                    if(tag instanceof CompoundTag){
+                        CompoundTag oldPatternTag = (CompoundTag) tag;
+                        CompoundTag patternTag = new CompoundTag();
+                        patternTag.setInt("Color", oldPatternTag.getInt("color"));
+                        patternTag.setString("Pattern", oldPatternTag.getString("type"));
+                        patternsList.addTag(patternTag);
+                    }
+                }
+
+                tileEntity.setTag("Patterns", patternsList);
+            }
+        }
+
+        {
+            CompoundTag contents = compoundTag.getCompound("contents");
+            if(contents != null){
+                ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
+                for(Map.Entry<String, Tag<?>> item : contents.entrySet()){
+                    if(item.getValue() instanceof CompoundTag) {
+                        try {
+                            ItemStack itemStack = TagUtils.compoundToItem((CompoundTag) item.getValue());
+                            CompoundTag itemCompound = new CompoundTag();
+                            itemCompound.setString("id", plugin.getNMSAdapter().getMinecraftKey(itemStack));
+                            itemCompound.setByte("Count", (byte) itemStack.getAmount());
+                            itemCompound.setTag("tag", (((CompoundTag) item.getValue())).getCompound("NBT"));
+                            itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
+                            items.addTag(itemCompound);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+
+                tileEntity.setTag("Items", items);
+            }
+        }
+
+        {
+            String flower = compoundTag.getString("flower");
+            if(flower != null){
+                try {
+                    String[] flowerSections = flower.split(":");
+                    tileEntity.setString("Item", plugin.getNMSAdapter().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
+                    tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
+                }catch (Exception ignored){}
+            }
+        }
+
+        {
+            String skullType = compoundTag.getString("skullType");
+            if(skullType != null){
+                tileEntity.setByte("SkullType", (byte) (SkullType.valueOf(skullType).ordinal() - 1));
+            }
+        }
+
+        {
+            String rotation = compoundTag.getString("rotation");
+            if(rotation != null){
+                tileEntity.setByte("Rot", rotationToByte.getOrDefault(BlockFace.valueOf(rotation), (byte) 0));
+            }
+        }
+
+        {
+            String owner = compoundTag.getString("owner");
+            if(owner != null){
+                tileEntity.setString("Name", owner);
+            }
+        }
+
+        {
+            String signLine1 = compoundTag.getString("signLine1");
+            if(signLine1 != null){
+                tileEntity.setString("Text1", signLine1);
+            }
+        }
+
+        {
+            String signLine2 = compoundTag.getString("signLine2");
+            if(signLine2 != null){
+                tileEntity.setString("Text2", signLine2);
+            }
+        }
+
+        {
+            String signLine3 = compoundTag.getString("signLine3");
+            if(signLine3 != null){
+                tileEntity.setString("Text3", signLine3);
+            }
+        }
+
+        {
+            String signLine4 = compoundTag.getString("signLine4");
+            if(signLine4 != null){
+                tileEntity.setString("Text4", signLine4);
+            }
+        }
+
+        {
+            String spawnedType = compoundTag.getString("spawnedType");
+            if(spawnedType != null){
+                tileEntity.setString("EntityId", spawnedType);
+            }
+        }
+
+        if(tileEntity.size() != 0)
+            compoundTag.setTag("tileEntity", tileEntity);
     }
 
 }

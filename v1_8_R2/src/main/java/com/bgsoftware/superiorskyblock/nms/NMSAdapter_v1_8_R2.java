@@ -10,6 +10,8 @@ import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_8_R2.Chunk;
 import net.minecraft.server.v1_8_R2.EntityPlayer;
 import net.minecraft.server.v1_8_R2.EnumParticle;
+import net.minecraft.server.v1_8_R2.Item;
+import net.minecraft.server.v1_8_R2.MinecraftKey;
 import net.minecraft.server.v1_8_R2.MinecraftServer;
 import net.minecraft.server.v1_8_R2.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_8_R2.PlayerInteractManager;
@@ -28,6 +30,7 @@ import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
@@ -222,6 +225,12 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
     @Override
     public double[] getTPS() {
         return MinecraftServer.getServer().recentTps;
+    }
+
+    @Override
+    public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
+        MinecraftKey minecraftKey = Item.REGISTRY.c(CraftItemStack.asNMSCopy(itemStack).getItem());
+        return minecraftKey == null ? "minecraft:air" : minecraftKey.toString();
     }
 
 }
