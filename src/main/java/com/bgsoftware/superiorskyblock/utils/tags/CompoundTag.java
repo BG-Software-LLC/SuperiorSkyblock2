@@ -35,8 +35,12 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -81,19 +85,16 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
     }
 
     @Override
-    public Map<String, Tag<?>> getValue() {
-        return value;
-    }
+    protected void writeData(DataOutputStream os) throws IOException {
+        for(Map.Entry<String, Tag<?>> entry : value.entrySet()) {
+            entry.getValue().write(os);
 
-    @Override
-    public String toString() {
-        StringBuilder bldr = new StringBuilder();
-        bldr.append("TAG_Compound: ").append(value.size()).append(" entries\r\n{\r\n");
-        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
-            bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
+            byte[] keyBytes = entry.getKey().getBytes(StandardCharsets.UTF_8);
+            os.writeShort(keyBytes.length);
+            os.write(keyBytes);
         }
-        bldr.append("}");
-        return bldr.toString();
+
+        os.writeByte((byte) 0);
     }
 
     @Override
@@ -110,6 +111,17 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder bldr = new StringBuilder();
+        bldr.append("TAG_Compound: ").append(value.size()).append(" entries\r\n{\r\n");
+        for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
+            bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
+        }
+        bldr.append("}");
+        return bldr.toString();
     }
 
     public static CompoundTag fromNBT(Object tag){
@@ -129,6 +141,21 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static CompoundTag fromStream(DataInputStream is, int depth) throws IOException{
+        Map<String, Tag<?>> tagMap = new HashMap<>();
+        Tag<?> tag;
+
+        while (!((tag = Tag.fromStream(is, depth + 1)) instanceof EndTag)) {
+            int keyLength = is.readShort() & 0xFFFF;
+            byte[] keyBytes = new byte[keyLength];
+            is.readFully(keyBytes);
+            String key = new String(keyBytes, StandardCharsets.UTF_8);
+            tagMap.put(key, tag);
+        }
+
+        return new CompoundTag(tagMap);
     }
 
 }

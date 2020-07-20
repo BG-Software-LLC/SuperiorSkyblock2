@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -66,8 +69,8 @@ public final class FloatTag extends Tag<Float> {
     }
 
     @Override
-    public String toString() {
-        return "TAG_Float: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeFloat(value);
     }
 
     @Override
@@ -94,6 +97,10 @@ public final class FloatTag extends Tag<Float> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static FloatTag fromStream(DataInputStream is) throws IOException{
+        return new FloatTag(is.readFloat());
     }
 
 }

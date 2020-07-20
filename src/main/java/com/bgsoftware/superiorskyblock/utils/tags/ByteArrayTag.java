@@ -36,6 +36,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 
 /**
@@ -64,16 +67,9 @@ public final class ByteArrayTag extends Tag<byte[]> {
     }
 
     @Override
-    public String toString() {
-        StringBuilder hex = new StringBuilder();
-        for (byte b : value) {
-            String hexDigits = Integer.toHexString(b).toUpperCase();
-            if (hexDigits.length() == 1) {
-                hex.append("0");
-            }
-            hex.append(hexDigits).append(" ");
-        }
-        return "TAG_Byte_Array: " + hex.toString();
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        os.write(value);
     }
 
     @Override
@@ -86,6 +82,19 @@ public final class ByteArrayTag extends Tag<byte[]> {
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder hex = new StringBuilder();
+        for (byte b : value) {
+            String hexDigits = Integer.toHexString(b).toUpperCase();
+            if (hexDigits.length() == 1) {
+                hex.append("0");
+            }
+            hex.append(hexDigits).append(" ");
+        }
+        return "TAG_Byte_Array: " + hex.toString();
+    }
+
     public static ByteArrayTag fromNBT(Object tag){
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
 
@@ -96,6 +105,13 @@ public final class ByteArrayTag extends Tag<byte[]> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static ByteArrayTag fromStream(DataInputStream is) throws IOException{
+        int length = is.readInt();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return new ByteArrayTag(bytes);
     }
 
 }

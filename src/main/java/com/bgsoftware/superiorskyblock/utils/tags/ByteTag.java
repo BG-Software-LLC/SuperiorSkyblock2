@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -65,8 +68,8 @@ public final class ByteTag extends Tag<Byte> {
     }
 
     @Override
-    public String toString() {
-        return "TAG_Byte: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeByte(value);
     }
 
     @Override
@@ -94,6 +97,10 @@ public final class ByteTag extends Tag<Byte> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static ByteTag fromStream(DataInputStream is) throws IOException{
+        return new ByteTag(is.readByte());
     }
 
 }

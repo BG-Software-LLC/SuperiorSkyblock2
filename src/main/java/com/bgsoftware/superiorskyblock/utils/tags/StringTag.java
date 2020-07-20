@@ -35,8 +35,12 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
 /**
  * The <code>TAG_String</code> tag.
@@ -65,8 +69,10 @@ public final class StringTag extends Tag<String> {
     }
 
     @Override
-    public String toString() {
-        return "TAG_String: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        os.writeShort(bytes.length);
+        os.write(bytes);
     }
 
     @Override
@@ -94,6 +100,13 @@ public final class StringTag extends Tag<String> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static StringTag fromStream(DataInputStream is) throws IOException{
+        int length = is.readShort();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return new StringTag(new String(bytes, StandardCharsets.UTF_8));
     }
 
 }

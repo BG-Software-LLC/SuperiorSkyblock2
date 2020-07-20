@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -56,18 +59,13 @@ public final class LongTag extends Tag<Long> {
         CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, long.class);
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
     public LongTag(long value) {
         super(value);
     }
 
     @Override
-    public String toString() {
-        return "TAG_Long: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeLong(value);
     }
 
     @Override
@@ -95,6 +93,10 @@ public final class LongTag extends Tag<Long> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static LongTag fromStream(DataInputStream is) throws IOException{
+        return new LongTag(is.readLong());
     }
 
 }

@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,6 +75,11 @@ public final class ListTag extends Tag<List<Tag<?>>> {
         this.type = type;
     }
 
+    @Override
+    public List<Tag<?>> getValue() {
+        return Collections.unmodifiableList(value);
+    }
+
     /**
      * Gets the type of item in this list.
      *
@@ -86,8 +94,17 @@ public final class ListTag extends Tag<List<Tag<?>>> {
     }
 
     @Override
-    public List<Tag<?>> getValue() {
-        return Collections.unmodifiableList(value);
+    protected void writeData(DataOutputStream os) throws IOException {
+        int size = value.size();
+        os.writeByte(NBTUtils.getTypeCode(type));
+        os.writeInt(size);
+        for (Tag<?> _tag : value)
+            _tag.writeData(os);
+    }
+
+    @Override
+    public Object toNBT() {
+        return plugin.getNMSTags().parseList(this);
     }
 
     @Override
@@ -99,11 +116,6 @@ public final class ListTag extends Tag<List<Tag<?>>> {
         }
         bldr.append("}");
         return bldr.toString();
-    }
-
-    @Override
-    public Object toNBT() {
-        return plugin.getNMSTags().parseList(this);
     }
 
     public static ListTag fromNBT(Object tag){
@@ -122,6 +134,22 @@ public final class ListTag extends Tag<List<Tag<?>>> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static ListTag fromStream(DataInputStream is, int depth) throws IOException{
+        int childType = is.readByte();
+        int length = is.readInt();
+        List<Tag<?>> tagList = new ArrayList<>();
+
+        for (int i = 0; i < length; i++) {
+            Tag<?> tag = Tag.fromStream(is, depth + 1, childType);
+            if (tag instanceof EndTag) {
+                throw new IOException("TAG_End not permitted in a list.");
+            }
+            tagList.add(tag);
+        }
+
+        return new ListTag(NBTUtils.getTypeClass(childType), tagList);
     }
 
 }

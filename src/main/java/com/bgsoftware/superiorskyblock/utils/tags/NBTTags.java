@@ -32,63 +32,23 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+public final class NBTTags {
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-
-/**
- * The <code>TAG_End</code> tag.
- *
- * @author Graham Edgecombe
- */
-@SuppressWarnings("WeakerAccess")
-public final class EndTag extends Tag<Object> {
-
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagEnd");
-        CONSTRUCTOR = ReflectionUtils.getDeclaredConstructor(CLASS);
-    }
-
-    /**
-     * Creates the tag.
-     */
-    public EndTag() {
-        super(null);
-        /* empty */
-    }
-
-    @Override
-    protected void writeData(DataOutputStream os) {
+    private NBTTags() {
 
     }
 
-    @Override
-    public String toString() {
-        return "TAG_End";
-    }
-
-    @Override
-    public Object toNBT() {
-        try{
-            return CONSTRUCTOR.newInstance();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    public static EndTag fromStream(DataInputStream is, int depth) throws IOException{
-        if (depth == 0) {
-            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
-        } else {
-            return new EndTag();
-        }
-    }
+    public static final int TYPE_END = 0;
+    public static final int TYPE_BYTE = 1;
+    public static final int TYPE_SHORT = 2;
+    public static final int TYPE_INT = 3;
+    public static final int TYPE_LONG = 4;
+    public static final int TYPE_FLOAT = 5;
+    public static final int TYPE_DOUBLE = 6;
+    public static final int TYPE_BYTE_ARRAY = 7;
+    public static final int TYPE_STRING = 8;
+    public static final int TYPE_LIST = 9;
+    public static final int TYPE_COMPOUND = 10;
+    public static final int TYPE_INT_ARRAY = 11;
 
 }

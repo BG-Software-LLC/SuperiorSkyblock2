@@ -21,8 +21,6 @@ import com.bgsoftware.superiorskyblock.schematics.TagBuilder;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.NBTInputStream;
-import com.bgsoftware.superiorskyblock.utils.tags.NBTOutputStream;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
@@ -36,6 +34,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler implements SchematicManager {
@@ -209,8 +211,8 @@ public final class SchematicsHandler implements SchematicManager {
                 file.createNewFile();
             }
 
-            try (NBTInputStream reader = new NBTInputStream(new FileInputStream(file))) {
-                CompoundTag compoundTag = (CompoundTag) reader.readTag();
+            try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                CompoundTag compoundTag = (CompoundTag) Tag.fromStream(reader, 0);
                 if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(ServerVersion.getBukkitVersion()))
                     SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
                 if(compoundTag.getValue().isEmpty()) {
@@ -241,11 +243,9 @@ public final class SchematicsHandler implements SchematicManager {
             file.getParentFile().mkdirs();
             file.createNewFile();
 
-            NBTOutputStream writer = new NBTOutputStream(new FileOutputStream(file));
-
-            writer.writeTag(schematic.getTag());
-
-            writer.close();
+            try(DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
+                schematic.getTag().write(writer);
+            }
         }catch(IOException ex){
             ex.printStackTrace();
         }

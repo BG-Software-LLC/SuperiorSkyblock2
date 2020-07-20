@@ -35,6 +35,10 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 /**
  * Represents a single NBT tag.
  *
@@ -51,28 +55,34 @@ public abstract class Tag<E> {
         CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
     }
 
-    /**
-     * The value.
-     */
     protected final E value;
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public Tag(E value) {
+    protected Tag(E value) {
         this.value = value;
     }
 
-    /**
-     * Gets the value of this tag.
-     *
-     * @return The value of this tag.
-     */
     public E getValue(){
         return value;
     }
+
+    @Override
+    public String toString() {
+        return NBTUtils.getTypeName(this.getClass()) + ": " + value;
+    }
+
+    public void write(DataOutputStream os) throws IOException{
+        int type = NBTUtils.getTypeCode(this.getClass());
+
+        os.writeByte(type);
+
+        if (type == NBTTags.TYPE_END) {
+            throw new IOException("Named TAG_End not permitted.");
+        }
+
+        writeData(os);
+    }
+
+    protected abstract void writeData(DataOutputStream outputStream) throws IOException;
 
     public abstract Object toNBT();
 
@@ -103,6 +113,42 @@ public abstract class Tag<E> {
             return StringTag.fromNBT(tag);
 
         throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to Tag!");
+    }
+
+    public static Tag<?> fromStream(DataInputStream is, int depth) throws IOException{
+        int type = is.readByte() & 0xFF;
+        return fromStream(is, depth, type);
+    }
+
+    protected static Tag<?> fromStream(DataInputStream is, int depth, int type) throws IOException{
+        switch (type) {
+            case NBTTags.TYPE_END:
+                return EndTag.fromStream(is, depth);
+            case NBTTags.TYPE_BYTE:
+                return ByteTag.fromStream(is);
+            case NBTTags.TYPE_SHORT:
+                return ShortTag.fromStream(is);
+            case NBTTags.TYPE_INT:
+                return IntTag.fromStream(is);
+            case NBTTags.TYPE_LONG:
+                return LongTag.fromStream(is);
+            case NBTTags.TYPE_FLOAT:
+                return FloatTag.fromStream(is);
+            case NBTTags.TYPE_DOUBLE:
+                return DoubleTag.fromStream(is);
+            case NBTTags.TYPE_BYTE_ARRAY:
+                return ByteArrayTag.fromStream(is);
+            case NBTTags.TYPE_STRING:
+                return StringTag.fromStream(is);
+            case NBTTags.TYPE_LIST:
+                return ListTag.fromStream(is, depth);
+            case NBTTags.TYPE_COMPOUND:
+                return CompoundTag.fromStream(is, depth);
+            case NBTTags.TYPE_INT_ARRAY:
+                return IntArrayTag.fromStream(is);
+        }
+
+        throw new IllegalArgumentException("Invalid tag: " + type);
     }
 
 }

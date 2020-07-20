@@ -3,6 +3,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.UUID;
@@ -70,6 +73,24 @@ public final class IntArrayTag extends Tag<int[]> {
     }
 
     @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        for(int i : value)
+            os.writeInt(i);
+    }
+
+
+    @Override
+    public Object toNBT() {
+        try {
+            return CONSTRUCTOR.newInstance((Object) value);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public String toString() {
         StringBuilder integers = new StringBuilder();
         for (int b : value) {
@@ -113,16 +134,6 @@ public final class IntArrayTag extends Tag<int[]> {
         return true;
     }
 
-    @Override
-    public Object toNBT() {
-        try {
-            return CONSTRUCTOR.newInstance((Object) value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
     public static IntArrayTag fromNBT(Object tag){
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntArrayTag!");
 
@@ -138,6 +149,15 @@ public final class IntArrayTag extends Tag<int[]> {
     public static IntArrayTag fromUUID(UUID uuid){
         long MSB = uuid.getMostSignificantBits(), LSB = uuid.getLeastSignificantBits();
         return new IntArrayTag(new int[]{(int)(MSB >> 32), (int)MSB, (int)(LSB >> 32), (int)LSB});
+    }
+
+    public static IntArrayTag fromStream(DataInputStream is) throws IOException{
+        int length = is.readInt();
+        int[] data = new int[length];
+        for (int i = 0; i < length; i++) {
+            data[i] = is.readInt();
+        }
+        return new IntArrayTag(data);
     }
 
 }

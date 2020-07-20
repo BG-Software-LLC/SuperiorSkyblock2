@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -55,18 +58,13 @@ public final class ShortTag extends Tag<Short> {
         CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, short.class);
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
     public ShortTag(short value) {
         super(value);
     }
 
     @Override
-    public String toString() {
-        return "TAG_Short: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeShort(value);
     }
 
     @Override
@@ -94,6 +92,10 @@ public final class ShortTag extends Tag<Short> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static ShortTag fromStream(DataInputStream is) throws IOException{
+        return new ShortTag(is.readShort());
     }
 
 }

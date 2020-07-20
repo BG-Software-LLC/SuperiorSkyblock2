@@ -49,33 +49,33 @@ public final class NBTUtils {
      * @return The type name.
      */
     public static String getTypeName(Class<? extends Tag> clazz) {
-	if (clazz.equals(ByteArrayTag.class)) {
-	    return "TAG_Byte_Array";
-	} else if (clazz.equals(ByteTag.class)) {
-	    return "TAG_Byte";
-	} else if (clazz.equals(CompoundTag.class)) {
-	    return "TAG_Compound";
-	} else if (clazz.equals(DoubleTag.class)) {
-	    return "TAG_Double";
-	} else if (clazz.equals(EndTag.class)) {
-	    return "TAG_End";
-	} else if (clazz.equals(FloatTag.class)) {
-	    return "TAG_Float";
-	} else if (clazz.equals(IntTag.class)) {
-	    return "TAG_Int";
-	} else if (clazz.equals(ListTag.class)) {
-	    return "TAG_List";
-	} else if (clazz.equals(LongTag.class)) {
-	    return "TAG_Long";
-	} else if (clazz.equals(ShortTag.class)) {
-	    return "TAG_Short";
-	} else if (clazz.equals(StringTag.class)) {
-	    return "TAG_String";
-	}  else if (clazz.equals(IntArrayTag.class)) {
-		return "TAG_Int_Array";
-	} else {
-	    throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
-	}
+		if (clazz.equals(ByteArrayTag.class)) {
+			return "TAG_Byte_Array";
+		} else if (clazz.equals(ByteTag.class)) {
+			return "TAG_Byte";
+		} else if (clazz.equals(CompoundTag.class)) {
+			return "TAG_Compound";
+		} else if (clazz.equals(DoubleTag.class)) {
+			return "TAG_Double";
+		} else if (clazz.equals(EndTag.class)) {
+			return "TAG_End";
+		} else if (clazz.equals(FloatTag.class)) {
+			return "TAG_Float";
+		} else if (clazz.equals(IntTag.class)) {
+			return "TAG_Int";
+		} else if (clazz.equals(ListTag.class)) {
+			return "TAG_List";
+		} else if (clazz.equals(LongTag.class)) {
+			return "TAG_Long";
+		} else if (clazz.equals(ShortTag.class)) {
+			return "TAG_Short";
+		} else if (clazz.equals(StringTag.class)) {
+			return "TAG_String";
+		}  else if (clazz.equals(IntArrayTag.class)) {
+			return "TAG_Int_Array";
+		} else {
+			throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
+		}
     }
 
     /**
@@ -89,29 +89,29 @@ public final class NBTUtils {
      */
     public static int getTypeCode(Class<? extends Tag> clazz) {
 		if (clazz.equals(ByteArrayTag.class)) {
-			return NBTConstants.TYPE_BYTE_ARRAY;
+			return NBTTags.TYPE_BYTE_ARRAY;
 		} else if (clazz.equals(ByteTag.class)) {
-			return NBTConstants.TYPE_BYTE;
+			return NBTTags.TYPE_BYTE;
 		} else if (clazz.equals(CompoundTag.class)) {
-			return NBTConstants.TYPE_COMPOUND;
+			return NBTTags.TYPE_COMPOUND;
 		} else if (clazz.equals(DoubleTag.class)) {
-			return NBTConstants.TYPE_DOUBLE;
+			return NBTTags.TYPE_DOUBLE;
 		} else if (clazz.equals(EndTag.class)) {
-			return NBTConstants.TYPE_END;
+			return NBTTags.TYPE_END;
 		} else if (clazz.equals(FloatTag.class)) {
-			return NBTConstants.TYPE_FLOAT;
+			return NBTTags.TYPE_FLOAT;
 		} else if (clazz.equals(IntTag.class)) {
-			return NBTConstants.TYPE_INT;
+			return NBTTags.TYPE_INT;
 		} else if (clazz.equals(ListTag.class)) {
-			return NBTConstants.TYPE_LIST;
+			return NBTTags.TYPE_LIST;
 		} else if (clazz.equals(LongTag.class)) {
-			return NBTConstants.TYPE_LONG;
+			return NBTTags.TYPE_LONG;
 		} else if (clazz.equals(ShortTag.class)) {
-			return NBTConstants.TYPE_SHORT;
+			return NBTTags.TYPE_SHORT;
 		} else if (clazz.equals(StringTag.class)) {
-			return NBTConstants.TYPE_STRING;
+			return NBTTags.TYPE_STRING;
 		} else if (clazz.equals(IntArrayTag.class)) {
-			return NBTConstants.TYPE_INT_ARRAY;
+			return NBTTags.TYPE_INT_ARRAY;
 		} else {
 			throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
 		}
@@ -127,32 +127,32 @@ public final class NBTUtils {
      *             if the tag type is invalid.
      */
     public static Class<? extends Tag> getTypeClass(int type) {
-	switch (type) {
-	case NBTConstants.TYPE_END:
-	    return EndTag.class;
-	case NBTConstants.TYPE_BYTE:
-	    return ByteTag.class;
-	case NBTConstants.TYPE_SHORT:
-	    return ShortTag.class;
-	case NBTConstants.TYPE_INT:
-	    return IntTag.class;
-	case NBTConstants.TYPE_LONG:
-	    return LongTag.class;
-	case NBTConstants.TYPE_FLOAT:
-	    return FloatTag.class;
-	case NBTConstants.TYPE_DOUBLE:
-	    return DoubleTag.class;
-	case NBTConstants.TYPE_BYTE_ARRAY:
-	    return ByteArrayTag.class;
-	case NBTConstants.TYPE_STRING:
-	    return StringTag.class;
-	case NBTConstants.TYPE_LIST:
-	    return ListTag.class;
-	case NBTConstants.TYPE_COMPOUND:
-	    return CompoundTag.class;
-	default:
-	    throw new IllegalArgumentException("Invalid tag type : " + type + ".");
-	}
+		switch (type) {
+			case NBTTags.TYPE_END:
+				return EndTag.class;
+			case NBTTags.TYPE_BYTE:
+				return ByteTag.class;
+			case NBTTags.TYPE_SHORT:
+				return ShortTag.class;
+			case NBTTags.TYPE_INT:
+				return IntTag.class;
+			case NBTTags.TYPE_LONG:
+				return LongTag.class;
+			case NBTTags.TYPE_FLOAT:
+				return FloatTag.class;
+			case NBTTags.TYPE_DOUBLE:
+				return DoubleTag.class;
+			case NBTTags.TYPE_BYTE_ARRAY:
+				return ByteArrayTag.class;
+			case NBTTags.TYPE_STRING:
+				return StringTag.class;
+			case NBTTags.TYPE_LIST:
+				return ListTag.class;
+			case NBTTags.TYPE_COMPOUND:
+				return CompoundTag.class;
+			default:
+				throw new IllegalArgumentException("Invalid tag type : " + type + ".");
+		}
     }
 
     /**

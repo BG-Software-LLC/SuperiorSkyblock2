@@ -35,6 +35,9 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -55,18 +58,13 @@ public final class IntTag extends Tag<Integer> {
         CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, int.class);
     }
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
     public IntTag(int value) {
         super(value);
     }
 
     @Override
-    public String toString() {
-        return "TAG_Int: " + value;
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value);
     }
 
     @Override
@@ -94,6 +92,10 @@ public final class IntTag extends Tag<Integer> {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    public static IntTag fromStream(DataInputStream is) throws IOException{
+        return new IntTag(is.readInt());
     }
 
 }
