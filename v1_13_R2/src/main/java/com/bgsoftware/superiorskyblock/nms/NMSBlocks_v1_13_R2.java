@@ -10,14 +10,23 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_13_R2.AxisAlignedBB;
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.Block;
+import net.minecraft.server.v1_13_R2.BlockBed;
 import net.minecraft.server.v1_13_R2.BlockFlowerPot;
-import net.minecraft.server.v1_13_R2.BlockLeaves;
 import net.minecraft.server.v1_13_R2.BlockPosition;
+import net.minecraft.server.v1_13_R2.BlockProperties;
+import net.minecraft.server.v1_13_R2.BlockStateBoolean;
+import net.minecraft.server.v1_13_R2.BlockStateEnum;
+import net.minecraft.server.v1_13_R2.BlockStateInteger;
 import net.minecraft.server.v1_13_R2.Blocks;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
@@ -27,6 +36,7 @@ import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.EntityTypes;
 import net.minecraft.server.v1_13_R2.EnumColor;
 import net.minecraft.server.v1_13_R2.IBlockData;
+import net.minecraft.server.v1_13_R2.IBlockState;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.IChunkAccess;
 import net.minecraft.server.v1_13_R2.IChunkLoader;
@@ -76,30 +86,81 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-@SuppressWarnings({"unused", "ConstantConditions"})
+@SuppressWarnings({"unused", "ConstantConditions", "rawtypes"})
 public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Map<String, BlockStateEnum> nameToBlockState = new HashMap<>();
+    private static final Map<BlockStateEnum, String> blockStateToName = new HashMap<>();
+
+    static {
+        register("axis", BlockProperties.z);
+        register("axis-empty", BlockProperties.A);
+        register("facing", BlockProperties.H);
+        register("facing-notup", BlockProperties.I);
+        register("facing-horizontal", BlockProperties.J);
+        register("face", BlockProperties.K);
+        register("redstone-east", BlockProperties.L);
+        register("redstone-north", BlockProperties.M);
+        register("redstone-south", BlockProperties.N);
+        register("redstone-west", BlockProperties.O);
+        register("double-half", BlockProperties.P);
+        register("half", BlockProperties.Q);
+        register("track-shape-empty", BlockProperties.R);
+        register("track-shape", BlockProperties.S);
+        register("part", BlockProperties.ao);
+        register("chest-type", BlockProperties.ap);
+        register("comparator-mode", BlockProperties.aq);
+        register("hinge", BlockProperties.ar);
+        register("instrument", BlockProperties.as);
+        register("piston-type", BlockProperties.at);
+        register("slab-type", BlockProperties.au);
+        register("shape", BlockProperties.av);
+        register("mode", BlockProperties.aw);
+    }
+
+    private static void register(String key, BlockStateEnum<?> blockStateEnum){
+        nameToBlockState.put(key, blockStateEnum);
+        blockStateToName.put(blockStateEnum, key);
+    }
 
     @Override
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
+    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
 
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
-        if(blockData.getBlock() instanceof BlockLeaves)
-            blockData = blockData.set(BlockLeaves.PERSISTENT, true);
+        if(statesTag != null){
+            for(Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()){
+                try {
+                    if (entry.getValue() instanceof ByteTag) {
+                        blockData = blockData.set(BlockStateBoolean.of(entry.getKey()), ((ByteTag) entry.getValue()).getValue() == 1);
+                    } else if (entry.getValue() instanceof IntArrayTag) {
+                        int[] data = ((IntArrayTag) entry.getValue()).getValue();
+                        blockData = blockData.set(BlockStateInteger.of(entry.getKey(), data[1], data[2]), data[0]);
+                    } else if (entry.getValue() instanceof StringTag) {
+                        String data = ((StringTag) entry.getValue()).getValue();
+                        BlockStateEnum blockStateEnum = nameToBlockState.get(entry.getKey());
+                        if(blockStateEnum != null)
+                            //noinspection unchecked
+                            blockData = blockData.set(blockStateEnum, Enum.valueOf(blockStateEnum.b(), data));
+                    }
+                }catch (Exception ignored){}
+            }
+        }
 
-        if(blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+        if((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
             world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }
@@ -143,7 +204,7 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     public void setBlock(Location location, Material material, byte data) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        setBlock(location.getChunk(), location, Block.getCombinedId(CraftMagicNumbers.getBlock(material, data)), BlockType.BLOCK);
+        setBlock(location.getChunk(), location, Block.getCombinedId(CraftMagicNumbers.getBlock(material, data)), null, BlockType.BLOCK);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
@@ -154,6 +215,40 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
             if(entity instanceof EntityPlayer)
                 ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
         }
+    }
+
+    @Override
+    public CompoundTag readBlockStates(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+        IBlockData blockData = world.getType(blockPosition);
+        CompoundTag compoundTag = null;
+
+        for(Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()){
+            if(compoundTag == null)
+                compoundTag = new CompoundTag();
+
+            Tag<?> value;
+            Class<?> keyClass = entry.getKey().getClass();
+            String name = entry.getKey().a();
+
+            if(keyClass.equals(BlockStateBoolean.class)) {
+                value = new ByteTag((Boolean) entry.getValue() ? (byte) 1 : 0);
+            }
+            else if(keyClass.equals(BlockStateInteger.class)) {
+                BlockStateInteger key = (BlockStateInteger) entry.getKey();
+                value = new IntArrayTag(new int[] {(Integer) entry.getValue(), key.min, key.max});
+            }
+            else{
+                BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
+                name = blockStateToName.get(key);
+                value = new StringTag(((Enum<?>) entry.getValue()).name());
+            }
+
+            compoundTag.setTag(name, value);
+        }
+
+        return compoundTag;
     }
 
     @Override
@@ -210,7 +305,7 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
     @Override
     public int getCombinedId(Material material, byte data) {
-        return Block.getCombinedId(CraftMagicNumbers.getBlock(material, data));
+        return Block.getCombinedId(CraftMagicNumbers.getBlock(material).getBlockData());
     }
 
     @Override

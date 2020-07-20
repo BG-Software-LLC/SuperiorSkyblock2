@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -27,9 +28,13 @@ import java.util.concurrent.CompletableFuture;
 
 public interface NMSBlocks {
 
-    void setBlock(Chunk chunk, Location location, int combinedId, BlockType blockType, Object... args);
+    void setBlock(Chunk chunk, Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args);
 
     void setBlock(Location location, Material material, byte data);
+
+    default CompoundTag readBlockStates(Location location){
+        return null;
+    }
 
     void refreshChunk(Chunk chunk);
 

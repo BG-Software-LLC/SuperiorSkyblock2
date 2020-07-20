@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.schematics.data;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.SkullType;
@@ -15,12 +16,14 @@ import java.util.List;
 
 public class SchematicBlock {
 
-    public final static SchematicBlock AIR = of(0);
+    public final static SchematicBlock AIR = of(0, null);
 
     private final int combinedId;
+    private final CompoundTag statesTag;
 
-    private SchematicBlock(int combinedId){
+    private SchematicBlock(int combinedId, CompoundTag statesTag){
         this.combinedId = combinedId;
+        this.statesTag = statesTag;
     }
 
     public int getCombinedId() {
@@ -32,7 +35,7 @@ public class SchematicBlock {
     }
 
     protected void applyBlock(BlockChangeTask blockChangeTask, Location location, BlockType blockType, Object... args){
-        blockChangeTask.setBlock(location, combinedId, blockType, args);
+        blockChangeTask.setBlock(location, combinedId, statesTag, blockType, args);
     }
 
     private static class SchematicBanner extends SchematicBlock{
@@ -40,8 +43,8 @@ public class SchematicBlock {
         private final DyeColor baseColor;
         private final List<Pattern> patterns;
 
-        private SchematicBanner(int combinedId, DyeColor baseColor, List<Pattern> patterns){
-            super(combinedId);
+        private SchematicBanner(int combinedId, CompoundTag statesTag, DyeColor baseColor, List<Pattern> patterns){
+            super(combinedId, statesTag);
             this.baseColor = baseColor;
             this.patterns = patterns;
         }
@@ -57,8 +60,8 @@ public class SchematicBlock {
         private final ItemStack[] contents;
         private final String name;
 
-        private SchematicInventoryHolder(int combinedId, ItemStack[] contents, String name){
-            super(combinedId);
+        private SchematicInventoryHolder(int combinedId, CompoundTag statesTag, ItemStack[] contents, String name){
+            super(combinedId, statesTag);
             this.contents = contents;
             this.name = name;
         }
@@ -73,8 +76,8 @@ public class SchematicBlock {
 
         private final ItemStack flower;
 
-        private SchematicFlowerPot(int combinedId, ItemStack flower){
-            super(combinedId);
+        private SchematicFlowerPot(int combinedId, CompoundTag statesTag, ItemStack flower){
+            super(combinedId, statesTag);
             this.flower = flower;
         }
 
@@ -90,8 +93,8 @@ public class SchematicBlock {
         private final BlockFace rotation;
         private final String owner;
 
-        private SchematicSkull(int combinedId, SkullType skullType, BlockFace rotation, String owner){
-            super(combinedId);
+        private SchematicSkull(int combinedId, CompoundTag statesTag, SkullType skullType, BlockFace rotation, String owner){
+            super(combinedId, statesTag);
             this.skullType = skullType;
             this.rotation = rotation;
             this.owner = owner;
@@ -107,8 +110,8 @@ public class SchematicBlock {
 
         private final String[] lines;
 
-        private SchematicSign(int combinedId, String[] lines){
-            super(combinedId);
+        private SchematicSign(int combinedId, CompoundTag statesTag, String[] lines){
+            super(combinedId, statesTag);
             this.lines = lines;
         }
 
@@ -130,8 +133,8 @@ public class SchematicBlock {
 
         private final EntityType spawnedType;
 
-        private SchematicSpawner(int combinedId, EntityType spawnedType){
-            super(combinedId);
+        private SchematicSpawner(int combinedId, CompoundTag statesTag, EntityType spawnedType){
+            super(combinedId, statesTag);
             this.spawnedType = spawnedType;
         }
 
@@ -141,32 +144,32 @@ public class SchematicBlock {
         }
     }
 
-    public static SchematicBlock of(int combinedId){
-        return new SchematicBlock(combinedId);
+    public static SchematicBlock of(int combinedId, CompoundTag statesTag){
+        return new SchematicBlock(combinedId, statesTag);
     }
 
-    public static SchematicBanner of(int combinedId, DyeColor baseColor, List<Pattern> patterns){
-        return new SchematicBanner(combinedId, baseColor, patterns);
+    public static SchematicBanner of(int combinedId, CompoundTag statesTag, DyeColor baseColor, List<Pattern> patterns){
+        return new SchematicBanner(combinedId, statesTag, baseColor, patterns);
     }
 
-    public static SchematicInventoryHolder of(int combinedId, ItemStack[] contents, String name){
-        return new SchematicInventoryHolder(combinedId, contents, name);
+    public static SchematicInventoryHolder of(int combinedId, CompoundTag statesTag, ItemStack[] contents, String name){
+        return new SchematicInventoryHolder(combinedId, statesTag, contents, name);
     }
 
-    public static SchematicFlowerPot of(int combinedId, ItemStack flower){
-        return new SchematicFlowerPot(combinedId, flower);
+    public static SchematicFlowerPot of(int combinedId, CompoundTag statesTag, ItemStack flower){
+        return new SchematicFlowerPot(combinedId, statesTag, flower);
     }
 
-    public static SchematicSkull of(int combinedId, SkullType skullType, BlockFace rotation, String owner){
-        return new SchematicSkull(combinedId, skullType, rotation, owner);
+    public static SchematicSkull of(int combinedId, CompoundTag statesTag, SkullType skullType, BlockFace rotation, String owner){
+        return new SchematicSkull(combinedId, statesTag, skullType, rotation, owner);
     }
 
-    public static SchematicSign of(int combinedId, String[] lines){
-        return new SchematicSign(combinedId, lines);
+    public static SchematicSign of(int combinedId, CompoundTag statesTag, String[] lines){
+        return new SchematicSign(combinedId, statesTag, lines);
     }
 
-    public static SchematicSpawner of(int combinedId, EntityType entityType){
-        return new SchematicSpawner(combinedId, entityType);
+    public static SchematicSpawner of(int combinedId, CompoundTag statesTag, EntityType entityType){
+        return new SchematicSpawner(combinedId, statesTag, entityType);
     }
 
 }

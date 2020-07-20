@@ -103,9 +103,11 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     continue;
                 }
 
+                CompoundTag statesTag = (CompoundTag) compoundValue.get("states");
+
                 if(compoundValue.containsKey("baseColor") || compoundValue.containsKey("patterns")) {
                     blocks[x][y][z] = SchematicBlock.of(
-                            combinedId,
+                            combinedId, statesTag,
                             getOrNull(DyeColor.class, ((StringTag) compoundValue.getOrDefault("baseColor", new StringTag(null))).getValue()),
                             TagUtils.getPatternsFromTag((CompoundTag) compoundValue.getOrDefault("patterns", new CompoundTag()))
                     );
@@ -130,18 +132,18 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
                     String containerName = ((StringTag) compoundValue.getOrDefault("name", new StringTag(""))).getValue();
 
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, contents, containerName);
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, contents, containerName);
                 }
 
                 else if(compoundValue.containsKey("flower")){
                     String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
-                    blocks[x][y][z] = SchematicBlock.of(combinedId,
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag,
                             new ItemStack(Material.valueOf(sections[0]), 1, Short.parseShort(sections[1])));
                 }
 
                 else if(compoundValue.containsKey("skullType") || compoundValue.containsKey("rotation") || compoundValue.containsKey("owner")){
                     blocks[x][y][z] = SchematicBlock.of(
-                            combinedId,
+                            combinedId, statesTag,
                             getOrNull(SkullType.class, ((StringTag) compoundValue.getOrDefault("skullType", new StringTag(null))).getValue()),
                             getOrNull(BlockFace.class, ((StringTag) compoundValue.getOrDefault("rotation", new StringTag(null))).getValue()),
                             ((StringTag) compoundValue.getOrDefault("owner", new StringTag(null))).getValue()
@@ -154,18 +156,18 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     for(int i = 0; i < 4; i++)
                         lines[i] = ((StringTag) compoundValue.getOrDefault("signLine" + i, new StringTag(""))).getValue();
 
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, lines);
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, lines);
                 }
 
                 else if(compoundValue.containsKey("spawnedType")){
                     blocks[x][y][z] = SchematicBlock.of(
-                            combinedId,
+                            combinedId, statesTag,
                             getOrValue(EntityType.class, ((StringTag) compoundValue.get("spawnedType")).getValue(), EntityType.PIG)
                     );
                 }
 
                 else{
-                    blocks[x][y][z] = SchematicBlock.of(combinedId);
+                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag);
                 }
 
                 readBlock(blocks[x][y][z]);

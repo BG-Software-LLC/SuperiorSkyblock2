@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
 import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
@@ -82,7 +83,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
     @Override
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, BlockType blockType, Object... args) {
+    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
 
@@ -142,7 +143,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         //noinspection deprecation
         int combinedId = material.getId() + (data << 12);
-        setBlock(location.getChunk(), location, combinedId, BlockType.BLOCK);
+        setBlock(location.getChunk(), location, combinedId, null, BlockType.BLOCK);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);

@@ -43,15 +43,14 @@ public final class TagBuilder {
         return this;
     }
 
-    public TagBuilder withMaterialAndData(Material material, byte data){
+    public TagBuilder withMaterial(Material material){
         compoundValue.add("type", new StringTag(material.name()));
-        if(data > 0)
-            compoundValue.add("data", new IntTag(data));
         return this;
     }
 
-    public TagBuilder applyTileEntity(CompoundTag tileEntity){
-        compoundValue.add("tileEntity", tileEntity);
+    public TagBuilder withStates(CompoundTag statesTag){
+        if(statesTag != null)
+            compoundValue.add("states", statesTag);
         return this;
     }
 

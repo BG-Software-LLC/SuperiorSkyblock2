@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
@@ -168,30 +169,33 @@ public final class SchematicsHandler implements SchematicManager {
                     Material blockType = block.getType();
 
                     if(blockType != Material.AIR) {
-                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z));
+                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z))
+                                .withStates(plugin.getNMSBlocks().readBlockStates(block.getLocation()));
 
                         if(ServerVersion.isLegacy())
                             tagBuilder.withCombinedId(getCombinedId(block));
                         else
-                            tagBuilder.withMaterialAndData(blockType, block.getData());
+                            tagBuilder.withMaterial(blockType);
 
-                        if(block.getState() instanceof Banner){
-                            tagBuilder.applyBanner((Banner) block.getState());
+                        BlockState blockState = block.getState();
+
+                        if(blockState instanceof Banner){
+                            tagBuilder.applyBanner((Banner) blockState);
                         }
-                        else if(block.getState() instanceof InventoryHolder){
-                            tagBuilder.applyContents(block.getState());
+                        else if(blockState instanceof InventoryHolder){
+                            tagBuilder.applyContents(blockState);
                         }
                         else if(block.getType() == Material.FLOWER_POT){
                             tagBuilder.applyFlower(getFlower(block));
                         }
-                        else if(block.getState() instanceof Skull){
-                            tagBuilder.applySkull((Skull) block.getState());
+                        else if(blockState instanceof Skull){
+                            tagBuilder.applySkull((Skull) blockState);
                         }
-                        else if(block.getState() instanceof Sign){
-                            tagBuilder.applySign((Sign) block.getState());
+                        else if(blockState instanceof Sign){
+                            tagBuilder.applySign((Sign) blockState);
                         }
-                        else if(block.getState() instanceof CreatureSpawner){
-                            tagBuilder.applySpawner((CreatureSpawner) block.getState());
+                        else if(blockState instanceof CreatureSpawner){
+                            tagBuilder.applySpawner((CreatureSpawner) blockState);
                         }
 
                         blocks.add(tagBuilder.build());
