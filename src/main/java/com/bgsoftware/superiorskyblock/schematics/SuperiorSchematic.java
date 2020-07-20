@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
@@ -18,19 +17,13 @@ import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
-import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,71 +97,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
 
                 CompoundTag statesTag = (CompoundTag) compoundValue.get("states");
-
-                if(compoundValue.containsKey("baseColor") || compoundValue.containsKey("patterns")) {
-                    blocks[x][y][z] = SchematicBlock.of(
-                            combinedId, statesTag,
-                            getOrNull(DyeColor.class, ((StringTag) compoundValue.getOrDefault("baseColor", new StringTag(null))).getValue()),
-                            TagUtils.getPatternsFromTag((CompoundTag) compoundValue.getOrDefault("patterns", new CompoundTag()))
-                    );
-                }
-
-                else if(compoundValue.containsKey("contents")){
-                    ItemStack[] contents = null;
-
-                    if(plugin.getSettings().defaultContainersEnabled){
-                        InventoryType containerType = InventoryType.valueOf(((StringTag) compoundValue.getOrDefault("inventoryType", new StringTag("CHEST"))).getValue());
-                        Registry<Integer, ItemStack> containerContents = plugin.getSettings().defaultContainersContents.get(containerType);
-                        if(containerContents != null) {
-                            contents = new ItemStack[27];
-                            for (Map.Entry<Integer, ItemStack> entry : containerContents.entries())
-                                contents[entry.getKey()] = entry.getValue().clone();
-                        }
-                    }
-
-                    if(contents == null){
-                        contents = TagUtils.compoundToInventory((CompoundTag) compoundValue.get("contents"));
-                    }
-
-                    String containerName = ((StringTag) compoundValue.getOrDefault("name", new StringTag(""))).getValue();
-
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, contents, containerName);
-                }
-
-                else if(compoundValue.containsKey("flower")){
-                    String[] sections = ((StringTag) compoundValue.get("flower")).getValue().split(":");
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag,
-                            new ItemStack(Material.valueOf(sections[0]), 1, Short.parseShort(sections[1])));
-                }
-
-                else if(compoundValue.containsKey("skullType") || compoundValue.containsKey("rotation") || compoundValue.containsKey("owner")){
-                    blocks[x][y][z] = SchematicBlock.of(
-                            combinedId, statesTag,
-                            getOrNull(SkullType.class, ((StringTag) compoundValue.getOrDefault("skullType", new StringTag(null))).getValue()),
-                            getOrNull(BlockFace.class, ((StringTag) compoundValue.getOrDefault("rotation", new StringTag(null))).getValue()),
-                            ((StringTag) compoundValue.getOrDefault("owner", new StringTag(null))).getValue()
-                    );
-                }
-
-                else if(compoundValue.containsKey("signLine1") || compoundValue.containsKey("signLine2") || compoundValue.containsKey("signLine3") || compoundValue.containsKey("signLine4")){
-                    String[] lines = new String[] { "", "", "", "" };
-
-                    for(int i = 0; i < 4; i++)
-                        lines[i] = ((StringTag) compoundValue.getOrDefault("signLine" + i, new StringTag(""))).getValue();
-
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, lines);
-                }
-
-                else if(compoundValue.containsKey("spawnedType")){
-                    blocks[x][y][z] = SchematicBlock.of(
-                            combinedId, statesTag,
-                            getOrValue(EntityType.class, ((StringTag) compoundValue.get("spawnedType")).getValue(), EntityType.PIG)
-                    );
-                }
-
-                else{
-                    blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag);
-                }
+                CompoundTag tileEntity = (CompoundTag) compoundValue.get("tileEntity");
+                blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, tileEntity);
 
                 readBlock(blocks[x][y][z]);
             }
@@ -225,7 +155,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 for (int x = 0; x <= sizes[0]; x++) {
                     for (int z = 0; z <= sizes[2]; z++) {
                         if (blocks[x][y][z].getCombinedId() > 0)
-                            blocks[x][y][z].applyBlock(blockChangeTask, min.clone().add(x, y, z), island);
+                            blocks[x][y][z].applyBlock(blockChangeTask, min.clone().add(x, y, z));
                     }
                 }
             }
@@ -278,18 +208,6 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             return ((ByteTag) tag).getValue();
         else
             return ((IntTag) tag).getValue();
-    }
-
-    private static <T extends Enum<T>> T getOrNull(Class<T> enumType, String name){
-        return getOrValue(enumType, name, null);
-    }
-
-    private static <T extends Enum<T>> T getOrValue(Class<T> enumType, String name, T value){
-        try {
-            return Enum.valueOf(enumType, name);
-        }catch(IllegalArgumentException ex){
-            return value;
-        }
     }
 
 }

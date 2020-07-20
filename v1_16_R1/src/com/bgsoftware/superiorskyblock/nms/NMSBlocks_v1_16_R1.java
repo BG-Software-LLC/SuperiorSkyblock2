@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -17,12 +16,10 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_16_R1.AxisAlignedBB;
 import net.minecraft.server.v1_16_R1.BiomeBase;
 import net.minecraft.server.v1_16_R1.Block;
 import net.minecraft.server.v1_16_R1.BlockBed;
-import net.minecraft.server.v1_16_R1.BlockFlowerPot;
 import net.minecraft.server.v1_16_R1.BlockPosition;
 import net.minecraft.server.v1_16_R1.BlockProperties;
 import net.minecraft.server.v1_16_R1.BlockStateBoolean;
@@ -37,20 +34,12 @@ import net.minecraft.server.v1_16_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R1.ChunkSection;
 import net.minecraft.server.v1_16_R1.Entity;
 import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EntityTypes;
-import net.minecraft.server.v1_16_R1.EnumColor;
 import net.minecraft.server.v1_16_R1.GameRules;
 import net.minecraft.server.v1_16_R1.IBlockData;
 import net.minecraft.server.v1_16_R1.IBlockState;
-import net.minecraft.server.v1_16_R1.IChatBaseComponent;
-import net.minecraft.server.v1_16_R1.INamableTileEntity;
 import net.minecraft.server.v1_16_R1.IRegistry;
-import net.minecraft.server.v1_16_R1.ItemStack;
-import net.minecraft.server.v1_16_R1.MinecraftServer;
-import net.minecraft.server.v1_16_R1.MobSpawnerAbstract;
 import net.minecraft.server.v1_16_R1.NBTTagCompound;
 import net.minecraft.server.v1_16_R1.NBTTagList;
-import net.minecraft.server.v1_16_R1.NonNullList;
 import net.minecraft.server.v1_16_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R1.PacketPlayOutUnloadChunk;
@@ -58,35 +47,17 @@ import net.minecraft.server.v1_16_R1.PlayerChunkMap;
 import net.minecraft.server.v1_16_R1.PlayerConnection;
 import net.minecraft.server.v1_16_R1.ProtoChunk;
 import net.minecraft.server.v1_16_R1.TileEntity;
-import net.minecraft.server.v1_16_R1.TileEntityBanner;
-import net.minecraft.server.v1_16_R1.TileEntityBarrel;
-import net.minecraft.server.v1_16_R1.TileEntityBrewingStand;
-import net.minecraft.server.v1_16_R1.TileEntityChest;
-import net.minecraft.server.v1_16_R1.TileEntityDispenser;
-import net.minecraft.server.v1_16_R1.TileEntityFurnace;
-import net.minecraft.server.v1_16_R1.TileEntityHopper;
-import net.minecraft.server.v1_16_R1.TileEntityMobSpawner;
-import net.minecraft.server.v1_16_R1.TileEntityShulkerBox;
-import net.minecraft.server.v1_16_R1.TileEntitySign;
-import net.minecraft.server.v1_16_R1.TileEntitySkull;
 import net.minecraft.server.v1_16_R1.World;
 import net.minecraft.server.v1_16_R1.WorldServer;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
 import org.bukkit.block.Biome;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.banner.Pattern;
 import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_16_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R1.util.UnsafeList;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
@@ -147,7 +118,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     }
 
     @Override
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args) {
+    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
 
@@ -191,27 +162,12 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         chunkProviderServer.getLightEngine().a(blockPosition);
         chunkProviderServer.flagDirty(blockPosition);
 
-        if(blockType != BlockType.BLOCK && blockType != BlockType.FLOWER_POT) {
-            TileEntity tileEntity = world.getTileEntity(blockPosition);
-
-            switch (blockType) {
-                case BANNER:
-                    //noinspection unchecked
-                    setTileEntityBanner(tileEntity, (DyeColor) args[0], (List<Pattern>) args[1]);
-                    break;
-                case INVENTORY_HOLDER:
-                    setTileEntityInventoryHolder(tileEntity, (org.bukkit.inventory.ItemStack[]) args[0], (String) args[1]);
-                    break;
-                case SKULL:
-                    setTileEntitySkull(tileEntity, null, (BlockFace) args[1], (String) args[2]);
-                    break;
-                case SIGN:
-                    setTileEntitySign(tileEntity, (String[]) args[0]);
-                    break;
-                case SPAWNER:
-                    setTileEntityMobSpawner(tileEntity, (EntityType) args[0]);
-                    break;
-            }
+        if(tileEntity != null) {
+            NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
+            tileEntityCompound.setInt("x", blockPosition.getX());
+            tileEntityCompound.setInt("y", blockPosition.getY());
+            tileEntityCompound.setInt("z", blockPosition.getZ());
+            world.getTileEntity(blockPosition).load(blockData, tileEntityCompound);
         }
     }
 
@@ -219,7 +175,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     public void setBlock(Location location, Material material, byte data) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        setBlock(location.getChunk(), location, Block.getCombinedId(CraftMagicNumbers.getBlock(material, data)), null, BlockType.BLOCK);
+        setBlock(location.getChunk(), location, Block.getCombinedId(CraftMagicNumbers.getBlock(material, data)), null, null);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
@@ -267,6 +223,24 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     }
 
     @Override
+    public CompoundTag readTileEntity(Location location) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+        TileEntity tileEntity = world.getTileEntity(blockPosition);
+
+        if(tileEntity == null)
+            return null;
+
+        NBTTagCompound tileEntityCompound = tileEntity.save(new NBTTagCompound());
+
+        tileEntityCompound.remove("x");
+        tileEntityCompound.remove("y");
+        tileEntityCompound.remove("z");
+
+        return CompoundTag.fromNBT(tileEntityCompound);
+    }
+
+    @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
@@ -289,16 +263,6 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     }
 
     @Override
-    public org.bukkit.inventory.ItemStack getFlowerPot(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        BlockFlowerPot blockFlowerPot = (BlockFlowerPot) world.getType(blockPosition).getBlock();
-        Block flower = (Block) Fields.BLOCK_FLOWER_POT_CONTENT.get(blockFlowerPot);
-        ItemStack itemStack = new ItemStack(flower.getItem(), 1);
-        return CraftItemStack.asBukkitCopy(itemStack);
-    }
-
-    @Override
     public int getCombinedId(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         IBlockData blockData =  world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
@@ -315,66 +279,6 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         int firstMaterial = o1.isBlock() ? Block.getCombinedId(CraftMagicNumbers.getBlock(o1).getBlockData()) : o1.ordinal();
         int secondMaterial = o2.isBlock() ? Block.getCombinedId(CraftMagicNumbers.getBlock(o2).getBlockData()) : o2.ordinal();
         return Integer.compare(firstMaterial, secondMaterial);
-    }
-
-    private void setTileEntity(TileEntity tileEntity, CompoundTag tileEntityTag){
-        tileEntity.load(tileEntity.getBlock(), (NBTTagCompound) tileEntityTag.toNBT());
-    }
-
-    @Override
-    public void setTileEntityBanner(Object objectTileEntityBanner, DyeColor dyeColor, List<Pattern> patterns) {
-        TileEntityBanner tileEntityBanner = (TileEntityBanner) objectTileEntityBanner;
-        //noinspection deprecation
-        tileEntityBanner.color = EnumColor.fromColorIndex(dyeColor.getDyeData());
-        tileEntityBanner.patterns = new NBTTagList();
-
-        for(Pattern pattern : patterns){
-            NBTTagCompound compound = new NBTTagCompound();
-            //noinspection deprecation
-            compound.setInt("Color", pattern.getColor().getDyeData());
-            compound.setString("Pattern", pattern.getPattern().getIdentifier());
-            tileEntityBanner.patterns.add(compound);
-        }
-    }
-
-    @Override
-    public void setTileEntityInventoryHolder(Object tileEntityInventoryHolder, org.bukkit.inventory.ItemStack[] contents, String name) {
-        NonNullList<ItemStack> items = getItems(tileEntityInventoryHolder);
-        for(int i = 0; i < items.size() && i < contents.length; i++){
-            items.set(i, CraftItemStack.asNMSCopy(contents[i]));
-        }
-        setName(tileEntityInventoryHolder, name);
-    }
-
-    @Override
-    public void setTileEntityFlowerPot(Object objectTileEntityFlowerPot, org.bukkit.inventory.ItemStack bukkitFlower) {
-
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void setTileEntitySkull(Object objectTileEntitySkull, SkullType skullType, BlockFace rotation, String owner) {
-        TileEntitySkull tileEntitySkull = (TileEntitySkull) objectTileEntitySkull;
-
-        if(owner != null && !owner.isEmpty()){
-            GameProfile gameProfile = MinecraftServer.getServer().getUserCache().getProfile(owner);
-            if(gameProfile != null)
-                tileEntitySkull.setGameProfile(gameProfile);
-        }
-    }
-
-    @Override
-    public void setTileEntitySign(Object objectTileEntitySign, String[] lines) {
-        TileEntitySign tileEntitySign = (TileEntitySign) objectTileEntitySign;
-        IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
-        System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
-    }
-
-    @Override
-    public void setTileEntityMobSpawner(Object objectTileEntityMobSpawner, EntityType spawnedType) {
-        MobSpawnerAbstract mobSpawner = ((TileEntityMobSpawner) objectTileEntityMobSpawner).getSpawner();
-        //noinspection deprecation, OptionalGetWithoutIsPresent
-        mobSpawner.setMobName(EntityTypes.a(spawnedType.getName()).get());
     }
 
     @Override
@@ -600,66 +504,6 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     @Override
     public Key getMinecartBlock(Minecart minecart) {
         return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
-    }
-
-    @Override
-    public String getTileName(Location location) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        return tileEntity instanceof INamableTileEntity && ((INamableTileEntity) tileEntity).hasCustomName() ?
-                ((INamableTileEntity) tileEntity).getCustomName().getText() : "";
-    }
-
-    private NonNullList<ItemStack> getItems(Object tileEntityInventoryHolder){
-        if(tileEntityInventoryHolder instanceof TileEntityChest){
-            return (NonNullList<ItemStack>) ((TileEntityChest) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
-            return (NonNullList<ItemStack>) ((TileEntityDispenser) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
-            return (NonNullList<ItemStack>) ((TileEntityBrewingStand) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
-            return (NonNullList<ItemStack>) ((TileEntityFurnace) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
-            return (NonNullList<ItemStack>) ((TileEntityHopper) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityShulkerBox){
-            return (NonNullList<ItemStack>) ((TileEntityShulkerBox) tileEntityInventoryHolder).getContents();
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityBarrel){
-            return (NonNullList<ItemStack>) ((TileEntityBarrel) tileEntityInventoryHolder).getContents();
-        }
-
-        SuperiorSkyblockPlugin.log("&cCouldn't find inventory holder for class: " + tileEntityInventoryHolder.getClass() + " - contact @Ome_R!");
-
-        return NonNullList.a();
-    }
-
-    private void setName(Object tileEntityInventoryHolder, String name){
-        if(tileEntityInventoryHolder instanceof TileEntityChest){
-            ((TileEntityChest) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityDispenser){
-            ((TileEntityDispenser) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityBrewingStand){
-            ((TileEntityBrewingStand) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityFurnace){
-            ((TileEntityFurnace) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityHopper){
-            ((TileEntityHopper) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityShulkerBox){
-            ((TileEntityShulkerBox) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
-        else if(tileEntityInventoryHolder instanceof TileEntityBarrel){
-            ((TileEntityBarrel) tileEntityInventoryHolder).setCustomName(IChatBaseComponent.ChatSerializer.a(name));
-        }
     }
 
 }

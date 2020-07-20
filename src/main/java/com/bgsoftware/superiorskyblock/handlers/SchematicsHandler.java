@@ -31,17 +31,10 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Banner;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.block.Sign;
-import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -167,38 +160,16 @@ public final class SchematicsHandler implements SchematicManager {
                     int _x = x + min.getBlockX(), _y = y + min.getBlockY(),  _z = z + min.getBlockZ();
                     Block block = world.getBlockAt(_x, _y, _z);
                     Material blockType = block.getType();
+                    Location blockLocation = block.getLocation();
 
                     if(blockType != Material.AIR) {
-                        TagBuilder tagBuilder = new TagBuilder().withBlockPosition(SchematicPosition.of(x, y, z))
-                                .withStates(plugin.getNMSBlocks().readBlockStates(block.getLocation()));
-
-                        if(ServerVersion.isLegacy())
-                            tagBuilder.withCombinedId(getCombinedId(block));
-                        else
-                            tagBuilder.withMaterial(blockType);
-
-                        BlockState blockState = block.getState();
-
-                        if(blockState instanceof Banner){
-                            tagBuilder.applyBanner((Banner) blockState);
-                        }
-                        else if(blockState instanceof InventoryHolder){
-                            tagBuilder.applyContents(blockState);
-                        }
-                        else if(block.getType() == Material.FLOWER_POT){
-                            tagBuilder.applyFlower(getFlower(block));
-                        }
-                        else if(blockState instanceof Skull){
-                            tagBuilder.applySkull((Skull) blockState);
-                        }
-                        else if(blockState instanceof Sign){
-                            tagBuilder.applySign((Sign) blockState);
-                        }
-                        else if(blockState instanceof CreatureSpawner){
-                            tagBuilder.applySpawner((CreatureSpawner) blockState);
-                        }
-
-                        blocks.add(tagBuilder.build());
+                        blocks.add(new TagBuilder()
+                                .withBlockPosition(SchematicPosition.of(x, y, z))
+                                .withBlockType(blockLocation, blockType)
+                                .withStates(plugin.getNMSBlocks().readBlockStates(blockLocation))
+                                .withTileEntity(plugin.getNMSBlocks().readTileEntity(blockLocation))
+                                .build()
+                        );
                     }
                 }
             }
@@ -227,14 +198,6 @@ public final class SchematicsHandler implements SchematicManager {
 
         if(runnable != null)
             runnable.run();
-    }
-
-    private int getCombinedId(Block block) {
-        return plugin.getNMSBlocks().getCombinedId(block.getLocation());
-    }
-
-    private ItemStack getFlower(Block block){
-        return plugin.getNMSBlocks().getFlowerPot(block.getLocation());
     }
 
     private Schematic loadFromFile(String schemName, File file){

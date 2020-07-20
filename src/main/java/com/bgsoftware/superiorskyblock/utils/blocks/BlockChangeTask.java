@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.schematics.data.BlockType;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.google.common.base.Preconditions;
@@ -30,10 +29,11 @@ public final class BlockChangeTask {
         this.island = island;
     }
 
-    public void setBlock(Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args){
+    public void setBlock(Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
         Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
         ChunkPosition chunkPosition = new ChunkPosition(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>()).add(new BlockData(location, combinedId, statesTag, blockType, args));
+        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>())
+                .add(new BlockData(location, combinedId, statesTag, tileEntity));
     }
 
     public void submitUpdate(Runnable onFinish){
@@ -49,7 +49,8 @@ public final class BlockChangeTask {
                 ChunksTracker.markDirty(island, chunk, false);
 
                 for (BlockData blockData : entry.getValue())
-                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId, blockData.statesTag, blockData.blockType, blockData.args);
+                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId,
+                            blockData.statesTag, blockData.tileEntity);
             }
 
             chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
@@ -93,16 +94,13 @@ public final class BlockChangeTask {
 
         private final Location location;
         private final int combinedId;
-        private final CompoundTag statesTag;
-        private final BlockType blockType;
-        private final Object[] args;
+        private final CompoundTag statesTag, tileEntity;
 
-        BlockData(Location location, int combinedId, CompoundTag statesTag, BlockType blockType, Object... args){
+        BlockData(Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
             this.location = location;
             this.combinedId = combinedId;
             this.statesTag = statesTag;
-            this.blockType = blockType;
-            this.args = args;
+            this.tileEntity = tileEntity;
         }
 
     }
