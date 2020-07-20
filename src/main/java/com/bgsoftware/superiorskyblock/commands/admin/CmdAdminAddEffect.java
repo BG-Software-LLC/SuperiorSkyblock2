@@ -84,11 +84,9 @@ public final class CmdAdminAddEffect implements ISuperiorCommand {
             islands.add(island);
         }
 
-        PotionEffectType potionEffectType;
+        PotionEffectType potionEffectType = PotionEffectType.getByName(args[3].toUpperCase());
 
-        try{
-            potionEffectType = PotionEffectType.getByName(args[3].toUpperCase());
-        }catch (Exception ex){
+        if(potionEffectType == null){
             Locale.INVALID_EFFECT.send(sender, args[3]);
             return;
         }

@@ -222,11 +222,10 @@ public final class IslandDeserializer {
 
         islandEffectsSync.write(islandEffects -> {
             for(String effect : effects.split(",")){
-                try {
-                    String[] sections = effect.split("=");
-                    PotionEffectType potionEffectType = PotionEffectType.getByName(sections[0]);
+                String[] sections = effect.split("=");
+                PotionEffectType potionEffectType = PotionEffectType.getByName(sections[0]);
+                if(potionEffectType != null)
                     islandEffects.put(potionEffectType, Integer.parseInt(sections[1]));
-                }catch(Exception ignored){}
             }
         });
     }

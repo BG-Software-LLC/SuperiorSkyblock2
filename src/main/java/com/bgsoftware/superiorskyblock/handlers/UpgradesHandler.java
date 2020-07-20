@@ -105,9 +105,9 @@ public final class UpgradesHandler implements UpgradesManager {
                 Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
                 if(levelSection.contains("island-effects")){
                     for(String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
-                        try {
-                            islandEffects.put(PotionEffectType.getByName(effect), levelSection.getInt("island-effects." + effect) - 1);
-                        }catch(IllegalArgumentException ignored){}
+                        PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
+                        if(potionEffectType != null)
+                            islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
                     }
                 }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,

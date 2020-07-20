@@ -95,11 +95,9 @@ public final class FileUtils {
         if(section.contains("effects")){
             ConfigurationSection effectsSection = section.getConfigurationSection("effects");
             for(String _effect : effectsSection.getKeys(false)) {
-                PotionEffectType potionEffectType;
+                PotionEffectType potionEffectType = PotionEffectType.getByName(_effect);
 
-                try {
-                    potionEffectType = PotionEffectType.getByName(_effect);
-                } catch (Exception ex) {
+                if(potionEffectType == null){
                     SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + effectsSection.getCurrentPath() + "." + _effect + " into a potion effect, skipping...");
                     continue;
                 }
