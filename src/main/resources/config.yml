@@ -466,6 +466,13 @@ default-containers:
       '15':
         type: LEATHER_HELMET
 
+# Set lines for signs inside island schematics.
+# You can use the following placeholders:
+# {player} - The island-owner's name
+# {island} - The island's name if exists. if not, the owner's name will be pasted.
+# You can disable this feature by setting the section to 'default-signs: []'
+default-signs: []
+
 # A list of commands that will be executed when an event is called.
 # You can find a list of events here:
 # https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events

@@ -53,9 +53,12 @@ public final class BlockChangeTask {
                     for (BlockData blockData : entry.getValue()) {
                         if(blockData.tileEntity != null) {
                             for (int i = 1; i <= 4; i++) {
-                                String line = blockData.tileEntity.getString("Text" + i);
+                                String line = getSignLine(i - 1, blockData.tileEntity.getString("Text" + i));
                                 if (line != null)
-                                    blockData.tileEntity.setString("Text" + i, line.replace("{player}", island.getOwner().getName()));
+                                    blockData.tileEntity.setString("Text" + i, line
+                                            .replace("{player}", island.getOwner().getName())
+                                            .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
+                                    );
                             }
 
                             if(plugin.getSettings().defaultContainersEnabled) {
@@ -78,6 +81,9 @@ public final class BlockChangeTask {
                                     }catch (Exception ignored){}
                                 }
                             }
+
+
+
                         }
 
                         plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId,
@@ -93,6 +99,11 @@ public final class BlockChangeTask {
         }finally {
             blocksCache.clear();
         }
+    }
+
+    private static String getSignLine(int index, String def){
+        return index >= plugin.getSettings().defaultSignLines.size() ? def :
+                plugin.getSettings().defaultSignLines.get(index);
     }
 
     private static class BlockData {

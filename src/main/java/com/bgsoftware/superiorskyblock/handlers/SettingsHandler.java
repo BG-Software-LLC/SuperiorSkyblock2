@@ -110,6 +110,7 @@ public final class SettingsHandler {
     public final List<String> blockedVisitorsCommands;
     public final boolean defaultContainersEnabled;
     public final Registry<InventoryType, Registry<Integer, ItemStack>> defaultContainersContents;
+    public final List<String> defaultSignLines;
     public final Registry<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final long homeWarmup;
@@ -289,6 +290,7 @@ public final class SettingsHandler {
                 SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
             }
         }
+        defaultSignLines = cfg.getStringList("default-signs");
         eventCommands = Registry.createRegistry();
         for(String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)){
             eventCommands.add(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
