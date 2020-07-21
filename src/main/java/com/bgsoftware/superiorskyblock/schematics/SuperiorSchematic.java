@@ -285,6 +285,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }
 
                 tileEntity.setTag("Items", items);
+
+                String inventoryType = compoundTag.getString("inventoryType");
+                tileEntity.setString("inventoryType", inventoryType != null ? inventoryType : "CHEST");
             }
         }
 
@@ -321,28 +324,28 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         {
-            String signLine1 = compoundTag.getString("signLine1");
+            String signLine1 = compoundTag.getString("signLine0");
             if(signLine1 != null){
                 tileEntity.setString("Text1", signLine1);
             }
         }
 
         {
-            String signLine2 = compoundTag.getString("signLine2");
+            String signLine2 = compoundTag.getString("signLine1");
             if(signLine2 != null){
                 tileEntity.setString("Text2", signLine2);
             }
         }
 
         {
-            String signLine3 = compoundTag.getString("signLine3");
+            String signLine3 = compoundTag.getString("signLine2");
             if(signLine3 != null){
                 tileEntity.setString("Text3", signLine3);
             }
         }
 
         {
-            String signLine4 = compoundTag.getString("signLine4");
+            String signLine4 = compoundTag.getString("signLine3");
             if(signLine4 != null){
                 tileEntity.setString("Text4", signLine4);
             }

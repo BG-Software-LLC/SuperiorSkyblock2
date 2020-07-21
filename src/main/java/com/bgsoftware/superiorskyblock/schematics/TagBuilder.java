@@ -31,11 +31,15 @@ public final class TagBuilder {
         return this;
     }
 
-    public TagBuilder withBlockType(Location location, Material blockType){
-        if(ServerVersion.isLegacy())
+    public TagBuilder withBlockType(Location location, Material blockType, int data){
+        if(ServerVersion.isLegacy()) {
             compoundValue.add("combinedId", new IntTag(plugin.getNMSBlocks().getCombinedId(location)));
-        else
+        }
+        else {
             compoundValue.add("type", new StringTag(blockType.name()));
+            if(data != 0)
+                compoundValue.add("data", new IntTag(data));
+        }
 
         return this;
     }

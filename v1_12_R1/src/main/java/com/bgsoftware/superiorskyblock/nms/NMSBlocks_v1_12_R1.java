@@ -61,7 +61,7 @@ import java.util.function.Consumer;
 public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static Method chunkLoaderSaveChunkMethod = null;
+    private static Method chunkLoaderSaveChunkMethod = null, tileEntityLoadMethod = null;
 
     private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
@@ -69,6 +69,8 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
         try{
             //noinspection JavaReflectionMemberAccess
             chunkLoaderSaveChunkMethod = IChunkLoader.class.getMethod("saveChunk", World.class, Chunk.class, boolean.class);
+            //noinspection JavaReflectionMemberAccess
+            tileEntityLoadMethod = TileEntity.class.getMethod("load", NBTTagCompound.class);
         }catch (Exception ignored){}
     }
 
@@ -104,7 +106,11 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
             tileEntityCompound.setInt("z", blockPosition.getZ());
-            world.getTileEntity(blockPosition).a(tileEntityCompound);
+            try{
+                tileEntityLoadMethod.invoke(world.getTileEntity(blockPosition), tileEntityCompound);
+            }catch (Throwable ex){
+                world.getTileEntity(blockPosition).a(tileEntityCompound);
+            }
         }
     }
 
