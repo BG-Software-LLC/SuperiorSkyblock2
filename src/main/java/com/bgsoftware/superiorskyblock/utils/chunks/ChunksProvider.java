@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.scheduler.BukkitTask;
@@ -69,7 +69,7 @@ public final class ChunksProvider {
     private static BukkitTask runChunksLoader(){
         boolean asyncLoading = PaperHook.isUsingPaper() && ServerVersion.isAtLeast(ServerVersion.v1_13);
 
-        Runnable loadChunks = () -> {
+        return Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for(int i = 0; i < plugin.getSettings().chunksPerTick; i++) {
                 double[] tps = plugin.getNMSAdapter().getTPS();
                 double averageTPS = (tps[0] + tps[1] + tps[2]) / 3;
@@ -82,24 +82,17 @@ public final class ChunksProvider {
                 if (chunkPosition == null)
                     return;
 
-                Chunk chunk = chunkPosition.loadChunk();
-
                 if(asyncLoading){
-                    Executor.sync(() -> finishLoad(chunkPosition, chunk));
+                    PaperLib.getChunkAtAsync(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ(), true)
+                            .whenComplete((chunk, ex) -> finishLoad(chunkPosition, chunk));
                 }
-                else{
+
+                else {
+                    Chunk chunk = chunkPosition.loadChunk();
                     finishLoad(chunkPosition, chunk);
                 }
             }
-        };
-
-        if(asyncLoading) {
-            return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, loadChunks, 1L, 1L);
-        }
-
-        else{
-            return Bukkit.getScheduler().runTaskTimer(plugin, loadChunks, 1L, 1L);
-        }
+        }, 1L, 1L);
     }
 
     private static void finishLoad(ChunkPosition chunkPosition, Chunk chunk){
