@@ -176,19 +176,19 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
     }
 
     @Override
-    public org.bukkit.Chunk getChunkIfLoaded(org.bukkit.World bukkitWorld, int x, int z) {
-        Chunk chunk = ((CraftWorld) bukkitWorld).getHandle().getChunkProviderServer().getChunkIfLoaded(x, z);
+    public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
+        Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().getChunkProviderServer()
+                .getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
         return chunk == null ? null : chunk.bukkitChunk;
     }
 
     @Override
-    public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
+    public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(ChunkPosition chunkPosition) {
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
 
         CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> completableFuture = new CompletableFuture<>();
-        ChunkPosition chunkPosition = ChunkPosition.of(bukkitWorld, chunkX, chunkZ);
 
-        runActionOnChunk(bukkitWorld, chunkCoords, false, chunk -> {
+        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, false, chunk -> {
             KeyMap<Integer> blockCounts = new KeyMap<>();
             Set<Location> spawnersLocations = new HashSet<>();
 
@@ -197,7 +197,7 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
                     for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
-                            Location location = new Location(bukkitWorld, (chunkX << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkZ << 4) + bp.getZ());
+                            Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
                             short data = (short) blockData.getBlock().toLegacyData(blockData);
                             Key blockKey = Key.of(type, data, location);
@@ -217,29 +217,29 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
     }
 
     @Override
-    public void deleteChunk(Island island, org.bukkit.World bukkitWorld, int chunkX, int chunkZ) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
-        runActionOnChunk(bukkitWorld, chunkCoords, true, chunk -> {
+    public void deleteChunk(Island island, ChunkPosition chunkPosition) {
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             Arrays.fill(chunk.getSections(), Chunk.a);
             Arrays.fill(chunk.entitySlices, new UnsafeList<>());
 
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::s);
             chunk.tileEntities.clear();
 
-            ChunksTracker.markEmpty(island, ChunkPosition.of(bukkitWorld, chunkX, chunkZ), false);
+            ChunksTracker.markEmpty(island, chunkPosition, false);
         }, chunk -> refreshChunk(chunk.bukkitChunk));
     }
 
     @Override
-    public void setChunkBiome(org.bukkit.World bukkitWorld, int chunkX, int chunkZ, Biome biome, List<Player> playersToUpdate) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkX, chunkZ);
-        runActionOnChunk(bukkitWorld, chunkCoords, true, chunk -> {
+    public void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate) {
+        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             byte biomeBase = (byte) BiomeBase.REGISTRY_ID.a(CraftBlock.biomeToBiomeBase(biome));
             Arrays.fill(chunk.getBiomeIndex(), biomeBase);
             chunk.e();
         },
         chunk -> {
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkX, chunkZ);
+            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
             PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
 
             playersToUpdate.forEach(player -> {

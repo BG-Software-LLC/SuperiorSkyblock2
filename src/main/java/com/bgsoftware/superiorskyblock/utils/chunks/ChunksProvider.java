@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
@@ -33,8 +32,7 @@ public final class ChunksProvider {
 
     }
 
-    public static CompletableFuture<Chunk> loadChunk(World world, int x, int z, Consumer<Chunk> onLoadConsumer){
-        ChunkPosition chunkPosition = ChunkPosition.of(world, x, z);
+    public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> onLoadConsumer){
         Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);
 
         if(chunkInfo != null){

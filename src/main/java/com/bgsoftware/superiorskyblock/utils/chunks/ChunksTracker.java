@@ -145,7 +145,7 @@ public final class ChunksTracker {
             ((SIsland) island).saveDirtyChunks();
     }
 
-    private static void markDirty(Island island, ChunkPosition chunkPosition, boolean save){
+    public static void markDirty(Island island, ChunkPosition chunkPosition, boolean save){
         if(island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 

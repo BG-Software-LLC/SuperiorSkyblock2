@@ -26,7 +26,6 @@ import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -54,6 +53,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -672,9 +672,8 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
-                .map(pair -> world.getChunkAt(pair.getKey(), pair.getValue()))
-                .collect(Collectors.toList());
+        return IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks).stream()
+                .map(ChunkPosition::loadChunk).collect(Collectors.toList());
     }
 
     @Override
@@ -693,10 +692,8 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
-                .map(pair -> plugin.getNMSBlocks().getChunkIfLoaded(world, pair.getKey(), pair.getValue()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks).stream()
+                .map(plugin.getNMSBlocks()::getChunkIfLoaded).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
@@ -712,31 +709,26 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
         World world = getCenter(environment).getWorld();
-        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream().map(pair -> {
-            CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(world, pair.getKey(), pair.getValue(), null);
-            return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
-        }).collect(Collectors.toList());
+        return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, whenComplete);
     }
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
         World world = getCenter(environment).getWorld();
-        return getChunkCoords(world, onlyProtected, noEmptyChunks).stream()
-                .map(pair -> ChunksProvider.loadChunk(world, pair.getKey(), pair.getValue(), onChunkLoad))
-                .collect(Collectors.toList());
+        return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, onChunkLoad);
     }
 
     @Override
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
         World world = getCenter(environment).getWorld();
-        getChunkCoords(world, onlyProtected, true)
-                .forEach(pair -> plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue()));
+        IslandUtils.getChunkCoords(this,world, onlyProtected, true)
+                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(this, chunkPosition));
     }
 
     @Override
     public void resetChunks(boolean onlyProtected) {
-        getChunkCoords(onlyProtected, true).forEach((world, list) -> list.forEach(pair ->
-                plugin.getNMSBlocks().deleteChunk(this, world, pair.getKey(), pair.getValue())));
+        IslandUtils.getChunkCoords(this, onlyProtected, true)
+                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(this, chunkPosition));
     }
 
     @Override
@@ -1052,16 +1044,22 @@ public final class SIsland extends DatabaseObject implements Island {
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + (asker == null ? "Null" : asker.getName()));
 
-        List<CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>>> chunksToLoad = new ArrayList<>();
+        List<CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>>> chunksToLoad;
         BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
                 new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
-        BiConsumer<World, Pair<Integer, Integer>> onChunkLoad = snapshot == null ? (world, pair) -> {} : snapshot::cacheChunk;
-
-        getChunkCoords(true, true).forEach((world, list) -> chunksToLoad.addAll(list.stream().map(pair -> {
-            onChunkLoad.accept(world, pair);
-            return plugin.getNMSBlocks().calculateChunk(world, pair.getKey(), pair.getValue());
-        }).collect(Collectors.toList())));
+        if(snapshot == null) {
+            chunksToLoad = IslandUtils.getChunkCoords(this, true, true).stream()
+                    .map(chunkPosition -> plugin.getNMSBlocks().calculateChunk(chunkPosition))
+                    .collect(Collectors.toList());
+        }
+        else{
+            chunksToLoad = new ArrayList<>();
+            IslandUtils.getAllChunksAsync(this, true, true, chunk -> {
+                snapshot.cacheChunk(chunk);
+                chunksToLoad.add(plugin.getNMSBlocks().calculateChunk(ChunkPosition.of(chunk)));
+            });
+        }
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
         SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
@@ -1228,28 +1226,28 @@ public final class SIsland extends DatabaseObject implements Island {
 
         {
             World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
-            getChunkCoords(normalWorld, false, false).forEach(pair ->
-                    plugin.getNMSBlocks().setChunkBiome(normalWorld, pair.getKey(), pair.getValue(), biome, playersToUpdate));
+            IslandUtils.getChunkCoords(this, normalWorld, false, false).forEach(chunkPosition ->
+                    plugin.getNMSBlocks().setChunkBiome(chunkPosition, biome, playersToUpdate));
         }
 
         if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
             Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                     ServerVersion.isEquals(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
-            getChunkCoords(netherWorld, false, false).forEach(pair ->
-                    plugin.getNMSBlocks().setChunkBiome(netherWorld, pair.getKey(), pair.getValue(), netherBiome, playersToUpdate));
+            IslandUtils.getChunkCoords(this, netherWorld, false, false).forEach(chunkPosition ->
+                    plugin.getNMSBlocks().setChunkBiome(chunkPosition, netherBiome, playersToUpdate));
         }
 
         if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
             Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
-            getChunkCoords(endWorld, false, false).forEach(pair ->
-                    plugin.getNMSBlocks().setChunkBiome(endWorld, pair.getKey(), pair.getValue(), endBiome, playersToUpdate));
+            IslandUtils.getChunkCoords(this, endWorld, false, false).forEach(chunkPosition ->
+                    plugin.getNMSBlocks().setChunkBiome(chunkPosition, endBiome, playersToUpdate));
         }
 
         for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
-            getChunkCoords(registeredWorld, false, false).forEach(pair ->
-                    plugin.getNMSBlocks().setChunkBiome(registeredWorld, pair.getKey(), pair.getValue(), biome, playersToUpdate));
+            IslandUtils.getChunkCoords(this, registeredWorld, false, false).forEach(chunkPosition ->
+                    plugin.getNMSBlocks().setChunkBiome(chunkPosition, biome, playersToUpdate));
         }
 
         setBiomeRaw(biome);
@@ -2859,21 +2857,6 @@ public final class SIsland extends DatabaseObject implements Island {
      *  Private methods
      */
 
-//    private void assignPermissionNodes(){
-//        boolean save = false;
-//
-//        for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-//            if(!permissionNodes.containsKey(playerRole)) {
-//                PlayerRole previousRole = SPlayerRole.of(playerRole.getWeight() - 1);
-//                permissionNodes.add(playerRole, new RolePermissionNode(playerRole, permissionNodes.get(previousRole)));
-//                save = true;
-//            }
-//        }
-//
-//        if(save && owner != null)
-//            savePermissionNodes();
-//    }
-
     private void assignGenerator(){
         if(getGeneratorAmounts().isEmpty()) {
             cobbleGeneratorValues.write(cobbleGenerator -> {
@@ -2924,48 +2907,6 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(callback != null)
             callback.run();
-    }
-
-    private List<Pair<Integer, Integer>> getChunkCoords(World world, boolean onlyProtected, boolean noEmptyChunks){
-        List<Pair<Integer, Integer>> chunkCoords = new ArrayList<>();
-
-        Location min = onlyProtected ? getMinimumProtected() : getMinimum();
-        Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-
-        for(int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++){
-            for(int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z)) {
-                    chunkCoords.add(new Pair<>(x, z));
-                }
-            }
-        }
-
-        return chunkCoords;
-    }
-
-    private Map<World, List<Pair<Integer, Integer>>> getChunkCoords(boolean onlyProtected, boolean noEmptyChunks){
-        Map<World, List<Pair<Integer, Integer>>> chunkCoords = new HashMap<>();
-
-        {
-            World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
-            chunkCoords.put(normalWorld, getChunkCoords(normalWorld, onlyProtected, noEmptyChunks));
-        }
-
-        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
-            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            chunkCoords.put(netherWorld, getChunkCoords(netherWorld, onlyProtected, noEmptyChunks));
-        }
-
-        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
-            World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            chunkCoords.put(endWorld, getChunkCoords(endWorld, onlyProtected, noEmptyChunks));
-        }
-
-        for(World registeredWorld : plugin.getGrid().getRegisteredWorlds()){
-            chunkCoords.put(registeredWorld, getChunkCoords(registeredWorld, onlyProtected, noEmptyChunks));
-        }
-
-        return chunkCoords;
     }
 
     public static class WarpData{

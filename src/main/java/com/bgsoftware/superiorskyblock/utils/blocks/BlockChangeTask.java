@@ -2,25 +2,23 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public final class BlockChangeTask {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Map<ChunkPosition, List<BlockData>> blocksCache = Maps.newConcurrentMap();
-    private final List<Chunk> chunksToUpdate = new ArrayList<>();
     private final Island island;
 
     private boolean submitted = false;
@@ -31,8 +29,7 @@ public final class BlockChangeTask {
 
     public void setBlock(Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
         Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
-        ChunkPosition chunkPosition = new ChunkPosition(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
-        blocksCache.computeIfAbsent(chunkPosition, pairs -> new ArrayList<>())
+        blocksCache.computeIfAbsent(ChunkPosition.of(location), pairs -> new ArrayList<>())
                 .add(new BlockData(location, combinedId, statesTag, tileEntity));
     }
 
@@ -41,56 +38,30 @@ public final class BlockChangeTask {
             Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
 
             submitted = true;
+            int index = 0, size = blocksCache.size();
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
-                Chunk chunk = Bukkit.getWorld(entry.getKey().world).getChunkAt(entry.getKey().x, entry.getKey().z);
-                chunksToUpdate.add(chunk);
-                plugin.getNMSBlocks().refreshLight(chunk);
-                ChunksTracker.markDirty(island, chunk, false);
+                int entryIndex = ++index;
+                ChunksProvider.loadChunk(entry.getKey(), chunk -> {
+                    plugin.getNMSBlocks().refreshLight(chunk);
+                    ChunksTracker.markDirty(island, chunk, false);
 
-                for (BlockData blockData : entry.getValue())
-                    plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId,
-                            blockData.statesTag, blockData.tileEntity);
+                    for (BlockData blockData : entry.getValue())
+                        plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId,
+                                blockData.statesTag, blockData.tileEntity);
+
+                    plugin.getNMSBlocks().refreshChunk(chunk);
+
+                    if(entryIndex == size && onFinish != null)
+                        onFinish.run();
+                });
             }
-
-            chunksToUpdate.forEach(chunk -> plugin.getNMSBlocks().refreshChunk(chunk));
-
-            if (onFinish != null)
-                onFinish.run();
         }finally {
             blocksCache.clear();
-            chunksToUpdate.clear();
         }
     }
 
-    private static class ChunkPosition{
-
-        private final String world;
-        private final int x, z;
-
-        ChunkPosition(String world, int x, int z){
-            this.world = world;
-            this.x = x;
-            this.z = z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            ChunkPosition that = (ChunkPosition) o;
-            return x == that.x &&
-                    z == that.z &&
-                    Objects.equals(world, that.world);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(world, x, z);
-        }
-    }
-
-    private static class BlockData{
+    private static class BlockData {
 
         private final Location location;
         private final int combinedId;

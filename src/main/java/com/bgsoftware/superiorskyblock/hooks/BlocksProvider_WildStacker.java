@@ -26,7 +26,6 @@ import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -77,8 +76,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
         private final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
 
-        public void cacheChunk(World world, Pair<Integer, Integer> pair){
-            Chunk chunk = world.getChunkAt(pair.getKey(), pair.getValue());
+        public void cacheChunk(Chunk chunk){
             try {
                 StackedSnapshot stackedSnapshot;
                 try {

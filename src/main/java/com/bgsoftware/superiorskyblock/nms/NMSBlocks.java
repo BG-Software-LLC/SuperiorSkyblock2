@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -45,13 +44,13 @@ public interface NMSBlocks {
         return Integer.compare(o1.ordinal(), o2.ordinal());
     }
 
-    Chunk getChunkIfLoaded(World world, int x, int z);
+    Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
-    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(World world, int x, int z);
+    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(ChunkPosition chunkPosition);
 
-    void deleteChunk(Island island, World world, int x, int z);
+    void deleteChunk(Island island, ChunkPosition chunkPosition);
 
-    void setChunkBiome(World world, int x, int z, Biome biome, List<Player> playersToUpdate);
+    void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
 
     int tickIslands(int random);
 
