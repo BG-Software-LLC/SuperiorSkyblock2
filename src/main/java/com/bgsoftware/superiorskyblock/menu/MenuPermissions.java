@@ -285,7 +285,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                 if (permissionSection.contains("role-permission")) {
                     menuPermissions.addData(permission + "-role-permission", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("role-permission")));
                 }
-                if(position >= 0)
+                if(position >= 0 && position < islandPermissions.size())
                     islandPermissions.add(position, islandPrivilege);
                 else
                     islandPermissions.add(islandPrivilege);
