@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -411,7 +410,8 @@ public final class BlocksListener implements Listener {
             amount = 1;
         }
 
-        ItemStack blockItem = block.getState().getData().toItemStack(amount);
+        ItemStack blockItem = ServerVersion.isLegacy() ? block.getState().getData().toItemStack(amount) :
+                new ItemStack(block.getType(), amount);
 
         if(blockItem.getType().name().equals("GLOWING_REDSTONE_ORE")) {
             blockItem.setType(Material.REDSTONE_ORE);
