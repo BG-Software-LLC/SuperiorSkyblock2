@@ -71,6 +71,12 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public void registerCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key, BigDecimal worthValue, BigDecimal levelValue) {
+        if(worthValue instanceof BigDecimalFormatted)
+            worthValue = new BigDecimal(((BigDecimalFormatted) worthValue).getAsString());
+
+        if(levelValue instanceof BigDecimalFormatted)
+            levelValue = new BigDecimal(((BigDecimalFormatted) levelValue).getAsString());
+
         if(worthValue != null && !customBlockValues.containsKey(key)){
             customBlockValues.put(key, worthValue.toString());
         }
@@ -130,8 +136,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
         ConfigurationSection valuesSection = cfg.contains("block-values") ? cfg.getConfigurationSection("block-values") : cfg.getConfigurationSection("");
 
         for(String key : valuesSection.getKeys(false))
-            blockValues.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)),
-                    String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
+            blockValues.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)), valuesSection.getString(key));
     }
 
     private void loadBlockLevels(SuperiorSkyblockPlugin plugin){
@@ -144,8 +149,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
         ConfigurationSection valuesSection = cfg.getConfigurationSection("");
 
         for(String key : valuesSection.getKeys(false))
-            blockLevels.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)),
-                    String.valueOf(valuesSection.isDouble(key) ? valuesSection.getDouble(key) : (double) valuesSection.getInt(key)));
+            blockLevels.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)), valuesSection.getString(key));
     }
 
     private static Bindings createBindings() {
