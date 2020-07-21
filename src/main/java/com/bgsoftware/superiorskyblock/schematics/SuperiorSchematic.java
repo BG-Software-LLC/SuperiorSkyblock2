@@ -194,7 +194,6 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     }
 
                     ((SIsland) island).handleBlocksPlace(cachedCounts);
-                    ((SIsland) island).saveDirtyChunks();
 
                     EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 

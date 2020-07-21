@@ -1547,7 +1547,9 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void handleBlocksPlace(KeyMap<Integer> blocks){
-        handleBlocksPlace(blocks, true, this.blockCounts, this.islandWorth, this.islandLevel);
+        handleBlocksPlace(blocks, false, this.blockCounts, this.islandWorth, this.islandLevel);
+        saveBlockCounts();
+        saveDirtyChunks();
     }
 
     public void handleBlocksPlace(KeyMap<Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
@@ -1853,10 +1855,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     EventsCaller.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
-        blockCounts.read(blockCounts -> Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
-                .setString(IslandSerializer.serializeBlockCounts(blockCounts))
-                .setString(owner.getUniqueId().toString())
-                .execute(true));
+        saveBlockCounts();
     }
 
     /*
@@ -2819,6 +2818,13 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(ChunksTracker.serialize(this))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
+    }
+
+    public void saveBlockCounts(){
+        blockCounts.read(blockCounts -> Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockCounts(blockCounts))
+                .setString(owner.getUniqueId().toString())
+                .execute(true));
     }
 
     /*
