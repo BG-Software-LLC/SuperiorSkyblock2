@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Members'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

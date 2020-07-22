@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lPermissions Controller'
+previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'

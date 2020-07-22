@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lSelect a biome'
+previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'

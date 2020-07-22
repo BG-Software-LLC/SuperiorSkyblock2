@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Warps'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Visitors'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lTop Islands'
+previous-menu: true
 
 pattern:
   - '~ ~ ~ ~ ~ ~ ~ ~ ~'

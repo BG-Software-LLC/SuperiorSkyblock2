@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Ratings (%superior_island_rating%/5)'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

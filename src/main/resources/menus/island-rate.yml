@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&l         Rate Island'
+previous-menu: true
 type: HOPPER
 
 pattern:

@@ -123,6 +123,7 @@ public final class MenuBiomes extends SuperiorMenu {
 
         menuBiomes.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuBiomes.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+        menuBiomes.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
 
         List<String> pattern = cfg.getStringList("pattern");
 

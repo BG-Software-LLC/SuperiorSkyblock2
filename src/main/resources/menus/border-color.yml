@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&l        Border Color'
+previous-menu: true
 type: HOPPER
 
 pattern:

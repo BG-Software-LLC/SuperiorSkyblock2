@@ -120,6 +120,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
         return getData().data.containsKey(key);
     }
 
+    public void setPreviousMoveAllowed(boolean isPreviousMoveAllowed){
+        addData("previous-menu", isPreviousMoveAllowed);
+    }
+
     @Override
     public Inventory getInventory(){
         return buildInventory(null);
@@ -281,7 +285,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
                 open(previousMenu);
             }
 
-            else if(previousMenu != null) {
+            else if(previousMenu != null && (boolean) getData("previous-menu", true)) {
                 if (previousMove)
                     previousMenu.cloneAndOpen(previousMenu.previousMenu);
                 else

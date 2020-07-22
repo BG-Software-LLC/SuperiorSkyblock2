@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lYour Missions'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

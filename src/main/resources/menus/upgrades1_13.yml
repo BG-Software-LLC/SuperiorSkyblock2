@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Upgrades'
+previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'

@@ -79,6 +79,7 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         menuMemberRole.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuMemberRole.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+        menuMemberRole.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
 
         List<String> pattern = cfg.getStringList("pattern");
 

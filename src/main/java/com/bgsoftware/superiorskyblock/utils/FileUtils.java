@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.FileUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -124,6 +123,7 @@ public final class FileUtils {
 
         menu.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menu.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
+        menu.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
 
         List<String> pattern = cfg.getStringList("pattern");
 

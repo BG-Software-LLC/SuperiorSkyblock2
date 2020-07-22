@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Panel'
+previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'

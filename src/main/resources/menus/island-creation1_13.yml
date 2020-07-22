@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lCreate a new island...'
+previous-menu: true
 
 pattern:
   - '# @ # # ^ # # $ #'

@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lSelect Language...'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'

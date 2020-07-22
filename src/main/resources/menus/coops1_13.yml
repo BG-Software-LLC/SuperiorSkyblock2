@@ -6,6 +6,7 @@
 ######################################################
 
 title: '&lIsland Coop Players ({0}/{1})'
+previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
