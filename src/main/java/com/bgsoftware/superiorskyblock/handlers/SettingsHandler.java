@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import io.netty.util.internal.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -137,6 +138,7 @@ public final class SettingsHandler {
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final boolean schematicNameArgument;
+    public final String islandChestTitle;
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
 
@@ -323,6 +325,7 @@ public final class SettingsHandler {
         negativeLevel = cfg.getBoolean("negative-level", true);
         disabledEvents = cfg.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
         schematicNameArgument = cfg.getBoolean("schematic-name-argument", true);
+        islandChestTitle = StringUtils.translateColors(cfg.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = cfg.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = cfg.getInt("island-chests.default-size", 3);
     }

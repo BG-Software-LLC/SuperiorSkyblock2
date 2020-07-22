@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SIslandChest implements IslandChest {
 
-    private Inventory inventory = Bukkit.createInventory(this, 9, ChatColor.BOLD + "Island Chest");
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().islandChestTitle);
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private int contentsUpdateCounter = 0;
 
@@ -36,7 +38,7 @@ public final class SIslandChest implements IslandChest {
             updateFlag.set(true);
             ItemStack[] oldContents = inventory.getContents();
             List<HumanEntity> toUpdate = inventory.getViewers();
-            inventory = Bukkit.createInventory(this, 9 * rows, ChatColor.BOLD + "Island Chest");
+            inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().islandChestTitle);
             inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
             toUpdate.forEach(humanEntity -> humanEntity.openInventory(inventory));
             updateFlag.set(false);
@@ -72,7 +74,7 @@ public final class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, ItemStack[] contents){
         SIslandChest islandChest = new SIslandChest(island);
-        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, ChatColor.BOLD + "Island Chest");
+        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().islandChestTitle);
         islandChest.inventory.setContents(contents);
         return islandChest;
     }

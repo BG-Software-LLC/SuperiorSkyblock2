@@ -587,6 +587,8 @@ schematic-name-argument: true
 
 # Settings related to the island chest.
 island-chests:
+  # The chest title.
+  chest-title: '&4Island Chest'
   # Default amount of pages.
   # You can set this value to 0 to not have any pages by default.
   default-pages: 0
