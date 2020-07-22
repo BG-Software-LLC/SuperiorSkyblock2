@@ -1055,9 +1055,11 @@ public final class SIsland extends DatabaseObject implements Island {
         }
         else{
             chunksToLoad = new ArrayList<>();
-            IslandUtils.getAllChunksAsync(this, true, true, chunk -> {
-                snapshot.cacheChunk(chunk);
-                chunksToLoad.add(plugin.getNMSBlocks().calculateChunk(ChunkPosition.of(chunk)));
+            IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk).forEach(completableFuture -> {
+                CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateCompletable = new CompletableFuture<>();
+                completableFuture.whenComplete((chunk, ex) -> plugin.getNMSBlocks().calculateChunk(ChunkPosition.of(chunk)).whenComplete(
+                        (pair, ex2) -> calculateCompletable.complete(pair)));
+                chunksToLoad.add(calculateCompletable);
             });
         }
 
