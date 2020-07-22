@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -69,6 +70,11 @@ public final class GridHandler implements GridManager {
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
     private boolean blockFailed = false;
+
+    private BigDecimalFormatted totalWorth = BigDecimalFormatted.ZERO;
+    private long lastTimeWorthUpdate = 0;
+    private BigDecimalFormatted totalLevel = BigDecimalFormatted.ZERO;
+    private long lastTimeLevelUpdate = 0;
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -503,6 +509,34 @@ public final class GridHandler implements GridManager {
     public void registerSortingType(SortingType sortingType) {
         SuperiorSkyblockPlugin.debug("Action: Register Sorting Type, Sorting Type: " + sortingType.getName());
         islands.registerSortingType(sortingType, true);
+    }
+
+    @Override
+    public BigDecimal getTotalWorth() {
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastTimeWorthUpdate > 60000){
+            lastTimeWorthUpdate = currentTime;
+            totalWorth = BigDecimalFormatted.ZERO;
+            for(Island island : getIslands())
+                totalWorth = totalWorth.add(island.getWorth());
+        }
+
+        return totalWorth;
+    }
+
+    @Override
+    public BigDecimal getTotalLevel() {
+        long currentTime = System.currentTimeMillis();
+
+        if(currentTime - lastTimeLevelUpdate > 60000){
+            lastTimeLevelUpdate = currentTime;
+            totalLevel = BigDecimalFormatted.ZERO;
+            for(Island island : getIslands())
+                totalLevel = totalLevel.add(island.getIslandLevel());
+        }
+
+        return totalLevel;
     }
 
     public void loadGrid(ResultSet resultSet) throws SQLException {

@@ -354,6 +354,10 @@ public abstract class PlaceholderHook {
                         return String.valueOf(island.getAllWarps().size());
                     case "creation_time":
                         return island.getCreationTimeDate();
+                    case "total_worth":
+                        return plugin.getGrid().getTotalWorth().toString();
+                    case "total_level":
+                        return plugin.getGrid().getTotalLevel().toString();
                 }
 
             }

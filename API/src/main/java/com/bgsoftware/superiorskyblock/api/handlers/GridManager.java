@@ -288,4 +288,16 @@ public interface GridManager {
      */
     void registerSortingType(SortingType sortingType);
 
+    /**
+     * Get the total worth of all the islands.
+     * This value is updated every minute, so it might not be 100% accurate.
+     */
+    BigDecimal getTotalWorth();
+
+    /**
+     * Get the total level of all the islands.
+     * This value is updated every minute, so it might not be 100% accurate.
+     */
+    BigDecimal getTotalLevel();
+
 }
