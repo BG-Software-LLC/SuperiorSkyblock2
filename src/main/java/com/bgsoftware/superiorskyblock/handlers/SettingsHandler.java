@@ -402,6 +402,8 @@ public final class SettingsHandler {
             cfg.set("default-containers.enabled", cfg.getBoolean("starter-chest.enabled"));
             cfg.set("default-containers.containers.chest", cfg.getConfigurationSection("starter-chest.contents"));
         }
+        if(cfg.contains("default-generator"))
+            cfg.set("default-values.generator", cfg.getStringList("default-generator"));
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){
