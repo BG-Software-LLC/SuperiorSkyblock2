@@ -292,7 +292,9 @@ spawn:
 
 # When enabled, players will get teleported upon void fall.
 # If they fall not in an island, they will be teleported to spawn.
-void-teleport: true
+void-teleport:
+  members: true
+  visitors: true
 
 # When disabled, visitors won't get damaged in other islands.
 visitors-damage: false

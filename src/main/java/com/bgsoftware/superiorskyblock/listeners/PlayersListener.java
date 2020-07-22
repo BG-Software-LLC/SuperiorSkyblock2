@@ -360,21 +360,19 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e){
-        if(!plugin.getSettings().voidTeleport)
-            return;
-
         Location from = e.getFrom(), to = e.getTo();
 
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
             return;
 
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        if(island == null)
+        if(island == null || (island.isVisitor(superiorPlayer, false) ?
+                !plugin.getSettings().voidTeleportVisitors : !plugin.getSettings().voidTeleportMembers))
             return;
 
         noFallDamage.add(e.getPlayer().getUniqueId());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         superiorPlayer.teleport(island, result -> {
             if(!result){
                 Locale.TELEPORTED_FAILED.send(superiorPlayer);

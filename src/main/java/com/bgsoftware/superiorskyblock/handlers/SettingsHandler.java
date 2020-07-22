@@ -76,7 +76,8 @@ public final class SettingsHandler {
     public final List<String> spawnPermissions;
     public final boolean spawnWorldBorder;
     public final int spawnSize;
-    public final boolean voidTeleport;
+    public final boolean voidTeleportMembers;
+    public final boolean voidTeleportVisitors;
     public final List<String> interactables;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
@@ -225,7 +226,8 @@ public final class SettingsHandler {
         spawnPermissions = cfg.getStringList("spawn.permissions");
         spawnWorldBorder = cfg.getBoolean("spawn.world-border", false);
         spawnSize = cfg.getInt("spawn.size", 200);
-        voidTeleport = cfg.getBoolean("void-teleport", true);
+        voidTeleportMembers = cfg.getBoolean("void-teleport.members", true);
+        voidTeleportVisitors = cfg.getBoolean("void-teleport.visitors", true);
         interactables = loadInteractables(plugin);
         visitorsDamage = cfg.getBoolean("visitors-damage", false);
         coopDamage = cfg.getBoolean("coop-damage", true);
@@ -404,6 +406,11 @@ public final class SettingsHandler {
         }
         if(cfg.contains("default-generator"))
             cfg.set("default-values.generator", cfg.getStringList("default-generator"));
+        if(cfg.isBoolean("void-teleport")){
+            boolean voidTeleport = cfg.getBoolean("void-teleport");
+            cfg.set("void-teleport.members", voidTeleport);
+            cfg.set("void-teleport.visitors", voidTeleport);
+        }
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){
