@@ -43,6 +43,9 @@ CHANGED_BIOME_OTHER: '&e&l岛屿 | &7成功将 {1} 的岛屿生物群系改变�
 CHANGED_BLOCK_LIMIT: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿将 {0} &7方块数量限制提升.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
+CHANGED_CHEST_SIZE: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}''s island.'
+CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for all the islands.'
+CHANGED_CHEST_SIZE_NAME: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}.'
 CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
 CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
 CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
@@ -102,6 +105,7 @@ COMMAND_ARGUMENT_PERMISSION: 权限
 COMMAND_ARGUMENT_PLAYER_NAME: 玩家名
 COMMAND_ARGUMENT_PRIVATE: 私有
 COMMAND_ARGUMENT_RATING: 评分
+COMMAND_ARGUMENT_ROWS: rows
 COMMAND_ARGUMENT_SCHEMATIC_NAME: 地图文件名
 COMMAND_ARGUMENT_SETTINGS: 设置
 COMMAND_ARGUMENT_SIZE: 尺寸
@@ -153,6 +157,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛�
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 给一个岛屿设置生物群系.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
+COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: 更新其他玩家岛屿的农作物生长速度.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: 更新其他玩家的岛屿解散次数.
@@ -183,6 +188,7 @@ COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank
 COMMAND_DESCRIPTION_BAN: 在岛屿上禁封一个玩家.
 COMMAND_DESCRIPTION_BIOME: 改变岛屿群系.
 COMMAND_DESCRIPTION_BORDER: 更新岛屿边界颜色.
+COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
 COMMAND_DESCRIPTION_CLOSE: 将岛屿向公众关闭.
 COMMAND_DESCRIPTION_COOP: 将一个玩家加入岛屿临时成员&c(下线后自动取消)&7.
 COMMAND_DESCRIPTION_COOPS: 打开临时成员菜单.
@@ -260,6 +266,7 @@ DISBAND_SET_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿解散次数设置为
 DISBANDED_ISLAND: '&e&l岛屿 | &7你解散了你的岛屿...'
 DISBANDED_ISLAND_OTHER: '&e&l岛屿 | &7你解散了 &b{0} &7的岛屿.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&l岛屿 | &7Y你解散了岛屿 &b{0}.'
+EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&c小心！你传送至了一个开启PVP的岛屿，十秒后你将可被其他玩家攻击...'
 EXPELLED_PLAYER: '&e&l岛屿 | &b{0} &7被逐出岛屿.'
 FORMAT_QUAD: Q
@@ -314,11 +321,13 @@ INVALID_LIMIT: '&c&l错误 | &7未知方块限制 {0}.'
 INVALID_MATERIAL: '&c&l错误 | &7未知材质 {0}.'
 INVALID_MISSION: '&c&l错误 | &7未知任务 {0}.'
 INVALID_MULTIPLIER: '&c&l错误 | &7未知倍率 {0}.'
+INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&l错误 | &7百分比必须在0到100之间.'
 INVALID_PLAYER: '&c&l错误 | &7找不到名为 &b{0} &7的玩家'
 INVALID_RATE: |
   &c&l错误 | &7找不到这个评分等级 {0}.
   &c&l错误 | &7岛屿评级: {1}
+INVALID_ROWS: '&c&lError | &7Invalid amount of rows: {0}'
 INVALID_ROLE: |
   &c&l错误 | &7找不到这个岛屿职位 {0}.
   &c&l错误 | &7岛屿职位: {1}
@@ -470,12 +479,14 @@ NO_DISBAND_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位�
 NO_EXPEL_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能踢出岛屿成员.'
 NO_INVITE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能发送岛屿团队邀请.'
 NO_ISLAND_INVITE: '&c&l错误 | &7没有找到这个岛屿团队邀请.'
+NO_ISLAND_CHEST_PERMISSION: '&c&lError | &7You must be at least {0} in order to access the island''s chest.'
 NO_ISLANDS_TO_PURGE: '&c&l错误 | &7没有需要清理的岛屿.'
 NO_KICK_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能踢出玩家.'
 NO_MORE_DISBANDS: '&c&l错误 | &7你已经不能再解散岛屿了，且行且珍惜！'
 NO_MORE_WARPS: '&c&l错误 | &7你的岛屿地标数已达到设置上限，不能再创建更多地标了！'
 NO_NAME_PERMISSION: '&c&l错误 | &7你不能给你的岛屿更名！'
 NO_OPEN_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置岛屿为对游客开放.'
+NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能编辑岛屿职位权限.'
 NO_PROMOTE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给其他成员晋升.'
 NO_RANKUP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给岛屿进行升级.'

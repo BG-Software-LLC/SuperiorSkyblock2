@@ -35,6 +35,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege FLY = IslandPrivilege.getByName("FLY");
     public static IslandPrivilege INTERACT = IslandPrivilege.getByName("INTERACT");
     public static IslandPrivilege INVITE_MEMBER = IslandPrivilege.getByName("INVITE_MEMBER");
+    public static IslandPrivilege ISLAND_CHEST = IslandPrivilege.getByName("ISLAND_CHEST");
     public static IslandPrivilege ITEM_FRAME = IslandPrivilege.getByName("ITEM_FRAME");
     public static IslandPrivilege KICK_MEMBER = IslandPrivilege.getByName("KICK_MEMBER");
     public static IslandPrivilege LEASH = IslandPrivilege.getByName("LEASH");

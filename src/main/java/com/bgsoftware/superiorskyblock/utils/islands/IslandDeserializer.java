@@ -3,16 +3,19 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -228,6 +231,21 @@ public final class IslandDeserializer {
                     islandEffects.put(potionEffectType, Integer.parseInt(sections[1]));
             }
         });
+    }
+
+    public static void deserializeIslandChest(Island island, String islandChest, SyncedObject<IslandChest[]> islandChestSync){
+        if(islandChest == null || islandChest.isEmpty())
+            return;
+
+        String[] islandChestsSections = islandChest.split("\n");
+
+        IslandChest[] islandChests = new IslandChest[islandChestsSections.length];
+
+        for(int i = 0; i < islandChestsSections.length; i++){
+            islandChests[i] = SIslandChest.createChest(island, ItemUtils.deserialize(islandChestsSections[i]));
+        }
+
+        islandChestSync.set(islandChests);
     }
 
 }

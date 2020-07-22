@@ -53,6 +53,9 @@ CHANGED_BLOCK_LIMIT: '&e&lNâng cấp | &7Thay đổi thành công giới hạn 
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0}
   đảo của {1}.'
+CHANGED_CHEST_SIZE: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}''s island.'
+CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for all the islands.'
+CHANGED_CHEST_SIZE_NAME: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}.'
 CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
 CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
 CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
@@ -128,6 +131,7 @@ COMMAND_ARGUMENT_PERMISSION: quyen
 COMMAND_ARGUMENT_PLAYER_NAME: ten-nguoi-choi
 COMMAND_ARGUMENT_PRIVATE: rieng-tu
 COMMAND_ARGUMENT_RATING: danh-gia
+COMMAND_ARGUMENT_ROWS: rows
 COMMAND_ARGUMENT_SCHEMATIC_NAME: ten-schematic
 COMMAND_ARGUMENT_SETTINGS: cai-dat
 COMMAND_ARGUMENT_SIZE: kich-thuoc
@@ -184,6 +188,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
   khác.
+COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Đặt hệ số tăng trưởng cây trồng cho đảo
   của người chơi khác.
@@ -221,6 +226,7 @@ COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
+COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
 COMMAND_DESCRIPTION_CLOSE: Đóng đảo thành công cộng.
 COMMAND_DESCRIPTION_COOP: Thêm thành viên co-op cho đảo bạn.
 COMMAND_DESCRIPTION_COOPS: Mở menu co-op.
@@ -307,6 +313,7 @@ DISBAND_SET_OTHER: '&e&lĐảo Thần | &7Bạn đã đặt số lần giải t�
 DISBANDED_ISLAND: '&e&lĐảo Thần | &7Bạn đã giải tán hòn đảo của bạn.'
 DISBANDED_ISLAND_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo của {0}.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo {0}.'
+EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&7&oBạn đã được dịch chuyển đến một hòn đảo có bật PVP. Bạn được
   miễn dịch với PVP trong 10 giây tiếp theo...'
 EXPELLED_PLAYER: '&e&lĐảo Thần | &7{0} đã bị trục xuất khỏi đảo.'
@@ -367,11 +374,13 @@ INVALID_LIMIT: '&c&lLỗi | &7Giới hạn không hợp lệ {0}.'
 INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
+INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lLỗi | &7Tỷ lệ phần trăm phải nằm trong khoảng từ 0 đến 100.'
 INVALID_PLAYER: '&c&lLỗi | &7Không thể tìm thấy một người chơi được gọi là {0}'
 INVALID_RATE: |
   &c&lLỗi | &7Không thể tìm thấy một đánh giá với tên {0}.
   &c&lLỗi | &7Các đánh giá đỏa: {1}
+INVALID_ROWS: '&c&lError | &7Invalid amount of rows: {0}'
 INVALID_ROLE: |
   &c&lLỗi | &7Không thể tìm thấy vai trò đảo {0}.
   &c&lLỗi | &7Các vai trò của đảo : {1}
@@ -537,12 +546,14 @@ NO_EXPEL_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để trục xu
   hòn đảo của bạn.'
 NO_INVITE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để mời người chơi.'
 NO_ISLAND_INVITE: '&c&lLỗi | &7Không thể tìm thấy bất kỳ lời mời từ hòn đảo này.'
+NO_ISLAND_CHEST_PERMISSION: '&c&lError | &7You must be at least {0} in order to access the island''s chest.'
 NO_ISLANDS_TO_PURGE: '&c&lLỗi | &7Không có đảo để lọc.'
 NO_KICK_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để để kick người chơi.'
 NO_MORE_DISBANDS: '&c&lLỗi | &7Bạn không thể giải tán đảo nữa.'
 NO_MORE_WARPS: '&c&lLỗi | &7Đảo của bạn không thể có thêm khu vực.'
 NO_NAME_PERMISSION: '&c&lLỗi | &7Bạn không thể thay đổi tên đảo.'
 NO_OPEN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để mở đảo thành công cộng.'
+NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để có được thông
   tin về quyền.'
 NO_PROMOTE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để thăng chức người chơi.'

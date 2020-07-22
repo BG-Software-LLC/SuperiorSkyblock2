@@ -136,6 +136,8 @@ public final class SettingsHandler {
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
     public final boolean schematicNameArgument;
+    public final int islandChestsDefaultPage;
+    public final int islandChestsDefaultSize;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -319,6 +321,8 @@ public final class SettingsHandler {
         negativeLevel = cfg.getBoolean("negative-level", true);
         disabledEvents = cfg.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
         schematicNameArgument = cfg.getBoolean("schematic-name-argument", true);
+        islandChestsDefaultPage = cfg.getInt("island-chests.default-pages", 0);
+        islandChestsDefaultSize = cfg.getInt("island-chests.default-size", 3);
     }
 
     public void updateValue(String path, Object value){

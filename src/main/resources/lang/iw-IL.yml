@@ -46,6 +46,9 @@ CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
+CHANGED_CHEST_SIZE: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}''s island.'
+CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for all the islands.'
+CHANGED_CHEST_SIZE_NAME: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}.'
 CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
 CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
 CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
@@ -110,6 +113,7 @@ COMMAND_ARGUMENT_PERMISSION: תושר
 COMMAND_ARGUMENT_PLAYER_NAME: ןקחשה םש
 COMMAND_ARGUMENT_PRIVATE: יטרפ
 COMMAND_ARGUMENT_RATING: גוריד
+COMMAND_ARGUMENT_ROWS: rows
 COMMAND_ARGUMENT_SCHEMATIC_NAME: הנבמה םש
 COMMAND_ARGUMENT_SETTINGS: תורדגה
 COMMAND_ARGUMENT_SIZE: לדוג
@@ -161,6 +165,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיג
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: רחא ןקחש לש יא של הלידגה סונוב תא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS: ןקחש לש תורתומה תוקיחמה תומכ תא תונשל.
@@ -194,6 +199,7 @@ COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
+COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
 COMMAND_DESCRIPTION_CLOSE: רוביצל יאה תא רוגסל.
 COMMAND_DESCRIPTION_COOP: יאה לש הלועפ ףתשמכ ןקחש ףיסוהל.
 COMMAND_DESCRIPTION_COOPS: 'Open the coops menu.'
@@ -272,6 +278,7 @@ DISBAND_SET_OTHER: '&e&lיא | &7{1} ל {0} לש תורתומה תוקיחמה �
 DISBANDED_ISLAND: '&e&lיא | &7ךלש יאה תא תקחמ.'
 DISBANDED_ISLAND_OTHER: '&e&lיא | &7{0} לש יאה תא תקחמ.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lיא | &7{0} יאה תא תקחמ.'
+EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&7&oתוינש 10 כ ךשמב תוכמ לבקת אל התא .תוכמ וב תתל ןתינש יא לא תרגוש...'
 EXPELLED_PLAYER: '&e&lיא | &7יאה ןמ שרוג {0}.'
 FORMAT_QUAD: 'Q'
@@ -330,11 +337,13 @@ INVALID_LIMIT: '&c&lהאיגש | &7{0} תיקוח אל הלבגמ.'
 INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
+INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lהאיגש | &7100 ל 0 ןיב תויהל בייח זוחא.'
 INVALID_PLAYER: '&c&lהאיגש | &7{0} םשה םע ןקחש אוצמל ןתינ אל.'
 INVALID_RATE: |
   &c&lהאיגש | &7{0} םשה םע גוריד אוצמל ןתינ אל.
   &c&lהאיגש | &7{0} :םיגוריד
+INVALID_ROWS: '&c&lError | &7Invalid amount of rows: {0}'
 INVALID_ROLE: |
   &c&lהאיגש | &7{0} הגרדה תא אוצמל היה ןתינ אל.
   &c&lהאיגש | &7{1} :תוגרד
@@ -489,6 +498,7 @@ NO_DEPOSIT_PERMISSION: '&c&lהאיגש | &7יאה לש קנבב ףסכ דיקפ�
 NO_DISBAND_PERMISSION: '&c&lהאיגש | &7יאה תא קוחמל תנמ לע ןימדא תגרדב תוחפל תויהל בייח התא.'
 NO_EXPEL_PERMISSION: '&c&lהאיגש | &7יאהמ םירקבמ שרגל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_INVITE_PERMISSION: '&c&lהאיגש | &7םינקחש ןימזהל תנמ לע ןימדא תגרדב תוחפל תויהל בייח התא.'
+NO_ISLAND_CHEST_PERMISSION: '&c&lError | &7You must be at least {0} in order to access the island''s chest.'
 NO_ISLAND_INVITE: '&c&lהאיגש | &7הזה יאהמ תונמזה אוצמל ןתינ היה אל.'
 NO_ISLANDS_TO_PURGE: '&c&lהאיגש | &7יוקינל םייא םוש ואצמנ אל.'
 NO_KICK_PERMISSION: '&c&lהאיגש | &7םינקחש ףיעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
@@ -496,6 +506,7 @@ NO_MORE_DISBANDS: '&c&lהאיגש | &7םייא דוע קוחמל לוכי אל �
 NO_MORE_WARPS: '&c&lהאיגש | &7ךלש יאל םימוקימ דוע רוציל ןתינ אל.'
 NO_NAME_PERMISSION: '&c&lהאיגש | &7ךלש יאה לש םשה תא תונשל לוכי אל התא.'
 NO_OPEN_PERMISSION: '&c&lהאיגש | &7רוביצל יאה תא חותפל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
+NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&lהאיגש | &7תואשרה רובע עדימ לבקל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_PROMOTE_PERMISSION: '&c&lהאיגש | &7םינקחש הגרדב תולעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NO_RANKUP_PERMISSION: '&c&lהאיגש | &7םיגורדש המרב תולעהל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'

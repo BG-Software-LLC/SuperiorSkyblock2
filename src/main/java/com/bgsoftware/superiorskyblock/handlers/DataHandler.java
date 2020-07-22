@@ -143,6 +143,7 @@ public final class DataHandler {
         addColumnIfNotExists("coopLimit", "islands", String.valueOf(plugin.getSettings().defaultCoopLimit), "INTEGER");
         addColumnIfNotExists("islandEffects", "islands", "''", "TEXT");
         addColumnIfNotExists("item", "stackedBlocks", "''", "TEXT");
+        addColumnIfNotExists("islandChest", "islands", "''", "LONGTEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -270,7 +271,8 @@ public final class DataHandler {
                 "bonusLevel TEXT," +
                 "creationTime INTEGER," +
                 "coopLimit INTEGER," +
-                "islandEffects TEXT" +
+                "islandEffects TEXT," +
+                "islandChest LONGTEXT" +
                 ");");
     }
 

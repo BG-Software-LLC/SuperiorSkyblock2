@@ -1,6 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -9,13 +12,18 @@ import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.math.BigInteger;
 import java.util.Map;
 
+@SuppressWarnings("deprecation")
 public final class ItemUtils {
 
     private ItemUtils(){
@@ -69,25 +77,58 @@ public final class ItemUtils {
         }
     }
 
-    private static boolean isValidAndSpawnEgg(ItemStack itemStack){
-        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
-    }
-
     public static void addItem(ItemStack itemStack, PlayerInventory playerInventory, Location toDrop){
         Map<Integer, ItemStack> additionalItems = playerInventory.addItem(itemStack);
         for(ItemStack additionalItem : additionalItems.values())
             toDrop.getWorld().dropItemNaturally(toDrop, additionalItem);
     }
 
-    public static int countItems(Inventory inventory, Material type){
-        int counter = 0;
+    public static String serialize(ItemStack[] contents){
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutput = new DataOutputStream(outputStream);
 
-        for(ItemStack itemStack : inventory.getContents()){
-            if(itemStack != null && itemStack.getType() == type)
-                counter += itemStack.getAmount();
+        CompoundTag compoundTag = new CompoundTag();
+        compoundTag.setInt("Length", contents.length);
+
+        for(int i = 0; i < contents.length; i++) {
+            if(contents[i] != null && contents[i].getType() != Material.AIR)
+                compoundTag.setTag(i + "", TagUtils.itemToCompound(contents[i]));
         }
 
-        return counter;
+        try {
+            compoundTag.write(dataOutput);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return "";
+        }
+
+        return new BigInteger(1, outputStream.toByteArray()).toString(32);
+    }
+
+    public static ItemStack[] deserialize(String serialized){
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
+        CompoundTag compoundTag;
+
+        try {
+            compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new ItemStack[0];
+        }
+
+        ItemStack[] contents = new ItemStack[compoundTag.getInt("Length")];
+
+        for(int i = 0; i < contents.length; i++) {
+            CompoundTag itemCompound = compoundTag.getCompound(i + "");
+            if(itemCompound != null)
+                contents[i] = TagUtils.compoundToItem(itemCompound);
+        }
+
+        return contents;
+    }
+
+    private static boolean isValidAndSpawnEgg(ItemStack itemStack){
+        return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
 }

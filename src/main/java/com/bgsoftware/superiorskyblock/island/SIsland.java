@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -160,6 +161,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<String> schemName = SyncedObject.of("");
     private final SyncedObject<Integer> unlockedWorlds = SyncedObject.of(0);
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
+    private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().islandChestsDefaultPage]);
 
     /*
      * Island multipliers & limits
@@ -195,6 +197,7 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
         IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
+        IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
 
         rawKeyPlacements = false;
 
@@ -280,6 +283,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.schemName.set(schemName);
         //assignPermissionNodes();
         assignGenerator();
+        assignIslandChest();
     }
 
     /*
@@ -2714,6 +2718,35 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     /*
+     *  Vault related methods
+     */
+
+    @Override
+    public IslandChest[] getChest() {
+        return islandChest.readAndGet(islandChests -> Arrays.copyOf(islandChests, islandChests.length));
+    }
+
+    @Override
+    public int getChestSize() {
+        return islandChest.readAndGet(islandChests -> islandChests.length);
+    }
+
+    @Override
+    public void setChestRows(int index, int rows) {
+        IslandChest[] islandChests = islandChest.get();
+        int oldSize = islandChests.length;
+
+        if(index >= oldSize) {
+            islandChests = Arrays.copyOf(islandChests, index + 1);
+            islandChest.set(islandChests);
+            for(int i = oldSize; i <= index; i++)
+                islandChests[i] = new SIslandChest(this);
+        }
+
+        islandChests[index].setRows(rows);
+    }
+
+    /*
      *  Data related methods
      */
 
@@ -2758,6 +2791,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setLong(creationTime)
                 .setInt(coopLimit.get())
                 .setString(IslandSerializer.serializeEffects(islandEffects))
+                .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(owner.getUniqueId().toString())
                 .execute(async);
     }
@@ -2812,6 +2846,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setLong(creationTime)
                 .setInt(coopLimit.get())
                 .setString(IslandSerializer.serializeEffects(islandEffects))
+                .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .execute(async);
     }
 
@@ -2827,6 +2862,13 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeBlockCounts(blockCounts))
                 .setString(owner.getUniqueId().toString())
                 .execute(true));
+    }
+
+    public void saveIslandChests(){
+        Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+                .setString(IslandSerializer.serializeIslandChest(islandChest))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*
@@ -2877,6 +2919,15 @@ public final class SIsland extends DatabaseObject implements Island {
                     .setString(owner.getUniqueId().toString())
                     .execute(true);
         }
+    }
+
+    private void assignIslandChest(){
+        islandChest.write(islandChests -> {
+            for(int i = 0; i < islandChests.length; i++) {
+                islandChests[i] = new SIslandChest(this);
+                islandChests[i].setRows(plugin.getSettings().islandChestsDefaultSize);
+            }
+        });
     }
 
     private void checkMembersDuplication(){

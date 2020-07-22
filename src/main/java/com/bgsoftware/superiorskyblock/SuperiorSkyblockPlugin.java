@@ -271,6 +271,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         );
                         dirtyChunksHolder.execute(false);
                     }
+                    {
+                        StatementHolder islandChestHolder = Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder();
+                        islandChestHolder.prepareBatch();
+                        islandList.forEach(island -> islandChestHolder
+                                .setString(IslandSerializer.serializeIslandChest(island.getChest()))
+                                .setString(island.getOwner().getUniqueId() + "")
+                                .addBatch()
+                        );
+                        islandChestHolder.execute(false);
+                    }
 
                     islandList.forEach(Island::removeEffects);
                 }
@@ -572,6 +582,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("FLY");
         IslandPrivilege.register("INTERACT");
         IslandPrivilege.register("INVITE_MEMBER");
+        IslandPrivilege.register("ISLAND_CHEST");
         IslandPrivilege.register("ITEM_FRAME");
         IslandPrivilege.register("KICK_MEMBER");
         IslandPrivilege.register("LEASH");

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -1127,6 +1128,21 @@ public final class SpawnIsland implements Island {
     @Override
     public int getPosition(SortingType sortingType) {
         return -1;
+    }
+
+    @Override
+    public IslandChest[] getChest() {
+        return new IslandChest[0];
+    }
+
+    @Override
+    public int getChestSize() {
+        return 0;
+    }
+
+    @Override
+    public void setChestRows(int index, int rows) {
+
     }
 
     @SuppressWarnings("NullableProblems")

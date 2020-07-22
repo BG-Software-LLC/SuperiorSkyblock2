@@ -584,3 +584,11 @@ disabled-events: []
 # Should there be a schematic-name argument in the create command?
 # When enabled, people will be able to skip the create menu and create islands directly with the command.
 schematic-name-argument: true
+
+# Settings related to the island chest.
+island-chests:
+  # Default amount of pages.
+  # You can set this value to 0 to not have any pages by default.
+  default-pages: 0
+  # Default size for the pages.
+  default-size: 3

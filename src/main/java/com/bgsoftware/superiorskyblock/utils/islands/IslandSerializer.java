@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -9,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
@@ -162,6 +164,19 @@ public final class IslandSerializer {
         effects.forEach((potionEffectType, level) ->
                 islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level));
         return islandEffects.length() == 0 ? "" : islandEffects.toString().substring(1);
+    }
+
+    public static String serializeIslandChest(SyncedObject<IslandChest[]> islandChest){
+        return islandChest.readAndGet(IslandSerializer::serializeIslandChest);
+    }
+
+    public static String serializeIslandChest(IslandChest[] islandChest){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(IslandChest _islandChest : islandChest)
+            stringBuilder.append("\n").append(ItemUtils.serialize(_islandChest.getContents()));
+
+        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
 }

@@ -1322,4 +1322,26 @@ public interface Island extends Comparable<Island> {
 
     int getPosition(SortingType sortingType);
 
+    /*
+     *  Vault related methods
+     */
+
+    /**
+     * Get the island chest.
+     */
+    IslandChest[] getChest();
+
+    /**
+     * Get the amount of pages the island chest has.
+     */
+    int getChestSize();
+
+    /**
+     * Set the amount of rows for the chest in a specific index.
+     * @param index The index of the page (0 or above)
+     * @param rows The amount of rows for that page.
+     */
+    void setChestRows(int index, int rows);
+
+
 }

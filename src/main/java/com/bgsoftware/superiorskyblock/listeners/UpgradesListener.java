@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -31,10 +33,12 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
@@ -317,6 +321,28 @@ public final class UpgradesListener implements Listener {
                     Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack((Minecart) e.getVehicle()));
             }
         });
+    }
+
+    /*
+     *   ISLAND CHEST
+     */
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onIslandChestInteract(InventoryClickEvent e){
+        InventoryHolder inventoryHolder = e.getView().getTopInventory() == null ? null : e.getView().getTopInventory().getHolder();
+
+        if(!(inventoryHolder instanceof IslandChest))
+            return;
+
+        SIslandChest islandChest = (SIslandChest) inventoryHolder;
+
+        if(islandChest.isUpdating()) {
+            e.setCancelled(true);
+        }
+
+        else{
+            islandChest.updateContents();
+        }
     }
 
     private ItemStack asItemStack(Minecart minecart){

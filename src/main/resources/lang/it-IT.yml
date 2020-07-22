@@ -54,6 +54,9 @@ CHANGED_BLOCK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato il limite del blocco 
   in tutte le isole.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato il limite del blocco {0}
   nell''isola di {1}.'
+CHANGED_CHEST_SIZE: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}''s island.'
+CHANGED_CHEST_SIZE_ALL: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for all the islands.'
+CHANGED_CHEST_SIZE_NAME: '&e&lChest | &7Successfully updated the rows of page #{0} to {1} for {2}.'
 CHANGED_COOP_LIMIT: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}''s island.'
 CHANGED_COOP_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the coop players limit of all the islands.'
 CHANGED_COOP_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the coop players limit of {0}.'
@@ -131,6 +134,7 @@ COMMAND_ARGUMENT_PERMISSION: permesso
 COMMAND_ARGUMENT_PLAYER_NAME: nome-giocatore
 COMMAND_ARGUMENT_PRIVATE: privato
 COMMAND_ARGUMENT_RATING: valutazione
+COMMAND_ARGUMENT_ROWS: rows
 COMMAND_ARGUMENT_SCHEMATIC_NAME: nome-schematica
 COMMAND_ARGUMENT_SETTINGS: impostazioni
 COMMAND_ARGUMENT_SIZE: dimensione
@@ -191,6 +195,7 @@ COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Imposta il limite di un blocco per l'isola
   di un giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_CROP_GROWTH: Imposta il moltiplicatore della crescita
   delle colture per l'isola di un giocatore.
@@ -231,6 +236,7 @@ COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank
 COMMAND_DESCRIPTION_BAN: Bandisci un giocatore dalla tua isola.
 COMMAND_DESCRIPTION_BIOME: Cambia il bioma dell'isola.
 COMMAND_DESCRIPTION_BORDER: Cambia il colore del bordo delle isole.
+COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
 COMMAND_DESCRIPTION_CLOSE: Chiudi l'isola al pubblico.
 COMMAND_DESCRIPTION_COOP: Aggiungi un giocatore come co-op alla tua isola.
 COMMAND_DESCRIPTION_COOPS: Apri il menu Coops.
@@ -317,6 +323,7 @@ DISBAND_SET_OTHER: '&e&lIsola | &7Hai impostato i reset dell''isola di {0} a {1}
 DISBANDED_ISLAND: '&e&lIsola | &7Hai sciolto la tua isola.'
 DISBANDED_ISLAND_OTHER: '&e&lIsola | &7Hai sciolto l''isola di {0}.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lIsola | &7Hai sciolto l''isola {0}.'
+EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&7&oSei stato teletrasportato in un''isola con PVP abilitato. Sei
   immune al PVP per i prossimi 10 secondi...'
 EXPELLED_PLAYER: '&e&lIsola | &7{0} è stato espulso dall''isola.'
@@ -381,11 +388,13 @@ INVALID_LIMIT: '&c&lErrore | &7Limite non valido {0}.'
 INVALID_MATERIAL: '&c&lErrore | &7Materiale non valido {0}.'
 INVALID_MISSION: '&c&lErrore | &7Missione non valida {0}.'
 INVALID_MULTIPLIER: '&c&lErrore | &7Moltiplicatore non valido {0}.'
+INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lErrore | &7La percentuale deve essere compresa tra 0 e 100.'
 INVALID_PLAYER: '&c&lErrore | &7Non sono riuscito a trova il giocatore {0}'
 INVALID_RATE: |
   &c&lErrore | &7Impossibile trovare una valutazione con il nome {0}.
   &c&lErrore | &7Valutazioni dell''isola: {1}
+INVALID_ROWS: '&c&lError | &7Invalid amount of rows: {0}'
 INVALID_ROLE: |
   &c&lErrore | &7Impossibile trovare il ruolo dell''isola {0}.
   &c&lErrore | &7Ruoli dell'isola: {1}
@@ -558,6 +567,7 @@ NO_DISBAND_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per sciogliere la 
 NO_EXPEL_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per espellere i giocatori
   dalla tua isola.'
 NO_INVITE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per invitare i giocatori.'
+NO_ISLAND_CHEST_PERMISSION: '&c&lError | &7You must be at least {0} in order to access the island''s chest.'
 NO_ISLAND_INVITE: '&c&lErrore | &7Impossibile trovare inviti da quest''isola.'
 NO_ISLANDS_TO_PURGE: '&c&lErrore | &7Non ci sono isole da eliminare.'
 NO_KICK_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per cacciare i giocatori.'
@@ -566,6 +576,7 @@ NO_MORE_WARPS: '&c&lErrore | &7La tua isola non può avere più warp.'
 NO_NAME_PERMISSION: '&c&lErrore | &7Non puoi cambiare il nome della tua isola.'
 NO_OPEN_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per aprire l''isola al
   pubblico.'
+NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&lErrore | &7Devi avere almeno {0} per ottenere
   informazioni sulle autorizzazioni.'
 NO_PROMOTE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per promuovere i giocatori.'
