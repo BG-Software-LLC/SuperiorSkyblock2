@@ -43,8 +43,11 @@ public final class BlockValuesHandler implements BlockValuesManager {
                 return BigDecimalFormatted.of(customBlockValue);
         }
 
-        if(plugin.getSettings().syncWorth)
-            return BigDecimalFormatted.of(plugin.getProviders().getPrice((Key) key));
+        if(plugin.getSettings().syncWorth) {
+            BigDecimal price = plugin.getProviders().getPrice((Key) key);
+            if(price.compareTo(BigDecimal.ZERO) <= 0)
+                return BigDecimalFormatted.of(price);
+        }
 
         return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
     }
