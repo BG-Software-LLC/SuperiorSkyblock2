@@ -14,16 +14,13 @@ import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -57,7 +54,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
@@ -473,68 +469,23 @@ public final class BlocksListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
-        int chunkX = e.getBlock().getX() >> 4, chunkZ = e.getBlock().getZ() >> 4;
-        World world = e.getBlock().getWorld();
-        Executor.async(() -> {
-            if(!world.isChunkLoaded(chunkX, chunkZ))
-                return;
-
-            Registry<Location, Integer> blocksToChange = Registry.createRegistry();
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            for(Block block : e.getBlocks()){
-                int blockAmount = plugin.getGrid().getBlockAmount(block);
-                if(blockAmount > 1){
-                    blocksToChange.add(block.getRelative(e.getDirection()).getLocation(), blockAmount);
-                    blocksToChange.add(block.getLocation(), 0);
-                }
+        for(Block block : e.getBlocks()) {
+            if (plugin.getGrid().getBlockAmount(block) > 1) {
+                e.setCancelled(true);
+                break;
             }
-
-            Executor.sync(() -> {
-                blocksToChange.entries().forEach(entry -> plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue()));
-                blocksToChange.delete();
-            });
-        }, 2L);
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
-        List<Location> locations = e.getBlocks().stream().map(Block::getLocation).collect(Collectors.toList());
-        Executor.async(() -> {
-            Registry<Location, Integer> blocksToChange = Registry.createRegistry();
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            for(Location location : locations){
-                int blockAmount = plugin.getGrid().getBlockAmount(location);
-                if(blockAmount > 1){
-                    blocksToChange.add(getRelative(location, e.getDirection()), blockAmount);
-                    blocksToChange.add(location, 0);
-                }
+        for(Block block : e.getBlocks()) {
+            if (plugin.getGrid().getBlockAmount(block) > 1) {
+                e.setCancelled(true);
+                break;
             }
-
-            Executor.sync(() -> {
-                blocksToChange.entries().forEach(entry -> plugin.getGrid().setBlockAmount(entry.getKey().getBlock(), entry.getValue()));
-                blocksToChange.delete();
-            });
-        }, 2L);
-    }
-
-    private Location getRelative(Location location, BlockFace blockFace){
-        switch (blockFace){
-            case NORTH:
-                return location.clone().subtract(0, 0, 1);
-            case SOUTH:
-                return location.clone().add(0, 0, 1);
-            case WEST:
-                return location.clone().subtract(1, 0, 0);
-            case EAST:
-                return location.clone().add(1, 0, 0);
-            case DOWN:
-                return location.clone().subtract(0, 1, 0);
-            case UP:
-                return location.clone().add(0, 1, 0);
-            default:
-                return location;
         }
     }
 
