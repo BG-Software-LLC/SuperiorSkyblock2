@@ -132,8 +132,10 @@ public final class CmdAdminAddEffect implements ISuperiorCommand {
 
             if(island != null){
                 for(PotionEffectType potionEffectType : PotionEffectType.values()){
-                    if(potionEffectType.getName().toLowerCase().startsWith(args[3].toLowerCase()))
-                        list.add(potionEffectType.getName().toLowerCase());
+                    try {
+                        if (potionEffectType != null && potionEffectType.getName().toLowerCase().startsWith(args[3].toLowerCase()))
+                            list.add(potionEffectType.getName().toLowerCase());
+                    }catch (Exception ignored){}
                 }
             }
         }
