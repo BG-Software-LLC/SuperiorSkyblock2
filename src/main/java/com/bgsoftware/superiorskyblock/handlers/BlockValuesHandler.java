@@ -45,7 +45,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
         if(plugin.getSettings().syncWorth) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
-            if(price.compareTo(BigDecimal.ZERO) <= 0)
+            if(price.compareTo(BigDecimal.ZERO) > 0)
                 return BigDecimalFormatted.of(price);
         }
 
