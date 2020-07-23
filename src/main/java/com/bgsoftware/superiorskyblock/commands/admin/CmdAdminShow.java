@@ -180,13 +180,11 @@ public final class CmdAdminShow implements ISuperiorCommand {
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
-            plugin.getPlayers().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
-                    .forEach(playerRole -> rolesStrings.add(playerRole, new StringBuilder()));
 
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
             if (!Locale.ISLAND_INFO_PLAYER_LINE.isEmpty(locale)) {
-                members.forEach(superiorPlayer -> rolesStrings.get(superiorPlayer.getPlayerRole())
+                members.forEach(superiorPlayer -> rolesStrings.computeIfAbsent(superiorPlayer.getPlayerRole(), role -> new StringBuilder())
                         .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(locale, superiorPlayer.getName())).append("\n"));
             }
 
