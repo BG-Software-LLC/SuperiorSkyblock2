@@ -2740,8 +2740,9 @@ public final class SIsland extends DatabaseObject implements Island {
         if(index >= oldSize) {
             islandChests = Arrays.copyOf(islandChests, index + 1);
             islandChest.set(islandChests);
-            for(int i = oldSize; i <= index; i++)
-                islandChests[i] = new SIslandChest(this, i);
+            for(int i = oldSize; i <= index; i++) {
+                (islandChests[i] = new SIslandChest(this, i)).setRows(plugin.getSettings().islandChestsDefaultSize);
+            }
         }
 
         islandChests[index].setRows(rows);
