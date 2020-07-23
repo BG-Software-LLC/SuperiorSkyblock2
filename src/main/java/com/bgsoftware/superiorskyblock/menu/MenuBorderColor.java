@@ -49,6 +49,9 @@ public final class MenuBorderColor extends SuperiorMenu {
                 borderColor = BorderColor.RED;
             else return;
 
+            if(!superiorPlayer.hasWorldBorderEnabled())
+                superiorPlayer.toggleWorldBorder();
+
             superiorPlayer.setBorderColor(borderColor);
             plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
 
