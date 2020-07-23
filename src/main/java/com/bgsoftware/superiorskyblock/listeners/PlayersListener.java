@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
@@ -230,9 +231,10 @@ public final class PlayersListener implements Listener {
             if (fromIsland != null && e.getVehicle().getWorld().equals(e.getTo().getWorld()) &&
                     (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
                 Entity passenger = e.getVehicle().getPassenger();
-                if(passenger != null && (!(passenger instanceof Player) || !SSuperiorPlayer.of(passenger).hasBypassModeEnabled())) {
+                SuperiorPlayer superiorPlayer = passenger instanceof Player ? SSuperiorPlayer.of(passenger) : null;
+                if(passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
                     e.getVehicle().setPassenger(null);
-                    passenger.teleport(e.getFrom());
+                    PaperHook.teleport(passenger, e.getFrom());
                 }
             }
         }
@@ -287,7 +289,7 @@ public final class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = superiorPlayer.getIsland();
@@ -393,8 +395,9 @@ public final class PlayersListener implements Listener {
         if(e.getLocation().getWorld().getEnvironment() == World.Environment.THE_END &&
                 plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())){
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-            if(island != null)
-                Executor.sync(() -> e.getEntity().teleport(island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+            if(island != null) {
+                Executor.sync(() -> PaperHook.teleport(e.getEntity(), island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+            }
         }
     }
 

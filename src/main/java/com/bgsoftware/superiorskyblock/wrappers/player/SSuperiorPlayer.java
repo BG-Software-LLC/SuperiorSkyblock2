@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
@@ -179,8 +180,17 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void teleport(Location location) {
-        if(isOnline())
-            asPlayer().teleport(location);
+        teleport(location, null);
+    }
+
+    @Override
+    public void teleport(Location location, Consumer<Boolean> teleportResult) {
+        if(isOnline()) {
+            PaperHook.teleport(asPlayer(), location, teleportResult == null ? r-> {} : teleportResult);
+        }
+
+        if(teleportResult != null)
+            teleportResult.accept(false);
     }
 
     @Override

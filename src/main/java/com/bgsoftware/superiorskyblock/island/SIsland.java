@@ -2278,9 +2278,10 @@ public final class SIsland extends DatabaseObject implements Island {
             return;
         }
 
-        if(superiorPlayer.asPlayer().teleport(location)){
-            Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
-        }
+        superiorPlayer.teleport(location, success -> {
+            if(success)
+                Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
+        });
     }
 
     @Override

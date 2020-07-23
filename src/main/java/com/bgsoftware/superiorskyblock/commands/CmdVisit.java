@@ -88,7 +88,7 @@ public final class CmdVisit implements ISuperiorCommand {
             return;
         }
 
-        superiorPlayer.asPlayer().teleport(visitLocation);
+        superiorPlayer.teleport(visitLocation);
     }
 
     @Override

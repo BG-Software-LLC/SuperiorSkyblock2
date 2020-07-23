@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -77,7 +78,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location) {
-        npc.teleport(location);
+        teleport(location, null);
+    }
+
+    @Override
+    public void teleport(Location location, Consumer<Boolean> teleportResult) {
+        PaperHook.teleport(npc, location, teleportResult == null ? r -> {} : teleportResult);
     }
 
     @Override
@@ -86,10 +92,8 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, Consumer<Boolean> consumerResult) {
-        boolean result = npc.teleport(island.getCenter(World.Environment.NORMAL));
-        if(consumerResult != null)
-            consumerResult.accept(result);
+    public void teleport(Island island, Consumer<Boolean> teleportResult) {
+        PaperHook.teleport(npc, island.getCenter(World.Environment.NORMAL), teleportResult == null ? r -> {} : teleportResult);
     }
 
     @Override

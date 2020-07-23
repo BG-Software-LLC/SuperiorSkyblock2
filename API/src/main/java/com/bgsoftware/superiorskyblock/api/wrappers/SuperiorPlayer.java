@@ -73,6 +73,13 @@ public interface SuperiorPlayer {
     void teleport(Location location);
 
     /**
+     * Teleport the player to a location.
+     * @param location The location to teleport the player to.
+     * @param teleportResult The result of the teleportation process. May be null.
+     */
+    void teleport(Location location, Consumer<Boolean> teleportResult);
+
+    /**
      * Teleport the player to an island.
      * @param island The island to teleport the player to.
      */

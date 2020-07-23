@@ -49,7 +49,7 @@ public final class EventsCaller {
         IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, island, enterCause);
         Bukkit.getPluginManager().callEvent(islandEnterEvent);
         if(islandEnterEvent.isCancelled() && islandEnterEvent.getCancelTeleport() != null)
-            superiorPlayer.asPlayer().teleport(islandEnterEvent.getCancelTeleport());
+            superiorPlayer.teleport(islandEnterEvent.getCancelTeleport());
         return !islandEnterEvent.isCancelled();
     }
 
@@ -60,7 +60,7 @@ public final class EventsCaller {
         IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(superiorPlayer, island, enterCause);
         Bukkit.getPluginManager().callEvent(islandEnterProtectedEvent);
         if(islandEnterProtectedEvent.isCancelled() && islandEnterProtectedEvent.getCancelTeleport() != null)
-            superiorPlayer.asPlayer().teleport(islandEnterProtectedEvent.getCancelTeleport());
+            superiorPlayer.teleport(islandEnterProtectedEvent.getCancelTeleport());
         return !islandEnterProtectedEvent.isCancelled();
     }
 

@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.utils.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PaperHook;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.scheduler.BukkitTask;
@@ -67,8 +65,6 @@ public final class ChunksProvider {
     }
 
     private static BukkitTask runChunksLoader(){
-        boolean asyncLoading = PaperHook.isUsingPaper() && ServerVersion.isAtLeast(ServerVersion.v1_13);
-
         return Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for(int i = 0; i < plugin.getSettings().chunksPerTick; i++) {
                 double[] tps = plugin.getNMSAdapter().getTPS();
@@ -82,15 +78,7 @@ public final class ChunksProvider {
                 if (chunkPosition == null)
                     return;
 
-                if(asyncLoading){
-                    PaperLib.getChunkAtAsync(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ(), true)
-                            .whenComplete((chunk, ex) -> finishLoad(chunkPosition, chunk));
-                }
-
-                else {
-                    Chunk chunk = chunkPosition.loadChunk();
-                    finishLoad(chunkPosition, chunk);
-                }
+                PaperHook.loadChunk(chunkPosition, chunk -> finishLoad(chunkPosition, chunk));
             }
         }, 1L, 1L);
     }

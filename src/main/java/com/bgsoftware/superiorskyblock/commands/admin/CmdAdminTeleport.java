@@ -73,7 +73,7 @@ public final class CmdAdminTeleport implements ISuperiorCommand {
 
         Location visitLocation = targetIsland.getTeleportLocation(World.Environment.NORMAL);
 
-        superiorPlayer.asPlayer().teleport(visitLocation);
+        superiorPlayer.teleport(visitLocation);
     }
 
     @Override
