@@ -43,7 +43,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
                 return BigDecimalFormatted.of(customBlockValue);
         }
 
-        if(plugin.getSettings().syncWorth) {
+        if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
             if(price.compareTo(BigDecimal.ZERO) > 0)
                 return BigDecimalFormatted.of(price);
@@ -159,6 +159,22 @@ public final class BlockValuesHandler implements BlockValuesManager {
         SimpleBindings bindings = new SimpleBindings();
         bindings.put("Math", Math.class);
         return bindings;
+    }
+
+    public enum SyncWorthStatus{
+
+        NONE,
+        BUY,
+        SELL;
+
+        public static SyncWorthStatus of(String name){
+            try{
+                return valueOf(name);
+            }catch (Exception ex){
+                return NONE;
+            }
+        }
+
     }
 
 }

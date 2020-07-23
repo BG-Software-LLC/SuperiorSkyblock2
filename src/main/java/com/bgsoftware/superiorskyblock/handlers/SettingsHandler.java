@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import io.netty.util.internal.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -133,7 +132,7 @@ public final class SettingsHandler {
     public final String defaultBorderColor;
     public final boolean generators;
     public final boolean obsidianToLava;
-    public final boolean syncWorth;
+    public final BlockValuesHandler.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
@@ -320,7 +319,7 @@ public final class SettingsHandler {
         defaultBorderColor = cfg.getString("default-border-color", "BLUE");
         generators = cfg.getBoolean("generators", true);
         obsidianToLava = cfg.getBoolean("obsidian-to-lava", false);
-        syncWorth = cfg.getBoolean("sync-worth", false);
+        syncWorth = BlockValuesHandler.SyncWorthStatus.of(cfg.getString("sync-worth", "NONE"));
         negativeWorth = cfg.getBoolean("negative-worth", true);
         negativeLevel = cfg.getBoolean("negative-level", true);
         disabledEvents = cfg.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
@@ -414,6 +413,8 @@ public final class SettingsHandler {
             cfg.set("void-teleport.members", voidTeleport);
             cfg.set("void-teleport.visitors", voidTeleport);
         }
+        if(cfg.isBoolean("sync-worth"))
+            cfg.set("sync-worth", cfg.getBoolean("sync-worth") ? "BUY" : "NONE");
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){

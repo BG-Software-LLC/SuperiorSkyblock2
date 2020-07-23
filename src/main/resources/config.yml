@@ -567,8 +567,9 @@ generators: true
 obsidian-to-lava: false
 
 # Should the worth values be synced with other prices providers?
+# You can set the following values: NONE (disabled), BUY (buy prices), SELL (sell prices)
 # Supported Providers: ShopGUIPlus
-sync-worth: false
+sync-worth: NONE
 
 # Can the worth value of the island be negative?
 negative-worth: true
