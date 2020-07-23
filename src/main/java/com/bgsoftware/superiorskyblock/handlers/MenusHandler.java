@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRate;
@@ -56,6 +57,7 @@ public final class MenusHandler implements MenusManager {
         loadMenu(MenuCoops::init);
         loadMenu(MenuCounts::init);
         loadMenu(MenuGlobalWarps::init);
+        loadMenu(MenuIslandChest::init);
         loadMenu(MenuIslandCreation::init);
         loadMenu(MenuIslandMissions::init);
         loadMenu(MenuIslandRate::init);

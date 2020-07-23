@@ -242,7 +242,7 @@ public final class IslandDeserializer {
         IslandChest[] islandChests = new IslandChest[islandChestsSections.length];
 
         for(int i = 0; i < islandChestsSections.length; i++){
-            islandChests[i] = SIslandChest.createChest(island, ItemUtils.deserialize(islandChestsSections[i]));
+            islandChests[i] = SIslandChest.createChest(island, i, ItemUtils.deserialize(islandChestsSections[i]));
         }
 
         islandChestSync.set(islandChests);

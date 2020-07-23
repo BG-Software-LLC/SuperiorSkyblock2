@@ -22,9 +22,16 @@ public final class SIslandChest implements IslandChest {
     private int contentsUpdateCounter = 0;
 
     private final Island island;
+    private final int index;
 
-    public SIslandChest(Island island){
+    public SIslandChest(Island island, int index){
         this.island = island;
+        this.index = index;
+    }
+
+    @Override
+    public int getIndex() {
+        return index;
     }
 
     @Override
@@ -72,8 +79,8 @@ public final class SIslandChest implements IslandChest {
         }
     }
 
-    public static SIslandChest createChest(Island island, ItemStack[] contents){
-        SIslandChest islandChest = new SIslandChest(island);
+    public static SIslandChest createChest(Island island, int index, ItemStack[] contents){
+        SIslandChest islandChest = new SIslandChest(island, index);
         islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().islandChestTitle);
         islandChest.inventory.setContents(contents);
         return islandChest;

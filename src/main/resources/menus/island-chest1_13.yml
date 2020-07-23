@@ -1,0 +1,53 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Chest'
+previous-menu: true
+
+pattern:
+  - '# # # # # # # # #'
+  - '# $ @ @ @ @ @ $ #'
+  - '# $ @ @ @ @ @ $ #'
+  - '# $ @ @ @ @ @ $ #'
+  - '# $ @ @ @ @ @ $ #'
+  - '# # % # * # ^ # #'
+
+slots: '@'
+previous-page: '%'
+current-page: '*'
+next-page: '^'
+
+items:
+  '@':
+    valid-page:
+      type: CHEST_MINECART
+      name: '&ePage #{0}'
+      lore:
+        - '&eSize: &7{1}'
+    invalid-page:
+      type: MINECART
+      name: '&f '
+  '%':
+    type: PAPER
+    name: '{0}Previous Page'
+  '*':
+    type: SUNFLOWER
+    name: '&aCurrent Page'
+    lore:
+      - '&7Page {0}'
+  '^':
+    type: PAPER
+    name: '{0}Next Page'
+  '#':
+    type: RAIL
+    name: '&f '
+
+sounds:
+  '@':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1

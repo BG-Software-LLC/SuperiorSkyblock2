@@ -2741,7 +2741,7 @@ public final class SIsland extends DatabaseObject implements Island {
             islandChests = Arrays.copyOf(islandChests, index + 1);
             islandChest.set(islandChests);
             for(int i = oldSize; i <= index; i++)
-                islandChests[i] = new SIslandChest(this);
+                islandChests[i] = new SIslandChest(this, i);
         }
 
         islandChests[index].setRows(rows);
@@ -2925,7 +2925,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private void assignIslandChest(){
         islandChest.write(islandChests -> {
             for(int i = 0; i < islandChests.length; i++) {
-                islandChests[i] = new SIslandChest(this);
+                islandChests[i] = new SIslandChest(this, i);
                 islandChests[i].setRows(plugin.getSettings().islandChestsDefaultSize);
             }
         });

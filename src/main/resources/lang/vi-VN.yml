@@ -314,7 +314,6 @@ DISBAND_SET_OTHER: '&e&lĐảo Thần | &7Bạn đã đặt số lần giải t�
 DISBANDED_ISLAND: '&e&lĐảo Thần | &7Bạn đã giải tán hòn đảo của bạn.'
 DISBANDED_ISLAND_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo của {0}.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo {0}.'
-EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&7&oBạn đã được dịch chuyển đến một hòn đảo có bật PVP. Bạn được
   miễn dịch với PVP trong 10 giây tiếp theo...'
 EXPELLED_PLAYER: '&e&lĐảo Thần | &7{0} đã bị trục xuất khỏi đảo.'
@@ -554,7 +553,6 @@ NO_MORE_DISBANDS: '&c&lLỗi | &7Bạn không thể giải tán đảo nữa.'
 NO_MORE_WARPS: '&c&lLỗi | &7Đảo của bạn không thể có thêm khu vực.'
 NO_NAME_PERMISSION: '&c&lLỗi | &7Bạn không thể thay đổi tên đảo.'
 NO_OPEN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để mở đảo thành công cộng.'
-NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để có được thông
   tin về quyền.'
 NO_PROMOTE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để thăng chức người chơi.'

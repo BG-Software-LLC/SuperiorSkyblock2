@@ -7,6 +7,11 @@ import org.bukkit.inventory.ItemStack;
 public interface IslandChest extends InventoryHolder {
 
     /**
+     * Get the index of this chest.
+     */
+    int getIndex();
+
+    /**
      * Get the amount of rows for this chest.
      */
     int getRows();

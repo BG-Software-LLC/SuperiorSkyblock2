@@ -267,7 +267,6 @@ DISBAND_SET_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿解散次数设置为
 DISBANDED_ISLAND: '&e&l岛屿 | &7你解散了你的岛屿...'
 DISBANDED_ISLAND_OTHER: '&e&l岛屿 | &7你解散了 &b{0} &7的岛屿.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&l岛屿 | &7Y你解散了岛屿 &b{0}.'
-EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&c小心！你传送至了一个开启PVP的岛屿，十秒后你将可被其他玩家攻击...'
 EXPELLED_PLAYER: '&e&l岛屿 | &b{0} &7被逐出岛屿.'
 FORMAT_QUAD: Q
@@ -487,7 +486,6 @@ NO_MORE_DISBANDS: '&c&l错误 | &7你已经不能再解散岛屿了，且行且�
 NO_MORE_WARPS: '&c&l错误 | &7你的岛屿地标数已达到设置上限，不能再创建更多地标了！'
 NO_NAME_PERMISSION: '&c&l错误 | &7你不能给你的岛屿更名！'
 NO_OPEN_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能设置岛屿为对游客开放.'
-NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能编辑岛屿职位权限.'
 NO_PROMOTE_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给其他成员晋升.'
 NO_RANKUP_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能给岛屿进行升级.'

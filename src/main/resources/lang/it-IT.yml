@@ -324,7 +324,6 @@ DISBAND_SET_OTHER: '&e&lIsola | &7Hai impostato i reset dell''isola di {0} a {1}
 DISBANDED_ISLAND: '&e&lIsola | &7Hai sciolto la tua isola.'
 DISBANDED_ISLAND_OTHER: '&e&lIsola | &7Hai sciolto l''isola di {0}.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lIsola | &7Hai sciolto l''isola {0}.'
-EMPTY_ISLAND_CHEST: '&c&lError | &7Your island chest is empty.'
 ENTER_PVP_ISLAND: '&7&oSei stato teletrasportato in un''isola con PVP abilitato. Sei
   immune al PVP per i prossimi 10 secondi...'
 EXPELLED_PLAYER: '&e&lIsola | &7{0} è stato espulso dall''isola.'
@@ -577,7 +576,6 @@ NO_MORE_WARPS: '&c&lErrore | &7La tua isola non può avere più warp.'
 NO_NAME_PERMISSION: '&c&lErrore | &7Non puoi cambiare il nome della tua isola.'
 NO_OPEN_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per aprire l''isola al
   pubblico.'
-NO_PAGE_ACCESS: '&c&lError | &7You don''t have access to view this page.'
 NO_PERMISSION_CHECK_PERMISSION: '&c&lErrore | &7Devi avere almeno {0} per ottenere
   informazioni sulle autorizzazioni.'
 NO_PROMOTE_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per promuovere i giocatori.'

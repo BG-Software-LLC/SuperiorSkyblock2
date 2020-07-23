@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
@@ -12,8 +12,6 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public final class CmdChest implements ISuperiorCommand {
 
@@ -29,7 +27,7 @@ public final class CmdChest implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "chest [page]";
+        return "chest";
     }
 
     @Override
@@ -44,7 +42,7 @@ public final class CmdChest implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -67,41 +65,11 @@ public final class CmdChest implements ISuperiorCommand {
             return;
         }
 
-        int page = 1;
-
-        if(args.length == 2) {
-            try {
-                page = Integer.parseInt(args[1]);
-            } catch (Exception ignored) {
-                Locale.INVALID_PAGE.send(sender, args[1]);
-                return;
-            }
-        }
-
-        IslandChest[] islandChests = island.getChest();
-
-
-        if(page > islandChests.length){
-            if(islandChests.length == 0)
-                Locale.EMPTY_ISLAND_CHEST.send(sender);
-            else
-                Locale.NO_PAGE_ACCESS.send(sender);
-            return;
-        }
-
-        islandChests[page - 1].openChest(superiorPlayer);
+        MenuIslandChest.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.ISLAND_CHEST)){
-            return IntStream.range(1, island.getChestSize() + 1).boxed().map(i -> i + "")
-                    .filter(i -> i.startsWith(args[1])).collect(Collectors.toList());
-        }
-
         return new ArrayList<>();
     }
 
