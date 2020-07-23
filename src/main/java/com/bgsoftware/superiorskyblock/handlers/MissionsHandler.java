@@ -62,6 +62,7 @@ public final class MissionsHandler implements MissionsManager {
         FileUtils.copyResource("missions/IslandMissions.jar");
         FileUtils.copyResource("missions/ItemsMissions.jar");
         FileUtils.copyResource("missions/KillsMissions.jar");
+        FileUtils.copyResource("missions/StatisticsMissions.jar");
 
         if(!file.exists())
             FileUtils.saveResource("missions/missions.yml");
