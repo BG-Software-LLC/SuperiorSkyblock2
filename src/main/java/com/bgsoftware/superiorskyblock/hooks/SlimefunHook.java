@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import me.mrCookieSlime.Slimefun.SlimefunPlugin;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
+import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionManager;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -63,7 +64,13 @@ public final class SlimefunHook implements ProtectionModule {
 
     public static void register(SuperiorSkyblockPlugin plugin){
         SlimefunHook slimefunHook = new SlimefunHook(plugin);
-        SlimefunPlugin.getProtectionManager().registerModule(Bukkit.getServer(), plugin.getName(), pl -> slimefunHook);
+        ProtectionManager protectionManager;
+        try{
+            protectionManager = SlimefunPlugin.getProtectionManager();
+        }catch (Throwable ex){
+            protectionManager = io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin.getProtectionManager();
+        }
+        protectionManager.registerModule(Bukkit.getServer(), plugin.getName(), pl -> slimefunHook);
     }
 
 }
