@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.utils.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.scheduler.BukkitTask;
@@ -78,7 +77,7 @@ public final class ChunksProvider {
                 if (chunkPosition == null)
                     return;
 
-                PaperHook.loadChunk(chunkPosition, chunk -> finishLoad(chunkPosition, chunk));
+                plugin.getProviders().loadChunk(chunkPosition, chunk -> finishLoad(chunkPosition, chunk));
             }
         }, 1L, 1L);
     }

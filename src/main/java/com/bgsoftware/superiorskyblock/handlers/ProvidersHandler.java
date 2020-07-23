@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.hooks.AsyncProvider;
+import com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
@@ -28,19 +30,23 @@ import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public final class ProvidersHandler implements ProvidersManager {
 
@@ -50,6 +56,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
     private VanishProvider vanishProvider = player -> false;
+    private AsyncProvider asyncProvider = new AsyncProvider_Default();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -108,6 +115,14 @@ public final class ProvidersHandler implements ProvidersManager {
                 vanishProvider = new VanishProvider_Essentials();
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
                 vanishProvider = new VanishProvider_CMI();
+
+            try{
+                Class.forName("com.destroystokyo.paper.VersionHistoryManager$VersionData");
+                if(ServerVersion.isAtLeast(ServerVersion.v1_13)){
+                    asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
+                }
+            }catch (Exception ignored){}
+
         });
 
         PlaceholderHook.register(plugin);
@@ -146,5 +161,18 @@ public final class ProvidersHandler implements ProvidersManager {
     public boolean isVanished(Player player){
         return vanishProvider.isVanished(player);
     }
+
+    public void loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> chunkResult){
+        asyncProvider.loadChunk(chunkPosition, chunkResult);
+    }
+
+    public void teleport(Entity entity, Location location){
+        asyncProvider.teleport(entity, location);
+    }
+
+    public void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult){
+        asyncProvider.teleport(entity, location, teleportResult);
+    }
+
 
 }

@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.PaperHook;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
@@ -234,7 +233,7 @@ public final class PlayersListener implements Listener {
                 SuperiorPlayer superiorPlayer = passenger instanceof Player ? SSuperiorPlayer.of(passenger) : null;
                 if(passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
                     e.getVehicle().setPassenger(null);
-                    PaperHook.teleport(passenger, e.getFrom());
+                    plugin.getProviders().teleport(passenger, e.getFrom());
                 }
             }
         }
@@ -396,7 +395,8 @@ public final class PlayersListener implements Listener {
                 plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())){
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
             if(island != null) {
-                Executor.sync(() -> PaperHook.teleport(e.getEntity(), island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+                Executor.sync(() -> plugin.getProviders().teleport(e.getEntity(),
+                        island.getTeleportLocation(World.Environment.NORMAL)), 5L);
             }
         }
     }
