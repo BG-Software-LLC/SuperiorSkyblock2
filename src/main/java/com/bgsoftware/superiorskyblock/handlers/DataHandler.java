@@ -313,7 +313,7 @@ public final class DataHandler {
 
         if(database == DatabaseType.MySQL) {
             column = "COLUMN " + column;
-            if(type.equals("TEXT"))
+            if(type.equals("TEXT") || type.equals("LONGTEXT"))
                 defaultSection = "";
         }
 
