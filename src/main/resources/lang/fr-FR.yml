@@ -29,6 +29,7 @@ BLOCK_COUNTS_CHECK: |
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
 BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lNiveau | &7Le le niveau du bloc {0} est de {1}.'
+BLOCK_LEVEL_WORTHLESS: '&e&lNiveau | &7Le bloc {0} n''a pas de valeur.'
 BLOCK_VALUE: '&e&lValeur | &7La valeur du bloc {0} est de {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lValeur | &7Le bloc {0} n''a pas de valeur.'
 BONUS_SET_SUCCESS: '&e&lIle | &7Bonus de l''île mit à jour sur {0}.'

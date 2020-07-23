@@ -29,6 +29,7 @@ BLOCK_COUNTS_CHECK: |
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
 BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&l岛屿等级 | &7方块 &b{0} &7的等级为 &a{1}.'
+BLOCK_LEVEL_WORTHLESS: '&e&l岛屿等级 | &7方块 &b{0} &7一文不值.'
 BLOCK_VALUE: '&e&l岛屿价值 | &7方块 &b{0} &7的价值为 &a{1}.'
 BLOCK_VALUE_WORTHLESS: '&e&l岛屿价值 | &7方块 &b{0} &7一文不值.'
 BONUS_SET_SUCCESS: '&e&l岛屿 | &7已成功更新岛屿奖励至 &b{0}&7.'

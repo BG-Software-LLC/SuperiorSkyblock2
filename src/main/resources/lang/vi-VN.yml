@@ -33,6 +33,7 @@ BLOCK_COUNTS_CHECK: |
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
 BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lCấp Độ | &7Khối {0} có giá trị cấp độ là {1}.'
+BLOCK_LEVEL_WORTHLESS: '&e&lCấp Độ | &7Khối {0} là vô giá trị.'
 BLOCK_VALUE: '&e&lĐáng giá | &7Khối {0} được đánh giá với {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lĐáng giá | &7Khối {0} là vô giá trị.'
 BONUS_SET_SUCCESS: '&e&lĐảo Thần | &7Cập nhật thành công phần thưởng đảo đến {0}.'

@@ -79,30 +79,31 @@ public final class CmdValue implements ISuperiorCommand {
         if(keyName.isEmpty())
             keyName = StringUtils.format(toCheck.getGlobalKey());
 
-        BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck),
-                blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
-
         java.util.Locale locale = superiorPlayer.getUserLocale();
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if(blockWorth.doubleValue() <= 0) {
-            if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
-                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
-        }
-        else{
-            if(!Locale.BLOCK_VALUE.isEmpty(locale))
-                stringBuilder.append(Locale.BLOCK_VALUE.getMessage(locale, keyName, StringUtils.format(blockWorth))).append("\n");
-        }
-
-        if(blockLevel.doubleValue() <= 0) {
-            if(!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale) && blockWorth.doubleValue() > 0) {
-                stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
+        {
+            BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck);
+            if (blockWorth.doubleValue() <= 0) {
+                if (!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
+                    stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
+            } else {
+                if (!Locale.BLOCK_VALUE.isEmpty(locale))
+                    stringBuilder.append(Locale.BLOCK_VALUE.getMessage(locale, keyName, StringUtils.format(blockWorth))).append("\n");
             }
         }
-        else{
-            if(!Locale.BLOCK_LEVEL.isEmpty(locale))
-                stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel))).append("\n");
+
+        {
+            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
+            if (blockLevel.doubleValue() <= 0) {
+                if (!Locale.BLOCK_LEVEL_WORTHLESS.isEmpty(locale) && blockLevel.doubleValue() > 0) {
+                    stringBuilder.append(Locale.BLOCK_LEVEL_WORTHLESS.getMessage(locale, keyName)).append("\n");
+                }
+            } else {
+                if (!Locale.BLOCK_LEVEL.isEmpty(locale))
+                    stringBuilder.append(Locale.BLOCK_LEVEL.getMessage(locale, keyName, StringUtils.format(blockLevel))).append("\n");
+            }
         }
 
         Locale.sendMessage(superiorPlayer, stringBuilder.toString(), false);

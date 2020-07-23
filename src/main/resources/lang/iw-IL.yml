@@ -30,6 +30,7 @@ BLOCK_COUNTS_CHECK: |
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lIsland | &7This island has no tracked blocks.'
 BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lתודוקנ | &7{1} אוה {0} קולבה לש תודוקנה רפסמ.'
+BLOCK_LEVEL_WORTHLESS: '&e&lתודוקנ | &7םולכ הווש אל {0} קולבה.'
 BLOCK_VALUE: '&e&lיווש | &7{1} אוה {0} קולבה לש יוושה.'
 BLOCK_VALUE_WORTHLESS: '&e&lיווש | &7םולכ הווש אל {0} קולבה.'
 BONUS_SET_SUCCESS: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש סונובה.'
