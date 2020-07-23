@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
@@ -97,6 +98,9 @@ public final class ProvidersHandler implements ProvidersManager {
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
                     setSpawnersProvider(new BlocksProvider_EpicSpawners());
+                } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
+                        (spawnersProvider.equalsIgnoreCase("UltimateStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                    setSpawnersProvider(new BlocksProvider_UltimateStacker());
                 }
             }
 
