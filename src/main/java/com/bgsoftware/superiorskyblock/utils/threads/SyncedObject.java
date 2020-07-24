@@ -8,10 +8,10 @@ import java.util.function.Function;
 
 public final class SyncedObject<T> {
 
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private T value;
 
-    private SyncedObject(T value){
+    SyncedObject(T value){
         this.value = value;
     }
 

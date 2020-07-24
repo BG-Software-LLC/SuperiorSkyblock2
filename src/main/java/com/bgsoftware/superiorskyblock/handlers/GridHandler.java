@@ -86,6 +86,10 @@ public final class GridHandler implements GridManager {
         spawnIsland = new SpawnIsland(plugin);
     }
 
+    public void syncUpgrades(){
+        getIslands().forEach(island -> ((SIsland) island).updateUpgrades());
+    }
+
     public void createIsland(ResultSet resultSet) throws SQLException{
         UUID owner = UUID.fromString(resultSet.getString("owner"));
         islands.add(owner, new SIsland(this, resultSet));

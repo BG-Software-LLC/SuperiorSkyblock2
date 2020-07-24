@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -116,6 +117,10 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
 
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, V> asKeyMap(){
         return registry.toMap().entrySet().stream().collect(Collectors.toMap(entry -> Key.of(entry.getKey()), Entry::getValue));
+    }
+
+    public Map<String, V> asMap(){
+        return new HashMap<>(registry.toMap());
     }
 
 }

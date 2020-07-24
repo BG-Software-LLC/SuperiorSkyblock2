@@ -65,6 +65,9 @@ import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
@@ -131,13 +134,9 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
     private final Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions = Registry.createRegistry();
     private final Registry<IslandPrivilege, PlayerRole> rolePermissions = Registry.createRegistry();
-    private final SyncedObject<KeyMap<Integer>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
     private final Registry<IslandFlag, Byte> islandSettings = Registry.createRegistry();
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
-    private final SyncedObject<KeyMap<Integer>> blockLimits = SyncedObject.of(new KeyMap<>(plugin.getSettings().defaultBlockLimits));
-    private final SyncedObject<Map<EntityType, Integer>> entityLimits = SyncedObject.of(new HashMap<>(plugin.getSettings().defaultEntityLimits));
-    private final SyncedObject<Map<PotionEffectType, Integer>> islandEffects = SyncedObject.of(new HashMap<>());
     private final Registry<String, WarpData> warps = Registry.createRegistry();
     private final SyncedObject<BigDecimalFormatted> islandBank = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
@@ -146,7 +145,6 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<BigDecimalFormatted> bonusLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
-    private final SyncedObject<Integer> islandSize = SyncedObject.of(plugin.getSettings().defaultIslandSize);
     private final Registry<World.Environment, Location> teleportLocations = Registry.createRegistry();
     private final SyncedObject<Location> visitorsLocation = SyncedObject.of(null);
     private final SyncedObject<Boolean> locked = SyncedObject.of(false);
@@ -167,12 +165,18 @@ public final class SIsland extends DatabaseObject implements Island {
      * Island multipliers & limits
      */
 
-    private final SyncedObject<Integer> warpsLimit = SyncedObject.of(plugin.getSettings().defaultWarpsLimit);
-    private final SyncedObject<Integer> teamLimit = SyncedObject.of(plugin.getSettings().defaultTeamLimit);
-    private final SyncedObject<Integer> coopLimit = SyncedObject.of(plugin.getSettings().defaultCoopLimit);
-    private final SyncedObject<Double> cropGrowth = SyncedObject.of((double) plugin.getSettings().defaultCropGrowth);
-    private final SyncedObject<Double> spawnerRates = SyncedObject.of((double) plugin.getSettings().defaultSpawnerRates);
-    private final SyncedObject<Double> mobDrops = SyncedObject.of((double) plugin.getSettings().defaultMobDrops);
+    private final UpgradeKeyMap blockLimits = UpgradeKeyMap.createMap();
+    private final UpgradeKeyMap cobbleGeneratorValues = UpgradeKeyMap.createMap();
+    private final UpgradeMap<EntityType> entityLimits = UpgradeMap.createMap();
+    private final UpgradeMap<PotionEffectType> islandEffects = UpgradeMap.createMap();
+
+    private final UpgradeValue<Integer> islandSize = UpgradeValue.createInteger();
+    private final UpgradeValue<Integer> warpsLimit = UpgradeValue.createInteger();
+    private final UpgradeValue<Integer> teamLimit = UpgradeValue.createInteger();
+    private final UpgradeValue<Integer> coopLimit = UpgradeValue.createInteger();
+    private final UpgradeValue<Double> cropGrowth = UpgradeValue.createDouble();
+    private final UpgradeValue<Double> spawnerRates = UpgradeValue.createDouble();
+    private final UpgradeValue<Double> mobDrops = UpgradeValue.createDouble();
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
@@ -261,6 +265,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         //assignPermissionNodes();
         checkMembersDuplication();
+        updateUpgrades();
     }
 
     public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName, String schemName){
@@ -284,6 +289,7 @@ public final class SIsland extends DatabaseObject implements Island {
         //assignPermissionNodes();
         assignGenerator();
         assignIslandChest();
+        updateUpgrades();
     }
 
     /*
@@ -494,12 +500,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getCoopLimit() {
-        int coopLimit = this.coopLimit.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            coopLimit = Math.max(coopLimit, getUpgradeLevel(upgrade).getCoopLimit());
-
-        return coopLimit;
+        return this.coopLimit.get();
     }
 
     @Override
@@ -1172,12 +1173,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(plugin.getSettings().buildOutsideIsland)
             return (int) Math.round(plugin.getSettings().maxIslandSize * 1.5);
 
-        int islandSize = this.islandSize.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            islandSize = Math.max(islandSize, getUpgradeLevel(upgrade).getBorderSize());
-
-        return islandSize;
+        return this.islandSize.get();
     }
 
     @Override
@@ -1527,12 +1523,10 @@ public final class SIsland extends DatabaseObject implements Island {
             increaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
+        boolean hasBlockLimit = blockLimits.containsKey(key);
 
         if(increaseAmount || hasBlockLimit) {
             SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
-
-            KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             syncedBlockCounts.write(blockCounts -> addCounts(blockCounts, blockLimits, key, amount));
 
@@ -1559,8 +1553,6 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void handleBlocksPlace(KeyMap<Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
-        KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
-
         KeyMap<Integer> blockCounts = new KeyMap<>();
         BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
 
@@ -1602,7 +1594,7 @@ public final class SIsland extends DatabaseObject implements Island {
             saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
-    private void addCounts(KeyMap<Integer> blockCounts, KeyMap<Integer> blockLimits, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+    private void addCounts(KeyMap<Integer> blockCounts, UpgradeKeyMap blockLimits, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
         int currentAmount = blockCounts.getRaw(valueKey, 0);
@@ -1673,12 +1665,10 @@ public final class SIsland extends DatabaseObject implements Island {
             decreaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.containsKey(key));
+        boolean hasBlockLimit = blockLimits.containsKey(key);
 
         if(decreaseAmount || hasBlockLimit){
             SuperiorSkyblockPlugin.debug("Action: Block Break, Island: " + owner.getName() + ", Block: " + key);
-
-            KeyMap<Integer> blockLimits = this.blockLimits.readAndGet(_blockLimits -> _blockLimits);
 
             blockCounts.write(blockCounts -> {
                 Key valueKey = plugin.getBlockValues().getBlockKey(key);
@@ -1895,8 +1885,12 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
 
-        if(getUpgradeLevel(upgrade).getBorderSize() != -1)
+        UpgradeLevel upgradeLevel = getUpgradeLevel(upgrade);
+
+        if(upgradeLevel.getBorderSize() != -1)
             updateBorder();
+
+        syncUpgrade(upgradeLevel);
 
         MenuUpgrades.refreshMenus();
     }
@@ -1908,14 +1902,17 @@ public final class SIsland extends DatabaseObject implements Island {
         return plugin.getUpgrades().getUpgrades().stream().collect(Collectors.toMap(Upgrade::getName, upgrade -> 1));
     }
 
+    public void updateUpgrades(){
+        blockLimits.clearUpgrades();
+        entityLimits.clearUpgrades();
+        cobbleGeneratorValues.clearUpgrades();
+        islandEffects.clearUpgrades();
+        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade(getUpgradeLevel(upgrade)));
+    }
+
     @Override
     public double getCropGrowthMultiplier() {
-        double cropGrowth = this.cropGrowth.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            cropGrowth = Math.max(cropGrowth, getUpgradeLevel(upgrade).getCropGrowth());
-
-        return cropGrowth;
+        return cropGrowth.get();
     }
 
     @Override
@@ -1930,12 +1927,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public double getSpawnerRatesMultiplier() {
-        double spawnerRates = this.spawnerRates.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            spawnerRates = Math.max(spawnerRates, getUpgradeLevel(upgrade).getSpawnerRates());
-
-        return spawnerRates;
+        return this.spawnerRates.get();
     }
 
     @Override
@@ -1950,12 +1942,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public double getMobDropsMultiplier() {
-        double mobDrops = this.mobDrops.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            mobDrops = Math.max(mobDrops, getUpgradeLevel(upgrade).getMobDrops());
-
-        return mobDrops;
+        return this.mobDrops.get();
     }
 
     @Override
@@ -1970,50 +1957,23 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getOrDefault(key, NO_LIMIT));
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getBlockLimit(key));
-
-        return blockLimit;
+        return blockLimits.get(key, NO_LIMIT);
     }
 
     @Override
     public int getExactBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        int blockLimit = blockLimits.readAndGet(blockLimits -> blockLimits.getRaw(key, NO_LIMIT));
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            blockLimit = Math.max(blockLimit, getUpgradeLevel(upgrade).getExactBlockLimit(key));
-
-        return blockLimit;
+        return blockLimits.getRaw(key, NO_LIMIT);
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlocksLimits() {
-        KeyMap<Integer> blockLimits = new KeyMap<>();
-
-        this.blockLimits.read(_blockLimits -> _blockLimits.forEach(blockLimits::put));
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
-            for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : getUpgradeLevel(upgrade).getBlockLimits().entrySet()) {
-                blockLimits.put(entry.getKey(), Math.max(entry.getValue(), blockLimits.getOrDefault(entry.getKey(), 0)));
-            }
-        }
-
-        return blockLimits;
+        return this.blockLimits.copy();
     }
 
     @Override
     public void setBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + limit);
-
-        blockLimits.write(blockLimits -> {
-            if(limit <= NO_LIMIT)
-                blockLimits.remove(key);
-            else
-                blockLimits.put(key, limit);
-        });
-
+        blockLimits.set(key ,limit);
         Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
                 .setString(IslandSerializer.serializeBlockLimits(blockLimits))
                 .setString(owner.getUniqueId().toString())
@@ -2042,40 +2002,18 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        int entityLimit = entityLimits.readAndGet(entityLimits -> entityLimits.getOrDefault(entityType, NO_LIMIT));
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            entityLimit = Math.max(entityLimit, getUpgradeLevel(upgrade).getEntityLimit(entityType));
-
-        return entityLimit;
+        return this.entityLimits.get(entityType, NO_LIMIT);
     }
 
     @Override
     public Map<EntityType, Integer> getEntitiesLimits() {
-        Map<EntityType, Integer> entityLimits = new HashMap<>();
-
-        this.entityLimits.read(_entityLimits -> _entityLimits.forEach(entityLimits::put));
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
-            for(Map.Entry<EntityType, Integer> entry : getUpgradeLevel(upgrade).getEntityLimits().entrySet()) {
-                entityLimits.put(entry.getKey(), Math.max(entry.getValue(), entityLimits.getOrDefault(entry.getKey(), 0)));
-            }
-        }
-
-        return entityLimits;
+        return this.entityLimits.copy();
     }
 
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
         SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + entityType + ", Limit: " + limit);
-
-        entityLimits.write(entityLimits -> {
-            if(limit <= NO_LIMIT)
-                entityLimits.remove(entityType);
-            else
-                entityLimits.put(entityType, limit);
-        });
-
+        entityLimits.set(entityType, limit);
         Query.ISLAND_SET_ENTITY_LIMITS.getStatementHolder()
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(owner.getUniqueId().toString())
@@ -2125,12 +2063,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getTeamLimit() {
-        int teamLimit = this.teamLimit.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            teamLimit = Math.max(teamLimit, getUpgradeLevel(upgrade).getTeamLimit());
-
-        return teamLimit;
+        return this.teamLimit.get();
     }
 
     @Override
@@ -2145,12 +2078,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getWarpsLimit() {
-        int warpsLimit = this.warpsLimit.get();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            warpsLimit = Math.max(warpsLimit, getUpgradeLevel(upgrade).getWarpsLimit());
-
-        return warpsLimit;
+        return this.warpsLimit.get();
     }
 
     @Override
@@ -2167,12 +2095,12 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setPotionEffect(PotionEffectType type, int level) {
         if(level <= 0) {
-            islandEffects.write(islandEffects -> islandEffects.remove(type));
+            islandEffects.remove(type);
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().removePotionEffect(type)));
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
-            islandEffects.write(islandEffects -> islandEffects.put(type, level - 1));
+            islandEffects.set(type, level - 1);
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().addPotionEffect(potionEffect, true)));
         }
 
@@ -2184,12 +2112,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getPotionEffectLevel(PotionEffectType type) {
-        int effectLevel = islandEffects.readAndGet(islandEffects -> islandEffects.getOrDefault(type, -1)) + 1;
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            effectLevel = Math.max(effectLevel, getUpgradeLevel(upgrade).getPotionEffect(type));
-
-        return effectLevel;
+        return islandEffects.get(type, -1) + 1;
     }
 
     @Override
@@ -2566,7 +2489,7 @@ public final class SIsland extends DatabaseObject implements Island {
             setGeneratorAmount(key, 0);
         }
         else if(percentage == 100){
-            cobbleGeneratorValues.write(Map::clear);
+            cobbleGeneratorValues.clear();
             setGeneratorAmount(key, 1);
         }
         else {
@@ -2576,8 +2499,7 @@ public final class SIsland extends DatabaseObject implements Island {
             double realPercentage = percentage / 100D;
             double amount = (realPercentage * totalAmount) / (1 - realPercentage);
             if(amount < 1){
-                cobbleGeneratorValues.write(cobbleGenerator ->
-                        cobbleGenerator.keySet().forEach(mat -> cobbleGenerator.put(mat, cobbleGenerator.get(mat) * 10)));
+                cobbleGeneratorValues.map(v -> v * 10);
                 amount *= 10;
             }
             setGeneratorAmount(key, (int) Math.round(amount));
@@ -2603,14 +2525,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
         SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
-
-        cobbleGeneratorValues.write(cobbleGenerator -> {
-            if(amount <= 0)
-                cobbleGenerator.remove(key);
-            else
-                cobbleGenerator.put(key, amount);
-        });
-
+        cobbleGeneratorValues.set(key, amount);
         Query.ISLAND_SET_GENERATOR.getStatementHolder()
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
                 .setString(owner.getUniqueId().toString())
@@ -2619,15 +2534,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        int generatorAmount = cobbleGeneratorValues.readAndGet(cobbleGenerator -> cobbleGenerator.getOrDefault(key, 0));
-
-        if(generatorAmount > 0)
-            return generatorAmount;
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            generatorAmount = Math.max(generatorAmount, getUpgradeLevel(upgrade).getGeneratorAmount(key));
-
-        return generatorAmount;
+        return cobbleGeneratorValues.get(key, 0);
     }
 
     @Override
@@ -2641,20 +2548,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        Map<String, Integer> cobbleGenerator = new HashMap<>();
-        cobbleGeneratorValues.read(cobbleGeneratorValues ->
-                cobbleGeneratorValues.forEach((k, v) -> cobbleGenerator.put(k.toString(), getGeneratorAmount(k))));
-
-        if(!cobbleGenerator.isEmpty())
-            return cobbleGenerator;
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
-            for(Map.Entry<String, Integer> entry : getUpgradeLevel(upgrade).getGeneratorAmounts().entrySet()) {
-                cobbleGenerator.put(entry.getKey(), Math.max(entry.getValue(), cobbleGenerator.getOrDefault(entry.getKey(), 0)));
-            }
-        }
-
-        return cobbleGenerator;
+        return cobbleGeneratorValues.copy().asMap();
     }
 
     @Override
@@ -2672,9 +2566,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void clearGeneratorAmounts() {
         SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName());
-
-        cobbleGeneratorValues.write(KeyMap::clear);
-
+        cobbleGeneratorValues.clear();
         Query.ISLAND_SET_GENERATOR.getStatementHolder()
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
                 .setString(owner.getUniqueId().toString())
@@ -2766,7 +2658,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setInt(islandSize.get())
                 .setString(IslandSerializer.serializeBlockLimits(blockLimits))
                 .setInt(teamLimit.get())
-                .setFloat((float) (double) cropGrowth.get())
+                .setFloat((float) (double) cropGrowth.getValue())
                 .setFloat((float) (double) spawnerRates.get())
                 .setFloat((float) (double) mobDrops.get())
                 .setString(discord.get())
@@ -2820,7 +2712,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setInt(islandSize.get())
                 .setString(IslandSerializer.serializeBlockLimits(blockLimits))
                 .setInt(teamLimit.get())
-                .setFloat((float) (double) cropGrowth.get())
+                .setFloat((float) (double) cropGrowth.getValue())
                 .setFloat((float) (double) spawnerRates.get())
                 .setFloat((float) (double) mobDrops.get())
                 .setString(discord.get())
@@ -2910,11 +2802,8 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     private void assignGenerator(){
-        if(getGeneratorAmounts().isEmpty()) {
-            cobbleGeneratorValues.write(cobbleGenerator -> {
-                if (cobbleGenerator.isEmpty() && owner != null)
-                    cobbleGenerator.putAll(plugin.getSettings().defaultGenerator);
-            });
+        if(getGeneratorAmounts().isEmpty() && owner != null) {
+            plugin.getSettings().defaultGenerator.forEach(cobbleGeneratorValues::set);
 
             Query.ISLAND_SET_GENERATOR.getStatementHolder()
                     .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
@@ -2958,6 +2847,20 @@ public final class SIsland extends DatabaseObject implements Island {
                     .setString(owner.getUniqueId().toString())
                     .execute(true);
         }
+    }
+
+    private void syncUpgrade(UpgradeLevel upgradeLevel){
+        cropGrowth.setIfSync(upgradeLevel.getCropGrowth());
+        spawnerRates.setIfSync(upgradeLevel.getSpawnerRates());
+        mobDrops.setIfSync(upgradeLevel.getMobDrops());
+        blockLimits.setIfSync(upgradeLevel.getBlockLimits(), true);
+        entityLimits.setIfSync(upgradeLevel.getEntityLimits());
+        teamLimit.setIfSync(upgradeLevel.getTeamLimit());
+        warpsLimit.setIfSync(upgradeLevel.getWarpsLimit());
+        coopLimit.setIfSync(upgradeLevel.getCoopLimit());
+        islandSize.setIfSync(upgradeLevel.getBorderSize());
+        cobbleGeneratorValues.setIfSyncString(upgradeLevel.getGeneratorAmounts(), false);
+        islandEffects.setIfSync(upgradeLevel.getPotionEffects());
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

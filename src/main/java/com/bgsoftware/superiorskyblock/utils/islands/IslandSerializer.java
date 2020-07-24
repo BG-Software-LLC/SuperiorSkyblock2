@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
@@ -14,6 +15,8 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -74,25 +77,25 @@ public final class IslandSerializer {
         return blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1);
     }
 
-    public static String serializeBlockLimits(SyncedObject<KeyMap<Integer>> blocks){
+    public static String serializeBlockLimits(UpgradeKeyMap blocks){
         return blocks.readAndGet(IslandSerializer::serializeBlockLimits);
     }
 
-    public static String serializeBlockLimits(KeyMap<Integer> blocks){
+    public static String serializeBlockLimits(KeyMap<Pair<Integer, Integer>> blocks){
         StringBuilder blockLimits = new StringBuilder();
-        blocks.keySet().forEach(blockKey ->
-                blockLimits.append(",").append(blockKey).append("=").append(blocks.get(blockKey)));
+        blocks.forEach((blockKey, pair) ->
+                blockLimits.append(",").append(blockKey).append("=").append(pair.getKey()));
         return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
     }
 
-    public static String serializeEntityLimits(SyncedObject<Map<EntityType, Integer>> entities){
+    public static String serializeEntityLimits(UpgradeMap<EntityType> entities){
         return entities.readAndGet(IslandSerializer::serializeEntityLimits);
     }
 
-    public static String serializeEntityLimits(Map<EntityType, Integer> entities){
+    public static String serializeEntityLimits(Map<EntityType, Pair<Integer, Integer>> entities){
         StringBuilder entityLimits = new StringBuilder();
-        entities.keySet().forEach(entityType ->
-                entityLimits.append(",").append(entityType).append("=").append(entities.get(entityType)));
+        entities.forEach((entityType, pair) ->
+                entityLimits.append(",").append(entityType).append("=").append(pair.getKey()));
         return entityLimits.length() == 0 ? "" : entityLimits.toString().substring(1);
     }
 
@@ -134,14 +137,14 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeGenerator(SyncedObject<KeyMap<Integer>> cobbleGenerator){
+    public static String serializeGenerator(UpgradeKeyMap cobbleGenerator){
         return cobbleGenerator.readAndGet(IslandSerializer::serializeGenerator);
     }
 
-    public static String serializeGenerator(KeyMap<Integer> cobbleGenerator){
+    public static String serializeGenerator(KeyMap<Pair<Integer, Integer>> cobbleGenerator){
         StringBuilder missionsBuilder = new StringBuilder();
         cobbleGenerator.forEach((key, value) ->
-                missionsBuilder.append(",").append(key).append("=").append(value));
+                missionsBuilder.append(",").append(key).append("=").append(value.getKey()));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
@@ -155,14 +158,14 @@ public final class IslandSerializer {
         return locationsBuilder.length() == 0 ? "" : locationsBuilder.substring(1);
     }
 
-    public static String serializeEffects(SyncedObject<Map<PotionEffectType, Integer>> effects){
+    public static String serializeEffects(UpgradeMap<PotionEffectType> effects){
         return effects.readAndGet(IslandSerializer::serializeEffects);
     }
 
-    public static String serializeEffects(Map<PotionEffectType, Integer> effects){
+    public static String serializeEffects(Map<PotionEffectType, Pair<Integer, Integer>> effects){
         StringBuilder islandEffects = new StringBuilder();
         effects.forEach((potionEffectType, level) ->
-                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level));
+                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level.getKey()));
         return islandEffects.length() == 0 ? "" : islandEffects.toString().substring(1);
     }
 

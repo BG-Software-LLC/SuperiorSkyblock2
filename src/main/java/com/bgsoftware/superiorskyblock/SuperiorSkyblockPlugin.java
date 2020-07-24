@@ -222,7 +222,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             return;
 
         ChunksProvider.stop();
-        CropsTask.cancelTask();
+        //CropsTask.cancelTask();
         try {
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();
@@ -401,6 +401,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
         else{
             Executor.sync(gridHandler::updateSpawn);
+            gridHandler.syncUpgrades();
         }
 
         schematicsHandler = new SchematicsHandler(this);
@@ -425,7 +426,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 if(island != null)
                     island.applyEffects(superiorPlayer);
             }
-            CropsTask.startTask();
+            //CropsTask.startTask();
         });
     }
 

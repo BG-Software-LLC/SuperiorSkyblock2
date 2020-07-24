@@ -52,7 +52,13 @@ public interface NMSBlocks {
 
     void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
 
-    int tickIslands(int random);
+    default int tickIslands(int random){
+        return 0;
+    }
+
+    default void startTickingChunk(Island island, Chunk chunk){
+
+    }
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

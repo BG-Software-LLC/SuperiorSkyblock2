@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -164,6 +165,11 @@ public final class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getPotionEffect(PotionEffectType potionEffectType) {
         return islandEffects.getOrDefault(potionEffectType, 0);
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getPotionEffects() {
+        return islandEffects;
     }
 
     public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){

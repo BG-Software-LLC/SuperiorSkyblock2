@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
@@ -118,5 +117,10 @@ public interface UpgradeLevel {
      * @param potionEffectType The potion effect to check.
      */
     int getPotionEffect(PotionEffectType potionEffectType);
+
+    /**
+     * Get all the potion effects for this level.
+     */
+    Map<PotionEffectType, Integer> getPotionEffects();
 
 }
