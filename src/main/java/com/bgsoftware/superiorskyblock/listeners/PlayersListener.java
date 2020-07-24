@@ -26,6 +26,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -447,7 +448,7 @@ public final class PlayersListener implements Listener {
                     island.setSchematicGenerate(environment);
                 }
                 else{
-                    Locale.sendSchematicMessage(superiorPlayer, "&cThe server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
+                    Locale.sendSchematicMessage(superiorPlayer, ChatColor.RED + "The server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
                             "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".");
                 }
             }
