@@ -595,3 +595,9 @@ island-chests:
   default-pages: 0
   # Default size for the pages.
   default-size: 3
+
+# Custom aliases for plugin's commands.
+command-aliases:
+  example-command:
+  - 'Aliase1'
+  - 'Aliase2'

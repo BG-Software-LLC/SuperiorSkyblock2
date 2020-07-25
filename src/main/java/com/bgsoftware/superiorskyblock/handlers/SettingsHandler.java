@@ -140,6 +140,7 @@ public final class SettingsHandler {
     public final String islandChestTitle;
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
+    public final Map<String, List<String>> commandAliases;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -152,7 +153,7 @@ public final class SettingsHandler {
         convertInteractables(plugin, cfg);
 
         cfg.syncWithConfig(file, plugin.getResource("config.yml"),  "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases");
 
         databaseType = cfg.getString("database.type");
         databaseMySQLAddress = cfg.getString("database.address");
@@ -327,6 +328,12 @@ public final class SettingsHandler {
         islandChestTitle = StringUtils.translateColors(cfg.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = cfg.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = cfg.getInt("island-chests.default-size", 3);
+        commandAliases = new HashMap<>();
+        if(cfg.isConfigurationSection("command-aliases")){
+            for(String label : cfg.getConfigurationSection("command-aliases").getKeys(false)){
+                commandAliases.put(label.toLowerCase(), cfg.getStringList("command-aliases." + label));
+            }
+        }
     }
 
     public void updateValue(String path, Object value){
@@ -338,7 +345,7 @@ public final class SettingsHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases");
 
         cfg.set(path, value);
 

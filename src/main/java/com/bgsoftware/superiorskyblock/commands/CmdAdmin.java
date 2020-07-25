@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 public final class CmdAdmin implements ISuperiorCommand {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
     private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
     private final CommandsHandler commandsHandler;
@@ -220,9 +222,11 @@ public final class CmdAdmin implements ISuperiorCommand {
         if(args.length != 1) {
             for (SuperiorCommand subCommand : subCommands.values()) {
                 if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
-                    for (String aliases : subCommand.getAliases()) {
-                        if (aliases.startsWith(args[1].toLowerCase())) {
-                            list.add(aliases);
+                    List<String> aliases = new ArrayList<>(subCommand.getAliases());
+                    aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                    for (String _aliases : aliases) {
+                        if (_aliases.startsWith(args[1].toLowerCase())) {
+                            list.add(_aliases);
                             break;
                         }
                     }
@@ -234,15 +238,20 @@ public final class CmdAdmin implements ISuperiorCommand {
     }
 
     public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
-        List<String> aliases = superiorCommand.getAliases();
-        if(subCommands.containsKey(aliases.get(0).toLowerCase())){
-            subCommands.remove(aliases.get(0).toLowerCase());
-            aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
+        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
+        String label = aliases.get(0).toLowerCase();
+        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
+
+        if(subCommands.containsKey(label)){
+            subCommands.remove(label);
+            aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
         }
-        subCommands.add(aliases.get(0).toLowerCase(), superiorCommand);
+        subCommands.add(label, superiorCommand);
+
         for(int i = 1; i < aliases.size(); i++){
             aliasesToCommand.add(aliases.get(i).toLowerCase(), superiorCommand);
         }
+
         if(sort){
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));

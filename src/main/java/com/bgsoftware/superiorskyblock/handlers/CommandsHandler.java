@@ -65,6 +65,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdWithdraw;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -77,8 +78,6 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,8 +85,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
 public final class CommandsHandler extends BukkitCommand implements CommandsManager {
 
@@ -267,9 +264,11 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
 
         for(SuperiorCommand subCommand : getSubCommands()) {
             if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
-                for (String aliases : subCommand.getAliases()) {
-                    if (aliases.startsWith(args[0].toLowerCase())) {
-                        list.add(aliases);
+                List<String> aliases = new ArrayList<>(subCommand.getAliases());
+                aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                for (String _aliases : aliases) {
+                    if (_aliases.startsWith(args[0].toLowerCase())) {
+                        list.add(_aliases);
                         break;
                     }
                 }
@@ -310,15 +309,20 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
     }
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
-        List<String> aliases = superiorCommand.getAliases();
-        if(subCommands.containsKey(aliases.get(0).toLowerCase())){
-            subCommands.remove(aliases.get(0).toLowerCase());
-            aliasesToCommand.values().removeIf(sC -> sC.getAliases().equals(aliases));
+        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
+        String label = aliases.get(0).toLowerCase();
+        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
+
+        if(subCommands.containsKey(label)){
+            subCommands.remove(label);
+            aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
         }
-        subCommands.add(aliases.get(0).toLowerCase(), superiorCommand);
+        subCommands.add(label, superiorCommand);
+
         for(int i = 1; i < aliases.size(); i++){
             aliasesToCommand.add(aliases.get(i).toLowerCase(), superiorCommand);
         }
+
         if(sort){
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
@@ -341,7 +345,8 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
                 continue;
 
             try {
-                Optional<Class<?>> commandClass = getCommandClasses(file.toURL()).stream().findFirst();
+                //noinspection deprecation
+                Optional<Class<?>> commandClass = FileUtils.getClasses(file.toURL(), SuperiorCommand.class).stream().findFirst();
 
                 if(!commandClass.isPresent())
                     continue;
@@ -362,32 +367,6 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
             }
         }
 
-    }
-
-    private List<Class<?>> getCommandClasses(URL jar) {
-        List<Class<?>> list = new ArrayList<>();
-
-        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, SuperiorCommand.class.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
-            JarEntry jarEntry;
-            while ((jarEntry = jis.getNextJarEntry()) != null){
-                String name = jarEntry.getName();
-
-                if (name == null || name.isEmpty() || !name.endsWith(".class")) {
-                    continue;
-                }
-
-                name = name.replace("/", ".");
-                String clazzName = name.substring(0, name.lastIndexOf(".class"));
-
-                Class<?> c = cl.loadClass(clazzName);
-
-                if (SuperiorCommand.class.isAssignableFrom(c)) {
-                    list.add(c);
-                }
-            }
-        } catch (Throwable ignored) { }
-
-        return list;
     }
 
     private SuperiorCommand createInstance(Class<?> clazz) throws Exception{
