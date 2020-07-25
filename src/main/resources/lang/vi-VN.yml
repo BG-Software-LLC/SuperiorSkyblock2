@@ -74,6 +74,7 @@ CHANGED_ISLAND_EFFECT_LEVEL: '&e&lUpgrades | &7Successfully updated the level of
 CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for all the islands.'
 CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lNâng cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
+CHANGED_ISLAND_SIZE_ALL: '&e&lUpgrades | &7Successfully updated the island size of all the islands.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo của
   {0}.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oNgười chơi có thể xây dựng bên ngoài hòn đảo của họ, vì vậy kích thước đảo không ảnh hưởng. Bạn có thể tắt tính năng đó trong cấu hình để kích thước đảo có ảnh hưởng trở lại.'

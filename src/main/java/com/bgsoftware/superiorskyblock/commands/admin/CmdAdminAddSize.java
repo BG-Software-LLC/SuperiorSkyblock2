@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -58,16 +59,26 @@ public final class CmdAdminAddSize implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+        List<Island> islands = new ArrayList<>();
 
-        if(island == null){
-            if(args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
+        if(args[2].equalsIgnoreCase("*")){
+            islands.addAll(plugin.getGrid().getIslands());
+        }
+
+        else {
+            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+
+            if (island == null) {
+                if (args[2].equalsIgnoreCase(sender.getName()))
+                    Locale.INVALID_ISLAND.send(sender);
+                else if (targetPlayer == null)
+                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
+                else
+                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                return;
+            }
+
+            islands.add(island);
         }
 
         int size;
@@ -84,17 +95,19 @@ public final class CmdAdminAddSize implements ISuperiorCommand {
             return;
         }
 
-        island.setIslandSize(island.getIslandSize() + size);
+        Executor.data(() -> islands.forEach(island -> island.setIslandSize(island.getIslandSize() + size)));
 
-        if(targetPlayer == null)
-            Locale.CHANGED_ISLAND_SIZE_NAME.send(sender, island.getName());
+        if(islands.size() > 1)
+            Locale.CHANGED_ISLAND_SIZE_ALL.send(sender);
+        else if(targetPlayer == null)
+            Locale.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
 
         if(plugin.getSettings().buildOutsideIsland)
             Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
 
-        island.updateBorder();
+        islands.forEach(Island::updateBorder);
     }
 
     @Override

@@ -62,6 +62,7 @@ CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the leve
 CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}.'
 CHANGED_ISLAND_SIZE: '&e&l岛屿升级 | &7成功升级{0}的岛屿边界范围！'
 CHANGED_ISLAND_SIZE_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的边界范围！'
+CHANGED_ISLAND_SIZE_ALL: '&e&lUpgrades | &7Successfully updated the island size of all the islands.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&o玩家可以在岛外建造，所以岛屿的大小没有影响，你可以在配置文件中关闭此功能，这样岛屿的大小会再次受到影响.'
 CHANGED_LANGUAGE: '&e&l语言 | &7成功将你的语言设置为 &b简体中文&7.'
 CHANGED_MOB_DROPS: '&e&l岛屿升级 | &7成功升级岛屿生物掉落概率为 &b{0} &7倍.'

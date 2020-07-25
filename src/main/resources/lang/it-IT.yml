@@ -76,6 +76,7 @@ CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the leve
 CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lAggiornamenti | &7Aggiornata correttamente la dimensione
   dell''isola di {0}.'
+CHANGED_ISLAND_SIZE_ALL: '&e&lUpgrades | &7Successfully updated the island size of all the islands.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lAggiornamenti | &7Aggiornato con successo la dimensione
   dell''isola di {0}.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oIl giocatore ha il permesso di costruire fuori dai limiti della sua isola, però il size dell''isola non ha effetti. Puoi disattivare questa funzione dalle configurazione in modo che le dimensioni dell''isola abbiano di nuovo effetto.'

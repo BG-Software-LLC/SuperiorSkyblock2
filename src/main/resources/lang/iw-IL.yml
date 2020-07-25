@@ -64,6 +64,7 @@ CHANGED_ISLAND_EFFECT_LEVEL: '&e&lUpgrades | &7Successfully updated the level of
 CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for all the islands.'
 CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lUpgrades | &7Successfully updated the level of the island effect {0} for {1}.'
 CHANGED_ISLAND_SIZE: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לדוג.'
+CHANGED_ISLAND_SIZE_ALL: '&e&lUpgrades | &7Successfully updated the island size of all the islands.'
 CHANGED_ISLAND_SIZE_NAME: '&e&lםיגורדש | &7החלצהב ןכדוע {0} יאה לדוג.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oPlayers are able to build outside their island, so the island size has no affect. You can toggle that feature off in the config so island size will have affect again.'
 CHANGED_LANGUAGE: '&e&lהפש | &7תירבעל החלצהב התנוש ךלש הפשה.'
