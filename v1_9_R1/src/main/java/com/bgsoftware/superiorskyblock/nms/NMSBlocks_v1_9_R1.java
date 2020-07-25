@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -25,6 +27,7 @@ import net.minecraft.server.v1_9_R1.ChunkSection;
 import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.IBlockData;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
 import net.minecraft.server.v1_9_R1.IChunkLoader;
 import net.minecraft.server.v1_9_R1.NBTTagCompound;
 import net.minecraft.server.v1_9_R1.PacketPlayOutBlockChange;
@@ -32,6 +35,7 @@ import net.minecraft.server.v1_9_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_9_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_9_R1.PlayerConnection;
 import net.minecraft.server.v1_9_R1.TileEntity;
+import net.minecraft.server.v1_9_R1.TileEntitySign;
 import net.minecraft.server.v1_9_R1.World;
 import net.minecraft.server.v1_9_R1.WorldServer;
 import org.bukkit.Location;
@@ -40,6 +44,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_9_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_9_R1.util.UnsafeList;
@@ -337,6 +342,20 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
                 pair.getZ().getBlock().a(pair.getX(), pair.getY(), pair.getZ(), ThreadLocalRandom.current())));
 
         return random;
+    }
+
+    @Override
+    public void handleSignPlace(Island island, Location location) {
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
+        TileEntitySign tileEntitySign = (TileEntitySign) worldServer.getTileEntity(blockPosition);
+        String[] lines = new String[4];
+        System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
+        for(int i = 0; i < 4; i++)
+            lines[i] = StringUtils.stripColors(lines[i]);
+        BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, lines, false);
+        IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
+        System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
     }
 
 }

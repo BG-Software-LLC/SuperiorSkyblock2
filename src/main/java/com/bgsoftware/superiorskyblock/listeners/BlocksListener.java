@@ -495,62 +495,65 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSignPlace(SignChangeEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null)
+            onSignPlace(SSuperiorPlayer.of(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
+    }
 
-        if(island == null)
-            return;
+    public void onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
+        warpLocation.setYaw(superiorPlayer.getLocation().getYaw());
 
-        Location warpLocation = e.getBlock().getLocation();
-        warpLocation.setYaw(e.getPlayer().getLocation().getYaw());
-
-        if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().signWarpLine)){
+        if(lines[0].equalsIgnoreCase(plugin.getSettings().signWarpLine)){
             if (!island.hasMoreWarpSlots()) {
-                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                if(message)
+                    Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
-                    e.setLine(i, "");
+                    lines[i] = "";
                 return;
             }
 
-            String warpName = e.getLine(1);
-            boolean privateFlag = e.getLine(2).equalsIgnoreCase("private");
+            String warpName = lines[1];
+            boolean privateFlag = lines[2].equalsIgnoreCase("private");
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
-                Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+                if(message)
+                    Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
-                    e.setLine(i, "");
+                    lines[i] = "";
             }
             else {
                 List<String> signWarp = plugin.getSettings().signWarp;
                 for (int i = 0; i < signWarp.size(); i++)
-                    e.setLine(i, signWarp.get(i));
+                    lines[i] = signWarp.get(i);
                 island.setWarpLocation(warpName, warpLocation, privateFlag);
-                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+                if(message)
+                    Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
             }
         }
 
-        else if(e.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
+        else if(lines[0].equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
             if (!island.hasMoreWarpSlots()) {
-                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                if(message)
+                    Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
-                    e.setLine(i, "");
+                    lines[i] = "";
                 return;
             }
 
             StringBuilder descriptionBuilder = new StringBuilder();
 
             for(int i = 1; i < 4; i++){
-                String line = e.getLine(i);
+                String line = lines[i];
                 if(!line.isEmpty())
                     descriptionBuilder.append("\n").append(ChatColor.RESET).append(line);
             }
 
             String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
 
-            e.setLine(0, plugin.getSettings().visitorsSignActive);
+            lines[0] = plugin.getSettings().visitorsSignActive;
 
             for (int i = 1; i <= 3; i++)
-                e.setLine(i, StringUtils.translateColors(e.getLine(i)));
+                lines[i] = StringUtils.translateColors(lines[i]);
 
             Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
             if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
@@ -561,7 +564,8 @@ public final class BlocksListener implements Listener {
 
             island.setVisitorsLocation(warpLocation);
             island.setDescription(description);
-            Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+            if(message)
+                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
         }
     }
 

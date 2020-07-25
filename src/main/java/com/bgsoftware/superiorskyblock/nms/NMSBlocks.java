@@ -56,9 +56,11 @@ public interface NMSBlocks {
         return 0;
     }
 
-    default void startTickingChunk(Island island, Chunk chunk){
+    default void startTickingChunk(Island island, Chunk chunk, boolean stop){
 
     }
+
+    void handleSignPlace(Island island, Location location);
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

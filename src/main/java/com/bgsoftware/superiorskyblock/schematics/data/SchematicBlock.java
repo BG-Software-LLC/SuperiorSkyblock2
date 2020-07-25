@@ -22,6 +22,10 @@ public final class SchematicBlock {
         return combinedId;
     }
 
+    public CompoundTag getTileEntity() {
+        return tileEntity;
+    }
+
     public void applyBlock(BlockChangeTask blockChangeTask, Location location){
         blockChangeTask.setBlock(location, combinedId, statesTag, tileEntity);
     }

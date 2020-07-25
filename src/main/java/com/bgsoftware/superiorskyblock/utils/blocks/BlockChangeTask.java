@@ -51,18 +51,19 @@ public final class BlockChangeTask {
                     ChunksTracker.markDirty(island, chunk, false);
 
                     for (BlockData blockData : entry.getValue()) {
-                        if(blockData.tileEntity != null) {
+                        CompoundTag tileEntity = blockData.tileEntity;
+                        if(tileEntity != null) {
                             for (int i = 1; i <= 4; i++) {
-                                String line = getSignLine(i - 1, blockData.tileEntity.getString("Text" + i));
+                                String line = getSignLine(i - 1, tileEntity.getString("Text" + i));
                                 if (line != null)
-                                    blockData.tileEntity.setString("Text" + i, line
+                                    tileEntity.setString("Text" + i, line
                                             .replace("{player}", island.getOwner().getName())
                                             .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
                                     );
                             }
 
                             if(plugin.getSettings().defaultContainersEnabled) {
-                                String inventoryType = blockData.tileEntity.getString("inventoryType");
+                                String inventoryType = tileEntity.getString("inventoryType");
                                 if (inventoryType != null) {
                                     try {
                                         InventoryType containerType = InventoryType.valueOf(inventoryType);
@@ -76,18 +77,19 @@ public final class BlockChangeTask {
                                                 itemCompound.setByte("Slot", (byte) (int) itemEntry.getKey());
                                                 items.addTag(itemCompound);
                                             });
-                                            blockData.tileEntity.setTag("Items", items);
+                                            tileEntity.setTag("Items", items);
                                         }
                                     }catch (Exception ignored){}
                                 }
                             }
-
-
-
                         }
 
                         plugin.getNMSBlocks().setBlock(chunk, blockData.location, blockData.combinedId,
-                                blockData.statesTag, blockData.tileEntity);
+                                blockData.statesTag, tileEntity);
+
+                        if(tileEntity != null && (tileEntity.containsKey("Text1") || tileEntity.containsKey("Text2") ||
+                                tileEntity.containsKey("Text3") || tileEntity.containsKey("Text4")))
+                            plugin.getNMSBlocks().handleSignPlace(island, blockData.location);
                     }
 
                     plugin.getNMSBlocks().refreshChunk(chunk);
