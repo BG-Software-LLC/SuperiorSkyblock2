@@ -12,14 +12,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public final class CmdAdminSetSize implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("setsize");
+        return Arrays.asList("setsize", "setislandsize", "setbordersize");
     }
 
     @Override
