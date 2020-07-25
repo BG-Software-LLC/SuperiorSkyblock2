@@ -227,7 +227,6 @@ public final class CmdAdmin implements ISuperiorCommand {
                     for (String _aliases : aliases) {
                         if (_aliases.startsWith(args[1].toLowerCase())) {
                             list.add(_aliases);
-                            break;
                         }
                     }
                 }

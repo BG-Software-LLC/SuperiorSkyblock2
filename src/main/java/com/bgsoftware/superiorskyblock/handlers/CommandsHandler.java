@@ -269,7 +269,6 @@ public final class CommandsHandler extends BukkitCommand implements CommandsMana
                 for (String _aliases : aliases) {
                     if (_aliases.startsWith(args[0].toLowerCase())) {
                         list.add(_aliases);
-                        break;
                     }
                 }
             }
