@@ -42,8 +42,8 @@ public final class SettingsHandler {
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
     public final int defaultCropGrowth;
-    public final int defaultSpawnerRates;
-    public final int defaultMobDrops;
+    public final double defaultSpawnerRates;
+    public final double defaultMobDrops;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -185,8 +185,8 @@ public final class SettingsHandler {
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
         defaultCoopLimit = cfg.getInt("default-values.coop-limit", 8);
         defaultCropGrowth = cfg.getInt("default-values.crop-growth", 1);
-        defaultSpawnerRates = cfg.getInt("default-values.spawner-rates", 1);
-        defaultMobDrops = cfg.getInt("default-values.mob-drops", 1);
+        defaultSpawnerRates = cfg.getDouble("default-values.spawner-rates", 1D);
+        defaultMobDrops = cfg.getDouble("default-values.mob-drops", 1D);
         islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);

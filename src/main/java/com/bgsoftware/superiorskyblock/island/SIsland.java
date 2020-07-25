@@ -1908,6 +1908,35 @@ public final class SIsland extends DatabaseObject implements Island {
         cobbleGeneratorValues.clearUpgrades();
         islandEffects.clearUpgrades();
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade(getUpgradeLevel(upgrade)));
+
+        /* I am making sure to also assign the default values if needed. */
+
+        if(getIslandSize() <= 0)
+            islandSize.set(plugin.getSettings().defaultIslandSize);
+
+        if(getBlocksLimits().isEmpty())
+            blockLimits.set(plugin.getSettings().defaultBlockLimits);
+
+        if(getEntitiesLimits().isEmpty())
+            entityLimits.set(plugin.getSettings().defaultEntityLimits);
+
+        if(getWarpsLimit() <= 0)
+            warpsLimit.set(plugin.getSettings().defaultWarpsLimit);
+
+        if(getTeamLimit() <= 0)
+            teamLimit.set(plugin.getSettings().defaultTeamLimit);
+
+        if(getCoopLimit() <= 0)
+            coopLimit.set(plugin.getSettings().defaultCoopLimit);
+
+        if(getCropGrowthMultiplier() <= 0)
+            cropGrowth.set((double) plugin.getSettings().defaultCropGrowth);
+
+        if(getSpawnerRatesMultiplier() <= 0)
+            spawnerRates.set(plugin.getSettings().defaultSpawnerRates);
+
+        if(getMobDropsMultiplier() <= 0)
+            mobDrops.set(plugin.getSettings().defaultMobDrops);
     }
 
     @Override
