@@ -57,6 +57,7 @@ import org.bukkit.craftbukkit.v1_13_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -74,41 +75,59 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
-    private static final Map<String, BlockStateEnum> nameToBlockState = new HashMap<>();
-    private static final Map<BlockStateEnum, String> blockStateToName = new HashMap<>();
+    private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
+    private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
 
     static {
-        register("axis", BlockProperties.y);
-        register("axis-empty", BlockProperties.z);
-        register("facing", BlockProperties.G);
-        register("facing-notup", BlockProperties.H);
-        register("facing-horizontal", BlockProperties.I);
-        register("face", BlockProperties.J);
-        register("redstone-east", BlockProperties.K);
-        register("redstone-north", BlockProperties.L);
-        register("redstone-south", BlockProperties.M);
-        register("redstone-west", BlockProperties.N);
-        register("double-half", BlockProperties.O);
-        register("half", BlockProperties.P);
-        register("track-shape-empty", BlockProperties.Q);
-        register("track-shape", BlockProperties.R);
-        register("part", BlockProperties.an);
-        register("chest-type", BlockProperties.ao);
-        register("comparator-mode", BlockProperties.ap);
-        register("hinge", BlockProperties.aq);
-        register("instrument", BlockProperties.ar);
-        register("piston-type", BlockProperties.as);
-        register("slab-type", BlockProperties.at);
-        register("shape", BlockProperties.au);
-        register("mode", BlockProperties.av);
+        Map<String, String> fieldNameToName = new HashMap<>();
+        fieldNameToName.put("z", "axis-empty");
+        fieldNameToName.put("H", "facing-notup");
+        fieldNameToName.put("I", "facing-horizontal");
+        fieldNameToName.put("K", "redstone-east");
+        fieldNameToName.put("L", "redstone-north");
+        fieldNameToName.put("M", "redstone-south");
+        fieldNameToName.put("N", "redstone-west");
+        fieldNameToName.put("O", "double-half");
+        fieldNameToName.put("Q", "track-shape-empty");
+        fieldNameToName.put("R", "track-shape");
+        fieldNameToName.put("S", "age2");
+        fieldNameToName.put("T", "age3");
+        fieldNameToName.put("U", "age5");
+        fieldNameToName.put("V", "age7");
+        fieldNameToName.put("W", "age15");
+        fieldNameToName.put("X", "age25");
+        fieldNameToName.put("ae", "level3");
+        fieldNameToName.put("af", "level1-8");
+        fieldNameToName.put("ag", "level15");
+        fieldNameToName.put("aa", "distance1-7");
+        fieldNameToName.put("ao", "chest-type");
+        fieldNameToName.put("ap", "comparator-mode");
+        fieldNameToName.put("as", "piston-type");
+        fieldNameToName.put("at", "slab-type");
+
+        try{
+            for(Field field : BlockProperties.class.getFields()){
+                Object value = field.get(null);
+                if(value instanceof IBlockState) {
+                    register(fieldNameToName.getOrDefault(field.getName(), ((IBlockState) value).a()),
+                            field.getName(), (IBlockState) value);
+                }
+            }
+        }catch (Exception ignored){}
     }
 
-    private static void register(String key, BlockStateEnum<?> blockStateEnum){
-        nameToBlockState.put(key, blockStateEnum);
-        blockStateToName.put(blockStateEnum, key);
+    private static void register(String key, String fieldName, IBlockState<?> blockState){
+        if(nameToBlockState.containsKey(key)){
+            SuperiorSkyblockPlugin.log("&cWarning: block state " + key + "(" + fieldName + ") already exists. Contact Ome_R!");
+        }
+        else {
+            nameToBlockState.put(key, blockState);
+            blockStateToName.put(blockState, key);
+        }
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
@@ -119,17 +138,17 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
         if(statesTag != null){
             for(Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()){
                 try {
-                    if (entry.getValue() instanceof ByteTag) {
-                        blockData = blockData.set(BlockStateBoolean.of(entry.getKey()), ((ByteTag) entry.getValue()).getValue() == 1);
-                    } else if (entry.getValue() instanceof IntArrayTag) {
-                        int[] data = ((IntArrayTag) entry.getValue()).getValue();
-                        blockData = blockData.set(BlockStateInteger.of(entry.getKey(), data[1], data[2]), data[0]);
-                    } else if (entry.getValue() instanceof StringTag) {
-                        String data = ((StringTag) entry.getValue()).getValue();
-                        BlockStateEnum blockStateEnum = nameToBlockState.get(entry.getKey());
-                        if(blockStateEnum != null)
-                            //noinspection unchecked
-                            blockData = blockData.set(blockStateEnum, Enum.valueOf(blockStateEnum.b(), data));
+                    IBlockState blockState = nameToBlockState.get(entry.getKey());
+                    if(blockState != null) {
+                        if (entry.getValue() instanceof ByteTag) {
+                            blockData = blockData.set(blockState, ((ByteTag) entry.getValue()).getValue() == 1);
+                        } else if (entry.getValue() instanceof IntArrayTag) {
+                            int[] data = ((IntArrayTag) entry.getValue()).getValue();
+                            blockData = blockData.set(blockState, data[0]);
+                        } else if (entry.getValue() instanceof StringTag) {
+                            String data = ((StringTag) entry.getValue()).getValue();
+                            blockData = blockData.set(blockState, Enum.valueOf(blockState.b(), data));
+                        }
                     }
                 }catch (Exception ignored){}
             }
