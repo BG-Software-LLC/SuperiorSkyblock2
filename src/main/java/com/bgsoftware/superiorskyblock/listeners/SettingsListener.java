@@ -8,12 +8,12 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -34,6 +34,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
@@ -41,7 +42,7 @@ import org.bukkit.projectiles.ProjectileSource;
 @SuppressWarnings("unused")
 public final class SettingsListener implements Listener {
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
 
     public SettingsListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
@@ -231,31 +232,35 @@ public final class SettingsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onEntityExplode(EntityExplodeEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-        if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
+    public void onEntityExplodeDamage(HangingBreakByEntityEvent e){
+        if(handleEntityExplode(e.getRemover(), e.getEntity().getLocation()))
+            e.setCancelled(true);
+    }
 
-            if((e.getEntity() instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
-                    e.getEntity() instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION) ||
-                    ((e.getEntity() instanceof Wither || e.getEntity() instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
-                    (e.getEntity() instanceof Fireball && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL)))
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent e){
+        if(handleEntityExplode(e.getEntity(), e.getLocation()))
             e.blockList().clear();
-        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityChangeBlock(EntityChangeBlockEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
+        if(handleEntityExplode(e.getEntity(), e.getBlock().getLocation()))
+            e.setCancelled(true);
+    }
 
-            if(((e.getEntity() instanceof Wither) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
-                    ((e.getEntity() instanceof Enderman) && !island.hasSettingsEnabled(IslandFlags.ENDERMAN_GRIEF)))
-                e.setCancelled(true);
+    private boolean handleEntityExplode(Entity source, Location explodeLocation){
+        Island island = plugin.getGrid().getIslandAt(explodeLocation);
+        if(island != null && (plugin.getSettings().spawnProtection || !island.isSpawn())){
+            if((source instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
+                    source instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION) ||
+                    ((source instanceof Wither || source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
+                    (source instanceof Fireball && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL))) {
+                return true;
+            }
         }
+
+        return false;
     }
 
 }
