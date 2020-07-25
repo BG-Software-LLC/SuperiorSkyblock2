@@ -36,6 +36,11 @@ public final class UpgradeMap<K> {
         this.value.write(map -> map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value));
     }
 
+    public void set(Map<K, Integer> otherMap){
+        this.value.write(map -> otherMap.forEach((key, value) ->
+                map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value)));
+    }
+
     public void remove(K key){
         this.value.write(map -> map.remove(key));
     }

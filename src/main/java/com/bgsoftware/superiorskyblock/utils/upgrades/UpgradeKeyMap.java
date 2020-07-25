@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import org.bukkit.Bukkit;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -43,6 +42,11 @@ public final class UpgradeKeyMap {
 
     public void set(Key key, Integer value){
         this.value.write(map -> map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value));
+    }
+
+    public void set(KeyMap<Integer> otherMap){
+        this.value.write(map -> otherMap.forEach((key, value) ->
+                map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value)));
     }
 
     public void setIfSyncString(Map<String, Integer> upgrades, boolean checkMax){
