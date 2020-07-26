@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -93,6 +94,8 @@ public final class CmdDeposit implements ISuperiorCommand {
             Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, amount);
             return;
         }
+
+        EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
 
         island.depositMoney(amount);
         EconomyHook.withdrawMoney(superiorPlayer.asPlayer(), amount);

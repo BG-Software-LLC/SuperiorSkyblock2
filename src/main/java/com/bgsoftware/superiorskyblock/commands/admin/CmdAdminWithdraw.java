@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -101,6 +102,8 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
             Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBank().toString());
             amount = island.getMoneyInBank();
         }
+
+        EventsCaller.callIslandBankWithdrawEvent(sender instanceof Player ? SSuperiorPlayer.of(sender) : null, island, amount);
 
         island.withdrawMoney(amount);
 

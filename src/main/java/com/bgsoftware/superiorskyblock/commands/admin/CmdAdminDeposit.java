@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -14,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,16 +91,19 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
             islands.add(island);
         }
 
-        double amount;
+        BigDecimal amount;
 
         try{
-            amount = Double.parseDouble(args[3]);
+            amount = BigDecimal.valueOf(Double.parseDouble(args[3]));
         }catch(IllegalArgumentException ignored){
             Locale.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.depositMoney(amount)));
+        Executor.data(() -> islands.forEach(island -> {
+            EventsCaller.callIslandBankDepositEvent(sender instanceof Player ? SSuperiorPlayer.of(sender) : null, island, amount);
+            island.depositMoney(amount);
+        }));
 
         if(targetPlayer == null)
             Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");

@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.utils.events;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
 import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
@@ -217,6 +219,20 @@ public final class EventsCaller {
         BlockUnstackEvent blockUnstackEvent = new BlockUnstackEvent(block, originalAmount, newAmount);
         Bukkit.getPluginManager().callEvent(blockUnstackEvent);
         return !blockUnstackEvent.isCancelled();
+    }
+
+    public static void callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount){
+        if(!plugin.getSettings().disabledEvents.contains("islandbankdepositevent")) {
+            IslandBankDepositEvent islandBankDepositEvent = new IslandBankDepositEvent(superiorPlayer, island, amount);
+            Bukkit.getPluginManager().callEvent(islandBankDepositEvent);
+        }
+    }
+
+    public static void callIslandBankWithdrawEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount){
+        if(!plugin.getSettings().disabledEvents.contains("islandbankwithdrawevent")) {
+            IslandBankWithdrawEvent islandBankWithdrawEvent = new IslandBankWithdrawEvent(superiorPlayer, island, amount);
+            Bukkit.getPluginManager().callEvent(islandBankWithdrawEvent);
+        }
     }
 
 }
