@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * The <code>TAG_Long</code> tag.
@@ -49,38 +46,15 @@ import java.lang.reflect.Method;
 @SuppressWarnings("WeakerAccess")
 public final class LongTag extends Tag<Long> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagLong");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, long.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, long.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagLong");
 
     public LongTag(long value) {
-        super(value);
+        super(value, CLASS, long.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeLong(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null){
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }
-            else{
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static LongTag fromNBT(Object tag){

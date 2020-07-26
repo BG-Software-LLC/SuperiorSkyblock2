@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * The <code>TAG_Byte</code> tag.
@@ -48,15 +45,7 @@ import java.lang.reflect.Method;
  */
 public final class ByteTag extends Tag<Byte> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByte");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, byte.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, byte.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagByte");
 
     /**
      * Creates the tag.
@@ -64,27 +53,12 @@ public final class ByteTag extends Tag<Byte> {
      * @param value The value.
      */
     public ByteTag(byte value) {
-        super(value);
+        super(value, CLASS, byte.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeByte(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null){
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }
-            else{
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static ByteTag fromNBT(Object tag){

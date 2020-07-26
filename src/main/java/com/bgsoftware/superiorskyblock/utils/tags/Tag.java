@@ -33,7 +33,9 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectConstructor;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
+import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -49,16 +51,14 @@ public abstract class Tag<E> {
 
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    static final Class<?> CLASS;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTBase");
-    }
-
+    protected final ReflectMethod<Object> A;
+    protected final ReflectConstructor<Object> CONSTRUCTOR;
     protected final E value;
 
-    protected Tag(E value) {
+    protected Tag(E value, Class<?> clazz, Class<?>... parameterTypes) {
         this.value = value;
+        this.A = new ReflectMethod<>(clazz, "a", parameterTypes);
+        this.CONSTRUCTOR = new ReflectConstructor<>(clazz, parameterTypes);
     }
 
     public E getValue(){
@@ -84,7 +84,14 @@ public abstract class Tag<E> {
 
     protected abstract void writeData(DataOutputStream outputStream) throws IOException;
 
-    public abstract Object toNBT();
+    public Object toNBT(){
+        if(A.isValid()){
+            return A.invoke(null, value);
+        }
+        else{
+            return CONSTRUCTOR.newInstance(value);
+        }
+    }
 
     public static Tag<?> fromNBT(Object tag){
         if(tag.getClass().equals(ByteArrayTag.CLASS))
@@ -149,6 +156,16 @@ public abstract class Tag<E> {
         }
 
         throw new IllegalArgumentException("Invalid tag: " + type);
+    }
+
+    protected static Class<?> getNNTClass(String nbtType){
+        try{
+            String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+            return Class.forName("net.minecraft.server." + version + "." + nbtType);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
     }
 
 }

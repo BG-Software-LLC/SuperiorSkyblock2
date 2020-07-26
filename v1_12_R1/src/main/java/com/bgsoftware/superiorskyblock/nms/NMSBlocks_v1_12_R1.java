@@ -10,7 +10,8 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
@@ -22,6 +23,7 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_12_R1.ChunkProviderServer;
 import net.minecraft.server.v1_12_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.Entity;
@@ -50,7 +52,6 @@ import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_12_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -66,18 +67,11 @@ import java.util.function.Consumer;
 public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static Method chunkLoaderSaveChunkMethod = null, tileEntityLoadMethod = null;
 
-    private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
-
-    static {
-        try{
-            //noinspection JavaReflectionMemberAccess
-            chunkLoaderSaveChunkMethod = IChunkLoader.class.getMethod("saveChunk", World.class, Chunk.class, boolean.class);
-            //noinspection JavaReflectionMemberAccess
-            tileEntityLoadMethod = TileEntity.class.getMethod("load", NBTTagCompound.class);
-        }catch (Exception ignored){}
-    }
+    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
+    private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
+    private static final ReflectMethod<Void> SAVE_CHUNK = new ReflectMethod<>(IChunkLoader.class, "saveChunk", World.class, Chunk.class, boolean.class);
+    private static final ReflectMethod<Void> LOAD = new ReflectMethod<>(TileEntity.class, "load", NBTTagCompound.class);
 
     @Override
     public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
@@ -111,11 +105,10 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
             tileEntityCompound.setInt("z", blockPosition.getZ());
-            try{
-                tileEntityLoadMethod.invoke(world.getTileEntity(blockPosition), tileEntityCompound);
-            }catch (Throwable ex){
+            if(LOAD.isValid())
+                LOAD.invoke(world.getTileEntity(blockPosition), tileEntityCompound);
+            else
                 world.getTileEntity(blockPosition).a(tileEntityCompound);
-            }
         }
     }
 
@@ -273,7 +266,7 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.getChunkProvider()));
+        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> CHUNK_LOADER.get(world.getChunkProvider()));
 
         Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
 
@@ -294,12 +287,10 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
                     Chunk loadedChunk = (Chunk) chunkData[0];
                     chunkConsumer.accept(loadedChunk);
                     if(saveChunk) {
-                        if(chunkLoaderSaveChunkMethod != null){
-                            chunkLoaderSaveChunkMethod.invoke(chunkLoader, world, loadedChunk, false);
-                        }
-                        else {
+                        if(SAVE_CHUNK.isValid())
+                            SAVE_CHUNK.invoke(chunkLoader, world, loadedChunk, false);
+                        else
                             chunkLoader.a(world, loadedChunk);
-                        }
                     }
                 }catch (Exception ex){
                     ex.printStackTrace();

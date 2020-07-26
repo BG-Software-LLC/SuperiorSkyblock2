@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
@@ -84,6 +84,8 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
+
+    private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -501,11 +503,9 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
 
         Executor.sync(() -> blocksToTick.forEach(pair -> {
             Block block = pair.getZ().getBlock();
-            if(!Fields.BLOCK_RANDOM_TICK.isNull())
-                Fields.BLOCK_RANDOM_TICK.set(block, true);
+            RANDOM_TICK.set(block, true);
             pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current());
-            if(!Fields.BLOCK_RANDOM_TICK.isNull())
-                Fields.BLOCK_RANDOM_TICK.set(block, false);
+            RANDOM_TICK.set(block, false);
         }));
 
         return random;

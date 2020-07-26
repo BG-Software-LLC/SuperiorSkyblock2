@@ -32,12 +32,9 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 
 /**
  * The <code>TAG_End</code> tag.
@@ -47,20 +44,13 @@ import java.lang.reflect.Constructor;
 @SuppressWarnings("WeakerAccess")
 public final class EndTag extends Tag<Object> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagEnd");
-        CONSTRUCTOR = ReflectionUtils.getDeclaredConstructor(CLASS);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagEnd");
 
     /**
      * Creates the tag.
      */
     public EndTag() {
-        super(null);
-        /* empty */
+        super(null, CLASS);
     }
 
     @Override
@@ -71,16 +61,6 @@ public final class EndTag extends Tag<Object> {
     @Override
     public String toString() {
         return "TAG_End";
-    }
-
-    @Override
-    public Object toNBT() {
-        try{
-            return CONSTRUCTOR.newInstance();
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static EndTag fromStream(DataInputStream is, int depth) throws IOException{

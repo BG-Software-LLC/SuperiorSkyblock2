@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * The <code>TAG_Short</code> tag.
@@ -48,38 +45,15 @@ import java.lang.reflect.Method;
  */
 public final class ShortTag extends Tag<Short> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagShort");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, short.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, short.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagShort");
 
     public ShortTag(short value) {
-        super(value);
+        super(value, CLASS, short.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeShort(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null){
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }
-            else{
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static ShortTag fromNBT(Object tag){

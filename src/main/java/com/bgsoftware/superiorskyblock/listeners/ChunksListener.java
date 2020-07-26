@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,13 +15,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
-import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @SuppressWarnings("unused")
 public final class ChunksListener implements Listener {
+
+    private static final ReflectMethod<Void> SET_SAVE_CHUNK = new ReflectMethod<>(ChunkUnloadEvent.class, "setSaveChunk", boolean.class);
 
     private final Set<Integer> alreadyUnloadedChunks = new HashSet<>();
     private final SuperiorSkyblockPlugin plugin;
@@ -51,12 +53,8 @@ public final class ChunksListener implements Listener {
                     e.setCancelled(true);
                     alreadyUnloadedChunks.add(hashedChunk);
                     chunk.unload(false);
-                } else try {
-                    //noinspection JavaReflectionMemberAccess
-                    Method setSaveChunkMethod = ChunkUnloadEvent.class.getMethod("setSaveChunk", boolean.class);
-                    setSaveChunkMethod.invoke(e, false);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } else {
+                    SET_SAVE_CHUNK.invoke(e, false);
                 }
             }
         }

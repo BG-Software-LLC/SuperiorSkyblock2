@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * The <code>TAG_Float</code> tag.
@@ -49,15 +46,7 @@ import java.lang.reflect.Method;
 @SuppressWarnings("WeakerAccess")
 public final class FloatTag extends Tag<Float> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagFloat");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, float.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, float.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagFloat");
 
     /**
      * Creates the tag.
@@ -65,26 +54,12 @@ public final class FloatTag extends Tag<Float> {
      * @param value The value.
      */
     public FloatTag(float value) {
-        super(value);
+        super(value, CLASS, float.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeFloat(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null) {
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }else{
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static FloatTag fromNBT(Object tag){

@@ -42,11 +42,10 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.tasks.CropsTask;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
@@ -66,7 +65,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -77,6 +75,7 @@ import java.util.stream.Collectors;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
+    private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static SuperiorSkyblockPlugin plugin;
 
     private GridHandler gridHandler = null;
@@ -110,9 +109,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         initCustomFilter();
 
-        loadAPI();
+        PLUGIN.set(null, this);
 
-        if(!loadNMSAdapter() || !ReflectionUtils.init()) {
+        if(!loadNMSAdapter()) {
             shouldEnable = false;
         }
     }
@@ -366,15 +365,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             getServer().dispatchCommand(getServer().getConsoleSender(), "mv import " + worldName + " normal -g " + getName());
             getServer().dispatchCommand(getServer().getConsoleSender(), "mv modify set generator " + getName() + " " + worldName);
         }
-    }
-
-    private void loadAPI(){
-        try{
-            Field plugin = SuperiorSkyblockAPI.class.getDeclaredField("plugin");
-            plugin.setAccessible(true);
-            plugin.set(null, this);
-            plugin.setAccessible(false);
-        }catch(Exception ignored){}
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_11_R1.Block;
@@ -12,12 +12,14 @@ import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.Blocks;
 import net.minecraft.server.v1_11_R1.Chunk;
 import net.minecraft.server.v1_11_R1.ChunkSection;
+import net.minecraft.server.v1_11_R1.DataPaletteBlock;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumParticle;
 import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.Item;
 import net.minecraft.server.v1_11_R1.MinecraftKey;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
+import net.minecraft.server.v1_11_R1.NibbleArray;
 import net.minecraft.server.v1_11_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_11_R1.PlayerInteractManager;
 import net.minecraft.server.v1_11_R1.SoundCategory;
@@ -272,17 +274,22 @@ public final class NMSAdapter_v1_11_R1 implements NMSAdapter {
 
     private static class EmptyCounterChunkSection extends ChunkSection {
 
+        private static final ReflectField<Integer> NON_EMPTY_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "nonEmptyBlockCount");
+        private static final ReflectField<Integer> TICKING_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "tickingBlockCount");
+        private static final ReflectField<DataPaletteBlock> BLOCK_IDS = new ReflectField<>(ChunkSection.class, DataPaletteBlock.class, "blockIds");
+        private static final ReflectField<NibbleArray> EMITTED_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "emittedLight");
+        private static final ReflectField<NibbleArray> SKY_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "skyLight");
+
         private int nonEmptyBlockCount, tickingBlockCount;
 
-        @SuppressWarnings("ConstantConditions")
         EmptyCounterChunkSection(ChunkSection chunkSection){
             super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
 
-            nonEmptyBlockCount = (int) Fields.CHUNK_SECTION_NON_EMPTY_BLOCK_COUNT.get(chunkSection);
-            tickingBlockCount = (int) Fields.CHUNK_SECTION_TICKING_BLOCK_COUNT.get(chunkSection);
-            Fields.CHUNK_SECTION_BLOCK_IDS.set(this, chunkSection.getBlocks());
-            Fields.CHUNK_SECTION_EMITTED_LIGHT.set(this, chunkSection.getEmittedLightArray());
-            Fields.CHUNK_SECTION_SKY_LIGHT.set(this, chunkSection.getSkyLightArray());
+            nonEmptyBlockCount = NON_EMPTY_BLOCK_COUNT.get(this, 0);
+            tickingBlockCount = TICKING_BLOCK_COUNT.get(this, 0);
+            BLOCK_IDS.set(this, chunkSection.getBlocks());
+            EMITTED_LIGHT.set(this, chunkSection.getEmittedLightArray());
+            SKY_LIGHT.set(this, chunkSection.getSkyLightArray());
         }
 
         @Override

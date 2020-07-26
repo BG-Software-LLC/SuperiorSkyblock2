@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -49,15 +46,7 @@ import java.nio.charset.StandardCharsets;
  */
 public final class StringTag extends Tag<String> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagString");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, String.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, String.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagString");
 
     /**
      * Creates the tag.
@@ -65,7 +54,7 @@ public final class StringTag extends Tag<String> {
      * @param value The value.
      */
     public StringTag(String value) {
-        super(value);
+        super(value, CLASS, String.class);
     }
 
     @Override
@@ -73,21 +62,6 @@ public final class StringTag extends Tag<String> {
         byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
         os.writeShort(bytes.length);
         os.write(bytes);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null){
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }
-            else{
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static StringTag fromNBT(Object tag){

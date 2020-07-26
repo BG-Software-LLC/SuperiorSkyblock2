@@ -32,15 +32,13 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,16 +52,11 @@ import java.util.Set;
  */
 public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method COMPOUND_SET, COMPOUND_GET;
+    protected static final Class<?> CLASS = getNNTClass("NBTTagCompound");
 
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagCompound");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS);
-        COMPOUND_SET = ReflectionUtils.getMethod(CLASS, "set", null, String.class, Tag.CLASS);
-        COMPOUND_GET = ReflectionUtils.getMethod(CLASS, "get", null, String.class);
-    }
+    private static final ReflectMethod<Void> SET = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagCompound",
+            "set", String.class, getNNTClass("NBTBase"));
+    private static final ReflectMethod<Object> GET = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagCompound", "get", String.class);
 
     public CompoundTag() {
         this(new HashMap<>());
@@ -75,7 +68,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
      * @param value The value.
      */
     public CompoundTag(Map<String, Tag<?>> value) {
-        super(value);
+        super(value, CLASS);
     }
 
     public void setString(String key, String value){
@@ -145,7 +138,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             Object nbtTagCompound = CONSTRUCTOR.newInstance();
 
             for(String key : value.keySet()){
-                COMPOUND_SET.invoke(nbtTagCompound, key, value.get(key).toNBT());
+                SET.invoke(nbtTagCompound, key, value.get(key).toNBT());
             }
 
             return nbtTagCompound;
@@ -181,7 +174,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
 
             for(String key : keySet) {
-                map.put(key, Tag.fromNBT(COMPOUND_GET.invoke(tag, key)));
+                map.put(key, Tag.fromNBT(GET.invoke(tag, key)));
             }
 
             return new CompoundTag(map);

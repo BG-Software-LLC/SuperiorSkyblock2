@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R1.AxisAlignedBB;
 import net.minecraft.server.v1_16_R1.BiomeBase;
+import net.minecraft.server.v1_16_R1.BiomeStorage;
 import net.minecraft.server.v1_16_R1.Block;
 import net.minecraft.server.v1_16_R1.BlockBed;
 import net.minecraft.server.v1_16_R1.BlockPosition;
@@ -84,6 +85,9 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
+
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
+    private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -392,7 +396,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
 
-            BiomeBase[] biomeBases = (BiomeBase[]) Fields.BIOME_STORAGE_BIOME_BASES.get(chunk.getBiomeIndex());
+            BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
 
             if(biomeBases == null)
                 throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.x + "," + chunkCoords.z + ").");
@@ -534,11 +538,9 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
                             IBlockData blockData = chunkSection.getType(x, y, z);
                             if (blockData.isTicking() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(blockData.getBlock()).name())) {
                                 Block block = blockData.getBlock();
-                                if (!Fields.BLOCK_RANDOM_TICK.isNull())
-                                    Fields.BLOCK_RANDOM_TICK.set(block, true);
+                                RANDOM_TICK.set(block, true);
                                 blockData.b((WorldServer) world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)), ThreadLocalRandom.current());
-                                if (!Fields.BLOCK_RANDOM_TICK.isNull())
-                                    Fields.BLOCK_RANDOM_TICK.set(block, false);
+                                RANDOM_TICK.set(block, false);
                             }
                         }
                     }

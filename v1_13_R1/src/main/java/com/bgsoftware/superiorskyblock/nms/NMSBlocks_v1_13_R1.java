@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
@@ -30,6 +30,7 @@ import net.minecraft.server.v1_13_R1.BlockStateInteger;
 import net.minecraft.server.v1_13_R1.Blocks;
 import net.minecraft.server.v1_13_R1.Chunk;
 import net.minecraft.server.v1_13_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_13_R1.ChunkProviderServer;
 import net.minecraft.server.v1_13_R1.ChunkSection;
 import net.minecraft.server.v1_13_R1.Entity;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
@@ -79,9 +80,11 @@ import java.util.function.Consumer;
 public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
+    private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
     private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
+    private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
+    private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -400,7 +403,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<IChunkAccess> chunkConsumer, Consumer<Chunk> updateChunk){
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> (IChunkLoader) Fields.CHUNK_PROVIDER_CHUNK_LOADER.get(world.getChunkProvider()));
+        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> CHUNK_LOADER.get(world.getChunkProvider()));
 
         Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
 
@@ -475,11 +478,9 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
         Executor.sync(() -> blocksToTick.forEach(pair -> {
             Block block = pair.getZ().getBlock();
-            if(!Fields.BLOCK_RANDOM_TICK.isNull())
-                Fields.BLOCK_RANDOM_TICK.set(block, true);
+            RANDOM_TICK.set(block, true);
             pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current());
-            if(!Fields.BLOCK_RANDOM_TICK.isNull())
-                Fields.BLOCK_RANDOM_TICK.set(block, false);
+            RANDOM_TICK.set(block, false);
         }));
 
         return random;

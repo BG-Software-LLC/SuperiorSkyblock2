@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import org.bukkit.enchantments.Enchantment;
-
-import java.lang.reflect.Field;
 
 public final class EnchantsUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final ReflectField<Boolean> ACCEPTING_NEW = new ReflectField<>(Enchantment.class, boolean.class, "acceptingNew");
 
     private static Enchantment glowEnchant;
 
@@ -17,14 +17,7 @@ public final class EnchantsUtils {
 
     public static void registerGlowEnchantment(){
         glowEnchant = plugin.getNMSAdapter().getGlowEnchant();
-
-        try{
-            Field field = Enchantment.class.getDeclaredField("acceptingNew");
-            field.setAccessible(true);
-            field.set(null, true);
-            field.setAccessible(false);
-        }catch(Exception ignored){}
-
+        ACCEPTING_NEW.set(null, true);
         try{
             Enchantment.registerEnchantment(glowEnchant);
         }catch(Exception ignored){}

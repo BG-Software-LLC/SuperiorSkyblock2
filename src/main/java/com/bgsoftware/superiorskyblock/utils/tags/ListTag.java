@@ -32,13 +32,12 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,13 +50,8 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public final class ListTag extends Tag<List<Tag<?>>> {
 
-    static final Class<?> CLASS;
-    static final Method LIST_SIZE;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagList");
-        LIST_SIZE = ReflectionUtils.getMethod(CLASS, "size", int.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagList");
+    private static final ReflectMethod<Integer> SIZE = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagList", "size");
 
     /**
      * The type.
@@ -71,7 +65,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
      * @param value The value.
      */
     public ListTag(Class<? extends Tag> type, List<Tag<?>> value) {
-        super(new ArrayList<>(value));
+        super(new ArrayList<>(value), null);
         this.type = type;
     }
 
@@ -124,7 +118,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
         List<Tag<?>> list = new ArrayList<>();
 
         try {
-            int size = (int) LIST_SIZE.invoke(tag);
+            int size = SIZE.invoke(tag);
 
             for(int i = 0; i < size; i++)
                 list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));

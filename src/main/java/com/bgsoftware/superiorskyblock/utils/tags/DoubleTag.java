@@ -32,14 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * The <code>TAG_Double</code> tag.
@@ -48,15 +45,7 @@ import java.lang.reflect.Method;
  */
 public final class DoubleTag extends Tag<Double> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-    static final Method CONSTRUCTOR_METHOD;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagDouble");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, double.class);
-        CONSTRUCTOR_METHOD = ReflectionUtils.getMethod(CLASS, "a", CLASS, double.class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagDouble");
 
     /**
      * Creates the tag.
@@ -64,27 +53,12 @@ public final class DoubleTag extends Tag<Double> {
      * @param value The value.
      */
     public DoubleTag(double value) {
-        super(value);
+        super(value, CLASS, double.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeDouble(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            if(CONSTRUCTOR_METHOD != null) {
-                return CONSTRUCTOR_METHOD.invoke(null, value);
-            }
-            else {
-                return CONSTRUCTOR.newInstance(value);
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static DoubleTag fromNBT(Object tag){

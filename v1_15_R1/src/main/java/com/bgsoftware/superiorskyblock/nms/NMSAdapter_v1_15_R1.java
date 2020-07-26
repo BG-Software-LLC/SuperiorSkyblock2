@@ -4,10 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_15_R1.BiomeBase;
+import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.ChatMessage;
@@ -57,7 +58,10 @@ import java.util.Optional;
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
 
-    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f", "g");
+    private static final ReflectField<BiomeStorage> BIOME_STORAGE =
+            new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -179,8 +183,8 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
 
-        Object biomeStorage = Fields.BIOME_GRID_BIOME_STORAGE.get(biomeGrid);
-        BiomeBase[] biomeBases = (BiomeBase[]) Fields.BIOME_STORAGE_BIOME_BASES.get(biomeStorage);
+        BiomeStorage biomeStorage = BIOME_STORAGE.get(biomeGrid);
+        BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(biomeStorage);
 
         if(biomeBases == null)
             return;

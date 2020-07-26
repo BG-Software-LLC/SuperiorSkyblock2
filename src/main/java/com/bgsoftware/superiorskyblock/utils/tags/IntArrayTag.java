@@ -1,15 +1,3 @@
-package com.bgsoftware.superiorskyblock.utils.tags;
-
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
-import com.google.common.base.Preconditions;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.UUID;
-
 //@formatter:off
 
 /*
@@ -46,6 +34,15 @@ import java.util.UUID;
  */
 
 //@formatter:on
+package com.bgsoftware.superiorskyblock.utils.tags;
+
+import com.google.common.base.Preconditions;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * The <code>TAG_Byte_Array</code> tag.
@@ -55,13 +52,7 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public final class IntArrayTag extends Tag<int[]> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagIntArray");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, int[].class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
 
     /**
      * Creates the tag.
@@ -69,7 +60,7 @@ public final class IntArrayTag extends Tag<int[]> {
      * @param value The value.
      */
     public IntArrayTag(int[] value) {
-        super(value);
+        super(value, CLASS, int[].class);
     }
 
     @Override
@@ -77,17 +68,6 @@ public final class IntArrayTag extends Tag<int[]> {
         os.writeInt(value.length);
         for(int i : value)
             os.writeInt(i);
-    }
-
-
-    @Override
-    public Object toNBT() {
-        try {
-            return CONSTRUCTOR.newInstance((Object) value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     @Override

@@ -33,13 +33,11 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.utils.tags;
 
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectionUtils;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 
 /**
  * The <code>TAG_Byte_Array</code> tag.
@@ -49,13 +47,7 @@ import java.lang.reflect.Constructor;
 @SuppressWarnings("WeakerAccess")
 public final class ByteArrayTag extends Tag<byte[]> {
 
-    static final Class<?> CLASS;
-    static final Constructor<?> CONSTRUCTOR;
-
-    static {
-        CLASS = ReflectionUtils.getClass("net.minecraft.server.VERSION.NBTTagByteArray");
-        CONSTRUCTOR = ReflectionUtils.getConstructor(CLASS, byte[].class);
-    }
+    protected static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
 
     /**
      * Creates the tag.
@@ -63,23 +55,13 @@ public final class ByteArrayTag extends Tag<byte[]> {
      * @param value The value.
      */
     public ByteArrayTag(byte[] value) {
-        super(value);
+        super(value, CLASS, byte[].class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
         os.writeInt(value.length);
         os.write(value);
-    }
-
-    @Override
-    public Object toNBT() {
-        try {
-            return CONSTRUCTOR.newInstance((Object) value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     @Override

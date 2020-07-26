@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
@@ -10,7 +11,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -23,44 +23,45 @@ import java.io.DataOutputStream;
 import java.math.BigInteger;
 import java.util.Map;
 
-@SuppressWarnings("deprecation")
 public final class ItemUtils {
+
+    private static final ReflectMethod<EquipmentSlot> GET_HAND = new ReflectMethod<>(BlockPlaceEvent.class, "getHand");
+    private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
+    private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
     private ItemUtils(){
 
     }
 
-    @SuppressWarnings("JavaReflectionMemberAccess")
     public static void removeItem(ItemStack itemStack, Event event, Player player){
-        try{
-            EquipmentSlot equipmentSlot = (EquipmentSlot) BlockPlaceEvent.class.getMethod("getHand").invoke(event);
+        if(GET_HAND.isValid()){
+            EquipmentSlot equipmentSlot = GET_HAND.invoke(event);
             if(equipmentSlot.name().equals("OFF_HAND")){
-                ItemStack offHand = (ItemStack) PlayerInventory.class.getMethod("getItemInOffHand").invoke(player.getInventory());
+                ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
                 if(offHand.isSimilar(itemStack)){
                     offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
-                    PlayerInventory.class.getMethod("setItemInOffHand", ItemStack.class)
-                            .invoke(player.getInventory(), offHand);
+                    SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), offHand);
                     return;
                 }
             }
-        }catch(Exception ignored){}
+        }
 
         player.getInventory().removeItem(itemStack);
     }
 
-    @SuppressWarnings("JavaReflectionMemberAccess")
     public static void setItem(ItemStack itemStack, Event event, Player player){
-        try{
-            EquipmentSlot equipmentSlot = (EquipmentSlot) PlayerInteractEvent.class.getMethod("getHand").invoke(event);
+        if(GET_HAND.isValid()){
+            EquipmentSlot equipmentSlot = GET_HAND.invoke(event);
             if(equipmentSlot.name().equals("OFF_HAND")){
                 player.getInventory().setItem(40, itemStack);
                 return;
             }
-        }catch(Exception ignored){}
+        }
 
         player.getInventory().setItemInHand(itemStack);
     }
 
+    @SuppressWarnings("deprecation")
     public static EntityType getEntityType(ItemStack itemStack){
         if(!isValidAndSpawnEgg(itemStack))
             return itemStack.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND : EntityType.UNKNOWN;

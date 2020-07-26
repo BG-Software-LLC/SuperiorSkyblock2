@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
-import com.bgsoftware.superiorskyblock.utils.reflections.Fields;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -37,6 +37,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private static final Pattern COMMAND_PATTERN_ARGS = Pattern.compile("\\[(.+)](.+)");
     private static final Pattern COMMAND_PATTERN = Pattern.compile("\\[(.+)]");
+    private static final ReflectField<Object> INVENTORY =
+            new ReflectField<>("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory", Object.class, "inventory");
 
     public static final char[] itemChars = new char[] {
             '!', '@', '#', '$', '%', '^', '&', '*', '-', '_', '+', '=',
@@ -314,7 +316,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
 
         if(inventory.getHolder() == null)
-            Fields.CRAFT_INVENTORY_INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
+            INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
 
         //noinspection all
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();

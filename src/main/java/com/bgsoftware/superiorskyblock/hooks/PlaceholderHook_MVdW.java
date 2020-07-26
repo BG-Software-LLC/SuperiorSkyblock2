@@ -7,12 +7,16 @@ import be.maximvdw.placeholderapi.events.PlaceholderAddedEvent;
 import be.maximvdw.placeholderapi.internal.PlaceholderPack;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import org.bukkit.OfflinePlayer;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public final class PlaceholderHook_MVdW extends PlaceholderHook {
+
+    private static final ReflectField<PlaceholderPack> CUSTOM_PLACEHOLDERS = new ReflectField<>(PlaceholderAPI.class, PlaceholderPack.class, "customPlaceholders");
+    private static final ReflectField<List<PlaceholderAddedEvent>> PLACEHOLDER_ADDED_HANDLERS =
+            new ReflectField<>(PlaceholderAPI.class, List.class, "placeholderAddedHandlers");
 
     PlaceholderHook_MVdW(){
         for(IslandPrivilege islandPrivilege : IslandPrivilege.values()) {
@@ -135,8 +139,8 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
 
     //Register placeholder without logging to console
     private void registerPlaceholder(String placeholder){
-        PlaceholderPack customPlaceholders = getPlaceholderPack();
-        List<PlaceholderAddedEvent> placeholderAddedHandlers = getEventHandlers();
+        PlaceholderPack customPlaceholders = CUSTOM_PLACEHOLDERS.get(null);
+        List<PlaceholderAddedEvent> placeholderAddedHandlers = PLACEHOLDER_ADDED_HANDLERS.get(null);
 
         if(customPlaceholders == null || placeholderAddedHandlers == null)
             return;
@@ -155,33 +159,6 @@ public final class PlaceholderHook_MVdW extends PlaceholderHook {
                 return replacer.onPlaceholderReplace(event);
             }
         });
-    }
-
-    private PlaceholderPack getPlaceholderPack(){
-        try {
-            Field packField = PlaceholderAPI.class.getDeclaredField("customPlaceholders");
-            packField.setAccessible(true);
-            Object obj = packField.get(null);
-            packField.setAccessible(false);
-            return (PlaceholderPack) obj;
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    private List<PlaceholderAddedEvent> getEventHandlers(){
-        try {
-            Field eventHandlersField = PlaceholderAPI.class.getDeclaredField("placeholderAddedHandlers");
-            eventHandlersField.setAccessible(true);
-            Object obj = eventHandlersField.get(null);
-            eventHandlersField.setAccessible(false);
-            //noinspection unchecked
-            return (List<PlaceholderAddedEvent>) obj;
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
     }
 
     public static String parse(OfflinePlayer offlinePlayer, String str){
