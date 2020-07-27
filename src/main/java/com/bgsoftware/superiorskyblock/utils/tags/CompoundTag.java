@@ -63,7 +63,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
     }
 
     public CompoundTag(CompoundTag other) {
-        super(other.value, CLASS);
+        super(new HashMap<>(other.value), CLASS);
     }
 
 
