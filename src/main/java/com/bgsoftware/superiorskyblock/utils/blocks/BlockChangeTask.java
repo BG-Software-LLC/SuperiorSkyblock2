@@ -53,6 +53,7 @@ public final class BlockChangeTask {
                     for (BlockData blockData : entry.getValue()) {
                         CompoundTag tileEntity = blockData.tileEntity;
                         if(tileEntity != null) {
+                            tileEntity = new CompoundTag(tileEntity);
                             for (int i = 1; i <= 4; i++) {
                                 String line = getSignLine(i - 1, tileEntity.getString("Text" + i));
                                 if (line != null)

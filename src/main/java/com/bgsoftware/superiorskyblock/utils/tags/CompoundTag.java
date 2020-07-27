@@ -62,6 +62,11 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         this(new HashMap<>());
     }
 
+    public CompoundTag(CompoundTag other) {
+        super(other.value, CLASS);
+    }
+
+
     /**
      * Creates the tag.
      *
