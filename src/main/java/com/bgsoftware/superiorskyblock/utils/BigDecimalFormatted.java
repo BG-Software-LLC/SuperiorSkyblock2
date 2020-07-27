@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 public final class BigDecimalFormatted extends BigDecimal {
 
     public static BigDecimalFormatted ZERO = new BigDecimalFormatted(0);
+    public static BigDecimalFormatted NEGATIVE = new BigDecimalFormatted(-1);
 
     private BigDecimalFormatted(int i){
         super(i);

@@ -43,13 +43,18 @@ public final class BlockValuesHandler implements BlockValuesManager {
                 return BigDecimalFormatted.of(customBlockValue);
         }
 
+        String value = blockValues.get(key);
+
+        if(value != null)
+            return BigDecimalFormatted.of(value);
+
         if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
             if(price.compareTo(BigDecimal.ZERO) > 0)
                 return BigDecimalFormatted.of(price);
         }
 
-        return BigDecimalFormatted.of(blockValues.getOrDefault(key, "-1"));
+        return BigDecimalFormatted.NEGATIVE;
     }
 
     public void setBlockWorth(Key key, BigDecimal worth){
