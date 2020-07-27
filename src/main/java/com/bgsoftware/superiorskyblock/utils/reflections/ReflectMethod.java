@@ -23,7 +23,11 @@ public final class ReflectMethod<T> {
     }
 
     public ReflectMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes){
-        this.method = getMethod(clazz, methodName, parameterTypes);
+        this(clazz, null, methodName, parameterTypes);
+    }
+
+    public ReflectMethod(Class<?> clazz, Class<?> returnType, String methodName, Class<?>... parameterTypes){
+        this.method = getMethod(clazz, methodName, returnType, parameterTypes);
     }
 
     public T invoke(Object instance, Object... args){
@@ -48,13 +52,18 @@ public final class ReflectMethod<T> {
         return method != null;
     }
 
-    private static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes){
+    private static Method getMethod(Class<?> clazz, String methodName, Class<?> returnType, Class<?>... parameterTypes){
         Method method = null;
 
         if(clazz != null) {
             try {
                 method = clazz.getDeclaredMethod(methodName, parameterTypes);
-                method.setAccessible(true);
+                if(returnType != null && !method.getReturnType().equals(returnType)){
+                    method = null;
+                }
+                else {
+                    method.setAccessible(true);
+                }
             } catch (Exception ignored) {}
         }
 

@@ -57,7 +57,7 @@ public abstract class Tag<E> {
 
     protected Tag(E value, Class<?> clazz, Class<?>... parameterTypes) {
         this.value = value;
-        this.A = new ReflectMethod<>(clazz, "a", parameterTypes);
+        this.A = new ReflectMethod<>(clazz, clazz, "a", parameterTypes);
         this.CONSTRUCTOR = new ReflectConstructor<>(clazz, parameterTypes);
     }
 
