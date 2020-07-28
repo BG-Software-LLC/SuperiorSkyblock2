@@ -2932,7 +2932,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private void updateOldUpgradeValues(){
         for(com.bgsoftware.superiorskyblock.api.key.Key key : blockLimits.keySet()){
-            if(blockLimits.getValue(key, -1) == plugin.getSettings().defaultBlockLimits.get(key))
+            if(blockLimits.getValue(key, -1) == plugin.getSettings().defaultBlockLimits.getOrDefault(key, -2))
                 blockLimits.set(key, -1);
         }
 
