@@ -72,8 +72,10 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
         String level = blockLevels.get(key);
 
-        if(level == null)
+        if(level == null) {
             level = convertValueToLevel((BigDecimalFormatted) getBlockWorth(key));
+            blockLevels.put(key, level);
+        }
 
         return BigDecimalFormatted.of(level);
     }
