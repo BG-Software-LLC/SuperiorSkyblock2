@@ -32,7 +32,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
     private static final ReflectMethod<Object> GET_BLOCK_TYPE = new ReflectMethod<>(BaseBlock.class, "getBlockType");
     private static final ReflectMethod<Integer> GET_INTERNAL_ID = new ReflectMethod<>(BaseBlock.class, "getInternalId");
-    private static final ReflectMethod<Material> ADAPT = new ReflectMethod<>(BukkitAdapter.class, "adapt",
+    private static final ReflectMethod<Material> ADAPT = new ReflectMethod<>("com.sk89q.worldedit.bukkit.BukkitAdapter", "adapt",
             "com.sk89q.worldedit.world.block.BlockTypes");
 
     private static final ReflectMethod<Integer> GET_ID = new ReflectMethod<>(BaseBlock.class, "getId");

@@ -51,7 +51,7 @@ import java.util.List;
 public final class ListTag extends Tag<List<Tag<?>>> {
 
     protected static final Class<?> CLASS = getNNTClass("NBTTagList");
-    private static final ReflectMethod<Integer> SIZE = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagList", "size");
+    private static final ReflectMethod<Integer> SIZE = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagList", "size", new Class[0]);
 
     /**
      * The type.

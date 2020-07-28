@@ -10,6 +10,10 @@ public final class ReflectMethod<T> {
 
     private final Method method;
 
+    public ReflectMethod(String classPath, String methodName, String... parameterTypes){
+        this(getClass(classPath), methodName, parameterTypes);
+    }
+
     public ReflectMethod(String classPath, String methodName, Class<?>... parameterTypes){
         this(getClass(classPath), methodName, parameterTypes);
     }
@@ -80,9 +84,7 @@ public final class ReflectMethod<T> {
         try{
             for(int i = 0; i < classPaths.length; i++)
                 classes[i] = Class.forName(classPaths[i].replace("VERSION", version));
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
+        }catch (Exception ignored){}
 
         return classes;
     }
