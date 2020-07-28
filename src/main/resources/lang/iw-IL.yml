@@ -193,6 +193,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: יא לע עדימ לבקל.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teleport to the spawn location.
 COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_STATS: 'Show stats about the plugin.'
+COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: רחא יא לא רגתשהל.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
@@ -589,6 +590,9 @@ SIZE_BIGGER_MAX: '&c&lError | &7You cannot set a size bigger than the max island
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Successfully teleported {0} to spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7Successfully updated the spawn location to {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[יומס] &e[{0}] {1}&f: &7{2}'
+SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
+SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
+SYNC_UPGRADES_NAME: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}.'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאב אצמנ אל התא.'
 TELEPORT_OUTSIDE_ISLAND: '&c&lError | &7You cannot teleport outside of your protection range.'

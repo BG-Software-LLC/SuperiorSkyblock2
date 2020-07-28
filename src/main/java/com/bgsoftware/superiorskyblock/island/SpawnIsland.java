@@ -803,6 +803,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void syncUpgrades() {
+
+    }
+
+    @Override
     public double getCropGrowthMultiplier() {
         return 1;
     }
@@ -848,6 +853,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void clearBlockLimits() {
+
+    }
+
+    @Override
     public void setBlockLimit(Key key, int limit) {
 
     }
@@ -870,6 +880,11 @@ public final class SpawnIsland implements Island {
     @Override
     public Map<EntityType, Integer> getEntitiesLimits() {
         return new HashMap<>();
+    }
+
+    @Override
+    public void clearEntitiesLimits() {
+
     }
 
     @Override
@@ -934,6 +949,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void removeEffects() {
+
+    }
+
+    @Override
+    public void clearEffects() {
 
     }
 

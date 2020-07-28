@@ -182,6 +182,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: 查看一个岛屿的详细信息.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: 传送至重生点.
 COMMAND_DESCRIPTION_ADMIN_SPY: 切换聊天监视模式
 COMMAND_DESCRIPTION_ADMIN_STATS: 查看插件数据.
+COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: 传送到其他玩家的岛屿.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: 取消岛屿在排行榜的忽略.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 为岛屿解锁新维度
@@ -569,6 +570,9 @@ SIZE_BIGGER_MAX: '&c&l错误 | &7不能超过岛屿最大大小限制.'
 SPAWN_TELEPORT_SUCCESS: '&e&l重生 | &7成功将 {0} 传送至出生点.'
 SPAWN_SET_SUCCESS: '&e&l重生 | &7成功将重生点位置设置为 {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[&a&l岛屿频道&7] &7[&c&l管理员&7] &b{1} &f&l说: &7{2}'
+SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
+SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
+SYNC_UPGRADES_NAME: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}.'
 TEAM_CHAT_FORMAT: '&7[&a&l岛屿频道&7] &7[&e&l{0}&7] &b{1} &f&l说: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&l错误 | &7你现在不在你的岛屿中.'
 TELEPORT_OUTSIDE_ISLAND: '&c&l错误 | &7你不能在岛屿范围外传送.'

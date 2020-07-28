@@ -65,6 +65,10 @@ public final class UpgradeMap<K> {
         this.value.write(map -> map.values().forEach(pair -> pair.setValue(0)));
     }
 
+    public void clear(){
+        this.value.write(Map::clear);
+    }
+
     public Set<K> keySet(){
         return value.readAndGet(Map::keySet);
     }

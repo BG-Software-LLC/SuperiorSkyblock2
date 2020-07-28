@@ -902,6 +902,12 @@ public interface Island extends Comparable<Island> {
     void setUpgradeLevel(Upgrade upgrade, int level);
 
     /**
+     * Sync all the upgrade values again.
+     * This will remove custom values that were set using the set commands.
+     */
+    void syncUpgrades();
+
+    /**
      * Get the crop-growth multiplier for the island.
      */
     double getCropGrowthMultiplier();
@@ -954,6 +960,11 @@ public interface Island extends Comparable<Island> {
     Map<Key, Integer> getBlocksLimits();
 
     /**
+     * Clear all the block limits of the island.
+     */
+    void clearBlockLimits();
+
+    /**
      * Set the block limit of a block.
      * @param key The block's key to set the limit to.
      * @param limit The limit to set.
@@ -985,6 +996,11 @@ public interface Island extends Comparable<Island> {
      * Get all the entities limits for the island.
      */
     Map<EntityType, Integer> getEntitiesLimits();
+
+    /**
+     * Clear all the entities limits from the island.
+     */
+    void clearEntitiesLimits();
 
     /**
      * Set the entity limit of an entity.
@@ -1064,6 +1080,11 @@ public interface Island extends Comparable<Island> {
      * Remove all the island effects from the players inside the island.
      */
     void removeEffects();
+
+    /**
+     * Remove all the effects from the island.
+     */
+    void clearEffects();
 
     /*
      *  Warps related methods

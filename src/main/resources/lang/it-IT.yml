@@ -228,6 +228,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Ottieni informazioni su un'isola.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teletrasportati nella posizione di spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
 COMMAND_DESCRIPTION_ADMIN_STATS: Mostra le statistiche riguardanti il plugin.
+COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle migliori
   isole .
@@ -684,6 +685,9 @@ SIZE_BIGGER_MAX: '&c&lErrore | &7Non è possibile impostare una dimensione maggi
 SPAWN_TELEPORT_SUCCESS: '&e&lSpawn | &7Hai teletrasportato {0} con successo allo spawn.'
 SPAWN_SET_SUCCESS: '&e&lSpawn | &7La posizione di spawn è stata aggiornata correttamente alle coordinate: {0}'
 SPY_TEAM_CHAT_FORMAT: '&7[Spy] &e[{0}] {1}&f: &7{2}'
+SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
+SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
+SYNC_UPGRADES_NAME: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}.'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErrore | &7Non sei nella tua isola.'
 TELEPORT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi teletrasportarti fuori dal raggio di protezione.'

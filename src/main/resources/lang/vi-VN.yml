@@ -219,6 +219,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Dịch chuyển đến vị trí trung tâm.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
 COMMAND_DESCRIPTION_ADMIN_STATS: Coi thông kê về plugin.
+COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Dịch chuyển đến hòn đảo khác
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
   đầu.
@@ -656,6 +657,9 @@ SIZE_BIGGER_MAX: '&c&lLỗi | &7Bạn không thể đặt kích thước lớn h
 SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
 SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
+SYNC_UPGRADES: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}''s island.'
+SYNC_UPGRADES_ALL: '&e&lUpgrades | &7Successfully synced all upgrade values of all the islands.'
+SYNC_UPGRADES_NAME: '&e&lUpgrades | &7Successfully synced all upgrade values of {0}.'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'
 TELEPORT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể dịch chuyển ra ngoài phạm vi bảo vệ đảo của bạn.'

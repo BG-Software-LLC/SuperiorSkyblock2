@@ -40,10 +40,15 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandChest islandChest) {
-        return validPage.clone()
-                .replaceAll("{0}", (islandChest.getIndex() + 1) + "")
-                .replaceAll("{1}", (islandChest.getRows() * 9) + "")
-                .build(superiorPlayer);
+        try {
+            return validPage.clone()
+                    .replaceAll("{0}", (islandChest.getIndex() + 1) + "")
+                    .replaceAll("{1}", (islandChest.getRows() * 9) + "")
+                    .build(superiorPlayer);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return getNullItem();
+        }
     }
 
     @Override

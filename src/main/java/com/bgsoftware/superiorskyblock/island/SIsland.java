@@ -1896,6 +1896,24 @@ public final class SIsland extends DatabaseObject implements Island {
         MenuUpgrades.refreshMenus();
     }
 
+    @Override
+    public void syncUpgrades() {
+        clearGeneratorAmounts();
+        clearEffects();
+        clearBlockLimits();
+        clearEntitiesLimits();
+
+        setCropGrowthMultiplier(-1D);
+        setSpawnerRatesMultiplier(-1D);
+        setMobDropsMultiplier(-1D);
+        setTeamLimit(-1);
+        setWarpsLimit(-1);
+        setCoopLimit(-1);
+        setIslandSize(-1);
+
+        plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade(getUpgradeLevel(upgrade)));
+    }
+
     public Map<String, Integer> getUpgrades(){
         if(!upgrades.isEmpty())
             return upgrades.toMap();
@@ -2001,6 +2019,16 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public void clearBlockLimits() {
+        SuperiorSkyblockPlugin.debug("Action: Clear Block Limits, Island: " + owner.getName());
+        blockLimits.clear();
+        Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder()
+                .setString(IslandSerializer.serializeBlockLimits(blockLimits))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
     public void setBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + limit);
         blockLimits.set(key ,limit);
@@ -2038,6 +2066,16 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public Map<EntityType, Integer> getEntitiesLimits() {
         return this.entityLimits.copy();
+    }
+
+    @Override
+    public void clearEntitiesLimits() {
+        SuperiorSkyblockPlugin.debug("Action: Clear Entity Limit, Island: " + owner.getName());
+        entityLimits.clear();
+        Query.ISLAND_SET_ENTITY_LIMITS.getStatementHolder()
+                .setString(IslandSerializer.serializeEntityLimits(entityLimits))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     @Override
@@ -2124,6 +2162,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setPotionEffect(PotionEffectType type, int level) {
+        SuperiorSkyblockPlugin.debug("Action: Set Island Effect, Island: " + owner.getName() + ", Effect: " + type.getName() + ", Level: " + level);
+
         if(level <= 0) {
             islandEffects.remove(type);
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().removePotionEffect(type)));
@@ -2173,6 +2213,17 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void removeEffects() {
         getAllPlayersInside().forEach(this::removeEffects);
+    }
+
+    @Override
+    public void clearEffects() {
+        SuperiorSkyblockPlugin.debug("Action: Clear Island Effects, Island: " + owner.getName());
+        islandEffects.clear();
+        removeEffects();
+        Query.ISLAND_SET_ISLAND_EFFECTS.getStatementHolder()
+                .setString(IslandSerializer.serializeEffects(islandEffects))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     /*
