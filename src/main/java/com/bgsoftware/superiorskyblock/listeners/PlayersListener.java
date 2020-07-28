@@ -126,7 +126,7 @@ public final class PlayersListener implements Listener {
             SkinsRestorerHook.setSkinTexture(superiorPlayer);
         }
         else {
-            plugin.getNMSAdapter().setSkinTexture(superiorPlayer);
+            Executor.sync(() -> plugin.getNMSAdapter().setSkinTexture(superiorPlayer), 5L);
         }
 
         Island island = superiorPlayer.getIsland();
