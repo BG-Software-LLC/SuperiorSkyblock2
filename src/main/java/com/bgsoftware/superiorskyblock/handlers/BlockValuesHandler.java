@@ -33,6 +33,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
         this.plugin = plugin;
         loadBlockValues(plugin);
         loadBlockLevels(plugin);
+        convertValuesToLevels();
     }
 
     @Override
@@ -69,7 +70,12 @@ public final class BlockValuesHandler implements BlockValuesManager {
                 return BigDecimalFormatted.of(customBlockLevel);
         }
 
-        return BigDecimalFormatted.of(blockLevels.getOrDefault(key, convertValueToLevel((BigDecimalFormatted) getBlockWorth(key))));
+        String level = blockLevels.get(key);
+
+        if(level == null)
+            level = convertValueToLevel((BigDecimalFormatted) getBlockWorth(key));
+
+        return BigDecimalFormatted.of(level);
     }
 
     @Override
@@ -158,6 +164,14 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
         for(String key : valuesSection.getKeys(false))
             blockLevels.put(getBlockKey(com.bgsoftware.superiorskyblock.utils.key.Key.of(key)), valuesSection.getString(key));
+    }
+
+    private void convertValuesToLevels() {
+        for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, String> entry : blockValues.entrySet()){
+            if(!blockLevels.containsKey(entry.getKey())){
+                blockLevels.put(entry.getKey(), convertValueToLevel(BigDecimalFormatted.of(entry.getValue())));
+            }
+        }
     }
 
     private static Bindings createBindings() {
