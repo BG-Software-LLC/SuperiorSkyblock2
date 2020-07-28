@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -37,6 +36,7 @@ import net.minecraft.server.v1_13_R2.IBlockState;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.IChunkAccess;
 import net.minecraft.server.v1_13_R2.IChunkLoader;
+import net.minecraft.server.v1_13_R2.ITickable;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
@@ -45,6 +45,7 @@ import net.minecraft.server.v1_13_R2.PlayerConnection;
 import net.minecraft.server.v1_13_R2.ProtoChunk;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntitySign;
+import net.minecraft.server.v1_13_R2.TileEntityTypes;
 import net.minecraft.server.v1_13_R2.World;
 import net.minecraft.server.v1_13_R2.WorldServer;
 import org.bukkit.Location;
@@ -61,7 +62,6 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -419,63 +419,11 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     }
 
     @Override
-    public int tickIslands(int random) {
-        List<Pair<Island, List<org.bukkit.Chunk>>> activeChunks = new ArrayList<>();
-        List<BiPair<WorldServer, BlockPosition, IBlockData>> blocksToTick = new ArrayList<>();
-        org.bukkit.World normalWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.NORMAL),
-                netherWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.NETHER),
-                endWorld = plugin.getGrid().getIslandsWorld(org.bukkit.World.Environment.THE_END);
-        int[] globalRandomTickSpeeds = new int[] {
-                normalWorld == null ? 0 : ((CraftWorld) normalWorld).getHandle().getGameRules().c("randomTickSpeed"),
-                netherWorld == null ? 0 : ((CraftWorld) netherWorld).getHandle().getGameRules().c("randomTickSpeed"),
-                endWorld == null ? 0 : ((CraftWorld) endWorld).getHandle().getGameRules().c("randomTickSpeed")
-        };
-
-        plugin.getGrid().getIslands().stream()
-                .filter(island -> island.getCropGrowthMultiplier() > 1 && !island.getAllPlayersInside().isEmpty())
-                .forEach(island -> activeChunks.add(new Pair<>(island, island.getLoadedChunks(true, true))));
-
-        for(Pair<Island, List<org.bukkit.Chunk>> chunkPair : activeChunks){
-            Island island = chunkPair.getKey();
-            double islandCropGrowthMultiplier = island == null ? 0 : island.getCropGrowthMultiplier() - 1;
-
-            for(org.bukkit.Chunk bukkitChunk : chunkPair.getValue()) {
-                Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-                WorldServer chunkWorld = (WorldServer) chunk.world;
-                ChunkCoordIntPair chunkCoord = chunk.getPos();
-                int chunkRandomTickSpeed = (int) (globalRandomTickSpeeds[chunkWorld.getWorld().getEnvironment().ordinal()] * islandCropGrowthMultiplier);
-
-                int chunkX = chunkCoord.d();
-                int chunkZ = chunkCoord.e();
-
-                if (chunkRandomTickSpeed > 0) {
-                    for (ChunkSection chunkSection : chunk.getSections()) {
-                        if (chunkSection != Chunk.a && chunkSection.b()) {
-                            for (int i = 0; i < chunkRandomTickSpeed; i++) {
-                                random = random * 3 + 1013904223;
-                                int factor = random >> 2;
-                                int x = factor & 15;
-                                int z = factor >> 8 & 15;
-                                int y = factor >> 16 & 15;
-                                IBlockData blockData = chunkSection.getType(x, y, z);
-                                if (blockData.t() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(blockData.getBlock()).name())) {
-                                    blocksToTick.add(new BiPair<>(chunkWorld, new BlockPosition(x + chunkX, y + chunkSection.getYPosition(), z + chunkZ), blockData));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        Executor.sync(() -> blocksToTick.forEach(pair -> {
-            Block block = pair.getZ().getBlock();
-            RANDOM_TICK.set(block, true);
-            pair.getZ().b(pair.getX(), pair.getY(), ThreadLocalRandom.current());
-            RANDOM_TICK.set(block, false);
-        }));
-
-        return random;
+    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
+        if(stop)
+            CropsTickingTileEntity.tickingChunks.remove(((CraftChunk) chunk).getHandle().getPos().a());
+        else
+            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
     }
 
     @Override
@@ -505,6 +453,71 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     @Override
     public Key getMinecartBlock(Minecart minecart) {
         return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
+    }
+
+    private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
+
+        private static final Set<Long> tickingChunks = new HashSet<>();
+        private static int random = ThreadLocalRandom.current().nextInt();
+
+        private final Island island;
+        private final Chunk chunk;
+        private final int chunkX, chunkZ;
+
+        private int currentTick = 0;
+
+        private CropsTickingTileEntity(Island island, Chunk chunk){
+            super(TileEntityTypes.COMMAND_BLOCK);
+            this.island = island;
+            this.chunk = chunk;
+            this.chunkX = chunk.getPos().x;
+            this.chunkZ = chunk.getPos().z;
+            setWorld(chunk.getWorld());
+            setPosition(new BlockPosition(chunkX, 1, chunkZ));
+            world.tileEntityListTick.add(this);
+        }
+
+        @Override
+        public void tick() {
+            if(++currentTick <= plugin.getSettings().cropsInterval)
+                return;
+
+            currentTick = 0;
+
+            int worldRandomTick = world.getGameRules().c("randomTickSpeed");
+            int chunkRandomTickSpeed = (int) (worldRandomTick * island.getCropGrowthMultiplier() * plugin.getSettings().cropsInterval);
+
+            if (chunkRandomTickSpeed > 0) {
+                for (ChunkSection chunkSection : chunk.getSections()) {
+                    if (chunkSection != Chunk.a && chunkSection.d()) {
+                        for (int i = 0; i < chunkRandomTickSpeed; i++) {
+                            random = random * 3 + 1013904223;
+                            int factor = random >> 2;
+                            int x = factor & 15;
+                            int z = factor >> 8 & 15;
+                            int y = factor >> 16 & 15;
+                            IBlockData blockData = chunkSection.getType(x, y, z);
+                            Block block = blockData.getBlock();
+                            if (block.isTicking(blockData) && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
+                                RANDOM_TICK.set(block, true);
+                                blockData.b(world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)), ThreadLocalRandom.current());
+                                RANDOM_TICK.set(block, false);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        static void create(Island island, Chunk chunk){
+            long chunkPair = chunk.getPos().a();
+            if(!tickingChunks.contains(chunkPair)){
+                tickingChunks.add(chunkPair);
+                new CropsTickingTileEntity(island, chunk);
+            }
+        }
+
     }
 
 }

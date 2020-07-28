@@ -47,6 +47,8 @@ public final class BlockChangeTask {
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
                 int entryIndex = ++index;
                 ChunksProvider.loadChunk(entry.getKey(), chunk -> {
+                    plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
+
                     plugin.getNMSBlocks().refreshLight(chunk);
                     ChunksTracker.markDirty(island, chunk, false);
 

@@ -52,12 +52,10 @@ public interface NMSBlocks {
 
     void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
 
-    default int tickIslands(int random){
-        return 0;
-    }
+    void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
-    default void startTickingChunk(Island island, Chunk chunk, boolean stop){
-
+    default boolean hasCropsTicking(Chunk chunk){
+        return false;
     }
 
     void handleSignPlace(Island island, Location location);

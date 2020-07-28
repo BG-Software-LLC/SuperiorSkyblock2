@@ -87,7 +87,6 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
 
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
-    private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -536,11 +535,9 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
                             int z = factor >> 8 & 15;
                             int y = factor >> 16 & 15;
                             IBlockData blockData = chunkSection.getType(x, y, z);
-                            if (blockData.isTicking() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(blockData.getBlock()).name())) {
-                                Block block = blockData.getBlock();
-                                RANDOM_TICK.set(block, true);
+                            Block block = blockData.getBlock();
+                            if (block.isTicking(blockData) && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
                                 blockData.b((WorldServer) world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)), ThreadLocalRandom.current());
-                                RANDOM_TICK.set(block, false);
                             }
                         }
                     }

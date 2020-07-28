@@ -67,7 +67,7 @@ public final class ChunksListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent e){
-        if(plugin.getGrid() == null || e.getWorld().getEnvironment() != World.Environment.NORMAL)
+        if(plugin.getGrid() == null)
             return;
 
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
@@ -76,7 +76,9 @@ public final class ChunksListener implements Listener {
         if(island == null || island.isSpawn())
             return;
 
-        ((SIsland) island).setBiomeRaw(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()));
+        if(e.getWorld().getEnvironment() == World.Environment.NORMAL) {
+            ((SIsland) island).setBiomeRaw(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()));
+        }
 
         plugin.getNMSAdapter().injectChunkSections(e.getChunk());
         plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), false);
