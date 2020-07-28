@@ -57,8 +57,11 @@ public final class SQLHelper {
                 config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName + "?useSSL=" + useSSL);
                 config.setUsername(userName);
                 config.setPassword(password);
-                config.setMaximumPoolSize(10);
-                config.setIdleTimeout(30000);
+                config.setMinimumIdle(5);
+                config.setMaximumPoolSize(50);
+                config.setConnectionTimeout(10000);
+                config.setIdleTimeout(600000);
+                config.setMaxLifetime(1800000);
 
                 dataSource = new HikariDataSource(config);
 
