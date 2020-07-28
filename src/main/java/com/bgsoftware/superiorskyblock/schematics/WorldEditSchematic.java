@@ -15,7 +15,6 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -26,9 +25,10 @@ import java.util.function.Consumer;
 
 public final class WorldEditSchematic extends BaseSchematic implements Schematic {
 
-    private static final ReflectMethod<BlockVector3> AT = new ReflectMethod<>(BlockVector3.class, "at", int.class, int.class, int.class);
+    private static final Class<?> BLOCK_VECTOR3_CLASS = getClass("com.sk89q.worldedit.math.BlockVector3");
+    private static final ReflectMethod<Object> AT = new ReflectMethod<>(BLOCK_VECTOR3_CLASS, "at", int.class, int.class, int.class);
     private static final ReflectMethod<EditSession> PASTE = new ReflectMethod<>(com.boydti.fawe.object.schematic.Schematic.class,
-            "paste", World.class, BlockVector3.class, boolean.class, boolean.class, Transform.class);
+            "paste", World.class, BLOCK_VECTOR3_CLASS, boolean.class, boolean.class, Transform.class);
 
     private static final ReflectMethod<Object> GET_BLOCK_TYPE = new ReflectMethod<>(BaseBlock.class, "getBlockType");
     private static final ReflectMethod<Integer> GET_INTERNAL_ID = new ReflectMethod<>(BaseBlock.class, "getInternalId");
@@ -147,6 +147,14 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
         }
 
+    }
+
+    private static Class<?> getClass(String classPath){
+        try{
+            return Class.forName(classPath);
+        }catch (Throwable ex){
+            return null;
+        }
     }
 
 }
