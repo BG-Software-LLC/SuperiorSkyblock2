@@ -32,7 +32,8 @@ public final class CmdAdminSetSize implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         return "admin setsize <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_SIZE.getMessage(locale) + ">";
     }
 
