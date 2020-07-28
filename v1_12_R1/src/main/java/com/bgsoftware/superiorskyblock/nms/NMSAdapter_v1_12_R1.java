@@ -279,8 +279,8 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         EmptyCounterChunkSection(ChunkSection chunkSection){
             super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
 
-            nonEmptyBlockCount = NON_EMPTY_BLOCK_COUNT.get(this, 0);
-            tickingBlockCount = TICKING_BLOCK_COUNT.get(this, 0);
+            nonEmptyBlockCount = NON_EMPTY_BLOCK_COUNT.get(chunkSection, 0);
+            tickingBlockCount = TICKING_BLOCK_COUNT.get(chunkSection, 0);
             BLOCK_IDS.set(this, chunkSection.getBlocks());
             EMITTED_LIGHT.set(this, chunkSection.getEmittedLightArray());
             SKY_LIGHT.set(this, chunkSection.getSkyLightArray());
