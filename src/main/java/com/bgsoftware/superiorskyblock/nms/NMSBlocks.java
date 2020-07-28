@@ -54,10 +54,6 @@ public interface NMSBlocks {
 
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
-    default boolean hasCropsTicking(Chunk chunk){
-        return false;
-    }
-
     void handleSignPlace(Island island, Location location);
 
     default Material getMaterial(int combinedId) {

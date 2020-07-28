@@ -456,8 +456,12 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
     @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if(stop)
-            CropsTickingTileEntity.tickingChunks.remove(((CraftChunk) chunk).getHandle().getPos().pair());
+        if(stop) {
+            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.tickingChunks
+                    .remove(((CraftChunk) chunk).getHandle().getPos().pair());
+            if(cropsTickingTileEntity != null)
+                cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
+        }
         else
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
     }
@@ -493,7 +497,7 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
 
-        private static final Set<Long> tickingChunks = new HashSet<>();
+        private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
         private static int random = ThreadLocalRandom.current().nextInt();
 
         private final Island island;
@@ -520,7 +524,9 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             currentTick = 0;
 
             int worldRandomTick = world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
-            int chunkRandomTickSpeed = (int) (worldRandomTick * island.getCropGrowthMultiplier() * plugin.getSettings().cropsInterval);
+            double cropGrowth = island.getCropGrowthMultiplier() - 1;
+
+            int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
 
             if (chunkRandomTickSpeed > 0) {
                 for (ChunkSection chunkSection : chunk.getSections()) {
@@ -552,9 +558,8 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
         static void create(Island island, Chunk chunk){
             long chunkPair = chunk.getPos().pair();
-            if(!tickingChunks.contains(chunkPair)){
-                tickingChunks.add(chunkPair);
-                new CropsTickingTileEntity(island, chunk);
+            if(!tickingChunks.containsKey(chunkPair)){
+                tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk));
             }
         }
 

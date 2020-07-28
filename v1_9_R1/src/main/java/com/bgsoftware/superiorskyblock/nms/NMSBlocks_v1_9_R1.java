@@ -52,6 +52,7 @@ import org.bukkit.craftbukkit.v1_9_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -291,8 +292,12 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
 
     @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if(stop)
-            CropsTickingTileEntity.tickingChunks.remove(ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
+        if(stop) {
+            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.tickingChunks
+                    .remove(ChunkCoordIntPair.a(chunk.getX(), chunk.getZ()));
+            if(cropsTickingTileEntity != null)
+                cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
+        }
         else
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
     }
@@ -313,7 +318,7 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
 
-        private static final Set<Long> tickingChunks = new HashSet<>();
+        private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
         private static int random = ThreadLocalRandom.current().nextInt();
 
         private final Island island;
@@ -340,7 +345,9 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
             currentTick = 0;
 
             int worldRandomTick = world.getGameRules().c("randomTickSpeed");
-            int chunkRandomTickSpeed = (int) (worldRandomTick * island.getCropGrowthMultiplier() * plugin.getSettings().cropsInterval);
+            double cropGrowth = island.getCropGrowthMultiplier() - 1;
+
+            int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
 
             if (chunkRandomTickSpeed > 0) {
                 for (ChunkSection chunkSection : chunk.getSections()) {
@@ -366,9 +373,8 @@ public final class NMSBlocks_v1_9_R1 implements NMSBlocks {
 
         static void create(Island island, Chunk chunk){
             long chunkKey = ChunkCoordIntPair.a(chunk.locX, chunk.locZ);
-            if(!tickingChunks.contains(chunkKey)){
-                tickingChunks.add(chunkKey);
-                new CropsTickingTileEntity(island, chunk);
+            if(!tickingChunks.containsKey(chunkKey)){
+                tickingChunks.put(chunkKey, new CropsTickingTileEntity(island, chunk));
             }
         }
 
