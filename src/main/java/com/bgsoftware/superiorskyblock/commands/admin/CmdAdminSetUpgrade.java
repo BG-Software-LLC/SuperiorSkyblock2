@@ -76,7 +76,7 @@ public final class CmdAdminSetUpgrade implements ISuperiorCommand {
         String upgradeName = args[3].toLowerCase();
 
         if(!plugin.getUpgrades().isUpgrade(upgradeName)){
-            Locale.INVALID_UPGRADE.send(sender, args[3], getUpgradesString(plugin));
+            Locale.INVALID_UPGRADE.send(sender, args[3], StringUtils.getUpgradesString(plugin));
             return;
         }
 
@@ -134,15 +134,6 @@ public final class CmdAdminSetUpgrade implements ISuperiorCommand {
         }
 
         return list;
-    }
-
-    private String getUpgradesString(SuperiorSkyblockPlugin plugin){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(Upgrade upgrade : plugin.getUpgrades().getUpgrades())
-            stringBuilder.append(", ").append(upgrade.getName());
-
-        return stringBuilder.toString().substring(2);
     }
 
 }
