@@ -265,59 +265,62 @@ public final class CustomEventsListener implements Listener {
 
     private boolean handlePlayerLeave(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
                                       Island fromIsland, Island toIsland, IslandLeaveEvent.LeaveCause leaveCause, Event event){
-        if(fromIsland != null){
-            if(!fromIsland.equals(toIsland)){
-                if(!EventsCaller.callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
-                    if(event instanceof Cancellable)
-                        ((Cancellable) event).setCancelled(true);
-                    return false;
-                }
-                else{
-                    fromIsland.setPlayerInside(superiorPlayer, false);
-                    Player player = superiorPlayer.asPlayer();
-                    player.resetPlayerTime();
-                    player.resetPlayerWeather();
-                    fromIsland.removeEffects(superiorPlayer);
-                }
+        if(fromIsland == null)
+            return true;
+
+        boolean equalIslands = fromIsland.equals(toIsland);
+
+        if(!equalIslands){
+            if(!EventsCaller.callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
+                if(event instanceof Cancellable)
+                    ((Cancellable) event).setCancelled(true);
+                return false;
             }
-
-            Player player = superiorPlayer.asPlayer();
-
-            if((toIsland == null || !toIsland.equals(fromIsland) || !toIsland.isInsideRange(toLocation)) && fromIsland.isInsideRange(fromLocation)){
-                if(plugin.getSettings().stopLeaving && toLocation != null && !superiorPlayer.hasBypassModeEnabled() &&
-                        !fromIsland.isSpawn() && fromLocation.getWorld().equals(toLocation.getWorld()) &&
-                        (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(toLocation)) {
-                    if(event instanceof Cancellable)
-                        ((Cancellable) event).setCancelled(true);
-                    return false;
-                }
-
-                if(!EventsCaller.callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
-                    if(event instanceof Cancellable)
-                        ((Cancellable) event).setCancelled(true);
-                    return false;
-                }
-                else if(superiorPlayer.hasIslandFlyEnabled() && toIsland == null &&
-                        player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR){
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                    Locale.ISLAND_FLY_DISABLED.send(player);
-                }
-            }
-
-            boolean sameWorld = toLocation != null && fromLocation.getWorld().equals(toLocation.getWorld());
-
-            //We want to update the border if player teleported between dimensions of his island.
-            if(!sameWorld){
-                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
-            }
-
             else{
-                Executor.sync(() -> {
-                    if(superiorPlayer.isOnline())
-                        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
-                }, 5L);
+                fromIsland.setPlayerInside(superiorPlayer, false);
+                Player player = superiorPlayer.asPlayer();
+                player.resetPlayerTime();
+                player.resetPlayerWeather();
+                fromIsland.removeEffects(superiorPlayer);
             }
+        }
+
+        Player player = superiorPlayer.asPlayer();
+
+        if((toIsland == null || !equalIslands || !toIsland.isInsideRange(toLocation)) && fromIsland.isInsideRange(fromLocation)){
+            if(plugin.getSettings().stopLeaving && toLocation != null && !superiorPlayer.hasBypassModeEnabled() &&
+                    !fromIsland.isSpawn() && fromLocation.getWorld().equals(toLocation.getWorld()) &&
+                    (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(toLocation)) {
+                if(event instanceof Cancellable)
+                    ((Cancellable) event).setCancelled(true);
+                return false;
+            }
+
+            if(!EventsCaller.callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, toLocation)){
+                if(event instanceof Cancellable)
+                    ((Cancellable) event).setCancelled(true);
+                return false;
+            }
+            else if(superiorPlayer.hasIslandFlyEnabled() && toIsland == null &&
+                    player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR){
+                player.setAllowFlight(false);
+                player.setFlying(false);
+                Locale.ISLAND_FLY_DISABLED.send(player);
+            }
+        }
+
+        boolean sameWorld = toLocation != null && fromLocation.getWorld().equals(toLocation.getWorld());
+
+        //We want to update the border if player teleported between dimensions of his island.
+        if(!sameWorld){
+            Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+        }
+
+        else if(!equalIslands){
+            Executor.sync(() -> {
+                if(superiorPlayer.isOnline())
+                    plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+            }, 5L);
         }
 
         return true;
@@ -325,6 +328,7 @@ public final class CustomEventsListener implements Listener {
 
     private void handlePlayerEnter(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
                                    Island fromIsland, Island toIsland, IslandEnterEvent.EnterCause enterCause, Event event){
+
         if (toIsland != null) {
             if(toIsland.isBanned(superiorPlayer) && !superiorPlayer.hasBypassModeEnabled() &&
                     !superiorPlayer.hasPermissionWithoutOP("superior.admin.ban.bypass")){
