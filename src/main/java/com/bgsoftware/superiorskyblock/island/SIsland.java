@@ -265,6 +265,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         //assignPermissionNodes();
         checkMembersDuplication();
+        updateOldUpgradeValues();
         updateUpgrades();
     }
 
@@ -2876,6 +2877,44 @@ public final class SIsland extends DatabaseObject implements Island {
                     .setString(owner.getUniqueId().toString())
                     .execute(true);
         }
+    }
+
+    private void updateOldUpgradeValues(){
+        for(com.bgsoftware.superiorskyblock.api.key.Key key : blockLimits.keySet()){
+            if(blockLimits.getValue(key, -1) == plugin.getSettings().defaultBlockLimits.get(key))
+                blockLimits.set(key, -1);
+        }
+
+        for(EntityType entityType : entityLimits.keySet()){
+            if(entityLimits.getValue(entityType).equals(plugin.getSettings().defaultEntityLimits.get(entityType)))
+                entityLimits.set(entityType, -1);
+        }
+
+        for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues.keySet()){
+            if(cobbleGeneratorValues.getValue(key, -1) == plugin.getSettings().defaultGenerator.getOrDefault(key, -2))
+                cobbleGeneratorValues.set(key, -1);
+        }
+
+        if(getIslandSize() == plugin.getSettings().defaultIslandSize)
+            islandSize.set(-1);
+
+        if(getWarpsLimit() == plugin.getSettings().defaultWarpsLimit)
+            warpsLimit.set(-1);
+
+        if(getTeamLimit() == plugin.getSettings().defaultTeamLimit)
+            teamLimit.set(-1);
+
+        if(getCoopLimit() == plugin.getSettings().defaultCoopLimit)
+            coopLimit.set(-1);
+
+        if(getCropGrowthMultiplier() == plugin.getSettings().defaultCropGrowth)
+            cropGrowth.set(-1D);
+
+        if(getSpawnerRatesMultiplier() == plugin.getSettings().defaultSpawnerRates)
+            spawnerRates.set(-1D);
+
+        if(getMobDropsMultiplier() == plugin.getSettings().defaultMobDrops)
+            mobDrops.set(-1D);
     }
 
     private void syncUpgrade(UpgradeLevel upgradeLevel){

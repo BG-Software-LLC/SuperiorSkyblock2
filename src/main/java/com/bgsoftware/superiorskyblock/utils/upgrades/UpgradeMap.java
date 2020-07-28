@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public final class UpgradeMap<K> {
@@ -62,6 +63,10 @@ public final class UpgradeMap<K> {
 
     public void clearUpgrades(){
         this.value.write(map -> map.values().forEach(pair -> pair.setValue(0)));
+    }
+
+    public Set<K> keySet(){
+        return value.readAndGet(Map::keySet);
     }
 
     public Map<K, Integer> copy(){

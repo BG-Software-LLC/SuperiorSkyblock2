@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public final class UpgradeKeyMap {
@@ -98,6 +99,10 @@ public final class UpgradeKeyMap {
             Pair<Integer, Integer> pair = map.get(mat);
             pair.setKey(function.apply(pair.getKey()));
         }));
+    }
+
+    public Set<Key> keySet(){
+        return value.readAndGet(Map::keySet);
     }
 
     public KeyMap<Integer> copy(){
