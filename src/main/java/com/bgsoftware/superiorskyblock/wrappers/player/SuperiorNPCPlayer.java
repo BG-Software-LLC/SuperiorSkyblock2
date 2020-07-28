@@ -240,6 +240,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasFlyGamemode() {
+        return false;
+    }
+
+    @Override
     public int getDisbands() {
         return 0;
     }

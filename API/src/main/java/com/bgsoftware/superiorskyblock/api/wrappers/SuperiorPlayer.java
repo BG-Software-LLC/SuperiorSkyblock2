@@ -249,6 +249,11 @@ public interface SuperiorPlayer {
     boolean hasPermission(IslandPrivilege permission);
 
     /**
+     * Check whether or not this player is in a gamemode with fly mode enabled.
+     */
+    boolean hasFlyGamemode();
+
+    /**
      * Get the amount of left disbands.
      */
     int getDisbands();

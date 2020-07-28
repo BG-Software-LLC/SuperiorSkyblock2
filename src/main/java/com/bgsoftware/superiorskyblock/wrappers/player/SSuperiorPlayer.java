@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -77,6 +78,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     private boolean immuneToPvP = false;
     private boolean immuneToTeleport = false;
+    private boolean leavingFlag = false;
 
     private BukkitTask teleportTask = null;
 
@@ -644,6 +646,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         return island != null && island.hasPermission(this, permission);
     }
 
+    @Override
+    public boolean hasFlyGamemode() {
+        Player player = asPlayer();
+        return player != null && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
+    }
+
     public boolean isImmunedToPvP(){
         return immuneToPvP;
     }
@@ -651,6 +659,15 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setImmunedToPvP(boolean immunedToPvP){
         this.immuneToPvP = immunedToPvP;
         SuperiorSkyblockPlugin.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
+    }
+
+    public boolean isLeavingFlag() {
+        return leavingFlag;
+    }
+
+    public void setLeavingFlag(boolean leavingFlag){
+        SuperiorSkyblockPlugin.debug("Action: Set Leaving Flag, Player: " + getName() + ", Flag: " + leavingFlag);
+        this.leavingFlag = leavingFlag;
     }
 
     public void setTeleportTask(BukkitTask teleportTask){

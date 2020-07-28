@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
@@ -232,6 +233,13 @@ public final class EventsCaller {
         if(!plugin.getSettings().disabledEvents.contains("islandbankwithdrawevent")) {
             IslandBankWithdrawEvent islandBankWithdrawEvent = new IslandBankWithdrawEvent(superiorPlayer, island, amount);
             Bukkit.getPluginManager().callEvent(islandBankWithdrawEvent);
+        }
+    }
+
+    public static void callIslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, IslandRestrictMoveEvent.RestrictReason restrictReason){
+        if(!plugin.getSettings().disabledEvents.contains("islandrestrictmoveevent")) {
+            IslandRestrictMoveEvent islandRestrictMoveEvent = new IslandRestrictMoveEvent(superiorPlayer, restrictReason);
+            Bukkit.getPluginManager().callEvent(islandRestrictMoveEvent);
         }
     }
 
