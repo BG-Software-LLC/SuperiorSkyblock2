@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
@@ -1867,7 +1868,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
-        return upgrade.getUpgradeLevel(getUpgrades().getOrDefault(upgrade.getName(), 1));
+        return upgrade.getUpgradeLevel(getUpgrades().getOrDefault(upgrade.getName(), -1));
     }
 
     @Override
@@ -1911,7 +1912,13 @@ public final class SIsland extends DatabaseObject implements Island {
         setCoopLimit(-1);
         setIslandSize(-1);
 
+        // We want to sync the default upgrade first, then the actual upgrades
+        syncUpgrade(DefaultUpgradeLevel.getInstance());
+        // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade(getUpgradeLevel(upgrade)));
+
+        if(getIslandSize() != -1)
+            updateBorder();
     }
 
     public Map<String, Integer> getUpgrades(){
@@ -1922,40 +1929,21 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void updateUpgrades(){
+        islandSize.clearUpgrade();
         blockLimits.clearUpgrades();
         entityLimits.clearUpgrades();
+        warpsLimit.clearUpgrade();
+        teamLimit.clearUpgrade();
+        coopLimit.clearUpgrade();
+        cropGrowth.clearUpgrade();
+        spawnerRates.clearUpgrade();
+        mobDrops.clearUpgrade();
         cobbleGeneratorValues.clearUpgrades();
         islandEffects.clearUpgrades();
+        // We want to sync the default upgrade first, then the actual upgrades
+        syncUpgrade(DefaultUpgradeLevel.getInstance());
+        // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade(getUpgradeLevel(upgrade)));
-
-        /* I am making sure to also assign the default values if needed. */
-
-        if(getIslandSize() <= 0)
-            islandSize.set(plugin.getSettings().defaultIslandSize);
-
-        if(getBlocksLimits().isEmpty())
-            blockLimits.set(plugin.getSettings().defaultBlockLimits);
-
-        if(getEntitiesLimits().isEmpty())
-            entityLimits.set(plugin.getSettings().defaultEntityLimits);
-
-        if(getWarpsLimit() <= 0)
-            warpsLimit.set(plugin.getSettings().defaultWarpsLimit);
-
-        if(getTeamLimit() <= 0)
-            teamLimit.set(plugin.getSettings().defaultTeamLimit);
-
-        if(getCoopLimit() <= 0)
-            coopLimit.set(plugin.getSettings().defaultCoopLimit);
-
-        if(getCropGrowthMultiplier() <= 0)
-            cropGrowth.set((double) plugin.getSettings().defaultCropGrowth);
-
-        if(getSpawnerRatesMultiplier() <= 0)
-            spawnerRates.set(plugin.getSettings().defaultSpawnerRates);
-
-        if(getMobDropsMultiplier() <= 0)
-            mobDrops.set(plugin.getSettings().defaultMobDrops);
     }
 
     @Override
@@ -2969,17 +2957,17 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void syncUpgrade(UpgradeLevel upgradeLevel){
-        cropGrowth.setIfSync(upgradeLevel.getCropGrowth());
-        spawnerRates.setIfSync(upgradeLevel.getSpawnerRates());
-        mobDrops.setIfSync(upgradeLevel.getMobDrops());
-        blockLimits.setIfSync(upgradeLevel.getBlockLimits(), true);
-        entityLimits.setIfSync(upgradeLevel.getEntityLimits());
-        teamLimit.setIfSync(upgradeLevel.getTeamLimit());
-        warpsLimit.setIfSync(upgradeLevel.getWarpsLimit());
-        coopLimit.setIfSync(upgradeLevel.getCoopLimit());
-        islandSize.setIfSync(upgradeLevel.getBorderSize());
-        cobbleGeneratorValues.setIfSyncString(upgradeLevel.getGeneratorAmounts(), false);
-        islandEffects.setIfSync(upgradeLevel.getPotionEffects());
+        cropGrowth.setUpgrade(upgradeLevel.getCropGrowth());
+        spawnerRates.setUpgrade(upgradeLevel.getSpawnerRates());
+        mobDrops.setUpgrade(upgradeLevel.getMobDrops());
+        blockLimits.setUpgrade(upgradeLevel.getBlockLimits(), true);
+        entityLimits.setUpgrade(upgradeLevel.getEntityLimits());
+        teamLimit.setUpgrade(upgradeLevel.getTeamLimit());
+        warpsLimit.setUpgrade(upgradeLevel.getWarpsLimit());
+        coopLimit.setUpgrade(upgradeLevel.getCoopLimit());
+        islandSize.setUpgrade(upgradeLevel.getBorderSize());
+        cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(), false);
+        islandEffects.setUpgrade(upgradeLevel.getPotionEffects());
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

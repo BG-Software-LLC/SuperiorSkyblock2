@@ -50,22 +50,22 @@ public final class UpgradeKeyMap {
                 map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value)));
     }
 
-    public void setIfSyncString(Map<String, Integer> upgrades, boolean checkMax){
+    public void setUpgradeString(Map<String, Integer> upgrades, boolean checkMax){
         KeyMap<Pair<Integer, Integer>> map = this.value.readAndGet(KeyMap::new);
         for(Map.Entry<String, Integer> entry : upgrades.entrySet()){
             Pair<Integer, Integer> pair = map.get(entry.getKey());
-            if(pair == null || (pair.getKey() < 0 && (!checkMax || entry.getValue() > pair.getValue()))){
+            if(pair == null || (!checkMax || entry.getValue() > pair.getValue())){
                 this.value.write(_map -> _map.computeIfAbsent(Key.of(entry.getKey()), k -> new Pair<>(-1, 0))
                         .setValue(entry.getValue()));
             }
         }
     }
 
-    public void setIfSync(Map<Key, Integer> upgrades, boolean checkMax){
+    public void setUpgrade(Map<Key, Integer> upgrades, boolean checkMax){
         KeyMap<Pair<Integer, Integer>> map = this.value.readAndGet(KeyMap::new);
         for(Map.Entry<Key, Integer> entry : upgrades.entrySet()){
             Pair<Integer, Integer> pair = map.getRaw(entry.getKey(), null);
-            if(pair == null || (pair.getKey() < 0 && (!checkMax || entry.getValue() > pair.getValue()))){
+            if(pair == null || (!checkMax || entry.getValue() > pair.getValue())){
                 this.value.write(_map -> _map.computeIfAbsent(entry.getKey(), k -> new Pair<>(-1, 0))
                         .setValue(entry.getValue()));
             }

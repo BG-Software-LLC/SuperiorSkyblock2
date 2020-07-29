@@ -31,7 +31,7 @@ public final class SUpgrade implements Upgrade {
 
     @Override
     public SUpgradeLevel getUpgradeLevel(int level) {
-        return level <= 0 || level > upgradeLevels.length ? NULL_LEVEL : upgradeLevels[level - 1];
+        return level == -1 ? DefaultUpgradeLevel.getInstance() : level <= 0 || level > upgradeLevels.length ? NULL_LEVEL : upgradeLevels[level - 1];
     }
 
     @Override
@@ -66,4 +66,5 @@ public final class SUpgrade implements Upgrade {
     public int hashCode() {
         return Objects.hash(name);
     }
+
 }

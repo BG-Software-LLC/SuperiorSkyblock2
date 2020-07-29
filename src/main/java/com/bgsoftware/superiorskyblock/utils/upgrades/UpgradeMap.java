@@ -46,11 +46,11 @@ public final class UpgradeMap<K> {
         this.value.write(map -> map.remove(key));
     }
 
-    public void setIfSync(Map<K, Integer> upgrades){
+    public void setUpgrade(Map<K, Integer> upgrades){
         Map<K, Pair<Integer, Integer>> map = this.value.readAndGet(HashMap::new);
         for(Map.Entry<K, Integer> entry : upgrades.entrySet()){
             Pair<Integer, Integer> pair = map.get(entry.getKey());
-            if(pair == null || (pair.getKey() < 0 && entry.getValue() > pair.getValue())){
+            if(pair == null || entry.getValue() > pair.getValue()){
                 this.value.write(_map -> _map.computeIfAbsent(entry.getKey(), k -> new Pair<>(-1, 0))
                         .setValue(entry.getValue()));
             }

@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -21,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class SUpgradeLevel implements UpgradeLevel {
+public class SUpgradeLevel implements UpgradeLevel {
 
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 
 import java.util.Collection;
 
@@ -18,6 +19,11 @@ public interface UpgradesManager {
      * @param slot The slot of the upgrade.
      */
     Upgrade getUpgrade(int slot);
+
+    /**
+     * Get an upgrade-level object that contains all the default values from config.
+     */
+    UpgradeLevel getDefaultLevel();
 
     /**
      * Check whether or not an upgrade with the provided name exists or not.

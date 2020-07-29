@@ -9,11 +9,13 @@ import java.util.function.Predicate;
 public final class UpgradeValue<T> {
 
     private final SyncedObject<Pair<T, T>> value;
+    private final T defaultUpgradeValue;
     private final Predicate<T> syncValue;
     private final BiPredicate<T, T> isGreater;
 
     private UpgradeValue(T value, T upgradeValue, Predicate<T> syncValue, BiPredicate<T, T> isGreater){
         this.value = SyncedObject.of(new Pair<>(value, upgradeValue));
+        this.defaultUpgradeValue = upgradeValue;
         this.syncValue = syncValue;
         this.isGreater = isGreater;
     }
@@ -31,11 +33,15 @@ public final class UpgradeValue<T> {
         this.value.write(pair -> pair.setKey(value));
     }
 
-    public void setIfSync(T value){
+    public void setUpgrade(T value){
         Pair<T, T> pair = this.value.get();
-        if(syncValue.test(pair.getKey()) && isGreater.test(value, pair.getValue())){
+        if(isGreater.test(value, pair.getValue())){
             this.value.write(_pair -> _pair.setValue(value));
         }
+    }
+
+    public void clearUpgrade(){
+        this.value.write(pair -> pair.setValue(defaultUpgradeValue));
     }
 
     public static UpgradeValue<Double> createDouble(){
