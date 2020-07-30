@@ -671,8 +671,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     public void setTeleportTask(BukkitTask teleportTask){
-        if(teleportTask != null)
-            teleportTask.cancel();
+        if(this.teleportTask != null)
+            this.teleportTask.cancel();
         this.teleportTask = teleportTask;
     }
 
