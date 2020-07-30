@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.events;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
 import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
@@ -23,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
+import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -241,6 +243,10 @@ public final class EventsCaller {
             IslandRestrictMoveEvent islandRestrictMoveEvent = new IslandRestrictMoveEvent(superiorPlayer, restrictReason);
             Bukkit.getPluginManager().callEvent(islandRestrictMoveEvent);
         }
+    }
+
+    public static void callPluginInitializeEvent(SuperiorSkyblock plugin){
+        Bukkit.getPluginManager().callEvent(new PluginInitializeEvent(plugin));
     }
 
 }

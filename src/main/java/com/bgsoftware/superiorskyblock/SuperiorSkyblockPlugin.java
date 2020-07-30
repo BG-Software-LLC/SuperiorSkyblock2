@@ -41,6 +41,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -173,6 +174,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             loadWorld();
 
+            EventsCaller.callPluginInitializeEvent(this);
             reloadPlugin(true);
 
             if (Updater.isOutdated()) {
