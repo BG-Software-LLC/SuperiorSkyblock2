@@ -130,16 +130,37 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelPlace(BarrelPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
+
+            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
             int increaseAmount = e.getBarrel().getStackAmount();
-            if(island != null && increaseAmount > 1)
-                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), increaseAmount - 1);
+
+            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                e.setCancelled(true);
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+            }
+
+            else{
+                island.handleBlockPlace(blockKey, increaseAmount - 1);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelStack(BarrelStackEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-            if(island != null)
-                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getTarget().getStackAmount());
+
+            if(island == null)
+                return;
+
+            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
+            int increaseAmount = e.getBarrel().getStackAmount();
+
+            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                e.setCancelled(true);
+            }
+
+            else{
+                island.handleBlockPlace(blockKey, increaseAmount);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -150,10 +171,23 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelUnstack(BarrelPlaceInventoryEvent e){
+        public void onBarrelPlace(BarrelPlaceInventoryEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-            if(island != null)
-                island.handleBlockPlace(Key.of(e.getBarrel().getBarrelItem(1)), e.getIncreaseAmount());
+
+            if(island == null)
+                return;
+
+            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
+            int increaseAmount = e.getIncreaseAmount();
+
+            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+                e.setCancelled(true);
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+            }
+
+            else{
+                island.handleBlockPlace(blockKey, increaseAmount);
+            }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
