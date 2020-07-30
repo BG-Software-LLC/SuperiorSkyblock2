@@ -5,8 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
-import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -47,8 +46,8 @@ public final class UpgradesHandler implements UpgradesManager {
     }
 
     @Override
-    public UpgradeLevel getDefaultLevel() {
-        return DefaultUpgradeLevel.getInstance();
+    public Upgrade getDefaultUpgrade() {
+        return DefaultUpgrade.getInstance();
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;

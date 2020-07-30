@@ -21,9 +21,9 @@ public interface UpgradesManager {
     Upgrade getUpgrade(int slot);
 
     /**
-     * Get an upgrade-level object that contains all the default values from config.
+     * Get an upgrade object that contains all the default values from config.
      */
-    UpgradeLevel getDefaultLevel();
+    Upgrade getDefaultUpgrade();
 
     /**
      * Check whether or not an upgrade with the provided name exists or not.

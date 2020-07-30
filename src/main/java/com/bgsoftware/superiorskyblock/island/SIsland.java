@@ -1868,7 +1868,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
-        return upgrade.getUpgradeLevel(getUpgrades().getOrDefault(upgrade.getName(), -1));
+        return upgrade.getUpgradeLevel(getUpgrades().getOrDefault(upgrade.getName(), 1));
     }
 
     @Override

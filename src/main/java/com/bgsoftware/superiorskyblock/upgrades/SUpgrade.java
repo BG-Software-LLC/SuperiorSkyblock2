@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
-public final class SUpgrade implements Upgrade {
+public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
             new HashSet<>(), -1, -1, -1, -1, -1, -1, -1,
@@ -31,7 +31,7 @@ public final class SUpgrade implements Upgrade {
 
     @Override
     public SUpgradeLevel getUpgradeLevel(int level) {
-        return level == -1 ? DefaultUpgradeLevel.getInstance() : level <= 0 || level > upgradeLevels.length ? NULL_LEVEL : upgradeLevels[level - 1];
+        return level <= 0 || level > upgradeLevels.length ? NULL_LEVEL : upgradeLevels[level - 1];
     }
 
     @Override
