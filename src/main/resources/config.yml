@@ -528,6 +528,8 @@ crops-to-grow:
 - 'SPRUCE_SAPLING'
 - 'CROPS'
 - 'WHEAT'
+- 'CARROT'
+- 'POTATO'
 
 # How frequency should the crops task run? (in ticks)
 crops-interval: 5
