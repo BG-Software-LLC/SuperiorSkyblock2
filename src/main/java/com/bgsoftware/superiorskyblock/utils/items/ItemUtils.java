@@ -11,6 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -25,7 +26,8 @@ import java.util.Map;
 
 public final class ItemUtils {
 
-    private static final ReflectMethod<EquipmentSlot> GET_HAND = new ReflectMethod<>(BlockPlaceEvent.class, "getHand");
+    private static final ReflectMethod<EquipmentSlot> GET_HAND_BLOCK_PLACE = new ReflectMethod<>(BlockPlaceEvent.class, "getHand");
+    private static final ReflectMethod<EquipmentSlot> GET_HAND_PLAYER_INTERACT = new ReflectMethod<>(PlayerInteractEvent.class, "getHand");
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
@@ -34,8 +36,15 @@ public final class ItemUtils {
     }
 
     public static void removeItem(ItemStack itemStack, Event event, Player player){
-        if(GET_HAND.isValid()){
-            EquipmentSlot equipmentSlot = GET_HAND.invoke(event);
+        ReflectMethod<EquipmentSlot> reflectMethod = null;
+
+        if(event instanceof BlockPlaceEvent)
+            reflectMethod = GET_HAND_BLOCK_PLACE;
+        else if(event instanceof PlayerInteractEvent)
+            reflectMethod = GET_HAND_PLAYER_INTERACT;
+
+        if(reflectMethod != null && reflectMethod.isValid()){
+            EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
             if(equipmentSlot.name().equals("OFF_HAND")){
                 ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
                 if(offHand.isSimilar(itemStack)){
@@ -50,9 +59,16 @@ public final class ItemUtils {
     }
 
     public static void setItem(ItemStack itemStack, Event event, Player player){
-        if(GET_HAND.isValid()){
-            EquipmentSlot equipmentSlot = GET_HAND.invoke(event);
-            if(equipmentSlot.name().equals("OFF_HAND")){
+        ReflectMethod<EquipmentSlot> reflectMethod = null;
+
+        if(event instanceof BlockPlaceEvent)
+            reflectMethod = GET_HAND_BLOCK_PLACE;
+        else if(event instanceof PlayerInteractEvent)
+            reflectMethod = GET_HAND_PLAYER_INTERACT;
+
+        if(reflectMethod != null && reflectMethod.isValid()){
+            EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
+            if(equipmentSlot != null && equipmentSlot.name().equals("OFF_HAND")){
                 player.getInventory().setItem(40, itemStack);
                 return;
             }
