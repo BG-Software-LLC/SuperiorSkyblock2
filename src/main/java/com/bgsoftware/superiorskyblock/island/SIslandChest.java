@@ -73,7 +73,7 @@ public final class SIslandChest implements IslandChest {
     }
 
     public void updateContents(){
-        if(++contentsUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
+        if(++contentsUpdateCounter >= 50){
             contentsUpdateCounter = 0;
             ((SIsland) island).saveIslandChests();
         }

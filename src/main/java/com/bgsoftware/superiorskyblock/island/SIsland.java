@@ -2838,7 +2838,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void saveIslandChests(){
-        Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder()
+        Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder()
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
