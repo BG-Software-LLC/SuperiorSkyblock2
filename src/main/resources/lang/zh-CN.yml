@@ -133,6 +133,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Increase the spawner rates multipl
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Increase members limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_WARPS_LIMIT: 'Increase the warps limit of an island.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: 打开管理员忽略模式.
+COMMAND_DESCRIPTION_ADMIN_CHEST: 'Open island''s chest of another island.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: 给指定的岛屿清除矿物生成概率.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: 将一个岛屿向公众关闭.
 COMMAND_DESCRIPTION_ADMIN_COUNT: 检查一个岛屿指定方块的数量.

@@ -137,6 +137,7 @@ COMMAND_DESCRIPTION_ADMIN_PURGE: Purger les îles.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Augmenter une amélioration pour l''île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Octroyer un bonus à un joueur.
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Activer/Désactiver le mode bypass.
+COMMAND_DESCRIPTION_ADMIN_CHEST: 'Open island''s chest of another island.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Réinitialiser le taux des générateurs pour l'île spécifié.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.
 COMMAND_DESCRIPTION_ADMIN_COUNT: Vérifier le nombre de blocs sur lîle spécifiée.

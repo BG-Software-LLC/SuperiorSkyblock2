@@ -141,6 +141,7 @@ COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Increase the spawner rates multipl
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Increase members limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_ADD_WARPS_LIMIT: 'Increase the warps limit of an island.'
 COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
+COMMAND_DESCRIPTION_ADMIN_CHEST: 'Open island''s chest of another island.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
 COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
