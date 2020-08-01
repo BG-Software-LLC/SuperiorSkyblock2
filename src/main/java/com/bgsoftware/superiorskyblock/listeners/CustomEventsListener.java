@@ -431,13 +431,7 @@ public final class CustomEventsListener implements Listener {
             }, 5L);
         }
 
-        // Joined to the server - we need to delay the world-border
-        if(fromLocation == null) {
-            Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
-        }
-        else {
-            plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland);
-        }
+        Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
     }
 
 }
