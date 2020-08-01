@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.EnumParticle;
@@ -160,6 +162,13 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
 
         for(int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
+    }
+
+    @Override
+    public void playBreakAnimation(org.bukkit.block.Block block) {
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
     }
 
     @Override

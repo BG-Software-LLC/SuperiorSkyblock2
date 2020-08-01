@@ -401,6 +401,8 @@ public final class BlocksListener implements Listener {
 
         plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
 
+        plugin.getNMSAdapter().playBreakAnimation(block);
+
         if(plugin.getGrid().hasBlockFailed()) {
             if(island != null)
                 island.handleBlockBreak(Key.of(block), blockAmount - 1);

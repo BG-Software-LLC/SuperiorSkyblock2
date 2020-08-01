@@ -179,6 +179,13 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     }
 
     @Override
+    public void playBreakAnimation(org.bukkit.block.Block block) {
+        World world = ((CraftWorld) block.getWorld()).getHandle();
+        BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+        world.a(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
+    }
+
+    @Override
     public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
 
