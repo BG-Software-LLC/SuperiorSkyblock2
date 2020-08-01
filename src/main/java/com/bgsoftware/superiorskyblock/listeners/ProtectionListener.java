@@ -27,6 +27,7 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Villager;
 import org.bukkit.entity.WaterMob;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -466,8 +467,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         IslandPrivilege islandPermission = e.getEntity() instanceof ArmorStand ? IslandPrivileges.BREAK :
-                e.getEntity() instanceof Animals || e.getEntity() instanceof WaterMob ? IslandPrivileges.ANIMAL_DAMAGE :
-                        IslandPrivileges.MONSTER_DAMAGE;
+                e.getEntity() instanceof Animals || e.getEntity() instanceof WaterMob || e.getEntity() instanceof Villager ?
+                        IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.MONSTER_DAMAGE;
 
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
