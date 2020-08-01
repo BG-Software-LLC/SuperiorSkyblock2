@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -709,9 +710,8 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     }
 
     @Override
-    public void executeUpdateStatement(boolean async) {
-        Query.PLAYER_UPDATE.getStatementHolder(this)
-                .setString(islandLeader.getUniqueId().toString())
+    public StatementHolder setUpdateStatement(StatementHolder statementHolder) {
+        return statementHolder.setString(islandLeader.getUniqueId().toString())
                 .setString(name)
                 .setString(playerRole.getId() + "")
                 .setString(textureValue)
@@ -723,8 +723,12 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
                 .setBoolean(worldBorderEnabled)
-                .setString(player.toString())
-                .execute(async);
+                .setString(player.toString());
+    }
+
+    @Override
+    public void executeUpdateStatement(boolean async) {
+        setUpdateStatement(Query.PLAYER_UPDATE.getStatementHolder(this)).execute(async);
     }
 
     @Override

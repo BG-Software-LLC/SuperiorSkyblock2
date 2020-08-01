@@ -7,12 +7,14 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.sql.ResultSet;
@@ -134,12 +136,28 @@ public final class PlayersHandler implements PlayersManager {
 
     // Updating last time status
     public void savePlayers(){
-        StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder(null);
-        long lastTimeStatus = System.currentTimeMillis() / 1000;
-        playerStatusHolder.prepareBatch();
-        players.values().stream().filter(SuperiorPlayer::isOnline).forEach(superiorPlayer ->
-                playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
-        playerStatusHolder.execute(false);
+        List<SuperiorPlayer> onlinePlayers = Bukkit.getOnlinePlayers().stream()
+                .map(SSuperiorPlayer::of)
+                .collect(Collectors.toList());
+
+        List<SuperiorPlayer> modifiedPlayers = players.values().stream()
+                .filter(player -> ((DatabaseObject) player).isModified())
+                .collect(Collectors.toList());
+
+        if(!onlinePlayers.isEmpty()){
+            long lastTimeStatus = System.currentTimeMillis() / 1000;
+            StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder(null);
+            playerStatusHolder.prepareBatch();
+            onlinePlayers.forEach(superiorPlayer -> playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
+            playerStatusHolder.execute(false);
+        }
+
+        if(!modifiedPlayers.isEmpty()){
+            StatementHolder playerUpdateHolder = Query.PLAYER_UPDATE.getStatementHolder(null);
+            playerUpdateHolder.prepareBatch();
+            modifiedPlayers.forEach(player -> ((SSuperiorPlayer) player).setUpdateStatement(playerUpdateHolder).addBatch());
+            playerUpdateHolder.execute(false);
+        }
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

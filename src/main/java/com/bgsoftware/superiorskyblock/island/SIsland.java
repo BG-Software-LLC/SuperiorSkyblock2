@@ -47,6 +47,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
@@ -2718,7 +2719,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         islandChests[index].setRows(rows);
 
-        setModified(Query.ISLAND_SET_ISLAND_CHEST);
+        setIslandChestsModified();
     }
 
     /*
@@ -2726,9 +2727,8 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
-    public void executeUpdateStatement(boolean async){
-        Query.ISLAND_UPDATE.getStatementHolder(this)
-                .setString(LocationUtils.getLocation(getTeleportLocation(World.Environment.NORMAL)))
+    public StatementHolder setUpdateStatement(StatementHolder statementHolder) {
+        return statementHolder.setString(LocationUtils.getLocation(getTeleportLocation(World.Environment.NORMAL)))
                 .setString(LocationUtils.getLocation(visitorsLocation.get()))
                 .setString(IslandSerializer.serializePlayers(members))
                 .setString(IslandSerializer.serializePlayers(banned))
@@ -2767,8 +2767,12 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setInt(coopLimit.getValue())
                 .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
-                .setString(owner.getUniqueId().toString())
-                .execute(async);
+                .setString(owner.getUniqueId().toString());
+    }
+
+    @Override
+    public void executeUpdateStatement(boolean async) {
+        setUpdateStatement(Query.ISLAND_UPDATE.getStatementHolder(this)).execute(async);
     }
 
     @Override
@@ -2837,6 +2841,10 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeBlockCounts(blockCounts))
                 .setString(owner.getUniqueId().toString())
                 .execute(true));
+    }
+
+    public void setIslandChestsModified(){
+        setModified(Query.ISLAND_SET_ISLAND_CHEST);
     }
 
     public void saveIslandChests(){

@@ -21,12 +21,12 @@ import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -54,6 +54,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -618,57 +619,31 @@ public final class GridHandler implements GridManager {
     }
 
     public void saveIslands(){
-        List<Island> islandList = getIslands();
+        List<Island> onlineIslands = Bukkit.getOnlinePlayers().stream()
+                .map(player -> SSuperiorPlayer.of(player).getIsland())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-        List<Island> modifiedIslands = islandList.stream()
+        List<Island> modifiedIslands = getIslands().stream()
                 .filter(island -> ((DatabaseObject) island).isModified())
                 .collect(Collectors.toList());
 
-        long lastTimeStatus = System.currentTimeMillis() / 1000;
-
-        if(!islandList.isEmpty()) {
-            {
-                StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder(null);
-                islandStatusHolder.prepareBatch();
-                islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
-                islandStatusHolder.execute(false);
-            }
+        if(!onlineIslands.isEmpty()) {
+            long lastTimeStatus = System.currentTimeMillis() / 1000;
+            StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder(null);
+            islandStatusHolder.prepareBatch();
+            onlineIslands.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
+            islandStatusHolder.execute(false);
         }
 
         if(!modifiedIslands.isEmpty()){
-            {
-                StatementHolder islandCountsHolder = Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder(null);
-                islandCountsHolder.prepareBatch();
-                modifiedIslands.forEach(island -> islandCountsHolder
-                        .setString(IslandSerializer.serializeBlockCounts(((SIsland) island).getRawBlockCounts()))
-                        .setString(island.getOwner().getUniqueId() + "")
-                        .addBatch()
-                );
-                islandCountsHolder.execute(false);
-            }
-            {
-                StatementHolder dirtyChunksHolder = Query.ISLAND_SET_DIRTY_CHUNKS.getStatementHolder(null);
-                dirtyChunksHolder.prepareBatch();
-                modifiedIslands.forEach(island -> dirtyChunksHolder
-                        .setString(ChunksTracker.serialize(island))
-                        .setString(island.getOwner().getUniqueId() + "")
-                        .addBatch()
-                );
-                dirtyChunksHolder.execute(false);
-            }
-            {
-                StatementHolder islandChestHolder = Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder(null);
-                islandChestHolder.prepareBatch();
-                modifiedIslands.forEach(island -> islandChestHolder
-                        .setString(IslandSerializer.serializeIslandChest(island.getChest()))
-                        .setString(island.getOwner().getUniqueId() + "")
-                        .addBatch()
-                );
-                islandChestHolder.execute(false);
-            }
+            StatementHolder islandUpdateHolder = Query.ISLAND_UPDATE.getStatementHolder(null);
+            islandUpdateHolder.prepareBatch();
+            modifiedIslands.forEach(island -> ((SIsland) island).setUpdateStatement(islandUpdateHolder).addBatch());
+            islandUpdateHolder.execute(false);
         }
 
-        islandList.forEach(Island::removeEffects);
+        getIslands().forEach(Island::removeEffects);
     }
 
     private BlockFace getIslandFace(Location location){

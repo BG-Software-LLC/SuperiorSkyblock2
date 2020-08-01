@@ -6,6 +6,11 @@ public abstract class DatabaseObject {
 
     public static final DatabaseObject NULL_DATA = new DatabaseObject() {
         @Override
+        public StatementHolder setUpdateStatement(StatementHolder statementHolder) {
+            return null;
+        }
+
+        @Override
         public void executeUpdateStatement(boolean async) {
 
         }
@@ -23,6 +28,8 @@ public abstract class DatabaseObject {
 
     private final EnumMap<Query, Integer> modifiedCalls = new EnumMap<>(Query.class);
 
+    public abstract StatementHolder setUpdateStatement(StatementHolder statementHolder);
+
     public abstract void executeUpdateStatement(boolean async);
 
     public abstract void executeInsertStatement(boolean async);
@@ -35,6 +42,7 @@ public abstract class DatabaseObject {
 
     public void setUpdated(Query query){
         int calls = modifiedCalls.getOrDefault(query, 0) - 1;
+
         if(calls <= 0)
             modifiedCalls.remove(query);
         else
