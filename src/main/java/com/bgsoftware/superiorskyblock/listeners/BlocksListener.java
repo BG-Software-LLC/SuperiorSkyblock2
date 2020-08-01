@@ -315,9 +315,11 @@ public final class BlocksListener implements Listener {
         if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(againstBlock.getWorld().getName()))
             return false;
 
+        if(placeItem.hasItemMeta() && (placeItem.getItemMeta().hasDisplayName() || placeItem.getItemMeta().hasLore()))
+            return false;
+
         if(againstBlock.getType().name().equals("GLOWING_REDSTONE_ORE"))
             againstBlock.setType(Material.REDSTONE_ORE);
-
 
         //noinspection deprecation
         byte blockData = againstBlock.getData();
