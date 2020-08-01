@@ -81,7 +81,9 @@ public final class ChunksListener implements Listener {
         }
 
         plugin.getNMSAdapter().injectChunkSections(e.getChunk());
-        plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), false);
+
+        if(island.isInsideRange(e.getChunk()))
+            plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), false);
 
         if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);

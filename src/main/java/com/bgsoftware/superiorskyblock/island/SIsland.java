@@ -1181,7 +1181,17 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public void setIslandSize(int islandSize) {
         SuperiorSkyblockPlugin.debug("Action: Set Size, Island: " + owner.getName() + ", Size: " + islandSize);
+
+        // First, we want to remove all the current crop tile entities
+        getLoadedChunks(true, false).forEach(chunk ->
+                plugin.getNMSBlocks().startTickingChunk(this, chunk, true));
+
         this.islandSize.set(islandSize);
+
+        // Now, we want to update the tile entities again
+        getLoadedChunks(true, false).forEach(chunk ->
+                plugin.getNMSBlocks().startTickingChunk(this, chunk, false));
+
         Query.ISLAND_SET_SIZE.getStatementHolder()
                 .setInt(islandSize)
                 .setString(owner.getUniqueId().toString())
