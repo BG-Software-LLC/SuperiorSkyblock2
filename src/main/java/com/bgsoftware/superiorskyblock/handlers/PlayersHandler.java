@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.database.Query;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -128,6 +130,16 @@ public final class PlayersHandler implements PlayersManager {
             ((SIsland) island).replacePlayers(originPlayer, newPlayer);
 
         ((SSuperiorPlayer) originPlayer).merge((SSuperiorPlayer) newPlayer);
+    }
+
+    // Updating last time status
+    public void savePlayers(){
+        StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder(null);
+        long lastTimeStatus = System.currentTimeMillis() / 1000;
+        playerStatusHolder.prepareBatch();
+        players.values().stream().filter(SuperiorPlayer::isOnline).forEach(superiorPlayer ->
+                playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
+        playerStatusHolder.execute(false);
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

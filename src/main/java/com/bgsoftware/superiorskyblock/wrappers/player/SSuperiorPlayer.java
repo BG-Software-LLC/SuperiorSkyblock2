@@ -133,7 +133,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setTextureValue(String textureValue) {
         SuperiorSkyblockPlugin.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
         this.textureValue = textureValue;
-        Query.PLAYER_SET_TEXTURE.getStatementHolder()
+        Query.PLAYER_SET_TEXTURE.getStatementHolder(this)
                 .setString(textureValue)
                 .setString(player.toString())
                 .execute(true);
@@ -142,7 +142,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void updateName(){
         this.name = asPlayer().getName();
-        Query.PLAYER_SET_NAME.getStatementHolder()
+        Query.PLAYER_SET_NAME.getStatementHolder(this)
                 .setString(name)
                 .setString(player.toString())
                 .execute(true);
@@ -163,7 +163,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         this.userLocale = userLocale;
 
-        Query.PLAYER_SET_LANGUAGE.getStatementHolder()
+        Query.PLAYER_SET_LANGUAGE.getStatementHolder(this)
                 .setString(userLocale.getLanguage() + "-" + userLocale.getCountry())
                 .setString(player.toString())
                 .execute(true);
@@ -329,7 +329,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setIslandLeader(SuperiorPlayer superiorPlayer) {
         SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + superiorPlayer.getName());
         this.islandLeader = superiorPlayer;
-        Query.PLAYER_SET_LEADER.getStatementHolder()
+        Query.PLAYER_SET_LEADER.getStatementHolder(this)
                 .setString(islandLeader.getUniqueId().toString())
                 .setString(player.toString())
                 .execute(true);
@@ -352,7 +352,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setPlayerRole(PlayerRole playerRole) {
         SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
-        Query.PLAYER_SET_ROLE.getStatementHolder()
+        Query.PLAYER_SET_ROLE.getStatementHolder(this)
                 .setString(playerRole.getId() + "")
                 .setString(player.toString())
                 .execute(true);
@@ -367,7 +367,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
         SuperiorSkyblockPlugin.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
-        Query.PLAYER_SET_TOGGLED_BORDER.getStatementHolder()
+        Query.PLAYER_SET_TOGGLED_BORDER.getStatementHolder(this)
                 .setBoolean(worldBorderEnabled)
                 .setString(player.toString())
                 .execute(true);
@@ -434,7 +434,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setDisbands(int disbands) {
         SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
         this.disbands = Math.max(disbands, 0);
-        Query.PLAYER_SET_DISBANDS.getStatementHolder()
+        Query.PLAYER_SET_DISBANDS.getStatementHolder(this)
                 .setInt(disbands)
                 .setString(player.toString())
                 .execute(true);
@@ -444,7 +444,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
         SuperiorSkyblockPlugin.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
-        Query.PLAYER_SET_TOGGLED_PANEL.getStatementHolder()
+        Query.PLAYER_SET_TOGGLED_PANEL.getStatementHolder(this)
                 .setBoolean(toggledPanel)
                 .setString(player.toString())
                 .execute(true);
@@ -478,7 +478,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void toggleIslandFly(){
         islandFly = !islandFly;
         SuperiorSkyblockPlugin.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
-        Query.PLAYER_SET_ISLAND_FLY.getStatementHolder()
+        Query.PLAYER_SET_ISLAND_FLY.getStatementHolder(this)
                 .setBoolean(islandFly)
                 .setString(player.toString())
                 .execute(true);
@@ -511,7 +511,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         this.borderColor = borderColor;
 
-        Query.PLAYER_SET_BORDER.getStatementHolder()
+        Query.PLAYER_SET_BORDER.getStatementHolder(this)
                 .setString(borderColor.name())
                 .setString(player.toString())
                 .execute(true);
@@ -523,7 +523,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
 
-        Query.PLAYER_SET_LAST_STATUS.getStatementHolder()
+        Query.PLAYER_SET_LAST_STATUS.getStatementHolder(this)
                 .setString(lastTimeStatus + "")
                 .setString(player.toString())
                 .execute(true);
@@ -539,7 +539,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
-        Query.PLAYER_SET_MISSIONS.getStatementHolder()
+        Query.PLAYER_SET_MISSIONS.getStatementHolder(this)
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(player.toString())
                 .execute(true);
@@ -558,7 +558,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
         mission.clearData(this);
 
-        Query.PLAYER_SET_MISSIONS.getStatementHolder()
+        Query.PLAYER_SET_MISSIONS.getStatementHolder(this)
                 .setString(IslandSerializer.serializeMissions(completedMissions))
                 .setString(player.toString())
                 .execute(true);
@@ -710,7 +710,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void executeUpdateStatement(boolean async) {
-        Query.PLAYER_UPDATE.getStatementHolder()
+        Query.PLAYER_UPDATE.getStatementHolder(this)
                 .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
                 .setString(playerRole.getId() + "")
@@ -729,7 +729,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void executeInsertStatement(boolean async) {
-        Query.PLAYER_INSERT.getStatementHolder()
+        Query.PLAYER_INSERT.getStatementHolder(this)
                 .setString(player.toString())
                 .setString(islandLeader.getUniqueId().toString())
                 .setString(name)
@@ -748,7 +748,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
 
     @Override
     public void executeDeleteStatement(boolean async) {
-        Query.PLAYER_DELETE.getStatementHolder()
+        Query.PLAYER_DELETE.getStatementHolder(this)
                 .setString(player.toString())
                 .execute(async);
     }

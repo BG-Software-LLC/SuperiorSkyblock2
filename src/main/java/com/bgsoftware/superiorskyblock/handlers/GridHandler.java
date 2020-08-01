@@ -13,12 +13,15 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -429,7 +432,7 @@ public final class GridHandler implements GridManager {
 
         if(amount > 1) {
             if (originalBlock != null) {
-                Query.STACKED_BLOCKS_INSERT.getStatementHolder()
+                Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
                         .setString(block.getWorld().getName())
                         .setInt(block.getX())
                         .setInt(block.getY())
@@ -438,7 +441,7 @@ public final class GridHandler implements GridManager {
                         .setString(Key.of(block).toString())
                         .execute(true);
             } else {
-                Query.STACKED_BLOCKS_UPDATE.getStatementHolder()
+                Query.STACKED_BLOCKS_UPDATE.getStatementHolder(null)
                         .setInt(amount)
                         .setString(block.getWorld().getName())
                         .setInt(block.getX())
@@ -447,7 +450,7 @@ public final class GridHandler implements GridManager {
                         .execute(true);
             }
         }else{
-            Query.STACKED_BLOCKS_DELETE.getStatementHolder()
+            Query.STACKED_BLOCKS_DELETE.getStatementHolder(null)
                     .setString(block.getWorld().getName())
                     .setInt(block.getX())
                     .setInt(block.getY())
@@ -592,7 +595,7 @@ public final class GridHandler implements GridManager {
     public void executeStackedBlocksInsertStatement(boolean async){
         for(Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks : this.stackedBlocks.values()) {
             for (Map.Entry<SBlockPosition, Pair<Integer, Key>> entry : stackedBlocks.entrySet()) {
-                Query.STACKED_BLOCKS_INSERT.getStatementHolder()
+                Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
                         .setString(entry.getKey().getWorld().getName())
                         .setInt(entry.getKey().getX())
                         .setInt(entry.getKey().getY())
@@ -605,13 +608,67 @@ public final class GridHandler implements GridManager {
     }
 
     public void executeGridInsertStatement(boolean async) {
-        Query.GRID_INSERT.getStatementHolder()
+        Query.GRID_INSERT.getStatementHolder(null)
                 .setString(this.lastIsland.toString())
                 .setString("")
                 .setInt(plugin.getSettings().maxIslandSize)
                 .setString(plugin.getSettings().islandWorldName)
                 .setString("")
                 .execute(async);
+    }
+
+    public void saveIslands(){
+        List<Island> islandList = getIslands();
+
+        List<Island> modifiedIslands = islandList.stream()
+                .filter(island -> ((DatabaseObject) island).isModified())
+                .collect(Collectors.toList());
+
+        long lastTimeStatus = System.currentTimeMillis() / 1000;
+
+        if(!islandList.isEmpty()) {
+            {
+                StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder(null);
+                islandStatusHolder.prepareBatch();
+                islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
+                islandStatusHolder.execute(false);
+            }
+        }
+
+        if(!modifiedIslands.isEmpty()){
+            {
+                StatementHolder islandCountsHolder = Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder(null);
+                islandCountsHolder.prepareBatch();
+                modifiedIslands.forEach(island -> islandCountsHolder
+                        .setString(IslandSerializer.serializeBlockCounts(((SIsland) island).getRawBlockCounts()))
+                        .setString(island.getOwner().getUniqueId() + "")
+                        .addBatch()
+                );
+                islandCountsHolder.execute(false);
+            }
+            {
+                StatementHolder dirtyChunksHolder = Query.ISLAND_SET_DIRTY_CHUNKS.getStatementHolder(null);
+                dirtyChunksHolder.prepareBatch();
+                modifiedIslands.forEach(island -> dirtyChunksHolder
+                        .setString(ChunksTracker.serialize(island))
+                        .setString(island.getOwner().getUniqueId() + "")
+                        .addBatch()
+                );
+                dirtyChunksHolder.execute(false);
+            }
+            {
+                StatementHolder islandChestHolder = Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder(null);
+                islandChestHolder.prepareBatch();
+                modifiedIslands.forEach(island -> islandChestHolder
+                        .setString(IslandSerializer.serializeIslandChest(island.getChest()))
+                        .setString(island.getOwner().getUniqueId() + "")
+                        .addBatch()
+                );
+                islandChestHolder.execute(false);
+            }
+        }
+
+        islandList.forEach(Island::removeEffects);
     }
 
     private BlockFace getIslandFace(Location location){
@@ -628,7 +685,7 @@ public final class GridHandler implements GridManager {
     private void setLastIsland(SBlockPosition blockPosition){
         SuperiorSkyblockPlugin.debug("Action: Set Last Island, Location: " + blockPosition);
         this.lastIsland = blockPosition;
-        Query.GRID_UPDATE_LAST_ISLAND.getStatementHolder()
+        Query.GRID_UPDATE_LAST_ISLAND.getStatementHolder(null)
                 .setString(blockPosition.toString())
                 .execute(true);
     }

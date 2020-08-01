@@ -38,11 +38,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
-import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -66,13 +62,9 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
@@ -223,7 +215,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             return;
 
         ChunksProvider.stop();
-        //CropsTask.cancelTask();
         try {
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();
@@ -231,73 +222,20 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Island island : gridHandler.getIslandsToPurge())
                 island.disbandIsland();
 
-            Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+            playersHandler.savePlayers();
+            gridHandler.saveIslands();
 
-            if(!players.isEmpty()){
-                long lastTimeStatus = System.currentTimeMillis() / 1000;
-
-                StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder();
-                playerStatusHolder.prepareBatch();
-                players.stream().map(SSuperiorPlayer::of).forEach(superiorPlayer ->
-                        playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
-                playerStatusHolder.execute(false);
-
-                List<Island> islandList = players.stream().map(player -> SSuperiorPlayer.of(player).getIsland())
-                        .filter(Objects::nonNull).collect(Collectors.toList());
-
-                if(!islandList.isEmpty()) {
-                    {
-                        StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder();
-                        islandStatusHolder.prepareBatch();
-                        islandList.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
-                        islandStatusHolder.execute(false);
-                    }
-                    {
-                        StatementHolder islandCountsHolder = Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder();
-                        islandCountsHolder.prepareBatch();
-                        islandList.forEach(island -> islandCountsHolder
-                                .setString(IslandSerializer.serializeBlockCounts(((SIsland) island).getRawBlockCounts()))
-                                .setString(island.getOwner().getUniqueId() + "")
-                                .addBatch()
-                        );
-                        islandCountsHolder.execute(false);
-                    }
-                    {
-                        StatementHolder dirtyChunksHolder = Query.ISLAND_SET_DIRTY_CHUNKS.getStatementHolder();
-                        dirtyChunksHolder.prepareBatch();
-                        islandList.forEach(island -> dirtyChunksHolder
-                                .setString(ChunksTracker.serialize(island))
-                                .setString(island.getOwner().getUniqueId() + "")
-                                .addBatch()
-                        );
-                        dirtyChunksHolder.execute(false);
-                    }
-                    {
-                        StatementHolder islandChestHolder = Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder();
-                        islandChestHolder.prepareBatch();
-                        islandList.forEach(island -> islandChestHolder
-                                .setString(IslandSerializer.serializeIslandChest(island.getChest()))
-                                .setString(island.getOwner().getUniqueId() + "")
-                                .addBatch()
-                        );
-                        islandChestHolder.execute(false);
-                    }
-
-                    islandList.forEach(Island::removeEffects);
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                player.closeInventory();
+                nmsAdapter.setWorldBorder(superiorPlayer, null);
+                if (superiorPlayer.hasIslandFlyEnabled()) {
+                    player.setAllowFlight(false);
+                    player.setFlying(false);
                 }
-
-                players.forEach(player -> {
-                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
-                    player.closeInventory();
-                    nmsAdapter.setWorldBorder(superiorPlayer, null);
-                    if (superiorPlayer.hasIslandFlyEnabled()) {
-                        player.setAllowFlight(false);
-                        player.setFlying(false);
-                    }
-                });
-            }
-        }catch(Exception ignored){
-            //Ignore
+            });
+        }catch(Exception ex){
+            ex.printStackTrace();
         }finally {
             CalcTask.cancelTask();
             Executor.close();

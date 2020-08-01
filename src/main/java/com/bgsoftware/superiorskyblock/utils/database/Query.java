@@ -76,7 +76,7 @@ public enum Query {
         return query;
     }
 
-    public StatementHolder getStatementHolder(){
-        return new StatementHolder(this);
+    public StatementHolder getStatementHolder(DatabaseObject databaseObject){
+        return new StatementHolder(databaseObject, this);
     }
 }

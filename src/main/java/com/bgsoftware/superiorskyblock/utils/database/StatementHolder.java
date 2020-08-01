@@ -16,14 +16,19 @@ public final class StatementHolder {
     private final List<Registry<Integer, Object>> batches = new ArrayList<>();
 
     private final String query;
+    private final DatabaseObject databaseObject;
+    private final Query queryEnum;
     private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
     private boolean isBatch = false;
 
-    StatementHolder(Query query){
+    StatementHolder(DatabaseObject databaseObject, Query query){
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+        this.queryEnum = query;
         this.query = query.getStatement().replace("{prefix}", prefix);
+        this.databaseObject = databaseObject == null ? DatabaseObject.NULL_DATA : databaseObject;
+        this.databaseObject.setModified(query);
     }
 
     public StatementHolder setString(String value){
@@ -114,13 +119,18 @@ public final class StatementHolder {
                         }
                         preparedStatement.executeUpdate();
                     }
+
+                    databaseObject.setUpdated(queryEnum);
                 }, ex -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
                     ex.printStackTrace();
+
+                    databaseObject.setUpdated(queryEnum);
                 });
             }
         } finally {
             values.clear();
+            databaseObject.setUpdated(queryEnum);
         }
     }
 
