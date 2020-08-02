@@ -35,7 +35,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin chest <" +
+        return "admin delwarp <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + ">";
