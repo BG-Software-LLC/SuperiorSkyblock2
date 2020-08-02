@@ -504,7 +504,7 @@ public final class BlocksListener implements Listener {
             onSignPlace(SSuperiorPlayer.of(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
     }
 
-    public void onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
+    public boolean onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
         warpLocation.setYaw(superiorPlayer.getLocation().getYaw());
 
         if(lines[0].equalsIgnoreCase(plugin.getSettings().signWarpLine)){
@@ -513,7 +513,7 @@ public final class BlocksListener implements Listener {
                     Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
                     lines[i] = "";
-                return;
+                return true;
             }
 
             String warpName = lines[1];
@@ -533,6 +533,8 @@ public final class BlocksListener implements Listener {
                 if(message)
                     Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
             }
+
+            return true;
         }
 
         else if(lines[0].equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
@@ -541,7 +543,7 @@ public final class BlocksListener implements Listener {
                     Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
                     lines[i] = "";
-                return;
+                return true;
             }
 
             StringBuilder descriptionBuilder = new StringBuilder();
@@ -570,7 +572,11 @@ public final class BlocksListener implements Listener {
             island.setDescription(description);
             if(message)
                 Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+
+            return true;
         }
+
+        return false;
     }
 
     public void onSignBreak(Player player, Sign sign){

@@ -30,6 +30,8 @@ public interface NMSBlocks {
 
     CompoundTag readTileEntity(Location location);
 
+    String parseSignLine(String original);
+
     void refreshChunk(Chunk chunk);
 
     void refreshLight(Chunk chunk);

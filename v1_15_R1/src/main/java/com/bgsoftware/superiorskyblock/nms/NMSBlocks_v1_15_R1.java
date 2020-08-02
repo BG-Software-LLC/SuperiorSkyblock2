@@ -63,6 +63,7 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_15_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
@@ -262,6 +263,11 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         tileEntityCompound.remove("z");
 
         return CompoundTag.fromNBT(tileEntityCompound);
+    }
+
+    @Override
+    public String parseSignLine(String original) {
+        return IChatBaseComponent.ChatSerializer.a(CraftChatMessage.fromString(original)[0]);
     }
 
     @Override
@@ -473,10 +479,17 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         TileEntitySign tileEntitySign = (TileEntitySign) worldServer.getTileEntity(blockPosition);
         String[] lines = new String[4];
         System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
+        String[] strippedLines = new String[4];
         for(int i = 0; i < 4; i++)
-            lines[i] = StringUtils.stripColors(lines[i]);
-        BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, lines, false);
-        IChatBaseComponent[] newLines = CraftSign.sanitizeLines(lines);
+            strippedLines[i] = StringUtils.stripColors(lines[i]);
+
+        IChatBaseComponent[] newLines;
+
+        if(BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, strippedLines, false))
+            newLines = CraftSign.sanitizeLines(strippedLines);
+        else
+            newLines = CraftSign.sanitizeLines(lines);
+
         System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
     }
 

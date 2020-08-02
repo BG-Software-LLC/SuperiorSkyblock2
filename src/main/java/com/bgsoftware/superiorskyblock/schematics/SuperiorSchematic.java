@@ -324,30 +324,30 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         {
-            String signLine1 = compoundTag.getString("signLine0");
+            String signLine0 = compoundTag.getString("signLine0");
+            if(signLine0 != null){
+                tileEntity.setString("Text1", plugin.getNMSBlocks().parseSignLine(signLine0));
+            }
+        }
+
+        {
+            String signLine1 = compoundTag.getString("signLine1");
             if(signLine1 != null){
-                tileEntity.setString("Text1", signLine1);
+                tileEntity.setString("Text2", plugin.getNMSBlocks().parseSignLine(signLine1));
             }
         }
 
         {
-            String signLine2 = compoundTag.getString("signLine1");
+            String signLine2 = compoundTag.getString("signLine2");
             if(signLine2 != null){
-                tileEntity.setString("Text2", signLine2);
+                tileEntity.setString("Text3", plugin.getNMSBlocks().parseSignLine(signLine2));
             }
         }
 
         {
-            String signLine3 = compoundTag.getString("signLine2");
+            String signLine3 = compoundTag.getString("signLine3");
             if(signLine3 != null){
-                tileEntity.setString("Text3", signLine3);
-            }
-        }
-
-        {
-            String signLine4 = compoundTag.getString("signLine3");
-            if(signLine4 != null){
-                tileEntity.setString("Text4", signLine4);
+                tileEntity.setString("Text4", plugin.getNMSBlocks().parseSignLine(signLine3));
             }
         }
 
