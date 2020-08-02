@@ -27,6 +27,7 @@ import net.minecraft.server.v1_13_R2.BlockStateEnum;
 import net.minecraft.server.v1_13_R2.BlockStateInteger;
 import net.minecraft.server.v1_13_R2.Blocks;
 import net.minecraft.server.v1_13_R2.Chunk;
+import net.minecraft.server.v1_13_R2.ChunkConverter;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_13_R2.ChunkSection;
 import net.minecraft.server.v1_13_R2.Entity;
@@ -43,6 +44,7 @@ import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_13_R2.PlayerConnection;
 import net.minecraft.server.v1_13_R2.ProtoChunk;
+import net.minecraft.server.v1_13_R2.ProtoChunkExtension;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntitySign;
 import net.minecraft.server.v1_13_R2.TileEntityTypes;
@@ -376,7 +378,14 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-            Arrays.fill(chunk.getBiomeIndex(), biomeBase);
+            BiomeBase[] biomeIndex = chunk.getBiomeIndex();
+
+            if(chunk instanceof ProtoChunk && biomeIndex == null) {
+                biomeIndex = new BiomeBase[256];
+                chunk.a(biomeIndex);
+            }
+
+            Arrays.fill(biomeIndex, biomeBase);
             if(chunk instanceof Chunk)
                 ((Chunk) chunk).markDirty();
         },
@@ -407,9 +416,13 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         else{
             Executor.async(() -> {
                 try{
-                    ProtoChunk protoChunk = chunkLoader.b(world, chunkCoords.x, chunkCoords.z, null);
+                    ProtoChunk protoChunk = chunkLoader.b(world, chunkCoords.x, chunkCoords.z, chunkAccess -> {});
+
+                    if(protoChunk == null || protoChunk instanceof ProtoChunkExtension)
+                        protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
+
                     chunkConsumer.accept(protoChunk);
-                    if(saveChunk)
+                    if (saveChunk)
                         chunkLoader.saveChunk(world, protoChunk);
                 }catch (Exception ex){
                     ex.printStackTrace();
