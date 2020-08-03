@@ -358,6 +358,7 @@ public final class CustomEventsListener implements Listener {
         boolean equalIslands = toIsland.equals(fromIsland);
         boolean toInsideRange = toIsland.isInsideRange(toLocation);
         boolean fromInsideRange = fromLocation != null && fromIsland != null && fromIsland.isInsideRange(fromLocation);
+        boolean equalWorlds = fromLocation != null && toLocation.getWorld().equals(fromLocation.getWorld());
         Player player = superiorPlayer.asPlayer();
 
         if(toInsideRange && (!equalIslands || !fromInsideRange)){
@@ -369,8 +370,11 @@ public final class CustomEventsListener implements Listener {
             }
         }
 
-        if(equalIslands)
+        if(equalIslands) {
+            if(!equalWorlds)
+                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
             return;
+        }
 
         if (!EventsCaller.callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);

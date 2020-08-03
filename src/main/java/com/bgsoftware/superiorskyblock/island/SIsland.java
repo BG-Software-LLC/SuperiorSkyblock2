@@ -1900,10 +1900,10 @@ public final class SIsland extends DatabaseObject implements Island {
 
         UpgradeLevel upgradeLevel = getUpgradeLevel(upgrade);
 
+        syncUpgrade(upgradeLevel);
+
         if(upgradeLevel.getBorderSize() != -1)
             updateBorder();
-
-        syncUpgrade(upgradeLevel);
 
         MenuUpgrades.refreshMenus();
     }
