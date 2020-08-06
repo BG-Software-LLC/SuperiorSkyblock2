@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -20,7 +22,7 @@ public abstract class Mission<V> {
 
     private final List<String> requiredMissions = new ArrayList<>();
     private final List<String> requiredChecks = new ArrayList<>();
-    private final Map<SuperiorPlayer, V> missionData = new HashMap<>();
+    private final Map<SuperiorPlayer, V> missionData = new ConcurrentHashMap<>();
 
     private String name = null;
     private Consumer<V> clearMethod = null;
