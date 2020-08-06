@@ -146,6 +146,7 @@ COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific 
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
 COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 'Toggle debug outputs.'
+COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: רחא יאב ןקחש הגרדב דירוהל.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: רחא יא לש קנב לא ףסכ ריבעהל.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: רחא ןקחש לש יא קוחמל.

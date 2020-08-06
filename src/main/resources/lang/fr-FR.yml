@@ -117,6 +117,7 @@ COMMAND_ARGUMENT_VALUE: valeur
 COMMAND_ARGUMENT_WARP_NAME: nom-du-warp
 COMMAND_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez attendre {0} avant de réutiliser cette commande.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 'Activer ou désactiver les informations de débogage.'
+COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
 COMMAND_DESCRIPTION_ACCEPT: Accepter l'invitation d'un joueur.
 COMMAND_DESCRIPTION_ADMIN: Utiliser les commandes admin.
 COMMAND_DESCRIPTION_ADMIN_ADD: Ajouter un joueur comme membre d'une île.
