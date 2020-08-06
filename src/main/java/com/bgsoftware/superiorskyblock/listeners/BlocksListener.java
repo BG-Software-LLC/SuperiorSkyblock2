@@ -25,7 +25,10 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowman;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -40,6 +43,7 @@ import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -491,6 +495,49 @@ public final class BlocksListener implements Listener {
                 break;
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onGolemCreate(CreatureSpawnEvent e){
+        if(!e.getSpawnReason().name().contains("BUILD"))
+            return;
+
+        List<Location> blocksToCheck = new ArrayList<>();
+        Location entityLocation = e.getEntity().getLocation();
+
+        if(e.getEntity() instanceof IronGolem){
+            blocksToCheck.add(entityLocation.clone());
+            blocksToCheck.add(entityLocation.clone().add(0, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 1, 1));
+            blocksToCheck.add(entityLocation.clone().add(-1, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(-1, 1, -1));
+            blocksToCheck.add(entityLocation.clone().add(0, 2, 0));
+        }
+
+        else if(e.getEntity() instanceof Snowman){
+            blocksToCheck.add(entityLocation.clone());
+            blocksToCheck.add(entityLocation.clone().add(0, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(0, 2, 0));
+        }
+
+
+        else if(e.getEntity() instanceof Wither){
+            blocksToCheck.add(entityLocation.clone());
+            blocksToCheck.add(entityLocation.clone().add(0, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 1, 1));
+            blocksToCheck.add(entityLocation.clone().add(-1, 1, 0));
+            blocksToCheck.add(entityLocation.clone().add(-1, 1, -1));
+            blocksToCheck.add(entityLocation.clone().add(0, 2, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 2, 0));
+            blocksToCheck.add(entityLocation.clone().add(1, 2, 1));
+            blocksToCheck.add(entityLocation.clone().add(-1, 2, 0));
+            blocksToCheck.add(entityLocation.clone().add(-1, 2, -1));
+        }
+
+        if(blocksToCheck.stream().anyMatch(location -> plugin.getGrid().getBlockAmount(location) > 1))
+            e.setCancelled(true);
     }
 
     /*
