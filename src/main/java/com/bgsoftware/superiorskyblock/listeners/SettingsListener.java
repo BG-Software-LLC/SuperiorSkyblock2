@@ -14,6 +14,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -134,6 +135,22 @@ public final class SettingsListener implements Listener {
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
+                e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEndermanGrief(EntityChangeBlockEvent e){
+        if(!(e.getEntity() instanceof Enderman))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if(island != null) {
+            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+                return;
+
+            if(!island.hasSettingsEnabled(IslandFlags.ENDERMAN_GRIEF))
                 e.setCancelled(true);
         }
     }
