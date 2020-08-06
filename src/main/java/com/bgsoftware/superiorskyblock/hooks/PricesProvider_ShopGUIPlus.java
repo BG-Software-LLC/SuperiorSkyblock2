@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;
-import org.bukkit.Material;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -19,17 +18,10 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
     public BigDecimal getPrice(Key key) {
         double price = 0;
 
-        Material material = Material.matchMaterial(key.getGlobalKey());
-        short data = 0;
-
-        try{
-            data = Short.parseShort(key.getSubKey());
-        }catch (Throwable ignored){}
-
         Map<String, Shop> shops = shopPlugin.getShopManager().shops;
         for(Shop shop : shops.values()){
             for(ShopItem shopItem : shop.getShopItems()){
-                if(shopItem.getItem().getType() == material && shopItem.getItem().getDurability() == data){
+                if(Key.of(shopItem.getItem()).equals(key)){
                     double shopPrice;
 
                     switch (plugin.getSettings().syncWorth){
