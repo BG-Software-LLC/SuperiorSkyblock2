@@ -8,11 +8,9 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -59,14 +57,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         try {
-            if (schematicProgress) {
-                pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback, onFailure));
-                return;
-            }
-
             SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
-
-            schematicProgress = true;
 
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
@@ -86,12 +77,9 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
                 }catch(Throwable ex){
                     if(onFailure != null)
                         onFailure.accept(ex);
-                }finally {
-                    Executor.sync(this::onSchematicFinish, 10L);
                 }
             });
         }catch(Throwable ex){
-            onSchematicFinish();
             if(onFailure != null)
                 onFailure.accept(ex);
         }

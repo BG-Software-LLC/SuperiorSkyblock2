@@ -165,14 +165,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         try {
-            if (schematicProgress) {
-                pasteSchematicQueue.push(new PasteSchematicData(this, island, location, callback, onFailure));
-                return;
-            }
-
             SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
-
-            schematicProgress = true;
 
             Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 
@@ -201,12 +194,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 }catch(Throwable ex) {
                     if(onFailure != null)
                         onFailure.accept(ex);
-                }finally {
-                    Executor.sync(this::onSchematicFinish, 10L);
                 }
             });
         }catch (Throwable ex){
-            onSchematicFinish();
             if(onFailure != null)
                 onFailure.accept(ex);
         }
