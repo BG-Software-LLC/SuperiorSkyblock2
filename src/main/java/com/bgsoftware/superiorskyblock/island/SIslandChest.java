@@ -42,13 +42,16 @@ public final class SIslandChest implements IslandChest {
     @Override
     public void setRows(int rows) {
         Executor.ensureMain(() -> {
-            updateFlag.set(true);
-            ItemStack[] oldContents = inventory.getContents();
-            List<HumanEntity> toUpdate = inventory.getViewers();
-            inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().islandChestTitle);
-            inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
-            toUpdate.forEach(humanEntity -> humanEntity.openInventory(inventory));
-            updateFlag.set(false);
+            try {
+                updateFlag.set(true);
+                ItemStack[] oldContents = inventory.getContents();
+                List<HumanEntity> toUpdate = inventory.getViewers();
+                inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().islandChestTitle);
+                inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
+                toUpdate.forEach(humanEntity -> humanEntity.openInventory(inventory));
+            }finally {
+                updateFlag.set(false);
+            }
         });
     }
 
