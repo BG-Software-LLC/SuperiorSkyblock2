@@ -143,6 +143,7 @@ island-roles:
     - BREAK
     - BUILD
     - CLOSE_BYPASS
+    - CROPS_GROWTH
     - DROP_ITEMS
     - EXPEL_BYPASS
     - FARM_TRAMPING
