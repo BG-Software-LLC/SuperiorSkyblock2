@@ -309,21 +309,24 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
     public void handleSignPlace(Island island, Location location) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
-        TileEntitySign tileEntitySign = (TileEntitySign) worldServer.getTileEntity(blockPosition);
-        String[] lines = new String[4];
-        System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
-        String[] strippedLines = new String[4];
-        for(int i = 0; i < 4; i++)
-            strippedLines[i] = StringUtils.stripColors(lines[i]);
+        TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
+        if(tileEntity instanceof TileEntitySign) {
+            TileEntitySign tileEntitySign = (TileEntitySign) tileEntity;
+            String[] lines = new String[4];
+            System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
+            String[] strippedLines = new String[4];
+            for (int i = 0; i < 4; i++)
+                strippedLines[i] = StringUtils.stripColors(lines[i]);
 
-        IChatBaseComponent[] newLines;
+            IChatBaseComponent[] newLines;
 
-        if(BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, strippedLines, false))
-            newLines = CraftSign.sanitizeLines(strippedLines);
-        else
-            newLines = CraftSign.sanitizeLines(lines);
+            if (BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, strippedLines, false))
+                newLines = CraftSign.sanitizeLines(strippedLines);
+            else
+                newLines = CraftSign.sanitizeLines(lines);
 
-        System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+            System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
