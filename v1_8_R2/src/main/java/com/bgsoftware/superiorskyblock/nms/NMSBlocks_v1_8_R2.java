@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -43,6 +44,7 @@ import org.bukkit.craftbukkit.v1_8_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R2.block.CraftSign;
+import org.bukkit.craftbukkit.v1_8_R2.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_8_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_8_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R2.util.UnsafeList;
@@ -230,12 +232,26 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
     @Override
     public void deleteChunk(Island island, ChunkPosition chunkPosition) {
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             Arrays.fill(chunk.getSections(), null);
             Arrays.fill(chunk.entitySlices, new UnsafeList<>());
 
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::t);
             chunk.tileEntities.clear();
+
+
+            if(!(world.generator instanceof WorldGenerator)){
+                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, 0L, world.generator);
+                Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunkCoords.x, chunkCoords.z);
+
+                for (int i = 0; i < 16; i++)
+                    chunk.getSections()[i] = generatedChunk.getSections()[i];
+
+                for (Map.Entry<BlockPosition, TileEntity> entry : generatedChunk.getTileEntities().entrySet())
+                    world.setTileEntity(entry.getKey(), entry.getValue());
+            }
 
             ChunksTracker.markEmpty(island, chunkPosition, false);
         }, chunk -> refreshChunk(chunk.bukkitChunk));

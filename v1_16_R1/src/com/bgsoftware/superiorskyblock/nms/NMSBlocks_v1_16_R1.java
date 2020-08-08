@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -63,11 +64,13 @@ import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -377,6 +380,8 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     @Override
     public void deleteChunk(Island island, ChunkPosition chunkPosition) {
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
+        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
+
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             Arrays.fill(chunk.getSections(), Chunk.a);
             Arrays.fill(chunk.entitySlices, new UnsafeList<>());
@@ -384,12 +389,54 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
             chunk.tileEntities.clear();
 
+            if(!(world.generator instanceof WorldGenerator)){
+                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
+                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
+                customChunkGenerator.buildBase(null, protoChunk);
+
+                for(int i = 0; i < 16; i++)
+                    chunk.getSections()[i] = protoChunk.getSections()[i];
+
+                for(Map.Entry<BlockPosition, TileEntity> entry : protoChunk.x().entrySet())
+                    world.setTileEntity(entry.getKey(), entry.getValue());
+            }
+
             refreshChunk(chunk.getBukkitChunk());
         },
         levelCompound -> {
-            levelCompound.set("Sections", new NBTTagList());
-            levelCompound.set("TileEntities", new NBTTagList());
+            NBTTagList sectionsList = new NBTTagList();
+            NBTTagList tileEntities = new NBTTagList();
+
+            levelCompound.set("Sections", sectionsList);
+            levelCompound.set("TileEntities", tileEntities);
             levelCompound.set("Entities", new NBTTagList());
+
+            if(!(world.generator instanceof WorldGenerator)) {
+                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
+                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
+                customChunkGenerator.buildBase(null, protoChunk);
+                ChunkSection[] chunkSections = protoChunk.getSections();
+
+                for(int i = -1; i < 17; ++i) {
+                    int chunkSectionIndex = i;
+                    ChunkSection chunkSection = Arrays.stream(chunkSections).filter(_chunkPosition ->
+                            _chunkPosition != null && _chunkPosition.getYPosition() >> 4 == chunkSectionIndex)
+                            .findFirst().orElse(Chunk.a);
+
+                    if (chunkSection != Chunk.a) {
+                        NBTTagCompound sectionCompound = new NBTTagCompound();
+                        sectionCompound.setByte("Y", (byte) (i & 255));
+                        chunkSection.getBlocks().a(sectionCompound, "Palette", "BlockStates");
+                        sectionsList.add(sectionCompound);
+                    }
+                }
+
+                for(BlockPosition tilePosition : protoChunk.c()){
+                    NBTTagCompound tileCompound = protoChunk.i(tilePosition);
+                    if(tileCompound != null)
+                        tileEntities.add(tileCompound);
+                }
+            }
         });
 
         ChunksTracker.markEmpty(island, chunkPosition, false);
