@@ -351,7 +351,7 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
             this.chunkX = chunk.locX;
             this.chunkZ = chunk.locZ;
             a(chunk.getWorld());
-            a(new BlockPosition(chunkX, 1, chunkZ));
+            a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
             world.tileEntityList.add(this);
         }
 

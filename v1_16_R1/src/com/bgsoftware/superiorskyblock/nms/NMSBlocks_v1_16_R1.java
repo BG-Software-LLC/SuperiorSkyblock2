@@ -70,7 +70,6 @@ import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -578,7 +577,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             this.chunk = chunk;
             this.chunkX = chunk.getPos().x;
             this.chunkZ = chunk.getPos().z;
-            setLocation(chunk.getWorld(), new BlockPosition(chunkX, 1, chunkZ));
+            setLocation(chunk.getWorld(), new BlockPosition(chunkX << 4, 1, chunkZ << 4));
             world.tileEntityListTick.add(this);
         }
 

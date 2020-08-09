@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.server.v1_15_R1.AxisAlignedBB;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
@@ -48,6 +49,7 @@ import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_15_R1.PacketPlayOutUnloadChunk;
+import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunkMap;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.minecraft.server.v1_15_R1.ProtoChunk;
@@ -56,6 +58,7 @@ import net.minecraft.server.v1_15_R1.TileEntitySign;
 import net.minecraft.server.v1_15_R1.TileEntityTypes;
 import net.minecraft.server.v1_15_R1.World;
 import net.minecraft.server.v1_15_R1.WorldServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -559,6 +562,9 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
 
+        private static final ReflectField<CompletableFuture<Either<Chunk, PlayerChunk.Failure>>> TICKING_FUTURE =
+                new ReflectField<>(PlayerChunk.class, CompletableFuture.class, "tickingFuture");
+
         private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
         private static int random = ThreadLocalRandom.current().nextInt();
 
@@ -574,7 +580,7 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             this.chunk = chunk;
             this.chunkX = chunk.getPos().x;
             this.chunkZ = chunk.getPos().z;
-            setLocation(chunk.getWorld(), new BlockPosition(chunkX, 1, chunkZ));
+            setLocation(chunk.getWorld(), new BlockPosition(chunkX << 4, 1, chunkZ << 4));
             world.tileEntityListTick.add(this);
         }
 
