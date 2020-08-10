@@ -41,6 +41,7 @@ CHANGED_BIOME: '&e&lIle | &7Le biome a été modifié sur {0}. Vous devez vous r
 CHANGED_BIOME_ALL: '&e&lIle | &7Biome de toutes les îles défini sur {0}.'
 CHANGED_BIOME_NAME: '&e&lIle | &7Biome de l''île {1} défini sur {0}.'
 CHANGED_BIOME_OTHER: '&e&lIle | &7Biome de l''île de {1} défini sur {0}.'
+CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour l''île de {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour toutes les îles.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lAméliorations | &7Vous avez changé la limite de blocs de {0} pour {1}.'
@@ -115,6 +116,7 @@ COMMAND_ARGUMENT_SIZE: taille
 COMMAND_ARGUMENT_UPGRADE_NAME: nom-de-l'upgrade
 COMMAND_ARGUMENT_VALUE: valeur
 COMMAND_ARGUMENT_WARP_NAME: nom-du-warp
+COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez attendre {0} avant de réutiliser cette commande.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 'Activer ou désactiver les informations de débogage.'
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
@@ -161,6 +163,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Définir le biome de l'île spécifiée.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Définir une limite de blocs pour l''île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
@@ -310,6 +313,7 @@ IGNORED_ISLAND_NAME: '&e&lIle | &7L''île {0} est désormais masquée du top des
 INTERACT_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas interagir en dehors de votre île.'
 INVALID_AMOUNT: '&c&lErreur | &7Nombre invalide {0}.'
 INVALID_BIOME: '&c&lErreur | &7Biome invalide {0}.'
+INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lErreur | &7Entité invalide {0}.'
 INVALID_SCHEMATIC: '&c&lErrEUR | &7Il n''existe aucun schematic portant le nom {0}.'
@@ -347,6 +351,7 @@ INVALID_UPGRADE: |
 INVALID_VISIT_LOCATION: '&c&lErreur | &7Cette île ne possède aucune zone visiteurs.'
 INVALID_VISIT_LOCATION_BYPASS: '&7&oVous avez activé le mode bypass, téléportation sur l''île...'
 INVALID_WARP: '&c&lErreur | &7Warp invalide: {0}.'
+INVALID_WORLD: '&c&lError | &7Invalid world {0}.'
 INVITE_ANNOUNCEMENT: '&e&lIle | &7{0} a invité {1} sur l''île.'
 INVITE_BANNED_PLAYER: '&c&lErreur | &7Ce joueur est banni de l''île et ne peut pas être invité.'
 INVITE_TO_FULL_ISLAND: '&c&lErreur | &7Vous ne pouvez pas inviter plus de membres sur l''île.'

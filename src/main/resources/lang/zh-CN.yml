@@ -41,6 +41,7 @@ CHANGED_BIOME: '&e&l岛屿 | &7岛屿生物群系已更新！你需要重新进�
 CHANGED_BIOME_ALL: '&e&l岛屿 | &7成功将所有岛屿的生物群系改变为 {0} .'
 CHANGED_BIOME_NAME: '&e&l岛屿 | &7成功将岛屿 {1} 的生物群系改变为 {0} .'
 CHANGED_BIOME_OTHER: '&e&l岛屿 | &7成功将 {1} 的岛屿生物群系改变为 {0} .'
+CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&l岛屿升级 | &7成功为所有岛屿将 {0} &7方块数量限制提升.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&l岛屿升级 | &7成功为岛屿将 &b{0} &7方块数量限制提升至 &b{1}.'
@@ -115,6 +116,7 @@ COMMAND_ARGUMENT_TIME: 时间
 COMMAND_ARGUMENT_UPGRADE_NAME: 升级项目
 COMMAND_ARGUMENT_VALUE: 数值
 COMMAND_ARGUMENT_WARP_NAME: 地标名
+COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&e&l岛屿 | &7你只能在 &b{0} &7后再次使用这个命令.'
 COMMAND_DESCRIPTION_ACCEPT: 同意玩家的岛屿邀请.
 COMMAND_DESCRIPTION_ADMIN: 查看管理员命令.
@@ -160,6 +162,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: 重载插件.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛屿评分.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 给一个岛屿设置生物群系.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
@@ -310,6 +313,7 @@ IGNORED_ISLAND_NAME: '&e&l岛屿 | &7岛屿 &b{0} 不再被统计进入排行榜
 INTERACT_OUTSIDE_ISLAND: '&c&l错误 | &7你无法对边界范围外的东西操作.'
 INVALID_AMOUNT: '&c&l错误 | &7未知数量 &b{0}.'
 INVALID_BIOME: '&c&l错误 | &7错误的生物群系 {0}.'
+INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&l错误 | &7错误的实体类型 {0}.'
 INVALID_ENVIRONMENT: '&c&l错误 | &7未知世界 &b{0}.'
@@ -347,6 +351,7 @@ INVALID_UPGRADE: |
 INVALID_VISIT_LOCATION: '&c&l错误 | &7这个岛屿没有设置游客传送点.'
 INVALID_VISIT_LOCATION_BYPASS: '&7&o你有忽略模式，将你传送至岛屿上...'
 INVALID_WARP: '&c&l错误 | &7未知地标 {0}.'
+INVALID_WORLD: '&c&lError | &7Invalid world {0}.'
 INVITE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7邀请了 &b{1} 加入空岛团队.'
 INVITE_BANNED_PLAYER: '&c&l错误 | &7这个玩家被岛屿禁封了，无法邀请.'
 INVITE_TO_FULL_ISLAND: '&c&l错误 | &7你的岛屿成员数量已达上限，不能再邀请更多成员了！'

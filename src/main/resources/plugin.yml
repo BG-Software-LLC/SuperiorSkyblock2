@@ -202,6 +202,8 @@ permissions:
             description: Create schematics for the plugin.
           superior.admin.setbiome:
             description: Set the biome of an island.
+          superior.admin.setblockamount:
+            description: Set the block amount in a specific location.
           superior.admin.setblocklimit:
             description: Set block limit for another player's island.
           superior.admin.setcooplimit:

@@ -49,6 +49,7 @@ CHANGED_BIOME: '&e&lĐảo Thần | &7Thay đổi thành công quần xã thành
 CHANGED_BIOME_ALL: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho tất cả các đảo.'
 CHANGED_BIOME_NAME: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho đảo {1}.'
 CHANGED_BIOME_OTHER: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho đảo của {1}.'
+CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
   {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
@@ -141,6 +142,7 @@ COMMAND_ARGUMENT_TIME: thoi-gian
 COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
+COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&c&lLỗi | &7Bạn chỉ có thể sử dụng lệnh trong {0}.'
 COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các command của admin.
@@ -190,6 +192,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng đư
   một người chơi.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
   khác.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
@@ -363,6 +366,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài s
   vi   đảo của bạn.'
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
+INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
 INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
@@ -400,6 +404,7 @@ INVALID_UPGRADE: |
 INVALID_VISIT_LOCATION: '&c&lLỗi | &7Hòn đảo này không có vị trí du khách.'
 INVALID_VISIT_LOCATION_BYPASS: '&7&oBạn có chế độ bypass, dịch chuyển bạn đến đảo...'
 INVALID_WARP: '&c&lLỗi | &7Khu vực không hợp lệ {0}.'
+INVALID_WORLD: '&c&lError | &7Invalid world {0}.'
 INVITE_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} mời {1} vào đảo.'
 INVITE_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này bị cấm từ đảo và không thể được
   mời.'

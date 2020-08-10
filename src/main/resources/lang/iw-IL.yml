@@ -44,6 +44,7 @@ CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייוניש
 CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
 CHANGED_BIOME_OTHER: '&e&lIsland | &7Successfully changed biome to {0} for {1}''s island.'
+CHANGED_BLOCK_AMOUNT: '&e&lBlocks | &7Successfully changed the block amount at {0} to {1}.'
 CHANGED_BLOCK_LIMIT: '&e&lםיגורדש | &7{1} לש יאל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lםיגורדש | &7םייאה לכל החלצהב הנכדוע {0} קולבה תלבגה.'
 CHANGED_BLOCK_LIMIT_NAME: '&e&lםיגורדש | &7{1} יאל החלצהב הנכדוע {0} קולבה תלבגה.'
@@ -123,6 +124,7 @@ COMMAND_ARGUMENT_TIME: ןמז
 COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
 COMMAND_ARGUMENT_VALUE: יווש
 COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
+COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&c&lהאיגש | &7{0} ב הדוקפב בוש שמתשהל לוכי התא.'
 COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
 COMMAND_DESCRIPTION_ADMIN: .ןימדאה תודוקפב שמתשהל.
@@ -168,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא ש�
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
+COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW: 'Set the chest rows for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_COOP_LIMIT: 'Set coop players limit for another player''s island.'
@@ -326,6 +329,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ םירבד �
   אל התא.'
 INVALID_AMOUNT: '&c&lהאיגש | &7{0} תיקוח אל תומכ.'
 INVALID_BIOME: '&c&lError | &7Invalid biome {0}.'
+INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
@@ -363,6 +367,7 @@ INVALID_UPGRADE: |
 INVALID_VISIT_LOCATION: '&c&lהאיגש | &7םירקבמ םוקמ ןיא הזה יאל.'
 INVALID_VISIT_LOCATION_BYPASS: '&7&oתאז לכב יאה לא ךתוא רגשמ ,לעפומ הפיקע בצמ...'
 INVALID_WARP: '&c&lהאיגש | &7{0} יקוח אל םוקימ.'
+INVALID_WORLD: '&c&lError | &7Invalid world {0}.'
 INVITE_ANNOUNCEMENT: '&e&lיא | &7יאה לא {1} תא ןימזה {0}.'
 INVITE_BANNED_PLAYER: '&c&lהאיגש | &7הנמזה לבקל לוכי אל ןכלו יאה ןמ קחרומ הזה ןקחשה.'
 INVITE_TO_FULL_ISLAND: '&c&lהאיגש | &7ךלש יאל םישנא דוע ןימזהל לוכי אל התא.'
