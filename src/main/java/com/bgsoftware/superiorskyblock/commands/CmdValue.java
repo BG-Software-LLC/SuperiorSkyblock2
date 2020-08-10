@@ -85,7 +85,7 @@ public final class CmdValue implements ISuperiorCommand {
 
         {
             BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(toCheck);
-            if (blockWorth.doubleValue() <= 0) {
+            if (blockWorth.doubleValue() == 0) {
                 if (!Locale.BLOCK_VALUE_WORTHLESS.isEmpty(locale))
                     stringBuilder.append(Locale.BLOCK_VALUE_WORTHLESS.getMessage(locale, keyName)).append("\n");
             } else {
@@ -96,8 +96,8 @@ public final class CmdValue implements ISuperiorCommand {
 
         {
             BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(toCheck);
-            if (blockLevel.doubleValue() <= 0) {
-                if (!Locale.BLOCK_LEVEL_WORTHLESS.isEmpty(locale) && blockLevel.doubleValue() > 0) {
+            if (blockLevel.doubleValue() == 0) {
+                if (!Locale.BLOCK_LEVEL_WORTHLESS.isEmpty(locale)) {
                     stringBuilder.append(Locale.BLOCK_LEVEL_WORTHLESS.getMessage(locale, keyName)).append("\n");
                 }
             } else {

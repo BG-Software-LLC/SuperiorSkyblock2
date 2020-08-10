@@ -115,7 +115,7 @@ public final class MenuValues extends SuperiorMenu {
                     else if(cfg.contains("items." + ch + ".block")) {
                         Key key = Key.of(cfg.getString("items." + ch + ".block"));
                         menuValues.addData(slot + "", key);
-                        if(plugin.getBlockValues().getBlockWorth(key).doubleValue() == -1)
+                        if(!plugin.getBlockValues().hasBlockWorth(key))
                             plugin.getBlockValues().setBlockWorth(key, BigDecimal.ZERO);
                     }
 

@@ -51,11 +51,31 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
         if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
-            if(price.compareTo(BigDecimal.ZERO) > 0)
-                return BigDecimalFormatted.of(price);
+            return BigDecimalFormatted.of(price);
         }
 
-        return BigDecimalFormatted.NEGATIVE;
+        return BigDecimalFormatted.ZERO;
+    }
+
+    public boolean hasBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key){
+        if(((Key) key).isAPIKey()){
+            String customBlockValue = customBlockValues.get(key);
+            if(customBlockValue != null)
+                return true;
+        }
+
+        String value = blockValues.get(key);
+
+        if(value != null)
+            return true;
+
+        if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
+            BigDecimal price = plugin.getProviders().getPrice((Key) key);
+            if(price.compareTo(BigDecimal.ZERO) > 0)
+                return true;
+        }
+
+        return false;
     }
 
     public void setBlockWorth(Key key, BigDecimal worth){

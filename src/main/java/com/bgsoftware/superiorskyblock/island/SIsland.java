@@ -1519,6 +1519,9 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
+        if(amount == 0)
+            return;
+
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
@@ -1526,12 +1529,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-        if(blockValue.doubleValue() >= 0){
+        if(blockValue.compareTo(BigDecimal.ZERO) != 0){
             syncedIslandWorth.set(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
-        if(blockLevel.doubleValue() >= 0){
+        if(blockLevel.compareTo(BigDecimal.ZERO) != 0){
             syncedIslandLevel.set(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
@@ -1579,12 +1582,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
             BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-            if(blockValue.doubleValue() >= 0){
+            if(blockValue.doubleValue() != 0){
                 blocksValues = blocksValues.add(blockValue.multiply(new BigDecimal(entry.getValue())));
                 increaseAmount = true;
             }
 
-            if(blockLevel.doubleValue() >= 0){
+            if(blockLevel.doubleValue() != 0){
                 blocksLevels = blocksLevels.add(blockLevel.multiply(new BigDecimal(entry.getValue())));
                 increaseAmount = true;
             }
@@ -1625,8 +1628,8 @@ public final class SIsland extends DatabaseObject implements Island {
             }
 
             if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
-                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
+                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
                 currentAmount = blockCounts.getRaw(globalKey, 0);
                 blockCounts.put(globalKey, currentAmount + amount);
             }
@@ -1662,19 +1665,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-        if(blockValue.doubleValue() >= 0){
-            BigDecimalFormatted islandWorth = this.islandWorth.get().subtract(blockValue.multiply(new BigDecimal(amount)));
-            this.islandWorth.set(islandWorth);
-            if(islandWorth.doubleValue() < 0)
-                this.islandWorth.set(BigDecimalFormatted.ZERO);
+        if(blockValue.doubleValue() != 0){
+            this.islandWorth.set(islandWorth -> islandWorth.subtract(blockValue.multiply(new BigDecimal(amount))));
             decreaseAmount = true;
         }
 
-        if(blockLevel.doubleValue() >= 0){
-            BigDecimalFormatted islandLevel = this.islandLevel.get().subtract(blockLevel.multiply(new BigDecimal(amount)));
-            this.islandLevel.set(islandLevel);
-            if(islandLevel.doubleValue() < 0)
-                this.islandLevel.set(BigDecimalFormatted.ZERO);
+        if(blockLevel.doubleValue() != 0){
+            this.islandLevel.set(islandLevel -> islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount))));
             decreaseAmount = true;
         }
 
@@ -1697,8 +1694,8 @@ public final class SIsland extends DatabaseObject implements Island {
                 }
 
                 if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() >= 0 ||
-                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() >= 0)) {
+                        (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
+                                plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
                     removeCounts(blockCounts, globalKey, amount);
                 }
             });
