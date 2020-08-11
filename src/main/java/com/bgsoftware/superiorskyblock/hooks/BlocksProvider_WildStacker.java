@@ -140,7 +140,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             }
 
             else{
-                island.handleBlockPlace(blockKey, increaseAmount - 1);
+                island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
