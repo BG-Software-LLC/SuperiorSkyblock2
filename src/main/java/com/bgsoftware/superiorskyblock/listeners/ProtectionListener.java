@@ -139,7 +139,7 @@ public final class ProtectionListener implements Listener {
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
 
-        if(blockState instanceof Chest || blockType.name().contains("SHULKER_BOX") || blockType.name().contains("BARREL")) islandPermission = IslandPrivileges.CHEST_ACCESS;
+        if(isChest(blockState, blockType)) islandPermission = IslandPrivileges.CHEST_ACCESS;
         else if(blockState instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
         else if(blockState instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
         else if(blockType == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
@@ -157,6 +157,10 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
+    }
+
+    private boolean isChest(BlockState blockState, Material type){
+        return blockState instanceof Chest || type.name().contains("SHULKER_BOX") || type.name().contains("BARREL") || type == Material.ENDER_CHEST;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
