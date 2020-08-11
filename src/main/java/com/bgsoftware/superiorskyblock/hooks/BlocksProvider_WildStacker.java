@@ -151,8 +151,8 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
-            int increaseAmount = e.getBarrel().getStackAmount();
+            Key blockKey = Key.of(e.getTarget().getBarrelItem(1));
+            int increaseAmount = e.getTarget().getStackAmount();
 
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
                 e.setCancelled(true);
