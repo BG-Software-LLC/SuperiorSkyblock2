@@ -34,10 +34,12 @@ import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EntityEquipment;
@@ -262,6 +264,11 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
         return IRegistry.ITEM.getKey(CraftItemStack.asNMSCopy(itemStack).getItem()).toString();
+    }
+
+    @Override
+    public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
+        return ((CraftAnimals) animals).getHandle().i(CraftItemStack.asNMSCopy(itemStack));
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

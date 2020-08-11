@@ -13,6 +13,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
@@ -79,5 +82,7 @@ public interface NMSAdapter {
     }
 
     String getMinecraftKey(ItemStack itemStack);
+
+    boolean isAnimalFood(ItemStack itemStack, Animals animals);
 
 }

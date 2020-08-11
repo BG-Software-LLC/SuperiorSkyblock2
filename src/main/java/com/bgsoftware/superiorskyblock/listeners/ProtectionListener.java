@@ -407,9 +407,20 @@ public final class ProtectionListener implements Listener {
 
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+        ItemStack usedItem = e.getPlayer().getItemInHand();
 
-        if(island != null && !island.hasPermission(superiorPlayer, e.getRightClicked() instanceof ArmorStand ?
-                IslandPrivileges.INTERACT : IslandPrivileges.ANIMAL_BREED)){
+        IslandPrivilege islandPrivilege;
+
+        if(e.getRightClicked() instanceof ArmorStand){
+            islandPrivilege = IslandPrivileges.INTERACT;
+        }
+        else if(usedItem != null && e.getRightClicked() instanceof Animals &&
+                plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
+            islandPrivilege = IslandPrivileges.ANIMAL_BREED;
+        }
+        else return;
+
+        if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }

@@ -31,10 +31,12 @@ import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -240,6 +242,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
         MinecraftKey minecraftKey = Item.REGISTRY.c(CraftItemStack.asNMSCopy(itemStack).getItem());
         return minecraftKey == null ? "minecraft:air" : minecraftKey.toString();
+    }
+
+    @Override
+    public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
+        return ((CraftAnimals) animals).getHandle().d(CraftItemStack.asNMSCopy(itemStack));
     }
 
 }
