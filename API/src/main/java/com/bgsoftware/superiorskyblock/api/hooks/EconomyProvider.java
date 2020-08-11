@@ -1,9 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.entity.Player;
-
-import java.math.BigDecimal;
 
 public interface EconomyProvider {
 
