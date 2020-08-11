@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -108,12 +107,12 @@ public final class CmdRankup implements ISuperiorCommand {
 
             if (event.isCancelled()) {
                 hasNextLevel = false;
-            } else if (EconomyHook.getMoneyInBank(superiorPlayer) < nextUpgradePrice) {
+            } else if(plugin.getProviders().getMoneyInBank(superiorPlayer) < nextUpgradePrice){
                 Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                 hasNextLevel = false;
             } else {
                 if (nextUpgradePrice > 0)
-                    EconomyHook.withdrawMoney(superiorPlayer, nextUpgradePrice);
+                    plugin.getProviders().withdrawMoney(superiorPlayer, nextUpgradePrice);
 
                 for (String command : event.getResult().getKey()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command

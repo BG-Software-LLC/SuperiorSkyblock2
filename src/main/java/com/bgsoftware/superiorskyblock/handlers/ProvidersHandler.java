@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
+import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
@@ -12,6 +14,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
@@ -54,6 +57,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
 
     private SpawnersProvider spawnersProvider = new BlocksProvider_Default();
+    private EconomyProvider economyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
     private VanishProvider vanishProvider = player -> false;
@@ -141,6 +145,12 @@ public final class ProvidersHandler implements ProvidersManager {
         this.spawnersProvider = spawnersProvider;
     }
 
+    @Override
+    public void setEconomyProvider(EconomyProvider economyProvider) {
+        Preconditions.checkArgument(economyProvider != null, "EconomyProvider cannot be null.");
+        this.economyProvider = economyProvider;
+    }
+
     public Pair<Integer, String> getSpawner(Location location){
         return spawnersProvider.getSpawner(location);
     }
@@ -181,5 +191,36 @@ public final class ProvidersHandler implements ProvidersManager {
         asyncProvider.teleport(entity, location, teleportResult);
     }
 
+    public boolean hasEconomySupport(){
+        return economyProvider.isEnabled();
+    }
+
+    public double getMoneyInBank(SuperiorPlayer superiorPlayer){
+        return economyProvider.getMoneyInBank(superiorPlayer);
+    }
+
+    public void depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+        BigDecimal[] maximumsAndReminders = amount.divideAndRemainder(BigDecimal.valueOf(Double.MAX_VALUE));
+
+        for(int i = 0; i < maximumsAndReminders[0].intValue(); i++){
+            economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+        }
+
+        economyProvider.depositMoney(superiorPlayer, maximumsAndReminders[1].doubleValue());
+    }
+
+    public void withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+        BigDecimal[] maximumsAndReminders = amount.divideAndRemainder(BigDecimal.valueOf(Double.MAX_VALUE));
+
+        for(int i = 0; i < maximumsAndReminders[0].intValue(); i++){
+            withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+        }
+
+        withdrawMoney(superiorPlayer, maximumsAndReminders[1].doubleValue());
+    }
+
+    public void withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
+        economyProvider.withdrawMoney(superiorPlayer, amount);
+    }
 
 }

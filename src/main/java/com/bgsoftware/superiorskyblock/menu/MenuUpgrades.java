@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -70,7 +69,7 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = EconomyHook.getMoneyInBank(superiorPlayer) >= nextLevelPrice &&
+                    boolean nextLevel = plugin.getProviders().getMoneyInBank(superiorPlayer) >= nextLevelPrice &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }

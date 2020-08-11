@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -59,7 +58,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(!EconomyHook.isVaultEnabled()){
+        if(!plugin.getProviders().hasEconomySupport()){
             Locale.sendMessage(superiorPlayer, "&cServer doesn't have vault installed so island banks are disabled.", true);
             return;
         }
@@ -102,7 +101,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
         EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, amount);
 
         island.withdrawMoney(amount);
-        EconomyHook.depositMoney(superiorPlayer.asPlayer(), amount);
+        plugin.getProviders().depositMoney(superiorPlayer, amount);
 
         ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
     }

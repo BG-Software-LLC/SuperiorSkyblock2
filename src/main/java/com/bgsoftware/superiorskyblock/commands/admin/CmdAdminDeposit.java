@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.hooks.EconomyHook;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -63,7 +62,7 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(!EconomyHook.isVaultEnabled()){
+        if(!plugin.getProviders().hasEconomySupport()){
             Locale.sendMessage(sender, "&cServer doesn't have vault installed so island banks are disabled.", true);
             return;
         }
