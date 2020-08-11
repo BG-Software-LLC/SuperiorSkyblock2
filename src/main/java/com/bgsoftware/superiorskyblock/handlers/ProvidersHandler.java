@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
@@ -133,6 +134,10 @@ public final class ProvidersHandler implements ProvidersManager {
                     ex.printStackTrace();
                 }
             }
+
+            try{
+                setEconomyProvider(new EconomyProvider_Vault());
+            }catch (Exception ignored){}
 
         });
 
