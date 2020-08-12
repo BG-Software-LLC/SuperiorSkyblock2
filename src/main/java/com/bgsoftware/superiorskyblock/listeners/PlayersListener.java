@@ -378,6 +378,8 @@ public final class PlayersListener implements Listener {
                 !plugin.getSettings().voidTeleportVisitors : !plugin.getSettings().voidTeleportMembers))
             return;
 
+        SuperiorSkyblockPlugin.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
+
         noFallDamage.add(e.getPlayer().getUniqueId());
         superiorPlayer.teleport(island, result -> {
             if(!result){
