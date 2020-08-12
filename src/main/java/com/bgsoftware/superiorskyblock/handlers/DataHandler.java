@@ -4,9 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -144,6 +146,7 @@ public final class DataHandler {
         addColumnIfNotExists("islandEffects", "islands", "''", "TEXT");
         addColumnIfNotExists("item", "stackedBlocks", "''", "TEXT");
         addColumnIfNotExists("islandChest", "islands", "''", "LONGTEXT");
+        addColumnIfNotExists("uuid", "islands", "''", "VARCHAR(36)");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -177,11 +180,26 @@ public final class DataHandler {
         SuperiorSkyblockPlugin.log("Finished players!");
         SuperiorSkyblockPlugin.log("Starting to load islands...");
 
+        AtomicBoolean updateUUIDs = new AtomicBoolean(false);
+
         SQLHelper.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
             while (resultSet.next()) {
+                String uuidRaw = resultSet.getString("uuid");
+                if(!updateUUIDs.get() && (uuidRaw == null || uuidRaw.isEmpty()))
+                    updateUUIDs.set(true);
                 plugin.getGrid().createIsland(resultSet);
             }
         });
+
+        if(updateUUIDs.get()){
+            StatementHolder uuidHolder = Query.ISLAND_SET_UUID.getStatementHolder(null);
+            uuidHolder.prepareBatch();
+            plugin.getGrid().getIslands().forEach(island -> uuidHolder
+                    .setString(island.getUniqueId().toString())
+                    .setString(island.getOwner().getUniqueId().toString())
+                    .addBatch());
+            uuidHolder.execute(true);
+        }
 
         SuperiorSkyblockPlugin.log("Finished islands!");
         SuperiorSkyblockPlugin.log("Starting to load grid...");
@@ -272,7 +290,8 @@ public final class DataHandler {
                 "creationTime INTEGER," +
                 "coopLimit INTEGER," +
                 "islandEffects TEXT," +
-                "islandChest LONGTEXT" +
+                "islandChest LONGTEXT," +
+                "uuid VARCHAR(36)" +
                 ");");
     }
 

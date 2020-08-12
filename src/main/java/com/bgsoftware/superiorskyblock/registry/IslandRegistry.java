@@ -15,6 +15,7 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
     private static final Predicate<Island> ISLANDS_PREDICATE = island -> !island.isIgnored();
 
     private final Registry<IslandPosition, Island> islandsByPositions = createRegistry();
+    private final Registry<UUID, Island> islandsByUUID = createRegistry();
 
     public IslandRegistry(){
         SortingType.values().forEach(sortingType -> registerSortingType(sortingType, false, ISLANDS_PREDICATE));
@@ -25,16 +26,23 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
         return island == null || !island.isInside(location) ? null : island;
     }
 
+    public Island getByUUID(UUID uuid){
+        return islandsByUUID.get(uuid);
+    }
+
     public Island add(UUID uuid, Island island){
         islandsByPositions.add(IslandPosition.of(island), island);
+        islandsByUUID.add(island.getUniqueId(), island);
         return super.add(uuid, island);
     }
 
     @Override
     public Island remove(UUID uuid){
         Island island = super.remove(uuid);
-        if(island != null)
+        if(island != null) {
             islandsByPositions.remove(IslandPosition.of(island));
+            islandsByUUID.remove(island.getUniqueId());
+        }
         return island;
     }
 

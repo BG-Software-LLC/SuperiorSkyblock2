@@ -105,6 +105,13 @@ public interface GridManager {
     Island getIsland(UUID uuid);
 
     /**
+     * Get an island by it's uuid.
+     * @param uuid The uuid of the island.
+     * @return The island with that UUID. May be null.
+     */
+    Island getIslandByUUID(UUID uuid);
+
+    /**
      * Get an island by it's name.
      * @param islandName The name to check.
      * @return The island with that name. May be null.

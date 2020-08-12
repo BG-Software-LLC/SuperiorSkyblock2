@@ -35,6 +35,11 @@ public interface Island extends Comparable<Island> {
     SuperiorPlayer getOwner();
 
     /**
+     * Get the unique-id of the island.
+     */
+    UUID getUniqueId();
+
+    /**
      * Get the creation time of the island.
      */
     long getCreationTime();

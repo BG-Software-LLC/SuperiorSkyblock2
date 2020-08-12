@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 
 public final class SpawnIsland implements Island {
 
+    private static final UUID spawnUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
@@ -79,6 +80,11 @@ public final class SpawnIsland implements Island {
     @Override
     public SuperiorPlayer getOwner() {
         return null;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return spawnUUID;
     }
 
     @Override

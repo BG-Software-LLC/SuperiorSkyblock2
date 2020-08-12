@@ -113,6 +113,7 @@ public final class SIsland extends DatabaseObject implements Island {
      * Island identifiers
      */
     private SuperiorPlayer owner;
+    private final UUID uuid;
     private final BlockPosition center;
     private final long creationTime;
     private String creationTimeDate;
@@ -265,24 +266,33 @@ public final class SIsland extends DatabaseObject implements Island {
 
         ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
 
+        String uuidRaw = resultSet.getString("uuid");
+        if(uuidRaw == null || uuidRaw.isEmpty()){
+            this.uuid = owner.getUniqueId();
+        }
+        else{
+            this.uuid = UUID.fromString(uuidRaw);
+        }
+
         //assignPermissionNodes();
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
     }
 
-    public SIsland(SuperiorPlayer superiorPlayer, Location location, String islandName, String schemName){
-        this(superiorPlayer, SBlockPosition.of(location), islandName, schemName);
+    public SIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName){
+        this(superiorPlayer, uuid, SBlockPosition.of(location), islandName, schemName);
     }
 
     @SuppressWarnings("WeakerAccess")
-    public SIsland(SuperiorPlayer superiorPlayer, SBlockPosition wrappedLocation, String islandName, String schemName){
+    public SIsland(SuperiorPlayer superiorPlayer, UUID uuid, SBlockPosition wrappedLocation, String islandName, String schemName){
         if(superiorPlayer != null){
             this.owner = superiorPlayer.getIslandLeader();
             superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
         }else{
             this.owner = null;
         }
+        this.uuid = uuid;
         this.center = wrappedLocation;
         this.creationTime = System.currentTimeMillis() / 1000;
         updateCreationTimeDate();
@@ -302,6 +312,11 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public SuperiorPlayer getOwner() {
         return owner;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return uuid;
     }
 
     @Override
@@ -2764,6 +2779,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setInt(coopLimit.getValue())
                 .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
+                .setString(uuid.toString())
                 .setString(owner.getUniqueId().toString());
     }
 
@@ -2823,6 +2839,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setInt(coopLimit.getValue())
                 .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
+                .setString(uuid.toString())
                 .execute(async);
     }
 

@@ -126,7 +126,7 @@ public final class GridHandler implements GridManager {
         Location islandLocation = getNextLocation();
         servedPositions.add(SBlockPosition.of(islandLocation));
 
-        SIsland island = new SIsland(superiorPlayer, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
+        SIsland island = new SIsland(superiorPlayer, generateIslandUUID(), islandLocation.add(0.5, 0, 0.5), islandName, schemName);
         EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
 
         if(!event.isCancelled()) {
@@ -172,6 +172,16 @@ public final class GridHandler implements GridManager {
             servedPositions.remove(SBlockPosition.of(location));
     }
 
+    public UUID generateIslandUUID(){
+        UUID uuid;
+
+        do{
+            uuid = UUID.randomUUID();
+        }while (getIslandByUUID(uuid) != null || getIsland(uuid) != null);
+
+        return uuid;
+    }
+
     @Override
     public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
         return pendingCreationTasks.contains(superiorPlayer.getUniqueId());
@@ -198,6 +208,11 @@ public final class GridHandler implements GridManager {
     @Override
     public Island getIsland(UUID uuid){
         return islands.get(uuid);
+    }
+
+    @Override
+    public Island getIslandByUUID(UUID uuid) {
+        return islands.getByUUID(uuid);
     }
 
     @Override
