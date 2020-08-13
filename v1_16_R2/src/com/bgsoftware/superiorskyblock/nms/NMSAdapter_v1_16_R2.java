@@ -60,7 +60,7 @@ import java.util.Optional;
 public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE =
             new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
 

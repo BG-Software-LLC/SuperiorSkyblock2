@@ -89,7 +89,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
     private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
 
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "h");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
