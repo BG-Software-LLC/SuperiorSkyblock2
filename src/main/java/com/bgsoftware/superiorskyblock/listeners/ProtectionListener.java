@@ -24,6 +24,7 @@ import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -481,9 +482,9 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        IslandPrivilege islandPermission = e.getEntity() instanceof ArmorStand ? IslandPrivileges.BREAK :
-                e.getEntity() instanceof Animals || e.getEntity() instanceof WaterMob || e.getEntity() instanceof Villager ?
-                        IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.MONSTER_DAMAGE;
+        IslandPrivilege islandPermission = e.getEntity() instanceof Animals || e.getEntity() instanceof WaterMob ||
+                e.getEntity() instanceof Villager ? IslandPrivileges.ANIMAL_DAMAGE : e.getEntity() instanceof Monster ?
+                IslandPrivileges.MONSTER_DAMAGE : IslandPrivileges.BREAK;
 
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
