@@ -57,7 +57,7 @@ public final class CustomEventsListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameRotation(PlayerInteractEntityEvent e){
         if((e.getRightClicked() instanceof ItemFrame)){
             if(!ProtectionListener.IMP.onItemFrameRotate(e.getPlayer(), (ItemFrame) e.getRightClicked()))
@@ -65,7 +65,7 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameBreak(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof ItemFrame) {
             Player shooter;
@@ -81,7 +81,7 @@ public final class CustomEventsListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
 
@@ -137,7 +137,7 @@ public final class CustomEventsListener implements Listener {
         handlePlayerEnter(superiorPlayer, e.getFrom(), e.getTo(), fromIsland, toIsland, IslandEnterEvent.EnterCause.PORTAL, e);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent e){
         if(plugin.getGrid() == null)
             return;
