@@ -5,9 +5,12 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public final class Executor {
 
@@ -75,13 +78,14 @@ public final class Executor {
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
     }
 
+    public static NestedTask<Void> createTask(){
+        return new NestedTask<Void>().complete();
+    }
+
     public static void close(){
         try{
             shutdown = true;
             System.out.println("Shutting down database executor");
-//            databaseExecutor.shutdown();
-//            System.out.println("Waiting for database executor...");
-//            databaseExecutor.awaitTermination(1, TimeUnit.MINUTES);
             shutdownAndAwaitTermination();
         }catch(Exception ex){
             ex.printStackTrace();
@@ -104,6 +108,50 @@ public final class Executor {
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static final class NestedTask<T>{
+
+        private final CompletableFuture<T> value = new CompletableFuture<>();
+
+        NestedTask(){
+        }
+
+        public <R> NestedTask<R> runSync(Function<T, R> function){
+            NestedTask<R> nestedTask = new NestedTask<>();
+            value.whenComplete((value, ex) -> Executor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
+            return nestedTask;
+        }
+
+        public NestedTask<Void> runSync(Consumer<T> consumer){
+            NestedTask<Void> nestedTask = new NestedTask<>();
+            value.whenComplete((value, ex) -> Executor.ensureMain(() -> {
+                consumer.accept(value);
+                nestedTask.value.complete(null);
+            }));
+            return nestedTask;
+        }
+
+        public <R> NestedTask<R> runAsync(Function<T, R> function){
+            NestedTask<R> nestedTask = new NestedTask<>();
+            value.whenComplete((value, ex) -> Executor.async(() -> nestedTask.value.complete(function.apply(value))));
+            return nestedTask;
+        }
+
+        public NestedTask<Void> runAsync(Consumer<T> consumer){
+            NestedTask<Void> nestedTask = new NestedTask<>();
+            value.whenComplete((value, ex) -> Executor.async(() -> {
+                consumer.accept(value);
+                nestedTask.value.complete(null);
+            }));
+            return nestedTask;
+        }
+
+        private NestedTask<T> complete(){
+            value.complete(null);
+            return this;
+        }
+
     }
 
 }
