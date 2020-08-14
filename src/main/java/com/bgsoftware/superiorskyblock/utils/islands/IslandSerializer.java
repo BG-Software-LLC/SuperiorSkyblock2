@@ -176,8 +176,11 @@ public final class IslandSerializer {
     public static String serializeIslandChest(IslandChest[] islandChest){
         StringBuilder stringBuilder = new StringBuilder();
 
-        for(IslandChest _islandChest : islandChest)
-            stringBuilder.append("\n").append(ItemUtils.serialize(_islandChest.getContents()));
+        for(IslandChest _islandChest : islandChest) {
+            if(_islandChest != null) {
+                stringBuilder.append("\n").append(ItemUtils.serialize(_islandChest.getContents()));
+            }
+        }
 
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
