@@ -2050,6 +2050,16 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public void removeBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        SuperiorSkyblockPlugin.debug("Action: Remove Block Limit, Island: " + owner.getName() + ", Block: " + key);
+        blockLimits.remove(key);
+        Query.ISLAND_SET_BLOCK_LIMITS.getStatementHolder(this)
+                .setString(IslandSerializer.serializeBlockLimits(blockLimits))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
     public boolean hasReachedBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
         return hasReachedBlockLimit(key, 1);
     }

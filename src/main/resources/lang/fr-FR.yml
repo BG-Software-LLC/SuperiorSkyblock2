@@ -160,6 +160,7 @@ COMMAND_DESCRIPTION_ADMIN_OPEN_MENU: 'Open a custom menu for a player.'
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Promouvoir un membre d'une île.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Re-calculer la valeur d'une île.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Recharger toutes les configurations du plugin.
+COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Suppimer toutes les notes attribuées par un joueur.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Créer des schematics pour le plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Définir le biome de l'île spécifiée.

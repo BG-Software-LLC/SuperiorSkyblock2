@@ -50,6 +50,10 @@ public final class UpgradeKeyMap {
                 map.computeIfAbsent(key, k -> new Pair<>(-1, 0)).setKey(value)));
     }
 
+    public void remove(Key key){
+        this.value.write(map -> map.remove(key));
+    }
+
     public void setUpgradeString(Map<String, Integer> upgrades, boolean checkMax){
         KeyMap<Pair<Integer, Integer>> map = this.value.readAndGet(KeyMap::new);
         for(Map.Entry<String, Integer> entry : upgrades.entrySet()){

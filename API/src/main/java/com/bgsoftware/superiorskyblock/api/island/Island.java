@@ -977,6 +977,12 @@ public interface Island extends Comparable<Island> {
     void setBlockLimit(Key key, int limit);
 
     /**
+     * Remove the limit of a block.
+     * @param key The block's key to remove it's limit.
+     */
+    void removeBlockLimit(Key key);
+
+    /**
      * A method to check if a specific block has reached the limit.
      * This method checks for the block and it's global block key.
      * @param key The block's key to check.
