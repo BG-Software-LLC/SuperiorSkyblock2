@@ -1091,10 +1091,10 @@ public final class SIsland extends DatabaseObject implements Island {
         SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
         SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
 
-        Executor.async(() -> {
-            Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
-            Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
+        Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
+        Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
 
+        Executor.createTask().runAsync(v -> {
             for(CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> chunkInfoFuture : chunksToLoad){
                 BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>> chunkInfo;
 
@@ -1134,49 +1134,47 @@ public final class SIsland extends DatabaseObject implements Island {
                 for(Pair<Integer, Key> pair : plugin.getGrid().getBlockAmounts(chunkInfo.getX()))
                     handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
             }
+        }).runSync(v -> {
+            Key blockKey;
+            int blockCount;
 
-            Executor.sync(() -> {
-                Key blockKey;
-                int blockCount;
+            for(Pair<Location, Integer> pair : spawnersToCheck){
+                try {
+                    CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
+                    blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType(), pair.getKey());
+                    blockCount = pair.getValue();
+                    if(blockCount <= 0) {
+                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
+                        blockCount = spawnerInfo.getKey();
+                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), pair.getKey());
+                    }
+                    handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
+                }catch(Throwable ignored){}
+            }
+            spawnersToCheck.clear();
 
-                for(Pair<Location, Integer> pair : spawnersToCheck){
-                    try {
-                        CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType(), pair.getKey());
-                        blockCount = pair.getValue();
-                        if(blockCount <= 0) {
-                            Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
-                            blockCount = spawnerInfo.getKey();
-                            blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), pair.getKey());
-                        }
-                        handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
-                    }catch(Throwable ignored){}
-                }
-                spawnersToCheck.clear();
-
-                this.blockCounts.write(_blockCounts -> {
-                    _blockCounts.clear();
-                    blockCounts.read(_blockCounts::putAll);
-                });
-
-                this.islandWorth.set(islandWorth.get());
-                this.islandLevel.set(islandLevel.get());
-
-                BigDecimal newIslandLevel = getIslandLevel();
-                BigDecimal newIslandWorth = getWorth();
-
-                finishCalcIsland(asker, callback, newIslandLevel, newIslandWorth);
-
-                if(snapshot != null)
-                    snapshot.delete();
-
-                MenuValues.refreshMenus();
-                MenuCounts.refreshMenus();
-
-                saveBlockCounts(oldWorth, oldLevel);
-
-                beingRecalculated.set(false);
+            this.blockCounts.write(_blockCounts -> {
+                _blockCounts.clear();
+                blockCounts.read(_blockCounts::putAll);
             });
+
+            this.islandWorth.set(islandWorth.get());
+            this.islandLevel.set(islandLevel.get());
+
+            BigDecimal newIslandLevel = getIslandLevel();
+            BigDecimal newIslandWorth = getWorth();
+
+            finishCalcIsland(asker, callback, newIslandLevel, newIslandWorth);
+
+            if(snapshot != null)
+                snapshot.delete();
+
+            MenuValues.refreshMenus();
+            MenuCounts.refreshMenus();
+
+            saveBlockCounts(oldWorth, oldLevel);
+
+            beingRecalculated.set(false);
         });
     }
 

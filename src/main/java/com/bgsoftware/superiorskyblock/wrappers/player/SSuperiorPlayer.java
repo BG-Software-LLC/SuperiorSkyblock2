@@ -254,7 +254,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
         List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, (Consumer<Chunk>) null)
                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
-        Executor.async(() -> {
+        Executor.createTask().runAsync(v -> {
             for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
                 ChunkSnapshot chunkSnapshot;
 
@@ -284,25 +284,25 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
                         }
 
                         if(blockType.isSolid() || belowType.isSolid()){
-                            Location islandLocation = new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                            return new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
                                     chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z);
-
-                            Executor.sync(() -> {
-                                island.setTeleportLocation(islandLocation);
-                                SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandLocation));
-                                teleport(islandLocation.add(0.5, 0.5, 0.5));
-                                if(result != null)
-                                    result.accept(true);
-                            });
-
-                            return;
                         }
                     }
                 }
             }
 
-            if(result != null)
-                Executor.sync(() -> result.accept(false));
+            return null;
+        }).runSync(location -> {
+            if(location != null){
+                island.setTeleportLocation(location);
+                SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
+                teleport(location.add(0.5, 0.5, 0.5));
+                if(result != null)
+                    result.accept(true);
+            }
+            else if(result != null){
+                result.accept(false);
+            }
         });
     }
 
