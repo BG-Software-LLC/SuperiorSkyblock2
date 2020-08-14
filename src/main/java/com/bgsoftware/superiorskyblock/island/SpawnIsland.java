@@ -870,7 +870,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void removeBlockLimit(Key key) {
-        
+
     }
 
     @Override
