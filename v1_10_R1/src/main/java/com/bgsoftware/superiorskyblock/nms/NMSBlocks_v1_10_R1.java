@@ -290,19 +290,28 @@ public final class NMSBlocks_v1_10_R1 implements NMSBlocks {
         }
 
         else{
-            Executor.async(() -> {
-                try{
+            Executor.createTask().runAsync(v -> {
+                try {
                     Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkCoords.x, chunkCoords.z);
+                    Chunk loadedChunk = chunkData == null ? null : (Chunk) chunkData[0];
 
-                    if(chunkData == null)
-                        return;
+                    if(loadedChunk != null)
+                        chunkConsumer.accept(loadedChunk);
 
-                    Chunk loadedChunk = (Chunk) chunkData[0];
-                    chunkConsumer.accept(loadedChunk);
-                    if(saveChunk)
-                        chunkLoader.a(world, loadedChunk);
+                    return loadedChunk;
                 }catch (Exception ex){
                     ex.printStackTrace();
+                    return null;
+                }
+            }).runSync(loadedChunk -> {
+                if(loadedChunk != null) {
+                    if (saveChunk) {
+                        try {
+                            chunkLoader.a(world, loadedChunk);
+                        }catch (Exception ex){
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             });
         }
