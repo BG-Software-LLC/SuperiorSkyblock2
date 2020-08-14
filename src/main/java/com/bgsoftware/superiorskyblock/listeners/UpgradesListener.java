@@ -111,6 +111,8 @@ public final class UpgradesListener implements Listener {
                 }
             }
         }
+
+        EntityUtils.clearEntityEquipment(e.getEntity());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

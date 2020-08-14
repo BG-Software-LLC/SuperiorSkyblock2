@@ -68,7 +68,7 @@ public final class EntityUtils {
             }
         }catch(Throwable ignored){}
 
-        ItemStack[] entityEquipment = entityContent.remove(livingEntity.getUniqueId());
+        ItemStack[] entityEquipment = entityContent.get(livingEntity.getUniqueId());
         if(entityEquipment == null)
             entityEquipment = plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment());
 
@@ -77,6 +77,10 @@ public final class EntityUtils {
 
     public static void cacheEntityEquipment(LivingEntity livingEntity){
         entityContent.add(livingEntity.getUniqueId(), plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment()));
+    }
+
+    public static void clearEntityEquipment(LivingEntity livingEntity){
+        entityContent.remove(livingEntity.getUniqueId());
     }
 
     public static boolean isPlayerDamager(EntityDamageEvent e){
