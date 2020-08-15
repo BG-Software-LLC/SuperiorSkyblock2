@@ -51,6 +51,9 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
+        if(plugin.getGrid() == null)
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
         boolean animal = e.getEntity() instanceof Animals;
 

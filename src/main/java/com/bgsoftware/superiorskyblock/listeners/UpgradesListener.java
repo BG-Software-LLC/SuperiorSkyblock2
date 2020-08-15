@@ -262,6 +262,9 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e){
+        if(plugin.getGrid() == null)
+            return;
+        
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
         if(island == null)
