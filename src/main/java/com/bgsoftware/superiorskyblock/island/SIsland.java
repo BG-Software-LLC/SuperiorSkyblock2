@@ -923,7 +923,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(islandPrivilege == IslandPrivileges.FLY){
             Player player = superiorPlayer.asPlayer();
-            if(!player.isFlying() && value){
+            if(!player.isFlying() && value && superiorPlayer.hasIslandFlyEnabled()){
                 player.setAllowFlight(true);
                 player.setFlying(true);
                 Locale.ISLAND_FLY_ENABLED.send(player);
