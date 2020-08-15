@@ -1957,6 +1957,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  valuable_break:
+    display-menu: true
+    permission-enabled:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: GOLD_INGOT
+      name: '&6Valuable Blocks Break'
+      lore:
+        - '&7Access to break valuable blocks inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   withdraw_money:
     display-menu: true
     permission-enabled:
