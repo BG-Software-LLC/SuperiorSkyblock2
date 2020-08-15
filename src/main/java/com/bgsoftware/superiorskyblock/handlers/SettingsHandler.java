@@ -141,6 +141,7 @@ public final class SettingsHandler {
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
+    public final List<String> valuableBlocks;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -334,6 +335,7 @@ public final class SettingsHandler {
                 commandAliases.put(label.toLowerCase(), cfg.getStringList("command-aliases." + label));
             }
         }
+        valuableBlocks = cfg.getStringList("valuable-blocks");
     }
 
     public void updateValue(String path, Object value){

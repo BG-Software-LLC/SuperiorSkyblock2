@@ -97,10 +97,18 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPrivilege islandPermission = e.getBlock().getType() == Materials.SPAWNER.toBukkitType() ?
+        Material blockType = e.getBlock().getType();
+
+        IslandPrivilege islandPermission = blockType == Materials.SPAWNER.toBukkitType() ?
                 IslandPrivileges.SPAWNER_BREAK : IslandPrivileges.BREAK;
 
         if(!island.hasPermission(superiorPlayer, islandPermission)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(e.getPlayer());
+            return;
+        }
+
+        if(plugin.getSettings().valuableBlocks.contains(blockType.name()) && !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;

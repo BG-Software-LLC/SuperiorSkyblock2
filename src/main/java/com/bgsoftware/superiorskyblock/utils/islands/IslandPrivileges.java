@@ -65,6 +65,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege SPAWNER_BREAK = IslandPrivilege.getByName("SPAWNER_BREAK");
     public static IslandPrivilege UNCOOP_MEMBER = IslandPrivilege.getByName("UNCOOP_MEMBER");
     public static IslandPrivilege USE = IslandPrivilege.getByName("USE");
+    public static IslandPrivilege VALUABLE_BREAK = IslandPrivilege.getByName("VALUABLE_BREAK");
     public static IslandPrivilege WITHDRAW_MONEY = IslandPrivilege.getByName("WITHDRAW_MONEY");
 
     private static IslandPrivilege getSafe(String name){
