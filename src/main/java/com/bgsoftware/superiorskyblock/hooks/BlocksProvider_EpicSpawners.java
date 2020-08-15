@@ -42,7 +42,11 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
-        return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0).name();
+        try {
+            return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0).name();
+        }catch (Exception ex){
+            return "PIG";
+        }
     }
 
     @SuppressWarnings("unused")
