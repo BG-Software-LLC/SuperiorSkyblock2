@@ -88,6 +88,7 @@ public final class StatementHolder {
             StringHolder errorQuery = new StringHolder(query);
 
             synchronized (SQLHelper.getMutex()) {
+                SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     if (isBatch) {
                         if (batches.isEmpty()) {
