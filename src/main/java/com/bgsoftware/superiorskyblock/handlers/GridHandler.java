@@ -296,11 +296,11 @@ public final class GridHandler implements GridManager {
                 break;
             case NETHER:
                 if(plugin.getSettings().netherWorldEnabled)
-                    worldName = plugin.getSettings().islandWorldName + "_nether";
+                    worldName = plugin.getSettings().netherWorldName;
                 break;
             case THE_END:
                 if(plugin.getSettings().endWorldEnabled)
-                    worldName = plugin.getSettings().islandWorldName + "_the_end";
+                    worldName = plugin.getSettings().endWorldName;
                 break;
         }
 

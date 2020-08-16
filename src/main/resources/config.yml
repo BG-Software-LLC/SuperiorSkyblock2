@@ -248,14 +248,23 @@ bank-worth-rate: 1000
 worlds:
   # Set the name of the islands world.
   normal-world: SuperiorWorld
-  # Should the nether world be enabled?
-  nether-world: false
-  # Should nether be unlocked to islands by default?
-  nether-unlock: true
-  # Should the end world be enabled?
-  end-world: false
-  # Should end be unlocked to islands by default?
-  end-unlock: false
+  # Settings related to the nether world.
+  nether:
+    # Should the nether world be enabled?
+    enabled: false
+    # Should the nether be unlocked by default to islands?
+    unlock: true
+    # Custom name for the nether world.
+    # When empty, the name will be "<island-world>_nether"
+    name: ''
+  end:
+    # Should the end world be enabled?
+    enabled: false
+    # Should the end be unlocked by default to islands?
+    unlock: false
+    # Custom name for the end world.
+    # When empty, the name will be "<island-world>_the_end"
+    name: ''
   # Should the plugin optimize the island worlds?
   # When enabled, only chunks of islands will be saved from the island worlds.
   optimize: false

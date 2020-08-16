@@ -288,13 +288,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadWorld(){
-        String worldName = (settingsHandler = new SettingsHandler(this)).islandWorldName;
+        settingsHandler = new SettingsHandler(this);
         Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty);
-        loadWorld(worldName, difficulty, World.Environment.NORMAL);
+        loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
         if(settingsHandler.netherWorldEnabled)
-            loadWorld(worldName + "_nether", difficulty, World.Environment.NETHER);
+            loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
         if(settingsHandler.endWorldEnabled)
-            loadWorld(worldName + "_the_end", difficulty, World.Environment.THE_END);
+            loadWorld(settingsHandler.endWorldName, difficulty, World.Environment.THE_END);
     }
 
     private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){

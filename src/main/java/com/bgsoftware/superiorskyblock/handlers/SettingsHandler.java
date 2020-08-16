@@ -66,8 +66,10 @@ public final class SettingsHandler {
     public final String islandWorldName;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
+    public final String netherWorldName;
     public final boolean endWorldEnabled;
     public final boolean endWorldUnlocked;
+    public final String endWorldName;
     public final boolean optimizeWorlds;
     public final String worldsDifficulty;
     public final String spawnLocation;
@@ -217,10 +219,14 @@ public final class SettingsHandler {
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
-        netherWorldEnabled = cfg.getBoolean("worlds.nether-world", false);
-        netherWorldUnlocked = cfg.getBoolean("worlds.nether-unlock", true);
-        endWorldEnabled = cfg.getBoolean("worlds.end-world", false);
-        endWorldUnlocked = cfg.getBoolean("worlds.end-unlock", false);
+        netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
+        netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
+        String netherWorldName = cfg.getString("worlds.nether.name", "");
+        this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
+        endWorldEnabled = cfg.getBoolean("worlds.end.enabled", false);
+        endWorldUnlocked = cfg.getBoolean("worlds.end.unlock", false);
+        String endWorldName = cfg.getString("worlds.end.name", "");
+        this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
@@ -424,6 +430,14 @@ public final class SettingsHandler {
         }
         if(cfg.isBoolean("sync-worth"))
             cfg.set("sync-worth", cfg.getBoolean("sync-worth") ? "BUY" : "NONE");
+        if(!cfg.contains("worlds.nether")){
+            cfg.set("worlds.nether.enabled", cfg.getBoolean("worlds.nether-world"));
+            cfg.set("worlds.nether.unlock", cfg.getBoolean("worlds.nether-unlock"));
+        }
+        if(!cfg.contains("worlds.end")){
+            cfg.set("worlds.end.enabled", cfg.getBoolean("worlds.end-world"));
+            cfg.set("worlds.end.unlock", cfg.getBoolean("worlds.end-unlock"));
+        }
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){
