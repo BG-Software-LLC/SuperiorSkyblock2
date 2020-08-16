@@ -38,19 +38,26 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key);
+
         if(((Key) key).isAPIKey()){
             String customBlockValue = customBlockValues.get(key);
-            if(customBlockValue != null)
+            if(customBlockValue != null) {
+                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth");
                 return BigDecimalFormatted.of(customBlockValue);
+            }
         }
 
         String value = blockValues.get(key);
 
-        if(value != null)
+        if(value != null) {
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
             return BigDecimalFormatted.of(value);
+        }
 
         if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price");
             return BigDecimalFormatted.of(price);
         }
 
@@ -84,10 +91,14 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key);
+
         if(((Key) key).isAPIKey()){
             String customBlockLevel = customBlockLevels.get(key);
-            if(customBlockLevel != null)
+            if(customBlockLevel != null) {
+                SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level");
                 return BigDecimalFormatted.of(customBlockLevel);
+            }
         }
 
         String level = blockLevels.get(key);
@@ -95,6 +106,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
         if(level == null) {
             level = convertValueToLevel((BigDecimalFormatted) getBlockWorth(key));
             blockLevels.put(key, level);
+            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Converted From Worth");
         }
 
         return BigDecimalFormatted.of(level);
