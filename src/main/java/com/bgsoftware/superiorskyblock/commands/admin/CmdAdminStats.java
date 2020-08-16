@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -50,9 +51,18 @@ public final class CmdAdminStats implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        sender.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Stats:\n" +
-                " - Islands: " + plugin.getGrid().getSize() + "\n" +
-                " - Pending Chunks: " + ChunksProvider.getSize());
+        StringBuilder statsMessage = new StringBuilder("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Stats:\n");
+
+        //Islands Stats
+        statsMessage.append(" - Islands: ").append(plugin.getGrid().getSize()).append("\n");
+        //Pending Chunks Stats
+        statsMessage.append(" - Pending Chunks: ").append(ChunksProvider.getSize()).append("\n");
+        //Query Stats
+        statsMessage.append(" - Database Queries:");
+        StatementHolder.getQueryCalls().forEach((q, i) -> statsMessage.append("\n    * ")
+                .append(q).append(" (").append(i.get()).append(")"));
+
+        sender.sendMessage(statsMessage.toString());
     }
 
     @Override

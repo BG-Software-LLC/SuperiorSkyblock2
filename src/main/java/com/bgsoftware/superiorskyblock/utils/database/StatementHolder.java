@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import java.util.Map;
 public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final EnumMap<Query, IncreasableInteger> queryCalls = new EnumMap<>(Query.class);
 
     private final List<Registry<Integer, Object>> batches = new ArrayList<>();
 
@@ -89,6 +92,7 @@ public final class StatementHolder {
 
             synchronized (SQLHelper.getMutex()) {
                 SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
+                queryCalls.computeIfAbsent(queryEnum, q -> new IncreasableInteger()).increase();
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     if (isBatch) {
                         if (batches.isEmpty()) {
@@ -135,6 +139,10 @@ public final class StatementHolder {
         }
     }
 
+    public static EnumMap<Query, IncreasableInteger> getQueryCalls() {
+        return queryCalls;
+    }
+
     private static class StringHolder{
 
         private String value;
@@ -147,6 +155,24 @@ public final class StatementHolder {
         public String toString() {
             return value;
         }
+    }
+
+    public static final class IncreasableInteger{
+
+        private int value = 0;
+
+        IncreasableInteger(){
+
+        }
+
+        public int get() {
+            return value;
+        }
+
+        public void increase(){
+            value++;
+        }
+
     }
 
 }
