@@ -40,6 +40,10 @@ public abstract class DatabaseObject {
         modifiedCalls.put(query, modifiedCalls.getOrDefault(query, 0) + 1);
     }
 
+    public void setFullUpdated(Query query){
+        modifiedCalls.remove(query);
+    }
+
     public void setUpdated(Query query){
         int calls = modifiedCalls.getOrDefault(query, 0) - 1;
 

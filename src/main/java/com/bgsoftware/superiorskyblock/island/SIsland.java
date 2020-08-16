@@ -1561,17 +1561,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
             updateLastTime();
 
-            if(save){
+            if(save)
                 saveBlockCounts(oldWorth, oldLevel);
-                if(++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
-                    blocksUpdateCounter = 0;
-                    plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
-                    plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-                    MenuTopIslands.refreshMenus();
-                    MenuValues.refreshMenus();
-                    MenuCounts.refreshMenus();
-                }
-            }
         }
     }
 
@@ -1874,7 +1865,20 @@ public final class SIsland extends DatabaseObject implements Island {
                     EventsCaller.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
-        saveBlockCounts();
+        if(++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
+            saveBlockCounts();
+            blocksUpdateCounter = 0;
+            plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
+            plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
+            MenuTopIslands.refreshMenus();
+            MenuValues.refreshMenus();
+            MenuCounts.refreshMenus();
+        }
+
+        else{
+            setModified(Query.ISLAND_SET_BLOCK_COUNTS);
+        }
+
     }
 
     /*
@@ -2859,6 +2863,9 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void saveBlockCounts(){
+        //Making sure there's no active modified flags.
+        setFullUpdated(Query.ISLAND_SET_BLOCK_COUNTS);
+        //Saving blocks.
         blockCounts.read(blockCounts -> Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder(this)
                 .setString(IslandSerializer.serializeBlockCounts(blockCounts))
                 .setString(owner.getUniqueId().toString())
@@ -2870,6 +2877,9 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     public void saveIslandChests(){
+        //Making sure there's no active modified flags.
+        setFullUpdated(Query.ISLAND_SET_ISLAND_CHEST);
+        //Saving chest.
         Query.ISLAND_SET_ISLAND_CHEST.getStatementHolder(this)
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(owner.getUniqueId().toString())
