@@ -474,7 +474,7 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
 
-        if(island == null)
+        if(island == null || !island.hasPermission(e.getPlayer(), IslandPrivileges.BREAK))
             return;
 
         if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) != 1)
