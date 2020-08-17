@@ -20,7 +20,7 @@ import java.util.Map;
 
 public final class BlockValuesHandler implements BlockValuesManager {
 
-    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static final ScriptEngine engine = new ScriptEngineManager(null).getEngineByName("JavaScript");
     private static final Bindings bindings = createBindings();
 
     private static final KeyMap<String> customBlockValues = new KeyMap<>(), customBlockLevels = new KeyMap<>();

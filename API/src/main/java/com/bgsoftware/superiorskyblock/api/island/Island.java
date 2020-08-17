@@ -355,10 +355,25 @@ public interface Island extends Comparable<Island> {
     void resetChunks(World.Environment environment, boolean onlyProtected);
 
     /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     * @param environment The environment to reset chunks in.
+     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish);
+
+    /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
      * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
      */
     void resetChunks(boolean onlyProtected);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onFinish Callback runnable.
+     */
+    void resetChunks(boolean onlyProtected, Runnable onFinish);
 
     /**
      * Check if the location is inside the island's area.

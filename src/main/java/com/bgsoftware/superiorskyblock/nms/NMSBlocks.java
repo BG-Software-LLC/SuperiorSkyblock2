@@ -50,7 +50,7 @@ public interface NMSBlocks {
 
     CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(ChunkPosition chunkPosition);
 
-    void deleteChunk(Island island, ChunkPosition chunkPosition);
+    void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish);
 
     void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
 

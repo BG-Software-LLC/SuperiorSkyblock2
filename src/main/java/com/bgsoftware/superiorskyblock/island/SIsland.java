@@ -743,15 +743,60 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
+        resetChunks(environment, onlyProtected, null);
+    }
+
+    @Override
+    public void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish) {
         World world = getCenter(environment).getWorld();
-        IslandUtils.getChunkCoords(this,world, onlyProtected, true)
-                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(this, chunkPosition));
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, world, onlyProtected, true);
+
+        if(chunkPositions.isEmpty()){
+            if(onFinish != null)
+                onFinish.run();
+            return;
+        }
+
+        for(int i = 0; i < chunkPositions.size() - 1; i++)
+            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
+
+        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
     }
 
     @Override
     public void resetChunks(boolean onlyProtected) {
-        IslandUtils.getChunkCoords(this, onlyProtected, true)
-                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(this, chunkPosition));
+        resetChunks(onlyProtected, null);
+    }
+
+    @Override
+    public void resetChunks(boolean onlyProtected, Runnable onFinish) {
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, onlyProtected, true);
+
+        if(chunkPositions.isEmpty()){
+            if(onFinish != null)
+                onFinish.run();
+            return;
+        }
+
+        for(int i = 0; i < chunkPositions.size() - 1; i++)
+            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
+
+        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+    }
+
+    public void resetChunksIncludeEmpty(boolean onlyProtected, Runnable onFinish) {
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, onlyProtected, false);
+
+        if(chunkPositions.isEmpty()){
+            if(onFinish != null)
+                onFinish.run();
+            return;
+        }
+
+        for(int i = 0; i < chunkPositions.size() - 1; i++)
+            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
+
+        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
     }
 
     @Override

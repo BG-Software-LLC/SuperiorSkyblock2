@@ -369,7 +369,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish) {
+
+    }
+
+    @Override
     public void resetChunks(boolean onlyProtected) {
+
+    }
+
+    @Override
+    public void resetChunks(boolean onlyProtected, Runnable onFinish) {
 
     }
 

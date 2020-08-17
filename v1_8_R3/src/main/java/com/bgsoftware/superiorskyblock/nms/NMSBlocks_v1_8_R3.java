@@ -230,11 +230,11 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     }
 
     @Override
-    public void deleteChunk(Island island, ChunkPosition chunkPosition) {
+    public void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish) {
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
         WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
 
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
+        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
             Arrays.fill(chunk.getSections(), null);
             Arrays.fill(chunk.entitySlices, new UnsafeList<>());
 
@@ -253,6 +253,8 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
             }
 
             ChunksTracker.markEmpty(island, chunkPosition, false);
+
+            onFinish.run();
         }, chunk -> refreshChunk(chunk.bukkitChunk));
     }
 
@@ -266,6 +268,10 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
+        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, updateChunk);
+    }
+
+    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> CHUNK_LOADER.get(world.chunkProviderServer));
 
@@ -275,6 +281,8 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
             chunkConsumer.accept(chunk);
             if(updateChunk != null)
                 updateChunk.accept(chunk);
+            if(onFinish != null)
+                onFinish.run();
         }
 
         else{
@@ -301,6 +309,8 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
                         }
                     }
                 }
+                if(onFinish != null)
+                    onFinish.run();
             });
         }
     }

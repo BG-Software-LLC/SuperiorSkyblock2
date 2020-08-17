@@ -132,37 +132,37 @@ public final class GridHandler implements GridManager {
         if(!event.isCancelled()) {
             pendingCreationTasks.add(superiorPlayer.getUniqueId());
 
-            island.resetChunks(true);
+            island.resetChunksIncludeEmpty(false, () -> {
+                Schematic schematic = plugin.getSchematics().getSchematic(schemName);
+                long startTime = System.currentTimeMillis();
+                schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
+                    islands.add(superiorPlayer.getUniqueId(), island);
+                    setLastIsland(SBlockPosition.of(islandLocation));
+                    plugin.getDataHandler().insertIsland(island);
 
-            Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-            long startTime = System.currentTimeMillis();
-            schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                islands.add(superiorPlayer.getUniqueId(), island);
-                setLastIsland(SBlockPosition.of(islandLocation));
-                plugin.getDataHandler().insertIsland(island);
+                    pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
-                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+                    island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
+                    island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
+                    island.setBiome(biome);
+                    island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
 
-                island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
-                island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
-                island.setBiome(biome);
-                island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
-
-                if (superiorPlayer.isOnline()) {
-                    Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
-                    if (event.getResult()) {
-                        superiorPlayer.teleport(island);
-                        if (island.isInside(superiorPlayer.getLocation()))
-                            Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+                    if (superiorPlayer.isOnline()) {
+                        Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
+                        if (event.getResult()) {
+                            superiorPlayer.teleport(island);
+                            if (island.isInside(superiorPlayer.getLocation()))
+                                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island), 20L);
+                        }
                     }
-                }
 
-                onCreationIslandFinish(islandLocation);
-            }, ex -> {
-                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-                onCreationIslandFinish(islandLocation);
-                ex.printStackTrace();
-                Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
+                    onCreationIslandFinish(islandLocation);
+                }, ex -> {
+                    pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+                    onCreationIslandFinish(islandLocation);
+                    ex.printStackTrace();
+                    Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
+                });
             });
         }
     }
