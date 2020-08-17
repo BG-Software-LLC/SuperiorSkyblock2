@@ -549,7 +549,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(inside && !isMember(superiorPlayer)){
             boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors ->
-                    !uniqueVisitors.contains(superiorPlayer) && uniqueVisitors.add(superiorPlayer));
+                    !plugin.getProviders().isVanished(superiorPlayer.asPlayer()) &&
+                            !uniqueVisitors.contains(superiorPlayer) && uniqueVisitors.add(superiorPlayer));
 
             if(newVisitor){
                 Query.ISLAND_SET_VISITORS.getStatementHolder(this)
