@@ -19,7 +19,7 @@ public final class CmdDisband implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Arrays.asList("disband", "reset");
+        return Arrays.asList("disband", "reset", "delete");
     }
 
     @Override
