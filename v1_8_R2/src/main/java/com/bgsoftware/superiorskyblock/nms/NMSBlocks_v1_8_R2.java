@@ -254,8 +254,6 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
             }
 
             ChunksTracker.markEmpty(island, chunkPosition, false);
-
-            onFinish.run();
         }, chunk -> refreshChunk(chunk.bukkitChunk));
     }
 
