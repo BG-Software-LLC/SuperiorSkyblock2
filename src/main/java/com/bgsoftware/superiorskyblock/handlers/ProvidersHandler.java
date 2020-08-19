@@ -177,7 +177,7 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     public BigDecimal getPrice(Key key){
-        return pricesProvider.getPrice(key);
+        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey() + ":0") : key);
     }
 
     public boolean isVanished(Player player){

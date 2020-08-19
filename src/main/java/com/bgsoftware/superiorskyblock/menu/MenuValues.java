@@ -9,9 +9,11 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -102,6 +105,8 @@ public final class MenuValues extends SuperiorMenu {
 
         menuValues.setRowsSize(pattern.size());
 
+        KeySet keysToUpdate = new KeySet(new ArrayList<>());
+
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
             int slot = row * 9;
@@ -115,8 +120,7 @@ public final class MenuValues extends SuperiorMenu {
                     else if(cfg.contains("items." + ch + ".block")) {
                         Key key = Key.of(cfg.getString("items." + ch + ".block"));
                         menuValues.addData(slot + "", key);
-                        if(!plugin.getBlockValues().hasBlockWorth(key))
-                            plugin.getBlockValues().setBlockWorth(key, BigDecimal.ZERO);
+                        keysToUpdate.add(key);
                     }
 
                     menuValues.addFillItem(slot, FileUtils.getItemStack("values.yml", cfg.getConfigurationSection("items." + ch)));
@@ -127,6 +131,11 @@ public final class MenuValues extends SuperiorMenu {
                 }
             }
         }
+
+        Executor.sync(() -> keysToUpdate.forEach(key -> {
+            if(!plugin.getBlockValues().hasBlockWorth(key))
+                plugin.getBlockValues().setBlockWorth((Key) key, BigDecimal.ZERO);
+        }), 5L);
 
         menuValues.setBackButton(backButton);
 
