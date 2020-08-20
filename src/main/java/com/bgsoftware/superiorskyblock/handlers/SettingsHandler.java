@@ -286,27 +286,32 @@ public final class SettingsHandler {
         blockedVisitorsCommands = cfg.getStringList("blocked-visitors-commands");
         defaultContainersEnabled = cfg.getBoolean("default-containers.enabled", false);
         defaultContainersContents = Registry.createRegistry();
-        for(String container : cfg.getConfigurationSection("default-containers.containers").getKeys(false)){
-            try {
-                InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
-                Registry<Integer, ItemStack>  containerContents = Registry.createRegistry();
-                ConfigurationSection containerSection = cfg.getConfigurationSection("default-containers.containers." + container);
-                for(String slot : containerSection.getKeys(false)) {
-                    try {
-                        ItemStack itemStack = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot)).build();
-                        itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
-                        containerContents.add(Integer.parseInt(slot), itemStack);
-                    } catch (Exception ignored) { }
+        if(cfg.contains("default-containers.containers")) {
+            for (String container : cfg.getConfigurationSection("default-containers.containers").getKeys(false)) {
+                try {
+                    InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
+                    Registry<Integer, ItemStack> containerContents = Registry.createRegistry();
+                    ConfigurationSection containerSection = cfg.getConfigurationSection("default-containers.containers." + container);
+                    for (String slot : containerSection.getKeys(false)) {
+                        try {
+                            ItemStack itemStack = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot)).build();
+                            itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
+                            containerContents.add(Integer.parseInt(slot), itemStack);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                    defaultContainersContents.add(containerType, containerContents);
+                } catch (IllegalArgumentException ex) {
+                    SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
                 }
-                defaultContainersContents.add(containerType, containerContents);
-            }catch (IllegalArgumentException ex){
-                SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
             }
         }
         defaultSignLines = cfg.getStringList("default-signs");
         eventCommands = Registry.createRegistry();
-        for(String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)){
-            eventCommands.add(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
+        if(cfg.contains("event-commands")) {
+            for (String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)) {
+                eventCommands.add(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
+            }
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
         homeWarmup = cfg.getLong("home-warmup", 0);
