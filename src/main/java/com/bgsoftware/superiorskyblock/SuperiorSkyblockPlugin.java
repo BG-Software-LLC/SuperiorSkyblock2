@@ -224,6 +224,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             playersHandler.savePlayers();
             gridHandler.saveIslands();
+            gridHandler.saveStackedBlocks();
 
             Bukkit.getOnlinePlayers().forEach(player -> {
                 SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);

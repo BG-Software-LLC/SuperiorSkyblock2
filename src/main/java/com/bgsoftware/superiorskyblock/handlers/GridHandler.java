@@ -597,6 +597,9 @@ public final class GridHandler implements GridManager {
         int z = resultSet.getInt("z");
         int amount = resultSet.getInt("amount");
 
+        if(world == null)
+            return;
+
         String item = resultSet.getString("item");
         Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
 
@@ -606,21 +609,6 @@ public final class GridHandler implements GridManager {
     public void updateStackedBlockKeys(){
         stackedBlocks.values().forEach(map ->
                 map.forEach((blockPosition, pair) -> pair.setValue(Key.of(blockPosition.getBlock()))));
-    }
-
-    public void executeStackedBlocksInsertStatement(boolean async){
-        for(Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks : this.stackedBlocks.values()) {
-            for (Map.Entry<SBlockPosition, Pair<Integer, Key>> entry : stackedBlocks.entrySet()) {
-                Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
-                        .setString(entry.getKey().getWorld().getName())
-                        .setInt(entry.getKey().getX())
-                        .setInt(entry.getKey().getY())
-                        .setInt(entry.getKey().getZ())
-                        .setInt(entry.getValue().getKey())
-                        .setString(entry.getValue().getValue().toString())
-                        .execute(async);
-            }
-        }
     }
 
     public void executeGridInsertStatement(boolean async) {
@@ -659,6 +647,44 @@ public final class GridHandler implements GridManager {
         }
 
         getIslands().forEach(Island::removeEffects);
+    }
+
+
+    public void saveStackedBlocks(){
+        Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks = new HashMap<>();
+        this.stackedBlocks.values().forEach(stackedBlocks::putAll);
+
+        {
+            StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_INSERT.getStatementHolder(null);
+            stackedBlocksHolder.prepareBatch();
+            stackedBlocks.forEach(((blockPosition, pair) -> {
+                if(pair.getKey() > 1){
+                    stackedBlocksHolder.setString(blockPosition.getWorldName())
+                            .setInt(blockPosition.getX())
+                            .setInt(blockPosition.getY())
+                            .setInt(blockPosition.getZ())
+                            .setInt(pair.getKey())
+                            .setString(pair.getValue().toString())
+                            .addBatch();
+                }
+            }));
+            stackedBlocksHolder.execute(false);
+        }
+
+        {
+            StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder(null);
+            stackedBlocksHolder.prepareBatch();
+            stackedBlocks.forEach(((blockPosition, pair) -> {
+                if(pair.getKey() <= 1){
+                    stackedBlocksHolder.setString(blockPosition.getWorldName())
+                            .setInt(blockPosition.getX())
+                            .setInt(blockPosition.getY())
+                            .setInt(blockPosition.getZ())
+                            .addBatch();
+                }
+            }));
+            stackedBlocksHolder.execute(false);
+        }
     }
 
     private BlockFace getIslandFace(Location location){
