@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -479,6 +480,23 @@ public final class GridHandler implements GridManager {
         return blockFailed;
     }
 
+    public void removeStackedBlocks(Island island){
+        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder((SIsland) island);
+        stackedBlocksHolder.prepareBatch();
+
+        IslandUtils.getChunkCoords(island, true, false).forEach(chunkPosition -> {
+            Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks = this.stackedBlocks.stackedBlocks.remove(chunkPosition);
+            if(stackedBlocks != null)
+                stackedBlocks.keySet().forEach(blockPosition -> {
+                    this.stackedBlocks.removeHologram(blockPosition.parse());
+                    stackedBlocksHolder.setString(blockPosition.getWorldName()).setInt(blockPosition.getX())
+                            .setInt(blockPosition.getY()).setInt(blockPosition.getZ()).addBatch();
+                });
+        });
+
+        stackedBlocksHolder.execute(true);
+    }
+
     @Override
     public void calcAllIslands(){
         calcAllIslands(null);
@@ -742,7 +760,8 @@ public final class GridHandler implements GridManager {
 
         private void updateName(Block block){
             int amount = getBlockAmount(block);
-            ArmorStand armorStand = getHologram(block);
+            ArmorStand armorStand = getHologram(block.getLocation(), true);
+            assert armorStand != null;
 
             if(amount <= 1){
                 Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(block));
@@ -758,27 +777,36 @@ public final class GridHandler implements GridManager {
 
         }
 
-        private ArmorStand getHologram(Block block){
-            Location hologramLocation = block.getLocation().add(0.5, 1, 0.5);
+        private void removeHologram(Location location){
+            ArmorStand armorStand = getHologram(location, false);
+            if(armorStand != null)
+                armorStand.remove();
+        }
+
+        private ArmorStand getHologram(Location location, boolean createNew){
+            Location hologramLocation = location.add(0.5, 1, 0.5);
 
             // Looking for an armorstand
-            for(Entity entity : block.getChunk().getEntities()){
-                if(entity instanceof ArmorStand && entity.getLocation().equals(hologramLocation)){
+            for(Entity entity : location.getChunk().getEntities()){
+                if(entity instanceof ArmorStand && entity.getLocation().equals(hologramLocation))
                     return (ArmorStand) entity;
-                }
             }
 
-            // Couldn't find one, creating one...
+            if(createNew) {
+                // Couldn't find one, creating one...
 
-            ArmorStand armorStand = block.getWorld().spawn(hologramLocation, ArmorStand.class);
+                ArmorStand armorStand = location.getWorld().spawn(hologramLocation, ArmorStand.class);
 
-            armorStand.setGravity(false);
-            armorStand.setSmall(true);
-            armorStand.setVisible(false);
-            armorStand.setCustomNameVisible(true);
-            armorStand.setMarker(true);
+                armorStand.setGravity(false);
+                armorStand.setSmall(true);
+                armorStand.setVisible(false);
+                armorStand.setCustomNameVisible(true);
+                armorStand.setMarker(true);
 
-            return armorStand;
+                return armorStand;
+            }
+
+            return null;
         }
 
         private String getFormattedType(String type){

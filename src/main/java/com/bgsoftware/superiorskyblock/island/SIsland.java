@@ -1085,6 +1085,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
+        plugin.getGrid().removeStackedBlocks(this);
+
         resetChunks(true);
 
         plugin.getGrid().deleteIsland(this);
