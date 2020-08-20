@@ -16,7 +16,7 @@ import java.util.Random;
 public final class WorldGenerator extends ChunkGenerator {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
+    private static final Biome NETHER_BIOME = getNetherBiome();
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
         return new Location(world, 0, 100, 0);
@@ -43,11 +43,19 @@ public final class WorldGenerator extends ChunkGenerator {
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes) {
         ChunkData chunkData = createChunkData(world);
 
-        if(world.getEnvironment() == World.Environment.NORMAL){
-            plugin.getNMSAdapter().setBiome(biomes, Biome.PLAINS);
+        switch (world.getEnvironment()){
+            case NETHER: {
+                plugin.getNMSAdapter().setBiome(biomes, NETHER_BIOME);
+                break;
+            }
+            case NORMAL: {
+                plugin.getNMSAdapter().setBiome(biomes, Biome.PLAINS);
 
-            if(chunkX == 0 && chunkZ == 0){
-                chunkData.setBlock(0, 99, 0, Material.BEDROCK);
+                if (chunkX == 0 && chunkZ == 0) {
+                    chunkData.setBlock(0, 99, 0, Material.BEDROCK);
+                }
+
+                break;
             }
         }
 
@@ -65,6 +73,14 @@ public final class WorldGenerator extends ChunkGenerator {
             blocks[y >> 4] = new byte[4096];
 
         blocks[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = (byte) blockId;
+    }
+
+    private static Biome getNetherBiome(){
+        try{
+            return Biome.valueOf("NETHER_WASTES");
+        }catch (Throwable ex){
+            return null;
+        }
     }
 
 }
