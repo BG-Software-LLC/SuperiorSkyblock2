@@ -96,10 +96,15 @@ public final class CmdDeposit implements ISuperiorCommand {
 
         EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
 
-        island.depositMoney(amount);
-        plugin.getProviders().withdrawMoney(superiorPlayer, amount);
+        String error = plugin.getProviders().withdrawMoney(superiorPlayer, amount);
 
-        ((SIsland) island).sendMessage(Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+        if(error != null && !error.isEmpty()){
+            Locale.DEPOSIT_ERROR.send(sender, error);
+        }
+        else {
+            island.depositMoney(amount);
+            ((SIsland) island).sendMessage(Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+        }
     }
 
     @Override

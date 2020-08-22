@@ -16,13 +16,13 @@ public final class EconomyProvider_Default implements EconomyProvider {
     }
 
     @Override
-    public void depositMoney(SuperiorPlayer superiorPlayer, double amount) {
-
+    public String depositMoney(SuperiorPlayer superiorPlayer, double amount) {
+        return "";
     }
 
     @Override
-    public void withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
-
+    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
+        return "";
     }
 
 }

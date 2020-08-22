@@ -264,6 +264,7 @@ DEMOTE_LEADER: '&c&lErreur | &7Vous ne pouvez pas rétrograder le propriétaire 
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErreur | &7Vous pouvez uniquement rétrograder des joueurs ayant un rôle d''île inférieur au votre.'
 DEMOTED_MEMBER: '&e&lIle | &7Vous avez rétrogradé {0} au rôle de {1} sur son île.'
 DEPOSIT_ANNOUNCEMENT: '&e&lBanque | &7{0} a déposé {1}$ sur le compte de l''île !'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez rien casser en dehors de votre île.'
 DISBAND_ANNOUNCEMENT: '&e&lIle | &7Votre île a été supprimée par {0}.'
 DISBAND_GIVE: '&e&lIle | &7Vous avez reçu {0} suppressions d''île.'
@@ -624,6 +625,7 @@ WITHDRAW_ALL_MONEY: |
   &e&lBanque | &7Le compte de l'île ne contient que {0}$.
   &e&lBanque | &7&oRécupération de tout l'argent..."
 WITHDRAW_ANNOUNCEMENT: '&e&lBanque | &7{0} a retiré {1}$ du compte de l''île !'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanque | &7Vous avez retiré {0}$ du compte de l''île de {1} !'
 WITHDRAWN_MONEY_NAME: '&e&lBanque | &7Vous avez retiré {0}$ du compte de l''île {1} !'
 WORLD_NOT_UNLOCKED: '&e&lMondes | &7Le monde {0} n''a pas encore été dévérouillé !'

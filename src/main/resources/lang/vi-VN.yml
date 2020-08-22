@@ -310,6 +310,7 @@ DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể hạ cấp 
   vai trò đảo thấp hơn của bạn.'
 DEMOTED_MEMBER: '&e&lĐảo Thần | &7Bạn đã hạ cấp {0} thành {1} trong đảo của họ.'
 DEPOSIT_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} đã gửi {1}$ vào ngân hàng đảo!'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể phá hủy bên ngoài phạm vi bảo vệ
   của bạn.'
 DISBAND_ANNOUNCEMENT: '&e&lĐảo Thần | &7Đảo của bạn đã bị giải tán bởi {0}.'
@@ -723,6 +724,7 @@ WITHDRAW_ALL_MONEY: |-
   &e&lNgân Hàng | &7Đảo ngân hàng chỉ có {0}$ bên trong.
   &e&lNgân Hàng | &7&oRút toàn bộ tiền..."
 WITHDRAW_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} rút {1}$ từ ngân hàng của đảo!'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo của {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã rút ${0} từ đảo {1}!'
 WORLD_NOT_UNLOCKED: '&e&lThế Giới | &7Thế giới {0} hiện chưa được mở khóa!'

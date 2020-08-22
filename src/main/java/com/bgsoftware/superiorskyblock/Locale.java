@@ -270,6 +270,7 @@ public enum Locale {
     DEMOTE_PLAYERS_WITH_LOWER_ROLE,
     DEMOTE_LEADER,
     DEPOSIT_ANNOUNCEMENT,
+    DEPOSIT_ERROR,
     DESTROY_OUTSIDE_ISLAND,
     DISBANDED_ISLAND,
     DISBANDED_ISLAND_OTHER,
@@ -596,6 +597,7 @@ public enum Locale {
     WITHDRAWN_MONEY_NAME,
     WITHDRAW_ALL_MONEY,
     WITHDRAW_ANNOUNCEMENT,
+    WITHDRAW_ERROR,
     WORLD_NOT_UNLOCKED;
 
     private static Set<java.util.Locale> locales = new HashSet<>();

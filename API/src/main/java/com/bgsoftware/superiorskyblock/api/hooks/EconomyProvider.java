@@ -22,14 +22,16 @@ public interface EconomyProvider {
      * Deposit money into a player's bank.
      * @param superiorPlayer The player to deposit money to.
      * @param amount The amount to deposit.
+     * @return The error message if needed. Otherwise, empty string.
      */
-    void depositMoney(SuperiorPlayer superiorPlayer, double amount);
+    String depositMoney(SuperiorPlayer superiorPlayer, double amount);
 
     /**
      * Withdraw money from a player's bank.
      * @param superiorPlayer The player to withdraw money from.
      * @param amount The amount to withdraw.
+     * @return The error message if needed. Otherwise, empty string.
      */
-    void withdrawMoney(SuperiorPlayer superiorPlayer, double amount);
+    String withdrawMoney(SuperiorPlayer superiorPlayer, double amount);
     
 }

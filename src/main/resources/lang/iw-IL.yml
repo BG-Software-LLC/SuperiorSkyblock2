@@ -276,6 +276,7 @@ DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7ךלשמ הכומנ הגרד
   דירוהל לוכי התא.'
 DEMOTED_MEMBER: '&e&lיא | &7ולש יאב {1} הגרדל {0} תא הגרדב תדרוה.'
 DEPOSIT_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבה לא ${0} דיקפה רמוע!'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ סורהל לוכי אל התא.'
 DISBAND_ANNOUNCEMENT: '&e&lיא | &7{0} ידי לע קחמנ ךלש יאה.'
 DISBAND_GIVE: '&e&lיא | &7תורתומ תוקיחמ {0} דוע תלביק.'
@@ -646,6 +647,7 @@ WITHDRAW_ALL_MONEY: |-
   &e&lקנב | &7וכותב םירלוד {0} קר שי יאה לש קנבב.
   &e&lקנב | &7&oףסכה לכ תא ךשומ...
 WITHDRAW_ANNOUNCEMENT: '&e&lקנב | &7יאה לש קנבהמ ${1} ךשמ {0}!'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lקנב | &7{1} לש יאה לש קנבהמ ${0} תכשמ!'
 WITHDRAWN_MONEY_NAME: '&e&lקנב | &7{1} יאה לש קנבהמ ${0} תכשמ!'
 WORLD_NOT_UNLOCKED: '&e&lתומלוע | &7הזה יאב חותפ אל ןיידע {0} םלועה.'

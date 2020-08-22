@@ -320,6 +320,7 @@ DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi degradare solo i giocatori 
   un ruolo dell''isola inferiore al tuo.'
 DEMOTED_MEMBER: '&e&lIsola | &7Hai degradato {0} a {1}.'
 DEPOSIT_ANNOUNCEMENT: '&e&lBanca | &7{0} ha depositato ${1} nella banca dell''isola!'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi distruggere al di fuori del tuo raggio
   di protezione.'
 DISBAND_ANNOUNCEMENT: '&e&lIsola | &7La tua isola è stata sciolta da {0}.'
@@ -750,6 +751,7 @@ WITHDRAW_ALL_MONEY: |-
   &e&lBanca | &7La banca dell'isola ha solo {0} dollari al suo interno.
   &e&lBanca | &7&oPrelevamento di tutti i soldi..."
 WITHDRAW_ANNOUNCEMENT: '&e&lBanca | &7{0} ha prelevato ${1} dalla banca dell''isola!'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBanca | &7Hai ritirato ${0} dalla banca dell''isola di {1}!'
 WITHDRAWN_MONEY_NAME: '&e&lBanca | &7Hai ritirato ${0} dalla riva dell''isola {1}!'
 WORLD_NOT_UNLOCKED: '&e&lWorlds | &7Il mondo {0} non è ancora stato sbloccato!'

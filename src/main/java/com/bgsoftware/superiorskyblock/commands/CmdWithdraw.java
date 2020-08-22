@@ -100,10 +100,15 @@ public final class CmdWithdraw implements ISuperiorCommand {
 
         EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, amount);
 
-        island.withdrawMoney(amount);
-        plugin.getProviders().depositMoney(superiorPlayer, amount);
+        String error = plugin.getProviders().depositMoney(superiorPlayer, amount);
 
-        ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+        if(error != null && !error.isEmpty()){
+            Locale.WITHDRAW_ERROR.send(sender, error);
+        }
+        else{
+            island.withdrawMoney(amount);
+            ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+        }
     }
 
     @Override

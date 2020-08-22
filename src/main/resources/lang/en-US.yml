@@ -264,6 +264,7 @@ DEMOTE_LEADER: '&c&lError | &7You cannot demote island leaders.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only demote players with a lower island role than yours.'
 DEMOTED_MEMBER: '&e&lIsland | &7You demoted {0} to a {1} in his island.'
 DEPOSIT_ANNOUNCEMENT: '&e&lBank | &7{0} deposited ${1} into the island bank!'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lError | &7You cannot destroy outside of your protection range.'
 DISBAND_ANNOUNCEMENT: '&e&lIsland | &7Your island was disbanded by {0}.'
 DISBAND_GIVE: '&e&lIsland | &7You received {0} disbands.'
@@ -624,6 +625,7 @@ WITHDRAW_ALL_MONEY: |-
   &e&lBank | &7Island bank has only {0} dollars inside it.
   &e&lBank | &7&oWithdrawing all money..."
 WITHDRAW_ANNOUNCEMENT: '&e&lBank | &7{0} withdrawn ${1} from the island bank!'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&lBank | &7You withdrawn ${0} from {1}''s island bank!'
 WITHDRAWN_MONEY_NAME: '&e&lBank | &7You withdrawn ${0} from the island bank of {1}!'
 WORLD_NOT_UNLOCKED: '&e&lWorlds | &7The {0} world is not unlocked yet!'

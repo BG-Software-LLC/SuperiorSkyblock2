@@ -264,6 +264,7 @@ DEMOTE_LEADER: '&c&l错误 | &7你不能给岛屿主降职.'
 DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能给比你空岛职位低的玩家降职.'
 DEMOTED_MEMBER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿职位降职为 &b{1}&7.'
 DEPOSIT_ANNOUNCEMENT: '&e&l岛屿银行 | &b{0} &7向岛屿银行存入了 &e$&b{1}&7！'
+DEPOSIT_ERROR: '&c&lError | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&l错误 | &7你无法破坏超出岛屿边界范围外的东西.'
 DISBAND_ANNOUNCEMENT: '&e&l岛屿 | &7你的岛屿被 &b{0} &7解散了.'
 DISBAND_GIVE: '&e&l岛屿 | &7你获得了 &b{0} &7次解散岛屿的机会.'
@@ -626,6 +627,7 @@ WITHDRAW_ALL_MONEY: |-
   &e&l岛屿银行 | &7岛屿银行余额: &e&l{0}
   &e&l岛屿银行 | &7取出所有余额..."
 WITHDRAW_ANNOUNCEMENT: '&e&l岛屿银行 | &b{0} &7从岛屿银行取出了 &e&l${1} &7游戏币！'
+WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&l岛屿银行 | &7你从 &b{1} &7的岛屿银行取出了 &e&l${0} &7游戏币！'
 WITHDRAWN_MONEY_NAME: '&e&l岛屿银行 | &7你从 &b{1} &7岛屿银行取出了 &e&l${0} &7游戏币！'
 WORLD_NOT_UNLOCKED: '&e&l岛屿维度 | &7你的岛屿还未解锁这个世界维度！'

@@ -205,26 +205,32 @@ public final class ProvidersHandler implements ProvidersManager {
         return economyProvider.getMoneyInBank(superiorPlayer);
     }
 
-    public void depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            String error = economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
+
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        economyProvider.depositMoney(superiorPlayer, amount.doubleValue());
+        return economyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public void withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            String error = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
+
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        withdrawMoney(superiorPlayer, amount.doubleValue());
+        return withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public void withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
-        economyProvider.withdrawMoney(superiorPlayer, amount);
+    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
+        return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
 }
