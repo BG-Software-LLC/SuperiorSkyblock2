@@ -56,6 +56,7 @@ import java.util.function.Consumer;
 public final class ProvidersHandler implements ProvidersManager {
 
     private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
+    private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
     private SpawnersProvider spawnersProvider = new BlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
@@ -205,23 +206,21 @@ public final class ProvidersHandler implements ProvidersManager {
     }
 
     public void depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
-        BigDecimal[] maximumsAndReminders = amount.divideAndRemainder(BigDecimal.valueOf(Double.MAX_VALUE));
-
-        for(int i = 0; i < maximumsAndReminders[0].intValue(); i++){
+        while(amount.compareTo(MAX_DOUBLE) > 0){
             economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            amount = amount.subtract(MAX_DOUBLE);
         }
 
-        economyProvider.depositMoney(superiorPlayer, maximumsAndReminders[1].doubleValue());
+        economyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
     public void withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
-        BigDecimal[] maximumsAndReminders = amount.divideAndRemainder(BigDecimal.valueOf(Double.MAX_VALUE));
-
-        for(int i = 0; i < maximumsAndReminders[0].intValue(); i++){
+        while(amount.compareTo(MAX_DOUBLE) > 0){
             withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            amount = amount.subtract(MAX_DOUBLE);
         }
 
-        withdrawMoney(superiorPlayer, maximumsAndReminders[1].doubleValue());
+        withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
     public void withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
