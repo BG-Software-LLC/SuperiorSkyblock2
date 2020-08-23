@@ -1151,6 +1151,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 // Load spawners
                 for(Location location : chunkInfo.getZ()){
                     Pair<Integer, String> spawnerInfo = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
+
                     if(spawnerInfo.getValue() == null){
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
                     }
@@ -1182,11 +1183,18 @@ public final class SIsland extends DatabaseObject implements Island {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
                     blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType(), pair.getKey());
                     blockCount = pair.getValue();
+
                     if(blockCount <= 0) {
                         Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
+
+                        String entityType = spawnerInfo.getValue();
+                        if(entityType == null)
+                            entityType = creatureSpawner.getSpawnedType().name();
+
                         blockCount = spawnerInfo.getKey();
-                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), pair.getKey());
+                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entityType, pair.getKey());
                     }
+
                     handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
                 }catch(Throwable ignored){}
             }
