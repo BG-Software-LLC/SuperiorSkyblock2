@@ -60,13 +60,16 @@ public final class GeneratorsListener implements Listener {
 
         String[] typeSections = newState.split(":");
 
-        island.handleBlockPlace(Key.of(newState), 1);
+        /* Block is being placed in BlocksListener#onBlockFromToMonitor
+            island.handleBlockPlace(Key.of(newState), 1); */
 
         if(typeSections[0].contains("COBBLESTONE"))
             return;
 
         e.setCancelled(true);
 
+        // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
+        island.handleBlockPlace(Key.of(newState), 1);
 
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
 
