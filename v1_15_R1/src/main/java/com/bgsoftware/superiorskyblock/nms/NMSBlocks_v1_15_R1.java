@@ -207,8 +207,8 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         setBlock(location.getChunk(), location, getCombinedId(material, data), null, null);
 
-        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
-                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
+        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 120, 0, blockPosition.getZ() - 120,
+                blockPosition.getX() + 120, 256, blockPosition.getZ() + 120);
 
         PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
 
