@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionManager;
@@ -63,13 +64,15 @@ public final class SlimefunHook implements ProtectionModule {
 
     public static void register(SuperiorSkyblockPlugin plugin){
         SlimefunHook slimefunHook = new SlimefunHook(plugin);
-        ProtectionManager protectionManager;
-        try{
-            protectionManager = me.mrCookieSlime.Slimefun.SlimefunPlugin.getProtectionManager();
-        }catch (Throwable ex){
-            protectionManager = io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin.getProtectionManager();
-        }
-        protectionManager.registerModule(Bukkit.getServer(), plugin.getName(), pl -> slimefunHook);
+        Executor.sync(() -> {
+            ProtectionManager protectionManager;
+            try{
+                protectionManager = me.mrCookieSlime.Slimefun.SlimefunPlugin.getProtectionManager();
+            }catch (Throwable ex){
+                protectionManager = io.github.thebusybiscuit.slimefun4.implementation.SlimefunPlugin.getProtectionManager();
+            }
+            protectionManager.registerModule(Bukkit.getServer(), plugin.getName(), pl -> slimefunHook);
+        }, 20L);
     }
 
 }

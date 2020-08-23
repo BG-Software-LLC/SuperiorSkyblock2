@@ -68,63 +68,63 @@ public final class ProvidersHandler implements ProvidersManager {
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
-                LeaderHeadsHook.register();
+                runSafe(LeaderHeadsHook::register);
 
             if(Bukkit.getPluginManager().isPluginEnabled("JetsMinions"))
-                JetsMinionsHook.register(plugin);
+                runSafe(() -> JetsMinionsHook.register(plugin));
 
             if(Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer"))
-                SkinsRestorerHook.register(plugin);
+                runSafe(() -> SkinsRestorerHook.register(plugin));
 
             if(Bukkit.getPluginManager().isPluginEnabled("ChangeSkin"))
-                ChangeSkinHook.register(plugin);
+                runSafe(() -> ChangeSkinHook.register(plugin));
 
             if(Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
-                SlimefunHook.register(plugin);
+                runSafe(() -> SlimefunHook.register(plugin));
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
 
                 if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
                         (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_MergedSpawner());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_MergedSpawner()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("AdvancedSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_AdvancedSpawners());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_AdvancedSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
                         (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_WildStacker());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_WildStacker()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
                         Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                         (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_SilkSpawners());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_SilkSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_PvpingSpawners());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_PvpingSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_EpicSpawners());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_EpicSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
                         (spawnersProvider.equalsIgnoreCase("UltimateStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
-                    setSpawnersProvider(new BlocksProvider_UltimateStacker());
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_UltimateStacker()));
                 }
             }
 
             if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms"))
-                permissionsProvider = new PermissionsProvider_LuckPerms();
+                runSafe(() -> permissionsProvider = new PermissionsProvider_LuckPerms());
 
             if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
-                pricesProvider = new PricesProvider_ShopGUIPlus();
+                runSafe(() -> pricesProvider = new PricesProvider_ShopGUIPlus());
 
             if(Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket"))
-                vanishProvider = new VanishProvider_VanishNoPacket();
+                runSafe(() -> vanishProvider = new VanishProvider_VanishNoPacket());
             else if(Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
                     Bukkit.getPluginManager().isPluginEnabled("PremiumVanish"))
-                vanishProvider = new VanishProvider_SuperVanish();
+                runSafe(() -> vanishProvider = new VanishProvider_SuperVanish());
             else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-                vanishProvider = new VanishProvider_Essentials();
+                runSafe(() -> vanishProvider = new VanishProvider_Essentials());
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
-                vanishProvider = new VanishProvider_CMI();
+                runSafe(() -> vanishProvider = new VanishProvider_CMI());
 
             if(hasPaperInstalled() && ServerVersion.isAtLeast(ServerVersion.v1_13)){
                 try {
@@ -139,10 +139,17 @@ public final class ProvidersHandler implements ProvidersManager {
             try{
                 setEconomyProvider(new EconomyProvider_Vault());
             }catch (Exception ignored){}
-
         });
 
         PlaceholderHook.register(plugin);
+    }
+
+    private void runSafe(Runnable runnable){
+        try{
+            runnable.run();
+        }catch (Throwable ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -238,7 +245,8 @@ public final class ProvidersHandler implements ProvidersManager {
             Class.forName("org.github.paperspigot.PaperSpigotConfig");
             return true;
         }catch (Throwable ex){
-            return false;
+            String version = Bukkit.getServer().getVersion().toLowerCase();
+            return version.contains("paper") || version.contains("ssspigot") || version.contains("taco");
         }
     }
 
