@@ -126,7 +126,7 @@ public final class ProvidersHandler implements ProvidersManager {
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
                 vanishProvider = new VanishProvider_CMI();
 
-            if(Bukkit.getServer().getVersion().toLowerCase().contains("paper") && ServerVersion.isAtLeast(ServerVersion.v1_13)){
+            if(hasPaperInstalled() && ServerVersion.isAtLeast(ServerVersion.v1_13)){
                 try {
                     asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
                     SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
@@ -231,6 +231,15 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
         return economyProvider.withdrawMoney(superiorPlayer, amount);
+    }
+
+    private static boolean hasPaperInstalled(){
+        try{
+            Class.forName("org.github.paperspigot.PaperSpigotConfig");
+            return true;
+        }catch (Throwable ex){
+            return false;
+        }
     }
 
 }

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
@@ -19,6 +20,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class WorldEditSchematic extends BaseSchematic implements Schematic {
@@ -83,6 +86,11 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
             if(onFailure != null)
                 onFailure.accept(ex);
         }
+    }
+
+    @Override
+    public Set<ChunkPosition> getLoadedChunks() {
+        return Collections.emptySet();
     }
 
     private void readBlocks() {

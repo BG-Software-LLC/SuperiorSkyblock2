@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
@@ -67,6 +69,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     private final int[] sizes = new int[3];
     private final SchematicBlock[][][] blocks;
     private final SchematicEntity[] entities;
+
+    private Set<ChunkPosition> loadedChunks = null;
 
     public SuperiorSchematic(String name, CompoundTag compoundTag){
         super(name);
@@ -190,7 +194,10 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
                     EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 
+                    loadedChunks = blockChangeTask.getLoadedChunks();
                     callback.run();
+                    loadedChunks = null;
+
                 }catch(Throwable ex) {
                     if(onFailure != null)
                         onFailure.accept(ex);
@@ -211,6 +218,10 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     public CompoundTag getTag(){
         return compoundTag;
+    }
+
+    public Set<ChunkPosition> getLoadedChunks() {
+        return loadedChunks;
     }
 
     private void readBlock(SchematicBlock block){

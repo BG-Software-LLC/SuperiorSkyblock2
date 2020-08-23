@@ -15,14 +15,18 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class BlockChangeTask {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Map<ChunkPosition, List<BlockData>> blocksCache = Maps.newConcurrentMap();
+    private final Set<ChunkPosition> interactedChunks = new HashSet<>();
     private final Island island;
 
     private boolean submitted = false;
@@ -47,6 +51,9 @@ public final class BlockChangeTask {
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
                 int entryIndex = ++index;
                 ChunksProvider.loadChunk(entry.getKey(), chunk -> {
+                    interactedChunks.add(entry.getKey());
+                    plugin.getNMSBlocks().deleteChunk(island, entry.getKey(), null);
+
                     if(island.isInsideRange(chunk))
                         plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
 
@@ -105,6 +112,10 @@ public final class BlockChangeTask {
         }finally {
             blocksCache.clear();
         }
+    }
+
+    public Set<ChunkPosition> getLoadedChunks(){
+        return Collections.unmodifiableSet(interactedChunks);
     }
 
     private static String getSignLine(int index, String def){

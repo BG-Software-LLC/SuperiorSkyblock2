@@ -785,19 +785,10 @@ public final class SIsland extends DatabaseObject implements Island {
         plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
     }
 
-    public void resetChunksIncludeEmpty(boolean onlyProtected, Runnable onFinish) {
-        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, onlyProtected, false);
-
-        if(chunkPositions.isEmpty()){
-            if(onFinish != null)
-                onFinish.run();
-            return;
-        }
-
-        for(int i = 0; i < chunkPositions.size() - 1; i++)
-            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
-
-        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+    public void resetChunksExcludedFromList(Collection<ChunkPosition> excludedChunkPositions) {
+        List<ChunkPosition> allChunks = IslandUtils.getChunkCoords(this, false, false);
+        allChunks.stream().filter(chunkPosition -> !excludedChunkPositions.contains(chunkPosition))
+                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(this, chunkPosition, null));
     }
 
     @Override

@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.schematics;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import org.bukkit.Location;
 
-import java.util.function.Consumer;
+import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class BaseSchematic implements Schematic {
@@ -23,22 +23,7 @@ public abstract class BaseSchematic implements Schematic {
         return name;
     }
 
-    protected static class PasteSchematicData {
-
-        protected final Schematic schematic;
-        protected final Island island;
-        protected final Location location;
-        protected final Runnable callback;
-        protected final Consumer<Throwable> onFailure;
-
-        protected PasteSchematicData(Schematic schematic, Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-            this.schematic = schematic;
-            this.island = island;
-            this.location = location;
-            this.callback = callback;
-            this.onFailure = onFailure;
-        }
-    }
+    public abstract Set<ChunkPosition> getLoadedChunks();
 
     public Location getTeleportLocation(Location location){
         return location;
