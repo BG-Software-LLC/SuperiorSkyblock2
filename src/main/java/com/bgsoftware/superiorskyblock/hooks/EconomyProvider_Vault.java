@@ -45,7 +45,9 @@ public final class EconomyProvider_Vault implements EconomyProvider {
     @Override
     public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        return econ.withdrawPlayer(offlinePlayer, amount).errorMessage;
+        double currentMoney = getMoneyInBank(superiorPlayer);
+        EconomyResponse economyResponse = econ.withdrawPlayer(offlinePlayer, amount);
+        return getMoneyInBank(superiorPlayer) == currentMoney ? "Couldn't process the transaction" : economyResponse.errorMessage;
     }
 
 }
