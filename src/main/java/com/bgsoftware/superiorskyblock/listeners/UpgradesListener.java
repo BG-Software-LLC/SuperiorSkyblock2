@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -51,7 +50,6 @@ public final class UpgradesListener implements Listener {
 
     private final Set<UUID> alreadySet = new HashSet<>();
     private final Set<UUID> noRightClickTwice = new HashSet<>();
-    private final Set<String> cacheEntityTypes = Sets.newHashSet("ARMOR_STAND", "FOX", "PIGLIN");
     private final SuperiorSkyblockPlugin plugin;
 
     public UpgradesListener(SuperiorSkyblockPlugin plugin){
@@ -117,7 +115,7 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof LivingEntity) || !cacheEntityTypes.contains(e.getEntityType().name()))
+        if(!(e.getEntity() instanceof LivingEntity) || ((LivingEntity) e.getEntity()).getHealth() - e.getFinalDamage() > 0)
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
