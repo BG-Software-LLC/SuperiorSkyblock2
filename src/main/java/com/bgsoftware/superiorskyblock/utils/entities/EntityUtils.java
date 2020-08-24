@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.utils.entities;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.ArmorStand;

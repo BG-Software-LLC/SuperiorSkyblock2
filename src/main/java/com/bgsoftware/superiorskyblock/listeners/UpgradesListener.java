@@ -115,7 +115,7 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof LivingEntity) || ((LivingEntity) e.getEntity()).getHealth() - e.getFinalDamage() > 0)
+        if(!(e.getEntity() instanceof LivingEntity))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
