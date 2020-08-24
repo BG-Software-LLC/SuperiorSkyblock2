@@ -195,7 +195,6 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
         IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
         IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
-        IslandDeserializer.deserializeBlockCounts(resultSet.getString("blockCounts"), this);
         IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
         IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
@@ -261,8 +260,13 @@ public final class SIsland extends DatabaseObject implements Island {
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
 
-        if(blockCounts.readAndGet(Map::isEmpty))
-            calcIslandWorth(null);
+        String blockCounts = resultSet.getString("blockCounts");
+
+        Executor.sync(() -> {
+            IslandDeserializer.deserializeBlockCounts(blockCounts, this);
+            if(this.blockCounts.readAndGet(Map::isEmpty))
+                calcIslandWorth(null);
+        }, 5L);
 
         ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
 
