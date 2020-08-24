@@ -35,7 +35,6 @@ import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -44,6 +43,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -126,7 +126,7 @@ public final class ProvidersHandler implements ProvidersManager {
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
                 runSafe(() -> vanishProvider = new VanishProvider_CMI());
 
-            if(hasPaperInstalled() && ServerVersion.isAtLeast(ServerVersion.v1_13)){
+            if(hasPaperAsyncSupport()){
                 try {
                     asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
                     SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
@@ -240,13 +240,13 @@ public final class ProvidersHandler implements ProvidersManager {
         return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
-    private static boolean hasPaperInstalled(){
+    private static boolean hasPaperAsyncSupport(){
         try{
-            Class.forName("org.github.paperspigot.PaperSpigotConfig");
+            //noinspection JavaReflectionMemberAccess
+            World.class.getMethod("getChunkAtAsync", int.class, int.class);
             return true;
         }catch (Throwable ex){
-            String version = Bukkit.getServer().getVersion().toLowerCase();
-            return version.contains("paper") || version.contains("ssspigot") || version.contains("taco");
+            return false;
         }
     }
 
