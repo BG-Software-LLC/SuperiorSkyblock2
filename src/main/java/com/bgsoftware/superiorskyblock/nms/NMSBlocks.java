@@ -3,8 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
+import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -48,7 +47,7 @@ public interface NMSBlocks {
 
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
-    CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(ChunkPosition chunkPosition);
+    CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition);
 
     void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish);
 

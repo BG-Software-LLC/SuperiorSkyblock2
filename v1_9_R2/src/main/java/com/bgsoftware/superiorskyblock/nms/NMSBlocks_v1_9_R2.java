@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.pair.BiPair;
+import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -198,10 +198,10 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
     }
 
     @Override
-    public CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> calculateChunk(ChunkPosition chunkPosition) {
+    public CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition) {
         ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
 
-        CompletableFuture<BiPair<ChunkPosition, KeyMap<Integer>, Set<Location>>> completableFuture = new CompletableFuture<>();
+        CompletableFuture<CalculatedChunk> completableFuture = new CompletableFuture<>();
 
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, false, chunk -> {
             KeyMap<Integer> blockCounts = new KeyMap<>();
@@ -225,7 +225,7 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
                 }
             }
 
-            completableFuture.complete(new BiPair<>(chunkPosition, blockCounts, spawnersLocations));
+            completableFuture.complete(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
         }, null);
 
         return completableFuture;
