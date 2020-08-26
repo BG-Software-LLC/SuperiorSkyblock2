@@ -263,7 +263,7 @@ public final class SettingsHandler {
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
         defaultGenerator = new KeyMap<>();
-        for(String line : cfg.getStringList("default-generator")){
+        for(String line : cfg.getStringList("default-values.generator")){
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
