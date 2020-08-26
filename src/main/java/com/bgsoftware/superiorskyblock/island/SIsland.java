@@ -1149,6 +1149,9 @@ public final class SIsland extends DatabaseObject implements Island {
                     continue;
                 }
 
+                // We want to remove spawners from the chunkInfo, as it will be used later
+                chunkInfo.getY().remove(Key.of(Materials.SPAWNER.toBukkitType().name()));
+
                 // Load block counts
                 handleBlocksPlace(chunkInfo.getY(), false, blockCounts, islandWorth, islandLevel);
 
