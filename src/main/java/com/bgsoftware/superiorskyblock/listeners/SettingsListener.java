@@ -269,6 +269,12 @@ public final class SettingsListener implements Listener {
             e.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onEntityExplodeDamage(EntityDamageByEntityEvent e){
+        if(handleEntityExplode(e.getDamager(), e.getEntity().getLocation()))
+            e.setCancelled(true);
+    }
+
     private boolean handleEntityExplode(Entity source, Location explodeLocation){
         Island island = plugin.getGrid().getIslandAt(explodeLocation);
         if(island != null && (plugin.getSettings().spawnProtection || !island.isSpawn())){
