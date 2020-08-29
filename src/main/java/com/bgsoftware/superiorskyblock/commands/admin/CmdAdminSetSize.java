@@ -96,7 +96,10 @@ public final class CmdAdminSetSize implements ISuperiorCommand {
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setIslandSize(size)));
+        Executor.data(() -> islands.forEach(island -> {
+            island.setIslandSize(size);
+            island.updateBorder();
+        }));
 
         if(islands.size() > 1)
             Locale.CHANGED_ISLAND_SIZE_ALL.send(sender);
@@ -107,8 +110,6 @@ public final class CmdAdminSetSize implements ISuperiorCommand {
 
         if(plugin.getSettings().buildOutsideIsland)
             Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
-
-        islands.forEach(Island::updateBorder);
     }
 
     @Override
