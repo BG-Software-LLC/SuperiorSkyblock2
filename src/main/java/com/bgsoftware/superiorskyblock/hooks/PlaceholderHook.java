@@ -356,8 +356,12 @@ public abstract class PlaceholderHook {
                         return island.getCreationTimeDate();
                     case "total_worth":
                         return plugin.getGrid().getTotalWorth().toString();
+                    case "total_worth_format":
+                        return StringUtils.fancyFormat(plugin.getGrid().getTotalWorth(), superiorPlayer.getUserLocale());
                     case "total_level":
                         return plugin.getGrid().getTotalLevel().toString();
+                    case "total_level_format":
+                        return StringUtils.fancyFormat(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale());
                 }
 
             }
