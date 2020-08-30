@@ -62,6 +62,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -268,11 +269,22 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 generatorFolder.mkdirs();
             } else {
                 try {
+                    outerLoop:
                     for (File file : generatorFolder.listFiles()) {
-                        Optional<Class<?>> generatorClass = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
-                        if (generatorClass.isPresent()) {
-                            worldGenerator = (ChunkGenerator) generatorClass.get().newInstance();
-                            break;
+                        Optional<Class<?>> generatorClassOptional = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
+                        if (generatorClassOptional.isPresent()) {
+                            Class<?> generatorClass = generatorClassOptional.get();
+                            for(Constructor<?> constructor : generatorClass.getConstructors()){
+                                if(constructor.getParameterCount() == 0){
+                                    worldGenerator = (ChunkGenerator) generatorClass.newInstance();
+                                    break outerLoop;
+                                }
+                                else if(constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
+                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)){
+                                    worldGenerator = (ChunkGenerator) constructor.newInstance(this);
+                                    break outerLoop;
+                                }
+                            }
                         }
                     }
                 } catch (Exception ex) {
