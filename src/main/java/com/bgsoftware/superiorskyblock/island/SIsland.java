@@ -97,6 +97,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -2166,35 +2167,29 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
-        List<CompletableFuture<Chunk>> chunks = new ArrayList<>();
+        CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
         int entityLimit = getEntityLimit(entityType);
+
+        if(entityLimit <= SIsland.NO_LIMIT)
+            return CompletableFuture.completedFuture(false);
+
+        AtomicInteger amountOfEntities = new AtomicInteger(0);
 
         for(World.Environment environment : World.Environment.values()){
             try{
-                chunks.addAll(getAllChunksAsync(environment, true, true, (Consumer<Chunk>) null));
+                chunks.addAll(getAllChunksAsync(environment, true, true, chunk -> 
+                    amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())
+                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType()) &&
+                                    !EntityUtils.canBypassEntityLimit(entity)).count())));
             }catch(Exception ignored){}
         }
 
         CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
 
         Executor.async(() -> {
-            int amountOfEntities = 0;
-
-            if(entityLimit <= SIsland.NO_LIMIT){
-                completableFuture.complete(false);
-                return;
-            }
-
-            for(CompletableFuture<Chunk> completableChunk : chunks){
-                try{
-                    Chunk chunk = completableChunk.get();
-                    amountOfEntities += Arrays.stream(chunk.getEntities())
-                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType()) &&
-                                    !EntityUtils.canBypassEntityLimit(entity)).count();
-                }catch(Exception ignored){}
-            }
-
-            completableFuture.complete(amountOfEntities + amount - 1 > entityLimit);
+            //Waiting for all the chunks to load
+            chunks.forEachCompleted(chunk -> {}, (future, failure) -> {});
+            completableFuture.complete(amountOfEntities.get() + amount - 1 > entityLimit);
         });
 
         return completableFuture;
