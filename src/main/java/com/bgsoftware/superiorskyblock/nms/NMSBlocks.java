@@ -9,12 +9,12 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.material.MaterialData;
 
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface NMSBlocks {
@@ -70,6 +70,10 @@ public interface NMSBlocks {
         MaterialData materialData = minecart.getDisplayBlock();
         //noinspection deprecation
         return Key.of(materialData.getItemType(), materialData.getData());
+    }
+
+    default boolean isWaterLogged(Block block){
+        return block.getType().name().contains("WATER");
     }
 
 }

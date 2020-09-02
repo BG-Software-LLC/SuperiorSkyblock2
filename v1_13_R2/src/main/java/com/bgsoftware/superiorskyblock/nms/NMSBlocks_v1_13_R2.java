@@ -54,6 +54,8 @@ import net.minecraft.server.v1_13_R2.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_13_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock;
@@ -513,6 +515,16 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     @Override
     public Key getMinecartBlock(Minecart minecart) {
         return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
+    }
+
+    @Override
+    public boolean isWaterLogged(org.bukkit.block.Block block) {
+        if(block.getType().name().contains("WATER"))
+            return true;
+
+        BlockData blockData = block.getBlockData();
+
+        return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {

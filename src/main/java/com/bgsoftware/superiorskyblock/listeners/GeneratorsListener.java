@@ -80,7 +80,7 @@ public final class GeneratorsListener implements Listener {
 
     private boolean hasWaterNearby(Block block){
         for(BlockFace blockFace : nearbyFaces) {
-            if (block.getRelative(blockFace).getType().name().contains("WATER"))
+            if(plugin.getNMSBlocks().isWaterLogged(block.getRelative(blockFace)))
                 return true;
         }
 
