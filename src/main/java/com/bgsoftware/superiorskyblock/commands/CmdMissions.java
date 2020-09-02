@@ -29,7 +29,8 @@ public final class CmdMissions implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "missions [island/player]";
+        return "missions [" + Locale.COMMAND_ARGUMENT_ISLAND.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_PLAYER.getMessage(locale) + "]";
     }
 
     @Override
@@ -57,11 +58,11 @@ public final class CmdMissions implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
 
         if(args.length == 2){
-            if(args[1].equalsIgnoreCase("island")){
+            if(args[1].equalsIgnoreCase(Locale.COMMAND_ARGUMENT_ISLAND.getMessage(superiorPlayer.getUserLocale()))){
                 MenuIslandMissions.openInventory(superiorPlayer, null);
                 return;
             }
-            else if(args[1].equalsIgnoreCase("player")){
+            else if(args[1].equalsIgnoreCase(Locale.COMMAND_ARGUMENT_PLAYER.getMessage(superiorPlayer.getUserLocale()))){
                 MenuPlayerMissions.openInventory(superiorPlayer, null);
                 return;
             }
