@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -59,7 +60,6 @@ import net.minecraft.server.v1_16_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
@@ -149,12 +149,34 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
 
+        for(BlockData blockData : blockDataList)
+            setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
+                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+    }
+
+    @Override
+    public void setBlock(Location location, Material material, byte data) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, getCombinedId(material, data), null, null);
+
+        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
+                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
+
+        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
+
+        for(Entity entity : world.getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
         if(statesTag != null){
@@ -177,20 +199,20 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         }
 
         if((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
-            world.setTypeAndData(blockPosition, blockData, 3);
+            chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
-        int indexY = location.getBlockY() >> 4;
+        int indexY = blockPosition.getY() >> 4;
 
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if(chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
-        chunkSection.setType(location.getBlockX() & 15, location.getBlockY() & 15, location.getBlockZ() & 15, blockData, false);
+        chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15, blockData, false);
 
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getChunkProvider();
+        ChunkProviderServer chunkProviderServer = chunk.world.getChunkProvider();
         chunkProviderServer.getLightEngine().a(blockPosition);
         chunkProviderServer.flagDirty(blockPosition);
 
@@ -199,24 +221,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
             tileEntityCompound.setInt("z", blockPosition.getZ());
-            world.getTileEntity(blockPosition).load(blockData, tileEntityCompound);
-        }
-    }
-
-    @Override
-    public void setBlock(Location location, Material material, byte data) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        setBlock(location.getChunk(), location, getCombinedId(material, data), null, null);
-
-        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
-                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
-
-        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
-
-        for(Entity entity : world.getEntities(null, bb)){
-            if(entity instanceof EntityPlayer)
-                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+            chunk.world.getTileEntity(blockPosition).load(blockData, tileEntityCompound);
         }
     }
 
@@ -576,7 +581,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         if(block.getType().name().contains("WATER"))
             return true;
 
-        BlockData blockData = block.getBlockData();
+        org.bukkit.block.data.BlockData blockData = block.getBlockData();
 
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
     }

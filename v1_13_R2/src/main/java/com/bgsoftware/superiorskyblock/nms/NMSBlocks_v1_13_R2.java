@@ -136,12 +136,34 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
 
+        for(com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
+            setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
+                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+    }
+
+    @Override
+    public void setBlock(Location location, Material material, byte data) {
+        World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, getCombinedId(material, data), null, null);
+
+        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
+                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
+
+        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
+
+        for(Entity entity : world.getEntities(null, bb)){
+            if(entity instanceof EntityPlayer)
+                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
         if(statesTag != null){
@@ -164,18 +186,18 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         }
 
         if((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
-            world.setTypeAndData(blockPosition, blockData, 3);
+            chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
-        int indexY = location.getBlockY() >> 4;
+        int indexY = blockPosition.getY() >> 4;
 
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
         if(chunkSection == null)
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.g());
 
-        int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
+        int blockX = blockPosition.getX() & 15, blockY = blockPosition.getY() & 15, blockZ = blockPosition.getZ() & 15;
 
         chunkSection.setType(blockX, blockY, blockZ, blockData);
 
@@ -184,24 +206,7 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
             tileEntityCompound.setInt("z", blockPosition.getZ());
-            world.getTileEntity(blockPosition).load(tileEntityCompound);
-        }
-    }
-
-    @Override
-    public void setBlock(Location location, Material material, byte data) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        setBlock(location.getChunk(), location, getCombinedId(material, data), null, null);
-
-        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
-                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
-
-        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
-
-        for(Entity entity : world.getEntities(null, bb)){
-            if(entity instanceof EntityPlayer)
-                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+            chunk.world.getTileEntity(blockPosition).load(tileEntityCompound);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
@@ -19,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface NMSBlocks {
 
-    void setBlock(Chunk chunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity);
+    void setBlocks(Chunk chunk, List<BlockData> blockDataList);
 
     void setBlock(Location location, Material material, byte data);
 

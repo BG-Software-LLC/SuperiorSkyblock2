@@ -70,40 +70,13 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
 
     @Override
-    public void setBlock(org.bukkit.Chunk bukkitChunk, Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(location.getChunk().getX(), location.getChunk().getZ());
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
 
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        IBlockData blockData = Block.getByCombinedId(combinedId);
-
-        if(blockData.getBlock() instanceof BlockLeaves)
-            blockData = blockData.set(BlockLeaves.DECAYABLE, false);
-
-        if(blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
-            world.setTypeAndData(blockPosition, blockData, 3);
-            return;
-        }
-
-        int indexY = location.getBlockY() >> 4;
-
-        ChunkSection chunkSection = chunk.getSections()[indexY];
-
-        if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
-
-        int blockX = location.getBlockX() & 15, blockY = location.getBlockY() & 15, blockZ = location.getBlockZ() & 15;
-
-        chunkSection.setType(blockX, blockY, blockZ, blockData);
-
-        if(tileEntity != null) {
-            NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
-            assert tileEntityCompound != null;
-            tileEntityCompound.setInt("x", blockPosition.getX());
-            tileEntityCompound.setInt("y", blockPosition.getY());
-            tileEntityCompound.setInt("z", blockPosition.getZ());
-            world.getTileEntity(blockPosition).a(tileEntityCompound);
-        }
+        for(com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
+            setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
+                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
     }
 
     @Override
@@ -112,7 +85,7 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         //noinspection deprecation
         int combinedId = material.getId() + (data << 12);
-        setBlock(location.getChunk(), location, combinedId, null, null);
+        setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
 
         AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
                 blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
@@ -123,6 +96,38 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         for(Entity entity : (List<Entity>) world.getEntities(null, bb)){
             if(entity instanceof EntityPlayer)
                 ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
+        }
+    }
+
+    private void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if(blockData.getBlock() instanceof BlockLeaves)
+            blockData = blockData.set(BlockLeaves.DECAYABLE, false);
+
+        if(blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+            chunk.world.setTypeAndData(blockPosition, blockData, 3);
+            return;
+        }
+
+        int indexY = blockPosition.getY() >> 4;
+
+        ChunkSection chunkSection = chunk.getSections()[indexY];
+
+        if(chunkSection == null)
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
+
+        int blockX = blockPosition.getX() & 15, blockY = blockPosition.getY() & 15, blockZ = blockPosition.getZ() & 15;
+
+        chunkSection.setType(blockX, blockY, blockZ, blockData);
+
+        if(tileEntity != null) {
+            NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
+            assert tileEntityCompound != null;
+            tileEntityCompound.setInt("x", blockPosition.getX());
+            tileEntityCompound.setInt("y", blockPosition.getY());
+            tileEntityCompound.setInt("z", blockPosition.getZ());
+            chunk.world.getTileEntity(blockPosition).a(tileEntityCompound);
         }
     }
 
