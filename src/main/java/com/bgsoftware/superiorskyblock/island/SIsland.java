@@ -417,6 +417,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
         MenuMembers.refreshMenus();
 
+        if (superiorPlayer.isOnline())
+            updateIslandFly(superiorPlayer);
+
         Query.ISLAND_SET_MEMBERS.getStatementHolder(this)
                 .setString(IslandSerializer.serializePlayers(members))
                 .setString(owner.getUniqueId().toString())
@@ -432,8 +435,12 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if (superiorPlayer.isOnline()) {
             SuperiorMenu.killMenu(superiorPlayer);
-            if(plugin.getSettings().teleportOnKick && getAllPlayersInside().contains(superiorPlayer))
+            if(plugin.getSettings().teleportOnKick && getAllPlayersInside().contains(superiorPlayer)) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            }
+            else{
+                updateIslandFly(superiorPlayer);
+            }
         }
 
         MenuMemberManage.destroyMenus(superiorPlayer);
@@ -935,21 +942,8 @@ public final class SIsland extends DatabaseObject implements Island {
         if(value) {
             rolePermissions.add(islandPrivilege, playerRole);
 
-            if(islandPrivilege == IslandPrivileges.FLY){
-                for(SuperiorPlayer targetPlayer : getAllPlayersInside()){
-                    Player player = targetPlayer.asPlayer();
-                    if(!player.isFlying() && targetPlayer.hasIslandFlyEnabled() && hasPermission(targetPlayer, IslandPrivileges.FLY)){
-                        player.setAllowFlight(true);
-                        player.setFlying(true);
-                        Locale.ISLAND_FLY_ENABLED.send(player);
-                    }
-                    else if(player.isFlying() && !hasPermission(targetPlayer, IslandPrivileges.FLY)){
-                        player.setAllowFlight(false);
-                        player.setFlying(false);
-                        Locale.ISLAND_FLY_DISABLED.send(player);
-                    }
-                }
-            }
+            if(islandPrivilege == IslandPrivileges.FLY)
+                getAllPlayersInside().forEach(this::updateIslandFly);
 
             savePermissionNodes();
         }
@@ -964,19 +958,8 @@ public final class SIsland extends DatabaseObject implements Island {
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
-        if(islandPrivilege == IslandPrivileges.FLY){
-            Player player = superiorPlayer.asPlayer();
-            if(!player.isFlying() && value && superiorPlayer.hasIslandFlyEnabled()){
-                player.setAllowFlight(true);
-                player.setFlying(true);
-                Locale.ISLAND_FLY_ENABLED.send(player);
-            }
-            else if(player.isFlying() && !value){
-                player.setAllowFlight(false);
-                player.setFlying(false);
-                Locale.ISLAND_FLY_DISABLED.send(player);
-            }
-        }
+        if(islandPrivilege == IslandPrivileges.FLY)
+            updateIslandFly(superiorPlayer);
 
         savePermissionNodes();
 
@@ -1231,6 +1214,11 @@ public final class SIsland extends DatabaseObject implements Island {
     public void updateBorder() {
         SuperiorSkyblockPlugin.debug("Action: Update Border, Island: " + owner.getName());
         getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
+    }
+
+    @Override
+    public void updateIslandFly(SuperiorPlayer superiorPlayer) {
+        IslandUtils.updateIslandFly(this, superiorPlayer);
     }
 
     @Override

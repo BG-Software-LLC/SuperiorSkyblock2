@@ -419,20 +419,7 @@ public final class CustomEventsListener implements Listener {
         toIsland.applyEffects(superiorPlayer);
 
         if(superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()){
-            Executor.sync(() -> {
-                if(toIsland.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-                    if(!player.isFlying()) {
-                        player.setAllowFlight(true);
-                        player.setFlying(true);
-                        Locale.ISLAND_FLY_ENABLED.send(player);
-                    }
-                }
-                else if(player.isFlying()){
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                    Locale.ISLAND_FLY_DISABLED.send(player);
-                }
-            }, 5L);
+            Executor.sync(() -> toIsland.updateIslandFly(superiorPlayer), 5L);
         }
 
         Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);

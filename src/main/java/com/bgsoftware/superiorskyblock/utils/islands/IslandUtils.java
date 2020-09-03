@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +105,20 @@ public final class IslandUtils {
         }
 
         return chunkCoords;
+    }
+
+    public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer){
+        Player player = superiorPlayer.asPlayer();
+        if(!player.isFlying() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            Locale.ISLAND_FLY_ENABLED.send(player);
+        }
+        else if(player.isFlying() && !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
+            player.setAllowFlight(false);
+            player.setFlying(false);
+            Locale.ISLAND_FLY_DISABLED.send(player);
+        }
     }
 
 }

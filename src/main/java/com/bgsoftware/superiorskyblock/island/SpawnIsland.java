@@ -565,6 +565,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void updateIslandFly(SuperiorPlayer superiorPlayer) {
+        IslandUtils.updateIslandFly(this, superiorPlayer);
+    }
+
+    @Override
     public int getIslandSize() {
         return islandSize;
     }

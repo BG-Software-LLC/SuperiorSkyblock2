@@ -600,6 +600,12 @@ public interface Island extends Comparable<Island> {
     void updateBorder();
 
     /**
+     * Update the fly status for a player on this island.
+     * @param superiorPlayer The player to update.
+     */
+    void updateIslandFly(SuperiorPlayer superiorPlayer);
+
+    /**
      * Get the island radius of the island.
      */
     int getIslandSize();
