@@ -28,7 +28,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
@@ -37,6 +39,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
     private static boolean sortGlowWhenSelected;
 
     private SortingType sortingType;
+    private final Set<SortingType> alreadySorted = new HashSet<>();
 
     private MenuTopIslands(SuperiorPlayer superiorPlayer, SortingType sortingType){
         super("menuTopIslands", superiorPlayer, true);
@@ -177,7 +180,13 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         if(sortingType != null){
             this.sortingType = sortingType;
             previousMove = false;
-            open(previousMenu);
+
+            if(alreadySorted.add(sortingType)){
+                plugin.getGrid().sortIslands(sortingType, () -> open(previousMenu));
+            }
+            else {
+                open(previousMenu);
+            }
         }
 
         return sortingType != null;
