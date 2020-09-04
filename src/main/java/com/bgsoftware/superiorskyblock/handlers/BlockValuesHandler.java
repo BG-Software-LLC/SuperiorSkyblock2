@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,6 +26,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     private static final KeyMap<String> customBlockValues = new KeyMap<>(), customBlockLevels = new KeyMap<>();
     private static final KeyMap<CustomKeyParser> customKeyParsers = new KeyMap<>();
+    private static final KeySet valuesMenuBlocks = new KeySet();
 
     private final KeyMap<String> blockValues = new KeyMap<>(), blockLevels = new KeyMap<>();
     private final SuperiorSkyblockPlugin plugin;
@@ -64,29 +66,12 @@ public final class BlockValuesHandler implements BlockValuesManager {
         return BigDecimalFormatted.ZERO;
     }
 
-    public boolean hasBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key){
-        if(((Key) key).isAPIKey()){
-            String customBlockValue = customBlockValues.get(key);
-            if(customBlockValue != null)
-                return true;
-        }
-
-        String value = blockValues.get(key);
-
-        if(value != null)
-            return true;
-
-        if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
-            BigDecimal price = plugin.getProviders().getPrice((Key) key);
-            if(price.compareTo(BigDecimal.ZERO) > 0)
-                return true;
-        }
-
-        return false;
+    public void registerMenuValueBlocks(KeySet blocks){
+        valuesMenuBlocks.addAll(blocks);
     }
 
-    public void setBlockWorth(Key key, BigDecimal worth){
-        blockValues.put(key, worth.toString());
+    public boolean isValuesMenu(com.bgsoftware.superiorskyblock.api.key.Key key){
+        return valuesMenuBlocks.contains(key);
     }
 
     @Override

@@ -1589,9 +1589,9 @@ public final class SIsland extends DatabaseObject implements Island {
             increaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.containsKey(key);
+        boolean hasBlockLimit = blockLimits.containsKey(key), valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
-        if(increaseAmount || hasBlockLimit) {
+        if(increaseAmount || hasBlockLimit || valuesMenu) {
             SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
 
             syncedBlockCounts.write(blockCounts -> addCounts(blockCounts, blockLimits, key, amount));
@@ -1633,9 +1633,10 @@ public final class SIsland extends DatabaseObject implements Island {
                 increaseAmount = true;
             }
 
-            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey());
+            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey()),
+                    valuesMenu = plugin.getBlockValues().isValuesMenu(entry.getKey());
 
-            if(increaseAmount || hasBlockLimit) {
+            if(increaseAmount || hasBlockLimit || valuesMenu) {
                 SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
                 addCounts(blockCounts, blockLimits, entry.getKey(), entry.getValue());
             }
@@ -1716,9 +1717,9 @@ public final class SIsland extends DatabaseObject implements Island {
             decreaseAmount = true;
         }
 
-        boolean hasBlockLimit = blockLimits.containsKey(key);
+        boolean hasBlockLimit = blockLimits.containsKey(key), valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
-        if(decreaseAmount || hasBlockLimit){
+        if(decreaseAmount || hasBlockLimit || valuesMenu){
             SuperiorSkyblockPlugin.debug("Action: Block Break, Island: " + owner.getName() + ", Block: " + key);
 
             blockCounts.write(blockCounts -> {

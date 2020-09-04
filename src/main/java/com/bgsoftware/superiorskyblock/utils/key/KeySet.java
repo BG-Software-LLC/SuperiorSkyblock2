@@ -14,6 +14,10 @@ public final class KeySet extends AbstractSet<com.bgsoftware.superiorskyblock.ap
 
     private final Set<String> set;
 
+    public KeySet(){
+        this.set = new HashSet<>();
+    }
+
     public KeySet(List<String> keys){
         this.set = new HashSet<>(keys);
     }

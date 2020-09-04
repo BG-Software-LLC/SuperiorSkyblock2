@@ -105,7 +105,7 @@ public final class MenuValues extends SuperiorMenu {
 
         menuValues.setRowsSize(pattern.size());
 
-        KeySet keysToUpdate = new KeySet(new ArrayList<>());
+        KeySet keysToUpdate = new KeySet();
 
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
@@ -132,10 +132,7 @@ public final class MenuValues extends SuperiorMenu {
             }
         }
 
-        Executor.sync(() -> keysToUpdate.forEach(key -> {
-            if(!plugin.getBlockValues().hasBlockWorth(key))
-                plugin.getBlockValues().setBlockWorth((Key) key, BigDecimal.ZERO);
-        }), 5L);
+        plugin.getBlockValues().registerMenuValueBlocks(keysToUpdate);
 
         menuValues.setBackButton(backButton);
 
