@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -327,6 +328,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public void reloadPlugin(boolean loadGrid){
         CalcTask.startTask();
+        HeadUtils.readTextures(this);
 
         blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
