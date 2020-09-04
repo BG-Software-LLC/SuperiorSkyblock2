@@ -189,8 +189,6 @@ public final class SIsland extends DatabaseObject implements Island {
         this.creationTime = resultSet.getLong("creationTime");
         updateCreationTimeDate();
 
-        rawKeyPlacements = true;
-
         IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
         IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
         IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
@@ -206,8 +204,6 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
         IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
         IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
-
-        rawKeyPlacements = false;
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -265,7 +261,13 @@ public final class SIsland extends DatabaseObject implements Island {
         String blockCounts = resultSet.getString("blockCounts");
 
         Executor.sync(() -> {
-            IslandDeserializer.deserializeBlockCounts(blockCounts, this);
+            try {
+                rawKeyPlacements = true;
+                IslandDeserializer.deserializeBlockCounts(blockCounts, this);
+            }finally {
+                rawKeyPlacements = false;
+            }
+
             if(this.blockCounts.readAndGet(Map::isEmpty))
                 calcIslandWorth(null);
         }, 5L);
