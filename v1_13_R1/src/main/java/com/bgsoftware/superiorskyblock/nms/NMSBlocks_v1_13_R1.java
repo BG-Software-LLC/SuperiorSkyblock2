@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
@@ -92,6 +93,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
     private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
+    private static final ReflectMethod<Void> SET_CURRENT_CHUNK = new ReflectMethod<>(TileEntity.class, "setCurrentChunk", Chunk.class);
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -560,6 +562,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
             this.chunkZ = chunk.getPos().z;
             setWorld(chunk.getWorld());
             setPosition(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
+            SET_CURRENT_CHUNK.invoke(this, chunk);
             world.tileEntityListTick.add(this);
         }
 
@@ -577,7 +580,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
             if (chunkRandomTickSpeed > 0) {
                 for (ChunkSection chunkSection : chunk.getSections()) {
-                    if (chunkSection != Chunk.a && chunkSection.d()) {
+                    if (chunkSection != Chunk.a && chunkSection.shouldTick()) {
                         for (int i = 0; i < chunkRandomTickSpeed; i++) {
                             random = random * 3 + 1013904223;
                             int factor = random >> 2;
