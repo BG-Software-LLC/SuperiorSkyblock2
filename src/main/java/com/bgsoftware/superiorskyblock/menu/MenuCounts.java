@@ -207,7 +207,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
             ItemMeta currentMeta = clickedItem.getItemMeta();
             ItemBuilder itemBuilder;
 
-            if (rawKey != blockKey && blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty()) {
+            if (blockMaterial == Materials.SPAWNER.toBukkitType() && !blockKey.getSubKey().isEmpty()) {
                 itemBuilder = new ItemBuilder(HeadUtils.getPlayerHead(Materials.PLAYER_HEAD.toBukkitItem(),
                         HeadUtils.getTexture(blockKey.getSubKey())));
                 materialName = blockKey.getSubKey() + "_SPAWNER";
