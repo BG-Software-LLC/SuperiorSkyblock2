@@ -99,7 +99,8 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public Key getBlockKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return ((Key) key).isAPIKey() ? (Key) key : blockValues.containsKey(key) ? blockValues.getKey((Key) key) : blockLevels.getKey((Key) key);
+        return ((Key) key).isAPIKey() || isValuesMenu(key) ? (Key) key :
+                blockValues.containsKey(key) ? blockValues.getKey((Key) key) : blockLevels.getKey((Key) key);
     }
 
     @Override
