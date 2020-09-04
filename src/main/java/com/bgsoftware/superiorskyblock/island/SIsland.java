@@ -1124,7 +1124,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         Executor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(calculatedChunk -> {
-// We want to remove spawners from the chunkInfo, as it will be used later
+                // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().remove(Key.of(Materials.SPAWNER.toBukkitType().name()));
 
                 // Load block counts
