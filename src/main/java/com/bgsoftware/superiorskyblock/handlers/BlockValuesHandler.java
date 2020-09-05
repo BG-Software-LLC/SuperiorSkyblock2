@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
@@ -132,6 +133,15 @@ public final class BlockValuesHandler implements BlockValuesManager {
             return original;
 
         return (Key) customKeyParser.getCustomKey(location);
+    }
+
+    public Key convertKey(Key original, ItemStack itemStack){
+        CustomKeyParser customKeyParser = customKeyParsers.get(original);
+
+        if(customKeyParser == null)
+            return original;
+
+        return (Key) customKeyParser.getCustomKey(itemStack, original);
     }
 
     public Key convertKey(Key original){

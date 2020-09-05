@@ -79,12 +79,12 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     public static Key of(ItemStack itemStack){
-        return Materials.SPAWNER.toBukkitType() == itemStack.getType() ? plugin.getProviders().getSpawnerKey(itemStack) :
-                of(itemStack.getType(), itemStack.getDurability());
+        return of(Materials.SPAWNER.toBukkitType() == itemStack.getType() ? plugin.getProviders().getSpawnerKey(itemStack) :
+                of(itemStack.getType(), itemStack.getDurability()), itemStack);
     }
 
     public static Key of(Material material, short data){
-        return of(material + ":" + data);
+        return of(of(material + ":" + data), new ItemStack(material, 1, data));
     }
 
     public static Key of(String key){
@@ -101,6 +101,10 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
 
     public static Key of(Key key, Location location){
         return plugin.getBlockValues().convertKey(key, location);
+    }
+
+    public static Key of(Key key, ItemStack itemStack){
+        return plugin.getBlockValues().convertKey(key, itemStack);
     }
 
 }
