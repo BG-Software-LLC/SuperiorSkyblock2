@@ -17,16 +17,22 @@ permissions:
         children:
           superior.island.accept:
             description: Accept an invitation from a player.
+          superior.island.balance:
+            description: Check the amount of money inside an island's bank.
           superior.island.ban:
             description: Ban a player from your island.
           superior.island.biome:
             description: Change the biome of the island.
           superior.island.border:
             description: Change the border color of the islands.
+          superior.island.chest:
+            description: Open the island's chest.
           superior.island.close:
             description: Close the island to the public.
           superior.island.coop:
             description: Add a player as a co-op to your island.
+          superior.island.coops:
+            description: Open the coops menu.
           superior.island.counts:
             description: See block counts in your island.
           superior.island.create:
@@ -49,6 +55,8 @@ permissions:
             description: Invite a player to your island.
           superior.island.kick:
             description: Kick a player from your island.
+          superior.island.lang:
+            description: Change your personal language.
           superior.island.leave:
             description: Leave your island.
           superior.island.mission:
@@ -73,24 +81,24 @@ permissions:
             description: Rate an island.
           superior.island.ratings:
             description: Show all island ratings.
-          superior.island.settings:
-            description: Open the settings menu.
           superior.island.recalc:
             description: Re-calculates the island worth.
           superior.island.setdiscord:
             description: Set the discord of the island for island payouts.
           superior.island.setpaypal:
             description: Set the paypal email of the island for island payouts.
-          superior.island.setbiome:
-            description: Change the biome of your island.
           superior.island.setrole:
             description: Change the role of a player in your island.
           superior.island.setteleport:
             description: Change the teleport location of your island.
+          superior.island.settings:
+            description: Open the settings menu.
           superior.island.setwarp:
             description: Create a new island warp.
           superior.island.show:
             description: Get information about an island.
+          superior.island.stacker.*:
+            description: Gives the ability to stack blocks.
           superior.island.team:
             description: Get information about island members status.
           superior.island.teamchat:
@@ -124,8 +132,6 @@ permissions:
             description: List of island warps.
           superior.island.withdraw:
             description: Withdraw money from your island's bank into your personal account.
-          superior.island.stacker.*:
-            description: Gives the ability to stack blocks.
       superior.admin.*:
         description: Permission for all admin commands
         default: op
@@ -142,6 +148,8 @@ permissions:
             description: Increase coop players limit for another player's island.
           superior.admin.addcropgrowth:
             description: Increase the crop growth multiplier for another player's island.
+          superior.admin.addeffect:
+            description: Add an island effect for another player's island.
           superior.admin.addentitylimit:
             description: Increase entity limit for another player's island.
           superior.admin.addgenerator:
@@ -160,12 +168,16 @@ permissions:
             description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
+          superior.admin.chest:
+            description: Open island's chest of another island.
           superior.admin.cleargenerator:
             description: Clear generator rates for a specific island.
           superior.admin.close:
             description: Close an island to the public.
           superior.admin.count:
             description: Check a block count on a specific island.
+          superior.admin.delwarp:
+            description: Delete a warp for an island.
           superior.admin.demote:
             description: Demote a member in another player's island.
           superior.admin.deposit:
@@ -178,6 +190,10 @@ permissions:
             description: Ignore an island from top islands.
           superior.admin.join:
             description: Join an island without an invitation.
+          superior.admin.kick:
+            description: Kick a player from his island.
+          superior.admin.mission:
+            description: Change the status of a mission for a player.
           superior.admin.msg:
             description: Send a player a message without any prefixes.
           superior.admin.msgall:
@@ -186,6 +202,8 @@ permissions:
             description: Change the name of an island.
           superior.admin.open:
             description: Open an island to the public.
+          superior.admin.openmenu:
+            description: Open a custom menu for a player.
           superior.admin.promote:
             description: Promote a member in another player's island.
           superior.admin.purge:
@@ -208,12 +226,20 @@ permissions:
             description: Set the block amount in a specific location.
           superior.admin.setblocklimit:
             description: Set block limit for another player's island.
+          superior.admin.setchestrow:
+            description: Set the chest rows for another player's island.
           superior.admin.setcooplimit:
-            description: Set coop players limit for another player''s island.
+            description: Set coop players limit for another player's island.
           superior.admin.setcropgrowth:
             description: Set the crop growth multiplier for another player's island.
           superior.admin.setdisbands:
             description: Set a player's amount of island disbands.
+          superior.admin.seteffect:
+            description: Set the island effect level of another player's island.
+          superior.admin.setentitylimit:
+            description: Set entity limit for another player's island.
+          superior.admin.setgenerator:
+            description: Change percentage of a material for the cobblestone generator.
           superior.admin.setleader:
             description: Transfer an island to someone else.
           superior.admin.setmobdrops:
@@ -224,27 +250,35 @@ permissions:
             description: Set the rating of another player.
           superior.admin.setsettings:
             description: Toggle settings for a specific island.
-          superior.admin.setgenerator:
-            description: Change percentage of a material for the cobblestone generator.
           superior.admin.setsize:
             description: Change another player's island size.
+          superior.admin.setspawn:
+            description: Set the spawn location of the server.
           superior.admin.setspawnerrates:
             description: Set the spawner rates multiplier for another player's island.
           superior.admin.setteamlimit:
             description: Set members limit for another player's island.
+          superior.admin.settings:
+            description: Open the plugin settings editor.
           superior.admin.setupgrade:
             description: Set the level of an upgrade for another player's island.
           superior.admin.setwarpslimit:
             description: Set the warps limit of an island.
           superior.admin.show:
             description: Get information about an island.
+          superior.admin.spawn:
+            description: Teleport to the spawn location.
           superior.admin.spy:
             description: Toggle chat spy mode.
           superior.admin.stats:
             description: Show stats about the plugin.
+          superior.admin.syncupgrades:
+            description: Sync upgrade values for an island.
           superior.admin.teleport:
             description: Teleport to other islands.
           superior.admin.unignore:
             description: Unignore an island from top islands.
           superior.admin.withdraw:
             description: Withdraw money from another player's island bank.
+          superior.admin.world:
+            description: Unlock a world for an island.
