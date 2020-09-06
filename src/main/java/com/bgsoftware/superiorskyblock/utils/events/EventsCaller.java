@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandCoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
@@ -20,6 +21,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
@@ -247,6 +249,24 @@ public final class EventsCaller {
 
     public static void callPluginInitializeEvent(SuperiorSkyblock plugin){
         Bukkit.getPluginManager().callEvent(new PluginInitializeEvent(plugin));
+    }
+
+    public static boolean callIslandCoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target){
+        if(plugin.getSettings().disabledEvents.contains("islandcoopplayerevent"))
+            return true;
+
+        IslandCoopPlayerEvent islandCoopPlayerEvent = new IslandCoopPlayerEvent(island, player, target);
+        Bukkit.getPluginManager().callEvent(islandCoopPlayerEvent);
+        return !islandCoopPlayerEvent.isCancelled();
+    }
+
+    public static boolean callIslandUncoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target, IslandUncoopPlayerEvent.UncoopReason uncoopReason){
+        if(plugin.getSettings().disabledEvents.contains("islanduncoopplayerevent"))
+            return true;
+
+        IslandUncoopPlayerEvent islandUncoopPlayerEvent = new IslandUncoopPlayerEvent(island, player, target, uncoopReason);
+        Bukkit.getPluginManager().callEvent(islandUncoopPlayerEvent);
+        return !islandUncoopPlayerEvent.isCancelled();
     }
 
 }

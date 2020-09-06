@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -93,6 +94,9 @@ public final class CmdCoop implements ISuperiorCommand {
             Locale.COOP_LIMIT_EXCEED.send(superiorPlayer);
             return;
         }
+
+        if(!EventsCaller.callIslandCoopPlayerEvent(island, superiorPlayer, targetPlayer))
+            return;
 
         island.addCoop(targetPlayer);
 
