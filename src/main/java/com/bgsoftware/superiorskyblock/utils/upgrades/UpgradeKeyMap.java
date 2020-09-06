@@ -54,8 +54,12 @@ public final class UpgradeKeyMap {
         this.value.write(map -> map.remove(key));
     }
 
-    public void setUpgradeString(Map<String, Integer> upgrades, boolean checkMax){
+    public void setUpgradeString(Map<String, Integer> upgrades, boolean deleteIfNotEmpty, boolean checkMax){
         KeyMap<Pair<Integer, Integer>> map = this.value.readAndGet(KeyMap::new);
+
+        if(deleteIfNotEmpty && !upgrades.isEmpty())
+            clearUpgrades();
+
         for(Map.Entry<String, Integer> entry : upgrades.entrySet()){
             Pair<Integer, Integer> pair = map.get(entry.getKey());
             if(pair == null || (!checkMax || entry.getValue() > pair.getValue())){

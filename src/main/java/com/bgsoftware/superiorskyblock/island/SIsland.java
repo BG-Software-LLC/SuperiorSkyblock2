@@ -282,7 +282,6 @@ public final class SIsland extends DatabaseObject implements Island {
             this.uuid = UUID.fromString(uuidRaw);
         }
 
-        //assignPermissionNodes();
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -307,8 +306,7 @@ public final class SIsland extends DatabaseObject implements Island {
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
-        //assignPermissionNodes();
-        assignGenerator();
+
         assignIslandChest();
         updateUpgrades();
     }
@@ -2956,17 +2954,6 @@ public final class SIsland extends DatabaseObject implements Island {
      *  Private methods
      */
 
-    private void assignGenerator(){
-        if(getGeneratorAmounts().isEmpty() && owner != null) {
-            plugin.getSettings().defaultGenerator.forEach(cobbleGeneratorValues::set);
-
-            Query.ISLAND_SET_GENERATOR.getStatementHolder(this)
-                    .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
-                    .setString(owner.getUniqueId().toString())
-                    .execute(true);
-        }
-    }
-
     private void assignIslandChest(){
         islandChest.write(islandChests -> {
             for(int i = 0; i < islandChests.length; i++) {
@@ -3052,7 +3039,7 @@ public final class SIsland extends DatabaseObject implements Island {
         warpsLimit.setUpgrade(upgradeLevel.getWarpsLimit());
         coopLimit.setUpgrade(upgradeLevel.getCoopLimit());
         islandSize.setUpgrade(upgradeLevel.getBorderSize());
-        cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(), false);
+        cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(),true,false);
         islandEffects.setUpgrade(upgradeLevel.getPotionEffects());
     }
 
