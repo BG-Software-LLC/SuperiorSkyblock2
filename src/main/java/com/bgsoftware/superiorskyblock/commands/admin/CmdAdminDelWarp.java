@@ -38,7 +38,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
         return "admin delwarp <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + ">";
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
     }
 
     @Override
@@ -53,7 +53,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 4;
+        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -76,7 +76,12 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
             return;
         }
 
-        String warpName = args[3];
+        StringBuilder warpNameBuilder = new StringBuilder();
+
+        for(int i = 3; i < args.length; i++)
+            warpNameBuilder.append(" ").append(args[i]);
+
+        String warpName = warpNameBuilder.length() == 0 ? "" : warpNameBuilder.substring(1);
 
         if(island.getWarpLocation(warpName) == null){
             Locale.INVALID_WARP.send(sender, warpName);

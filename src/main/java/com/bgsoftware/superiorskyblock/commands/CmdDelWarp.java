@@ -31,7 +31,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + ">";
+        return "delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
     }
 
     @Override
@@ -46,7 +46,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return Integer.MAX_VALUE;
     }
 
     @Override
@@ -69,28 +69,35 @@ public final class CmdDelWarp implements ISuperiorCommand {
             return;
         }
 
-        if(island.getWarpLocation(args[1]) == null){
-            Locale.INVALID_WARP.send(superiorPlayer, args[1]);
+        StringBuilder warpNameBuilder = new StringBuilder();
+
+        for(int i = 1; i < args.length; i++)
+            warpNameBuilder.append(" ").append(args[i]);
+
+        String warpName = warpNameBuilder.length() == 0 ? "" : warpNameBuilder.substring(1);
+
+        if(island.getWarpLocation(warpName) == null){
+            Locale.INVALID_WARP.send(superiorPlayer, warpName);
             return;
         }
 
         boolean breakSign = false;
 
-        Block signBlock = island.getWarpLocation(args[1]).getBlock();
+        Block signBlock = island.getWarpLocation(warpName).getBlock();
         if(signBlock.getState() instanceof Sign){
             signBlock.setType(Material.AIR);
             signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
             breakSign = true;
         }
 
-        if(args[1].equalsIgnoreCase(SIsland.VISITORS_WARP_NAME)){
+        if(warpName.equalsIgnoreCase(SIsland.VISITORS_WARP_NAME)){
             island.setVisitorsLocation(null);
         }
         else{
-            island.deleteWarp(args[1]);
+            island.deleteWarp(warpName);
         }
 
-        Locale.DELETE_WARP.send(superiorPlayer, args[1]);
+        Locale.DELETE_WARP.send(superiorPlayer, warpName);
 
         if(breakSign){
             Locale.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
