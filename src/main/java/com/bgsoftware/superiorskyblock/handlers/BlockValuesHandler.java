@@ -75,6 +75,10 @@ public final class BlockValuesHandler implements BlockValuesManager {
         return valuesMenuBlocks.contains(key);
     }
 
+    public Key getValuesKey(com.bgsoftware.superiorskyblock.api.key.Key key){
+        return valuesMenuBlocks.getKey(key);
+    }
+
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
         SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key);
@@ -100,7 +104,7 @@ public final class BlockValuesHandler implements BlockValuesManager {
 
     @Override
     public Key getBlockKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return ((Key) key).isAPIKey() || isValuesMenu(key) ? (Key) key :
+        return ((Key) key).isAPIKey() || isValuesMenu(key) ? getValuesKey(key) :
                 blockValues.containsKey(key) ? blockValues.getKey((Key) key) : blockLevels.getKey((Key) key);
     }
 

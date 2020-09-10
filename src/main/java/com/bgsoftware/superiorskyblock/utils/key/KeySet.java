@@ -53,6 +53,15 @@ public final class KeySet extends AbstractSet<com.bgsoftware.superiorskyblock.ap
         return o instanceof Key && (set.contains(o.toString()) || (!((Key) o).getSubKey().isEmpty() && set.contains(((Key) o).getGlobalKey())));
     }
 
+    public Key getKey(com.bgsoftware.superiorskyblock.api.key.Key key){
+        if(set.contains(key.toString()))
+            return (Key) key;
+        else if(set.contains(key.getGlobalKey()))
+            return Key.of(key.getGlobalKey());
+        else
+            return (Key) key;
+    }
+
     @Override
     public boolean add(com.bgsoftware.superiorskyblock.api.key.Key key) {
         return set.add(key.toString());
