@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -241,7 +242,7 @@ public final class PlayersListener implements Listener {
                 SuperiorPlayer superiorPlayer = passenger instanceof Player ? SSuperiorPlayer.of(passenger) : null;
                 if(passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
                     e.getVehicle().setPassenger(null);
-                    plugin.getProviders().teleport(passenger, e.getFrom());
+                    TeleportUtils.teleport(passenger, e.getFrom());
                 }
             }
         }
@@ -405,7 +406,7 @@ public final class PlayersListener implements Listener {
                 plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())){
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
             if(island != null) {
-                Executor.sync(() -> plugin.getProviders().teleport(e.getEntity(),
+                Executor.sync(() -> TeleportUtils.teleport(e.getEntity(),
                         island.getTeleportLocation(World.Environment.NORMAL)), 5L);
             }
         }

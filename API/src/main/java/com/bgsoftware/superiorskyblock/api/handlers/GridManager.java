@@ -190,7 +190,9 @@ public interface GridManager {
 
     /**
      * Get the next location for a new island.
+     * @deprecated Moved to the separated WorldsProvider interface
      */
+    @Deprecated
     Location getNextLocation();
 
     /**

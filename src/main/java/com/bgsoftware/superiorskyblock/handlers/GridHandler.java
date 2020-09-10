@@ -70,7 +70,6 @@ public final class GridHandler implements GridManager {
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Set<UUID> customWorlds = Sets.newHashSet();
-    private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -119,13 +118,17 @@ public final class GridHandler implements GridManager {
 
         SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
 
-        if(!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName)){
-            onCreationIslandFinish(null);
+        if(!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName))
             return;
-        }
 
-        Location islandLocation = getNextLocation();
-        servedPositions.add(SBlockPosition.of(islandLocation));
+        Location islandLocation = plugin.getProviders().getNextLocation(
+                lastIsland.parse().clone(),
+                plugin.getSettings().islandsHeight,
+                plugin.getSettings().maxIslandSize,
+                superiorPlayer.getUniqueId()
+        );
+
+        SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(islandLocation));
 
         SIsland island = new SIsland(superiorPlayer, generateIslandUUID(), islandLocation.add(0.5, 0, 0.5), islandName, schemName);
         EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
@@ -157,19 +160,14 @@ public final class GridHandler implements GridManager {
                     }
                 }
 
-                onCreationIslandFinish(islandLocation);
+                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId());
             }, ex -> {
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-                onCreationIslandFinish(islandLocation);
+                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId());
                 ex.printStackTrace();
                 Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
             });
         }
-    }
-
-    private void onCreationIslandFinish(Location location){
-        if(location != null)
-            servedPositions.remove(SBlockPosition.of(location));
     }
 
     public UUID generateIslandUUID(){
@@ -328,43 +326,13 @@ public final class GridHandler implements GridManager {
 
     @Override
     public Location getNextLocation(){
-        return getNextLocation(lastIsland.parse().clone());
-    }
-
-    private Location getNextLocation(Location location){
-        location.setY(plugin.getSettings().islandsHeight);
-        BlockFace islandFace = getIslandFace(location);
-
-        int islandRange = plugin.getSettings().maxIslandSize * 3;
-
-        if(islandFace == BlockFace.NORTH){
-            location.add(islandRange, 0, 0);
-        }else if(islandFace == BlockFace.EAST){
-            if(location.getX() == -location.getZ())
-                location.add(islandRange, 0, 0);
-            else if(location.getX() == location.getZ())
-                location.subtract(islandRange, 0, 0);
-            else
-                location.add(0, 0, islandRange);
-        }else if(islandFace == BlockFace.SOUTH){
-            if(location.getX() == -location.getZ())
-                location.subtract(0, 0, islandRange);
-            else
-                location.subtract(islandRange, 0, 0);
-        }else if(islandFace == BlockFace.WEST){
-            if(location.getX() == location.getZ())
-                location.add(islandRange, 0, 0);
-            else
-                location.subtract(0, 0, islandRange);
-        }
-
-        if(servedPositions.contains(SBlockPosition.of(location)) || getIslandAt(location) != null){
-            return getNextLocation(location.clone());
-        }
-
-        SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(location));
-
-        return location;
+        //lastIsland.parse().clone()
+        return plugin.getProviders().getNextLocation(
+                lastIsland.parse().clone(),
+                plugin.getSettings().islandsHeight,
+                plugin.getSettings().maxIslandSize,
+                null
+        );
     }
 
     @Override
@@ -701,17 +669,6 @@ public final class GridHandler implements GridManager {
                 }
             }));
             stackedBlocksHolder.execute(false);
-        }
-    }
-
-    private BlockFace getIslandFace(Location location){
-        //Possibilities: North / East
-        if(location.getX() >= location.getZ()) {
-            return -location.getX() > location.getZ() ? BlockFace.NORTH : BlockFace.EAST;
-        }
-        //Possibilities: South / West
-        else{
-            return -location.getX() > location.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
         }
     }
 

@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -188,7 +189,7 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     @Override
     public void teleport(Location location, Consumer<Boolean> teleportResult) {
         if(isOnline()) {
-            plugin.getProviders().teleport(asPlayer(), location, teleportResult == null ? r-> {} : teleportResult);
+            TeleportUtils.teleport(asPlayer(), location, teleportResult);
             return;
         }
 

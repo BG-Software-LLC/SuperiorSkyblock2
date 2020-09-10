@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.wrappers.player;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -24,8 +24,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class SuperiorNPCPlayer implements SuperiorPlayer {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Entity npc;
 
@@ -85,7 +83,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location, Consumer<Boolean> teleportResult) {
-        plugin.getProviders().teleport(npc, location, teleportResult == null ? r -> {} : teleportResult);
+        TeleportUtils.teleport(npc, location, teleportResult);
     }
 
     @Override
@@ -95,8 +93,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Consumer<Boolean> teleportResult) {
-        plugin.getProviders().teleport(npc, island.getCenter(World.Environment.NORMAL),
-                teleportResult == null ? r -> {} : teleportResult);
+        teleport(island.getCenter(World.Environment.NORMAL), teleportResult);
     }
 
     @Override

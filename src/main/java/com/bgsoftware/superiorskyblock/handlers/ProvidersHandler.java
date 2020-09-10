@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.WorldsManager;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Default;
@@ -35,6 +37,7 @@ import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
+import com.bgsoftware.superiorskyblock.hooks.WorldsManager_Default;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -51,6 +54,7 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class ProvidersHandler implements ProvidersManager {
@@ -64,6 +68,7 @@ public final class ProvidersHandler implements ProvidersManager {
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
     private VanishProvider vanishProvider = player -> false;
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
+    private WorldsManager worldsManager = new WorldsManager_Default();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         Executor.sync(() -> {
@@ -164,6 +169,11 @@ public final class ProvidersHandler implements ProvidersManager {
         this.economyProvider = economyProvider;
     }
 
+    @Override
+    public void setWorldsManager(WorldsManager worldsManager) {
+        this.worldsManager = worldsManager;
+    }
+
     public Pair<Integer, String> getSpawner(Location location){
         return spawnersProvider.getSpawner(location);
     }
@@ -238,6 +248,18 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
         return economyProvider.withdrawMoney(superiorPlayer, amount);
+    }
+
+    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner){
+        return worldsManager.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner);
+    }
+
+    public void finishIslandCreation(Location islandLocation, UUID islandOwner){
+        worldsManager.finishIslandCreation(islandLocation, islandOwner);
+    }
+
+    public void prepareTeleport(Island island, Runnable finishCallback){
+        worldsManager.prepareTeleport(island, finishCallback);
     }
 
     private static boolean hasPaperAsyncSupport(){
