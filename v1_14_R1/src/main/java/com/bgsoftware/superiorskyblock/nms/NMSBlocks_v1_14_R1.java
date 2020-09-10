@@ -395,7 +395,7 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
             chunk.tileEntities.clear();
 
-            if(!(world.generator instanceof WorldGenerator)){
+            if(world.generator != null && !(world.generator instanceof WorldGenerator)){
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, 0L, world.generator);
                 ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
                 customChunkGenerator.buildBase(protoChunk);

@@ -417,7 +417,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             levelCompound.set("TileEntities", tileEntities);
             levelCompound.set("Entities", new NBTTagList());
 
-            if(!(world.generator instanceof WorldGenerator)) {
+            if(world.generator != null && !(world.generator instanceof WorldGenerator)) {
                 ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
                 customChunkGenerator.buildBase(null, protoChunk);

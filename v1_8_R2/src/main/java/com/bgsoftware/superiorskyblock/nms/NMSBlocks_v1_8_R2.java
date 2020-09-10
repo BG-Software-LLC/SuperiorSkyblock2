@@ -247,7 +247,7 @@ public final class NMSBlocks_v1_8_R2 implements NMSBlocks {
             chunk.tileEntities.clear();
 
 
-            if(!(world.generator instanceof WorldGenerator)){
+            if(world.generator != null && !(world.generator instanceof WorldGenerator)){
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, 0L, world.generator);
                 Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunkCoords.x, chunkCoords.z);
 

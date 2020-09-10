@@ -397,7 +397,7 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
                 ((ProtoChunk) chunk).s().clear();
             }
 
-            if(!(world.generator instanceof WorldGenerator)){
+            if(world.generator != null && !(world.generator instanceof WorldGenerator)){
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, 0L, world.generator);
                 ProtoChunk protoChunk = chunk instanceof ProtoChunk ? (ProtoChunk) chunk : new ProtoChunk(chunkCoords, ChunkConverter.a);
                 customChunkGenerator.createChunk(protoChunk);
