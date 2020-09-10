@@ -250,12 +250,12 @@ public final class ProvidersHandler implements ProvidersManager {
         return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
-    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner){
-        return worldsManager.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner);
+    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID){
+        return worldsManager.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner, islandUUID);
     }
 
-    public void finishIslandCreation(Location islandLocation, UUID islandOwner){
-        worldsManager.finishIslandCreation(islandLocation, islandOwner);
+    public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID){
+        worldsManager.finishIslandCreation(islandLocation, islandOwner, islandUUID);
     }
 
     public void prepareTeleport(Island island, Runnable finishCallback){

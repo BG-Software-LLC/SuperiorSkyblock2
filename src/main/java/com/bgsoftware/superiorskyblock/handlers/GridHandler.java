@@ -121,16 +121,19 @@ public final class GridHandler implements GridManager {
         if(!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName))
             return;
 
+        UUID islandUUID = generateIslandUUID();
+
         Location islandLocation = plugin.getProviders().getNextLocation(
                 lastIsland.parse().clone(),
                 plugin.getSettings().islandsHeight,
                 plugin.getSettings().maxIslandSize,
-                superiorPlayer.getUniqueId()
+                superiorPlayer.getUniqueId(),
+                islandUUID
         );
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(islandLocation));
 
-        SIsland island = new SIsland(superiorPlayer, generateIslandUUID(), islandLocation.add(0.5, 0, 0.5), islandName, schemName);
+        SIsland island = new SIsland(superiorPlayer, islandUUID, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
         EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
 
         if(!event.isCancelled()) {
@@ -160,10 +163,10 @@ public final class GridHandler implements GridManager {
                     }
                 }
 
-                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId());
+                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
             }, ex -> {
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId());
+                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
                 ex.printStackTrace();
                 Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
             });
@@ -331,7 +334,7 @@ public final class GridHandler implements GridManager {
                 lastIsland.parse().clone(),
                 plugin.getSettings().islandsHeight,
                 plugin.getSettings().maxIslandSize,
-                null
+                null, null
         );
     }
 

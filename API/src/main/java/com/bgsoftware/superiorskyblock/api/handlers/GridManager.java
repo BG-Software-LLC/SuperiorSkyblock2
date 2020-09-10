@@ -190,7 +190,8 @@ public interface GridManager {
 
     /**
      * Get the next location for a new island.
-     * @deprecated Moved to the separated WorldsProvider interface
+     * @deprecated Moved to the separated WorldsProvider interface.
+     * Using this method can give NullPointerExceptions and many other unexpected behaviors.
      */
     @Deprecated
     Location getNextLocation();

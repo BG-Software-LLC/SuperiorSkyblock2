@@ -17,7 +17,7 @@ public final class WorldsManager_Default implements WorldsManager {
     private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
 
     @Override
-    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner) {
+    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
         Location location = previousLocation.clone();
         location.setY(islandsHeight);
         BlockFace islandFace = getIslandFace(location);
@@ -46,7 +46,7 @@ public final class WorldsManager_Default implements WorldsManager {
         }
 
         if(servedPositions.contains(SBlockPosition.of(location)) || plugin.getGrid().getIslandAt(location) != null){
-            return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner);
+            return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner, islandUUID);
         }
 
         servedPositions.add(SBlockPosition.of(location));
@@ -55,7 +55,7 @@ public final class WorldsManager_Default implements WorldsManager {
     }
 
     @Override
-    public void finishIslandCreation(Location islandLocation, UUID islandOwner) {
+    public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
         if(islandLocation != null)
             servedPositions.remove(SBlockPosition.of(islandLocation));
     }

@@ -13,15 +13,17 @@ public interface WorldsManager {
      * @param islandsHeight The default islands height.
      * @param maxIslandSize The default maximum island size.
      * @param islandOwner The owner of the island.
+     * @param islandUUID The UUID of the island.
      */
-    Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner);
+    Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID);
 
     /**
      * Callback upon finishing of creation of islands.
      * @param islandLocation The location of the new island.
      * @param islandOwner The owner of the island.
+     * @param islandUUID The UUID of the island.
      */
-    void finishIslandCreation(Location islandLocation, UUID islandOwner);
+    void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID);
 
     /**
      * Prepare teleportation of an entity to an island.
