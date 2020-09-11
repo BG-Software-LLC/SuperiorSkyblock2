@@ -264,8 +264,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         worldsProvider.finishIslandCreation(islandLocation, islandOwner, islandUUID);
     }
 
-    public void prepareTeleport(Island island, Runnable finishCallback){
-        worldsProvider.prepareTeleport(island, finishCallback);
+    public void prepareTeleport(Island island, Location location, Runnable finishCallback){
+        worldsProvider.prepareTeleport(island, location, finishCallback);
     }
 
     public World getIslandsWorld(Island island, World.Environment environment){

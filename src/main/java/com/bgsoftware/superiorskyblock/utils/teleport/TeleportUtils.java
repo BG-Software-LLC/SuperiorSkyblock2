@@ -24,7 +24,7 @@ public final class TeleportUtils {
                 teleportResult == null ? r-> {} : teleportResult);
 
         if(island != null){
-            plugin.getProviders().prepareTeleport(island, teleportTask);
+            plugin.getProviders().prepareTeleport(island, location.clone(), teleportTask);
         }
         else{
             teleportTask.run();

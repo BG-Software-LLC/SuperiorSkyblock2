@@ -109,7 +109,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
     }
 
     @Override
-    public void prepareTeleport(Island island, World.Environment environment, Runnable finishCallback) {
+    public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
         finishCallback.run();
     }
 
