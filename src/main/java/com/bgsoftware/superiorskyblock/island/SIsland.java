@@ -606,7 +606,15 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getVisitorsLocation() {
-        return visitorsLocation.readAndGet(location -> location == null ? null : location.clone());
+        Location visitorsLocation = this.visitorsLocation.readAndGet(location -> location == null ? null : location.clone());
+
+        if(visitorsLocation == null)
+            return null;
+
+        World world = plugin.getGrid().getIslandsWorld(this, World.Environment.NORMAL);
+        visitorsLocation.setWorld(world);
+
+        return visitorsLocation;
     }
 
     @Override
@@ -622,7 +630,15 @@ public final class SIsland extends DatabaseObject implements Island {
         if (teleportLocation == null)
             teleportLocation = getCenter(environment);
 
-        return teleportLocation == null ? null : teleportLocation.clone();
+        if(teleportLocation == null)
+            return null;
+
+        World world = plugin.getGrid().getIslandsWorld(this, environment);
+
+        teleportLocation = teleportLocation.clone();
+        teleportLocation.setWorld(world);
+
+        return teleportLocation;
     }
 
     @Override

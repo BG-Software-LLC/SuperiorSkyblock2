@@ -53,10 +53,6 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -73,19 +69,21 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static SuperiorSkyblockPlugin plugin;
 
-    private GridHandler gridHandler = null;
-    private BlockValuesHandler blockValuesHandler = null;
-    private SchematicsHandler schematicsHandler = null;
-    private PlayersHandler playersHandler = null;
-    private MissionsHandler missionsHandler = null;
-    private MenusHandler menusHandler = null;
-    private KeysHandler keysHandler = null;
-    private ProvidersHandler providersHandler = null;
-    private UpgradesHandler upgradesHandler = null;
-    private CommandsHandler commandsHandler = null;
+    private final GridHandler gridHandler = new GridHandler(this);
+    private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this);
+    private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
+    private final PlayersHandler playersHandler = new PlayersHandler(this);
+    private final MissionsHandler missionsHandler = new MissionsHandler(this);
+    private final MenusHandler menusHandler = new MenusHandler(this);
+    private final KeysHandler keysHandler = new KeysHandler(this);
+    private final ProvidersHandler providersHandler = new ProvidersHandler(this);
+    private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
+    private final CommandsHandler commandsHandler = new CommandsHandler(this);
+    private final DataHandler dataHandler = new DataHandler(this);
 
+    // The only handler that is initialized is this one, therefore it's not final.
+    // This is to prevent it's fields to be non-finals.
     private SettingsHandler settingsHandler = null;
-    private DataHandler dataHandler = null;
 
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
@@ -141,6 +139,20 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
+            Executor.init(this);
+
+            loadSortingTypes();
+            loadIslandFlags();
+            loadIslandPrivileges();
+
+            EnchantsUtils.registerGlowEnchantment();
+
+            EventsCaller.callPluginInitializeEvent(this);
+
+            providersHandler.prepareWorlds();
+
+            reloadPlugin(true);
+
             try {
                 safeEventsRegister(new BlocksListener(this));
                 safeEventsRegister(new ChunksListener(this));
@@ -157,19 +169,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 Bukkit.shutdown();
                 return;
             }
-
-            Executor.init(this);
-
-            loadSortingTypes();
-            loadIslandFlags();
-            loadIslandPrivileges();
-
-            EnchantsUtils.registerGlowEnchantment();
-
-            loadWorld();
-
-            EventsCaller.callPluginInitializeEvent(this);
-            reloadPlugin(true);
 
             if (Updater.isOutdated()) {
                 log("");
@@ -262,7 +261,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     @SuppressWarnings("all")
-    private ChunkGenerator getGenerator(){
+    public ChunkGenerator getGenerator(){
         if(worldGenerator == null) {
             File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
 
@@ -301,62 +300,40 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return worldGenerator;
     }
 
-    private void loadWorld(){
-        settingsHandler = new SettingsHandler(this);
-        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty);
-        loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
-        if(settingsHandler.netherWorldEnabled)
-            loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
-        if(settingsHandler.endWorldEnabled)
-            loadWorld(settingsHandler.endWorldName, difficulty, World.Environment.THE_END);
-    }
-
-    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){
-        World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(getGenerator()).createWorld();
-        world.setDifficulty(difficulty);
-
-        if(getServer().getPluginManager().isPluginEnabled("Multiverse-Core")){
-            getServer().dispatchCommand(getServer().getConsoleSender(), "mv import " + worldName + " normal -g " + getName());
-            getServer().dispatchCommand(getServer().getConsoleSender(), "mv modify set generator " + getName() + " " + worldName);
-        }
-    }
-
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         return getGenerator();
     }
 
     public void reloadPlugin(boolean loadGrid){
-        CalcTask.startTask();
         HeadUtils.readTextures(this);
 
-        blockValuesHandler = new BlockValuesHandler(this);
         settingsHandler = new SettingsHandler(this);
-        upgradesHandler = new UpgradesHandler(this);
-        missionsHandler = new MissionsHandler(this);
+
+        blockValuesHandler.loadData();
+        upgradesHandler.loadData();
+        missionsHandler.loadData();
 
         Locale.reload();
 
-        commandsHandler = new CommandsHandler(this, settingsHandler.islandCommand);
-        nmsAdapter.registerCommand(commandsHandler);
+        commandsHandler.loadData();
 
         if(loadGrid) {
-            playersHandler = new PlayersHandler();
-            gridHandler = new GridHandler(this);
+            playersHandler.loadData();
+            gridHandler.loadData();
         }
         else{
             Executor.sync(gridHandler::updateSpawn);
             gridHandler.syncUpgrades();
         }
 
-        schematicsHandler = new SchematicsHandler(this);
-        providersHandler = new ProvidersHandler(this);
-        menusHandler = new MenusHandler(this);
-        keysHandler = new KeysHandler();
+        schematicsHandler.loadData();
+        providersHandler.loadData();
+        menusHandler.loadData();
 
         if (loadGrid) {
             try {
-                dataHandler = new DataHandler(this);
+                dataHandler.loadDataWithException();
             }catch(HandlerLoadException ex){
                 if(!HandlerLoadException.handle(ex))
                     return;
@@ -373,6 +350,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
             //CropsTask.startTask();
         });
+
+        CalcTask.startTask();
     }
 
     @Override

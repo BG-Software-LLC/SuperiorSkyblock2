@@ -20,7 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public final class BlockValuesHandler implements BlockValuesManager {
+public final class BlockValuesHandler extends AbstractHandler implements BlockValuesManager {
 
     private static final ScriptEngine engine = new ScriptEngineManager(null).getEngineByName("JavaScript");
     private static final Bindings bindings = createBindings();
@@ -30,10 +30,13 @@ public final class BlockValuesHandler implements BlockValuesManager {
     private static final KeySet valuesMenuBlocks = new KeySet();
 
     private final KeyMap<String> blockValues = new KeyMap<>(), blockLevels = new KeyMap<>();
-    private final SuperiorSkyblockPlugin plugin;
 
     public BlockValuesHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
+        super(plugin);
+    }
+
+    @Override
+    public void loadData(){
         loadBlockValues(plugin);
         loadBlockLevels(plugin);
         convertValuesToLevels();

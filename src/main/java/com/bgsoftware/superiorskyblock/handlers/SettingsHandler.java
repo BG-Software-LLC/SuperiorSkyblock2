@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
-public final class SettingsHandler {
+public final class SettingsHandler extends AbstractHandler {
 
     public final String databaseType;
     public final String databaseMySQLAddress;
@@ -146,6 +146,8 @@ public final class SettingsHandler {
     public final List<String> valuableBlocks;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if(!file.exists())
@@ -347,6 +349,11 @@ public final class SettingsHandler {
             }
         }
         valuableBlocks = cfg.getStringList("valuable-blocks");
+    }
+
+    @Override
+    public void loadData() {
+        throw new UnsupportedOperationException("Not supported for SettingsHandler");
     }
 
     public void updateValue(String path, Object value){

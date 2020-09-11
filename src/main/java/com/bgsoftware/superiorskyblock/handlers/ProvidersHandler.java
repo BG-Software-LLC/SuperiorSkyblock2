@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public final class ProvidersHandler implements ProvidersManager {
+public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
     private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
     private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -68,9 +68,15 @@ public final class ProvidersHandler implements ProvidersManager {
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
     private VanishProvider vanishProvider = player -> false;
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
-    private WorldsProvider worldsProvider = new WorldsProvider_Default();
+    private WorldsProvider worldsProvider;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+        this.worldsProvider = new WorldsProvider_Default(plugin);
+    }
+
+    @Override
+    public void loadData(){
         Executor.sync(() -> {
             if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
                 runSafe(LeaderHeadsHook::register);
@@ -268,6 +274,10 @@ public final class ProvidersHandler implements ProvidersManager {
 
     public boolean isIslandsWorld(World world){
         return worldsProvider.isIslandsWorld(world);
+    }
+
+    public void prepareWorlds(){
+        worldsProvider.prepareWorlds();
     }
 
     private static boolean hasPaperAsyncSupport(){

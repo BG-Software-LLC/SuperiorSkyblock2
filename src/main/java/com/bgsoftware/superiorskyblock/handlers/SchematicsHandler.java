@@ -50,14 +50,16 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
-public final class SchematicsHandler implements SchematicManager {
+public final class SchematicsHandler extends AbstractHandler implements SchematicManager {
 
     private final Registry<String, Schematic> schematics = Registry.createRegistry();
-    private final SuperiorSkyblockPlugin plugin;
 
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
+        super(plugin);
+    }
 
+    @Override
+    public void loadData(){
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
         if(!schematicsFolder.exists()) {

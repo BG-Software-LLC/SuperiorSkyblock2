@@ -86,7 +86,7 @@ public final class SBlockPosition implements BlockPosition {
     }
 
     public static SBlockPosition of(Location location){
-        return of(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return of(location.getWorld() == null ? null : location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     public static SBlockPosition of(String world, int x, int y, int z){

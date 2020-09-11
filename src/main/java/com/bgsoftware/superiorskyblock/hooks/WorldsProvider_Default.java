@@ -3,11 +3,15 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 
 import java.util.Set;
@@ -15,8 +19,50 @@ import java.util.UUID;
 
 public final class WorldsProvider_Default implements WorldsProvider {
 
-    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
+    private final SuperiorSkyblockPlugin plugin;
+
+    public WorldsProvider_Default(SuperiorSkyblockPlugin plugin){
+        this.plugin = plugin;
+    }
+
+    @Override
+    public void prepareWorlds() {
+        SettingsHandler settingsHandler = new SettingsHandler(plugin);
+        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty);
+        loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
+        if(settingsHandler.netherWorldEnabled)
+            loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
+        if(settingsHandler.endWorldEnabled)
+            loadWorld(settingsHandler.endWorldName, difficulty, World.Environment.THE_END);
+    }
+
+    @Override
+    public World getIslandsWorld(Island island, World.Environment environment) {
+        String worldName = "";
+
+        switch (environment){
+            case NORMAL:
+                worldName = plugin.getSettings().islandWorldName;
+                break;
+            case NETHER:
+                if(plugin.getSettings().netherWorldEnabled)
+                    worldName = plugin.getSettings().netherWorldName;
+                break;
+            case THE_END:
+                if(plugin.getSettings().endWorldEnabled)
+                    worldName = plugin.getSettings().endWorldName;
+                break;
+        }
+
+        return worldName.isEmpty() ? null : Bukkit.getWorld(worldName);
+    }
+
+    @Override
+    public boolean isIslandsWorld(World world) {
+        World islandsWorld = getIslandsWorld(null, world.getEnvironment());
+        return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
+    }
 
     @Override
     public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
@@ -67,33 +113,6 @@ public final class WorldsProvider_Default implements WorldsProvider {
         finishCallback.run();
     }
 
-    @Override
-    public World getIslandsWorld(Island island, World.Environment environment) {
-        String worldName = "";
-
-        switch (environment){
-            case NORMAL:
-                worldName = plugin.getSettings().islandWorldName;
-                break;
-            case NETHER:
-                if(plugin.getSettings().netherWorldEnabled)
-                    worldName = plugin.getSettings().netherWorldName;
-                break;
-            case THE_END:
-                if(plugin.getSettings().endWorldEnabled)
-                    worldName = plugin.getSettings().endWorldName;
-                break;
-        }
-
-        return worldName.isEmpty() ? null : Bukkit.getWorld(worldName);
-    }
-
-    @Override
-    public boolean isIslandsWorld(World world) {
-        World islandsWorld = getIslandsWorld(null, world.getEnvironment());
-        return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
-    }
-
     private BlockFace getIslandFace(Location location){
         //Possibilities: North / East
         if(location.getX() >= location.getZ()) {
@@ -102,6 +121,16 @@ public final class WorldsProvider_Default implements WorldsProvider {
         //Possibilities: South / West
         else{
             return -location.getX() > location.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
+        }
+    }
+
+    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){
+        World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(plugin.getGenerator()).createWorld();
+        world.setDifficulty(difficulty);
+
+        if(Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")){
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
         }
     }
 

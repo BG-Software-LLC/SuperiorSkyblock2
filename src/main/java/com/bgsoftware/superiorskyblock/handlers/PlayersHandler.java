@@ -26,19 +26,23 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
-public final class PlayersHandler implements PlayersManager {
+public final class PlayersHandler extends AbstractHandler implements PlayersManager {
 
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
-    private static final Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
-    private static final Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
-    private static final Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
+    private final Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
+    private final Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
+    private final Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
+    private final Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
 
-    private static int lastRole = Integer.MIN_VALUE;
+    private int lastRole = Integer.MIN_VALUE;
 
-    public PlayersHandler(){
+    public PlayersHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+    }
+
+    @Override
+    public void loadData(){
         ConfigurationSection rolesSection = plugin.getSettings().islandRolesSection;
         loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX, null);
         loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX, (SPlayerRole) getGuestRole());

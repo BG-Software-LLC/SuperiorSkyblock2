@@ -41,9 +41,14 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 import java.io.File;
 
-public final class MenusHandler implements MenusManager {
+public final class MenusHandler extends AbstractHandler implements MenusManager {
 
     public MenusHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+    }
+
+    @Override
+    public void loadData(){
         SuperiorMenuCustom.resetMenus();
 
         //Reload all menus
@@ -100,7 +105,6 @@ public final class MenusHandler implements MenusManager {
                 new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
         }
-
     }
 
     @Override

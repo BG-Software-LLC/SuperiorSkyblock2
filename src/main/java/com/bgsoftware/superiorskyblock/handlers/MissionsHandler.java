@@ -37,19 +37,20 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public final class MissionsHandler implements MissionsManager {
-
-    private final SuperiorSkyblockPlugin plugin;
+public final class MissionsHandler extends AbstractHandler implements MissionsManager {
 
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final static Registry<String, Mission<?>> missionMap = Registry.createRegistry();
     private final static Registry<Mission<?>, MissionData> missionDataMap = Registry.createRegistry();
 
-    @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
+        super(plugin);
+    }
 
+    @Override
+    @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
+    public void loadData(){
         File missionsDict = new File(plugin.getDataFolder(), "missions");
         File file = new File(plugin.getDataFolder(), "missions/missions.yml");
 
@@ -113,7 +114,6 @@ public final class MissionsHandler implements MissionsManager {
         }
 
         Executor.sync(() -> loadMissionsData(missionsToLoad), 10L);
-
     }
 
     @Override

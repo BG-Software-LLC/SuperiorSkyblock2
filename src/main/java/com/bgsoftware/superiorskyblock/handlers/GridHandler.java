@@ -61,9 +61,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public final class GridHandler implements GridManager {
-
-    private final SuperiorSkyblockPlugin plugin;
+public final class GridHandler extends AbstractHandler implements GridManager {
 
     private final IslandRegistry islands = new IslandRegistry();
     private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
@@ -81,7 +79,11 @@ public final class GridHandler implements GridManager {
     private long lastTimeLevelUpdate = 0;
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
+        super(plugin);
+    }
+
+    @Override
+    public void loadData(){
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
         Executor.sync(this::updateSpawn);
     }

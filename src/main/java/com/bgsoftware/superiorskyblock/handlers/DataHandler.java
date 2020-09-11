@@ -19,14 +19,22 @@ import java.sql.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
-public final class DataHandler {
+public final class DataHandler extends AbstractHandler {
 
-    private final SuperiorSkyblockPlugin plugin;
-    private final DatabaseType database;
+    private DatabaseType database = DatabaseType.SQLite;
 
+    public DataHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+    }
+
+    @Override
+    public void loadData() {
+        throw new UnsupportedOperationException("Not supported for DataHandler.");
+    }
+
+    @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public DataHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
-        this.plugin = plugin;
+    public void loadDataWithException() throws HandlerLoadException {
         this.database = DatabaseType.fromName(plugin.getSettings().databaseType);
 
         if(database == DatabaseType.SQLite){

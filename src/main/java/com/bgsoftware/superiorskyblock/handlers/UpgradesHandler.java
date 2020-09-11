@@ -25,42 +25,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public final class UpgradesHandler implements UpgradesManager {
+public final class UpgradesHandler extends AbstractHandler implements UpgradesManager {
 
-    private final SuperiorSkyblockPlugin plugin;
     private final Registry<String, SUpgrade> upgrades = Registry.createRegistry();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
-        this.plugin = plugin;
-        loadUpgrades();
+        super(plugin);
     }
 
     @Override
-    public SUpgrade getUpgrade(String upgradeName){
-        return upgrades.get(upgradeName);
-    }
-
-    @Override
-    public SUpgrade getUpgrade(int slot){
-        return upgrades.values().stream().filter(upgrade -> upgrade.getMenuSlot() == slot).findFirst().orElse(null);
-    }
-
-    @Override
-    public Upgrade getDefaultUpgrade() {
-        return DefaultUpgrade.getInstance();
-    }
-
-    @Override
-    public boolean isUpgrade(String upgradeName){
-        return upgrades.containsKey(upgradeName.toLowerCase());
-    }
-
-    @Override
-    public Collection<Upgrade> getUpgrades() {
-        return Collections.unmodifiableCollection(upgrades.values());
-    }
-
-    private void loadUpgrades(){
+    public void loadData(){
         File file = new File(plugin.getDataFolder(), "upgrades.yml");
 
         if(!file.exists())
@@ -122,6 +96,31 @@ public final class UpgradesHandler implements UpgradesManager {
             }
             this.upgrades.add(upgradeName, upgrade);
         }
+    }
+
+    @Override
+    public SUpgrade getUpgrade(String upgradeName){
+        return upgrades.get(upgradeName);
+    }
+
+    @Override
+    public SUpgrade getUpgrade(int slot){
+        return upgrades.values().stream().filter(upgrade -> upgrade.getMenuSlot() == slot).findFirst().orElse(null);
+    }
+
+    @Override
+    public Upgrade getDefaultUpgrade() {
+        return DefaultUpgrade.getInstance();
+    }
+
+    @Override
+    public boolean isUpgrade(String upgradeName){
+        return upgrades.containsKey(upgradeName.toLowerCase());
+    }
+
+    @Override
+    public Collection<Upgrade> getUpgrades() {
+        return Collections.unmodifiableCollection(upgrades.values());
     }
 
 }

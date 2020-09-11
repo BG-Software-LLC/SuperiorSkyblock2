@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -9,7 +10,16 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
-public final class KeysHandler implements KeysManager {
+public final class KeysHandler extends AbstractHandler implements KeysManager {
+
+    public KeysHandler(SuperiorSkyblockPlugin plugin){
+        super(plugin);
+    }
+
+    @Override
+    public void loadData() {
+
+    }
 
     @Override
     public boolean isSpawner(Material type) {
