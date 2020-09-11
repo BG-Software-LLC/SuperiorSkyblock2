@@ -53,4 +53,24 @@ public interface WorldsProvider {
      */
     void prepareTeleport(Island island, Location location, Runnable finishCallback);
 
+    /**
+     * Check whether or not nether worlds are enabled.
+     */
+    boolean isNetherEnabled();
+
+    /**
+     * Check whether or not nether worlds are unlocked for islands by default.
+     */
+    boolean isNetherUnlocked();
+
+    /**
+     * Check whether or not end worlds are enabled.
+     */
+    boolean isEndEnabled();
+
+    /**
+     * Check whether or not end worlds are unlocked for islands by default.
+     */
+    boolean isEndUnlocked();
+
 }

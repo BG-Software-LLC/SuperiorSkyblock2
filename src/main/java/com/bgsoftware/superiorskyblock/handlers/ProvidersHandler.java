@@ -256,6 +256,18 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
+    public void prepareWorlds(){
+        worldsProvider.prepareWorlds();
+    }
+
+    public World getIslandsWorld(Island island, World.Environment environment){
+        return worldsProvider.getIslandsWorld(island, environment);
+    }
+
+    public boolean isIslandsWorld(World world){
+        return worldsProvider.isIslandsWorld(world);
+    }
+
     public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID){
         return worldsProvider.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner, islandUUID);
     }
@@ -268,16 +280,20 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         worldsProvider.prepareTeleport(island, location, finishCallback);
     }
 
-    public World getIslandsWorld(Island island, World.Environment environment){
-        return worldsProvider.getIslandsWorld(island, environment);
+    public boolean isNetherEnabled(){
+        return worldsProvider.isNetherEnabled();
     }
 
-    public boolean isIslandsWorld(World world){
-        return worldsProvider.isIslandsWorld(world);
+    public boolean isNetherUnlocked(){
+        return worldsProvider.isNetherUnlocked();
     }
 
-    public void prepareWorlds(){
-        worldsProvider.prepareWorlds();
+    public boolean isEndEnabled(){
+        return worldsProvider.isEndEnabled();
+    }
+
+    public boolean isEndUnlocked(){
+        return worldsProvider.isEndUnlocked();
     }
 
     private static boolean hasPaperAsyncSupport(){

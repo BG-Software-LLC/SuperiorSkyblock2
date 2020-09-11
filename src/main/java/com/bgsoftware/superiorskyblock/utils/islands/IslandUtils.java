@@ -52,12 +52,12 @@ public final class IslandUtils {
             chunkCoords.addAll(getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks));
         }
 
-        if(plugin.getSettings().netherWorldEnabled && island.wasSchematicGenerated(World.Environment.NETHER)){
+        if(plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)){
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             chunkCoords.addAll(getChunkCoords(island, netherWorld, onlyProtected, noEmptyChunks));
         }
 
-        if(plugin.getSettings().endWorldEnabled && island.wasSchematicGenerated(World.Environment.THE_END)){
+        if(plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)){
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             chunkCoords.addAll(getChunkCoords(island, endWorld, onlyProtected, noEmptyChunks));
         }
@@ -90,12 +90,12 @@ public final class IslandUtils {
             chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }
 
-        if(plugin.getSettings().netherWorldEnabled && island.wasSchematicGenerated(World.Environment.NETHER)){
+        if(plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)){
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }
 
-        if(plugin.getSettings().endWorldEnabled && island.wasSchematicGenerated(World.Environment.THE_END)){
+        if(plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)){
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }

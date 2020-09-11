@@ -46,11 +46,11 @@ public final class WorldsProvider_Default implements WorldsProvider {
                 worldName = plugin.getSettings().islandWorldName;
                 break;
             case NETHER:
-                if(plugin.getSettings().netherWorldEnabled)
+                if(isNetherEnabled())
                     worldName = plugin.getSettings().netherWorldName;
                 break;
             case THE_END:
-                if(plugin.getSettings().endWorldEnabled)
+                if(isEndEnabled())
                     worldName = plugin.getSettings().endWorldName;
                 break;
         }
@@ -111,6 +111,26 @@ public final class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
         finishCallback.run();
+    }
+
+    @Override
+    public boolean isNetherEnabled() {
+        return plugin.getSettings().netherWorldEnabled;
+    }
+
+    @Override
+    public boolean isNetherUnlocked() {
+        return plugin.getSettings().netherWorldUnlocked;
+    }
+
+    @Override
+    public boolean isEndEnabled() {
+        return plugin.getSettings().endWorldEnabled;
+    }
+
+    @Override
+    public boolean isEndUnlocked() {
+        return plugin.getSettings().endWorldUnlocked;
     }
 
     private BlockFace getIslandFace(Location location){

@@ -856,7 +856,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getSettings().netherWorldUnlocked || (unlockedWorlds.get() & 1) == 1;
+        return plugin.getProviders().isNetherUnlocked() || (unlockedWorlds.get() & 1) == 1;
     }
 
     @Override
@@ -882,7 +882,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getSettings().endWorldUnlocked || (unlockedWorlds.get() & 2) == 2;
+        return plugin.getProviders().isEndUnlocked() || (unlockedWorlds.get() & 2) == 2;
     }
 
     @Override
@@ -1311,7 +1311,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     plugin.getNMSBlocks().setChunkBiome(chunkPosition, biome, playersToUpdate));
         }
 
-        if(plugin.getSettings().netherWorldEnabled && wasSchematicGenerated(World.Environment.NETHER)){
+        if(plugin.getProviders().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)){
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
             Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                     ServerVersion.isEquals(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
@@ -1319,7 +1319,7 @@ public final class SIsland extends DatabaseObject implements Island {
                     plugin.getNMSBlocks().setChunkBiome(chunkPosition, netherBiome, playersToUpdate));
         }
 
-        if(plugin.getSettings().endWorldEnabled && wasSchematicGenerated(World.Environment.THE_END)){
+        if(plugin.getProviders().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)){
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
             Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
             IslandUtils.getChunkCoords(this, endWorld, false, false).forEach(chunkPosition ->
