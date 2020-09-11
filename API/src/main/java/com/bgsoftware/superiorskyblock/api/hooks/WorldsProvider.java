@@ -48,8 +48,9 @@ public interface WorldsProvider {
     /**
      * Prepare teleportation of an entity to an island.
      * @param island The target island.
+     * @param environment The environment
      * @param finishCallback Callback function after the preparation is finished.
      */
-    void prepareTeleport(Island island, Runnable finishCallback);
+    void prepareTeleport(Island island, World.Environment environment, Runnable finishCallback);
 
 }
