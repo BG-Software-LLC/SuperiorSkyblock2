@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -30,6 +31,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -44,9 +46,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -58,6 +63,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
@@ -418,6 +424,8 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
         ItemStack usedItem = e.getPlayer().getItemInHand();
 
+        boolean villagerTrading = false;
+
         IslandPrivilege islandPrivilege;
 
         if(e.getRightClicked() instanceof ArmorStand){
@@ -427,12 +435,40 @@ public final class ProtectionListener implements Listener {
                 plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
             islandPrivilege = IslandPrivileges.ANIMAL_BREED;
         }
+        else if(e.getRightClicked() instanceof Villager){
+            islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
+            villagerTrading = true;
+        }
         else return;
 
         if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
+            if(villagerTrading) {
+                Executor.sync(() -> {
+                    Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
+                    if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT)
+                        e.getPlayer().closeInventory();
+                }, 1L);
+            }
         }
+    }
+
+    @EventHandler
+    public void onVillagerTrade(InventoryClickEvent e){
+        Inventory openInventory = e.getView().getTopInventory();
+
+        if(openInventory == null || openInventory.getType() != InventoryType.MERCHANT)
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+        Island island = plugin.getGrid().getIslandAt(e.getWhoClicked().getLocation());
+
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING)){
+            e.setCancelled(true);
+            e.getWhoClicked().closeInventory();
+        }
+
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

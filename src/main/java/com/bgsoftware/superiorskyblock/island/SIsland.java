@@ -87,6 +87,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -958,8 +960,16 @@ public final class SIsland extends DatabaseObject implements Island {
         if(value) {
             rolePermissions.add(islandPrivilege, playerRole);
 
-            if(islandPrivilege == IslandPrivileges.FLY)
+            if(islandPrivilege == IslandPrivileges.FLY) {
                 getAllPlayersInside().forEach(this::updateIslandFly);
+            }
+            else if(islandPrivilege == IslandPrivileges.VILLAGER_TRADING){
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Inventory openInventory = superiorPlayer.asPlayer().getOpenInventory().getTopInventory();
+                    if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !hasPermission(superiorPlayer, islandPrivilege))
+                        superiorPlayer.asPlayer().closeInventory();
+                });
+            }
 
             savePermissionNodes();
         }
@@ -974,8 +984,14 @@ public final class SIsland extends DatabaseObject implements Island {
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
-        if(islandPrivilege == IslandPrivileges.FLY)
+        if(islandPrivilege == IslandPrivileges.FLY) {
             updateIslandFly(superiorPlayer);
+        }
+        else if(islandPrivilege == IslandPrivileges.VILLAGER_TRADING){
+            Inventory openInventory = superiorPlayer.asPlayer().getOpenInventory().getTopInventory();
+            if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !value)
+                superiorPlayer.asPlayer().closeInventory();
+        }
 
         savePermissionNodes();
 
