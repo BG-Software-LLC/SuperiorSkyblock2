@@ -111,9 +111,9 @@ public final class CmdAdminSetBiome implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -121,7 +121,7 @@ public final class CmdAdminSetBiome implements ISuperiorCommand {
         else if(args.length == 4){
             for(Biome biome : Biome.values()){
                 String biomeName = biome.name().toLowerCase();
-                if(biomeName.startsWith(args[3].toLowerCase()))
+                if(biomeName.contains(args[3].toLowerCase()))
                     list.add(biomeName);
             }
         }

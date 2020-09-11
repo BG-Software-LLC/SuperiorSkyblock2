@@ -93,22 +93,22 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
         if(args.length == 3){
             list.addAll(Bukkit.getWorlds().stream().map(world -> world.getName().toLowerCase())
-                    .filter(name -> name.startsWith(args[2].toLowerCase())).collect(Collectors.toList()));
+                    .filter(name -> name.contains(args[2].toLowerCase())).collect(Collectors.toList()));
         }
 
         else if(sender instanceof Player){
             Location location = ((Player) sender).getLocation();
             if(args.length == 4){
-                if((location.getBlockX() + "").startsWith(args[3]))
+                if((location.getBlockX() + "").contains(args[3]))
                     list.add(location.getBlockX() + "");
             }
             else if(args.length == 5){
-                if((location.getBlockY() + "").startsWith(args[4]))
+                if((location.getBlockY() + "").contains(args[4]))
                     list.add(location.getBlockY() + "");
 
             }
             else if(args.length == 6){
-                if((location.getBlockZ() + "").startsWith(args[5]))
+                if((location.getBlockZ() + "").contains(args[5]))
                     list.add(location.getBlockZ() + "");
             }
         }

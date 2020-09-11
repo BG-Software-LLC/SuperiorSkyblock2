@@ -89,7 +89,7 @@ public final class CmdPanel implements ISuperiorCommand {
 
         if(args.length == 2){
             list.addAll(Stream.of("members", "visitors", "toggle")
-                    .filter(value -> value.startsWith(args[1].toLowerCase())).collect(Collectors.toList()));
+                    .filter(value -> value.contains(args[1].toLowerCase())).collect(Collectors.toList()));
         }
 
         return list;

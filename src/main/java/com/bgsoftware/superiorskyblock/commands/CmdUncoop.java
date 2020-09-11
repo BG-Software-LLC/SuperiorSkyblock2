@@ -103,7 +103,7 @@ public final class CmdUncoop implements ISuperiorCommand {
 
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer targetPlayer = SSuperiorPlayer.of(player);
-                if(island.isCoop(targetPlayer) && player.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                if(island.isCoop(targetPlayer) && player.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(player.getName());
                 }
             }

@@ -124,9 +124,9 @@ public final class CmdAdminSetEntityLimit implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -137,7 +137,7 @@ public final class CmdAdminSetEntityLimit implements ISuperiorCommand {
 
             if(island != null){
                 for(EntityType entityType : EntityType.values()){
-                    if(EntityUtils.canHaveLimit(entityType) && entityType.name().toLowerCase().startsWith(args[3].toLowerCase()))
+                    if(EntityUtils.canHaveLimit(entityType) && entityType.name().toLowerCase().contains(args[3].toLowerCase()))
                         list.add(entityType.name().toLowerCase());
                 }
             }

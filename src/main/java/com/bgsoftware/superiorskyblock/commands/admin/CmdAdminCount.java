@@ -132,9 +132,9 @@ public final class CmdAdminCount implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -146,10 +146,10 @@ public final class CmdAdminCount implements ISuperiorCommand {
             if(island != null){
                 String materialArgument = args[3].toLowerCase();
                 for(Material material : Material.values()){
-                    if(material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().startsWith(materialArgument))
+                    if(material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().contains(materialArgument))
                         list.add(material.name().toLowerCase());
                 }
-                if("*".startsWith(materialArgument))
+                if("*".contains(materialArgument))
                     list.add("*");
             }
         }

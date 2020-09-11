@@ -85,9 +85,9 @@ public final class CmdAdminTeleport implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island island = onlinePlayer.getIsland();
                 if (island != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(island.getName());
                 }
             }

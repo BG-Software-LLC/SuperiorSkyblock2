@@ -144,7 +144,7 @@ public final class CmdSetRole implements ISuperiorCommand {
 
             if(args.length == 2) {
                 for(SuperiorPlayer targetPlayer : island.getIslandMembers(true)){
-                    if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(targetPlayer.getName());
                 }
             }
@@ -152,7 +152,7 @@ public final class CmdSetRole implements ISuperiorCommand {
                 for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
                     if(playerRole.isRoleLadder()) {
                         String roleName = playerRole.toString().trim().toLowerCase();
-                        if (roleName.startsWith(args[2].toLowerCase()))
+                        if (roleName.contains(args[2].toLowerCase()))
                             list.add(roleName);
                     }
                 }

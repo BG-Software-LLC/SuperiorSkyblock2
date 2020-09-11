@@ -121,9 +121,9 @@ public final class CmdAdminSetChestRow implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -134,7 +134,7 @@ public final class CmdAdminSetChestRow implements ISuperiorCommand {
 
             if(island != null)
                 return IntStream.range(1, island.getChestSize() + 1).boxed().map(i -> i + "")
-                        .filter(i -> i.startsWith(args[3])).collect(Collectors.toList());
+                        .filter(i -> i.contains(args[3])).collect(Collectors.toList());
         }
         else if(args.length == 5){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
@@ -142,7 +142,7 @@ public final class CmdAdminSetChestRow implements ISuperiorCommand {
 
             if(island != null)
                 return IntStream.range(1, 7).boxed().map(i -> i + "")
-                        .filter(i -> i.startsWith(args[4])).collect(Collectors.toList());
+                        .filter(i -> i.contains(args[4])).collect(Collectors.toList());
         }
 
         return list;

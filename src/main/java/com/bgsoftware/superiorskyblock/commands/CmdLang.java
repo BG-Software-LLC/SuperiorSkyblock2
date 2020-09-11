@@ -65,7 +65,7 @@ public final class CmdLang implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for(Biome biome : Biome.values()){
-                if(biome.name().toLowerCase().startsWith(args[1].toLowerCase()))
+                if(biome.name().toLowerCase().contains(args[1].toLowerCase()))
                     list.add(biome.name().toLowerCase());
             }
 

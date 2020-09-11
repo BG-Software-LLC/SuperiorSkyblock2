@@ -94,19 +94,19 @@ public final class CmdAdminMission implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
         }
         else if(args.length == 4){
-            list.addAll(Stream.of("complete", "reset").filter(subCommand -> subCommand.startsWith(args[3].toLowerCase())).collect(Collectors.toList()));
+            list.addAll(Stream.of("complete", "reset").filter(subCommand -> subCommand.contains(args[3].toLowerCase())).collect(Collectors.toList()));
         }
         else if(args.length == 5 && (args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset"))){
             for(Mission<?> mission : plugin.getMissions().getAllMissions()){
-                if (mission.getName().toLowerCase().startsWith(args[4].toLowerCase()))
+                if (mission.getName().toLowerCase().contains(args[4].toLowerCase()))
                     list.add(mission.getName());
             }
         }

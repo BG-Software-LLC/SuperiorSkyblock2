@@ -230,7 +230,7 @@ public final class CmdAdmin implements ISuperiorCommand {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
                     aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
                     for (String _aliases : aliases) {
-                        if (_aliases.startsWith(args[1].toLowerCase())) {
+                        if (_aliases.contains(args[1].toLowerCase())) {
                             list.add(_aliases);
                         }
                     }

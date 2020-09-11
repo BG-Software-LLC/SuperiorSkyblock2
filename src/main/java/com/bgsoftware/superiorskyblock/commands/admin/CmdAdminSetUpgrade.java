@@ -118,9 +118,9 @@ public final class CmdAdminSetUpgrade implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -128,7 +128,7 @@ public final class CmdAdminSetUpgrade implements ISuperiorCommand {
 
         else if(args.length == 4){
             list.addAll(plugin.getUpgrades().getUpgrades().stream()
-                    .filter(upgrade -> upgrade.getName().toLowerCase().startsWith(args[3].toLowerCase()))
+                    .filter(upgrade -> upgrade.getName().toLowerCase().contains(args[3].toLowerCase()))
                     .map(Upgrade::getName)
                     .collect(Collectors.toList()));
         }

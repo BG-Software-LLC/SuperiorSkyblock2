@@ -141,7 +141,7 @@ public final class CmdRankup implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
-                if(upgrade.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                if(upgrade.getName().toLowerCase().contains(args[1].toLowerCase()))
                     list.add(upgrade.getName().toLowerCase());
             }
 

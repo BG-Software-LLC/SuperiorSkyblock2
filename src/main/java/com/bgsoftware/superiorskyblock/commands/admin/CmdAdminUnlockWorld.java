@@ -120,18 +120,18 @@ public final class CmdAdminUnlockWorld implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
         }else if(args.length == 4){
             list.addAll(Stream.of("nether", "the_end")
-                    .filter(value -> value.startsWith(args[3].toLowerCase())).collect(Collectors.toList()));
+                    .filter(value -> value.contains(args[3].toLowerCase())).collect(Collectors.toList()));
         }else if(args.length == 5){
             list.addAll(Stream.of("true", "false")
-                    .filter(value -> value.startsWith(args[4].toLowerCase())).collect(Collectors.toList()));
+                    .filter(value -> value.contains(args[4].toLowerCase())).collect(Collectors.toList()));
         }
 
         return list;

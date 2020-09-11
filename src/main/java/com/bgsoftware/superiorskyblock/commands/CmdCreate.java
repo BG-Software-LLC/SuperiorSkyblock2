@@ -118,7 +118,7 @@ public final class CmdCreate implements ISuperiorCommand {
             String argument = args[argumentLength - 1].toLowerCase();
             return plugin.getSchematics().getSchematics().stream()
                     .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_the_end") &&
-                            schematic.toLowerCase().startsWith(argument))
+                            schematic.toLowerCase().contains(argument))
                     .collect(Collectors.toList());
         }
 

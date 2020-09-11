@@ -90,9 +90,9 @@ public final class CmdRate implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island onlineIsland = onlinePlayer.getIsland();
                 if (onlineIsland != null && (plugin.getSettings().rateOwnIsland || !onlineIsland.equals(island))) {
-                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(player.getName());
-                    if(!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(onlineIsland.getName());
                 }
             }

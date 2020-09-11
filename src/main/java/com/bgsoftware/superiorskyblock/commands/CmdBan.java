@@ -100,7 +100,7 @@ public final class CmdBan implements ISuperiorCommand {
 
             for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
                 if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
-                        targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                        targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }
             }

@@ -86,7 +86,7 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                     list.add(player.getName());
             }
         }

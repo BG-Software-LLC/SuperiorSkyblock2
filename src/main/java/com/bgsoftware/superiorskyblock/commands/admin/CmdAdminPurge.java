@@ -81,7 +81,7 @@ public final class CmdAdminPurge implements ISuperiorCommand {
         List<String> list = new ArrayList<>();
 
         if(args.length == 3){
-            if("cancel".startsWith(args[2].toLowerCase()))
+            if("cancel".contains(args[2].toLowerCase()))
                 list.add("cancel");
         }
 

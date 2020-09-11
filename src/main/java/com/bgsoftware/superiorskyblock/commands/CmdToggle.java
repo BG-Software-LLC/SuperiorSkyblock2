@@ -96,7 +96,7 @@ public final class CmdToggle implements ISuperiorCommand {
 
         if(args.length == 2){
             list.addAll(Stream.of("border", "blocks")
-                    .filter(value -> value.startsWith(args[1].toLowerCase()) && sender.hasPermission("superior.island.toggle." +  value)).collect(Collectors.toList()));
+                    .filter(value -> value.contains(args[1].toLowerCase()) && sender.hasPermission("superior.island.toggle." +  value)).collect(Collectors.toList()));
         }
 
         return list;

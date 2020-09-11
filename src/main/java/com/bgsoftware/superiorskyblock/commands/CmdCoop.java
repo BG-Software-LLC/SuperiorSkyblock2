@@ -119,7 +119,7 @@ public final class CmdCoop implements ISuperiorCommand {
             for(Player player : Bukkit.getOnlinePlayers()){
                 SuperiorPlayer targetPlayer = SSuperiorPlayer.of(player);
                 if(!island.isMember(targetPlayer) && !island.isBanned(targetPlayer) && !island.isCoop(targetPlayer) &&
-                        player.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                        player.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(player.getName());
                 }
             }

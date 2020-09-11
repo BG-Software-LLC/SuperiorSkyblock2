@@ -102,9 +102,9 @@ public final class CmdVisit implements ISuperiorCommand {
                 Island island = onlinePlayer.getIsland();
                 if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
                         (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) ) {
-                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(island.getName());
                 }
             }

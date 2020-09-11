@@ -102,9 +102,9 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -117,13 +117,13 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
                 if(args.length == 4){
                     for(UUID uuid : island.getRatings().keySet()) {
                         SuperiorPlayer _targetPlayer = SSuperiorPlayer.of(uuid);
-                        if (_targetPlayer.getName().toLowerCase().startsWith(args[3].toLowerCase()))
+                        if (_targetPlayer.getName().toLowerCase().contains(args[3].toLowerCase()))
                             list.add(_targetPlayer.getName());
                     }
                 }
                 else if(args.length == 5){
                     for(Rating rating : Rating.values()){
-                        if (rating.name().toLowerCase().startsWith(args[4].toLowerCase()))
+                        if (rating.name().toLowerCase().contains(args[4].toLowerCase()))
                             list.add(rating.name().toLowerCase());
                     }
                 }

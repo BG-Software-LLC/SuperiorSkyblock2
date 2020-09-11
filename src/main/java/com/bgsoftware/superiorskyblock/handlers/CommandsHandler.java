@@ -383,7 +383,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
                     aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
                     for (String _aliases : aliases) {
-                        if (_aliases.startsWith(args[0].toLowerCase())) {
+                        if (_aliases.contains(args[0].toLowerCase())) {
                             list.add(_aliases);
                         }
                     }

@@ -117,15 +117,15 @@ public final class CmdAdminSetBonus implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
         }
         else if(args.length == 4){
-            list.addAll(Stream.of("worth", "level").filter(arg -> arg.startsWith(args[3].toLowerCase())).collect(Collectors.toSet()));
+            list.addAll(Stream.of("worth", "level").filter(arg -> arg.contains(args[3].toLowerCase())).collect(Collectors.toSet()));
         }
 
         return list;

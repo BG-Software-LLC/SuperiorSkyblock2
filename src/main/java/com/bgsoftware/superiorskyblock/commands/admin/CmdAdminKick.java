@@ -92,7 +92,7 @@ public final class CmdAdminKick implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null && playerIsland.getOwner() != onlinePlayer &&
-                        player.getName().toLowerCase().startsWith(args[2].toLowerCase())) {
+                        player.getName().toLowerCase().contains(args[2].toLowerCase())) {
                         list.add(player.getName());
                 }
             }

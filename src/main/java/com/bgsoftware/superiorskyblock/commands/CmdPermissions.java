@@ -98,7 +98,7 @@ public final class CmdPermissions implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for(Player player : Bukkit.getOnlinePlayers()){
-                if(player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                if(player.getName().toLowerCase().contains(args[1].toLowerCase()))
                     list.add(player.getName().toLowerCase());
             }
 

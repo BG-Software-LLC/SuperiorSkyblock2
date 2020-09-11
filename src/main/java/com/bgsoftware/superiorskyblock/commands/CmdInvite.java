@@ -134,7 +134,7 @@ public final class CmdInvite implements ISuperiorCommand {
 
             for(Player player : Bukkit.getOnlinePlayers()){
                 if(!island.isMember(SSuperiorPlayer.of(player)) &&
-                        player.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                        player.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(player.getName());
                 }
             }

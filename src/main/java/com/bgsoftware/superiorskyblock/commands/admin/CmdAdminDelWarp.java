@@ -120,9 +120,9 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -132,7 +132,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
             if(island != null)
                 list.addAll(island.getAllWarps().stream().filter(warpName ->
-                        warpName.toLowerCase().startsWith(args[3].toLowerCase())).collect(Collectors.toList()));
+                        warpName.toLowerCase().contains(args[3].toLowerCase())).collect(Collectors.toList()));
         }
 
         return list;

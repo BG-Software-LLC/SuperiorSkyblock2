@@ -109,7 +109,7 @@ public final class CmdPromote implements ISuperiorCommand {
                 PlayerRole nextRole = playerRole.getNextRole();
                 if(!playerRole.isLastRole() && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&
                         !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
-                        targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                        targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }
             }

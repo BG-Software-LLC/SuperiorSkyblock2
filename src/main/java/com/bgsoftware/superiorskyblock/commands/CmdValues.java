@@ -93,9 +93,9 @@ public final class CmdValues implements ISuperiorCommand {
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null && (superiorPlayer == null || island == null ||
                         !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {
-                    if (player.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }

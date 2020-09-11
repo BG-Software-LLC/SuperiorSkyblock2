@@ -95,7 +95,7 @@ public final class CmdTransfer implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
-                if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase())){
+                if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(targetPlayer.getName());
                 }
             }

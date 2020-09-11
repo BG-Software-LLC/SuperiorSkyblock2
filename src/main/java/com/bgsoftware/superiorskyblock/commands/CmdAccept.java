@@ -115,9 +115,9 @@ public final class CmdAccept implements ISuperiorCommand {
             for(UUID uuid : plugin.getGrid().getAllIslands()){
                 island = plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid));
                 if(island != null && island.isInvited(superiorPlayer)) {
-                    if(island.getOwner().getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(island.getOwner().getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(island.getOwner().getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(island.getName());
                 }
             }

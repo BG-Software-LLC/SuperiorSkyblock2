@@ -119,9 +119,9 @@ public final class CmdAdminAddEffect implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -133,7 +133,7 @@ public final class CmdAdminAddEffect implements ISuperiorCommand {
             if(island != null){
                 for(PotionEffectType potionEffectType : PotionEffectType.values()){
                     try {
-                        if (potionEffectType != null && potionEffectType.getName().toLowerCase().startsWith(args[3].toLowerCase()))
+                        if (potionEffectType != null && potionEffectType.getName().toLowerCase().contains(args[3].toLowerCase()))
                             list.add(potionEffectType.getName().toLowerCase());
                     }catch (Exception ignored){}
                 }

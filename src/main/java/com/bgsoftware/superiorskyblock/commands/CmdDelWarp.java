@@ -114,7 +114,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for(String warpName : island.getAllWarps()){
-                if(warpName.toLowerCase().startsWith(args[1].toLowerCase()))
+                if(warpName.toLowerCase().contains(args[1].toLowerCase()))
                     list.add(warpName);
             }
 

@@ -124,9 +124,9 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -135,7 +135,7 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
         else if(args.length == 4){
             list.addAll(IslandPrivilege.values().stream()
                     .map(islandPrivilege -> islandPrivilege.getName().toLowerCase())
-                    .filter(islandPermissionName -> islandPermissionName.startsWith(args[3].toLowerCase()))
+                    .filter(islandPermissionName -> islandPermissionName.contains(args[3].toLowerCase()))
                     .collect(Collectors.toList())
             );
         }
@@ -143,7 +143,7 @@ public final class CmdAdminSetPermission implements ISuperiorCommand {
         else if(args.length == 5){
             list.addAll(plugin.getPlayers().getRoles().stream()
                     .map(playerRole -> playerRole.toString().toLowerCase())
-                    .filter(playerRoleName -> playerRoleName.startsWith(args[4].toLowerCase()))
+                    .filter(playerRoleName -> playerRoleName.contains(args[4].toLowerCase()))
                     .collect(Collectors.toList())
             );
         }

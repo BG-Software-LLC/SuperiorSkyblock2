@@ -99,9 +99,9 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
                 SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                         list.add(playerIsland.getName());
                 }
             }
@@ -116,9 +116,9 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
                     if(!onlinePlayer.equals(superiorPlayer)) {
                         Island onlineIsland = onlinePlayer.getIsland();
                         if (onlineIsland != null && !onlineIsland.equals(playerIsland)) {
-                            if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                            if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
                                 list.add(player.getName());
-                            if (!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                            if (!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
                                 list.add(onlineIsland.getName());
                         }
                     }

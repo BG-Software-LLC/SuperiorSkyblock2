@@ -108,7 +108,7 @@ public final class CmdExpel implements ISuperiorCommand {
             List<String> list = new ArrayList<>();
 
             for (SuperiorPlayer targetPlayer : superiorPlayer.getIsland().getIslandVisitors()) {
-                if(targetPlayer.getName().toLowerCase().startsWith(args[1].toLowerCase()))
+                if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase()))
                     list.add(targetPlayer.getName());
             }
 
