@@ -84,10 +84,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void loadData(){
-        Executor.sync(() -> {
-            lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
-            updateSpawn();
-        });
+        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
+        Executor.sync(this::updateSpawn);
     }
 
     public void updateSpawn(){
