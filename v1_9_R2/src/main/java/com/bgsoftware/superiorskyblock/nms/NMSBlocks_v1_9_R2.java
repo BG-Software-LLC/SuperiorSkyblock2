@@ -23,7 +23,6 @@ import net.minecraft.server.v1_9_R2.Blocks;
 import net.minecraft.server.v1_9_R2.Chunk;
 import net.minecraft.server.v1_9_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_9_R2.ChunkProviderServer;
-import net.minecraft.server.v1_9_R2.ChunkRegionLoader;
 import net.minecraft.server.v1_9_R2.ChunkSection;
 import net.minecraft.server.v1_9_R2.Entity;
 import net.minecraft.server.v1_9_R2.EntityPlayer;
@@ -303,8 +302,7 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
         else{
             Executor.createTask().runAsync(v -> {
                 try {
-                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkCoords.x, chunkCoords.z);
-                    Chunk loadedChunk = chunkData == null ? null : (Chunk) chunkData[0];
+                    Chunk loadedChunk = chunkLoader.a(world, chunkCoords.x, chunkCoords.z);
 
                     if(loadedChunk != null)
                         chunkConsumer.accept(loadedChunk);

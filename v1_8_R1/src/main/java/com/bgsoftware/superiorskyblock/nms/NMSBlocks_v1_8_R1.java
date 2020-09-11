@@ -23,7 +23,6 @@ import net.minecraft.server.v1_8_R1.ChatSerializer;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R1.ChunkProviderServer;
-import net.minecraft.server.v1_8_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_8_R1.ChunkSection;
 import net.minecraft.server.v1_8_R1.Entity;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
@@ -233,7 +232,7 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
             }
 
             completableFuture.complete(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
-        }, null);
+        });
 
         return completableFuture;
     }
@@ -273,11 +272,11 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
             byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
             Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-        }, null);
+        });
     }
 
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
-        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, updateChunk);
+    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer){
+        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, null);
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk){
@@ -297,8 +296,7 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         else{
             Executor.createTask().runAsync(v -> {
                 try {
-                    Object[] chunkData = ((ChunkRegionLoader) chunkLoader).loadChunk(world, chunkCoords.x, chunkCoords.z);
-                    Chunk loadedChunk = chunkData == null ? null : (Chunk) chunkData[0];
+                    Chunk loadedChunk = chunkLoader.a(world, chunkCoords.x, chunkCoords.z);
 
                     if(loadedChunk != null)
                         chunkConsumer.accept(loadedChunk);
