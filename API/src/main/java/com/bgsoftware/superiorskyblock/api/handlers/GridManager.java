@@ -167,8 +167,18 @@ public interface GridManager {
      * Get the islands world by the environment.
      * If the environment is not the normal and that environment is disabled in config, null will be returned.
      * @param environment The world environment.
+     * @deprecated Unexpected behavior. Check getIslandsWorld(Island, Environment)
      */
+    @Deprecated
     World getIslandsWorld(World.Environment environment);
+
+    /**
+     * Get the world of an island by the environment.
+     * If the environment is not the normal and that environment is disabled in config, null will be returned.
+     * @param environment The world environment.
+     * @param island The island to check.
+     */
+    World getIslandsWorld(Island island, World.Environment environment);
 
     /**
      * Checks if the given world is an islands world.

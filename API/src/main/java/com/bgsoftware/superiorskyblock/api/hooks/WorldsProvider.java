@@ -2,10 +2,11 @@ package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.UUID;
 
-public interface WorldsManager {
+public interface WorldsProvider {
 
     /**
      * Get the location for a new island that is created.
@@ -31,5 +32,18 @@ public interface WorldsManager {
      * @param finishCallback Callback function after the preparation is finished.
      */
     void prepareTeleport(Island island, Runnable finishCallback);
+
+    /**
+     * Get the world of an island by the environment.
+     * @param environment The world environment.
+     * @param island The island to check.
+     */
+    World getIslandsWorld(Island island, World.Environment environment);
+
+    /**
+     * Checks if the given world is an islands world.
+     * @param world The world to check.
+     */
+    boolean isIslandsWorld(World world);
 
 }

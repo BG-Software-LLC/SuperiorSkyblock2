@@ -289,32 +289,17 @@ public final class GridHandler implements GridManager {
 
     @Override
     public World getIslandsWorld(World.Environment environment) {
-        String worldName = "";
+        return getIslandsWorld(null, environment);
+    }
 
-        switch (environment){
-            case NORMAL:
-                worldName = plugin.getSettings().islandWorldName;
-                break;
-            case NETHER:
-                if(plugin.getSettings().netherWorldEnabled)
-                    worldName = plugin.getSettings().netherWorldName;
-                break;
-            case THE_END:
-                if(plugin.getSettings().endWorldEnabled)
-                    worldName = plugin.getSettings().endWorldName;
-                break;
-        }
-
-        return worldName.isEmpty() ? null : Bukkit.getWorld(worldName);
+    @Override
+    public World getIslandsWorld(Island island, World.Environment environment) {
+        return plugin.getProviders().getIslandsWorld(island, environment);
     }
 
     @Override
     public boolean isIslandsWorld(World world) {
-        if(customWorlds.contains(world.getUID()))
-            return true;
-
-        World islandsWorld = getIslandsWorld(world.getEnvironment());
-        return islandsWorld != null && world.getUID().equals(islandsWorld.getUID());
+        return customWorlds.contains(world.getUID()) || plugin.getProviders().isIslandsWorld(world);
     }
 
     @Override

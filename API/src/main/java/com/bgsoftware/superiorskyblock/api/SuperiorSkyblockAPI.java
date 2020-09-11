@@ -130,7 +130,10 @@ public final class SuperiorSkyblockAPI {
      * Get the islands normal world.
      *
      * @return the islands normal world.
+     *
+     * @deprecated See WorldsManager#getIslandsWorld
      */
+    @Deprecated
     public static World getIslandsWorld(){
         return getIslandsWorld(World.Environment.NORMAL);
     }
@@ -140,9 +143,24 @@ public final class SuperiorSkyblockAPI {
      * @param environment The environment.
      *
      * @return the islands world.
+     *
+     * @deprecated Unexpected behavior. Check getIslandsWorld(Island, Environment)
      */
+    @Deprecated
     public static World getIslandsWorld(World.Environment environment){
-        return plugin.getGrid().getIslandsWorld(environment);
+        return getIslandsWorld(null, environment);
+    }
+
+    /**
+     * Get the world of an island by the world's environment.
+     * @param environment The environment.
+     * @param island The island to check.
+     *
+     * @return the islands world.
+     */
+    @Deprecated
+    public static World getIslandsWorld(Island island, World.Environment environment){
+        return plugin.getGrid().getIslandsWorld(island, environment);
     }
 
     /**

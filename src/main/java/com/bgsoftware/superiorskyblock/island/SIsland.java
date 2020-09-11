@@ -597,7 +597,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public Location getCenter(World.Environment environment){
-        World world = plugin.getGrid().getIslandsWorld(environment);
+        World world = plugin.getGrid().getIslandsWorld(this, environment);
 
         Preconditions.checkNotNull(world, "Couldn't find world for environment " + environment + ".");
 

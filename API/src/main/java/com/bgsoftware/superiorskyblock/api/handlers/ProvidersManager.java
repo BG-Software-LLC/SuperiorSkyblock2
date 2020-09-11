@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.WorldsManager;
+import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 
 public interface ProvidersManager {
 
@@ -21,9 +21,9 @@ public interface ProvidersManager {
     void setEconomyProvider(EconomyProvider economyProvider);
 
     /**
-     * Set a custom worlds manager for the plugin.
-     * @param worldsManager The worlds manager to set.
+     * Set a custom worlds provider for the plugin.
+     * @param worldsProvider The worlds provider to set.
      */
-    void setWorldsManager(WorldsManager worldsManager);
+    void setWorldsProvider(WorldsProvider worldsProvider);
 
 }
