@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -81,6 +82,15 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        List<String> list = new ArrayList<>();
+
+        if(args.length == 3){
+            for(Player player : Bukkit.getOnlinePlayers()){
+                if (player.getName().toLowerCase().startsWith(args[2].toLowerCase()))
+                    list.add(player.getName());
+            }
+        }
+
+        return list;
     }
 }
