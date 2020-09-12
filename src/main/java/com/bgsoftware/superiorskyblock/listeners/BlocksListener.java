@@ -563,7 +563,7 @@ public final class BlocksListener implements Listener {
                 return true;
             }
 
-            String warpName = lines[1];
+            String warpName = StringUtils.stripColors(lines[1]);
             boolean privateFlag = lines[2].equalsIgnoreCase("private");
 
             if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
