@@ -1687,6 +1687,8 @@ public final class SIsland extends DatabaseObject implements Island {
     private void addCounts(KeyMap<Integer> blockCounts, UpgradeKeyMap blockLimits, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
+        SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
+
         int currentAmount = blockCounts.getRaw(valueKey, 0);
         blockCounts.put(valueKey, currentAmount + amount);
 
@@ -1696,6 +1698,7 @@ public final class SIsland extends DatabaseObject implements Island {
             boolean limitCount = false;
 
             if (!limitKey.equals(valueKey)) {
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount);
                 currentAmount = blockCounts.getRaw(limitKey, 0);
                 blockCounts.put(limitKey, currentAmount + amount);
                 limitCount = true;
@@ -1704,6 +1707,7 @@ public final class SIsland extends DatabaseObject implements Island {
             if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
                     (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                             plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount);
                 currentAmount = blockCounts.getRaw(globalKey, 0);
                 blockCounts.put(globalKey, currentAmount + amount);
             }
@@ -1791,6 +1795,7 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     private void removeCounts(KeyMap<Integer> blockCounts, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+        SuperiorSkyblockPlugin.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
         int currentAmount = blockCounts.getRaw(key, 0);
         if(currentAmount <= amount)
             blockCounts.remove(key);
