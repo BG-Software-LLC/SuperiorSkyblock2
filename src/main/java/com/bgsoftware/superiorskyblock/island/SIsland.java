@@ -1981,6 +1981,8 @@ public final class SIsland extends DatabaseObject implements Island {
     public void setUpgradeLevel(Upgrade upgrade, int level) {
         SuperiorSkyblockPlugin.debug("Action: Set Upgrade, Island: " + owner.getName() + ", Upgrade: " + upgrade.getName() + ", Level: " + level);
 
+        int currentLevel = getUpgradeLevel(upgrade).getLevel();
+
         upgrades.add(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
         Query.ISLAND_SET_UPGRADES.getStatementHolder(this)
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
@@ -1989,7 +1991,14 @@ public final class SIsland extends DatabaseObject implements Island {
 
         UpgradeLevel upgradeLevel = getUpgradeLevel(upgrade);
 
-        syncUpgrade(upgradeLevel);
+        // Level was downgraded, we need to clear the values of that level and sync all upgrades again
+        if(currentLevel > level){
+            clearUpgrades();
+            syncUpgrades();
+        }
+        else {
+            syncUpgrade(upgradeLevel);
+        }
 
         if(upgradeLevel.getBorderSize() != -1)
             updateBorder();
@@ -3064,6 +3073,20 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(getMobDropsMultiplier() == plugin.getSettings().defaultMobDrops)
             mobDrops.set(-1D);
+    }
+
+    private void clearUpgrades(){
+        cropGrowth.clearUpgrade();
+        spawnerRates.clearUpgrade();
+        mobDrops.clearUpgrade();
+        blockLimits.clearUpgrades();
+        entityLimits.clearUpgrades();
+        teamLimit.clearUpgrade();
+        warpsLimit.clearUpgrade();
+        coopLimit.clearUpgrade();
+        islandSize.clearUpgrade();
+        cobbleGeneratorValues.clearUpgrades();
+        islandEffects.clearUpgrades();
     }
 
     private void syncUpgrade(UpgradeLevel upgradeLevel){

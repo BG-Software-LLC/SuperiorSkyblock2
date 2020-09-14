@@ -29,6 +29,10 @@ public final class UpgradeValue<T> {
         return value.get().getKey();
     }
 
+    public T getUpgradeValue(){
+        return value.get().getValue();
+    }
+
     public void set(T value){
         this.value.write(pair -> pair.setKey(value));
     }
