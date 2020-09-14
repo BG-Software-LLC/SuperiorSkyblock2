@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -31,13 +32,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Set<Pair<String, String>> requirements;
     private final double cropGrowth, spawnerRates, mobDrops;
     private final int teamLimit, warpsLimit, coopLimit, borderSize;
-    private final KeyMap<Integer> blockLimits, generatorRates;
-    private final Map<EntityType, Integer> entityLimits;
+    private final KeyMap<Integer> blockLimits, entityLimits, generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, Map<EntityType, Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, KeyMap<Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -121,11 +121,24 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return entityLimits.getOrDefault(entityType, SIsland.NO_LIMIT);
+        return getEntityLimit(Key.of(entityType));
+    }
+
+    @Override
+    public int getEntityLimit(Key key) {
+        return entityLimits.getOrDefault(key, SIsland.NO_LIMIT);
     }
 
     @Override
     public Map<EntityType, Integer> getEntityLimits() {
+        return getEntityLimitsAsKeys().entrySet().stream().collect(Collectors.toMap(
+                entry -> EntityUtils.getEntityTypeOrUnknown(entry.getKey()),
+                Map.Entry::getValue
+        ));
+    }
+
+    @Override
+    public Map<Key, Integer> getEntityLimitsAsKeys() {
         return entityLimits;
     }
 

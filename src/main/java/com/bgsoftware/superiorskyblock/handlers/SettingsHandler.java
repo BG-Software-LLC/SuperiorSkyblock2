@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,7 +36,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final String islandCommand;
     public final int defaultIslandSize;
     public final KeyMap<Integer> defaultBlockLimits;
-    public final Map<EntityType, Integer> defaultEntityLimits;
+    public final KeyMap<Integer> defaultEntityLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
@@ -180,12 +179,12 @@ public final class SettingsHandler extends AbstractHandler {
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
         }
-        defaultEntityLimits = new HashMap<>();
+        defaultEntityLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.entity-limits")){
             String[] sections = line.split(":");
-            try {
-                defaultEntityLimits.put(EntityType.valueOf(sections[0]), Integer.parseInt(sections[1]));
-            }catch(Exception ignored){}
+            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
+            String limit = sections.length == 2 ? sections[1] : sections[2];
+            defaultEntityLimits.put(Key.of(key), Integer.parseInt(limit));
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);

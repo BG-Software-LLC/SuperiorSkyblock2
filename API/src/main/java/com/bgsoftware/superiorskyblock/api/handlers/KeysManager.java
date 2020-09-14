@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,6 +24,8 @@ public interface KeysManager {
     Key getSpawnerKey(ItemStack itemStack);
 
     Key getKey(EntityType entityType);
+
+    Key getKey(Entity entity);
 
     Key getKey(Block block);
 

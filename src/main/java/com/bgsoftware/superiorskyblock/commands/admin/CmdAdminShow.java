@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
@@ -147,8 +146,8 @@ public final class CmdAdminShow implements ISuperiorCommand {
 
         if(!Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.isEmpty(locale)){
             StringBuilder entitiesString = new StringBuilder();
-            for(Map.Entry<EntityType, Integer> entry : island.getEntitiesLimits().entrySet()){
-                entitiesString.append(Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().name()), entry.getValue())).append("\n");
+            for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getEntitiesLimitsAsKeys().entrySet()){
+                entitiesString.append(Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue())).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_ENTITIES_LIMITS.getMessage(locale, entitiesString));
         }

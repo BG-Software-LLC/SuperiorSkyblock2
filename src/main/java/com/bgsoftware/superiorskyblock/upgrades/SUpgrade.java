@@ -13,7 +13,7 @@ public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
             new HashSet<>(), -1, -1, -1, -1, -1, -1, -1,
-            new KeyMap<>(), new HashMap<>(), new KeyMap<>(), new HashMap<>());
+            new KeyMap<>(), new KeyMap<>(), new KeyMap<>(), new HashMap<>());
 
     private final String name;
 

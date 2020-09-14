@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -1025,9 +1026,23 @@ public interface Island extends Comparable<Island> {
     int getEntityLimit(EntityType entityType);
 
     /**
+     * Get the entity limit of an entity.
+     * @param key The key of the entity to check.
+     */
+    int getEntityLimit(Key key);
+
+    /**
+     * Get all the entities limits for the island.
+     *
+     * @deprecated Check getEntitiesLimitsAsKeys()
+     */
+    @Deprecated
+    Map<EntityType, Integer> getEntitiesLimits();
+
+    /**
      * Get all the entities limits for the island.
      */
-    Map<EntityType, Integer> getEntitiesLimits();
+    Map<Key, Integer> getEntitiesLimitsAsKeys();
 
     /**
      * Clear all the entities limits from the island.
@@ -1042,6 +1057,13 @@ public interface Island extends Comparable<Island> {
     void setEntityLimit(EntityType entityType, int limit);
 
     /**
+     * Set the entity limit of an entity.
+     * @param key The key of the entity to set the limit to.
+     * @param limit The limit to set.
+     */
+    void setEntityLimit(Key key, int limit);
+
+    /**
      * A method to check if a specific entity has reached the limit.
      * @param entityType The entity's type to check.
      */
@@ -1049,10 +1071,23 @@ public interface Island extends Comparable<Island> {
 
     /**
      * A method to check if a specific entity has reached the limit.
+     * @param key The key of the entity to check.
+     */
+    CompletableFuture<Boolean> hasReachedEntityLimit(Key key);
+
+    /**
+     * A method to check if a specific entity has reached the limit.
      * @param amount The amount of entities that were added.
      * @param entityType The entity's type to check.
      */
     CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount);
+
+    /**
+     * A method to check if a specific entity has reached the limit.
+     * @param amount The amount of entities that were added.
+     * @param key The key of the entity to check.
+     */
+    CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount);
 
     /**
      * Get the team limit of the island.

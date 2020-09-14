@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,6 +29,14 @@ public interface Key extends Comparable<Key> {
      */
     static Key of(EntityType entityType){
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(entityType);
+    }
+
+    /**
+     * Get the key of an entity.
+     * @param entity The entity to check.
+     */
+    static Key of(Entity entity){
+        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(entity);
     }
 
     /**

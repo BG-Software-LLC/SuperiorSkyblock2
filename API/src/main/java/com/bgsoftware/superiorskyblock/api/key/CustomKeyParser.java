@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 public interface CustomKeyParser {
@@ -10,7 +11,18 @@ public interface CustomKeyParser {
      * Please note: this method should support async calls.
      * @param location The location of the block.
      */
-    Key getCustomKey(Location location);
+    default Key getCustomKey(Location location){
+        return null;
+    }
+
+    /**
+     * Get a custom key for an entity.
+     * Please note: this method should support async calls.
+     * @param entity The entity to check.
+     */
+    default Key getCustomKey(Entity entity){
+        return null;
+    }
 
     /**
      * Get a custom key for an item-stack.

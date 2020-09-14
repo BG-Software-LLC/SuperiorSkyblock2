@@ -25,7 +25,6 @@ import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
@@ -131,14 +130,14 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeEntityLimits(String entities, UpgradeMap<EntityType> entityLimits){
+    public static void deserializeEntityLimits(String entities, UpgradeKeyMap entityLimits){
         if(entities == null)
             return;
 
         for(String limit : entities.split(",")){
             try {
                 String[] sections = limit.split("=");
-                entityLimits.set(EntityType.valueOf(sections[0]), Integer.parseInt(sections[1]));
+                entityLimits.set(Key.of(sections[0]), Integer.parseInt(sections[1]));
             }catch(Exception ignored){}
         }
     }

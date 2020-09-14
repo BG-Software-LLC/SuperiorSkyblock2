@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,10 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
         return of(entityType.name());
     }
 
+    public static Key of(Entity entity){
+        return of(of(entity.getType().name()), entity);
+    }
+
     public static Key of(Block block){
         return of(block.getState());
     }
@@ -105,6 +110,10 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
 
     public static Key of(Key key, ItemStack itemStack){
         return plugin.getBlockValues().convertKey(key, itemStack);
+    }
+
+    public static Key of(Key key, Entity entity){
+        return plugin.getBlockValues().convertKey(key, entity);
     }
 
 }

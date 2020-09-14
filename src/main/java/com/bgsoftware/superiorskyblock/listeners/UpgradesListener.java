@@ -268,12 +268,10 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        EntityType entityType = e.getEntityType();
-
-        if(!EntityUtils.canHaveLimit(entityType))
+        if(!EntityUtils.canHaveLimit(e.getEntityType()))
             return;
 
-        island.hasReachedEntityLimit(entityType).whenComplete((result, ex) -> {
+        island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
             if(result)
                 e.getEntity().remove();
         });
@@ -310,14 +308,13 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        EntityType entityType = EntityUtils.getLimitEntityType(e.getVehicle().getType());
         //noinspection UnstableApiUsage
         UUID placedVehicle = vehiclesOwners.asMap().get(LocationUtils.getBlockLocation(e.getVehicle().getLocation()));
 
-        if(!EntityUtils.canHaveLimit(entityType))
+        if(!EntityUtils.canHaveLimit(e.getVehicle().getType()))
             return;
 
-        island.hasReachedEntityLimit(entityType).whenComplete((result, ex) -> {
+        island.hasReachedEntityLimit(Key.of(e.getVehicle())).whenComplete((result, ex) -> {
             if(result) {
                 e.getVehicle().remove();
                 if(placedVehicle != null)

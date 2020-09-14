@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,6 +45,11 @@ public final class KeysHandler extends AbstractHandler implements KeysManager {
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(EntityType entityType) {
         return Key.of(entityType).markAPIKey();
+    }
+
+    @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Entity entity) {
+        return Key.of(entity).markAPIKey();
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
@@ -85,16 +86,7 @@ public final class CmdAdminSetEntityLimit implements ISuperiorCommand {
             islands.add(island);
         }
 
-        EntityType entityType;
-
-        try {
-            entityType = EntityType.valueOf(args[3].toUpperCase());
-            if(!EntityUtils.canHaveLimit(entityType))
-                throw new IllegalArgumentException();
-        }catch(IllegalArgumentException ex){
-            Locale.INVALID_ENTITY.send(sender, args[4]);
-            return;
-        }
+        Key entityKey = Key.of(args[3].toUpperCase());
 
         int limit;
 
@@ -105,14 +97,14 @@ public final class CmdAdminSetEntityLimit implements ISuperiorCommand {
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setEntityLimit(entityType, limit)));
+        Executor.data(() -> islands.forEach(island -> island.setEntityLimit(entityKey, limit)));
 
         if(islands.size() > 1)
-            Locale.CHANGED_ENTITY_LIMIT_ALL.send(sender, StringUtils.format(entityType.name()));
+            Locale.CHANGED_ENTITY_LIMIT_ALL.send(sender, StringUtils.format(entityKey.getGlobalKey()));
         else if(targetPlayer == null)
-            Locale.CHANGED_ENTITY_LIMIT_NAME.send(sender, StringUtils.format(entityType.name()), islands.get(0).getName());
+            Locale.CHANGED_ENTITY_LIMIT_NAME.send(sender, StringUtils.format(entityKey.getGlobalKey()), islands.get(0).getName());
         else
-            Locale.CHANGED_ENTITY_LIMIT.send(sender, StringUtils.format(entityType.name()), targetPlayer.getName());
+            Locale.CHANGED_ENTITY_LIMIT.send(sender, StringUtils.format(entityKey.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

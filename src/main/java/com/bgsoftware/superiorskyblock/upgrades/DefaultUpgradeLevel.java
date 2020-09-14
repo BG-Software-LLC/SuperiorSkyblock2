@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.upgrades;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import org.bukkit.entity.EntityType;
 
@@ -19,7 +20,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
 
     private DefaultUpgradeLevel(){
         super(-1, 0, new ArrayList<>(), "", new HashSet<>(), 0D, 0D, 0D,
-                0, 0, 0, 0, new KeyMap<>(), new HashMap<>(), new KeyMap<>(),
+                0, 0, 0, 0, new KeyMap<>(), new KeyMap<>(), new KeyMap<>(),
                 new HashMap<>());
     }
 
@@ -55,11 +56,24 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return plugin.getSettings().defaultEntityLimits.getOrDefault(entityType, SIsland.NO_LIMIT);
+        return getEntityLimit(Key.of(entityType));
+    }
+
+    @Override
+    public int getEntityLimit(Key key) {
+        return plugin.getSettings().defaultEntityLimits.getOrDefault(key, SIsland.NO_LIMIT);
     }
 
     @Override
     public Map<EntityType, Integer> getEntityLimits() {
+        return getEntityLimitsAsKeys().entrySet().stream().collect(Collectors.toMap(
+                entry -> EntityUtils.getEntityTypeOrUnknown(entry.getKey()),
+                Map.Entry::getValue
+        ));
+    }
+
+    @Override
+    public Map<Key, Integer> getEntityLimitsAsKeys() {
         return plugin.getSettings().defaultEntityLimits;
     }
 

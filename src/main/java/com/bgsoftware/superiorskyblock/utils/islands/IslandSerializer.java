@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
@@ -88,14 +87,14 @@ public final class IslandSerializer {
         return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
     }
 
-    public static String serializeEntityLimits(UpgradeMap<EntityType> entities){
+    public static String serializeEntityLimits(UpgradeKeyMap entities){
         return entities.readAndGet(IslandSerializer::serializeEntityLimits);
     }
 
-    public static String serializeEntityLimits(Map<EntityType, Pair<Integer, Integer>> entities){
+    public static String serializeEntityLimits(KeyMap<Pair<Integer, Integer>> entities){
         StringBuilder entityLimits = new StringBuilder();
-        entities.forEach((entityType, pair) ->
-                entityLimits.append(",").append(entityType).append("=").append(pair.getKey()));
+        entities.forEach((entityKey, pair) ->
+                entityLimits.append(",").append(entityKey).append("=").append(pair.getKey()));
         return entityLimits.length() == 0 ? "" : entityLimits.toString().substring(1);
     }
 

@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
@@ -904,8 +905,18 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public int getEntityLimit(Key key) {
+        return SIsland.NO_LIMIT;
+    }
+
+    @Override
     public Map<EntityType, Integer> getEntitiesLimits() {
         return new HashMap<>();
+    }
+
+    @Override
+    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
+        return new KeyMap<>();
     }
 
     @Override
@@ -919,12 +930,27 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setEntityLimit(Key key, int limit) {
+
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         return hasReachedEntityLimit(entityType, 1);
     }
 
     @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key) {
+        return hasReachedEntityLimit(key, 1);
+    }
+
+    @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+        return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
         return CompletableFuture.completedFuture(false);
     }
 

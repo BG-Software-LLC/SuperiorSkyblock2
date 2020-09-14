@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
@@ -69,13 +68,10 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                     for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
                         blockLimits.put(block, levelSection.getInt("block-limits." + block));
                 }
-                Map<EntityType, Integer> entityLimits = new HashMap<>();
+                KeyMap<Integer> entityLimits = new KeyMap<>();
                 if(levelSection.contains("entity-limits")){
-                    for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false)) {
-                        try {
-                            entityLimits.put(EntityType.valueOf(entity.toUpperCase()), levelSection.getInt("entity-limits." + entity));
-                        }catch(IllegalArgumentException ignored){}
-                    }
+                    for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
+                        entityLimits.put(entity.toUpperCase(), levelSection.getInt("entity-limits." + entity));
                 }
                 KeyMap<Integer> generatorRates = new KeyMap<>();
                 if(levelSection.contains("generator-rates")){

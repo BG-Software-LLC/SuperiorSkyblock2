@@ -77,9 +77,23 @@ public interface UpgradeLevel {
     int getEntityLimit(EntityType entityType);
 
     /**
+     * Get the limit of an entity for this level.
+     * @param key The key of the entity to check.
+     */
+    int getEntityLimit(Key key);
+
+    /**
+     * Get all the entity limits for this level.
+     *
+     * @deprecated Check getEntityLimitsAsKeys()
+     */
+    @Deprecated
+    Map<EntityType, Integer> getEntityLimits();
+
+    /**
      * Get all the entity limits for this level.
      */
-    Map<EntityType, Integer> getEntityLimits();
+    Map<Key, Integer> getEntityLimitsAsKeys();
 
     /**
      * Get the team limit of this level.

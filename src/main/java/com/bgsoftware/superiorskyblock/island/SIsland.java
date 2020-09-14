@@ -174,7 +174,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private final UpgradeKeyMap blockLimits = UpgradeKeyMap.createMap();
     private final UpgradeKeyMap cobbleGeneratorValues = UpgradeKeyMap.createMap();
-    private final UpgradeMap<EntityType> entityLimits = UpgradeMap.createMap();
+    private final UpgradeKeyMap entityLimits = UpgradeKeyMap.createMap();
     private final UpgradeMap<PotionEffectType> islandEffects = UpgradeMap.createMap();
 
     private final UpgradeValue<Integer> islandSize = UpgradeValue.createInteger();
@@ -2167,11 +2167,25 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return this.entityLimits.get(entityType, NO_LIMIT);
+        return getEntityLimit(Key.of(entityType));
     }
 
     @Override
+    public int getEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return this.entityLimits.get(key, NO_LIMIT);
+    }
+
+    @Override
+    @Deprecated
     public Map<EntityType, Integer> getEntitiesLimits() {
+        return getEntitiesLimitsAsKeys().entrySet().stream().collect(Collectors.toMap(
+                entry -> EntityUtils.getEntityTypeOrUnknown(entry.getKey()),
+                Map.Entry::getValue
+        ));
+    }
+
+    @Override
+    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getEntitiesLimitsAsKeys() {
         return this.entityLimits.copy();
     }
 
@@ -2187,8 +2201,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
-        SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + entityType + ", Limit: " + limit);
-        entityLimits.set(entityType, limit);
+        setEntityLimit(Key.of(entityType), limit);
+    }
+
+    @Override
+    public void setEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + key + ", Limit: " + limit);
+        entityLimits.set(key, limit);
         Query.ISLAND_SET_ENTITY_LIMITS.getStatementHolder(this)
                 .setString(IslandSerializer.serializeEntityLimits(entityLimits))
                 .setString(owner.getUniqueId().toString())
@@ -2197,13 +2216,23 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
-        return hasReachedEntityLimit(entityType, 1);
+        return hasReachedEntityLimit(Key.of(entityType));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return hasReachedEntityLimit(key, 1);
     }
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+        return hasReachedEntityLimit(Key.of(entityType), amount);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
         CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
-        int entityLimit = getEntityLimit(entityType);
+        int entityLimit = getEntityLimit(key);
 
         if(entityLimit <= SIsland.NO_LIMIT)
             return CompletableFuture.completedFuture(false);
@@ -2212,10 +2241,10 @@ public final class SIsland extends DatabaseObject implements Island {
 
         for(World.Environment environment : World.Environment.values()){
             try{
-                chunks.addAll(getAllChunksAsync(environment, true, true, chunk -> 
-                    amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())
-                            .filter(entity -> entityType == EntityUtils.getLimitEntityType(entity.getType()) &&
-                                    !EntityUtils.canBypassEntityLimit(entity)).count())));
+                chunks.addAll(getAllChunksAsync(environment, true, true, chunk ->
+                        amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())
+                                .filter(entity -> key.equals(EntityUtils.getLimitEntityType(entity)) &&
+                                        !EntityUtils.canBypassEntityLimit(entity)).count())));
             }catch(Exception ignored){}
         }
 
@@ -3043,9 +3072,9 @@ public final class SIsland extends DatabaseObject implements Island {
                 blockLimits.set(key, -1);
         }
 
-        for(EntityType entityType : entityLimits.keySet()){
-            if(entityLimits.getValue(entityType).equals(plugin.getSettings().defaultEntityLimits.get(entityType)))
-                entityLimits.set(entityType, -1);
+        for(com.bgsoftware.superiorskyblock.api.key.Key key : entityLimits.keySet()){
+            if(entityLimits.getValue(key, -1) == plugin.getSettings().defaultEntityLimits.getOrDefault(key, -2))
+                entityLimits.set(key, -1);
         }
 
         for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues.keySet()){
@@ -3094,7 +3123,7 @@ public final class SIsland extends DatabaseObject implements Island {
         spawnerRates.setUpgrade(upgradeLevel.getSpawnerRates());
         mobDrops.setUpgrade(upgradeLevel.getMobDrops());
         blockLimits.setUpgrade(upgradeLevel.getBlockLimits(), true);
-        entityLimits.setUpgrade(upgradeLevel.getEntityLimits());
+        entityLimits.setUpgrade(upgradeLevel.getEntityLimitsAsKeys(), true);
         teamLimit.setUpgrade(upgradeLevel.getTeamLimit());
         warpsLimit.setUpgrade(upgradeLevel.getWarpsLimit());
         coopLimit.setUpgrade(upgradeLevel.getCoopLimit());

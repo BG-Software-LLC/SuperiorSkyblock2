@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import javax.script.Bindings;
@@ -139,7 +140,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         if(customKeyParser == null)
             return original;
 
-        return (Key) customKeyParser.getCustomKey(location);
+        com.bgsoftware.superiorskyblock.api.key.Key key = customKeyParser.getCustomKey(location);
+
+        return key == null ? original : (Key) key;
     }
 
     public Key convertKey(Key original, ItemStack itemStack){
@@ -149,6 +152,17 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return original;
 
         return (Key) customKeyParser.getCustomKey(itemStack, original);
+    }
+
+    public Key convertKey(Key original, Entity entity){
+        CustomKeyParser customKeyParser = customKeyParsers.get(original);
+
+        if(customKeyParser == null)
+            return original;
+
+        com.bgsoftware.superiorskyblock.api.key.Key key = customKeyParser.getCustomKey(entity);
+
+        return key == null ? original : (Key) key;
     }
 
     public Key convertKey(Key original){
