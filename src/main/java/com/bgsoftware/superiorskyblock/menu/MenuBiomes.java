@@ -167,6 +167,10 @@ public final class MenuBiomes extends SuperiorMenu {
                         menuBiomes.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
                         menuBiomes.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuBiomes.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+
+                        String permission = cfg.getString("permissions." + ch + ".permission");
+                        SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
+                        menuBiomes.addPermission(slot, permission, noAccessSound);
                     }
 
                     slot++;

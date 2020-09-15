@@ -278,6 +278,11 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                         menuTopIslands.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
                         menuTopIslands.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuTopIslands.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+
+                        String permission = cfg.getString("permissions." + ch + ".permission");
+                        SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
+                        menuTopIslands.addPermission(slot, permission, noAccessSound);
+
                         if(cfg.contains("items." + ch + ".sorting-type")) {
                             String sortingType = cfg.getString("items." + ch + ".sorting-type");
                             menuTopIslands.addData(slot + "", sortingType);

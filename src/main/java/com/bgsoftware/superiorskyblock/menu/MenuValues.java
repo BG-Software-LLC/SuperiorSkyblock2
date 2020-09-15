@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +23,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -126,6 +125,10 @@ public final class MenuValues extends SuperiorMenu {
                     menuValues.addFillItem(slot, FileUtils.getItemStack("values.yml", cfg.getConfigurationSection("items." + ch)));
                     menuValues.addCommands(slot, cfg.getStringList("commands." + ch));
                     menuValues.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+
+                    String permission = cfg.getString("permissions." + ch + ".permission");
+                    SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
+                    menuValues.addPermission(slot, permission, noAccessSound);
 
                     slot++;
                 }

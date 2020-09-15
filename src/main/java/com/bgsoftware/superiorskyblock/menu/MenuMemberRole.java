@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -106,6 +107,10 @@ public final class MenuMemberRole extends SuperiorMenu {
                     menuMemberRole.addFillItem(slot, FileUtils.getItemStack("member-role.yml", cfg.getConfigurationSection("items." + ch)));
                     menuMemberRole.addCommands(slot, cfg.getStringList("commands." + ch));
                     menuMemberRole.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+
+                    String permission = cfg.getString("permissions." + ch + ".permission");
+                    SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
+                    menuMemberRole.addPermission(slot, permission, noAccessSound);
 
                     slot++;
                 }

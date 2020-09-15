@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
@@ -81,6 +82,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
             getData().commands.add(slot, commands);
     }
 
+    public void addPermission(int slot, String permission, SoundWrapper noAccessSound) {
+        if(permission != null && !permission.isEmpty())
+            getData().permissions.add(slot, new Pair<>(permission, noAccessSound));
+    }
+
     public void addFillItem(int slot, ItemBuilder itemBuilder){
         if(itemBuilder != null)
             getData().fillItems.add(slot, itemBuilder);
@@ -145,6 +151,15 @@ public abstract class SuperiorMenu implements InventoryHolder {
             List<String> commands = getCommands(e.getRawSlot());
             if (commands != null)
                 commands.forEach(command -> runCommand(command, e, Bukkit.getConsoleSender()));
+
+            Pair<String, SoundWrapper> permission = getPermission(e.getRawSlot());
+            if(permission != null && !superiorPlayer.hasPermission(permission.getKey())){
+                if(permission.getValue() != null)
+                    permission.getValue().playSound(player);
+                
+                return;
+            }
+
         }
 
         if(e.getRawSlot() == getBackSlot()){
@@ -338,6 +353,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
         return getData().commands.get(slot);
     }
 
+    private Pair<String, SoundWrapper> getPermission(int slot){
+        return getData().permissions.get(slot);
+    }
+
     private MenuData getData(){
         if(!dataMap.containsKey(identifier)){
             dataMap.add(identifier, new MenuData());
@@ -407,6 +426,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
         private final Registry<Integer, SoundWrapper> sounds = Registry.createRegistry();
         private final Registry<Integer, List<String>> commands = Registry.createRegistry();
+        private final Registry<Integer, Pair<String, SoundWrapper>> permissions = Registry.createRegistry();
         private final Registry<Integer, ItemBuilder> fillItems = Registry.createRegistry();
         private final Registry<String, Object> data = Registry.createRegistry();
         private String title = "";

@@ -141,9 +141,12 @@ public final class FileUtils {
                     if(itemBuilder != null) {
                         List<String> commands = cfg.getStringList("commands." + ch);
                         SoundWrapper sound = getSound(cfg.getConfigurationSection("sounds." + ch));
+                        String permission = cfg.getString("permissions." + ch + ".permission");
+                        SoundWrapper noAccessSound = getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
 
                         menu.addFillItem(slot, itemBuilder);
                         menu.addCommands(slot, commands);
+                        menu.addPermission(slot, permission, noAccessSound);
                         menu.addSound(slot, sound);
                     }
 

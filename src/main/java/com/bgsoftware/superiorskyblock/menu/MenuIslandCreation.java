@@ -181,9 +181,13 @@ public final class MenuIslandCreation extends SuperiorMenu {
                     }
 
                     else{
-                        menuIslandCreation.addFillItem(slot,  FileUtils.getItemStack("island-creation.yml", cfg.getConfigurationSection("items." + ch)));
+                        menuIslandCreation.addFillItem(slot, FileUtils.getItemStack("island-creation.yml", cfg.getConfigurationSection("items." + ch)));
                         menuIslandCreation.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuIslandCreation.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+
+                        String permission = cfg.getString("permissions." + ch + ".permission");
+                        SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
+                        menuIslandCreation.addPermission(slot, permission, noAccessSound);
                     }
 
                     slot++;

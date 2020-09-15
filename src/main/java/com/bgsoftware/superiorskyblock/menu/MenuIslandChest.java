@@ -97,10 +97,13 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
             List<String> commands = cfg.getStringList("commands." + slotChar);
             SoundWrapper sound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotChar));
+            String permission = cfg.getString("permissions." + slotChar + ".permission");
+            SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + slotChar + ".no-access-sound"));
 
             slots.forEach(i -> {
                 menuIslandChest.addCommands(i, commands);
                 menuIslandChest.addSound(i, sound);
+                menuIslandChest.addPermission(i, permission, noAccessSound);
             });
         }
 

@@ -117,10 +117,13 @@ public final class MenuBorderColor extends SuperiorMenu {
 
                 List<String> commands = cfg.getStringList("commands." + itemChar);
                 SoundWrapper sound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar));
+                String permission = cfg.getString("permissions." + itemChar + ".permission");
+                SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + itemChar + ".no-access-sound"));
 
                 slots.forEach(i -> {
                     menuBorderColor.addCommands(i, commands);
                     menuBorderColor.addSound(i, sound);
+                    menuBorderColor.addPermission(i, permission, noAccessSound);
                     menuBorderColor.addData(i + "-enable-border", enableBorder);
                     menuBorderColor.addData(i + "-disable-border", disableBorder);
                 });
