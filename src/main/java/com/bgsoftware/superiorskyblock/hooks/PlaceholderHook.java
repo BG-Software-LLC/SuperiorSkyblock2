@@ -362,6 +362,10 @@ public abstract class PlaceholderHook {
                         return plugin.getGrid().getTotalLevel().toString();
                     case "total_level_format":
                         return StringUtils.fancyFormat(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale());
+                    case "nether_unlocked":
+                        return island.isNetherEnabled() ? "Yes" : "No";
+                    case "end_unlocked":
+                        return island.isEndEnabled() ? "Yes" : "No";
                 }
 
             }
