@@ -606,6 +606,8 @@ PERMISSION_CHANGED_NAME: '&e&lQuyền Lợi | &7Thay đổi thành công quyền
   {1}.'
 PERMISSION_CHANGED_ALL: '&e&lNâng cấp | &7Thay đổi thành công quyền {0} cho tất cả
   các đảo.'
+PERMISSIONS_RESET_PLAYER: '&e&lIsland | &7Successfully reset all the permissions for {0} to default values!'
+PERMISSIONS_RESET_ROLES: '&e&lIsland | &7Successfully reset all the permissions of the island to default values!'
 PLAYER_ALREADY_BANNED: '&c&lLỗi | &7Người chơi này đã bị cấm.'
 PLAYER_ALREADY_COOP: '&c&lLỗi | &7Người chơi này đã hợp tác.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lLỗi | &7Người chơi này đã có sẵn trong đảo.'

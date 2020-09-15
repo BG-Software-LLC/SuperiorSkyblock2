@@ -524,6 +524,8 @@ PANEL_TOGGLE_ON: |
 PERMISSION_CHANGED: '&e&lIle | &7Permission {0} de l''île de {1} mise à jour.'
 PERMISSION_CHANGED_NAME: '&e&lIle | &7Permission {0} de l''île {1} mise à jour.'
 PERMISSION_CHANGED_ALL: '&e&lIle | &7Permission {0} mise à jour pour toutes les îles.'
+PERMISSIONS_RESET_PLAYER: '&e&lIsland | &7Successfully reset all the permissions for {0} to default values!'
+PERMISSIONS_RESET_ROLES: '&e&lIsland | &7Successfully reset all the permissions of the island to default values!'
 PLAYER_ALREADY_BANNED: '&c&lErreur | &7Ce joueur est déjà banni.'
 PLAYER_ALREADY_COOP: '&c&lErreur | &7Ce joueur est déjà coopérateur.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lErreur | &7Ce joueur est déjà membre d''une île.'

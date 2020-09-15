@@ -96,12 +96,12 @@ public final class CmdPermissions implements ISuperiorCommand {
         else{
             if(permissionHolder instanceof PlayerRole) {
                 island.resetPermissions();
+                Locale.PERMISSIONS_RESET_ROLES.send(sender);
             }
             else {
                 island.resetPermissions((SuperiorPlayer) permissionHolder);
+                Locale.PERMISSIONS_RESET_PLAYER.send(sender, ((SuperiorPlayer) permissionHolder).getName());
             }
-
-            sender.sendMessage("Cool");
         }
 
     }

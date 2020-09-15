@@ -546,6 +546,8 @@ PANEL_TOGGLE_ON: |-
 PERMISSION_CHANGED: '&e&lיא | &7החלצהב {1} לש יאב {0} האשרהה תא תיניש.'
 PERMISSION_CHANGED_NAME: '&e&lיא | &7החלצהב {1} יאב {0} האשרהה תא תיניש.'
 PERMISSION_CHANGED_ALL: '&e&lיא | &7החלצהב םייאה לכב {0} האשרהה תא תיניש.'
+PERMISSIONS_RESET_PLAYER: '&e&lIsland | &7Successfully reset all the permissions for {0} to default values!'
+PERMISSIONS_RESET_ROLES: '&e&lIsland | &7Successfully reset all the permissions of the island to default values!'
 PLAYER_ALREADY_BANNED: '&c&lהאיגש | &7יאהמ קחרומ רבכ הזה ןקחשה.'
 PLAYER_ALREADY_COOP: '&c&lהאיגש | &7יאה לש הלועפ ףתשמ רבכ הזה ןקחשה.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7This player is already inside an island.'
