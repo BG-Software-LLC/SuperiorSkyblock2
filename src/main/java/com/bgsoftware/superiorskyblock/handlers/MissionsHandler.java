@@ -438,7 +438,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         private final List<ItemStack> itemRewards = new ArrayList<>();
         private final List<String> commandRewards = new ArrayList<>();
         private final boolean autoReward, islandMission;
-        public final boolean disbandReset;
+        public final boolean disbandReset, leaveReset;
         public final ItemBuilder notCompleted, canComplete, completed;
         public final int resetAmount;
 
@@ -448,6 +448,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             this.islandMission = section.getBoolean("island", false);
             this.autoReward = section.getBoolean("auto-reward", true);
             this.disbandReset = section.getBoolean("disband-reset", false);
+            this.leaveReset = section.getBoolean("leave-reset", false);
             this.resetAmount = section.getInt("reset-amount", 1);
 
             if(section.contains("rewards.items")){

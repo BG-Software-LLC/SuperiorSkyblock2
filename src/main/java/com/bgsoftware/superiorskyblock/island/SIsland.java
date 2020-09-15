@@ -443,6 +443,11 @@ public final class SIsland extends DatabaseObject implements Island {
             }
         }
 
+        plugin.getMissions().getAllMissions().stream().filter(mission -> {
+            MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
+            return missionData != null && missionData.leaveReset;
+        }).forEach(superiorPlayer::resetMission);
+
         MenuMemberManage.destroyMenus(superiorPlayer);
         MenuMemberRole.destroyMenus(superiorPlayer);
         MenuMembers.refreshMenus();
