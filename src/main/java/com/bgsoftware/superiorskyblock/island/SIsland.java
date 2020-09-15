@@ -87,8 +87,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -964,15 +962,27 @@ public final class SIsland extends DatabaseObject implements Island {
                 getAllPlayersInside().forEach(this::updateIslandFly);
             }
             else if(islandPrivilege == IslandPrivileges.VILLAGER_TRADING){
-                getAllPlayersInside().forEach(superiorPlayer -> {
-                    Inventory openInventory = superiorPlayer.asPlayer().getOpenInventory().getTopInventory();
-                    if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !hasPermission(superiorPlayer, islandPrivilege))
-                        superiorPlayer.asPlayer().closeInventory();
-                });
+                getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
             }
 
             savePermissionNodes();
         }
+    }
+
+    @Override
+    public void resetPermissions() {
+        SuperiorSkyblockPlugin.debug("Action: Reset Permissions, Island: " + owner.getName());
+
+        rolePermissions.clear();
+
+        getAllPlayersInside().forEach(superiorPlayer -> {
+            updateIslandFly(superiorPlayer);
+            IslandUtils.updateTradingMenus(this, superiorPlayer);
+        });
+
+        savePermissionNodes();
+
+        MenuPermissions.refreshMenus();
     }
 
     @Override
@@ -984,13 +994,28 @@ public final class SIsland extends DatabaseObject implements Island {
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
-        if(islandPrivilege == IslandPrivileges.FLY) {
-            updateIslandFly(superiorPlayer);
+        if(superiorPlayer.isOnline()) {
+            if (islandPrivilege == IslandPrivileges.FLY) {
+                updateIslandFly(superiorPlayer);
+            } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
+                IslandUtils.updateTradingMenus(this, superiorPlayer);
+            }
         }
-        else if(islandPrivilege == IslandPrivileges.VILLAGER_TRADING){
-            Inventory openInventory = superiorPlayer.asPlayer().getOpenInventory().getTopInventory();
-            if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !value)
-                superiorPlayer.asPlayer().closeInventory();
+
+        savePermissionNodes();
+
+        MenuPermissions.refreshMenus();
+    }
+
+    @Override
+    public void resetPermissions(SuperiorPlayer superiorPlayer) {
+        SuperiorSkyblockPlugin.debug("Action: Reset Permissions, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
+        playerPermissions.remove(superiorPlayer);
+
+        if(superiorPlayer.isOnline()) {
+            updateIslandFly(superiorPlayer);
+            IslandUtils.updateTradingMenus(this, superiorPlayer);
         }
 
         savePermissionNodes();

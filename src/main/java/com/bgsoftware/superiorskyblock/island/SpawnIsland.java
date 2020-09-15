@@ -482,7 +482,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void resetPermissions() {
+
+    }
+
+    @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
+
+    }
+
+    @Override
+    public void resetPermissions(SuperiorPlayer superiorPlayer) {
 
     }
 

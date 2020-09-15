@@ -11,6 +11,8 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +121,13 @@ public final class IslandUtils {
             player.setFlying(false);
             Locale.ISLAND_FLY_DISABLED.send(player);
         }
+    }
+
+    public static void updateTradingMenus(Island island, SuperiorPlayer superiorPlayer){
+        Player player = superiorPlayer.asPlayer();
+        Inventory openInventory = player.getOpenInventory().getTopInventory();
+        if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING))
+            player.closeInventory();
     }
 
 }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
@@ -30,7 +31,7 @@ public final class CmdPermissions implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
+        return "permissions [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "] [reset]";
     }
 
     @Override
@@ -45,7 +46,7 @@ public final class CmdPermissions implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -70,7 +71,9 @@ public final class CmdPermissions implements ISuperiorCommand {
 
         Object permissionHolder = SPlayerRole.guestRole();
 
-        if(args.length == 2){
+        boolean setToDefault = (args.length == 2 ? args[1] : args.length == 3 ? args[2] : "").equalsIgnoreCase("reset");
+
+        if((!setToDefault && args.length == 2) || args.length == 3){
             SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
 
             if(targetPlayer == null){
@@ -86,7 +89,21 @@ public final class CmdPermissions implements ISuperiorCommand {
             permissionHolder = targetPlayer;
         }
 
-        MenuPermissions.openInventory(superiorPlayer, null, island, permissionHolder);
+        if(!setToDefault){
+            MenuPermissions.openInventory(superiorPlayer, null, island, permissionHolder);
+        }
+
+        else{
+            if(permissionHolder instanceof PlayerRole) {
+                island.resetPermissions();
+            }
+            else {
+                island.resetPermissions((SuperiorPlayer) permissionHolder);
+            }
+
+            sender.sendMessage("Cool");
+        }
+
     }
 
     @Override
@@ -94,12 +111,20 @@ public final class CmdPermissions implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_PERMISSION)){
+        if(island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_PERMISSION)){
             List<String> list = new ArrayList<>();
 
-            for(Player player : Bukkit.getOnlinePlayers()){
-                if(player.getName().toLowerCase().contains(args[1].toLowerCase()))
-                    list.add(player.getName().toLowerCase());
+            if(args.length == 2) {
+                if("reset".contains(args[1].toLowerCase()))
+                    list.add("reset");
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
+                        list.add(player.getName().toLowerCase());
+                }
+            }
+            if(args.length == 3){
+                if("reset".contains(args[2].toLowerCase()))
+                    list.add("reset");
             }
 
             return list;

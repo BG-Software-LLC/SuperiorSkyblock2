@@ -497,12 +497,22 @@ public interface Island extends Comparable<Island> {
     void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value);
 
     /**
+     * Reset the roles permissions to default values.
+     */
+    void resetPermissions();
+
+    /**
      * Set a permission to a specific player.
      * @param superiorPlayer The player to set the permission to.
      * @param islandPrivilege The permission to set.
      * @param value The value to give the permission.
      */
     void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value);
+
+    /**
+     * Reset player permissions to default values.
+     */
+    void resetPermissions(SuperiorPlayer superiorPlayer);
 
     /**
      * Get the permission-node of a role.
