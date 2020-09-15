@@ -145,11 +145,14 @@ island-roles:
     - CLOSE_BYPASS
     - CROPS_GROWTH
     - DROP_ITEMS
+    - ENDER_PEARL
     - EXPEL_BYPASS
     - FARM_TRAMPING
+    - FERTILIZE
     - FISH
     - INTERACT
     - ITEM_FRAME
+    - LEASH
     - MINECART_DAMAGE
     - MINECART_ENTER
     - MINECART_OPEN
@@ -157,8 +160,10 @@ island-roles:
     - MONSTER_DAMAGE
     - PAINTING
     - PICKUP_DROPS
+    - PICKUP_FISH
     - SIGN_INTERACT
     - USE
+    - VILLAGER_TRADING
 
   # The roles ladder for island members.
   # All the island member roles go here.
@@ -177,6 +182,7 @@ island-roles:
       - CHEST_ACCESS
       - DEPOSIT_MONEY
       - FLY
+      - ISLAND_CHEST
       - MONSTER_SPAWN
       - RANKUP
       - SPAWNER_BREAK
