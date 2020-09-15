@@ -42,6 +42,14 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         if(!containsData(settingsName + "-settings-enabled"))
             return;
 
+        String permission = (String) getData(settingsName + "-permission");
+        SoundWrapper noAccessSound = (SoundWrapper) getData(settingsName + "-no-access-sound");
+        if(!permission.isEmpty() && !superiorPlayer.hasPermission(permission)){
+            if(noAccessSound != null)
+                noAccessSound.playSound(superiorPlayer.asPlayer());
+            return;
+        }
+
         if(island.hasSettingsEnabled(islandFlag)){
             island.disableSettings(islandFlag);
         }
@@ -155,6 +163,8 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
                 MenuSettings menuSettings = new MenuSettings(null, null);
                 menuSettings.addData(settings + "-sound", FileUtils.getSound(section.getConfigurationSection("sound")));
                 menuSettings.addData(settings + "-commands", section.getStringList("commands"));
+                menuSettings.addData(settings + "-permission", section.getString("required-permission", ""));
+                menuSettings.addData(settings + "-no-access-sound", FileUtils.getSound(section.getConfigurationSection("no-access-sound")));
                 menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
                 menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
                 if(position >= 0)
