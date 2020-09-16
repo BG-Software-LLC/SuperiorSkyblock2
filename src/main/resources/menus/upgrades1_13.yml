@@ -10,16 +10,14 @@ previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'
-  - '% @ % # % ^ % * %'
-  - '% ~ % ! % + % & %'
+  - '% % @ % # % ^ % %'
+  - '% % % ! % + % % %'
+  - '% % * % ~ % & % %'
   - '$ $ $ $ $ $ $ $ $'
 
 items:
   '$':
-    type: BLUE_STAINED_GLASS_PANE
-    name: '&f'
-  '%':
-    type: LIGHT_BLUE_STAINED_GLASS_PANE
+    type: BLACK_STAINED_GLASS_PANE
     name: '&f'
 
 upgrades:

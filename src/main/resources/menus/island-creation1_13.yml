@@ -9,7 +9,9 @@ title: '&lCreate a new island...'
 previous-menu: true
 
 pattern:
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
   - '# @ # # ^ # # $ #'
+  - '~ ~ ~ ~ ~ ~ ~ ~ ~'
 
 items:
   '@':
@@ -60,6 +62,9 @@ items:
       name: '&eDesert Island &c(Unavailable)'
       lore:
         - '&7Customized island with lots of sand!'
+  '~':
+    type: BLACK_STAINED_GLASS_PANE
+    name: '&f'
 
 sounds:
   '@':

@@ -78,12 +78,8 @@ items:
     name: '{0}Next Page'
   '~':
     type: STAINED_GLASS_PANE
-    data: 11
-    name: '&f '
-  '@':
-    type: STAINED_GLASS_PANE
-    data: 3
-    name: '&f '
+    data: 15
+    name: '&f'
 
 sounds:
   '@':

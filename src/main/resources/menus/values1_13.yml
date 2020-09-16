@@ -9,21 +9,16 @@ title: '{0} &n${1}'
 previous-menu: true
 
 pattern:
+  - '& & & & & & & & &'
   - '% $ A B C D E F %'
-  - '& & G H I J K L &'
-  - '^ ^ ^ ^ ^ ^ ^ ^ ^'
-  - '& * M N O P Q R &'
+  - '% % G H I J K L %'
+  - '% * M N O P Q R %'
   - '% % S T U V W X %'
+  - '& & & & & & & & &'
 
 items:
-  '%':
-    type: LIGHT_BLUE_STAINED_GLASS_PANE
-    name: '&f'
   '&':
-    type: BLUE_STAINED_GLASS_PANE
-    name: '&f'
-  '^':
-    type: CYAN_STAINED_GLASS_PANE
+    type: BLACK_STAINED_GLASS_PANE
     name: '&f'
   '$':
     type: SPAWNER
