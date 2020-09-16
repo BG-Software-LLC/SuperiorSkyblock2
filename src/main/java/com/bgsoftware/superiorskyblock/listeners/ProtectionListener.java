@@ -31,6 +31,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -526,9 +527,9 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        IslandPrivilege islandPermission = e.getEntity() instanceof Monster ? IslandPrivileges.MONSTER_DAMAGE :
-                e.getEntity() instanceof Creature || e.getEntity() instanceof Ambient ? IslandPrivileges.ANIMAL_DAMAGE :
-                        IslandPrivileges.BREAK;
+        IslandPrivilege islandPermission = e.getEntity() instanceof Monster || e.getEntity() instanceof Slime ?
+                IslandPrivileges.MONSTER_DAMAGE : e.getEntity() instanceof Creature || e.getEntity() instanceof Ambient ?
+                IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.BREAK;
 
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
