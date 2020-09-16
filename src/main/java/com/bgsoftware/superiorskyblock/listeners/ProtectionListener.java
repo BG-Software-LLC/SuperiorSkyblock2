@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,6 +26,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Monster;
@@ -45,9 +47,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -67,10 +69,17 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
+
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
+
+    private static final String PLAYER_DROP_KEY = "player-drop";
 
     public static ProtectionListener IMP;
     private final SuperiorSkyblockPlugin plugin;
@@ -498,11 +507,24 @@ public final class ProtectionListener implements Listener {
     public void onPlayerItemPickup(PlayerPickupItemEvent e){
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
+        UUID droppedPlayer = getPlayerWhoDropped(e.getItem());
 
-        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
+        if(island != null && !superiorPlayer.getUniqueId().equals(droppedPlayer) &&
+                !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onItemDespawn(ItemDespawnEvent e){
+        e.getEntity().removeMetadata(PLAYER_DROP_KEY, plugin);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onItemDrop(PlayerDropItemEvent e){
+        e.getItemDrop().setMetadata(PLAYER_DROP_KEY, new FixedMetadataValue(plugin, e.getPlayer().getUniqueId()));
+        Bukkit.broadcastMessage("Drop Event!");
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -749,6 +771,11 @@ public final class ProtectionListener implements Listener {
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
 
+    }
+
+    private static UUID getPlayerWhoDropped(Item item){
+        List<MetadataValue> playerDropValues = item.getMetadata(PLAYER_DROP_KEY);
+        return playerDropValues.size() >= 1 ? (UUID) playerDropValues.get(0).value() : null;
     }
 
     private boolean handleBlockPlace(Island island, SuperiorPlayer superiorPlayer, Block block, boolean sendMessages){
