@@ -524,7 +524,6 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onItemDrop(PlayerDropItemEvent e){
         e.getItemDrop().setMetadata(PLAYER_DROP_KEY, new FixedMetadataValue(plugin, e.getPlayer().getUniqueId()));
-        Bukkit.broadcastMessage("Drop Event!");
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
