@@ -82,6 +82,7 @@ public final class CmdUncoop implements ISuperiorCommand {
         }
 
         if(!EventsCaller.callIslandUncoopPlayerEvent(island, superiorPlayer, targetPlayer, IslandUncoopPlayerEvent.UncoopReason.PLAYER))
+            return;
 
         island.removeCoop(targetPlayer);
 
