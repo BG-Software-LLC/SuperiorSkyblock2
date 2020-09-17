@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -15,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.List;
 
-public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
+public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPlayer, Long>> {
 
     private final Island island;
 
@@ -26,15 +28,15 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
 
     @Override
     public Inventory getInventory() {
-        return buildInventory(title -> title.replace("{0}", island.getUniqueVisitors().size() + ""));
+        return buildInventory(title -> title.replace("{0}", island.getUniqueVisitorsWithTimes().size() + ""));
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
+    protected void onPlayerClick(InventoryClickEvent event, Pair<SuperiorPlayer, Long> pair) {
         if (event.getClick().name().contains("RIGHT")) {
-            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "invite " + targetPlayer.getName());
+            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "invite " + pair.getKey().getName());
         } else if (event.getClick().name().contains("LEFT")) {
-            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + targetPlayer.getName());
+            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + pair.getKey().getName());
         }
     }
 
@@ -44,25 +46,26 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<SuperiorPlayer> 
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<SuperiorPlayer, Long> pair) {
         try {
-            Island island = superiorPlayer.getIsland();
+            Island island = pair.getKey().getIsland();
             String islandOwner = island != null ? island.getOwner().getName() : "None";
             String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
             return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", superiorPlayer.getName())
+                    .replaceAll("{0}", pair.getKey().getName())
                     .replaceAll("{1}", islandOwner)
                     .replaceAll("{2}", islandName)
-                    .asSkullOf(superiorPlayer).build(superiorPlayer);
+                    .replaceAll("{3}", StringUtils.formatDate(pair.getValue()))
+                    .asSkullOf(pair.getKey()).build(pair.getKey());
         }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + pair.getKey().getName());
             throw ex;
         }
     }
 
     @Override
-    protected List<SuperiorPlayer> requestObjects() {
-        return island.getUniqueVisitors();
+    protected List<Pair<SuperiorPlayer, Long>> requestObjects() {
+        return island.getUniqueVisitorsWithTimes();
     }
 
     public static void init(){

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
@@ -46,6 +47,21 @@ public final class IslandDeserializer {
             for(String uuid : members.split(",")) {
                 try {
                     membersSet.add(SSuperiorPlayer.of(UUID.fromString(uuid)));
+                }catch(Exception ignored){}
+            }
+        });
+    }
+
+    public static void deserializePlayersWithTimes(String members, SyncedObject<? extends Collection<Pair<SuperiorPlayer, Long>>> membersSetSync){
+        if(members == null)
+            return;
+
+        membersSetSync.write(membersSet -> {
+            for(String member : members.split(",")) {
+                try {
+                    String[] memberSections = member.split(";");
+                    long lastTimeJoined = memberSections.length == 2 ? Long.parseLong(memberSections[1]) : System.currentTimeMillis();
+                    membersSet.add(new Pair<>(SSuperiorPlayer.of(UUID.fromString(memberSections[0])), lastTimeJoined));
                 }catch(Exception ignored){}
             }
         });

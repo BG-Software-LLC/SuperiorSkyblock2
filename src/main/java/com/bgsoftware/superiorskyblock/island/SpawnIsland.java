@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -125,6 +126,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
         return new ArrayList<>();
     }
 

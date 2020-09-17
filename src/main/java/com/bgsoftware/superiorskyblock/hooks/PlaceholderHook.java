@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
@@ -48,6 +49,7 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
+    private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
 
     public static void register(SuperiorSkyblockPlugin plugin){
         PlaceholderHook.plugin = plugin;
@@ -254,6 +256,15 @@ public abstract class PlaceholderHook {
                                 return members.get(index).getName();
                         }
                     }catch(IllegalArgumentException ignored){}
+                }
+
+                else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                    String visitorName = matcher.group(1);
+
+                    Pair<SuperiorPlayer, Long> visitorData = island.getUniqueVisitorsWithTimes().stream().filter(pair -> pair.getKey().getName().equalsIgnoreCase(visitorName))
+                            .findFirst().orElse(null);
+
+                    return visitorData == null ? "Haven't Joined" : StringUtils.formatDate(visitorData.getValue());
                 }
 
                 else switch (subPlaceholder) {

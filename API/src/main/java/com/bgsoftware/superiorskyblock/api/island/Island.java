@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -85,6 +86,11 @@ public interface Island extends Comparable<Island> {
      * Get all the visitors that visited the island until now.
      */
     List<SuperiorPlayer> getUniqueVisitors();
+
+    /**
+     * Get all the visitors that visited the island until now, with the time they last visited.
+     */
+    List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes();
 
     /**
      * Invite a player to the island.

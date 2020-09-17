@@ -27,6 +27,7 @@ items:
     name: '&e{0}'
     lore:
       - '&7Island Owner: {1}'
+      - '&7Last Time Joined: {3}'
   '%':
     type: PAPER
     name: '{0}Previous Page'

@@ -43,6 +43,16 @@ public final class IslandSerializer {
         return builder.toString();
     }
 
+    public static String serializePlayersWithTimes(SyncedObject<? extends Collection<Pair<SuperiorPlayer, Long>>> collection) {
+        return collection.readAndGet(IslandSerializer::serializePlayersWithTimes);
+    }
+
+    public static String serializePlayersWithTimes(Collection<Pair<SuperiorPlayer, Long>> collection) {
+        StringBuilder builder = new StringBuilder();
+        collection.forEach(pair -> builder.append(",").append(pair.getKey().getUniqueId().toString()).append(";").append(pair.getValue()));
+        return builder.toString();
+    }
+
     public static String serializePermissions(Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> playerRoles){
         StringBuilder permissionNodes = new StringBuilder();
         playerPermissions.entries().forEach(entry ->

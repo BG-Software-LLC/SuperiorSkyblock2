@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.util.Comparator;
@@ -49,5 +50,8 @@ public final class SortingComparators {
         int compare = Integer.compare(o2.getPlayerRole().getWeight(), o1.getPlayerRole().getWeight());
         return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
+
+    public final static Comparator<Pair<SuperiorPlayer, Long>> PAIRED_PLAYERS_NAMES_COMPARATOR =
+            Comparator.comparing(o -> o.getKey().getName());
 
 }

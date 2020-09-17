@@ -133,7 +133,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> uniqueVisitors = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final SyncedObject<UniquePriorityQueue<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
     private final SyncedObject<Set<SuperiorPlayer>> banned = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> coop = SyncedObject.of(new HashSet<>());
     private final SyncedObject<Set<SuperiorPlayer>> invitedPlayers = SyncedObject.of(new HashSet<>());
@@ -200,10 +200,13 @@ public final class SIsland extends DatabaseObject implements Island {
         IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
         IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
         IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
-        IslandDeserializer.deserializePlayers(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
+        IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
         IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
         IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
+
+        if(!resultSet.getString("uniqueVisitors").contains(";"))
+            saveUniqueVisitors();
 
         this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
@@ -380,6 +383,11 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
+        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(Pair::getKey).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
         return uniqueVisitors.readAndGet(ArrayList::new);
     }
 
@@ -565,19 +573,20 @@ public final class SIsland extends DatabaseObject implements Island {
             SuperiorSkyblockPlugin.debug("Action: Left Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         }
 
-        if(inside && !isMember(superiorPlayer)){
-            boolean newVisitor = uniqueVisitors.writeAndGet(uniqueVisitors ->
-                    !plugin.getProviders().isVanished(superiorPlayer.asPlayer()) &&
-                            !uniqueVisitors.contains(superiorPlayer) && uniqueVisitors.add(superiorPlayer));
+        if(!isMember(superiorPlayer) && !plugin.getProviders().isVanished(superiorPlayer.asPlayer())){
+            Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
+                    uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
 
-            if(newVisitor){
-                Query.ISLAND_SET_VISITORS.getStatementHolder(this)
-                        .setString(IslandSerializer.serializePlayers(uniqueVisitors))
-                        .setString(owner.getUniqueId().toString())
-                        .execute(true);
-
-                MenuUniqueVisitors.refreshMenus();
+            if(playerPairOptional.isPresent()){
+                playerPairOptional.get().setValue(System.currentTimeMillis());
             }
+            else{
+                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, System.currentTimeMillis())));
+            }
+
+            MenuUniqueVisitors.refreshMenus();
+
+            saveUniqueVisitors();
         }
 
         updateLastTime();
@@ -2918,7 +2927,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
                 .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
-                .setString(IslandSerializer.serializePlayers(uniqueVisitors))
+                .setString(IslandSerializer.serializePlayersWithTimes(uniqueVisitors))
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
@@ -2978,7 +2987,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeGenerator(cobbleGeneratorValues))
                 .setString(generatedSchematics.get() + "")
                 .setString(schemName.get())
-                .setString(IslandSerializer.serializePlayers(uniqueVisitors))
+                .setString(IslandSerializer.serializePlayersWithTimes(uniqueVisitors))
                 .setString(unlockedWorlds.get() + "")
                 .setLong(lastTimeUpdate.get())
                 .setString(ChunksTracker.serialize(this))
@@ -3170,6 +3179,13 @@ public final class SIsland extends DatabaseObject implements Island {
 
         if(callback != null)
             callback.run();
+    }
+
+    private void saveUniqueVisitors(){
+        Query.ISLAND_SET_VISITORS.getStatementHolder(this)
+                .setString(IslandSerializer.serializePlayersWithTimes(uniqueVisitors))
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
     }
 
     public static class WarpData{

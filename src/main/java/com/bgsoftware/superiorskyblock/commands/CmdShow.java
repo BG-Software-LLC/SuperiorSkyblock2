@@ -120,7 +120,7 @@ public final class CmdShow implements ISuperiorCommand {
         if(!Locale.ISLAND_INFO_PAYPAL.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.PAYPAL_SHOW))
             infoMessage.append(Locale.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
         if(!Locale.ISLAND_INFO_VISITORS_COUNT.isEmpty(locale))
-            infoMessage.append(Locale.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitors().size())).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_VISITORS_COUNT.getMessage(locale, island.getUniqueVisitorsWithTimes().size())).append("\n");
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
