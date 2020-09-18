@@ -493,7 +493,9 @@ MISSION_NO_AUTO_REWARD: '&e&lתומישמ | &7התוא םילשהל תנמ לע 
 MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&c&lהאיגש | &7וזה המישמה תא םילשמ התאש ינפל
   {0} המישמה תא םילשהל בייח התא.'
 MISSION_STATUS_COMPLETE: '&e&lתומישמ | &7{1} ןקחשל העצובל התנוש {0} המישמה לש סוטטסה.'
+MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&lתומישמ | &7{1} ןקחשל הלחתוא {0} המישמה לש סוטטסה.'
+MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
 NAME_ANNOUNCEMENT: '&e&lיא | &7{1} ל ולש יאה םש תא הניש {0}.'
 NAME_BLACKLISTED: '&c&lהאיגש | &7הזה םשב שמתשהל לוכי אל התא.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

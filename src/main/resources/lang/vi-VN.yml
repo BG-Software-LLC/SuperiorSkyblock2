@@ -536,7 +536,9 @@ MISSION_NO_AUTO_REWARD: '&e&lNhiệm vụ | &7Bạn đã có tất cả các v�
 MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&c&lLỗi | &7Bạn cần hoàn thành {0} trước
   khi hoàn thahf nhiệm vụ này.'
 MISSION_STATUS_COMPLETE: '&e&lNhiệm Vụ | &7Thay đổi trạng thái của nhiệm vụ {0} hoàn thành cho {1}.'
+MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&lNhiệm Vụ | &7Đặt lại trạng thái của nhiệm vụ {0} cho {1}.'
+MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
 NAME_ANNOUNCEMENT: '&e&lNâng cấp | &7{0} đã thay đổi tên đảo của anh/cô ấy thành {1}.'
 NAME_BLACKLISTED: '&c&lLỗi | &7Bạn không thể sử dụng tên này.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

@@ -64,21 +64,36 @@ public final class CmdAdminMission implements ISuperiorCommand {
             return;
         }
 
-        Mission<?> mission = plugin.getMissions().getMission(args[4]);
+        List<Mission<?>> missions = new ArrayList<>();
 
-        if(mission == null){
-            Locale.INVALID_MISSION.send(sender, args[4]);
-            return;
+        if(args[4].equals("*")){
+            missions.addAll(plugin.getMissions().getAllMissions());
+        }
+        else{
+            Mission<?> mission = plugin.getMissions().getMission(args[4]);
+
+            if(mission == null){
+                Locale.INVALID_MISSION.send(sender, args[4]);
+                return;
+            }
+
+            missions.add(mission);
         }
 
         if(args[3].equalsIgnoreCase("complete")){
-            plugin.getMissions().rewardMission(mission, targetPlayer, false, true);
-            Locale.MISSION_STATUS_COMPLETE.send(sender, mission.getName(), targetPlayer.getName());
+            missions.forEach(mission -> plugin.getMissions().rewardMission(mission, targetPlayer, false, true));
+            if(missions.size() == 1)
+                Locale.MISSION_STATUS_COMPLETE.send(sender, missions.get(0).getName(), targetPlayer.getName());
+            else
+                Locale.MISSION_STATUS_COMPLETE_ALL.send(sender, targetPlayer.getName());
             return;
         }
         else if(args[3].equalsIgnoreCase("reset")){
-            targetPlayer.resetMission(mission);
-            Locale.MISSION_STATUS_RESET.send(sender, mission.getName(), targetPlayer.getName());
+            missions.forEach(targetPlayer::resetMission);
+            if(missions.size() == 1)
+                Locale.MISSION_STATUS_RESET.send(sender, missions.get(0).getName(), targetPlayer.getName());
+            else
+                Locale.MISSION_STATUS_RESET_ALL.send(sender, targetPlayer.getName());
             return;
         }
 
@@ -106,7 +121,7 @@ public final class CmdAdminMission implements ISuperiorCommand {
         }
         else if(args.length == 5 && (args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset"))){
             for(Mission<?> mission : plugin.getMissions().getAllMissions()){
-                if (mission.getName().toLowerCase().contains(args[4].toLowerCase()))
+                if (args[4].equals("*") || mission.getName().toLowerCase().contains(args[4].toLowerCase()))
                     list.add(mission.getName());
             }
         }

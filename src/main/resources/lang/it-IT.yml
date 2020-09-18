@@ -553,8 +553,10 @@ MISSION_NOT_COMPLETE_REQUIRED_MISSIONS: '&c&lErrore | &7Devi completare la missi
   {0} prima di completare questa missione.'
 MISSION_STATUS_COMPLETE: '&e&lMission | &7Modificato lo stato della missione {0} da
   completare per {1}.'
+MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&lMission | &7Ripristinato lo stato della missione {0} per
   {1}.'
+MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
 NAME_ANNOUNCEMENT: '&e&lIsola | &7{0} ha cambiato il nome della sua isola in {1}.'
 NAME_BLACKLISTED: '&c&lErrore | &7Non puoi usare quel nome.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
