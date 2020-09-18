@@ -8,6 +8,7 @@ import java.util.Arrays;
 public enum Rating {
 
     UNKNOWN,
+    ZERO_STARS,
     ONE_STAR,
     TWO_STARS,
     THREE_STARS,
@@ -18,7 +19,7 @@ public enum Rating {
      * Get the integer value of the rating.
      */
     public int getValue(){
-        return ordinal();
+        return ordinal() - 1;
     }
 
     /**

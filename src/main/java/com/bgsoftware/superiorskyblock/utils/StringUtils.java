@@ -138,7 +138,7 @@ public final class StringUtils {
             starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if(rating >= 5)
             starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
-        for(int i = 5; i > rating; i--)
+        for(int i = 5; i > rating && i > 0; i--)
             starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage(locale));
 
         return starsString.toString();

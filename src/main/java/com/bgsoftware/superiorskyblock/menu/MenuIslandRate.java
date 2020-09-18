@@ -21,7 +21,7 @@ import java.util.List;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
-    private static List<Integer> oneStarSlot, twoStarsSlot, threeStarsSlot, fourStarsSlot, fiveStarsSlot;
+    private static List<Integer> zeroStarsSlot, oneStarSlot, twoStarsSlot, threeStarsSlot, fourStarsSlot, fiveStarsSlot;
 
     private final Island island;
 
@@ -34,7 +34,9 @@ public final class MenuIslandRate extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         Rating rating = Rating.UNKNOWN;
 
-        if(oneStarSlot.contains(e.getRawSlot()))
+        if(zeroStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.ZERO_STARS;
+        else if(oneStarSlot.contains(e.getRawSlot()))
             rating = Rating.ONE_STAR;
         else if(twoStarsSlot.contains(e.getRawSlot()))
             rating = Rating.TWO_STARS;
@@ -81,6 +83,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
+        zeroStarsSlot = getSlots(cfg, "zero-stars", charSlots);
         oneStarSlot = getSlots(cfg, "one-star", charSlots);
         twoStarsSlot = getSlots(cfg, "two-stars", charSlots);
         threeStarsSlot = getSlots(cfg, "three-stars", charSlots);
