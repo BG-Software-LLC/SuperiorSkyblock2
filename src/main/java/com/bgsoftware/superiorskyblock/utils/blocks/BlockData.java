@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,13 +18,16 @@ public final class BlockData {
 
     private final Location location;
     private final int combinedId;
+    private final byte skyLightLevel, blockLightLevel;
     private final CompoundTag statesTag, tileEntity;
 
     private CompoundTag clonedTileEntity = null;
 
-    public BlockData(Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
+    public BlockData(Location location, int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity){
         this.location = location;
         this.combinedId = combinedId;
+        this.skyLightLevel = skyLightLevel;
+        this.blockLightLevel = blockLightLevel;
         this.statesTag = statesTag;
         this.tileEntity = tileEntity;
     }
@@ -40,8 +44,20 @@ public final class BlockData {
         return location.getBlockZ();
     }
 
+    public World getWorld(){
+        return location.getWorld();
+    }
+
     public int getCombinedId() {
         return combinedId;
+    }
+
+    public byte getSkyLightLevel() {
+        return skyLightLevel;
+    }
+
+    public byte getBlockLightLevel() {
+        return blockLightLevel;
     }
 
     public CompoundTag getStatesTag() {

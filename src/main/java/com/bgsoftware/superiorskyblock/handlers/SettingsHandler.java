@@ -117,6 +117,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final long warpsWarmup;
     public final long homeWarmup;
     public final boolean liquidUpdate;
+    public final boolean lightsUpdate;
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
     public final boolean valuesMenu;
@@ -317,6 +318,7 @@ public final class SettingsHandler extends AbstractHandler {
         warpsWarmup = cfg.getLong("warps-warmup", 0);
         homeWarmup = cfg.getLong("home-warmup", 0);
         liquidUpdate = cfg.getBoolean("liquid-update", false);
+        lightsUpdate = cfg.getBoolean("lights-update", false);
         pvpWorlds = cfg.getStringList("pvp-worlds");
         stopLeaving = cfg.getBoolean("stop-leaving", false);
         valuesMenu = cfg.getBoolean("values-menu", true);

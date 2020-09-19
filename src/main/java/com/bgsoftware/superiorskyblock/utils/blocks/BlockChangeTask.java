@@ -31,10 +31,10 @@ public final class BlockChangeTask {
         this.island = island;
     }
 
-    public void setBlock(Location location, int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
+    public void setBlock(Location location, int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity){
         Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
         blocksCache.computeIfAbsent(ChunkPosition.of(location), pairs -> new ArrayList<>())
-                .add(new BlockData(location, combinedId, statesTag, tileEntity));
+                .add(new BlockData(location, combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity));
     }
 
     public void submitUpdate(Runnable onFinish){
@@ -53,7 +53,6 @@ public final class BlockChangeTask {
                     if(island.isInsideRange(chunk))
                         plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
 
-                    plugin.getNMSBlocks().refreshLight(chunk);
                     ChunksTracker.markDirty(island, chunk, false);
 
                     entry.getValue().forEach(blockData -> blockData.doPrePlace(island));

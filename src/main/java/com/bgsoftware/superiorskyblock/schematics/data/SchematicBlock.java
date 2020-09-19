@@ -6,14 +6,17 @@ import org.bukkit.Location;
 
 public final class SchematicBlock {
 
-    public final static SchematicBlock AIR = of(0, null, null);
+    public final static SchematicBlock AIR = of(0, (byte)0, (byte)0, null, null);
 
     private final int combinedId;
+    private final byte skyLightLevel, blockLightLevel;
     private final CompoundTag statesTag;
     private final CompoundTag tileEntity;
 
-    private SchematicBlock(int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
+    private SchematicBlock(int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity){
         this.combinedId = combinedId;
+        this.skyLightLevel = skyLightLevel;
+        this.blockLightLevel = blockLightLevel;
         this.statesTag = statesTag;
         this.tileEntity = tileEntity;
     }
@@ -27,11 +30,11 @@ public final class SchematicBlock {
     }
 
     public void applyBlock(BlockChangeTask blockChangeTask, Location location){
-        blockChangeTask.setBlock(location, combinedId, statesTag, tileEntity);
+        blockChangeTask.setBlock(location, combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
     }
 
-    public static SchematicBlock of(int combinedId, CompoundTag statesTag, CompoundTag tileEntity){
-        return new SchematicBlock(combinedId, statesTag, tileEntity);
+    public static SchematicBlock of(int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity){
+        return new SchematicBlock(combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
     }
 
 }

@@ -125,11 +125,14 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     continue;
                 }
 
+                byte skyLightLevel = ((ByteTag) compoundValue.getOrDefault("skyLightLevel", new ByteTag((byte)0))).getValue();
+                byte blockLightLevel = ((ByteTag) compoundValue.getOrDefault("blockLightLevel", new ByteTag((byte)0))).getValue();
+
                 parseOldTileEntity((CompoundTag) tag);
 
                 CompoundTag statesTag = (CompoundTag) compoundValue.get("states");
                 CompoundTag tileEntity = (CompoundTag) compoundValue.get("tileEntity");
-                blocks[x][y][z] = SchematicBlock.of(combinedId, statesTag, tileEntity);
+                blocks[x][y][z] = SchematicBlock.of(combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
 
                 readBlock(blocks[x][y][z]);
             }

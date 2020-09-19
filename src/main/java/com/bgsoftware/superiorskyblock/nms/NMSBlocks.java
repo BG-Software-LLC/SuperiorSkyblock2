@@ -28,13 +28,19 @@ public interface NMSBlocks {
         return null;
     }
 
+    default byte[] getLightLevels(Location location){
+        return new byte[0];
+    }
+
+    default void refreshLight(org.bukkit.Chunk bukkitChunk){
+
+    }
+
     CompoundTag readTileEntity(Location location);
 
     String parseSignLine(String original);
 
     void refreshChunk(Chunk chunk);
-
-    void refreshLight(Chunk chunk);
 
     int getCombinedId(Location location);
 

@@ -509,6 +509,10 @@ home-warmup: 0
 # Should liquids get updated when pasting schematics?
 liquid-update: false
 
+# Should lights get updated when pasting schematics?
+# Enabling this can drop performance a bit.
+lights-update: false
+
 # A list of worlds that PvP will be enabled between island members.
 pvp-worlds:
 - 'PvP'

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
@@ -33,17 +34,21 @@ import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkConverter;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_15_R1.ChunkProviderServer;
 import net.minecraft.server.v1_15_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_15_R1.ChunkSection;
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.GameRules;
+import net.minecraft.server.v1_15_R1.HeightMap;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IBlockState;
 import net.minecraft.server.v1_15_R1.IChatBaseComponent;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.ITickable;
+import net.minecraft.server.v1_15_R1.LightEngine;
+import net.minecraft.server.v1_15_R1.LightEngineBlock;
+import net.minecraft.server.v1_15_R1.LightEngineGraph;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
 import net.minecraft.server.v1_15_R1.PacketPlayOutBlockChange;
@@ -95,6 +100,8 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f", "g");
     private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
+
+    private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -155,6 +162,25 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
         for(com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
             setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+
+        if(plugin.getSettings().lightsUpdate) {
+            // Update lights for the blocks.
+            for (com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList) {
+                BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+                if (blockData.getBlockLightLevel() > 0) {
+                    try {
+                        ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
+                    } catch (Exception ignored) {}
+                }
+                if(blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL){
+                    try {
+                        SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
+                                blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
+                    } catch (Exception ignored) { }
+                }
+            }
+        }
+
     }
 
     @Override
@@ -202,18 +228,28 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             return;
         }
 
-        int indexY = blockPosition.getY() >> 4;
+        if(plugin.getSettings().lightsUpdate) {
+            chunk.setType(blockPosition, blockData, true, true);
+        }
+        else {
+            int indexY = blockPosition.getY() >> 4;
 
-        ChunkSection chunkSection = chunk.getSections()[indexY];
+            ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
-            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
+            if (chunkSection == null)
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 
-        chunkSection.setType(blockPosition.getX() & 15, blockPosition.getY() & 15, blockPosition.getZ() & 15, blockData, false);
+            int blockX = blockPosition.getX() & 15;
+            int blockY = blockPosition.getY();
+            int blockZ = blockPosition.getZ() & 15;
 
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) chunk.world.getChunkProvider();
-        chunkProviderServer.getLightEngine().a(blockPosition);
-        chunkProviderServer.flagDirty(blockPosition);
+            chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
+
+            chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING).a(blockX, blockY, blockZ, blockData);
+            chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING_NO_LEAVES).a(blockX, blockY, blockZ, blockData);
+            chunk.heightMap.get(HeightMap.Type.OCEAN_FLOOR).a(blockX, blockY, blockZ, blockData);
+            chunk.heightMap.get(HeightMap.Type.WORLD_SURFACE).a(blockX, blockY, blockZ, blockData);
+        }
 
         if(tileEntity != null) {
             NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
@@ -259,6 +295,16 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
     }
 
     @Override
+    public byte[] getLightLevels(Location location) {
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        LightEngine lightEngine = ((CraftWorld) location.getWorld()).getHandle().e();
+        return new byte[] {
+                location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 : (byte) lightEngine.a(EnumSkyBlock.SKY).b(blockPosition),
+                (byte) lightEngine.a(EnumSkyBlock.BLOCK).b(blockPosition)
+        };
+    }
+
+    @Override
     public CompoundTag readTileEntity(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
@@ -296,11 +342,6 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
                     ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
             }
         });
-    }
-
-    @Override
-    public void refreshLight(org.bukkit.Chunk chunk) {
-
     }
 
     @Override

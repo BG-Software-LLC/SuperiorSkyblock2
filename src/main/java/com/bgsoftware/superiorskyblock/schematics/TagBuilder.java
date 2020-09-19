@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
@@ -41,6 +42,14 @@ public final class TagBuilder {
                 compoundValue.add("data", new IntTag(data));
         }
 
+        return this;
+    }
+
+    public TagBuilder withLightLevels(byte[] lightLevels){
+        if(lightLevels.length > 0 && lightLevels[0] > 0)
+            compoundValue.add("skyLightLevel", new ByteTag(lightLevels[0]));
+        if(lightLevels.length > 1 && lightLevels[1] > 0)
+            compoundValue.add("blockLightLevel", new ByteTag(lightLevels[1]));
         return this;
     }
 

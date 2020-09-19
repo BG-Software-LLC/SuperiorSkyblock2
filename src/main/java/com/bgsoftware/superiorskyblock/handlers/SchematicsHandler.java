@@ -177,6 +177,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
                                 .withBlockPosition(SchematicPosition.of(x, y, z))
                                 .withBlockType(blockLocation, blockType, block.getData())
                                 .withStates(plugin.getNMSBlocks().readBlockStates(blockLocation))
+                                .withLightLevels(plugin.getNMSBlocks().getLightLevels(blockLocation))
                                 .withTileEntity(tileEntity)
                                 .build()
                         );
