@@ -575,7 +575,7 @@ public final class BlocksListener implements Listener {
             else {
                 List<String> signWarp = plugin.getSettings().signWarp;
                 for (int i = 0; i < signWarp.size(); i++)
-                    lines[i] = signWarp.get(i);
+                    lines[i] = signWarp.get(i).replace("{0}", warpName);
                 island.setWarpLocation(warpName, warpLocation, privateFlag);
                 if(message)
                     Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
