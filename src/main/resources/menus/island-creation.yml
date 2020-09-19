@@ -25,6 +25,8 @@ items:
       name: '&eNormal Island &a(Available)'
       lore:
         - '&7Simple island with trees and a mining area!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: SKULL_ITEM
       data: 3
@@ -32,6 +34,8 @@ items:
       name: '&eNormal Island &c(Unavailable)'
       lore:
         - '&7Simple island with trees and a mining area!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '^':
     schematic: 'mycel'
     required-permission: ''
@@ -43,6 +47,8 @@ items:
       name: '&eMycelium Island &a(Available)'
       lore:
         - '&7Customized island with lots of mycelium!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: SKULL_ITEM
       data: 3
@@ -50,6 +56,8 @@ items:
       name: '&eMycelium Island &c(Unavailable)'
       lore:
         - '&7Customized island with lots of mycelium!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '$':
     schematic: 'desert'
     required-permission: ''
@@ -61,6 +69,8 @@ items:
       name: '&eDesert Island &a(Available)'
       lore:
         - '&7Customized island with lots of sand!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: SKULL_ITEM
       data: 3
@@ -68,6 +78,8 @@ items:
       name: '&eDesert Island &c(Unavailable)'
       lore:
         - '&7Customized island with lots of sand!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '~':
     type: STAINED_GLASS_PANE
     data: 15

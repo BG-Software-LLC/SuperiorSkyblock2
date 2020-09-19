@@ -24,12 +24,16 @@ items:
       name: '&eNormal Island &a(Available)'
       lore:
         - '&7Simple island with trees and a mining area!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: PLAYER_HEAD
       skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzk1ZDM3OTkzZTU5NDA4MjY3ODQ3MmJmOWQ4NjgyMzQxM2MyNTBkNDMzMmEyYzdkOGM1MmRlNDk3NmIzNjIifX19'
       name: '&eNormal Island &c(Unavailable)'
       lore:
         - '&7Simple island with trees and a mining area!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '^':
     schematic: 'mycel'
     required-permission: ''
@@ -40,12 +44,16 @@ items:
       name: '&eMycelium Island &a(Available)'
       lore:
         - '&7Customized island with lots of mycelium!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: PLAYER_HEAD
       skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWE0NWQxYjQxN2NiZGRjMjE3NjdiMDYwNDRlODk5YjI2NmJmNzhhNjZlMjE4NzZiZTNjMDUxNWFiNTVkNzEifX19'
       name: '&eMycelium Island &c(Unavailable)'
       lore:
         - '&7Customized island with lots of mycelium!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '$':
     schematic: 'desert'
     required-permission: ''
@@ -56,12 +64,16 @@ items:
       name: '&eDesert Island &a(Available)'
       lore:
         - '&7Customized island with lots of sand!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
     no-access:
       type: PLAYER_HEAD
       skull: 'eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjVkYjMxMjA2N2JlMWQ1YzRmMTQ3OGFmM2NhMmY2Y2Y4MTA0YWI0Y2NiZmY1NzkxN2M4NTc4ZGFhMTUwMDJjMiJ9fX0='
       name: '&eDesert Island &c(Unavailable)'
       lore:
         - '&7Customized island with lots of sand!'
+        - '&7 '
+        - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '~':
     type: BLACK_STAINED_GLASS_PANE
     name: '&f'
