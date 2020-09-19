@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -54,6 +56,26 @@ public interface GridManager {
      * @param superiorPlayer The player to check.
      */
     boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Start the island preview task for a specific player.
+     * @param superiorPlayer The player to start preview for.
+     * @param schemName The schematic to preview.
+     * @param islandName The requested island name by the player.
+     */
+    void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName);
+
+    /**
+     * Cancel the island preview for a specific player.
+     * @param superiorPlayer The player to cancel preview for.
+     */
+    void cancelIslandPreview(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Check if a player has an ongoing island preview task.
+     * @param superiorPlayer The player to check.
+     */
+    IslandPreview getIslandPreview(SuperiorPlayer superiorPlayer);
 
     /**
      * Delete an island.

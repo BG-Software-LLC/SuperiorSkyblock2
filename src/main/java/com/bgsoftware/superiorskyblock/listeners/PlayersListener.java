@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
@@ -30,6 +31,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -531,7 +533,7 @@ public final class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerMoveWhileWarmup(PlayerMoveEvent e){
         Location from = e.getFrom(), to = e.getTo();
 
@@ -551,6 +553,60 @@ public final class PlayersListener implements Listener {
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerMoveWhilePreview(PlayerMoveEvent e){
+        Location from = e.getFrom(), to = e.getTo();
+
+        if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
+            return;
+
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
+
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+
+        if(islandPreview == null)
+            return;
+
+        //Checking for out of distance from preview location.
+        if(islandPreview.getLocation().distanceSquared(superiorPlayer.getLocation()) > 10000){
+            islandPreview.handleEscape();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerChatWhilePreview(AsyncPlayerChatEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
+
+        if(islandPreview == null)
+            return;
+
+        if(e.getMessage().equalsIgnoreCase("CONFIRM")){
+            e.setCancelled(true);
+            islandPreview.handleConfirm();
+        }
+        else if(e.getMessage().equalsIgnoreCase("CANCEL")){
+            e.setCancelled(true);
+            islandPreview.handleCancel();
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerTeleportWhilePreview(PlayerTeleportEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SuperiorNPCPlayer)
+            return;
+
+        if(e.getPlayer().getGameMode() == GameMode.SPECTATOR &&
+                plugin.getGrid().getIslandPreview(superiorPlayer) != null)
+            e.setCancelled(true);
     }
 
     private final class EffectsListener implements Listener{

@@ -10,9 +10,11 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -38,7 +40,8 @@ public final class MenuIslandCreation extends SuperiorMenu {
             if(containsData(schematic + "-slot")) {
                 int slot = (int) getData(schematic + "-slot");
                 if(slot == e.getRawSlot()) {
-                    clickSchematic(schematic, this, true);
+                    clickSchematic(schematic, this, e.getClick() == ClickType.RIGHT ||
+                            e.getClick() == ClickType.SHIFT_RIGHT, true);
                     break;
                 }
             }
@@ -67,7 +70,16 @@ public final class MenuIslandCreation extends SuperiorMenu {
        return inv;
     }
 
-    private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean fromInventory){
+    private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean rightClick, boolean fromInventory){
+        // Checking for preview of islands.
+        if(rightClick){
+            Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schematic);
+            if(previewLocation != null){
+                plugin.getGrid().startIslandPreview(menu.superiorPlayer, schematic, menu.islandName);
+                return;
+            }
+        }
+
         String permission = (String) menu.getData(schematic + "-permission", "");
         if (menu.superiorPlayer.hasPermission(permission)) {
             BigDecimal bonusWorth = BigDecimal.valueOf((double) menu.getData(schematic + "-bonus-worth", 0D));
@@ -206,15 +218,15 @@ public final class MenuIslandCreation extends SuperiorMenu {
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, String islandName){
         MenuIslandCreation menuIslandCreation = new MenuIslandCreation(superiorPlayer, islandName);
         if(plugin.getSettings().skipOneItemMenus && menuIslandCreation.hasOnlyOneItem()){
-            clickSchematic(menuIslandCreation.getOnlyOneItem(), menuIslandCreation, false);
+            clickSchematic(menuIslandCreation.getOnlyOneItem(), menuIslandCreation, false, false);
         }
         else {
             menuIslandCreation.open(previousMenu);
         }
     }
 
-    public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic){
-        clickSchematic(schematic, new MenuIslandCreation(superiorPlayer, islandName), false);
+    public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick){
+        clickSchematic(schematic, new MenuIslandCreation(superiorPlayer, islandName), rightClick, false);
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

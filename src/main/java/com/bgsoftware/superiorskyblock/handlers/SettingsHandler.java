@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
@@ -144,6 +146,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
     public final List<String> valuableBlocks;
+    public final Registry<String, Location> islandPreviewLocations;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -352,6 +355,11 @@ public final class SettingsHandler extends AbstractHandler {
             }
         }
         valuableBlocks = cfg.getStringList("valuable-blocks");
+        islandPreviewLocations = Registry.createRegistry();
+        if(cfg.isConfigurationSection("preview-islands")){
+            for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
+                islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
+        }
     }
 
     @Override

@@ -3,10 +3,12 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -25,6 +27,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
@@ -38,6 +41,7 @@ import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -67,6 +71,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
+    private final Registry<UUID, IslandPreview> islandPreviews = Registry.createRegistry();
     private final Set<UUID> customWorlds = Sets.newHashSet();
 
     private SpawnIsland spawnIsland;
@@ -120,6 +125,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
 
+        // Removing any active previews for the player.
+        boolean updateGamemode = islandPreviews.remove(superiorPlayer.getUniqueId()) != null;
+
         if(!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName))
             return;
 
@@ -160,6 +168,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 if (superiorPlayer.isOnline()) {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     if (event.getResult()) {
+                        if(updateGamemode)
+                            superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
                         superiorPlayer.teleport(island);
                         Executor.sync(() -> island.resetChunksExcludedFromList(loadedChunks), 2L);
                     }
@@ -188,6 +198,36 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
         return pendingCreationTasks.contains(superiorPlayer.getUniqueId());
+    }
+
+    @Override
+    public void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName) {
+        Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schemName.toLowerCase());
+        if(previewLocation != null) {
+            superiorPlayer.teleport(previewLocation, result -> {
+                if(result){
+                    islandPreviews.add(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
+                    Executor.ensureMain(() -> superiorPlayer.asPlayer().setGameMode(GameMode.SPECTATOR));
+                    Locale.ISLAND_PREVIEW_START.send(superiorPlayer);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void cancelIslandPreview(SuperiorPlayer superiorPlayer) {
+        IslandPreview islandPreview = islandPreviews.remove(superiorPlayer.getUniqueId());
+        if(islandPreview != null && superiorPlayer.isOnline()) {
+            Executor.ensureMain(() -> {
+                superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            });
+        }
+    }
+
+    @Override
+    public IslandPreview getIslandPreview(SuperiorPlayer superiorPlayer) {
+        return islandPreviews.get(superiorPlayer.getUniqueId());
     }
 
     @Override

@@ -107,7 +107,7 @@ public final class CmdCreate implements ISuperiorCommand {
             MenuIslandCreation.openInventory(superiorPlayer, null, islandName);
         }
         else{
-            MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematicName);
+            MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematicName, false);
         }
     }
 
