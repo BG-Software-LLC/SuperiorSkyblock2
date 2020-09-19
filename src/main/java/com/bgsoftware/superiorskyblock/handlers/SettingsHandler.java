@@ -216,6 +216,8 @@ public final class SettingsHandler extends AbstractHandler {
         islandRolesSection = cfg.getConfigurationSection("island-roles");
         signWarpLine = cfg.getString("sign-warp-line", "[IslandWarp]");
         signWarp = StringUtils.translateColors(cfg.getStringList("sign-warp"));
+        while(signWarp.size() < 4)
+            signWarp.add("");
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
