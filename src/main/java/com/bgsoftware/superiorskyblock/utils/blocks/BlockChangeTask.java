@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.bukkit.Location;
@@ -44,10 +45,14 @@ public final class BlockChangeTask {
             submitted = true;
             int index = 0, size = blocksCache.size();
 
+            List<BlockData> interactedBlocks = new ArrayList<>();
+
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
                 int entryIndex = ++index;
                 ChunksProvider.loadChunk(entry.getKey(), chunk -> {
                     interactedChunks.add(entry.getKey());
+                    interactedBlocks.addAll(entry.getValue());
+
                     plugin.getNMSBlocks().deleteChunk(island, entry.getKey(), null);
 
                     if(island.isInsideRange(chunk))
@@ -63,8 +68,10 @@ public final class BlockChangeTask {
 
                     plugin.getNMSBlocks().refreshChunk(chunk);
 
-                    if(entryIndex == size && onFinish != null)
+                    if(entryIndex == size && onFinish != null) {
                         onFinish.run();
+                        Executor.sync(() -> plugin.getNMSBlocks().refreshLights(chunk.getWorld(), interactedBlocks), 10L);
+                    }
                 });
             }
         }finally {

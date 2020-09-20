@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
@@ -28,11 +29,9 @@ public interface NMSBlocks {
         return null;
     }
 
-    default byte[] getLightLevels(Location location){
-        return new byte[0];
-    }
+    byte[] getLightLevels(Location location);
 
-    default void refreshLight(org.bukkit.Chunk bukkitChunk){
+    default void refreshLights(World bukkitWorld, List<BlockData> blockData){
 
     }
 

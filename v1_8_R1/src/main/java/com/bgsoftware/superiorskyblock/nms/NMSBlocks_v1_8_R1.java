@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R1.AxisAlignedBB;
 import net.minecraft.server.v1_8_R1.Block;
@@ -26,6 +26,7 @@ import net.minecraft.server.v1_8_R1.ChunkProviderServer;
 import net.minecraft.server.v1_8_R1.ChunkSection;
 import net.minecraft.server.v1_8_R1.Entity;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
+import net.minecraft.server.v1_8_R1.EnumSkyBlock;
 import net.minecraft.server.v1_8_R1.IBlockData;
 import net.minecraft.server.v1_8_R1.IChatBaseComponent;
 import net.minecraft.server.v1_8_R1.IChunkLoader;
@@ -50,6 +51,7 @@ import org.bukkit.craftbukkit.v1_8_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +70,8 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
 
+    private static final ReflectMethod<Boolean> WORLD_REFRESH_LIGHT = new ReflectMethod<>(World.class, boolean.class, "c", EnumSkyBlock.class, BlockPosition.class, Chunk.class, List.class);
+
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
         World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
@@ -76,6 +80,18 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         for(com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
             setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+
+        // Update lights for the blocks.
+        for (com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList) {
+            BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+            if(plugin.getSettings().lightsUpdate && blockData.getBlockLightLevel() > 0)
+                world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
+
+            byte skyLight = plugin.getSettings().lightsUpdate ? blockData.getSkyLightLevel() : 15;
+
+            if(skyLight > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
+                world.a(EnumSkyBlock.SKY, blockPosition, skyLight);
+        }
     }
 
     @Override
@@ -109,16 +125,26 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
             return;
         }
 
-        int indexY = blockPosition.getY() >> 4;
+        int blockX = blockPosition.getX() & 15;
+        int blockY = blockPosition.getY();
+        int blockZ = blockPosition.getZ() & 15;
+
+        int highestBlockLight = chunk.b(blockX, blockZ);
+        boolean initLight = false;
+
+        int indexY = blockY >> 4;
 
         ChunkSection chunkSection = chunk.getSections()[indexY];
 
-        if(chunkSection == null)
+        if(chunkSection == null) {
             chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, !chunk.world.worldProvider.o());
+            initLight = blockY > highestBlockLight;
+        }
 
-        int blockX = blockPosition.getX() & 15, blockY = blockPosition.getY() & 15, blockZ = blockPosition.getZ() & 15;
+        chunkSection.setType(blockX, blockY & 15, blockZ, blockData);
 
-        chunkSection.setType(blockX, blockY, blockZ, blockData);
+        if(initLight)
+            chunk.initLighting();
 
         if(tileEntity != null) {
             NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
@@ -128,6 +154,70 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
             tileEntityCompound.setInt("z", blockPosition.getZ());
             chunk.world.getTileEntity(blockPosition).a(tileEntityCompound);
         }
+    }
+
+    @Override
+    public byte[] getLightLevels(Location location) {
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        Chunk chunk = ((CraftWorld) location.getWorld()).getHandle().getChunkAtWorldCoords(blockPosition);
+        return new byte[] {
+                (byte) chunk.getBrightness(EnumSkyBlock.SKY, blockPosition),
+                (byte) chunk.getBrightness(EnumSkyBlock.BLOCK, blockPosition),
+        };
+    }
+
+    @Override
+    public void refreshLights(org.bukkit.World bukkitWorld, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
+        Set<ChunkCoordIntPair> chunksToUpdate = new HashSet<>();
+        World world = ((CraftWorld) bukkitWorld).getHandle();
+
+        blockDataList.forEach(blockData -> {
+            BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+            ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
+            if(blockData.getSkyLightLevel() > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
+                recalculateLighting(world, blockPosition, EnumSkyBlock.SKY);
+                chunksToUpdate.add(chunkCoords);
+            }
+            if(blockData.getBlockLightLevel() > 0) {
+                recalculateLighting(world, blockPosition, EnumSkyBlock.BLOCK);
+                chunksToUpdate.add(chunkCoords);
+            }
+        });
+
+        chunksToUpdate.forEach(chunkCoords -> refreshChunk(world.getChunkAt(chunkCoords.x, chunkCoords.z).bukkitChunk));
+    }
+
+    private void recalculateLighting(World world, BlockPosition blockPosition, EnumSkyBlock enumSkyBlock){
+        Chunk chunk = world.getChunkAtWorldCoords(blockPosition);
+        List<Chunk> nearbyChunks = new ArrayList<>();
+
+        if(WORLD_REFRESH_LIGHT.isValid()){
+            addChunk(nearbyChunks, world, chunk.locX - 1, chunk.locZ - 1);
+            addChunk(nearbyChunks, world, chunk.locX + 1, chunk.locZ - 1);
+            addChunk(nearbyChunks, world, chunk.locX - 1, chunk.locZ + 1);
+            addChunk(nearbyChunks, world, chunk.locX + 1, chunk.locZ + 1);
+
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.south(), chunk, nearbyChunks);
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.north(), chunk, nearbyChunks);
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.up(), chunk, nearbyChunks);
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.down(), chunk, nearbyChunks);
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.east(), chunk, nearbyChunks);
+            WORLD_REFRESH_LIGHT.invoke(world, enumSkyBlock, blockPosition.west(), chunk, nearbyChunks);
+        }
+        else{
+            world.c(enumSkyBlock, blockPosition.south());
+            world.c(enumSkyBlock, blockPosition.north());
+            world.c(enumSkyBlock, blockPosition.up());
+            world.c(enumSkyBlock, blockPosition.down());
+            world.c(enumSkyBlock, blockPosition.east());
+            world.c(enumSkyBlock, blockPosition.west());
+        }
+    }
+
+    private void addChunk(List<Chunk> chunks, World world, int chunkX, int chunkZ){
+        Chunk chunk = world.getChunkIfLoaded(chunkX, chunkZ);
+        if(chunk != null)
+            chunks.add(chunk);
     }
 
     @Override
@@ -168,24 +258,6 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
             if(entity instanceof EntityPlayer)
                 ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
         }
-    }
-
-    @Override
-    public void refreshLight(org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-
-        for(int i = 0; i < 16; i++) {
-            ChunkSection chunkSection = chunk.getSections()[i];
-            if(chunkSection == null) {
-                chunkSection = new ChunkSection(i << 4, !chunk.world.worldProvider.o());
-                chunk.getSections()[i] = chunkSection;
-            }
-
-            if (!chunk.world.worldProvider.o())
-                Arrays.fill(chunkSection.getSkyLightArray().a(), (byte) 15);
-        }
-
-        chunk.initLighting();
     }
 
     @Override
