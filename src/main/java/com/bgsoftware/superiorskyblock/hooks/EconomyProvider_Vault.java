@@ -8,6 +8,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.math.BigDecimal;
+
 public final class EconomyProvider_Vault implements EconomyProvider {
 
     private final Economy econ;
@@ -32,6 +34,11 @@ public final class EconomyProvider_Vault implements EconomyProvider {
             econ.createPlayerAccount(offlinePlayer);
 
         return econ.getBalance(offlinePlayer);
+    }
+
+    @Override
+    public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
+        return BigDecimal.valueOf(getMoneyInBank(superiorPlayer));
     }
 
     @Override

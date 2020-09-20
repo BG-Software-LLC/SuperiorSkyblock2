@@ -62,11 +62,6 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(!plugin.getProviders().hasEconomySupport()){
-            Locale.sendMessage(sender, "&cServer doesn't have vault installed so island banks are disabled.", true);
-            return;
-        }
-
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
         List<Island> islands = new ArrayList<>();
 
@@ -101,7 +96,7 @@ public final class CmdAdminDeposit implements ISuperiorCommand {
 
         Executor.data(() -> islands.forEach(island -> {
             EventsCaller.callIslandBankDepositEvent(sender instanceof Player ? SSuperiorPlayer.of(sender) : null, island, amount);
-            island.depositMoney(amount);
+            island.getIslandBank().depositAdminMoney(sender, amount);
         }));
 
         if(targetPlayer == null)

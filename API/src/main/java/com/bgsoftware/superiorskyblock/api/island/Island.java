@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -13,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -711,6 +711,11 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
+     * Get the bank of the island.
+     */
+    IslandBank getIslandBank();
+
+    /**
      * Get the money in the bank of the island.
      *
      * @deprecated see getMoneyInBank()
@@ -720,31 +725,46 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the money in the bank of the island.
+     *
+     * @deprecated See IslandBank#getBalance
      */
+    @Deprecated
     BigDecimal getMoneyInBank();
 
     /**
      * Deposit money into the bank.
      * @param amount The amount to deposit.
+     *
+     * @deprecated See IslandBank#depositMoney
      */
+    @Deprecated
     void depositMoney(double amount);
 
     /**
      * Deposit money into the bank.
      * @param amount The amount to deposit.
+     *
+     * @deprecated See IslandBank#depositMoney
      */
+    @Deprecated
     void depositMoney(BigDecimal amount);
 
     /**
      * Withdraw money from the bank.
      * @param amount The amount to withdraw.
+     *
+     * @deprecated See IslandBank#withdrawMoney
      */
+    @Deprecated
     void withdrawMoney(double amount);
 
     /**
      * Withdraw money from the bank.
      * @param amount The amount to withdraw.
+     *
+     * @deprecated See IslandBank#withdrawMoney
      */
+    @Deprecated
     void withdrawMoney(BigDecimal amount);
 
     /*

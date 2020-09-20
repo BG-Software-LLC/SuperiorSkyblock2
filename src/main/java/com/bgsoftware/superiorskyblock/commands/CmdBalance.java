@@ -84,11 +84,11 @@ public final class CmdBalance implements ISuperiorCommand {
         }
 
         if(targetPlayer != null && island == targetPlayer.getIsland())
-            Locale.ISLAND_BANK_SHOW.send(sender, island.getMoneyInBank());
+            Locale.ISLAND_BANK_SHOW.send(sender, island.getIslandBank().getBalance());
         else if(targetPlayer == null)
-            Locale.ISLAND_BANK_SHOW_OTHER_NAME.send(sender, island.getName(), island.getMoneyInBank());
+            Locale.ISLAND_BANK_SHOW_OTHER_NAME.send(sender, island.getName(), island.getIslandBank().getBalance());
         else
-            Locale.ISLAND_BANK_SHOW_OTHER.send(sender, targetPlayer.getName(), island.getMoneyInBank());
+            Locale.ISLAND_BANK_SHOW_OTHER.send(sender, targetPlayer.getName(), island.getIslandBank().getBalance());
     }
 
     @Override

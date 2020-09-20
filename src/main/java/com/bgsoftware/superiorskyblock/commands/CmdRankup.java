@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,7 +108,7 @@ public final class CmdRankup implements ISuperiorCommand {
 
             if (event.isCancelled()) {
                 hasNextLevel = false;
-            } else if(plugin.getProviders().getMoneyInBank(superiorPlayer) < nextUpgradePrice){
+            } else if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextUpgradePrice)) < 0){
                 Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                 hasNextLevel = false;
             } else {

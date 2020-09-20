@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -69,7 +70,7 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = plugin.getProviders().getMoneyInBank(superiorPlayer) >= nextLevelPrice &&
+                    boolean nextLevel = plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextLevelPrice)) >= 0 &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }

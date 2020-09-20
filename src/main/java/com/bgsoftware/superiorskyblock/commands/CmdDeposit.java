@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -58,11 +58,6 @@ public final class CmdDeposit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(!plugin.getProviders().hasEconomySupport()){
-            Locale.sendMessage(superiorPlayer, "&cServer doesn't have vault installed so island banks are disabled.", true);
-            return;
-        }
-
         if(island == null){
             Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
@@ -73,7 +68,7 @@ public final class CmdDeposit implements ISuperiorCommand {
             return;
         }
 
-        BigDecimal moneyInBank = BigDecimal.valueOf(plugin.getProviders().getMoneyInBank(superiorPlayer));
+        BigDecimal moneyInBank = plugin.getProviders().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
@@ -89,20 +84,15 @@ public final class CmdDeposit implements ISuperiorCommand {
             return;
         }
 
-        if(moneyInBank.compareTo(amount) < 0){
-            Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, amount);
-            return;
+        BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
+
+        if(transaction.getFailureReason().equals("Not enough money")){
+            Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, args[1]);
         }
-
-        EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
-
-        String error = plugin.getProviders().withdrawMoney(superiorPlayer, amount);
-
-        if(error != null && !error.isEmpty()){
-            Locale.DEPOSIT_ERROR.send(sender, error);
+        else if(!transaction.getFailureReason().isEmpty()){
+            Locale.DEPOSIT_ERROR.send(sender, transaction.getFailureReason());
         }
-        else {
-            island.depositMoney(amount);
+        else{
             ((SIsland) island).sendMessage(Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
         }
     }

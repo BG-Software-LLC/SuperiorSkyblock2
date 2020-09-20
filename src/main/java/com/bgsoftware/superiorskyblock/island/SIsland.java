@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -18,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
@@ -131,6 +133,8 @@ public final class SIsland extends DatabaseObject implements Island {
      * Island data
      */
 
+    private final SIslandBank islandBank = new SIslandBank(this);
+
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
     private final SyncedObject<UniquePriorityQueue<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
@@ -143,7 +147,6 @@ public final class SIsland extends DatabaseObject implements Island {
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final Registry<String, WarpData> warps = Registry.createRegistry();
-    private final SyncedObject<BigDecimalFormatted> islandBank = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
     private final SyncedObject<BigDecimalFormatted> bonusWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
@@ -208,7 +211,7 @@ public final class SIsland extends DatabaseObject implements Island {
         if(!resultSet.getString("uniqueVisitors").contains(";"))
             saveUniqueVisitors();
 
-        this.islandBank.set(BigDecimalFormatted.of(resultSet.getString("islandBank")));
+        this.islandBank.loadBalance(BigDecimalFormatted.of(resultSet.getString("islandBank")));
         this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
         this.islandSize.set(resultSet.getInt("islandSize"));
         this.teamLimit.set(resultSet.getInt("teamLimit"));
@@ -1551,6 +1554,11 @@ public final class SIsland extends DatabaseObject implements Island {
      */
 
     @Override
+    public IslandBank getIslandBank() {
+        return islandBank;
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
         return getMoneyInBank();
@@ -1558,56 +1566,27 @@ public final class SIsland extends DatabaseObject implements Island {
 
     @Override
     public BigDecimal getMoneyInBank() {
-        return islandBank.writeAndGet(islandBank -> {
-            if(islandBank.doubleValue() < 0) {
-                islandBank = BigDecimalFormatted.ZERO;
-                this.islandBank.set(islandBank);
-            }
-
-            return islandBank;
-        });
+        return islandBank.getBalance();
     }
 
     @Override
     public void depositMoney(double amount){
-        depositMoney(BigDecimal.valueOf(amount));
+        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
     public void depositMoney(BigDecimal amount) {
-        SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + owner.getName() + ", Money: " + amount);
-
-        String islandBankString = this.islandBank.writeAndGet(islandBank -> {
-            islandBank = islandBank.add(amount);
-            this.islandBank.set(islandBank);
-            return islandBank.getAsString();
-        });
-
-        Query.ISLAND_SET_BANK.getStatementHolder(this)
-                .setString(islandBankString)
-                .setString(owner.getUniqueId().toString())
-                .execute(true);
+        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
     public void withdrawMoney(double amount){
-        withdrawMoney(BigDecimal.valueOf(amount));
+        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
     public void withdrawMoney(BigDecimal amount) {
-        SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + owner.getName() + ", Money: " + amount);
-
-        String islandBankString = islandBank.writeAndGet(islandBank -> {
-            islandBank = islandBank.subtract(amount);
-            this.islandBank.set(islandBank);
-            return islandBank.getAsString();
-        });
-
-        Query.ISLAND_SET_BANK.getStatementHolder(this)
-                .setString(islandBankString)
-                .setString(owner.getUniqueId().toString())
-                .execute(true);
+        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     /*
@@ -1870,7 +1849,7 @@ public final class SIsland extends DatabaseObject implements Island {
     @Override
     public BigDecimal getWorth() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
-        BigDecimalFormatted islandWorth = this.islandWorth.get(), islandBank = this.islandBank.get(), bonusWorth = this.bonusWorth.get();
+        BigDecimalFormatted islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
         //noinspection BigDecimalMethodWithoutRoundingCalled
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
 
@@ -2905,7 +2884,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializePermissions(playerPermissions, rolePermissions))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
-                .setString(islandBank.get().getAsString())
+                .setString(islandBank.getBalance().getAsString())
                 .setInt(islandSize.getValue())
                 .setString(IslandSerializer.serializeBlockLimits(blockLimits))
                 .setInt(teamLimit.getValue())
@@ -2964,7 +2943,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializePermissions(playerPermissions, rolePermissions))
                 .setString(IslandSerializer.serializeUpgrades(upgrades))
                 .setString(IslandSerializer.serializeWarps(warps))
-                .setString(islandBank.get().getAsString())
+                .setString(islandBank.getBalance().getAsString())
                 .setInt(islandSize.getValue())
                 .setString(IslandSerializer.serializeBlockLimits(blockLimits))
                 .setInt(teamLimit.getValue())

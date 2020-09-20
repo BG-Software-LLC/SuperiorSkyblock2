@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdAccept;
 import com.bgsoftware.superiorskyblock.commands.CmdAdmin;
 import com.bgsoftware.superiorskyblock.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.commands.CmdBan;
+import com.bgsoftware.superiorskyblock.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.commands.CmdBiome;
 import com.bgsoftware.superiorskyblock.commands.CmdBorder;
 import com.bgsoftware.superiorskyblock.commands.CmdChest;
@@ -118,6 +119,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand((adminCommand = new CmdAdmin(this)), false);
         registerCommand(new CmdBalance(), false);
         registerCommand(new CmdBan(), false);
+        registerCommand(new CmdBank(), false);
         registerCommand(new CmdBiome(), false);
         registerCommand(new CmdBorder(), false);
         registerCommand(new CmdChest(), false);

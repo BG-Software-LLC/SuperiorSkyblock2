@@ -636,3 +636,7 @@ preview-islands:
   normal: world, 0, 100, 0
   mycel: world, 0, 100, 0
   desert: world, 0, 100, 0
+
+# Should transaction logs of the island bank be saved to database?
+# Warning: There may be a lot of transactions, and can increase database.
+bank-logs: true

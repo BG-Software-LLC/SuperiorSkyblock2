@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -664,6 +665,11 @@ public final class SpawnIsland implements Island {
     @Override
     public long getLastTimeUpdate() {
         return -1;
+    }
+
+    @Override
+    public IslandBank getIslandBank() {
+        return null;
     }
 
     @Override

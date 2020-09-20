@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 public final class SyncedObject<T> {
 
+    public static final SyncedObject EMPTY = SyncedObject.of(null);
+
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private T value;
 

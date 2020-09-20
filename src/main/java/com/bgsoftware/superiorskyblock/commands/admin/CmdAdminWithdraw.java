@@ -59,11 +59,6 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(!plugin.getProviders().hasEconomySupport()){
-            Locale.sendMessage(sender, "&cServer doesn't have vault installed so island banks are disabled.", true);
-            return;
-        }
-
         SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
@@ -80,7 +75,7 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if(args[3].equalsIgnoreCase("all") || args[3].equals("*")){
-            amount = island.getMoneyInBank();
+            amount = island.getIslandBank().getBalance();
         }
 
         else try{
@@ -92,19 +87,19 @@ public final class CmdAdminWithdraw implements ISuperiorCommand {
             return;
         }
 
-        if(island.getMoneyInBank().compareTo(BigDecimal.ZERO) == 0){
+        if(island.getIslandBank().getBalance().compareTo(BigDecimal.ZERO) == 0){
             Locale.ISLAND_BANK_EMPTY.send(sender);
             return;
         }
 
-        if(island.getMoneyInBank().compareTo(amount) < 0){
-            Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBank().toString());
-            amount = island.getMoneyInBank();
+        if(island.getIslandBank().getBalance().compareTo(amount) < 0){
+            Locale.WITHDRAW_ALL_MONEY.send(sender, island.getIslandBank().getBalance().toString());
+            amount = island.getIslandBank().getBalance();
         }
 
         EventsCaller.callIslandBankWithdrawEvent(sender instanceof Player ? SSuperiorPlayer.of(sender) : null, island, amount);
 
-        island.withdrawMoney(amount);
+        island.getIslandBank().withdrawAdminMoney(sender, amount);
 
         if(targetPlayer == null)
             Locale.WITHDRAWN_MONEY_NAME.send(sender, StringUtils.format(amount), island.getName());

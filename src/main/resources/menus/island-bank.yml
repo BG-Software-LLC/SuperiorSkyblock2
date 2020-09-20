@@ -1,0 +1,69 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lIsland Bank'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ ! @ @ @ % @ @'
+  - '@ @ # @ * @ ^ @ @'
+  - '@ @ $ @ @ @ & @ @'
+  - '@ @ @ @ @ @ @ @ @'
+
+items:
+  '!':
+    type: EMERALD
+    name: '&aDeposit Half Money'
+    lore:
+      - '&7Deposit half of your money into the bank.'
+    bank-action:
+      deposit: 50
+  '$':
+    type: EMERALD_BLOCK
+    name: '&aDeposit All Money'
+    lore:
+      - '&7Deposit all of your money into the bank.'
+    bank-action:
+      deposit: 100
+  '%':
+    type: REDSTONE
+    name: '&aWithdraw Half Money'
+    lore:
+      - '&7Withdraw half of the money from the bank.'
+    bank-action:
+      withdraw: 50
+  '&':
+    type: REDSTONE_BLOCK
+    name: '&aWithdraw All Money'
+    lore:
+      - '&7Withdraw all of the money from the bank.'
+    bank-action:
+      withdraw: 100
+  '*':
+    type: PAPER
+    name: '&6Balance'
+    lore:
+      - '&7Your bank currently has $%superior_island_bank_format%'
+
+sounds:
+  '!':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '$':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '%':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2
+  '&':
+    type: ENTITY_EXPERIENCE_ORB_PICKUP
+    volume: 0.2
+    pitch: 0.2

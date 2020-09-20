@@ -319,11 +319,11 @@ public abstract class PlaceholderHook {
                     case "raw_worth_format":
                         return StringUtils.fancyFormat(island.getRawWorth(), superiorPlayer.getUserLocale());
                     case "bank":
-                        return island.getMoneyInBank().toString();
+                        return island.getIslandBank().getBalance().toString();
                     case "bank_raw":
-                        return ((BigDecimalFormatted) island.getMoneyInBank()).getAsString();
+                        return ((BigDecimalFormatted) island.getIslandBank().getBalance()).getAsString();
                     case "bank_format":
-                        return StringUtils.fancyFormat(island.getMoneyInBank(), superiorPlayer.getUserLocale());
+                        return StringUtils.fancyFormat(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale());
                     case "hoppers_limit":
                         return String.valueOf(island.getBlockLimit(ConstantKeys.HOPPER));
                     case "crops_multiplier":

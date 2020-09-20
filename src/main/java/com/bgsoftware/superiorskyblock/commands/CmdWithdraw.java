@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -58,11 +59,6 @@ public final class CmdWithdraw implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
         Island island = superiorPlayer.getIsland();
 
-        if(!plugin.getProviders().hasEconomySupport()){
-            Locale.sendMessage(superiorPlayer, "&cServer doesn't have vault installed so island banks are disabled.", true);
-            return;
-        }
-
         if(island == null){
             Locale.INVALID_ISLAND.send(superiorPlayer);
             return;
@@ -76,7 +72,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
-            amount = island.getMoneyInBank();
+            amount = island.getIslandBank().getBalance();
         }
 
         else try{
@@ -88,27 +84,21 @@ public final class CmdWithdraw implements ISuperiorCommand {
             return;
         }
 
-        if(island.getMoneyInBank().compareTo(BigDecimal.ZERO) == 0){
+        if(island.getIslandBank().getBalance().compareTo(BigDecimal.ZERO) == 0){
             Locale.ISLAND_BANK_EMPTY.send(sender);
             return;
         }
 
-        if(island.getMoneyInBank().compareTo(amount) < 0){
-            Locale.WITHDRAW_ALL_MONEY.send(sender, island.getMoneyInBank().toString());
-            amount = island.getMoneyInBank();
+        BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
+
+        if(!transaction.getFailureReason().isEmpty()){
+            Locale.WITHDRAW_ERROR.send(sender, transaction.getFailureReason());
+        }
+        else{
+            ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(transaction.getAmount()));
         }
 
         EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, amount);
-
-        String error = plugin.getProviders().depositMoney(superiorPlayer, amount);
-
-        if(error != null && !error.isEmpty()){
-            Locale.WITHDRAW_ERROR.send(sender, error);
-        }
-        else{
-            island.withdrawMoney(amount);
-            ((SIsland) island).sendMessage(Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
-        }
     }
 
     @Override

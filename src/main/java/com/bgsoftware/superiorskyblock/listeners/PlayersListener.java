@@ -5,11 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -60,6 +62,7 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -607,6 +610,56 @@ public final class PlayersListener implements Listener {
         if(e.getPlayer().getGameMode() == GameMode.SPECTATOR &&
                 plugin.getGrid().getIslandPreview(superiorPlayer) != null)
             e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerChatWhileBank(AsyncPlayerChatEvent e){
+        SSuperiorPlayer superiorPlayer = (SSuperiorPlayer) SSuperiorPlayer.of(e.getPlayer());
+
+        boolean fromBank = false;
+
+        if(superiorPlayer.getBankWithdrawSlot() >= 0){
+            e.setCancelled(true);
+            fromBank = true;
+
+            try{
+                BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
+                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().withdrawMoney(superiorPlayer, amount, superiorPlayer.getBankCommandsToExecute());
+                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, superiorPlayer.getBankWithdrawSlot());
+            }catch(IllegalArgumentException ex){
+                Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
+            }
+        }
+        else if(superiorPlayer.getBankDepositSlot() >= 0){
+            e.setCancelled(true);
+            fromBank = true;
+
+            try{
+                BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
+                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, amount);
+                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, superiorPlayer.getBankDepositSlot());
+            }catch(IllegalArgumentException ex){
+                Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
+            }
+        }
+
+        if(fromBank) {
+            superiorPlayer.setBankWithdrawSlot(-1);
+            superiorPlayer.setBankDepositSlot(-1);
+            superiorPlayer.setBankCommandsToExecute(null);
+            MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerQuitWhileBank(PlayerQuitEvent e){
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(superiorPlayer instanceof SSuperiorPlayer){
+            ((SSuperiorPlayer) superiorPlayer).setBankWithdrawSlot(-1);
+            ((SSuperiorPlayer) superiorPlayer).setBankDepositSlot(-1);
+            ((SSuperiorPlayer) superiorPlayer).setBankCommandsToExecute(null);
+        }
     }
 
     private final class EffectsListener implements Listener{

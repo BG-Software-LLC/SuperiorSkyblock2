@@ -147,6 +147,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final Map<String, List<String>> commandAliases;
     public final List<String> valuableBlocks;
     public final Registry<String, Location> islandPreviewLocations;
+    public final boolean bankLogs;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -360,6 +361,7 @@ public final class SettingsHandler extends AbstractHandler {
             for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
                 islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
         }
+        bankLogs = cfg.getBoolean("bank-logs", true);
     }
 
     @Override

@@ -64,6 +64,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     private SpawnersProvider spawnersProvider = new BlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
+    private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
     private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
     private VanishProvider vanishProvider = player -> false;
@@ -149,6 +150,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
             try{
                 setEconomyProvider(new EconomyProvider_Vault());
+                setBankEconomyProvider(economyProvider);
             }catch (Exception ignored){}
         });
 
@@ -178,6 +180,12 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     @Override
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         this.worldsProvider = worldsProvider;
+    }
+
+    @Override
+    public void setBankEconomyProvider(EconomyProvider bankEconomyProvider) {
+        Preconditions.checkArgument(bankEconomyProvider != null, "EconomyProvider cannot be null.");
+        this.bankEconomyProvider = bankEconomyProvider;
     }
 
     public Pair<Integer, String> getSpawner(Location location){
@@ -220,12 +228,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         asyncProvider.teleport(entity, location, teleportResult);
     }
 
-    public boolean hasEconomySupport(){
-        return economyProvider.isEnabled();
-    }
-
-    public double getMoneyInBank(SuperiorPlayer superiorPlayer){
-        return economyProvider.getMoneyInBank(superiorPlayer);
+    public BigDecimal getBalance(SuperiorPlayer superiorPlayer){
+        return economyProvider.getBalance(superiorPlayer);
     }
 
     public String depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
@@ -294,6 +298,38 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public boolean isEndUnlocked(){
         return worldsProvider.isEndUnlocked();
+    }
+
+    public BigDecimal getBalanceForBanks(SuperiorPlayer superiorPlayer){
+        return bankEconomyProvider.getBalance(superiorPlayer);
+    }
+
+    public String depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+        while(amount.compareTo(MAX_DOUBLE) > 0){
+            String error = bankEconomyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
+
+            amount = amount.subtract(MAX_DOUBLE);
+        }
+
+        return bankEconomyProvider.depositMoney(superiorPlayer, amount.doubleValue());
+    }
+
+    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+        while(amount.compareTo(MAX_DOUBLE) > 0){
+            String error = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
+
+            amount = amount.subtract(MAX_DOUBLE);
+        }
+
+        return withdrawMoneyForBanks(superiorPlayer, amount.doubleValue());
+    }
+
+    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
+        return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
     private static boolean hasPaperAsyncSupport(){

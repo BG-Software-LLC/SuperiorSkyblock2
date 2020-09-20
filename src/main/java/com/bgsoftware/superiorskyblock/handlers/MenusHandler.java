@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuBiomes;
 import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
@@ -15,6 +16,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
@@ -55,6 +57,7 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(SuperiorMenuBlank::init);
         loadMenu(SuperiorMenuSettings::init);
 
+        loadMenu(MenuBankLogs::init);
         loadMenu(MenuBiomes::init);
         loadMenu(MenuBorderColor::init);
         loadMenu(MenuConfirmDisband::init);
@@ -62,6 +65,7 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(MenuCoops::init);
         loadMenu(MenuCounts::init);
         loadMenu(MenuGlobalWarps::init);
+        loadMenu(MenuIslandBank::init);
         loadMenu(MenuIslandChest::init);
         loadMenu(MenuIslandCreation::init);
         loadMenu(MenuIslandMissions::init);

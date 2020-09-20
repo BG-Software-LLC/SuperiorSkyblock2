@@ -26,4 +26,11 @@ public interface ProvidersManager {
      */
     void setWorldsProvider(WorldsProvider worldsProvider);
 
+    /**
+     * Set custom economy provider for the island banks.
+     * Cannot be null.
+     * @param economyProvider The economy provider to set.
+     */
+    void setBankEconomyProvider(EconomyProvider economyProvider);
+
 }

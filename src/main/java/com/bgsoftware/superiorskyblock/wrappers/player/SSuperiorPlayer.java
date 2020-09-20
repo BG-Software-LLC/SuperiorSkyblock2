@@ -82,6 +82,10 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     private boolean immuneToTeleport = false;
     private boolean leavingFlag = false;
 
+    private int bankWithdrawSlot = -1;
+    private int bankDepositSlot = -1;
+    private List<String> bankCommandsToExecute;
+
     private BukkitTask teleportTask = null;
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
@@ -689,6 +693,30 @@ public final class SSuperiorPlayer extends DatabaseObject implements SuperiorPla
     public void setImmunedToTeleport(boolean immuneToTeleport){
         this.immuneToTeleport = immuneToTeleport;
         SuperiorSkyblockPlugin.debug("Action: Set Teleport Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
+    }
+
+    public int getBankWithdrawSlot(){
+        return bankWithdrawSlot;
+    }
+
+    public void setBankWithdrawSlot(int bankWithdrawSlot){
+        this.bankWithdrawSlot = bankWithdrawSlot;
+    }
+
+    public int getBankDepositSlot(){
+        return bankDepositSlot;
+    }
+
+    public void setBankDepositSlot(int bankDepositSlot){
+        this.bankDepositSlot = bankDepositSlot;
+    }
+
+    public void setBankCommandsToExecute(List<String> bankCommandsToExecute) {
+        this.bankCommandsToExecute = bankCommandsToExecute;
+    }
+
+    public List<String> getBankCommandsToExecute() {
+        return bankCommandsToExecute;
     }
 
     public void merge(SSuperiorPlayer other){
