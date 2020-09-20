@@ -89,6 +89,9 @@ public final class CmdDeposit implements ISuperiorCommand {
         if(transaction.getFailureReason().equals("Not enough money")){
             Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, args[1]);
         }
+        else if(transaction.getFailureReason().equals("Exceed bank limit")){
+            Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
+        }
         else if(!transaction.getFailureReason().isEmpty()){
             Locale.DEPOSIT_ERROR.send(sender, transaction.getFailureReason());
         }

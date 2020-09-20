@@ -716,6 +716,17 @@ public interface Island extends Comparable<Island> {
     IslandBank getIslandBank();
 
     /**
+     * Get the limit of the bank.
+     */
+    BigDecimal getBankLimit();
+
+    /**
+     * Set a new limit for the bank.
+     * @param bankLimit The limit to set. Use -1 to remove the limit.
+     */
+    void setBankLimit(BigDecimal bankLimit);
+
+    /**
      * Get the money in the bank of the island.
      *
      * @deprecated see getMoneyInBank()

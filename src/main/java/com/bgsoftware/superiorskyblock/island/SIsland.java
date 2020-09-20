@@ -185,6 +185,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final UpgradeValue<Double> cropGrowth = UpgradeValue.createDouble();
     private final UpgradeValue<Double> spawnerRates = UpgradeValue.createDouble();
     private final UpgradeValue<Double> mobDrops = UpgradeValue.createDouble();
+    private final UpgradeValue<BigDecimal> bankLimit = UpgradeValue.createBigDecimal();
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = SSuperiorPlayer.of(UUID.fromString(resultSet.getString("owner")));
@@ -263,6 +264,7 @@ public final class SIsland extends DatabaseObject implements Island {
 
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
+        this.bankLimit.set(new BigDecimal(resultSet.getString("bankLimit")));
 
         String blockCounts = resultSet.getString("blockCounts");
 
@@ -1559,6 +1561,22 @@ public final class SIsland extends DatabaseObject implements Island {
     }
 
     @Override
+    public BigDecimal getBankLimit() {
+        return bankLimit.get();
+    }
+
+    @Override
+    public void setBankLimit(BigDecimal bankLimit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Bank Limit, Island: " + owner.getName() + ", Bank Limit: " + bankLimit);
+
+        this.bankLimit.set(bankLimit);
+        Query.ISLAND_SET_BANK_LIMIT.getStatementHolder(this)
+                .setString(bankLimit.toString())
+                .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
         return getMoneyInBank();
@@ -2038,6 +2056,7 @@ public final class SIsland extends DatabaseObject implements Island {
         setWarpsLimit(-1);
         setCoopLimit(-1);
         setIslandSize(-1);
+        setBankLimit(BigDecimal.valueOf(-2));
 
         // We want to sync the default upgrade first, then the actual upgrades
         syncUpgrade(DefaultUpgradeLevel.getInstance());
@@ -2917,6 +2936,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(uuid.toString())
+                .setString(bankLimit.get() + "")
                 .setString(owner.getUniqueId().toString());
     }
 
@@ -2977,6 +2997,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeEffects(islandEffects))
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(uuid.toString())
+                .setString(bankLimit.get() + "")
                 .execute(async);
     }
 
@@ -3134,6 +3155,7 @@ public final class SIsland extends DatabaseObject implements Island {
         islandSize.clearUpgrade();
         cobbleGeneratorValues.clearUpgrades();
         islandEffects.clearUpgrades();
+        bankLimit.clearUpgrade();
     }
 
     private void syncUpgrade(UpgradeLevel upgradeLevel){
@@ -3148,6 +3170,7 @@ public final class SIsland extends DatabaseObject implements Island {
         islandSize.setUpgrade(upgradeLevel.getBorderSize());
         cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(),true,false);
         islandEffects.setUpgrade(upgradeLevel.getPotionEffects());
+        bankLimit.setUpgrade(upgradeLevel.getBankLimit());
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

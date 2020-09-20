@@ -220,6 +220,8 @@ permissions:
             description: Remove all ratings given by a player.
           superior.admin.schematic:
             description: Create schematics for the plugin.
+          superior.admin.setbanklimit:
+            description: Set a bank limit to an island.
           superior.admin.setbiome:
             description: Set the biome of an island.
           superior.admin.setblockamount:

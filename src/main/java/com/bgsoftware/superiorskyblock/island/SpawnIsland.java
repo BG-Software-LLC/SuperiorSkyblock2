@@ -673,6 +673,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public BigDecimal getBankLimit() {
+        return BigDecimal.valueOf(-1);
+    }
+
+    @Override
+    public void setBankLimit(BigDecimal bankLimit) {
+
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
         return getMoneyInBank();

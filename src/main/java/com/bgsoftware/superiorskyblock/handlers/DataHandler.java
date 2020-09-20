@@ -155,6 +155,7 @@ public final class DataHandler extends AbstractHandler {
         addColumnIfNotExists("item", "stackedBlocks", "''", "TEXT");
         addColumnIfNotExists("islandChest", "islands", "''", "LONGTEXT");
         addColumnIfNotExists("uuid", "islands", "''", "VARCHAR(36)");
+        addColumnIfNotExists("bankLimit", "islands", "'0'", "TEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -299,7 +300,8 @@ public final class DataHandler extends AbstractHandler {
                 "coopLimit INTEGER," +
                 "islandEffects TEXT," +
                 "islandChest LONGTEXT," +
-                "uuid VARCHAR(36)" +
+                "uuid VARCHAR(36)," +
+                "bankLimit TEXT" +
                 ");");
     }
 

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import org.bukkit.entity.EntityType;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
     private DefaultUpgradeLevel(){
         super(-1, 0, new ArrayList<>(), "", new HashSet<>(), 0D, 0D, 0D,
                 0, 0, 0, 0, new KeyMap<>(), new KeyMap<>(), new KeyMap<>(),
-                new HashMap<>());
+                new HashMap<>(), BigDecimal.valueOf(-1));
     }
 
     @Override
@@ -107,6 +108,11 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
         return plugin.getSettings().defaultGenerator.asKeyMap().entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
+    }
+
+    @Override
+    public BigDecimal getBankLimit() {
+        return plugin.getSettings().defaultBankLimit;
     }
 
     public static DefaultUpgradeLevel getInstance(){

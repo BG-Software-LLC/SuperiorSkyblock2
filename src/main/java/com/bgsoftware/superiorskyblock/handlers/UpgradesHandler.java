@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                 int warpsLimit = levelSection.getInt("warps-limit", -1);
                 int coopLimit = levelSection.getInt("coop-limit", -1);
                 int borderSize = levelSection.getInt("border-size", -1);
+                BigDecimal bankLimit = new BigDecimal(levelSection.getString("bank-limit", "-1"));
                 KeyMap<Integer> blockLimits = new KeyMap<>();
                 if(levelSection.contains("block-limits")){
                     for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
@@ -88,7 +90,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                 }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,
                         cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
-                        entityLimits, generatorRates, islandEffects));
+                        entityLimits, generatorRates, islandEffects, bankLimit));
             }
             this.upgrades.add(upgradeName, upgrade);
         }

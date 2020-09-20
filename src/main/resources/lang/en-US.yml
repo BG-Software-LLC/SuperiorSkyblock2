@@ -20,7 +20,8 @@ ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Use /is admin {0} for the next pag
 ALREADY_IN_ISLAND: '&c&lError | &7You are already in an island.'
 ALREADY_IN_ISLAND_OTHER: '&c&lError | &7This player is already a member of your island.'
 BAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was BANNED from the island by {1}.'
-BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lError | &7You can only ban players with a lower island role than yours.'
+BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErroISLAND_INFO_ADMIN_BLOCKS_LIMITSr | &7You can only ban players with a lower island role than yours.'
+BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
 BANNED_FROM_ISLAND: '&c&lError | &7You are banned from this island.'
 BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_COUNTS_CHECK: |
@@ -37,6 +38,9 @@ BORDER_PLAYER_COLOR_UPDATED: '&e&lBorder | &7Successfully changed your personal 
 BUILD_OUTSIDE_ISLAND: '&c&lError | &7You cannot build outside of your protection range.'
 CANNOT_SET_ROLE: '&c&lError | &7You cannot set the player''s role to {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lError | &7You can only change permissions to lower island role than yours.'
+CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
+CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
+CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
 CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0}. You might need to reconnect to the server to see changes.'
 CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'
@@ -164,6 +168,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: 'Reload all configurations and tasks of the pl
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 'Remove all ratings given by a player.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 'Create schematics for the plugin.'
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 'Set block limit for another player''s island.'
@@ -377,6 +382,7 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Developed by Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Commands List [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Use /is help {0} for the next page.'
+ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lIsland | &7Blocks Limits:
   {0}

@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import io.netty.util.internal.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -137,6 +138,8 @@ public final class CmdAdminShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_WARPS_LIMIT.getMessage(locale, island.getWarpsLimit())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_COOP_LIMIT.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_COOP_LIMIT.getMessage(locale, island.getCoopLimit())).append("\n");
+        if(!Locale.ISLAND_INFO_ADMIN_BANK_LIMIT.isEmpty(locale))
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_BANK_LIMIT.getMessage(locale, StringUtils.format(island.getBankLimit()))).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(locale, island.getSpawnerRatesMultiplier())).append("\n");
         if(!Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty(locale))

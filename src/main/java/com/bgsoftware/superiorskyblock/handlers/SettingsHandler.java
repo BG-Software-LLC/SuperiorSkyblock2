@@ -17,6 +17,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int defaultCropGrowth;
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
+    public final BigDecimal defaultBankLimit;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -197,6 +199,7 @@ public final class SettingsHandler extends AbstractHandler {
         defaultCropGrowth = cfg.getInt("default-values.crop-growth", 1);
         defaultSpawnerRates = cfg.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = cfg.getDouble("default-values.mob-drops", 1D);
+        defaultBankLimit = new BigDecimal(cfg.getString("default-values.bank-limit", "-1"));
         islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);

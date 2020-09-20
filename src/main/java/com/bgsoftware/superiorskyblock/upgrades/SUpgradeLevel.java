@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +35,11 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final int teamLimit, warpsLimit, coopLimit, borderSize;
     private final KeyMap<Integer> blockLimits, entityLimits, generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
+    private final BigDecimal bankLimit;
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, KeyMap<Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects){
+    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements, double cropGrowth, double spawnerRates, double mobDrops, int teamLimit, int warpsLimit, int coopLimit, int borderSize, KeyMap<Integer> blockLimits, KeyMap<Integer> entityLimits, KeyMap<Integer> generatorRates, Map<PotionEffectType, Integer> islandEffects, BigDecimal bankLimit){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -54,6 +56,7 @@ public class SUpgradeLevel implements UpgradeLevel {
         this.entityLimits = entityLimits;
         this.generatorRates = generatorRates;
         this.islandEffects = islandEffects;
+        this.bankLimit = bankLimit;
     }
 
     @Override
@@ -182,6 +185,11 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
         return islandEffects;
+    }
+
+    @Override
+    public BigDecimal getBankLimit() {
+        return bankLimit;
     }
 
     public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){

@@ -62,6 +62,9 @@ public final class SIslandBank implements IslandBank {
 
             if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";
+            } else if(island.getBankLimit().compareTo(BigDecimal.valueOf(-1)) > 0 &&
+                    this.balance.get().add(amount).compareTo(island.getBankLimit()) > 0) {
+                failureReason = "Exceed bank limit";
             } else {
                 failureReason = plugin.getProviders().withdrawMoneyForBanks(superiorPlayer, amount);
             }
