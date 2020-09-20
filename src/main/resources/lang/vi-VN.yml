@@ -25,6 +25,7 @@ ALREADY_IN_ISLAND_OTHER: '&c&lLỗi | &7Người chơi này đã là thành viê
 BAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} vừa bị&c&n Cấm&7 trong đảo bởi {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể cấm người chơi có vai trò
   trong đảo thấp hơn bạn.'
+BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
 BANNED_FROM_ISLAND: '&c&lLỗi | &7Bạn đã bị cấm trong hòn đảo này.'
 BLOCK_COUNT_CHECK: '&e&lĐảo Thần | &7Đảo này có x{0} {1}.'
 BLOCK_COUNTS_CHECK: |
@@ -44,6 +45,9 @@ BUILD_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể xây dựng ngoài phạ
 CANNOT_SET_ROLE: '&c&lLỗi | &7Bạn không thể đặt vai trò của người chơi thành {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thay đổi quyền thành
   vai trò trong đảo thấp hơn vai trò của bạn.'
+CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
+CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
+CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
 CHANGED_BIOME: '&e&lĐảo Thần | &7Thay đổi thành công quần xã thành {0}. Bạn có thể
   cần kết nối lại với máy chủ để xem các thay đổi.'
 CHANGED_BIOME_ALL: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho tất cả các đảo.'
@@ -194,6 +198,7 @@ COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an isla
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: Đặt giới hạn khối cho đảo của người chơi
@@ -235,6 +240,7 @@ COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Mở khóa một thế giới cho một 
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Rút tiền từ ngân hàng đảo của người chơi khác.
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
+COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
 COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
@@ -433,6 +439,7 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7Được phát triển bởi Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách lệnh [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is help {0} cho trang tiếp theo.'
+ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lNâng cấp | &7Blocks Limits:
   {0}

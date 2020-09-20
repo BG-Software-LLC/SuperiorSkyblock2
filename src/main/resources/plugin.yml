@@ -21,6 +21,8 @@ permissions:
             description: Check the amount of money inside an island's bank.
           superior.island.ban:
             description: Ban a player from your island.
+          superior.island.bank:
+            description: Open the island's bank.
           superior.island.biome:
             description: Change the biome of the island.
           superior.island.border:

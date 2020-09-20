@@ -21,6 +21,7 @@ ALREADY_IN_ISLAND: '&c&l错误 | &7你现在已经在一个岛屿上了.'
 ALREADY_IN_ISLAND_OTHER: '&c&l错误 | &7这个玩家已经是你的岛屿成员了.'
 BAN_ANNOUNCEMENT: '&e&l岛屿 | &b{1} &7将 &b{0} 从你的岛屿中禁封了,他将不能再进入你的岛屿.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&l错误 | &7你只能禁封岛屿中职位比你低的玩家.'
+BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
 BANNED_FROM_ISLAND: '&c&l错误 | &7你被这个岛屿禁封了！'
 BLOCK_COUNT_CHECK: '&e&l岛屿 | &7这个岛屿有 {0}个 {1}.'
 BLOCK_COUNTS_CHECK: |
@@ -37,6 +38,9 @@ BORDER_PLAYER_COLOR_UPDATED: '&e&l岛屿边界 | &7已成功将岛屿边界颜�
 BUILD_OUTSIDE_ISLAND: '&c&l错误 | &7你不能超出岛屿边界.'
 CANNOT_SET_ROLE: '&c&l错误 | &7你不能设置玩家的空岛职位为 {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&l错误 | &7你只能为比你岛屿职位更低的玩家设置权限'
+CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
+CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
+CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
 CHANGED_BIOME: '&e&l岛屿 | &7岛屿生物群系已更新！你需要重新进入岛屿才能看到变化.'
 CHANGED_BIOME_ALL: '&e&l岛屿 | &7成功将所有岛屿的生物群系改变为 {0} .'
 CHANGED_BIOME_NAME: '&e&l岛屿 | &7成功将岛屿 {1} 的生物群系改变为 {0} .'
@@ -164,6 +168,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: 重载插件.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛屿评分.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 给一个岛屿设置生物群系.
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: 更新其他玩家岛屿的方块限制.
@@ -197,6 +202,7 @@ COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 为岛屿解锁新维度
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 从一个岛屿银行中取款.
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: 在岛屿上禁封一个玩家.
+COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
 COMMAND_DESCRIPTION_BIOME: 改变岛屿群系.
 COMMAND_DESCRIPTION_BORDER: 更新岛屿边界颜色.
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
@@ -376,6 +382,7 @@ ISLAND_HELP_FOOTER: '&e&l岛屿 &7帮助列表'
 ISLAND_HELP_HEADER: '&e&l岛屿 &7命令列表 [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&l岛屿 &7使用 &b/is help {0} &7来查看下一页.'
+ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&l岛屿 | &7岛屿方块限制:
   {0}

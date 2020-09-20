@@ -22,6 +22,7 @@ ALREADY_IN_ISLAND_OTHER: '&c&lהאיגש | &7ךלש יאב אצמנ רבכ הז�
 BAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ קחרוה. {0}'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7םכלשמ הכומנ הגרד ילעב םינקחש קר קיחרהל
   םילוכי םתא.'
+BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
 BANNED_FROM_ISLAND: '&c&lהאיגש | &7יאהמ קחרומ התא.'
 BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_COUNTS_CHECK: |
@@ -39,6 +40,9 @@ BUILD_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאל ץוחמ תונבל לו
 CANNOT_SET_ROLE: '&c&lהאיגש | &7{0} ל ןקחשה לש הגרדה תא תונשל לוכי אל התא.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lהאיגש | &7םינקחשל ךלשמ תוכומנ רתוי תוגרד קר
   תונשל לושכי התא.'
+CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
+CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
+CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
 CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
   ל החלצהב הנוש יאה לש םויבה.'
 CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
@@ -172,6 +176,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: ןיגאלפה לש םיצבקה לכ תא ש�
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: ןקחש ידי לע ונתנש םיגורידה לכ תא קוחמל.
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: ןיגאלפל שדח הנבמ רוציל.
+COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 'Set the biome of an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT: 'Set the block amount in a specific location.'
 COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_LIMIT: רחא ןקחש לש יאל םיקולב לש הלבגה תונשל.
@@ -208,6 +213,7 @@ COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.
 COMMAND_DESCRIPTION_BALANCE: 'Check the amount of money inside an island''s bank.'
 COMMAND_DESCRIPTION_BAN: ךלש יאהמ ןקחש קיחרהל.
+COMMAND_DESCRIPTION_BANK: 'Open the island''s bank.'
 COMMAND_DESCRIPTION_BIOME: יאה לש םויבה תא ףילחהל.
 COMMAND_DESCRIPTION_BORDER: םייאה לש לובגה עבצ תא ףילחהל.
 COMMAND_DESCRIPTION_CHEST: 'Open the island''s chest.'
@@ -394,6 +400,7 @@ ISLAND_HELP_FOOTER: '&e&lSuperiorSkyblock &7ידי לע רצונ Ome_R'
 ISLAND_HELP_HEADER: '&e&lSuperiorSkyblock &7תודוקפ תמישר [{0}/{1}]:'
 ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7אבה דומעל רבעמל /is help {0} ץרה.'
+ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lIsland | &7Bank Limit: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
   &e&lיא | &7םיקולב תלבגה:
   {0}
