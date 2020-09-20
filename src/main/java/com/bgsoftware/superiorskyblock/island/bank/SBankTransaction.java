@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public final class SBankTransaction implements BankTransaction {
@@ -25,6 +27,17 @@ public final class SBankTransaction implements BankTransaction {
         this.date = StringUtils.formatDate(time);
         this.failureReason = failureReason == null ? "" : failureReason;
         this.amount = amount;
+    }
+
+    public SBankTransaction(ResultSet resultSet) throws SQLException {
+        String player = resultSet.getString("player");
+        this.player = player == null || player.isEmpty() ? null  : UUID.fromString(player);
+        this.bankAction = BankAction.valueOf(resultSet.getString("bankAction"));
+        this.position = resultSet.getInt("position");
+        this.time = Long.parseLong(resultSet.getString("time"));
+        this.date = StringUtils.formatDate(time);
+        this.failureReason = resultSet.getString("failureReason");
+        this.amount = BigDecimalFormatted.of(resultSet.getString("amount"));
     }
 
     @Override

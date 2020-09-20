@@ -65,6 +65,8 @@ public enum Query {
     STACKED_BLOCKS_INSERT("REPLACE INTO {prefix}stackedBlocks (world,x,y,z,amount,item) VALUES(?,?,?,?,?,?);"),
     STACKED_BLOCKS_DELETE("DELETE FROM {prefix}stackedBlocks WHERE world=? AND x=? AND y=? AND z=?;"),
 
+    TRANSACTION_INSERT("REPLACE INTO {prefix}bankTransactions (island,player,bankAction,position,time,failureReason,amount) VALUES(?,?,?,?,?,?,?);"),
+
     GRID_UPDATE_LAST_ISLAND("UPDATE {prefix}grid SET lastIsland=?;"),
     GRID_INSERT("REPLACE INTO {prefix}grid (lastIsland,stackedBlocks,maxIslandSize,world,dirtyChunks) VALUES(?,?,?,?,?);");
 

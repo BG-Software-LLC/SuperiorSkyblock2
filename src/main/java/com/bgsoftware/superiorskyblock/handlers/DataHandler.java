@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
+import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -16,6 +18,7 @@ import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.sql.*;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
@@ -106,6 +109,19 @@ public final class DataHandler extends AbstractHandler {
                 "world TEXT, " +
                 "dirtyChunks TEXT" +
                 ");");
+
+        if(plugin.getSettings().bankLogs) {
+            //Creating default transactions table
+            SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}bankTransactions (" +
+                    "island VARCHAR(36), " +
+                    "player VARCHAR(36), " +
+                    "bankAction TEXT, " +
+                    "position INTEGER, " +
+                    "time TEXT, " +
+                    "failureReason TEXT," +
+                    "amount TEXT" +
+                    ");");
+        }
 
         if(!containsGrid())
             plugin.getGrid().executeGridInsertStatement(false);
@@ -238,6 +254,21 @@ public final class DataHandler extends AbstractHandler {
         }
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
+
+        if(plugin.getSettings().bankLogs) {
+            SuperiorSkyblockPlugin.log("Starting to bank transactions...");
+
+            SQLHelper.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
+                while (resultSet.next()) {
+                    try{
+                        Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
+                        ((SIslandBank) island.getIslandBank()).loadTransaction(new SBankTransaction(resultSet));
+                    }catch (Exception ignored){}
+                }
+            });
+
+            SuperiorSkyblockPlugin.log("Finished bank transactions!");
+        }
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
