@@ -48,6 +48,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -660,6 +661,17 @@ public final class PlayersListener implements Listener {
             ((SSuperiorPlayer) superiorPlayer).setBankDepositSlot(-1);
             ((SSuperiorPlayer) superiorPlayer).setBankCommandsToExecute(null);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+
+        if(island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().isFlying() &&
+                island.hasPermission(superiorPlayer, IslandPrivileges.FLY))
+            Executor.sync(() -> e.getPlayer().setFlying(true), 1L);
+
     }
 
     private final class EffectsListener implements Listener{
