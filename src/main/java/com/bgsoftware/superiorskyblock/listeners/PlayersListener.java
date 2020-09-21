@@ -670,7 +670,10 @@ public final class PlayersListener implements Listener {
 
         if(island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().isFlying() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY))
-            Executor.sync(() -> e.getPlayer().setFlying(true), 1L);
+            Executor.sync(() -> {
+                e.getPlayer().setAllowFlight(true);
+                e.getPlayer().setFlying(true);
+            }, 1L);
 
     }
 
