@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -200,6 +201,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
         else {
             if(targetPlayer != null)
                 command = PlaceholderHook.parse(targetPlayer, command);
+            else if(sender instanceof Player)
+                command = PlaceholderHook.parse(SSuperiorPlayer.of(sender), command);
 
             Bukkit.dispatchCommand(sender instanceof Player || command.startsWith("PLAYER:") ? e.getWhoClicked() : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", e.getWhoClicked().getName()));
