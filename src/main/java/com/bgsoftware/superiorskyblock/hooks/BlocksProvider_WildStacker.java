@@ -113,7 +113,8 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                 throw new RuntimeException("Chunk " + id + " is not cached.");
 
             try {
-                return stackedSnapshot.getAllBarrelsItems().values().stream().map(Pair::new).collect(Collectors.toSet());
+                return stackedSnapshot.getAllBarrelsItems().values().stream()
+                        .filter(entry -> entry.getValue() != null).map(Pair::new).collect(Collectors.toSet());
             }catch (Throwable ex){
                 return stackedSnapshot.getAllBarrels().values().stream().map(
                         entry -> new Pair<>(entry.getKey(), new ItemStack(entry.getValue())))
