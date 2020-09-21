@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -53,26 +53,38 @@ public final class MenusListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMenuClick(InventoryClickEvent e){
-        InventoryHolder inventoryHolder = e.getClickedInventory() == null || e.getView().getTopInventory() == null ? null : e.getView().getTopInventory().getHolder();
-
-        if(!(inventoryHolder instanceof SuperiorMenu) || !(e.getWhoClicked() instanceof Player))
+        if(!(e.getWhoClicked() instanceof Player) || e.getView().getTopInventory() == null ||
+                e.getClickedInventory() == null)
             return;
 
-        e.setCancelled(true);
+        InventoryHolder inventoryHolder = e.getView().getTopInventory().getHolder();
 
-        if(e.getClickedInventory().equals(e.getView().getTopInventory()))
-            ((SuperiorMenu) inventoryHolder).onClick(e);
+        if(inventoryHolder instanceof SuperiorMenu) {
+            e.setCancelled(true);
+
+            if (e.getClickedInventory().equals(e.getView().getTopInventory()))
+                ((SuperiorMenu) inventoryHolder).onClick(e);
+        }
+        else if(inventoryHolder instanceof StackedBlocksDepositMenu){
+            ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e);
+        }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onMenuClose(InventoryCloseEvent e){
         InventoryHolder inventoryHolder = e.getInventory() == null ? null : e.getInventory().getHolder();
 
-        if(!(inventoryHolder instanceof SuperiorMenu) || !(e.getPlayer() instanceof Player))
+        if(!(e.getPlayer() instanceof Player))
             return;
 
-        ((SuperiorMenu) inventoryHolder).closeInventory(SSuperiorPlayer.of(e.getPlayer()));
+        if(inventoryHolder instanceof SuperiorMenu) {
+            ((SuperiorMenu) inventoryHolder).closeInventory(SSuperiorPlayer.of(e.getPlayer()));
+        }
+        else if(inventoryHolder instanceof StackedBlocksDepositMenu){
+            ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
+        }
     }
+
 
     /**
      * Settings menu listeners

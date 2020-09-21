@@ -420,6 +420,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         return stackedBlocks.getOrDefault(SBlockPosition.of(location), 1);
     }
 
+    public Key getBlockKey(Location location){
+        return stackedBlocks.getOrDefault(SBlockPosition.of(location), Key.of(location.getBlock()));
+    }
+
     public Set<Pair<Integer, Key>> getBlockAmounts(ChunkPosition chunkPosition){
         return stackedBlocks.get(chunkPosition).values().stream()
                 .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))

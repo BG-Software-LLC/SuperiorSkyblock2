@@ -174,6 +174,10 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     }
 
     @Override
+    public void playPlaceSound(Location location) {
+    }
+
+    @Override
     public Enchantment getGlowEnchant() {
         int id = 100;
 

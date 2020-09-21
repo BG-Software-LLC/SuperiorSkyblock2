@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -58,6 +59,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
@@ -267,7 +269,7 @@ public final class BlocksListener implements Listener {
             }
 
             if(e.getItem() != null && canStackBlocks(e.getPlayer(), e.getItem(), e.getClickedBlock(), null) &&
-                    tryStack(e.getPlayer(), e.getItem(), e.getClickedBlock(), e)){
+                    tryStack(e.getPlayer(), e.getItem(), e.getClickedBlock().getLocation(), e)){
                 e.setCancelled(true);
             }
         }
@@ -281,7 +283,7 @@ public final class BlocksListener implements Listener {
         if(!canStackBlocks(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e.getBlockReplacedState()))
             return;
 
-        if(tryStack(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e))
+        if(tryStack(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst().getLocation(), e))
             e.setCancelled(true);
     }
 
@@ -299,11 +301,17 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        recentlyClicked.add(e.getPlayer().getUniqueId());
-        Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
+        if(plugin.getSettings().stackedBlocksMenuEnabled && e.getPlayer().isSneaking()){
+            StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
+            e.getPlayer().openInventory(depositMenu.getInventory());
+        }
+        else {
+            recentlyClicked.add(e.getPlayer().getUniqueId());
+            Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
-        if(tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
-            e.setCancelled(true);
+            if (tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -353,11 +361,19 @@ public final class BlocksListener implements Listener {
         return true;
     }
 
-    private boolean tryStack(Player player, ItemStack placeItem, Block againstBlock, Event event){
+    private boolean tryStack(Player player, ItemStack itemToDeposit, Location stackedBlock, Event event){
+        return tryStack(plugin, player, !player.isSneaking() ? 1 : itemToDeposit.getAmount(), stackedBlock, depositedAmount -> {
+            ItemStack inHand = itemToDeposit.clone();
+            inHand.setAmount(depositedAmount);
+            ItemUtils.removeItem(inHand, event, player);
+        });
+    }
+
+    public static boolean tryStack(SuperiorSkyblockPlugin plugin, Player player, int amount, Location stackedBlock, Consumer<Integer> depositedAmount){
         // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
-        int amount = !player.isSneaking() ? 1 : placeItem.getAmount();
-        int blockAmount = plugin.getGrid().getBlockAmount(againstBlock);
-        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(Key.of(againstBlock), Integer.MAX_VALUE);
+        int blockAmount = plugin.getGrid().getBlockAmount(stackedBlock);
+        Key blockKey = plugin.getGrid().getBlockKey(stackedBlock);
+        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(blockKey, Integer.MAX_VALUE);
 
         if(amount + blockAmount > blockLimit){
             amount = blockLimit - blockAmount;
@@ -366,22 +382,22 @@ public final class BlocksListener implements Listener {
         if(amount <= 0)
             return false;
 
-        if(!EventsCaller.callBlockStackEvent(againstBlock, blockAmount, blockAmount + amount))
+        Block block = stackedBlock.getBlock();
+
+        if(!EventsCaller.callBlockStackEvent(block, blockAmount, blockAmount + amount))
             return false;
 
-        plugin.getGrid().setBlockAmount(againstBlock, blockAmount + amount);
+        plugin.getGrid().setBlockAmount(block, blockAmount + amount);
 
         if(plugin.getGrid().hasBlockFailed())
             return false;
 
-        Island island = plugin.getGrid().getIslandAt(againstBlock.getLocation());
+        Island island = plugin.getGrid().getIslandAt(stackedBlock);
         if(island != null){
-            island.handleBlockPlace(againstBlock, amount);
+            island.handleBlockPlace(block, amount);
         }
 
-        ItemStack inHand = placeItem.clone();
-        inHand.setAmount(amount);
-        ItemUtils.removeItem(inHand, event, player);
+        depositedAmount.accept(amount);
 
         return true;
     }

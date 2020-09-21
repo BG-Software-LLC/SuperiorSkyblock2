@@ -55,6 +55,8 @@ public final class SettingsHandler extends AbstractHandler {
     public final String stackedBlocksName;
     public final KeyMap<Integer> stackedBlocksLimits;
     public final boolean stackedBlocksAutoPickup;
+    public final boolean stackedBlocksMenuEnabled;
+    public final String stackedBlocksMenuTitle;
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
     public final String islandTopOrder;
@@ -203,7 +205,7 @@ public final class SettingsHandler extends AbstractHandler {
         islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
-        stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
+        stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disfabled-worlds");
         whitelistedStackedBlocks = new KeySet(cfg.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = StringUtils.translateColors(cfg.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = new KeyMap<>();
@@ -217,6 +219,8 @@ public final class SettingsHandler extends AbstractHandler {
             }catch(Exception ignored){}
         });
         stackedBlocksAutoPickup = cfg.getBoolean("stacked-blocks.auto-collect", false);
+        stackedBlocksMenuEnabled = cfg.getBoolean("stacked-blocks.deposit-menu.enabled", true);
+        stackedBlocksMenuTitle = StringUtils.translateColors(cfg.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = cfg.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = cfg.getBoolean("rounded-island-level", false);
         islandTopOrder = cfg.getString("island-top-order", "WORTH");

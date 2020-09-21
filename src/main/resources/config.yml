@@ -113,6 +113,13 @@ stacked-blocks:
   # Should blocks get added directly into the player's inventory?
   auto-collect: false
 
+  # Settings related to the deposit menu.
+  deposit-menu:
+    # Should the menu be opened when shift-clicking stacked blocks?
+    enabled: true
+    # The title of the menu.
+    title: '&lDeposit Blocks'
+
 # Set a formula to calculate the island level by it's worth.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
 island-level-formula: '{} / 2'
