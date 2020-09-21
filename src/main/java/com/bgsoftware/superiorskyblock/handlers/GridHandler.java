@@ -626,8 +626,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void updateStackedBlockKeys(){
-        stackedBlocks.values().forEach(map ->
-                map.forEach((blockPosition, pair) -> pair.setValue(Key.of(blockPosition.getBlock()))));
+        stackedBlocks.values().forEach(map -> map.forEach((blockPosition, pair) -> {
+            try{
+                pair.setValue(Key.of(blockPosition.getBlock()));
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }));
     }
 
     public void executeGridInsertStatement(boolean async) {
