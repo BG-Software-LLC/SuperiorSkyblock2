@@ -22,7 +22,9 @@ ALREADY_IN_ISLAND_OTHER: '&c&lהאיגש | &7ךלש יאב אצמנ רבכ הז�
 BAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע יאהמ קחרוה. {0}'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lהאיגש | &7םכלשמ הכומנ הגרד ילעב םינקחש קר קיחרהל
   םילוכי םתא.'
+BANK_DEPOSIT_CUSTOM: '&e&lBank | &7Type the amount you want to deposit:'
 BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
+BANK_WITHDRAW_CUSTOM: '&e&lBank | &7Type the amount you want to withdraw:'
 BANNED_FROM_ISLAND: '&c&lהאיגש | &7יאהמ קחרומ התא.'
 BLOCK_COUNT_CHECK: '&e&lIsland | &7This island has x{0} {1}.'
 BLOCK_COUNTS_CHECK: |

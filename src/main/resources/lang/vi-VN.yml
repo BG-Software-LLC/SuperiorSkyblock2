@@ -25,7 +25,9 @@ ALREADY_IN_ISLAND_OTHER: '&c&lLỗi | &7Người chơi này đã là thành viê
 BAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} vừa bị&c&n Cấm&7 trong đảo bởi {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể cấm người chơi có vai trò
   trong đảo thấp hơn bạn.'
+BANK_DEPOSIT_CUSTOM: '&e&lBank | &7Type the amount you want to deposit:'
 BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
+BANK_WITHDRAW_CUSTOM: '&e&lBank | &7Type the amount you want to withdraw:'
 BANNED_FROM_ISLAND: '&c&lLỗi | &7Bạn đã bị cấm trong hòn đảo này.'
 BLOCK_COUNT_CHECK: '&e&lĐảo Thần | &7Đảo này có x{0} {1}.'
 BLOCK_COUNTS_CHECK: |

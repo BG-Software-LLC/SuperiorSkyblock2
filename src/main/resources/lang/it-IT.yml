@@ -25,7 +25,9 @@ ALREADY_IN_ISLAND_OTHER: '&c&lErrore | &7Questo giocatore è già membro della t
 BAN_ANNOUNCEMENT: '&e&lIsola | &7{0} è stato bannato dall''isola di {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lErrore | &7Puoi bannare solo i giocatori aventi
   un ruolo inferiore al tuo.'
+BANK_DEPOSIT_CUSTOM: '&e&lBank | &7Type the amount you want to deposit:'
 BANK_LIMIT_EXCEED: '&c&lError | &7You have exceeded your bank limit.'
+BANK_WITHDRAW_CUSTOM: '&e&lBank | &7Type the amount you want to withdraw:'
 BANNED_FROM_ISLAND: '&c&lErrore | &7Sei stato bannato da questa isola.'
 BLOCK_COUNT_CHECK: '&e&lIsola | &7Quest''isola ha x{0} {1}.'
 BLOCK_COUNTS_CHECK: |
