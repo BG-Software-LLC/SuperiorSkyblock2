@@ -17,6 +17,7 @@ import net.minecraft.server.v1_8_R1.MinecraftKey;
 import net.minecraft.server.v1_8_R1.MinecraftServer;
 import net.minecraft.server.v1_8_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_8_R1.PlayerInteractManager;
+import net.minecraft.server.v1_8_R1.StepSound;
 import net.minecraft.server.v1_8_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R1.World;
 import net.minecraft.server.v1_8_R1.WorldBorder;
@@ -175,6 +176,11 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
 
     @Override
     public void playPlaceSound(Location location) {
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        StepSound stepSound = world.getType(blockPosition).getBlock().stepSound;
+        world.makeSound(blockPosition.getX() + 0.5F, blockPosition.getY() + 0.5F, blockPosition.getZ() + 0.5F,
+                stepSound.getPlaceSound(), (stepSound.getVolume1() + 1.0F) / 2.0F, stepSound.getVolume2() * 0.8F);
     }
 
     @Override

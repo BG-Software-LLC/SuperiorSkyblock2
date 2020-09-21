@@ -175,7 +175,11 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
 
     @Override
     public void playPlaceSound(Location location) {
-        
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        World world = ((CraftWorld) location.getWorld()).getHandle();
+        Block.StepSound stepSound = world.getType(blockPosition).getBlock().stepSound;
+        world.makeSound(blockPosition.getX() + 0.5F, blockPosition.getY() + 0.5F, blockPosition.getZ() + 0.5F,
+                stepSound.getPlaceSound(), (stepSound.getVolume1() + 1.0F) / 2.0F, stepSound.getVolume2() * 0.8F);
     }
 
     @Override
