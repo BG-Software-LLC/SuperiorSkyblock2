@@ -6,7 +6,7 @@ import org.bukkit.OfflinePlayer;
 public final class PlaceholderHook_MVdW extends PlaceholderHook {
 
     PlaceholderHook_MVdW(){
-        be.maximvdw.placeholderapi.PlaceholderAPI.registerPlaceholder(plugin, "superior_*", e ->
+        PlaceholderAPI.registerPlaceholder(plugin, "superior_*", e ->
                 parsePlaceholder(e.getOfflinePlayer(), e.getPlaceholder().replace("superior_", "")));
     }
 
