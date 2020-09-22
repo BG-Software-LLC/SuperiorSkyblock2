@@ -72,6 +72,8 @@ public final class BigDecimalFormatted extends BigDecimal {
     }
 
     public static BigDecimalFormatted of(BigDecimal bigDecimal){
+        if(bigDecimal instanceof BigDecimalFormatted)
+            return (BigDecimalFormatted) bigDecimal;
         if(bigDecimal.toString().contains("-")) bigDecimal = bigDecimal.negate().negate();
         return new BigDecimalFormatted(bigDecimal.toString());
     }
