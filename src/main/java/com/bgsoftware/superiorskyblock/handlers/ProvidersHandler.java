@@ -152,9 +152,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 setEconomyProvider(new EconomyProvider_Vault());
                 setBankEconomyProvider(economyProvider);
             }catch (Exception ignored){}
-        });
 
-        PlaceholderHook.register(plugin);
+            PlaceholderHook.register(plugin);
+        });
     }
 
     private void runSafe(Runnable runnable){
