@@ -301,7 +301,8 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if(plugin.getSettings().stackedBlocksMenuEnabled && e.getPlayer().isSneaking()){
+        if(plugin.getSettings().stackedBlocksMenuEnabled && e.getPlayer().isSneaking() &&
+                plugin.getGrid().getBlockAmount(e.getClickedBlock()) > 1){
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
         }
