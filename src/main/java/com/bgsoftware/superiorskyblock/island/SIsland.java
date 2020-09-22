@@ -264,7 +264,9 @@ public final class SIsland extends DatabaseObject implements Island {
 
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
-        this.bankLimit.set(new BigDecimal(resultSet.getString("bankLimit")));
+        String bankLimit = resultSet.getString("bankLimit");
+        if(bankLimit != null && !bankLimit.isEmpty())
+            this.bankLimit.set(new BigDecimal(bankLimit));
 
         String blockCounts = resultSet.getString("blockCounts");
 
