@@ -3,14 +3,15 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
@@ -55,7 +56,6 @@ public final class SettingsListener implements Listener {
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
-        boolean animal = e.getEntity() instanceof Animals;
 
         if(island != null){
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
@@ -64,15 +64,21 @@ public final class SettingsListener implements Listener {
             switch (e.getSpawnReason()){
                 case JOCKEY:
                 case CHUNK_GEN:
-                case NATURAL:
-                    if(!island.hasSettingsEnabled(animal ? IslandFlags.NATURAL_ANIMALS_SPAWN : IslandFlags.NATURAL_MONSTER_SPAWN))
+                case NATURAL: {
+                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.NATURAL_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
                         e.setCancelled(true);
                     break;
+                }
                 case SPAWNER:
-                case SPAWNER_EGG:
-                    if(!island.hasSettingsEnabled(animal ? IslandFlags.SPAWNER_ANIMALS_SPAWN : IslandFlags.SPAWNER_MONSTER_SPAWN))
+                case SPAWNER_EGG: {
+                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
                         e.setCancelled(true);
                     break;
+                }
             }
         }
     }
