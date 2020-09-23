@@ -35,7 +35,7 @@ public enum Rating {
      * Get a rating by it's value.
      */
     public static Rating valueOf(int value){
-        return values()[value];
+        return values()[value + 1];
     }
 
 }
