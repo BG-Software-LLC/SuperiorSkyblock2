@@ -5,11 +5,14 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
+import org.bukkit.entity.Ambient;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -100,10 +103,6 @@ public final class EntityUtils {
         return false;
     }
 
-    public static EntityType getLimitEntityType(EntityType entityType){
-        return entityType.name().contains("MINECART") ? EntityType.MINECART : entityType;
-    }
-
     public static Key getLimitEntityType(Entity entity){
         Key key = Key.of(entity);
         return key.getGlobalKey().contains("MINECART") ?
@@ -132,6 +131,21 @@ public final class EntityUtils {
             return !((ArmorStand) entity).isVisible();
 
         return false;
+    }
+
+    public static boolean isMonster(EntityType entityType){
+        switch (entityType.name()){
+            case "SLIME":
+            case "MAGMA_CUBE":
+                return true;
+            default:
+                return Monster.class.isAssignableFrom(entityType.getEntityClass());
+        }
+    }
+
+    public static boolean isAnimal(EntityType entityType){
+        return Creature.class.isAssignableFrom(entityType.getEntityClass()) ||
+                Ambient.class.isAssignableFrom(entityType.getEntityClass());
     }
 
     private static <T> boolean contains(T[] arr, T val){

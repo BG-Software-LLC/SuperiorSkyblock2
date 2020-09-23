@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -18,21 +19,17 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Creature;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Monster;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
-import org.bukkit.entity.Slime;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -547,8 +544,8 @@ public final class ProtectionListener implements Listener {
         SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        IslandPrivilege islandPermission = e.getEntity() instanceof Monster || e.getEntity() instanceof Slime ?
-                IslandPrivileges.MONSTER_DAMAGE : e.getEntity() instanceof Creature || e.getEntity() instanceof Ambient ?
+        IslandPrivilege islandPermission = EntityUtils.isMonster(e.getEntityType()) ?
+                IslandPrivileges.MONSTER_DAMAGE : EntityUtils.isAnimal(e.getEntityType()) ?
                 IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.BREAK;
 
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
@@ -571,7 +568,9 @@ public final class ProtectionListener implements Listener {
             return;
 
         try {
-            IslandPrivilege islandPermission = e.getItem().getType() == Material.ARMOR_STAND ? IslandPrivileges.BUILD : Animals.class.isAssignableFrom(spawnType.getEntityClass()) ? IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.MONSTER_SPAWN;
+            IslandPrivilege islandPermission = EntityUtils.isMonster(spawnType) ?
+                    IslandPrivileges.MONSTER_SPAWN : EntityUtils.isAnimal(spawnType) ?
+                    IslandPrivileges.ANIMAL_SPAWN : IslandPrivileges.BUILD;
 
             if(island != null && !island.hasPermission(superiorPlayer, islandPermission)){
                 e.setCancelled(true);
