@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -55,7 +57,8 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
             return new ItemBuilder(clickedItem)
                     .replaceAll("{0}", transaction.getPosition() + "")
                     .replaceAll("{1}", transaction.getPlayer() ==  null ? "Console" : SSuperiorPlayer.of(transaction.getPlayer()).getName())
-                    .replaceAll("{2}", StringUtils.format(transaction.getAction().name()))
+                    .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
+                            Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
                     .replaceAll("{3}", transaction.getDate())
                     .replaceAll("{4}", transaction.getAmount() + "")
                     .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
