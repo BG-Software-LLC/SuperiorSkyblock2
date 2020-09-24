@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
+import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -88,6 +89,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
+    private NMSHolograms nmsHolograms;
 
     private ChunkGenerator worldGenerator = null;
 
@@ -253,6 +255,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
+            nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
             return true;
         }catch(Exception ex){
             ex.printStackTrace();
@@ -426,6 +429,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSBlocks getNMSBlocks() {
         return nmsBlocks;
+    }
+
+    public NMSHolograms getNMSHolograms() {
+        return nmsHolograms;
     }
 
     public String getFileName(){

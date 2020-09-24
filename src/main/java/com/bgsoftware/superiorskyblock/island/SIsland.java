@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
@@ -1231,8 +1232,9 @@ public final class SIsland extends DatabaseObject implements Island {
                             blockCounts, islandWorth, islandLevel);
                 }
 
-                for(Pair<Integer, Key> pair : plugin.getGrid().getBlockAmounts(calculatedChunk.getPosition()))
-                    handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
+                for(StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
+                    handleBlockPlace(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1,
+                            false, blockCounts, islandWorth, islandLevel);
             }, (cF, ex) -> {
                 SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                 ex.printStackTrace();

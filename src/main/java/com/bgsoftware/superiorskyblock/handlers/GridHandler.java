@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
@@ -20,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
+import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -32,7 +32,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.registry.IslandRegistry;
@@ -48,15 +47,13 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -68,11 +65,11 @@ import java.util.stream.Collectors;
 public final class GridHandler extends AbstractHandler implements GridManager {
 
     private final IslandRegistry islands = new IslandRegistry();
-    private final StackedBlocksHandler stackedBlocks = new StackedBlocksHandler();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Registry<UUID, IslandPreview> islandPreviews = Registry.createRegistry();
     private final Set<UUID> customWorlds = Sets.newHashSet();
+    private final StackedBlocksHandler stackedBlocks;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -85,6 +82,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
+        stackedBlocks = new StackedBlocksHandler(plugin);
     }
 
     @Override
@@ -417,24 +415,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public int getBlockAmount(Location location){
-        return stackedBlocks.getOrDefault(SBlockPosition.of(location), 1);
+        return stackedBlocks.getBlockAmount(SBlockPosition.of(location), 1);
     }
 
     public Key getBlockKey(Location location){
-        return stackedBlocks.getOrDefault(SBlockPosition.of(location), Key.of(location.getBlock()));
+        return stackedBlocks.getBlockKey(SBlockPosition.of(location), Key.of(location.getBlock()));
     }
 
-    public Set<Pair<Integer, Key>> getBlockAmounts(ChunkPosition chunkPosition){
-        return stackedBlocks.get(chunkPosition).values().stream()
-                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toSet());
+    public Set<StackedBlocksHandler.StackedBlock> getStackedBlocks(ChunkPosition chunkPosition){
+        return new HashSet<>(stackedBlocks.getStackedBlocks(chunkPosition).values());
     }
 
     @Override
     public void setBlockAmount(Block block, int amount){
         SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
 
-        Key originalBlock = stackedBlocks.getOrDefault(SBlockPosition.of(block.getLocation()), null);
+        Key originalBlock = stackedBlocks.getBlockKey(SBlockPosition.of(block.getLocation()), null);
         Key currentBlock = Key.of(block);
 
         blockFailed = false;
@@ -445,11 +441,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             blockFailed = true;
         }
 
-        stackedBlocks.put(SBlockPosition.of(block.getLocation()), amount, currentBlock);
-        stackedBlocks.updateName(block);
+        StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
+        stackedBlock.updateName();
 
         if(amount > 1) {
-            if (originalBlock != null) {
+            if (originalBlock == null) {
                 Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
                         .setString(block.getWorld().getName())
                         .setInt(block.getX())
@@ -486,10 +482,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         stackedBlocksHolder.prepareBatch();
 
         IslandUtils.getChunkCoords(island, true, false).forEach(chunkPosition -> {
-            Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks = this.stackedBlocks.stackedBlocks.remove(chunkPosition);
+            Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks = this.stackedBlocks.removeStackedBlocks(chunkPosition);
             if(stackedBlocks != null)
-                stackedBlocks.keySet().forEach(blockPosition -> {
-                    this.stackedBlocks.removeHologram(blockPosition.parse());
+                stackedBlocks.values().forEach(stackedBlock -> {
+                    stackedBlock.removeHologram();
+                    SBlockPosition blockPosition = stackedBlock.getBlockPosition();
                     stackedBlocksHolder.setString(blockPosition.getWorldName()).setInt(blockPosition.getX())
                             .setInt(blockPosition.getY()).setInt(blockPosition.getZ()).addBatch();
                 });
@@ -587,7 +584,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
-                stackedBlocks.put(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), Key.of("AIR"));
+                stackedBlocks.setStackedBlock(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), Key.of("AIR"));
             }
         }
 
@@ -622,13 +619,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         String item = resultSet.getString("item");
         Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
 
-        stackedBlocks.put(SBlockPosition.of(world, x, y, z), amount, blockKey);
+        stackedBlocks.setStackedBlock(SBlockPosition.of(world, x, y, z), amount, blockKey);
     }
 
     public void updateStackedBlockKeys(){
-        stackedBlocks.values().forEach(map -> map.forEach((blockPosition, pair) -> {
+        stackedBlocks.getStackedBlocks().forEach(map -> map.forEach((blockPosition, stackedBlock) -> {
             try{
-                pair.setValue(Key.of(blockPosition.getBlock()));
+                stackedBlock.setBlockKey(Key.of(blockPosition.getBlock()));
             }catch (Exception ex){
                 ex.printStackTrace();
             }
@@ -675,20 +672,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
 
     public void saveStackedBlocks(){
-        Map<SBlockPosition, Pair<Integer, Key>> stackedBlocks = new HashMap<>();
-        this.stackedBlocks.values().forEach(stackedBlocks::putAll);
+        Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks = new HashMap<>();
+        this.stackedBlocks.getStackedBlocks().forEach(stackedBlocks::putAll);
+
+        SQLHelper.executeUpdate("DELETE FROM {prefix}stackedBlocks;");
 
         {
             StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_INSERT.getStatementHolder(null);
             stackedBlocksHolder.prepareBatch();
             stackedBlocks.forEach(((blockPosition, pair) -> {
-                if(pair.getKey() > 1){
+                if(pair.getAmount() > 1){
                     stackedBlocksHolder.setString(blockPosition.getWorldName())
                             .setInt(blockPosition.getX())
                             .setInt(blockPosition.getY())
                             .setInt(blockPosition.getZ())
-                            .setInt(pair.getKey())
-                            .setString(pair.getValue().toString())
+                            .setInt(pair.getAmount())
+                            .setString(pair.getBlockKey().toString())
                             .addBatch();
                 }
             }));
@@ -699,7 +698,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder(null);
             stackedBlocksHolder.prepareBatch();
             stackedBlocks.forEach(((blockPosition, pair) -> {
-                if(pair.getKey() <= 1){
+                if(pair.getAmount() <= 1){
                     stackedBlocksHolder.setString(blockPosition.getWorldName())
                             .setInt(blockPosition.getX())
                             .setInt(blockPosition.getY())
@@ -717,103 +716,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Query.GRID_UPDATE_LAST_ISLAND.getStatementHolder(null)
                 .setString(blockPosition.toString())
                 .execute(true);
-    }
-
-    private class StackedBlocksHandler {
-
-        private final Map<ChunkPosition, Map<SBlockPosition, Pair<Integer, Key>>> stackedBlocks = Maps.newHashMap();
-
-        void put(SBlockPosition location, int amount, Key blockKey){
-            stackedBlocks.computeIfAbsent(ChunkPosition.of(location), m -> new HashMap<>())
-                    .put(location, new Pair<>(amount, blockKey));
-        }
-
-        @SuppressWarnings("SameParameterValue")
-        int getOrDefault(SBlockPosition location, int def){
-            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(location));
-            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(def, null)).getKey();
-        }
-
-        @SuppressWarnings("SameParameterValue")
-        Key getOrDefault(SBlockPosition location, Key def){
-            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(location));
-            return chunkStackedBlocks == null ? def : chunkStackedBlocks.getOrDefault(location, new Pair<>(null, def)).getValue();
-        }
-
-        Map<SBlockPosition, Pair<Integer, Key>> get(ChunkPosition chunkPosition){
-            return stackedBlocks.getOrDefault(chunkPosition, new HashMap<>());
-        }
-
-        boolean containsKey(SBlockPosition blockPosition){
-            Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(blockPosition));
-            return chunkStackedBlocks != null && chunkStackedBlocks.containsKey(blockPosition);
-        }
-
-        Collection<Map<SBlockPosition, Pair<Integer, Key>>> values(){
-            return stackedBlocks.values();
-        }
-
-        private void updateName(Block block){
-            int amount = getBlockAmount(block);
-            ArmorStand armorStand = getHologram(block.getLocation(), true);
-            assert armorStand != null;
-
-            if(amount <= 1){
-                Map<SBlockPosition, Pair<Integer, Key>> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(block));
-                if(chunkStackedBlocks != null)
-                    chunkStackedBlocks.remove(SBlockPosition.of(block.getLocation()));
-                armorStand.remove();
-            }else{
-                armorStand.setCustomName(plugin.getSettings().stackedBlocksName
-                        .replace("{0}", String.valueOf(amount))
-                        .replace("{1}", getFormattedType(block.getType().name()))
-                );
-            }
-
-        }
-
-        private void removeHologram(Location location){
-            ArmorStand armorStand = getHologram(location, false);
-            if(armorStand != null)
-                armorStand.remove();
-        }
-
-        private ArmorStand getHologram(Location location, boolean createNew){
-            Location hologramLocation = location.add(0.5, 1, 0.5);
-
-            // Looking for an armorstand
-            for(Entity entity : location.getChunk().getEntities()){
-                if(entity instanceof ArmorStand && entity.getLocation().equals(hologramLocation))
-                    return (ArmorStand) entity;
-            }
-
-            if(createNew) {
-                // Couldn't find one, creating one...
-
-                ArmorStand armorStand = location.getWorld().spawn(hologramLocation, ArmorStand.class);
-
-                armorStand.setGravity(false);
-                armorStand.setSmall(true);
-                armorStand.setVisible(false);
-                armorStand.setCustomNameVisible(true);
-                armorStand.setMarker(true);
-
-                return armorStand;
-            }
-
-            return null;
-        }
-
-        private String getFormattedType(String type){
-            StringBuilder stringBuilder = new StringBuilder();
-
-            for(String section : type.split("_")){
-                stringBuilder.append(" ").append(section.substring(0, 1).toUpperCase()).append(section.substring(1).toLowerCase());
-            }
-
-            return stringBuilder.toString().substring(1);
-        }
-
     }
 
 }
