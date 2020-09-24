@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
 
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private static List<Integer> timeSortSlots, moneySortSlots;
 
     private final Island island;
 
@@ -35,14 +36,31 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
     private Comparator<BankTransaction> sorting;
 
     private MenuBankLogs(SuperiorPlayer superiorPlayer, Island island){
-        super("menuBankLogs", superiorPlayer);
+        super("menuBankLogs", superiorPlayer, true);
         this.island = island;
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event, BankTransaction transaction) {
-        if(event.getAction().name().contains("RIGHT")){
+    protected void onPlayerClick(InventoryClickEvent e, BankTransaction transaction) {
+        boolean reopenMenu = false;
+
+        if(transaction == null) {
+            if (timeSortSlots.contains(e.getRawSlot())) {
+                sorting = Comparator.comparingLong(BankTransaction::getTime);
+                reopenMenu = true;
+            } else if (moneySortSlots.contains(e.getRawSlot())) {
+                sorting = (o1, o2) -> o2.getAmount().compareTo(o1.getAmount());
+                reopenMenu = true;
+            }
+        }
+        else if(e.getAction().name().contains("RIGHT")){
             filteredPlayer = transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer();
+            reopenMenu = true;
+        }
+
+        if(reopenMenu){
+            previousMove = false;
+            open(previousMenu);
         }
     }
 
@@ -98,6 +116,9 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         menuMembers.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuMembers.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuMembers.setSlots(getSlots(cfg, "slots", charSlots));
+
+        timeSortSlots = getSlots(cfg, "time-sort", charSlots);
+        moneySortSlots = getSlots(cfg, "money-sort", charSlots);
 
         charSlots.delete();
 

@@ -13,13 +13,16 @@ pattern:
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
-  - '$ $ $ $ $ $ $ $ $'
+  - '$ $ $ ! $ - $ $ $'
   - '# # % # * # ^ # #'
 
 slots: '@'
 previous-page: '%'
 current-page: '*'
 next-page: '^'
+
+time-sort: '!'
+money-sort: '-'
 
 items:
   '@':
