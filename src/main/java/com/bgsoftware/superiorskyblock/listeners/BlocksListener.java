@@ -650,7 +650,7 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
-        if(isWarpSign(sign.getLines())){
+        if(((SIsland) island).isWarp(sign.getLocation())){
             island.deleteWarp(superiorPlayer, sign.getLocation());
         }
         else{
@@ -660,17 +660,6 @@ public final class BlocksListener implements Listener {
                 Locale.DELETE_WARP.send(superiorPlayer, SIsland.VISITORS_WARP_NAME);
             }
         }
-    }
-
-    private boolean isWarpSign(String[] lines){
-        List<String> warpLines = plugin.getSettings().signWarp;
-
-        for(int i = 0; i < lines.length; i++) {
-            if (!lines[i].equals(warpLines.get(i)))
-                return false;
-        }
-
-        return true;
     }
 
     public static void handleBlockBreak(SuperiorSkyblockPlugin plugin, Block block){

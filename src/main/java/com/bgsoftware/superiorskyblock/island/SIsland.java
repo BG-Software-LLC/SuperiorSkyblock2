@@ -2507,6 +2507,15 @@ public final class SIsland extends DatabaseObject implements Island {
         }
     }
 
+    public boolean isWarp(Location location){
+        for(WarpData warpData : warps.values()){
+            if(LocationUtils.isSameBlock(location, warpData.location))
+                return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void deleteWarp(String name){
         SuperiorSkyblockPlugin.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
