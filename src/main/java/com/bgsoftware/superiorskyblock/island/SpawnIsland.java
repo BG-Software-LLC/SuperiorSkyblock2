@@ -683,6 +683,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean giveInterest(boolean checkOnlineOwner) {
+        return false;
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBankAsBigDecimal() {
         return getMoneyInBank();

@@ -727,6 +727,13 @@ public interface Island extends Comparable<Island> {
     void setBankLimit(BigDecimal bankLimit);
 
     /**
+     * Give the bank interest to this island.
+     * @param checkOnlineOwner Check if the island-owner was online recently.
+     * @return Whether or not the money was given.
+     */
+    boolean giveInterest(boolean checkOnlineOwner);
+
+    /**
      * Get the money in the bank of the island.
      *
      * @deprecated see getMoneyInBank()

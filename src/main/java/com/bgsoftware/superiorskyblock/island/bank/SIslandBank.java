@@ -109,6 +109,11 @@ public final class SIslandBank implements IslandBank {
         return bankTransaction;
     }
 
+    public void giveMoneyRaw(BigDecimal amount){
+        setBalance(this.balance.get().add(amount), true);
+        MenuIslandBank.refreshMenus();
+    }
+
     @Override
     public BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, List<String> commandsToExecute) {
         BigDecimal withdrawAmount = balance.get().min(amount);

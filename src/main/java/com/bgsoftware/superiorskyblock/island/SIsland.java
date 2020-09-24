@@ -169,6 +169,7 @@ public final class SIsland extends DatabaseObject implements Island {
     private final SyncedObject<Integer> unlockedWorlds = SyncedObject.of(0);
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
     private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().islandChestsDefaultPage]);
+    private final SyncedObject<Long> lastInterest = SyncedObject.of(-1L);
 
     /*
      * Island multipliers & limits
@@ -293,6 +294,17 @@ public final class SIsland extends DatabaseObject implements Island {
             this.uuid = UUID.fromString(uuidRaw);
         }
 
+        this.lastInterest.set(resultSet.getLong("lastInterest"));
+
+        long currentTime = System.currentTimeMillis() / 1000;
+        long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
+        if(ticksToNextInterest <= 0) {
+            giveInterest(true);
+        }
+        else {
+            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+        }
+
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -310,13 +322,18 @@ public final class SIsland extends DatabaseObject implements Island {
         }else{
             this.owner = null;
         }
+
+        long currentTime = System.currentTimeMillis() / 1000;
+
         this.uuid = uuid;
         this.center = wrappedLocation;
-        this.creationTime = System.currentTimeMillis() / 1000;
+        this.creationTime = currentTime;
         updateCreationTimeDate();
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
+
+        updateLastInterest(currentTime);
 
         assignIslandChest();
         updateUpgrades();
@@ -1578,6 +1595,25 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(bankLimit.toString())
                 .setString(owner.getUniqueId().toString())
                 .execute(true);
+    }
+
+    @Override
+    public boolean giveInterest(boolean checkOnlineOwner) {
+        long currentTime = System.currentTimeMillis() / 1000;
+
+        if(checkOnlineOwner && plugin.getSettings().bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > plugin.getSettings().bankInterestRecentActive)
+            return false;
+
+        SuperiorSkyblockPlugin.debug("Action: Give Bank Interest, Island: " + owner.getName());
+
+        BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(plugin.getSettings().bankInterestPercentage / 100D));
+        islandBank.giveMoneyRaw(balanceToGive);
+
+        updateLastInterest(currentTime);
+
+        return true;
     }
 
     @Override
@@ -2941,6 +2977,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(uuid.toString())
                 .setString(bankLimit.get() + "")
+                .setLong(lastInterest.get())
                 .setString(owner.getUniqueId().toString());
     }
 
@@ -3002,6 +3039,7 @@ public final class SIsland extends DatabaseObject implements Island {
                 .setString(IslandSerializer.serializeIslandChest(islandChest))
                 .setString(uuid.toString())
                 .setString(bankLimit.get() + "")
+                .setLong(lastInterest.get())
                 .execute(async);
     }
 
@@ -3191,6 +3229,19 @@ public final class SIsland extends DatabaseObject implements Island {
         Query.ISLAND_SET_VISITORS.getStatementHolder(this)
                 .setString(IslandSerializer.serializePlayersWithTimes(uniqueVisitors))
                 .setString(owner.getUniqueId().toString())
+                .execute(true);
+    }
+
+    private void updateLastInterest(long lastInterest){
+        if(plugin.getSettings().bankInterestEnabled) {
+            long ticksToNextInterest = plugin.getSettings().bankInterestInterval * 20;
+            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+        }
+
+        this.lastInterest.set(lastInterest);
+        Query.ISLAND_SET_LAST_INTEREST.getStatementHolder(this)
+                .setLong(lastInterest)
+                .setString(owner.getUniqueId() + "")
                 .execute(true);
     }
 

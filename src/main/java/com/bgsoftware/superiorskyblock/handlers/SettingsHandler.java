@@ -152,6 +152,10 @@ public final class SettingsHandler extends AbstractHandler {
     public final List<String> valuableBlocks;
     public final Registry<String, Location> islandPreviewLocations;
     public final boolean bankLogs;
+    public final boolean bankInterestEnabled;
+    public final int bankInterestInterval;
+    public final int bankInterestPercentage;
+    public final int bankInterestRecentActive;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -369,6 +373,10 @@ public final class SettingsHandler extends AbstractHandler {
                 islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
         }
         bankLogs = cfg.getBoolean("bank-logs", true);
+        bankInterestEnabled = cfg.getBoolean("bank-interest.enabled", true);
+        bankInterestInterval = cfg.getInt("bank-interest.interval", 86400);
+        bankInterestPercentage = cfg.getInt("bank-interest.percentage", 10);
+        bankInterestRecentActive = cfg.getInt("bank-interest.recent-active", 86400);
     }
 
     @Override
