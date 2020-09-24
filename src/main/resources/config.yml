@@ -79,7 +79,7 @@ default-values:
   mob-drops: 1
 
   # Set the default bank limit of islands.
-  # Set it to -1 for no block limits.
+  # Set it to -1 for no bank limits.
   bank-limit: -1
 
   # A list of default generator percentages for new islands.
