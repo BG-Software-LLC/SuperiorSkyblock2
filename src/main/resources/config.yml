@@ -78,6 +78,10 @@ default-values:
   # This multiplier can be expanded by using the /is admin setmobdrops command.
   mob-drops: 1
 
+  # Set the default bank limit of islands.
+  # Set it to -1 for no block limits.
+  bank-limit: -1
+
   # A list of default generator percentages for new islands.
   # Example: 'DIAMOND_BLOCK:50' will set 50% chance for diamond block.
   # You can find a list of materials here: https://bg-software.com/materials/
