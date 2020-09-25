@@ -171,7 +171,7 @@ public final class DataHandler extends AbstractHandler {
         addColumnIfNotExists("item", "stackedBlocks", "''", "TEXT");
         addColumnIfNotExists("islandChest", "islands", "''", "LONGTEXT");
         addColumnIfNotExists("uuid", "islands", "''", "VARCHAR(36)");
-        addColumnIfNotExists("bankLimit", "islands", "'0'", "TEXT");
+        addColumnIfNotExists("bankLimit", "islands", "'-2'", "TEXT");
         addColumnIfNotExists("lastInterest", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
 
         editColumn("members", "islands", "LONGTEXT");
