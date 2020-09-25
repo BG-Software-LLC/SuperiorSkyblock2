@@ -3,10 +3,9 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.Bukkit;
@@ -58,14 +57,14 @@ public final class CmdAdminJoin implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if(superiorPlayer.getIsland() != null){
             Locale.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
@@ -78,7 +77,7 @@ public final class CmdAdminJoin implements ISuperiorCommand {
             return;
         }
 
-        ((SIsland) island).sendMessage(Locale.JOIN_ADMIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Locale.JOIN_ADMIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
@@ -97,7 +96,7 @@ public final class CmdAdminJoin implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))

@@ -5,10 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,7 +55,7 @@ public final class CmdUncoop implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(island == null){
@@ -69,7 +68,7 @@ public final class CmdUncoop implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
@@ -86,7 +85,7 @@ public final class CmdUncoop implements ISuperiorCommand {
 
         island.removeCoop(targetPlayer);
 
-        ((SIsland) island).sendMessage(Locale.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Locale.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
         if(island.getName().isEmpty())
             Locale.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
@@ -96,14 +95,14 @@ public final class CmdUncoop implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.COOP_MEMBER)){
             List<String> list = new ArrayList<>();
 
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer targetPlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 if(island.isCoop(targetPlayer) && player.getName().toLowerCase().contains(args[1].toLowerCase())){
                     list.add(player.getName());
                 }

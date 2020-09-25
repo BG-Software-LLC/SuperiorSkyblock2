@@ -5,8 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,8 +54,8 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer leader = SSuperiorPlayer.of(args[2]);
-        SuperiorPlayer newLeader = SSuperiorPlayer.of(args[3]);
+        SuperiorPlayer leader = plugin.getPlayers().getSuperiorPlayer(args[2]);
+        SuperiorPlayer newLeader = plugin.getPlayers().getSuperiorPlayer(args[3]);
 
         if (leader == null) {
             Locale.INVALID_PLAYER.send(sender, args[2]);
@@ -86,7 +85,7 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
 
         if(island.transferIsland(newLeader)) {
             Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-            ((SIsland) island).sendMessage(Locale.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
+            IslandUtils.sendMessage(island, Locale.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
         }
     }
 
@@ -96,7 +95,7 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
@@ -108,11 +107,11 @@ public final class CmdAdminSetLeader implements ISuperiorCommand {
         }
 
         else if(args.length == 4){
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(args[2]);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
             if(superiorPlayer != null && superiorPlayer.getIsland() != null) {
                 Island playerIsland = superiorPlayer.getIsland();
                 for(Player player : Bukkit.getOnlinePlayers()){
-                    SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                    SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                     if(!onlinePlayer.equals(superiorPlayer)) {
                         Island onlineIsland = onlinePlayer.getIsland();
                         if (onlineIsland != null && !onlineIsland.equals(playerIsland)) {

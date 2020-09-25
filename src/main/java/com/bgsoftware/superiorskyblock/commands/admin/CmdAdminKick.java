@@ -5,9 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -55,7 +54,7 @@ public final class CmdAdminKick implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[2]);
@@ -74,11 +73,11 @@ public final class CmdAdminKick implements ISuperiorCommand {
             return;
         }
 
-        EventsCaller.callIslandKickEvent(sender instanceof Player ? SSuperiorPlayer.of(sender) : null, targetPlayer, targetIsland);
+        EventsCaller.callIslandKickEvent(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, targetPlayer, targetIsland);
 
         targetIsland.kickMember(targetPlayer);
 
-        ((SIsland) targetIsland).sendMessage(Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), sender.getName());
+        IslandUtils.sendMessage(targetIsland, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), sender.getName());
 
         Locale.GOT_KICKED.send(targetPlayer, sender.getName());
     }
@@ -89,7 +88,7 @@ public final class CmdAdminKick implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null && playerIsland.getOwner() != onlinePlayer &&
                         player.getName().toLowerCase().contains(args[2].toLowerCase())) {

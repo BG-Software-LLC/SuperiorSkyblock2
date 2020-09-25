@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -58,8 +57,8 @@ public final class CmdVisit implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
         Island targetIsland = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
 
@@ -93,12 +92,12 @@ public final class CmdVisit implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         List<String> list = new ArrayList<>();
 
         if(args.length == 2){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island island = onlinePlayer.getIsland();
                 if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
                         (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) ) {

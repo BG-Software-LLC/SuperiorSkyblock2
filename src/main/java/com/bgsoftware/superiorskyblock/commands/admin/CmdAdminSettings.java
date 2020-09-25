@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public final class CmdAdminSettings implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorMenuSettings.openInventory(SSuperiorPlayer.of(sender), null);
+        SuperiorMenuSettings.openInventory(plugin.getPlayers().getSuperiorPlayer(sender), null);
     }
 
     @Override

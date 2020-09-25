@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -50,6 +52,11 @@ public interface Island extends Comparable<Island> {
      * Get the creation time of the island, in a formatted string.
      */
     String getCreationTimeDate();
+
+    /**
+     * Re-sync the island with a new dates formatter.
+     */
+    void updateDatesFormatter();
 
     /*
      *  Player related methods
@@ -180,6 +187,11 @@ public interface Island extends Comparable<Island> {
     int getCoopLimit();
 
     /**
+     * Get the coop players limit of the island that was set using a command.
+     */
+    int getCoopLimitRaw();
+
+    /**
      * Set the coop players limit of the island.
      * @param coopLimit The coop players limit to set.
      */
@@ -229,6 +241,11 @@ public interface Island extends Comparable<Island> {
      * @param environment The environment.
      */
     Location getTeleportLocation(World.Environment environment);
+
+    /**
+     * Get all the teleport locations of the island.
+     */
+    Map<World.Environment, Location> getTeleportLocations();
 
     /**
      * Get the visitors' teleport location of the island.
@@ -427,6 +444,11 @@ public interface Island extends Comparable<Island> {
      */
     void setEndEnabled(boolean enabled);
 
+    /**
+     * Get the unlocked worlds flag.
+     */
+    int getUnlockedWorldsFlag();
+
     /*
      *  Permissions related methods
      */
@@ -550,6 +572,16 @@ public interface Island extends Comparable<Island> {
      */
     PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege);
 
+    /**
+     * Get all the custom player permissions of the island.
+     */
+    Map<SuperiorPlayer, PermissionNode> getPlayerPermissions();
+
+    /**
+     * Get the permissions and their required roles.
+     */
+    Map<IslandPrivilege, PlayerRole> getRolePermissions();
+
     /*
      *  General methods
      */
@@ -599,6 +631,13 @@ public interface Island extends Comparable<Island> {
     boolean transferIsland(SuperiorPlayer superiorPlayer);
 
     /**
+     * Replace a player with a new player.
+     * @param originalPlayer The old player to be replaced.
+     * @param newPlayer The new player.
+     */
+    void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer);
+
+    /**
      * Recalculate the island's worth value.
      * @param asker The player who makes the operation, may be null.
      */
@@ -626,6 +665,11 @@ public interface Island extends Comparable<Island> {
      * Get the island radius of the island.
      */
     int getIslandSize();
+
+    /**
+     * Get the island radius of the island that was set with a command.
+     */
+    int getIslandSizeRaw();
 
     /**
      * Set the radius of the island.
@@ -662,6 +706,12 @@ public interface Island extends Comparable<Island> {
      * Change the biome of the island's area.
      */
     void setBiome(Biome biome);
+
+    /**
+     * Change the biome of the island's area.
+     * @param updateBlocks Whether the blocks get updated or not.
+     */
+    void setBiome(Biome biome, boolean updateBlocks);
 
     /**
      * Check whether or not the island is locked to visitors.
@@ -702,6 +752,11 @@ public interface Island extends Comparable<Island> {
     void updateLastTime();
 
     /**
+     * Flag the island as a currently active island.
+     */
+    void setCurrentlyActive();
+
+    /**
      * Get the last time the island was updated.
      */
     long getLastTimeUpdate();
@@ -721,6 +776,11 @@ public interface Island extends Comparable<Island> {
     BigDecimal getBankLimit();
 
     /**
+     * Get the limit of the bank that was set using a command.
+     */
+    BigDecimal getBankLimitRaw();
+
+    /**
      * Set a new limit for the bank.
      * @param bankLimit The limit to set. Use -1 to remove the limit.
      */
@@ -732,6 +792,11 @@ public interface Island extends Comparable<Island> {
      * @return Whether or not the money was given.
      */
     boolean giveInterest(boolean checkOnlineOwner);
+
+    /**
+     * Get the last time that the bank interest was given.
+     */
+    long getLastInterestTime();
 
     /**
      * Get the money in the bank of the island.
@@ -824,6 +889,12 @@ public interface Island extends Comparable<Island> {
      * @param save Whether or not the block counts should be saved into database.
      */
     void handleBlockPlace(Key key, int amount, boolean save);
+
+    /**
+     * Handle placements of many blocks in one time.
+     * @param blocks All the blocks to place.
+     */
+    void handleBlocksPlace(Map<Key, Integer> blocks);
 
     /**
      * Handle a break of a block.
@@ -983,15 +1054,30 @@ public interface Island extends Comparable<Island> {
     void setUpgradeLevel(Upgrade upgrade, int level);
 
     /**
+     * Get all the upgrades with their levels.
+     */
+    Map<String, Integer> getUpgrades();
+
+    /**
      * Sync all the upgrade values again.
      * This will remove custom values that were set using the set commands.
      */
     void syncUpgrades();
 
     /**
+     * Update the upgrade values from default values of config & upgrades file.
+     */
+    void updateUpgrades();
+
+    /**
      * Get the crop-growth multiplier for the island.
      */
     double getCropGrowthMultiplier();
+
+    /**
+     * Get the crop-growth multiplier for the island that was set using a command.
+     */
+    double getCropGrowthRaw();
 
     /**
      * Set the crop-growth multiplier for the island.
@@ -1005,6 +1091,11 @@ public interface Island extends Comparable<Island> {
     double getSpawnerRatesMultiplier();
 
     /**
+     * Get the spawner-rates multiplier for the island that was set using a command.
+     */
+    double getSpawnerRatesRaw();
+
+    /**
      * Set the spawner-rates multiplier for the island.
      * @param spawnerRates The multiplier to set.
      */
@@ -1014,6 +1105,11 @@ public interface Island extends Comparable<Island> {
      * Get the mob-drops multiplier for the island.
      */
     double getMobDropsMultiplier();
+
+    /**
+     * Get the mob-drops multiplier for the island that was set using a command.
+     */
+    double getMobDropsRaw();
 
     /**
      * Set the mob-drops multiplier for the island.
@@ -1039,6 +1135,11 @@ public interface Island extends Comparable<Island> {
      * Get all the blocks limits for the island.
      */
     Map<Key, Integer> getBlocksLimits();
+
+    /**
+     * Get all the custom blocks limits for the island.
+     */
+    Map<Key, Integer> getCustomBlocksLimits();
 
     /**
      * Clear all the block limits of the island.
@@ -1099,6 +1200,11 @@ public interface Island extends Comparable<Island> {
     Map<Key, Integer> getEntitiesLimitsAsKeys();
 
     /**
+     * Get all the custom entities limits for the island.
+     */
+    Map<Key, Integer> getCustomEntitiesLimits();
+
+    /**
      * Clear all the entities limits from the island.
      */
     void clearEntitiesLimits();
@@ -1149,6 +1255,11 @@ public interface Island extends Comparable<Island> {
     int getTeamLimit();
 
     /**
+     * Get the team limit of the island that was set with a command.
+     */
+    int getTeamLimitRaw();
+
+    /**
      * Set the team limit of the island.
      * @param teamLimit The team limit to set.
      */
@@ -1158,6 +1269,11 @@ public interface Island extends Comparable<Island> {
      * Get the warps limit of the island.
      */
     int getWarpsLimit();
+
+    /**
+     * Get the warps limit of the island that was set using a command.
+     */
+    int getWarpsLimitRaw();
 
     /**
      * Set the warps limit for the island.
@@ -1232,6 +1348,12 @@ public interface Island extends Comparable<Island> {
     void setWarpLocation(String name, Location location, boolean privateFlag);
 
     /**
+     * Check whether or not a location is a warp of an island.
+     * @param location The location to check.
+     */
+    boolean isWarpLocation(Location location);
+
+    /**
      * Teleport a player to a warp.
      * @param superiorPlayer The player to teleport.
      * @param warp The warp's name to teleport the player to.
@@ -1255,6 +1377,11 @@ public interface Island extends Comparable<Island> {
      * Get all the warps' names of the island.
      */
     List<String> getAllWarps();
+
+    /**
+     * Get all the warps of the island.
+     */
+    Map<String, IslandWarp> getIslandWarps();
 
     /**
      * Check whether or not the island can create more warps.
@@ -1332,6 +1459,11 @@ public interface Island extends Comparable<Island> {
      */
     List<Mission<?>> getCompletedMissions();
 
+    /**
+     * Get all the completed missions with the amount of times they were completed.
+     */
+    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
+
     /*
      *  Settings related methods
      */
@@ -1365,6 +1497,12 @@ public interface Island extends Comparable<Island> {
      * @param islandFlag The settings to check.
      */
     boolean hasSettingsEnabled(IslandFlag islandFlag);
+
+    /**
+     * Get all the settings of the island.
+     * If the byte value is 1, the setting is enabled. Otherwise, it's disabled.
+     */
+    Map<IslandFlag, Byte> getAllSettings();
 
     /**
      * Enable an island settings.
@@ -1428,6 +1566,11 @@ public interface Island extends Comparable<Island> {
     Map<String, Integer> getGeneratorAmounts();
 
     /**
+     * Get the custom amounts of the materials for the cobblestone generator in the island.
+     */
+    Map<Key, Integer> getCustomGeneratorAmounts();
+
+    /**
      * Get an array of materials for the cobblestone generator.
      */
     String[] getGeneratorArray();
@@ -1452,6 +1595,11 @@ public interface Island extends Comparable<Island> {
      * @param environment The environment to set.
      */
     void setSchematicGenerate(World.Environment environment);
+
+    /**
+     * Get the generated schematics flag.
+     */
+    int getGeneratedSchematicsFlag();
 
     /**
      * Get the schematic that was used to create the island.
@@ -1485,5 +1633,13 @@ public interface Island extends Comparable<Island> {
      */
     void setChestRows(int index, int rows);
 
+    /*
+     *  Data related methods
+     */
+
+    /**
+     * Get the data handler of the object.
+     */
+    IslandDataHandler getDataHandler();
 
 }

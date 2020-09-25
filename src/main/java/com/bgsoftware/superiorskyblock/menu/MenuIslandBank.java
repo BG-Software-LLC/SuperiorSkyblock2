@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public final class MenuIslandBank extends SuperiorMenu {
 
             if(withdrawValue instanceof Double){
                 if((double) withdrawValue <= 0){
-                    ((SSuperiorPlayer) superiorPlayer).setBankWithdrawSlot(e.getRawSlot());
+                    ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(e.getRawSlot());
                     previousMove = false;
                     e.getWhoClicked().closeInventory();
                     Locale.BANK_WITHDRAW_CUSTOM.send(superiorPlayer);
@@ -60,7 +60,7 @@ public final class MenuIslandBank extends SuperiorMenu {
         else if(containsData(e.getRawSlot() + "-deposit")){
             double depositPercentage = (Double) getData(e.getRawSlot() + "-deposit");
             if(depositPercentage <= 0){
-                ((SSuperiorPlayer) superiorPlayer).setBankDepositSlot(e.getRawSlot());
+                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(e.getRawSlot());
                 previousMove = false;
                 e.getWhoClicked().closeInventory();
                 Locale.BANK_DEPOSIT_CUSTOM.send(superiorPlayer);

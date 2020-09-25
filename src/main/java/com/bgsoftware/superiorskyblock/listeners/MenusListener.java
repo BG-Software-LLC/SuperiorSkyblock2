@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +26,11 @@ import java.util.regex.Pattern;
 public final class MenusListener implements Listener {
 
     private final Registry<UUID, ItemStack> latestClickedItem = Registry.createRegistry();
+    private final SuperiorSkyblockPlugin plugin;
+
+    public MenusListener(SuperiorSkyblockPlugin plugin){
+        this.plugin = plugin;
+    }
 
     /**
      * The following two events are here for patching a dupe glitch caused
@@ -78,7 +83,7 @@ public final class MenusListener implements Listener {
             return;
 
         if(inventoryHolder instanceof SuperiorMenu) {
-            ((SuperiorMenu) inventoryHolder).closeInventory(SSuperiorPlayer.of(e.getPlayer()));
+            ((SuperiorMenu) inventoryHolder).closeInventory(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         }
         else if(inventoryHolder instanceof StackedBlocksDepositMenu){
             ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
@@ -186,7 +191,7 @@ public final class MenusListener implements Listener {
             if(page == null)
                 page = 1;
 
-            SuperiorMenuSettings.openInventory(SSuperiorPlayer.of(e.getPlayer()), null, Math.max(1, page));
+            SuperiorMenuSettings.openInventory(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), null, Math.max(1, page));
             SuperiorMenuSettings.configValues.remove(e.getPlayer().getUniqueId());
         });
     }

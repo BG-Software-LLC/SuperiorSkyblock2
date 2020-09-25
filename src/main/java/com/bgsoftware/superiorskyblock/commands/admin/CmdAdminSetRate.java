@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,7 +58,7 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer islandOwner = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer islandOwner = plugin.getPlayers().getSuperiorPlayer(args[2]);
         Island targetIsland = islandOwner == null ? plugin.getGrid().getIsland(args[2]) : islandOwner.getIsland();
 
         if(targetIsland == null){
@@ -72,7 +71,7 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[3]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[3]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[3]);
@@ -99,7 +98,7 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
@@ -110,13 +109,13 @@ public final class CmdAdminSetRate implements ISuperiorCommand {
             }
         }
         else if(args.length > 3){
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+            SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
             if(island != null){
                 if(args.length == 4){
                     for(UUID uuid : island.getRatings().keySet()) {
-                        SuperiorPlayer _targetPlayer = SSuperiorPlayer.of(uuid);
+                        SuperiorPlayer _targetPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
                         if (_targetPlayer.getName().toLowerCase().contains(args[3].toLowerCase()))
                             list.add(_targetPlayer.getName());
                     }

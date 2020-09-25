@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -63,7 +61,7 @@ public final class StringUtils {
         dateFormatter = new SimpleDateFormat(dateFormat);
         try {
             for (Island island : plugin.getGrid().getIslands()) {
-                ((SIsland) island).updateCreationTimeDate();
+                island.updateDatesFormatter();
             }
         }catch (Exception ignored){}
     }
@@ -280,7 +278,7 @@ public final class StringUtils {
             return false;
         }
 
-        if(plugin.getSettings().islandNamesPreventPlayerNames && SSuperiorPlayer.of(strippedName) != null){
+        if(plugin.getSettings().islandNamesPreventPlayerNames && plugin.getPlayers().getSuperiorPlayer(strippedName) != null){
             Locale.NAME_SAME_AS_PLAYER.send(sender);
             return false;
         }

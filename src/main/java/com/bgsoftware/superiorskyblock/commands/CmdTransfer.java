@@ -4,8 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public final class CmdTransfer implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer player = SSuperiorPlayer.of(sender);
+        SuperiorPlayer player = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = player.getIsland();
 
         if (island == null) {
@@ -65,7 +64,7 @@ public final class CmdTransfer implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
         if (targetPlayer == null) {
             Locale.INVALID_PLAYER.send(sender, args[1]);
@@ -83,12 +82,12 @@ public final class CmdTransfer implements ISuperiorCommand {
         }
 
         if(island.transferIsland(targetPlayer))
-            ((SIsland) island).sendMessage(Locale.TRANSFER_BROADCAST, new ArrayList<>(), targetPlayer.getName());
+            IslandUtils.sendMessage(island, Locale.TRANSFER_BROADCAST, new ArrayList<>(), targetPlayer.getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(args.length == 2 && island != null && superiorPlayer.getPlayerRole().isLastRole()){

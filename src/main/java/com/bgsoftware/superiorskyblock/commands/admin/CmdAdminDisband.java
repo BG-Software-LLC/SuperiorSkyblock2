@@ -2,10 +2,9 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -58,7 +57,7 @@ public final class CmdAdminDisband implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
@@ -72,7 +71,7 @@ public final class CmdAdminDisband implements ISuperiorCommand {
         }
 
         if(EventsCaller.callIslandDisbandEvent(targetPlayer, island)){
-            ((SIsland) island).sendMessage(Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
+            IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
 
             if(targetPlayer == null)
                 Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());
@@ -89,7 +88,7 @@ public final class CmdAdminDisband implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))

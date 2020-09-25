@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -109,12 +109,12 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getBlockLimit(Key key) {
-        return blockLimits.getOrDefault(key, SIsland.NO_LIMIT);
+        return blockLimits.getOrDefault(key, IslandUtils.NO_LIMIT);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return blockLimits.getRaw(key, SIsland.NO_LIMIT);
+        return blockLimits.getRaw(key, IslandUtils.NO_LIMIT);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getEntityLimit(Key key) {
-        return entityLimits.getOrDefault(key, SIsland.NO_LIMIT);
+        return entityLimits.getOrDefault(key, IslandUtils.NO_LIMIT);
     }
 
     @Override

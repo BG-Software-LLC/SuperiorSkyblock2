@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.MenuBorderColor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -49,8 +48,7 @@ public final class CmdBorder implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        //BorderColorMenu.openInventory(SSuperiorPlayer.of(sender), null);
-        MenuBorderColor.openInventory(SSuperiorPlayer.of(sender), null);
+        MenuBorderColor.openInventory(plugin.getPlayers().getSuperiorPlayer(sender), null);
     }
 
     @Override

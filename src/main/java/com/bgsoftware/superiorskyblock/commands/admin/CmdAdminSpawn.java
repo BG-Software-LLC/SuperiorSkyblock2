@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -61,13 +60,13 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
         }
 
         else if(args.length == 3){
-            targetPlayer = SSuperiorPlayer.of(args[2]);
+            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
             if(targetPlayer != null && !targetPlayer.isOnline())
                 targetPlayer = null;
         }
 
         else if(sender instanceof Player){
-            targetPlayer = SSuperiorPlayer.of((Player) sender);
+            targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
         }
 
         if(targetPlayer == null){

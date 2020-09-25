@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,7 +42,7 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
 
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, UUID uuid, Rating rating) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(uuid);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
         try {
             return new ItemBuilder(clickedItem)
                     .replaceAll("{0}", superiorPlayer.getName())

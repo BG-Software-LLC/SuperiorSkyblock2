@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
+import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -358,5 +360,20 @@ public interface SuperiorPlayer {
      * Get the list of the completed missions of the player.
      */
     List<Mission<?>> getCompletedMissions();
+
+    /**
+     * Get all the completed missions with the amount of times they were completed.
+     */
+    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
+
+    /**
+     * Merge another player into this object.
+     */
+    void merge(SuperiorPlayer other);
+
+    /**
+     * Get the data handler of the object.
+     */
+    PlayerDataHandler getDataHandler();
 
 }

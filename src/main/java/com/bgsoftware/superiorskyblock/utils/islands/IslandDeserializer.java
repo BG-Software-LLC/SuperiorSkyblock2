@@ -10,10 +10,10 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
@@ -46,7 +45,7 @@ public final class IslandDeserializer {
         membersSetSync.write(membersSet -> {
             for(String uuid : members.split(",")) {
                 try {
-                    membersSet.add(SSuperiorPlayer.of(UUID.fromString(uuid)));
+                    membersSet.add(plugin.getPlayers().getSuperiorPlayer(UUID.fromString(uuid)));
                 }catch(Exception ignored){}
             }
         });
@@ -61,7 +60,7 @@ public final class IslandDeserializer {
                 try {
                     String[] memberSections = member.split(";");
                     long lastTimeJoined = memberSections.length == 2 ? Long.parseLong(memberSections[1]) : System.currentTimeMillis();
-                    membersSet.add(new Pair<>(SSuperiorPlayer.of(UUID.fromString(memberSections[0])), lastTimeJoined));
+                    membersSet.add(new Pair<>(plugin.getPlayers().getSuperiorPlayer(UUID.fromString(memberSections[0])), lastTimeJoined));
                 }catch(Exception ignored){}
             }
         });
@@ -90,7 +89,7 @@ public final class IslandDeserializer {
                         }
                     }
                 }catch(Exception ex){
-                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(UUID.fromString(sections[0]));
+                    SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(sections[0]));
                     playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, sections.length == 1 ? "" : sections[1]));
                 }
             }catch(Exception ignored){}
@@ -109,7 +108,7 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeWarps(String warps, Registry<String, SIsland.WarpData> warpsMap){
+    public static void deserializeWarps(String warps, Registry<String, SIslandWarp> warpsMap){
         if(warps == null)
             return;
 
@@ -117,7 +116,7 @@ public final class IslandDeserializer {
             try {
                 String[] sections = entry.split("=");
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
-                warpsMap.add(StringUtils.stripColors(sections[0]), new SIsland.WarpData(FileUtils.toLocation(sections[1]), privateFlag));
+                warpsMap.add(StringUtils.stripColors(sections[0]), new SIslandWarp(FileUtils.toLocation(sections[1]), privateFlag));
             }catch(Exception ignored){}
         }
     }

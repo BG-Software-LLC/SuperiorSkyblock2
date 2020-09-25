@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -33,7 +32,7 @@ public final class MenuMemberManage extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         if(rolesSlot.contains(e.getRawSlot())){
             previousMove = false;
-            MenuMemberRole.openInventory(SSuperiorPlayer.of(e.getWhoClicked()), this, targetPlayer);
+            MenuMemberRole.openInventory(plugin.getPlayers().getSuperiorPlayer(e.getWhoClicked()), this, targetPlayer);
         }
 
         else if(banSlot.contains(e.getRawSlot())){

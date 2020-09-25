@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
@@ -212,7 +212,7 @@ public final class SIslandBank implements IslandBank {
                 .write(transactions -> transactions.add(bankTransaction));
 
         if(save){
-            Query.TRANSACTION_INSERT.getStatementHolder((SIsland) island)
+            Query.TRANSACTION_INSERT.getStatementHolder((SIslandDataHandler) island.getDataHandler())
                     .setString(island.getUniqueId().toString())
                     .setString(senderUUID == null ? "" : senderUUID + "")
                     .setString(bankTransaction.getAction().name())
@@ -228,7 +228,7 @@ public final class SIslandBank implements IslandBank {
         this.balance.set(balance);
 
         if(save){
-            Query.ISLAND_SET_BANK.getStatementHolder((SIsland) island)
+            Query.ISLAND_SET_BANK.getStatementHolder((SIslandDataHandler) island.getDataHandler())
                     .setString(balance.getAsString())
                     .setString(island.getOwner().getUniqueId() + "")
                     .execute(true);

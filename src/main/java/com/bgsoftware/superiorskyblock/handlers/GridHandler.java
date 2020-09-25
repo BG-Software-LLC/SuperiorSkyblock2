@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
+import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -16,7 +17,6 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
@@ -30,7 +30,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.Locale;
@@ -96,12 +95,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void syncUpgrades(){
-        getIslands().forEach(island -> ((SIsland) island).updateUpgrades());
+        getIslands().forEach(Island::updateUpgrades);
     }
 
     public void createIsland(ResultSet resultSet) throws SQLException{
         UUID owner = UUID.fromString(resultSet.getString("owner"));
-        islands.add(owner, new SIsland(this, resultSet));
+        islands.add(owner, plugin.getFactory().createIsland(this, resultSet));
     }
 
     @Override
@@ -141,7 +140,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(islandLocation));
 
-        SIsland island = new SIsland(superiorPlayer, islandUUID, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
+        Island island = plugin.getFactory().createIsland(superiorPlayer, islandUUID, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
         EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
 
         if(!event.isCancelled()) {
@@ -169,7 +168,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         if(updateGamemode)
                             superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
                         superiorPlayer.teleport(island);
-                        Executor.sync(() -> island.resetChunksExcludedFromList(loadedChunks), 2L);
+                        Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 2L);
                     }
                 }
 
@@ -478,7 +477,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void removeStackedBlocks(Island island){
-        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder((SIsland) island);
+        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder((SIslandDataHandler) island.getDataHandler());
         stackedBlocksHolder.prepareBatch();
 
         IslandUtils.getChunkCoords(island, true, false).forEach(chunkPosition -> {
@@ -644,12 +643,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void saveIslands(){
         List<Island> onlineIslands = Bukkit.getOnlinePlayers().stream()
-                .map(player -> SSuperiorPlayer.of(player).getIsland())
+                .map(player -> plugin.getPlayers().getSuperiorPlayer(player).getIsland())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         List<Island> modifiedIslands = getIslands().stream()
-                .filter(island -> ((DatabaseObject) island).isModified())
+                .filter(island -> ((DatabaseObject) island.getDataHandler()).isModified())
                 .collect(Collectors.toList());
 
         if(!onlineIslands.isEmpty()) {
@@ -663,7 +662,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         if(!modifiedIslands.isEmpty()){
             StatementHolder islandUpdateHolder = Query.ISLAND_UPDATE.getStatementHolder(null);
             islandUpdateHolder.prepareBatch();
-            modifiedIslands.forEach(island -> ((SIsland) island).setUpdateStatement(islandUpdateHolder).addBatch());
+            modifiedIslands.forEach(island -> ((SIslandDataHandler) island.getDataHandler())
+                    .setUpdateStatement(islandUpdateHolder).addBatch());
             islandUpdateHolder.execute(false);
         }
 

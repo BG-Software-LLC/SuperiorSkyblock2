@@ -16,12 +16,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -83,7 +83,7 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerTeleport(PlayerTeleportEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer == null || superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -99,7 +99,7 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -111,7 +111,7 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerQuit(PlayerQuitEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -126,7 +126,7 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -147,7 +147,7 @@ public final class CustomEventsListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -279,7 +279,7 @@ public final class CustomEventsListener implements Listener {
         if(plugin.getSettings().stopLeaving && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
                 !fromIsland.isSpawn() && equalWorlds){
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
-            ((SSuperiorPlayer) superiorPlayer).setLeavingFlag(true);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setLeavingFlag(true);
             if(event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             return false;
@@ -329,8 +329,8 @@ public final class CustomEventsListener implements Listener {
             return;
 
         // This can happen after the leave event is cancelled.
-        if(((SSuperiorPlayer) superiorPlayer).isLeavingFlag()){
-            ((SSuperiorPlayer) superiorPlayer).setLeavingFlag(false);
+        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isLeavingFlag()){
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setLeavingFlag(false);
             return;
         }
 
@@ -388,14 +388,14 @@ public final class CustomEventsListener implements Listener {
         if(!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)){
             Locale.ENTER_PVP_ISLAND.send(superiorPlayer);
             if(plugin.getSettings().immuneToPVPWhenTeleport) {
-                ((SSuperiorPlayer) superiorPlayer).setImmunedToPvP(true);
-                Executor.sync(() -> ((SSuperiorPlayer) superiorPlayer).setImmunedToPvP(false), 200L);
+                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToPvP(true);
+                Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToPvP(false), 200L);
             }
         }
 
         if(toIsland.isMember(superiorPlayer)){
-            ((SSuperiorPlayer) superiorPlayer).setImmunedToTeleport(true);
-            Executor.sync(() -> ((SSuperiorPlayer) superiorPlayer).setImmunedToTeleport(false), 100L);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
+            Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
         }
 
         if(plugin.getSettings().spawnProtection || !toIsland.isSpawn()) {

@@ -3,10 +3,9 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
@@ -53,7 +52,7 @@ public final class CmdKick implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(island == null){
@@ -66,7 +65,7 @@ public final class CmdKick implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
         if(targetPlayer == null || !island.isMember(targetPlayer)){
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
@@ -82,14 +81,14 @@ public final class CmdKick implements ISuperiorCommand {
 
         island.kickMember(targetPlayer);
 
-        ((SIsland) island).sendMessage(Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
 
         Locale.GOT_KICKED.send(targetPlayer, superiorPlayer.getName());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.KICK_MEMBER)){

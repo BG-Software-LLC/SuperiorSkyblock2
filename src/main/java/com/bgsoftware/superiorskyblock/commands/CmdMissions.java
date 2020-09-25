@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public final class CmdMissions implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if(args.length == 2){
             if(args[1].equalsIgnoreCase(Locale.COMMAND_ARGUMENT_ISLAND.getMessage(superiorPlayer.getUserLocale()))){

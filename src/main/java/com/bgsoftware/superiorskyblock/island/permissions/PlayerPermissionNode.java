@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -12,7 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     protected final SuperiorPlayer superiorPlayer;
-    protected final SIsland island;
+    protected final Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
         this(superiorPlayer, island, "");
@@ -20,11 +19,11 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, String permissions){
         this.superiorPlayer = superiorPlayer;
-        this.island = island == null ? null : (SIsland) island;
+        this.island = island;
         setPermissions(permissions, false);
     }
 
-    private PlayerPermissionNode(Registry<IslandPrivilege, PrivilegeStatus> privileges, SuperiorPlayer superiorPlayer, SIsland island){
+    private PlayerPermissionNode(Registry<IslandPrivilege, PrivilegeStatus> privileges, SuperiorPlayer superiorPlayer, Island island){
         super(privileges);
 
         this.superiorPlayer = superiorPlayer;
@@ -62,7 +61,7 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
             this(null, null);
         }
 
-        EmptyPlayerPermissionNode(SuperiorPlayer superiorPlayer, SIsland island){
+        EmptyPlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
             super(null, superiorPlayer, island);
         }
 

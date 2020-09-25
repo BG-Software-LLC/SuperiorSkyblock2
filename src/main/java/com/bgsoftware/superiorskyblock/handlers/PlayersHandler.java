@@ -5,17 +5,19 @@ import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,6 +55,9 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(String name){
+        if(name == null)
+            return null;
+
         for(SuperiorPlayer superiorPlayer : players.values()){
             if(superiorPlayer.getName().equalsIgnoreCase(name))
                 return superiorPlayer;
@@ -61,17 +66,26 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         return null;
     }
 
-    public List<SuperiorPlayer> matchAllPlayers(Predicate<? super SuperiorPlayer> predicate){
-        return players.values().stream().filter(predicate).collect(Collectors.toList());
+    public SuperiorPlayer getSuperiorPlayer(CommandSender commandSender) {
+        return getSuperiorPlayer((Player) commandSender);
+    }
+
+    @Override
+    public SuperiorPlayer getSuperiorPlayer(Player player) {
+        return player.hasMetadata("NPC") ? new SuperiorNPCPlayer(player) : getSuperiorPlayer(player.getUniqueId());
     }
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         if(!players.containsKey(uuid)) {
-            players.add(uuid, new SSuperiorPlayer(uuid));
+            players.add(uuid, plugin.getFactory().createPlayer(uuid));
             Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)), 1L);
         }
         return players.get(uuid);
+    }
+
+    public List<SuperiorPlayer> matchAllPlayers(Predicate<? super SuperiorPlayer> predicate){
+        return players.values().stream().filter(predicate).collect(Collectors.toList());
     }
 
     @Override
@@ -125,27 +139,26 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     public void loadPlayer(ResultSet resultSet) throws SQLException {
         UUID player = UUID.fromString(resultSet.getString("player"));
-        SuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
-        players.add(player, superiorPlayer);
+        players.add(player, plugin.getFactory().createPlayer(resultSet));
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer){
         players.remove(originPlayer.getUniqueId());
 
         for(Island island : plugin.getGrid().getIslands())
-            ((SIsland) island).replacePlayers(originPlayer, newPlayer);
+            island.replacePlayers(originPlayer, newPlayer);
 
-        ((SSuperiorPlayer) originPlayer).merge((SSuperiorPlayer) newPlayer);
+        newPlayer.merge(originPlayer);
     }
 
     // Updating last time status
     public void savePlayers(){
         List<SuperiorPlayer> onlinePlayers = Bukkit.getOnlinePlayers().stream()
-                .map(SSuperiorPlayer::of)
+                .map(this::getSuperiorPlayer)
                 .collect(Collectors.toList());
 
         List<SuperiorPlayer> modifiedPlayers = players.values().stream()
-                .filter(player -> ((DatabaseObject) player).isModified())
+                .filter(player -> ((DatabaseObject) player.getDataHandler()).isModified())
                 .collect(Collectors.toList());
 
         if(!onlinePlayers.isEmpty()){
@@ -159,7 +172,8 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         if(!modifiedPlayers.isEmpty()){
             StatementHolder playerUpdateHolder = Query.PLAYER_UPDATE.getStatementHolder(null);
             playerUpdateHolder.prepareBatch();
-            modifiedPlayers.forEach(player -> ((SSuperiorPlayer) player).setUpdateStatement(playerUpdateHolder).addBatch());
+            modifiedPlayers.forEach(player -> ((SPlayerDataHandler) player.getDataHandler())
+                    .setUpdateStatement(playerUpdateHolder).addBatch());
             playerUpdateHolder.execute(false);
         }
     }

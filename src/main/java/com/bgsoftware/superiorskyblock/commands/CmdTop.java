@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
 
@@ -50,7 +49,7 @@ public final class CmdTop implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        MenuTopIslands.openInventory(SSuperiorPlayer.of(sender), null, SortingTypes.getDefaultSorting());
+        MenuTopIslands.openInventory(plugin.getPlayers().getSuperiorPlayer(sender), null, SortingTypes.getDefaultSorting());
     }
 
     @Override

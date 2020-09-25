@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
@@ -56,7 +55,7 @@ public final class CmdSetRole implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
 
         if(targetPlayer == null){
             Locale.INVALID_PLAYER.send(sender, args[1]);
@@ -82,7 +81,7 @@ public final class CmdSetRole implements ISuperiorCommand {
         Island island = targetPlayer.getIsland();
 
         if(sender instanceof Player){
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) sender);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
             island = superiorPlayer.getIsland();
 
             if(island == null){
@@ -136,7 +135,7 @@ public final class CmdSetRole implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_ROLE)){

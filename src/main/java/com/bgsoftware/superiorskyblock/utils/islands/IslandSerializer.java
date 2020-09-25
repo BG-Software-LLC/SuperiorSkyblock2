@@ -4,19 +4,19 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
@@ -53,13 +53,13 @@ public final class IslandSerializer {
         return builder.toString();
     }
 
-    public static String serializePermissions(Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> playerRoles){
+    public static String serializePermissions(Map<SuperiorPlayer, PermissionNode> playerPermissions, Map<IslandPrivilege, PlayerRole> playerRoles){
         StringBuilder permissionNodes = new StringBuilder();
-        playerPermissions.entries().forEach(entry ->
-                permissionNodes.append(",").append(entry.getKey().getUniqueId().toString()).append("=").append(entry.getValue().getAsStatementString()));
+        playerPermissions.forEach((key, value) -> permissionNodes.append(",").append(key.getUniqueId().toString())
+                .append("=").append(((PlayerPermissionNode) value).getAsStatementString()));
 
         Registry<PlayerRole, Set<IslandPrivilege>> reorderRoles = Registry.createRegistry();
-        playerRoles.entries().forEach(entry -> reorderRoles.computeIfAbsent(entry.getValue(), s -> new HashSet<>()).add(entry.getKey()));
+        playerRoles.forEach((key, value) -> reorderRoles.computeIfAbsent(value, s -> new HashSet<>()).add(key));
 
         reorderRoles.entries().forEach(entry ->
                 permissionNodes.append(",").append(entry.getKey().toString()).append("=").append(getAsStatementString(entry.getValue())));
@@ -75,91 +75,71 @@ public final class IslandSerializer {
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
-    public static String serializeBlockCounts(SyncedObject<KeyMap<Integer>> blocks){
-        return blocks.readAndGet(IslandSerializer::serializeBlockCounts);
-    }
-
-    public static String serializeBlockCounts(KeyMap<Integer> blocks){
+    public static String serializeBlockCounts(Map<Key, Integer> blocks){
         StringBuilder blockCounts = new StringBuilder();
         blocks.keySet().forEach(blockKey ->
                 blockCounts.append(";").append(blockKey).append("=").append(blocks.get(blockKey)));
         return blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1);
     }
 
-    public static String serializeBlockLimits(UpgradeKeyMap blocks){
-        return blocks.readAndGet(IslandSerializer::serializeBlockLimits);
-    }
-
-    public static String serializeBlockLimits(KeyMap<Pair<Integer, Integer>> blocks){
+    public static String serializeBlockLimits(Map<Key, Integer> blocks){
         StringBuilder blockLimits = new StringBuilder();
-        blocks.forEach((blockKey, pair) ->
-                blockLimits.append(",").append(blockKey).append("=").append(pair.getKey()));
+        blocks.forEach((blockKey, integer) ->
+                blockLimits.append(",").append(blockKey).append("=").append(integer));
         return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
     }
 
-    public static String serializeEntityLimits(UpgradeKeyMap entities){
-        return entities.readAndGet(IslandSerializer::serializeEntityLimits);
-    }
-
-    public static String serializeEntityLimits(KeyMap<Pair<Integer, Integer>> entities){
+    public static String serializeEntityLimits(Map<Key, Integer> entities){
         StringBuilder entityLimits = new StringBuilder();
-        entities.forEach((entityKey, pair) ->
-                entityLimits.append(",").append(entityKey).append("=").append(pair.getKey()));
+        entities.forEach((entityKey, integer) ->
+                entityLimits.append(",").append(entityKey).append("=").append(integer));
         return entityLimits.length() == 0 ? "" : entityLimits.toString().substring(1);
     }
 
-    public static String serializeUpgrades(Registry<String, Integer> upgrades){
+    public static String serializeUpgrades(Map<String, Integer> upgrades){
         StringBuilder upgradesBuilder = new StringBuilder();
-        upgrades.keys().forEach(upgrade ->
-                upgradesBuilder.append(",").append(upgrade).append("=").append(upgrades.get(upgrade)));
+        upgrades.forEach((upgrade, level) ->
+                upgradesBuilder.append(",").append(upgrade).append("=").append(level));
         return upgradesBuilder.toString();
     }
 
-    public static String serializeWarps(Registry<String, SIsland.WarpData> warps){
+    public static String serializeWarps(Map<String, IslandWarp> warps){
         StringBuilder warpsBuilder = new StringBuilder();
-        warps.keys().forEach(warp -> {
-            SIsland.WarpData warpData = warps.get(warp);
-            warpsBuilder.append(";").append(warp).append("=").append(FileUtils.fromLocation(warpData.location)).append("=").append(warpData.privateFlag);
-        });
+        warps.forEach((warpName, warpData) -> warpsBuilder.append(";").append(warpName).append("=")
+                .append(FileUtils.fromLocation(warpData.getLocation())).append("=").append(warpData.hasPrivateFlag()));
         return warpsBuilder.length() == 0 ? "" : warpsBuilder.toString().substring(1);
     }
 
-    public static String serializeRatings(Registry<UUID, Rating> ratings){
+    public static String serializeRatings(Map<UUID, Rating> ratings){
         StringBuilder ratingsBuilder = new StringBuilder();
-        ratings.keys().forEach(_uuid ->
-                ratingsBuilder.append(";").append(_uuid).append("=").append(ratings.get(_uuid).getValue()));
+        ratings.forEach((uuid, rating) ->
+                ratingsBuilder.append(";").append(uuid).append("=").append(rating.getValue()));
         return ratingsBuilder.length() == 0 ? "" : ratingsBuilder.toString().substring(1);
     }
 
 
-    public static String serializeMissions(Registry<Mission<?>, Integer> missions){
+    public static String serializeMissions(Map<Mission<?>, Integer> missions){
         StringBuilder missionsBuilder = new StringBuilder();
-        missions.entries().forEach(entry ->
-                missionsBuilder.append(";").append(entry.getKey()).append("=").append(entry.getValue()));
+        missions.forEach((key, value) -> missionsBuilder.append(";").append(key).append("=").append(value));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeSettings(Registry<IslandFlag, Byte> islandSettings){
+    public static String serializeSettings(Map<IslandFlag, Byte> islandSettings){
         StringBuilder missionsBuilder = new StringBuilder();
-        islandSettings.entries().forEach(entry ->
-                missionsBuilder.append(";").append(entry.getKey().getName()).append("=").append(entry.getValue()));
+        islandSettings.forEach((key, value) -> missionsBuilder.append(";").append(key.getName()).append("=").append(value));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeGenerator(UpgradeKeyMap cobbleGenerator){
-        return cobbleGenerator.readAndGet(IslandSerializer::serializeGenerator);
-    }
-
-    public static String serializeGenerator(KeyMap<Pair<Integer, Integer>> cobbleGenerator){
+    public static String serializeGenerator(Map<Key, Integer> cobbleGenerator){
         StringBuilder missionsBuilder = new StringBuilder();
         cobbleGenerator.forEach((key, value) ->
-                missionsBuilder.append(",").append(key).append("=").append(value.getKey()));
+                missionsBuilder.append(",").append(key).append("=").append(value));
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeLocations(Registry<World.Environment, Location> locations){
+    public static String serializeLocations(Map<World.Environment, Location> locations){
         StringBuilder locationsBuilder = new StringBuilder();
-        for(Map.Entry<World.Environment, Location> entry : locations.entries()){
+        for(Map.Entry<World.Environment, Location> entry : locations.entrySet()){
             Location loc = entry.getValue();
             String locationString = loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw() + "," + loc.getPitch();
             locationsBuilder.append(";").append(entry.getKey().name().toLowerCase()).append("=").append(locationString);
@@ -167,14 +147,10 @@ public final class IslandSerializer {
         return locationsBuilder.length() == 0 ? "" : locationsBuilder.substring(1);
     }
 
-    public static String serializeEffects(UpgradeMap<PotionEffectType> effects){
-        return effects.readAndGet(IslandSerializer::serializeEffects);
-    }
-
-    public static String serializeEffects(Map<PotionEffectType, Pair<Integer, Integer>> effects){
+    public static String serializeEffects(Map<PotionEffectType, Integer> effects){
         StringBuilder islandEffects = new StringBuilder();
         effects.forEach((potionEffectType, level) ->
-                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level.getKey()));
+                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level));
         return islandEffects.length() == 0 ? "" : islandEffects.toString().substring(1);
     }
 

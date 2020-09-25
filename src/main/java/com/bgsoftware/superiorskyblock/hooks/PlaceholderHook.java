@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -78,7 +77,7 @@ public abstract class PlaceholderHook {
 
     protected String parsePlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
         Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(offlinePlayer.getUniqueId());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
         Island island = superiorPlayer.getIsland();
 
         try {
@@ -110,7 +109,7 @@ public abstract class PlaceholderHook {
                     case "panel":
                         return superiorPlayer.hasToggledPanel() ? "Yes" : "No";
                     case "fly":
-                        return ((SSuperiorPlayer) superiorPlayer).hasIslandFlyEnabledRaw() ? "Yes" : "No";
+                        return superiorPlayer.hasIslandFlyEnabled() ? "Yes" : "No";
                     case "chat_spy":
                         return superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No";
                     case "border_color":

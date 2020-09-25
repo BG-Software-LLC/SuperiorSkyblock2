@@ -70,7 +70,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -340,7 +339,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             }
 
             if(sender instanceof Player){
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
                 if(superiorPlayer != null){
                     Island island = superiorPlayer.getIsland();

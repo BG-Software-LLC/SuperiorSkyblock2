@@ -3,9 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -56,7 +55,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(island == null){
@@ -90,7 +89,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
             breakSign = true;
         }
 
-        if(warpName.equalsIgnoreCase(SIsland.VISITORS_WARP_NAME)){
+        if(warpName.equalsIgnoreCase(IslandUtils.VISITORS_WARP_NAME)){
             island.setVisitorsLocation(null);
         }
         else{
@@ -107,7 +106,7 @@ public final class CmdDelWarp implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.DELETE_WARP)){

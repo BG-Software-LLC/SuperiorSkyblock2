@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
+import com.bgsoftware.superiorskyblock.handlers.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
@@ -21,7 +22,6 @@ import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -50,7 +50,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -81,6 +80,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
     private final CommandsHandler commandsHandler = new CommandsHandler(this);
     private final DataHandler dataHandler = new DataHandler(this);
+    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
 
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
@@ -160,7 +160,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new ChunksListener(this));
                 safeEventsRegister(new CustomEventsListener(this));
                 safeEventsRegister(new GeneratorsListener(this));
-                safeEventsRegister(new MenusListener());
+                safeEventsRegister(new MenusListener(this));
                 safeEventsRegister(new PlayersListener(this));
                 safeEventsRegister(new ProtectionListener(this));
                 safeEventsRegister(new SettingsListener(this));
@@ -183,7 +183,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             Executor.sync(() -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                     superiorPlayer.updateLastTimeStatus();
                     Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
                     Island playerIsland = superiorPlayer.getIsland();
@@ -197,9 +197,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         }
                     }
 
-                    if (playerIsland != null) {
-                        ((SIsland) playerIsland).setLastTimeUpdate(-1);
-                    }
+                    if (playerIsland != null)
+                        playerIsland.setCurrentlyActive();
 
                     if (island != null)
                         island.setPlayerInside(superiorPlayer, true);
@@ -230,7 +229,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.saveStackedBlocks();
 
             Bukkit.getOnlinePlayers().forEach(player -> {
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 player.closeInventory();
                 nmsAdapter.setWorldBorder(superiorPlayer, null);
                 if (superiorPlayer.hasIslandFlyEnabled()) {
@@ -345,7 +344,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         Executor.sync(() -> {
             for(Player player : Bukkit.getOnlinePlayers()) {
-                SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 Island island = gridHandler.getIslandAt(player.getLocation());
                 nmsAdapter.setWorldBorder(superiorPlayer, island);
                 if(island != null)
@@ -413,6 +412,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public SettingsHandler getSettings() {
         return settingsHandler;
+    }
+
+    @Override
+    public FactoriesHandler getFactory() {
+        return factoriesHandler;
     }
 
     public void setSettings(SettingsHandler settingsHandler){

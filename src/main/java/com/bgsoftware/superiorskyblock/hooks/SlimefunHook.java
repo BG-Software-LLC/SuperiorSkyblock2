@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionManager;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionModule;
@@ -37,7 +36,7 @@ public final class SlimefunHook implements ProtectionModule {
     @Override
     public boolean hasPermission(OfflinePlayer offlinePlayer, Location location, ProtectableAction protectableAction) {
         Island island = plugin.getGrid().getIslandAt(location);
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(offlinePlayer.getUniqueId());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
 
         if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return true;

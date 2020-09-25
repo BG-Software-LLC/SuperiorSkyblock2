@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.wrappers.player;
 
+import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
@@ -18,8 +19,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -340,4 +343,20 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     public List<Mission<?>> getCompletedMissions() {
         return new ArrayList<>();
     }
+
+    @Override
+    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public void merge(SuperiorPlayer other) {
+
+    }
+
+    @Override
+    public PlayerDataHandler getDataHandler() {
+        return null;
+    }
+
 }

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 
 import org.bukkit.Location;
@@ -191,7 +190,7 @@ public final class SettingsListener implements Listener {
         if(!(e.getEntity() instanceof Player))
             return;
 
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
 
         if(targetPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -201,13 +200,13 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer damagerPlayer;
 
         if(e.getDamager() instanceof Player){
-            damagerPlayer = SSuperiorPlayer.of((Player) e.getDamager());
+            damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getDamager());
         }
 
         else if(e.getDamager() instanceof Projectile){
             ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
             if(shooter instanceof Player)
-                damagerPlayer = SSuperiorPlayer.of((Player) ((Projectile) e.getDamager()).getShooter());
+                damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) ((Projectile) e.getDamager()).getShooter());
             else return;
         }
 
@@ -239,7 +238,7 @@ public final class SettingsListener implements Listener {
         if(!e.getEntityType().name().equals("SPLASH_POTION") || !(e.getEntity().getShooter() instanceof Player))
             return;
 
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of((Player) e.getEntity().getShooter());
+        SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity().getShooter());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) || island.hasSettingsEnabled(IslandFlags.PVP))
@@ -247,7 +246,7 @@ public final class SettingsListener implements Listener {
 
         for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){
             if(entity instanceof Player){
-                SuperiorPlayer targetPlayer = SSuperiorPlayer.of((Player) entity);
+                SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) entity);
 
                 if(damagerPlayer.equals(targetPlayer))
                     continue;

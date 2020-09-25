@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.menu.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
@@ -54,7 +53,7 @@ public final class CmdPanel implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if(superiorPlayer.getIsland() == null){
             Locale.INVALID_ISLAND.send(superiorPlayer);

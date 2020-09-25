@@ -4,16 +4,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -280,11 +280,6 @@ public final class DataHandler extends AbstractHandler {
                 SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + " is an island leader, but have a guest role - fixing it...");
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
-
-            if(superiorPlayer.getIsland() != null && !((SIsland) superiorPlayer.getIsland()).checkMember(superiorPlayer)){
-                SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + "'s island had corrupted members. Fixing it...");
-                ((SIsland) superiorPlayer.getIsland()).addMemberRaw(superiorPlayer);
-            }
         }
 
     }
@@ -355,7 +350,7 @@ public final class DataHandler extends AbstractHandler {
     }
 
     public void insertIsland(Island island){
-        ((SIsland) island).executeInsertStatement(true);
+        ((SIslandDataHandler) island.getDataHandler()).executeInsertStatement(true);
     }
 
     public void deleteIsland(Island island){
@@ -363,7 +358,7 @@ public final class DataHandler extends AbstractHandler {
     }
 
     public void insertPlayer(SuperiorPlayer player){
-        ((SSuperiorPlayer) player).executeInsertStatement(true);
+        ((SPlayerDataHandler) player.getDataHandler()).executeInsertStatement(true);
     }
 
     private boolean containsGrid(){

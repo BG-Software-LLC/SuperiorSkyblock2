@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -89,7 +88,7 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(!handleBlockPlace(island, superiorPlayer, e.getBlock(), true))
             e.setCancelled(true);
@@ -98,7 +97,7 @@ public final class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(island == null) {
             if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
@@ -144,7 +143,7 @@ public final class ProtectionListener implements Listener {
         Block clickedBlock = e.getClickedBlock();
 
         Island island = plugin.getGrid().getIslandAt(clickedBlock.getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(island == null) {
             if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(e.getPlayer().getWorld())) {
@@ -190,7 +189,7 @@ public final class ProtectionListener implements Listener {
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getEntity());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntity());
 
         if(!handleBlockPlace(island, superiorPlayer, e.getBlock(), false))
             e.setCancelled(true);
@@ -202,7 +201,7 @@ public final class ProtectionListener implements Listener {
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getTarget());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getTarget());
 
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.MONSTER_DAMAGE))
             e.setCancelled(true);
@@ -213,7 +212,7 @@ public final class ProtectionListener implements Listener {
         if(!(e.getRemover() instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getRemover());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getRemover());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
@@ -240,7 +239,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHangingPlace(HangingPlaceEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
@@ -266,7 +265,7 @@ public final class ProtectionListener implements Listener {
     }
 
     public boolean onItemFrameRotate(Player player, ItemFrame itemFrame){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
 
         if(island == null) {
@@ -292,7 +291,7 @@ public final class ProtectionListener implements Listener {
     }
 
     public boolean onItemFrameBreak(Player player, ItemFrame itemFrame){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
 
         if(island == null) {
@@ -371,7 +370,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBucketEmpty(PlayerBucketEmptyEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
@@ -397,7 +396,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBucketFill(PlayerBucketFillEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getBlockClicked().getLocation());
 
         if(island == null) {
@@ -426,7 +425,7 @@ public final class ProtectionListener implements Listener {
         if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
         ItemStack usedItem = e.getPlayer().getItemInHand();
 
@@ -467,7 +466,7 @@ public final class ProtectionListener implements Listener {
         if(openInventory == null || openInventory.getType() != InventoryType.MERCHANT)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getWhoClicked());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getWhoClicked());
         Island island = plugin.getGrid().getIslandAt(e.getWhoClicked().getLocation());
 
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING)){
@@ -479,7 +478,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerLeash(PlayerLeashEntityEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
@@ -490,7 +489,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerDropItem(PlayerDropItemEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.DROP_ITEMS)){
@@ -501,7 +500,7 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerItemPickup(PlayerPickupItemEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
         UUID droppedPlayer = getPlayerWhoDropped(e.getItem());
 
@@ -541,7 +540,7 @@ public final class ProtectionListener implements Listener {
         if(damager == null)
             return;
 
-        SuperiorPlayer damagerPlayer = SSuperiorPlayer.of(damager);
+        SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         IslandPrivilege islandPermission = EntityUtils.isMonster(e.getEntityType()) ?
@@ -559,7 +558,7 @@ public final class ProtectionListener implements Listener {
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || !e.hasItem())
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
 
         EntityType spawnType = ItemUtils.getEntityType(e.getItem());
@@ -611,7 +610,7 @@ public final class ProtectionListener implements Listener {
         if(!(e.getAttacker() instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getAttacker());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getAttacker());
         Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
 
         if(island == null)
@@ -628,7 +627,7 @@ public final class ProtectionListener implements Listener {
         if(!(e.getEntered() instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getEntered());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getEntered());
         Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
 
         if(island == null)
@@ -647,7 +646,7 @@ public final class ProtectionListener implements Listener {
         if(!(inventoryHolder instanceof Minecart))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(((Minecart) inventoryHolder).getLocation());
 
         if(island == null)
@@ -664,7 +663,7 @@ public final class ProtectionListener implements Listener {
         if(e.getCause() != PlayerTeleportEvent.TeleportCause.ENDER_PEARL || !plugin.getGrid().isIslandsWorld(e.getTo().getWorld()))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getTo());
 
         if(island == null){
@@ -697,7 +696,7 @@ public final class ProtectionListener implements Listener {
         if(!(projectileSource instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) projectileSource);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) projectileSource);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null)
@@ -715,7 +714,7 @@ public final class ProtectionListener implements Listener {
                 !Materials.BONE_MEAL.toBukkitItem().isSimilar(e.getItem()))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
 
         if(island == null) {
@@ -745,7 +744,7 @@ public final class ProtectionListener implements Listener {
         if(!(e.getRightClicked() instanceof Fish) || ServerVersion.isLegacy())
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
         if(island == null) {
@@ -819,7 +818,7 @@ public final class ProtectionListener implements Listener {
 
         @EventHandler
         public void onPlayerArrowPickup(PlayerPickupArrowEvent e){
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
             Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
             if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){

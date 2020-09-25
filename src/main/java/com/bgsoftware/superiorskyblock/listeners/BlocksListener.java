@@ -4,7 +4,6 @@ import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -12,11 +11,11 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -353,7 +352,7 @@ public final class BlocksListener implements Listener {
         if(!plugin.getSettings().whitelistedStackedBlocks.contains(againstBlock))
             return false;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if(!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
                 !superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType())))
@@ -565,7 +564,7 @@ public final class BlocksListener implements Listener {
     public void onSignPlace(SignChangeEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if(island != null)
-            onSignPlace(SSuperiorPlayer.of(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
+            onSignPlace(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
     }
 
     public boolean onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
@@ -644,20 +643,20 @@ public final class BlocksListener implements Listener {
     }
 
     public void onSignBreak(Player player, Sign sign){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(player);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
         if(island == null)
             return;
 
-        if(((SIsland) island).isWarp(sign.getLocation())){
+        if(island.isWarpLocation(sign.getLocation())){
             island.deleteWarp(superiorPlayer, sign.getLocation());
         }
         else{
             String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
             if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
                 island.setVisitorsLocation(null);
-                Locale.DELETE_WARP.send(superiorPlayer, SIsland.VISITORS_WARP_NAME);
+                Locale.DELETE_WARP.send(superiorPlayer, IslandUtils.VISITORS_WARP_NAME);
             }
         }
     }

@@ -15,13 +15,18 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class IslandUtils {
+
+    public static final String VISITORS_WARP_NAME = "visit";
+    public static final int NO_LIMIT = -1;
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -128,6 +133,23 @@ public final class IslandUtils {
         Inventory openInventory = player.getOpenInventory().getTopInventory();
         if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING))
             player.closeInventory();
+    }
+
+    public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
+        List<ChunkPosition> allChunks = IslandUtils.getChunkCoords(island, false, false);
+        allChunks.stream().filter(chunkPosition -> !excludedChunkPositions.contains(chunkPosition))
+                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(island, chunkPosition, null));
+    }
+
+    public static void sendMessage(Island island, Locale message, List<UUID> ignoredMembers, Object... args){
+        island.getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> message.send(superiorPlayer, args));
+    }
+
+    public static double getGeneratorPercentageDecimal(Island island, com.bgsoftware.superiorskyblock.api.key.Key key){
+        int totalAmount = island.getGeneratorTotalAmount();
+        return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key) * 100D) / totalAmount;
     }
 
 }

@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -74,7 +73,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         try {
             return new ItemBuilder(clickedItem)
                     .replaceAll("{0}", transaction.getPosition() + "")
-                    .replaceAll("{1}", transaction.getPlayer() ==  null ? "Console" : SSuperiorPlayer.of(transaction.getPlayer()).getName())
+                    .replaceAll("{1}", transaction.getPlayer() ==  null ? "Console" : plugin.getPlayers().getSuperiorPlayer(transaction.getPlayer()).getName())
                     .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
                             Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
                     .replaceAll("{3}", transaction.getDate())
@@ -91,7 +90,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
     @Override
     protected List<BankTransaction> requestObjects() {
         return filteredPlayer != null ? filteredPlayer.equals(CONSOLE_UUID) ? island.getIslandBank().getConsoleTransactions() :
-                island.getIslandBank().getTransactions(SSuperiorPlayer.of(filteredPlayer)) :
+                island.getIslandBank().getTransactions(plugin.getPlayers().getSuperiorPlayer(filteredPlayer)) :
                 sorting == null ? island.getIslandBank().getAllTransactions() :
                 island.getIslandBank().getAllTransactions().stream().sorted(sorting).collect(Collectors.toList());
     }

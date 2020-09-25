@@ -7,14 +7,12 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
-import io.netty.util.internal.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -69,7 +67,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
         java.util.Locale locale = LocaleUtils.getLocale(sender);
 
@@ -167,7 +165,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
             StringBuilder generatorString = new StringBuilder();
             for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
                 generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale, StringUtils.format(entry.getKey()),
-                        StringUtils.format(((SIsland) island).getGeneratorPercentageDecimal(Key.of(entry.getKey()))), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
+                        StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, Key.of(entry.getKey()))), island.getGeneratorAmount(Key.of(entry.getKey())))).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString));
         }
@@ -210,7 +208,7 @@ public final class CmdAdminShow implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))

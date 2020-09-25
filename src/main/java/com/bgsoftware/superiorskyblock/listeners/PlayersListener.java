@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
@@ -18,13 +18,13 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
 
@@ -101,7 +101,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent e){
-        SSuperiorPlayer superiorPlayer = (SSuperiorPlayer) SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(_superiorPlayer ->
                 _superiorPlayer != superiorPlayer && _superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
         if(!duplicatedPlayers.isEmpty()) {
@@ -120,7 +120,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -145,9 +145,9 @@ public final class PlayersListener implements Listener {
         Island island = superiorPlayer.getIsland();
 
         if(island != null) {
-            ((SIsland) island).sendMessage(Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
             island.updateLastTime();
-            ((SIsland) island).setLastTimeUpdate(-1);
+            island.setCurrentlyActive();
         }
 
         Executor.sync(() -> {
@@ -176,7 +176,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -186,18 +186,18 @@ public final class PlayersListener implements Listener {
         Island island = superiorPlayer.getIsland();
 
         if(island != null) {
-            ((SIsland) island).sendMessage(Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
             boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
                     !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) &&  _superiorPlayer.isOnline());
             if(!anyOnline)
-                ((SIsland) island).setLastTimeUpdate(System.currentTimeMillis() / 1000);
+                island.updateLastTime();
         }
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
                 if(!EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE))
                 _island.removeCoop(superiorPlayer);
-                ((SIsland) _island).sendMessage(Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
             }
         }
     }
@@ -210,7 +210,7 @@ public final class PlayersListener implements Listener {
         Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
         Island entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
-        if(SSuperiorPlayer.of(e.getPlayer()).hasBypassModeEnabled())
+        if(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()).hasBypassModeEnabled())
             return;
 
         if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
@@ -227,7 +227,7 @@ public final class PlayersListener implements Listener {
         Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
         Island entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
 
-        if(e.getEntered() instanceof Player && SSuperiorPlayer.of(e.getEntered()).hasBypassModeEnabled())
+        if(e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
             return;
 
         if(playerIsland != null && (entityIsland == null || entityIsland.equals(playerIsland)) &&
@@ -245,7 +245,7 @@ public final class PlayersListener implements Listener {
             if (fromIsland != null && e.getVehicle().getWorld().equals(e.getTo().getWorld()) &&
                     (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {
                 Entity passenger = e.getVehicle().getPassenger();
-                SuperiorPlayer superiorPlayer = passenger instanceof Player ? SSuperiorPlayer.of(passenger) : null;
+                SuperiorPlayer superiorPlayer = passenger instanceof Player ? plugin.getPlayers().getSuperiorPlayer(passenger) : null;
                 if(passenger != null && (superiorPlayer == null || !superiorPlayer.hasBypassModeEnabled())) {
                     e.getVehicle().setPassenger(null);
                     TeleportUtils.teleport(passenger, e.getFrom());
@@ -266,7 +266,7 @@ public final class PlayersListener implements Listener {
 
         Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
         Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer || superiorPlayer.hasBypassModeEnabled())
             return;
@@ -284,7 +284,7 @@ public final class PlayersListener implements Listener {
         if(!(e.getEntity() instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) e.getEntity());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -292,7 +292,7 @@ public final class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(EntityUtils.isPlayerDamager(e)){
-            if(((SSuperiorPlayer) superiorPlayer).isImmunedToPvP())
+            if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToPvP())
                 e.setCancelled(true);
             return;
         }
@@ -305,7 +305,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
         if(superiorPlayer.hasTeamChatEnabled()){
@@ -315,10 +315,10 @@ public final class PlayersListener implements Listener {
             }
 
             e.setCancelled(true);
-            ((SIsland) island).sendMessage(Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+            IslandUtils.sendMessage(island, Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(_onlinePlayer);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
                 if(onlinePlayer.hasAdminSpyEnabled())
                     Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             }
@@ -327,7 +327,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
         if(!superiorPlayer.hasTeamChatEnabled()){
@@ -354,7 +354,7 @@ public final class PlayersListener implements Listener {
                 !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.LEFT_CLICK_BLOCK))
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(!superiorPlayer.hasSchematicModeEnabled())
             return;
@@ -381,7 +381,7 @@ public final class PlayersListener implements Listener {
         if(from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island == null || (island.isVisitor(superiorPlayer, false) ?
@@ -420,7 +420,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -438,7 +438,7 @@ public final class PlayersListener implements Listener {
         if(environment == e.getPlayer().getWorld().getEnvironment())
             environment = World.Environment.NORMAL;
 
-        if(((SSuperiorPlayer) superiorPlayer).isImmunedToTeleport())
+        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
             return;
 
         if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
@@ -527,7 +527,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island != null && !island.isSpawn() && !island.isMember(superiorPlayer) &&
@@ -544,16 +544,16 @@ public final class PlayersListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        BukkitTask teleportTask = ((SSuperiorPlayer) superiorPlayer).getTeleportTask();
+        BukkitTask teleportTask = ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getTeleportTask();
 
         if(teleportTask != null){
             teleportTask.cancel();
-            ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 
@@ -566,7 +566,7 @@ public final class PlayersListener implements Listener {
         if(from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -584,7 +584,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerChatWhilePreview(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
 
         if(islandPreview == null)
@@ -603,7 +603,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleportWhilePreview(PlayerTeleportEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
@@ -615,58 +615,58 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerChatWhileBank(AsyncPlayerChatEvent e){
-        SSuperiorPlayer superiorPlayer = (SSuperiorPlayer) SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         boolean fromBank = false;
 
-        if(superiorPlayer.getBankWithdrawSlot() >= 0){
+        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankWithdrawSlot() >= 0){
             e.setCancelled(true);
             fromBank = true;
 
             try{
                 BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
-                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().withdrawMoney(superiorPlayer, amount, superiorPlayer.getBankCommandsToExecute());
-                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, superiorPlayer.getBankWithdrawSlot());
+                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().withdrawMoney(superiorPlayer, amount,
+                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankCommandsToExecute());
+                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction,
+                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankWithdrawSlot());
             }catch(IllegalArgumentException ex){
                 Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
             }
         }
-        else if(superiorPlayer.getBankDepositSlot() >= 0){
+        else if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankDepositSlot() >= 0){
             e.setCancelled(true);
             fromBank = true;
 
             try{
                 BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
                 BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, amount);
-                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, superiorPlayer.getBankDepositSlot());
+                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction,
+                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankDepositSlot());
             }catch(IllegalArgumentException ex){
                 Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
             }
         }
 
         if(fromBank) {
-            superiorPlayer.setBankWithdrawSlot(-1);
-            superiorPlayer.setBankDepositSlot(-1);
-            superiorPlayer.setBankCommandsToExecute(null);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(-1);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(-1);
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankCommandsToExecute(null);
             MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
         }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerQuitWhileBank(PlayerQuitEvent e){
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
-
-        if(superiorPlayer instanceof SSuperiorPlayer){
-            ((SSuperiorPlayer) superiorPlayer).setBankWithdrawSlot(-1);
-            ((SSuperiorPlayer) superiorPlayer).setBankDepositSlot(-1);
-            ((SSuperiorPlayer) superiorPlayer).setBankCommandsToExecute(null);
-        }
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(-1);
+        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(-1);
+        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankCommandsToExecute(null);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerChangeWorld(PlayerChangedWorldEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(e.getPlayer());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if(island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().isFlying() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY))

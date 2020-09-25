@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.google.common.collect.Sets;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -147,7 +146,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
 
         @Override
         public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-            SuperiorMenuCustom.openInventory(SSuperiorPlayer.of(sender), fileName, null);
+            SuperiorMenuCustom.openInventory(plugin.getPlayers().getSuperiorPlayer(sender), fileName, null);
         }
 
         @Override

@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,7 +32,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
         if(confirmSlot.contains(e.getRawSlot())){
             if(EventsCaller.callIslandDisbandEvent(superiorPlayer, island)){
-                ((SIsland) island).sendMessage(Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
                 Locale.DISBANDED_ISLAND.send(superiorPlayer);
 

@@ -2,10 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.google.common.collect.Lists;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -58,8 +57,8 @@ public final class CmdAccept implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[1]);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
         Island island;
 
         if(targetPlayer == null){
@@ -89,7 +88,7 @@ public final class CmdAccept implements ISuperiorCommand {
         if(!EventsCaller.callIslandJoinEvent(superiorPlayer, island))
             return;
 
-        ((SIsland) island).sendMessage(Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
@@ -108,12 +107,12 @@ public final class CmdAccept implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if(args.length == 2){
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of((Player) sender);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
             List<String> list = Lists.newArrayList();
             Island island;
 
             for(UUID uuid : plugin.getGrid().getAllIslands()){
-                island = plugin.getGrid().getIsland(SSuperiorPlayer.of(uuid));
+                island = plugin.getGrid().getIsland(plugin.getPlayers().getSuperiorPlayer(uuid));
                 if(island != null && island.isInvited(superiorPlayer)) {
                     if(island.getOwner().getName().toLowerCase().contains(args[1].toLowerCase()))
                         list.add(island.getOwner().getName());

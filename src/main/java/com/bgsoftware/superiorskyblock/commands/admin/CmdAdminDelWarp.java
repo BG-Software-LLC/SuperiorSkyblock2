@@ -5,9 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -63,7 +62,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
         if(island == null){
@@ -97,7 +96,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
             breakSign = true;
         }
 
-        if(args[1].equalsIgnoreCase(SIsland.VISITORS_WARP_NAME)){
+        if(args[1].equalsIgnoreCase(IslandUtils.VISITORS_WARP_NAME)){
             island.setVisitorsLocation(null);
         }
         else{
@@ -117,7 +116,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
 
         if(args.length == 3){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
                     if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
@@ -128,7 +127,7 @@ public final class CmdAdminDelWarp implements ISuperiorCommand {
             }
         }
         else if(args.length == 4){
-            SuperiorPlayer targetPlayer = SSuperiorPlayer.of(args[2]);
+            SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
             if(island != null)
                 list.addAll(island.getAllWarps().stream().filter(warpName ->

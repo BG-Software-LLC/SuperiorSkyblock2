@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.schematics;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -72,7 +71,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
             editSession.addNotifyTask(() -> {
                 try {
-                    ((SIsland) island).handleBlocksPlace(cachedCounts);
+                    island.handleBlocksPlace(cachedCounts);
 
                     EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 

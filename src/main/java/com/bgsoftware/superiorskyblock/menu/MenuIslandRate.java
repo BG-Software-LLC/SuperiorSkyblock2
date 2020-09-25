@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -54,7 +54,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Locale.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
 
-        ((SIsland) island).sendMessage(Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
+        IslandUtils.sendMessage(island, Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
 
         Executor.sync(() -> {
             previousMove = false;

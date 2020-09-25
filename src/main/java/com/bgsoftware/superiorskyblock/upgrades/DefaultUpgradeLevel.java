@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.upgrades;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import org.bukkit.entity.EntityType;
 
@@ -42,12 +42,12 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
 
     @Override
     public int getBlockLimit(Key key) {
-        return plugin.getSettings().defaultBlockLimits.getOrDefault(key, SIsland.NO_LIMIT);
+        return plugin.getSettings().defaultBlockLimits.getOrDefault(key, IslandUtils.NO_LIMIT);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return plugin.getSettings().defaultBlockLimits.getRaw(key, SIsland.NO_LIMIT);
+        return plugin.getSettings().defaultBlockLimits.getRaw(key, IslandUtils.NO_LIMIT);
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
 
     @Override
     public int getEntityLimit(Key key) {
-        return plugin.getSettings().defaultEntityLimits.getOrDefault(key, SIsland.NO_LIMIT);
+        return plugin.getSettings().defaultEntityLimits.getOrDefault(key, IslandUtils.NO_LIMIT);
     }
 
     @Override

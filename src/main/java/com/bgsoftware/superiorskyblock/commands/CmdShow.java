@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -72,14 +71,14 @@ public final class CmdShow implements ISuperiorCommand {
                 return;
             }
 
-            SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
             Island locationIsland = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
 
             island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
         }
         else{
-            targetPlayer = SSuperiorPlayer.of(args[1]);
+            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
             island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
         }
 
@@ -156,13 +155,13 @@ public final class CmdShow implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = sender instanceof Player ? SSuperiorPlayer.of(sender) : null;
+        SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
         List<String> list = new ArrayList<>();
 
         if(args.length == 2){
             for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = SSuperiorPlayer.of(player);
+                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null && (superiorPlayer == null || island == null ||
                         !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {

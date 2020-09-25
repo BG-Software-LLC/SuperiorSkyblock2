@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
@@ -52,7 +52,7 @@ public final class CmdTeleport implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = SSuperiorPlayer.of(sender);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if(island == null){
@@ -62,7 +62,7 @@ public final class CmdTeleport implements ISuperiorCommand {
 
         if(plugin.getSettings().homeWarmup > 0 && !superiorPlayer.hasBypassModeEnabled()) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().homeWarmup));
-            ((SSuperiorPlayer) superiorPlayer).setTeleportTask(Executor.sync(() ->
+            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(Executor.sync(() ->
                     teleportToIsland(superiorPlayer, island), plugin.getSettings().homeWarmup / 50));
         }
         else {
@@ -76,7 +76,7 @@ public final class CmdTeleport implements ISuperiorCommand {
     }
 
     private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island){
-        ((SSuperiorPlayer) superiorPlayer).setTeleportTask(null);
+        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
         superiorPlayer.teleport(island, result -> {
             if(result)
                 Locale.TELEPORTED_SUCCESS.send(superiorPlayer);

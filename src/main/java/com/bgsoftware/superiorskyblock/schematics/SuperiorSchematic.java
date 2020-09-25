@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.schematics;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematics.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -193,7 +192,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                         entity.spawnEntity(min);
                     }
 
-                    ((SIsland) island).handleBlocksPlace(cachedCounts);
+                    island.handleBlocksPlace(cachedCounts);
 
                     EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 

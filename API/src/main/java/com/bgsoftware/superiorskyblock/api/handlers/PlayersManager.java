@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,12 @@ public interface PlayersManager {
      * @return The player with that name. May be null.
      */
     SuperiorPlayer getSuperiorPlayer(String name);
+
+    /**
+     * Get a player by a player.
+     * @param player The player to check.
+     */
+    SuperiorPlayer getSuperiorPlayer(Player player);
 
     /**
      * Get a player by it's uuid.

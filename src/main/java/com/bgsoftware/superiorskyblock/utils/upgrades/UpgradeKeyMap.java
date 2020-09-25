@@ -128,6 +128,19 @@ public final class UpgradeKeyMap {
         return copyMap;
     }
 
+    public KeyMap<Integer> getCustomValues(){
+        KeyMap<Integer> copyMap = new KeyMap<>();
+
+        this.value.read(map -> {
+            for(Map.Entry<Key, Pair<Integer, Integer>> entry : map.entrySet()){
+                if(entry.getValue().getKey() >= 0)
+                    copyMap.put(entry.getKey(), entry.getValue().getKey());
+            }
+        });
+
+        return copyMap;
+    }
+
     public static UpgradeKeyMap createMap(){
         return new UpgradeKeyMap();
     }
