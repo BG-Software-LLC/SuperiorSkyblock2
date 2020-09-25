@@ -47,12 +47,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
         SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key);
 
-        if(((Key) key).isAPIKey()){
-            String customBlockValue = customBlockValues.get(key);
-            if(customBlockValue != null) {
-                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth");
-                return BigDecimalFormatted.of(customBlockValue);
-            }
+        String customBlockValue = customBlockValues.get(key);
+        if(customBlockValue != null) {
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth");
+            return BigDecimalFormatted.of(customBlockValue);
         }
 
         String value = blockValues.get(key);
@@ -87,12 +85,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
         SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key);
 
-        if(((Key) key).isAPIKey()){
-            String customBlockLevel = customBlockLevels.get(key);
-            if(customBlockLevel != null) {
-                SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level");
-                return BigDecimalFormatted.of(customBlockLevel);
-            }
+        String customBlockLevel = customBlockLevels.get(key);
+        if(customBlockLevel != null) {
+            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level");
+            return BigDecimalFormatted.of(customBlockLevel);
         }
 
         String level = blockLevels.get(key);
