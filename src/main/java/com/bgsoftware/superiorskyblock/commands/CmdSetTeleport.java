@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public final class CmdSetTeleport implements ISuperiorCommand {
             return;
         }
 
-        if (newLocation.getWorld().getEnvironment() != World.Environment.NORMAL || !island.isInsideRange(newLocation)) {
+        if (!island.isInsideRange(newLocation)) {
             Locale.TELEPORT_LOCATION_OUTSIDE_ISLAND.send(superiorPlayer);
             return;
         }
