@@ -3,9 +3,7 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
@@ -93,9 +91,6 @@ public final class CmdDeposit implements ISuperiorCommand {
         }
         else if(!transaction.getFailureReason().isEmpty()){
             Locale.DEPOSIT_ERROR.send(sender, transaction.getFailureReason());
-        }
-        else{
-            IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
         }
     }
 

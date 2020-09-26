@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -10,8 +11,10 @@ import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import org.bukkit.Bukkit;
@@ -80,6 +83,8 @@ public final class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
+            IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+
             MenuIslandBank.refreshMenus();
             MenuBankLogs.refreshMenus();
         }
@@ -147,6 +152,8 @@ public final class SIslandBank implements IslandBank {
             setBalance(this.balance.get().subtract(withdrawAmount), true);
 
             addTransaction(bankTransaction, true);
+
+            IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
 
             MenuIslandBank.refreshMenus();
             MenuBankLogs.refreshMenus();

@@ -4,10 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
@@ -93,11 +90,6 @@ public final class CmdWithdraw implements ISuperiorCommand {
         if(!transaction.getFailureReason().isEmpty()){
             Locale.WITHDRAW_ERROR.send(sender, transaction.getFailureReason());
         }
-        else{
-            IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(transaction.getAmount()));
-        }
-
-        EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, amount);
     }
 
     @Override
