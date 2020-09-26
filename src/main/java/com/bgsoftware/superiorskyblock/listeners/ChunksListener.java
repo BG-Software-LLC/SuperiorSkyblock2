@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -91,7 +93,19 @@ public final class ChunksListener implements Listener {
         if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
 
+        // We want to delete old holograms of stacked blocks
+        for(Entity entity : e.getChunk().getEntities()){
+            if(entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
+                    plugin.getGrid().getBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+                entity.remove();
+        }
+
         plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk())).forEach(StackedBlocksHandler.StackedBlock::updateName);
+    }
+
+    private static boolean isHologram(ArmorStand armorStand){
+        return !armorStand.hasGravity() && armorStand.isSmall() && !armorStand.isVisible() &&
+                armorStand.isCustomNameVisible() && armorStand.isMarker() && armorStand.getCustomName() != null;
     }
 
 }
