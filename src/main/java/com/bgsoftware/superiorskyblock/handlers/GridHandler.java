@@ -205,7 +205,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 if(result){
                     islandPreviews.add(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
                     Executor.ensureMain(() -> superiorPlayer.asPlayer().setGameMode(GameMode.SPECTATOR));
-                    Locale.ISLAND_PREVIEW_START.send(superiorPlayer);
+                    Locale.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
                 }
             });
         }
