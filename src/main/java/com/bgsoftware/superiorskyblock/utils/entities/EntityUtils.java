@@ -137,6 +137,7 @@ public final class EntityUtils {
         switch (entityType.name()){
             case "SLIME":
             case "MAGMA_CUBE":
+            case "PHANTOM":
                 return true;
             default:
                 return Monster.class.isAssignableFrom(entityType.getEntityClass());
