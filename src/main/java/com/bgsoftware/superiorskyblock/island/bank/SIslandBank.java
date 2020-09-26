@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
@@ -53,14 +54,18 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
-        SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + amount);
         BankTransaction bankTransaction;
         String failureReason;
 
-        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.DEPOSIT_MONEY)){
+            failureReason = "No permission";
+        }
+        else if(amount.compareTo(BigDecimal.ZERO) <= 0){
             failureReason = "Invalid amount";
         }
         else {
+            SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + amount);
+
             EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
 
             BigDecimal playerBalance = plugin.getProviders().getBalanceForBanks(superiorPlayer);
@@ -123,14 +128,21 @@ public final class SIslandBank implements IslandBank {
     public BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, List<String> commandsToExecute) {
         BigDecimal withdrawAmount = balance.get().min(amount);
 
-        SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
         BankTransaction bankTransaction;
         String failureReason;
 
-        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+        if(!island.hasPermission(superiorPlayer, IslandPrivileges.WITHDRAW_MONEY)){
+            failureReason = "No permission";
+        }
+        else if(this.balance.get().compareTo(BigDecimal.ZERO) <= 0){
+            failureReason = "Bank is empty";
+        }
+        else if(amount.compareTo(BigDecimal.ZERO) <= 0){
             failureReason = "Invalid amount";
         }
         else {
+            SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
+
             EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
             if (commandsToExecute == null || commandsToExecute.isEmpty()) {

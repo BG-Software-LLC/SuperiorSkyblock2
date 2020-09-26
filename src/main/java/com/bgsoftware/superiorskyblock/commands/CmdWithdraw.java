@@ -60,11 +60,6 @@ public final class CmdWithdraw implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.WITHDRAW_MONEY)){
-            Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
-            return;
-        }
-
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
@@ -75,20 +70,25 @@ public final class CmdWithdraw implements ISuperiorCommand {
             amount = new BigDecimal(args[1]);
         }catch(IllegalArgumentException ignored){}
 
-        if(amount.compareTo(BigDecimal.ZERO) < 0){
-            Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
-            return;
-        }
-
-        if(island.getIslandBank().getBalance().compareTo(BigDecimal.ZERO) == 0){
-            Locale.ISLAND_BANK_EMPTY.send(sender);
-            return;
-        }
-
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
 
-        if(!transaction.getFailureReason().isEmpty()){
-            Locale.WITHDRAW_ERROR.send(sender, transaction.getFailureReason());
+        String failureReason = transaction.getFailureReason();
+
+        if(!failureReason.isEmpty()){
+            switch (failureReason){
+                case "No permission":
+                    Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
+                    break;
+                case "Invalid amount":
+                    Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
+                    break;
+                case "Bank is empty":
+                    Locale.ISLAND_BANK_EMPTY.send(sender);
+                    break;
+                default:
+                    Locale.WITHDRAW_ERROR.send(sender, failureReason);
+                    break;
+            }
         }
     }
 

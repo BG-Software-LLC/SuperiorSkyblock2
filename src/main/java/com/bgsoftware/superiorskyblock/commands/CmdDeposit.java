@@ -60,11 +60,6 @@ public final class CmdDeposit implements ISuperiorCommand {
             return;
         }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.DEPOSIT_MONEY)){
-            Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
-            return;
-        }
-
         BigDecimal moneyInBank = plugin.getProviders().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);
 
@@ -76,21 +71,28 @@ public final class CmdDeposit implements ISuperiorCommand {
             amount = BigDecimal.valueOf(Double.parseDouble(args[1]));
         }catch(IllegalArgumentException ignored){}
 
-        if(amount.compareTo(BigDecimal.ZERO) <= 0){
-            Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
-            return;
-        }
-
         BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
 
-        if(transaction.getFailureReason().equals("Not enough money")){
-            Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, args[1]);
-        }
-        else if(transaction.getFailureReason().equals("Exceed bank limit")){
-            Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
-        }
-        else if(!transaction.getFailureReason().isEmpty()){
-            Locale.DEPOSIT_ERROR.send(sender, transaction.getFailureReason());
+        String failureReason = transaction.getFailureReason();
+
+        if(!failureReason.isEmpty()) {
+            switch (failureReason) {
+                case "No permission":
+                    Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
+                    break;
+                case "Invalid amount":
+                    Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
+                    break;
+                case "Not enough money":
+                    Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, args[1]);
+                    break;
+                case "Exceed bank limit":
+                    Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
+                    break;
+                default:
+                    Locale.DEPOSIT_ERROR.send(sender, failureReason);
+                    break;
+            }
         }
     }
 
