@@ -170,7 +170,7 @@ public final class SettingsHandler extends AbstractHandler {
         convertInteractables(plugin, cfg);
 
         cfg.syncWithConfig(file, plugin.getResource("config.yml"),  "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
 
         databaseType = cfg.getString("database.type");
         databaseMySQLAddress = cfg.getString("database.address");
@@ -393,7 +393,7 @@ public final class SettingsHandler extends AbstractHandler {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases");
+                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
 
         cfg.set(path, value);
 
