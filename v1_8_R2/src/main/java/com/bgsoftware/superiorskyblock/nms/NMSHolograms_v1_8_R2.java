@@ -153,7 +153,9 @@ public final class NMSHolograms_v1_8_R2 implements NMSHolograms {
         }
 
         private void setMarker(){
-            this.datawatcher.watch(10, this.datawatcher.getByte(10) | 16);
+            byte b0 = this.datawatcher.getByte(10);
+            b0 = (byte)(b0 | 16);
+            this.datawatcher.watch(10, b0);
         }
 
     }

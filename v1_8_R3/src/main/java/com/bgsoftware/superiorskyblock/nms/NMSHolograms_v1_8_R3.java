@@ -34,7 +34,7 @@ public final class NMSHolograms_v1_8_R3 implements NMSHolograms {
             setArms(false);
             setGravity(false);
             setBasePlate(true);
-            setMarker();
+            n(true);
             super.setCustomNameVisible(true);
             super.a(new AxisAlignedBB(0D, 0D, 0D, 0D, 0D, 0D));
             this.onGround = true; // Workaround to force EntityTrackerEntry to send a teleport packet.
@@ -150,10 +150,6 @@ public final class NMSHolograms_v1_8_R3 implements NMSHolograms {
                 this.bukkitEntity = new CraftArmorStand(this.world.getServer(), this);
             }
             return this.bukkitEntity;
-        }
-
-        private void setMarker(){
-            this.datawatcher.watch(10, this.datawatcher.getByte(10) | 16);
         }
 
     }
