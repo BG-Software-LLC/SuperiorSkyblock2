@@ -162,20 +162,20 @@ upgrades:
       border-size: 25
       commands:
         - 'island admin setupgrade %player% border-size 2'
-        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 50 blocks!'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 100x100 blocks!'
     '2':
       price: 80000.0
       border-size: 50
       commands:
         - 'island admin setupgrade %player% border-size 3'
-        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 75 blocks!'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 150x150 blocks!'
     '3':
       price: 150000.0
       permission: 'upgrade.size.donor'
       border-size: 75
       commands:
         - 'island admin setupgrade %player% border-size 4'
-        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 125 blocks!'
+        - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 250x250 blocks!'
     '4':
       price: 0.0
       border-size: 125
