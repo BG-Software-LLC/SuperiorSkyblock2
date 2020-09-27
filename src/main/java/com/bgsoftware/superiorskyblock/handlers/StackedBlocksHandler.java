@@ -107,6 +107,9 @@ public final class StackedBlocksHandler {
                 if(hologram == null)
                     hologram = plugin.getNMSHolograms().createHologram(blockPosition.parse().add(0.5, 1, 0.5));
 
+                if(blockKey == null)
+                    blockKey = Key.of(blockPosition.getBlock());
+
                 hologram.setHologramName(plugin.getSettings().stackedBlocksName
                         .replace("{0}", String.valueOf(amount))
                         .replace("{1}", StringUtils.format(blockKey.getGlobalKey()))
