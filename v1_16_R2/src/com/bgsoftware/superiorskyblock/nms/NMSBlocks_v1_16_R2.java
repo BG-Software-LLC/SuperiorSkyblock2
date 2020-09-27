@@ -235,8 +235,16 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
             ChunkSection chunkSection = chunk.getSections()[indexY];
 
-            if (chunkSection == null)
-                chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
+            if (chunkSection == null) {
+                try {
+                    // Paper's constructor for ChunkSection for more optimized chunk sections.
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
+                }catch (Throwable ex){
+                    // Spigot's constructor for ChunkSection
+                    // noinspection deprecation
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
+                }
+            }
 
             int blockX = blockPosition.getX() & 15;
             int blockY = blockPosition.getY();
@@ -437,7 +445,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
             if(world.generator != null && !(world.generator instanceof WorldGenerator)){
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
                 customChunkGenerator.buildBase(null, protoChunk);
 
                 for(int i = 0; i < 16; i++)
@@ -458,7 +466,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
             levelCompound.set("Entities", new NBTTagList());
 
             if(!(world.generator instanceof WorldGenerator)) {
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
                 CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
                 customChunkGenerator.buildBase(null, protoChunk);
                 ChunkSection[] chunkSections = protoChunk.getSections();
@@ -542,7 +550,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
                     if(chunkCompound == null){
-                        ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
                         chunkCompound = ChunkRegionLoader.saveChunk(world, protoChunk);
                     }
 
@@ -625,6 +633,17 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         org.bukkit.block.data.BlockData blockData = block.getBlockData();
 
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+    }
+
+    private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world){
+        try{
+            // Paper's constructor for ProtoChunk
+            return new ProtoChunk(chunkCoord, ChunkConverter.a, world);
+        }catch (Throwable ex){
+            // Spigot's constructor for ProtoChunk
+            // noinspection deprecation
+            return new ProtoChunk(chunkCoord, ChunkConverter.a);
+        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable{
