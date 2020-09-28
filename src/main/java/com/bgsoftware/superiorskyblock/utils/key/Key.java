@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,7 +67,7 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     public static Key of(Entity entity){
-        return of(of(entity.getType().name()), entity);
+        return of(EntityUtils.getLimitEntityType(entity), entity);
     }
 
     public static Key of(Block block){

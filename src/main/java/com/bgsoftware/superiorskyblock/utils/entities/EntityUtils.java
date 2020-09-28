@@ -104,7 +104,7 @@ public final class EntityUtils {
     }
 
     public static Key getLimitEntityType(Entity entity){
-        Key key = Key.of(entity);
+        Key key = Key.of(entity.getType());
         return key.getGlobalKey().contains("MINECART") ?
                 Key.of("MINECART" + (key.getSubKey().isEmpty() ? "" : ":" + key.getSubKey())) : key;
     }
