@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,10 +49,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
         if(itemToDeposit == null || itemToDeposit.getType() == Material.AIR)
             return;
 
-        Key blockKey = plugin.getGrid().getBlockKey(stackedBlock);
-        Key itemKey = Key.of(itemToDeposit);
-
-        if(!blockKey.equals(itemKey))
+        if(!BlocksListener.IMP.canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock(), null))
             e.setCancelled(true);
     }
 
@@ -61,12 +57,9 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
         int depositAmount = 0;
         ItemStack blockItem = null;
 
-        Key blockKey = plugin.getGrid().getBlockKey(stackedBlock);
-
         for(ItemStack itemStack : e.getInventory().getContents()){
             if(itemStack != null && itemStack.getType() != Material.AIR) {
-                Key itemKey = Key.of(itemStack);
-                if(blockKey.equals(itemKey)){
+                if(BlocksListener.IMP.canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock(), null)){
                     depositAmount += itemStack.getAmount();
                     blockItem = itemStack;
                 }

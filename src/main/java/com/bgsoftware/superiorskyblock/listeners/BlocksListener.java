@@ -320,7 +320,7 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
     }
 
-    private boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
+    public boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
         if(!plugin.getSettings().stackedBlocksEnabled)
             return false;
 
