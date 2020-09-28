@@ -186,7 +186,7 @@ public final class SIsland implements Island {
     private final UpgradeValue<Double> cropGrowth = UpgradeValue.createDouble();
     private final UpgradeValue<Double> spawnerRates = UpgradeValue.createDouble();
     private final UpgradeValue<Double> mobDrops = UpgradeValue.createDouble();
-    private final UpgradeValue<BigDecimal> bankLimit = UpgradeValue.createBigDecimal();
+    private final UpgradeValue<BigDecimalFormatted> bankLimit = UpgradeValue.createBigDecimal();
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
@@ -267,7 +267,7 @@ public final class SIsland implements Island {
         this.coopLimit.set(resultSet.getInt("coopLimit"));
         String bankLimit = resultSet.getString("bankLimit");
         if(bankLimit != null && !bankLimit.isEmpty())
-            this.bankLimit.set(new BigDecimal(bankLimit));
+            this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
 
         String blockCounts = resultSet.getString("blockCounts");
 
@@ -1545,7 +1545,7 @@ public final class SIsland implements Island {
     @Override
     public void setBankLimit(BigDecimal bankLimit) {
         SuperiorSkyblockPlugin.debug("Action: Set Bank Limit, Island: " + owner.getName() + ", Bank Limit: " + bankLimit);
-        this.bankLimit.set(bankLimit);
+        this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
         islandDataHandler.saveBankLimit();
     }
 
@@ -1897,7 +1897,7 @@ public final class SIsland implements Island {
     public void setBonusWorth(BigDecimal bonusWorth){
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Worth, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
 
-        BigDecimalFormatted newBonusWorth = bonusWorth instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusWorth : BigDecimalFormatted.of(bonusWorth);
+        BigDecimalFormatted newBonusWorth = BigDecimalFormatted.of(bonusWorth);
         this.bonusWorth.set(newBonusWorth);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
@@ -1916,7 +1916,7 @@ public final class SIsland implements Island {
     public void setBonusLevel(BigDecimal bonusLevel) {
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Level, Island: " + owner.getName() + ", Bonus: " + bonusLevel);
 
-        BigDecimalFormatted newBonusLevel = bonusLevel instanceof BigDecimalFormatted ? (BigDecimalFormatted) bonusLevel : BigDecimalFormatted.of(bonusLevel);
+        BigDecimalFormatted newBonusLevel = BigDecimalFormatted.of(bonusLevel);
         this.bonusLevel.set(newBonusLevel);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
@@ -3019,7 +3019,7 @@ public final class SIsland implements Island {
         islandSize.setUpgrade(upgradeLevel.getBorderSize());
         cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(),true,false);
         islandEffects.setUpgrade(upgradeLevel.getPotionEffects());
-        bankLimit.setUpgrade(upgradeLevel.getBankLimit());
+        bankLimit.setUpgrade(BigDecimalFormatted.of(upgradeLevel.getBankLimit()));
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

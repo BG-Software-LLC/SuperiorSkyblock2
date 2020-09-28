@@ -238,7 +238,7 @@ public final class SIslandBank implements IslandBank {
                     .setInt(bankTransaction.getPosition())
                     .setString(bankTransaction.getTime() + "")
                     .setString(bankTransaction.getFailureReason())
-                    .setString(((BigDecimalFormatted) bankTransaction.getAmount()).getAsString())
+                    .setString(BigDecimalFormatted.of(bankTransaction.getAmount()).getAsString())
                     .execute(true);
         }
     }

@@ -224,11 +224,11 @@ public abstract class PlaceholderHook {
                                 if(value){
                                     if(sortingType.equals(SortingTypes.BY_WORTH)){
                                         return formattedValue ? StringUtils.fancyFormat(_island.getWorth(), superiorPlayer.getUserLocale()) :
-                                                rawValue ? ((BigDecimalFormatted) _island.getWorth()).getAsString() : _island.getWorth().toString();
+                                                rawValue ? BigDecimalFormatted.of(_island.getWorth()).getAsString() : _island.getWorth().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_LEVEL)){
                                         return formattedValue ? StringUtils.fancyFormat(_island.getIslandLevel(), superiorPlayer.getUserLocale()) :
-                                                rawValue ? ((BigDecimalFormatted) _island.getIslandLevel()).getAsString() : _island.getIslandLevel().toString();
+                                                rawValue ? BigDecimalFormatted.of(_island.getIslandLevel()).getAsString() : _island.getIslandLevel().toString();
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_RATING)){
                                         return StringUtils.format(_island.getTotalRating());
@@ -300,7 +300,7 @@ public abstract class PlaceholderHook {
                     case "level":
                         return island.getIslandLevel().toString();
                     case "level_raw":
-                        return ((BigDecimalFormatted) island.getIslandLevel()).getAsString();
+                        return BigDecimalFormatted.of(island.getIslandLevel()).getAsString();
                     case "level_format":
                         return StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale());
                     case "level_int":
@@ -308,7 +308,7 @@ public abstract class PlaceholderHook {
                     case "worth":
                         return island.getWorth().toString();
                     case "worth_raw":
-                        return ((BigDecimalFormatted) island.getWorth()).getAsString();
+                        return BigDecimalFormatted.of(island.getWorth()).getAsString();
                     case "worth_format":
                         return StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale());
                     case "worth_int":
@@ -320,7 +320,7 @@ public abstract class PlaceholderHook {
                     case "bank":
                         return island.getIslandBank().getBalance().toString();
                     case "bank_raw":
-                        return ((BigDecimalFormatted) island.getIslandBank().getBalance()).getAsString();
+                        return BigDecimalFormatted.of(island.getIslandBank().getBalance()).getAsString();
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale());
                     case "hoppers_limit":

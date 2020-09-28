@@ -34,7 +34,7 @@ public final class BigDecimalFormatted extends BigDecimal {
     @Override
     public BigDecimalFormatted setScale(int newScale, RoundingMode roundingMode) {
         BigDecimal bigDecimal = super.setScale(newScale, roundingMode);
-        return bigDecimal instanceof BigDecimalFormatted ? (BigDecimalFormatted) bigDecimal : BigDecimalFormatted.of(bigDecimal);
+        return BigDecimalFormatted.of(bigDecimal);
     }
 
     @Override

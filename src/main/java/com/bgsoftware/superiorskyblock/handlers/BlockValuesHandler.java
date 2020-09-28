@@ -94,7 +94,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         String level = blockLevels.get(key);
 
         if(level == null) {
-            level = convertValueToLevel((BigDecimalFormatted) getBlockWorth(key));
+            level = convertValueToLevel(BigDecimalFormatted.of(getBlockWorth(key)));
             blockLevels.put(key, level);
             SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Converted From Worth");
         }
