@@ -10,6 +10,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
@@ -123,14 +124,12 @@ public final class EntityUtils {
 
     public static boolean canHaveLimit(EntityType entityType){
         Class<?> entityClass = entityType.getEntityClass();
-        return entityType.name().contains("MINECART") || (entityClass != null && LivingEntity.class.isAssignableFrom(entityClass));
+        return entityType.name().contains("MINECART") || (entityClass != null &&
+                (LivingEntity.class.isAssignableFrom(entityClass) || Hanging.class.isAssignableFrom(entityClass)));
     }
 
     public static boolean canBypassEntityLimit(Entity entity){
-        if(entity instanceof ArmorStand)
-            return !((ArmorStand) entity).isVisible();
-
-        return false;
+        return !(entity instanceof  ArmorStand) || !((ArmorStand) entity).isVisible();
     }
 
     public static boolean isMonster(EntityType entityType){

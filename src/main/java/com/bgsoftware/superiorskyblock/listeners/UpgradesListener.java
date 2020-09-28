@@ -19,7 +19,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
@@ -32,6 +33,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -260,9 +262,6 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent e){
-        if(plugin.getGrid() == null)
-            return;
-        
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
         if(island == null)
@@ -274,6 +273,25 @@ public final class UpgradesListener implements Listener {
         island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
             if(result)
                 e.getEntity().remove();
+        });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onHangingPlace(HangingPlaceEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null)
+            return;
+
+        if(!EntityUtils.canHaveLimit(e.getEntity().getType()))
+            return;
+
+        island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
+            if(result) {
+                e.getEntity().remove();
+                if(e.getPlayer().getGameMode() != GameMode.CREATIVE)
+                    e.getPlayer().getInventory().addItem(asItemStack(e.getEntity()));
+            }
         });
     }
 
@@ -318,7 +336,7 @@ public final class UpgradesListener implements Listener {
             if(result) {
                 e.getVehicle().remove();
                 if(placedVehicle != null)
-                    Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack((Minecart) e.getVehicle()));
+                    Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
             }
         });
     }
@@ -345,24 +363,36 @@ public final class UpgradesListener implements Listener {
         }
     }
 
-    private ItemStack asItemStack(Minecart minecart){
-        Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock(minecart).getGlobalKey());
-        switch (material.name()){
-            case "HOPPER":
-                return new ItemStack(Material.HOPPER_MINECART);
-            case "COMMAND_BLOCK":
-                return new ItemStack(Material.valueOf("COMMAND_BLOCK_MINECART"));
-            case "COMMAND":
-                return new ItemStack(Material.COMMAND_MINECART);
-            case "TNT":
-                return new ItemStack(ServerVersion.isLegacy() ? Material.EXPLOSIVE_MINECART : Material.valueOf("TNT_MINECART"));
-            case "FURNACE":
-                return new ItemStack(ServerVersion.isLegacy() ? Material.POWERED_MINECART : Material.valueOf("FURNACE_MINECART"));
-            case "CHEST":
-                return new ItemStack(ServerVersion.isLegacy() ? Material.STORAGE_MINECART : Material.valueOf("CHEST_MINECART"));
-            default:
-                return new ItemStack(Material.MINECART);
+    private ItemStack asItemStack(Entity entity){
+        if(entity instanceof Hanging){
+            switch (entity.getType()){
+                case ITEM_FRAME:
+                    return new ItemStack(Material.ITEM_FRAME);
+                case PAINTING:
+                    return new ItemStack(Material.PAINTING);
+            }
         }
+        else if(entity instanceof Minecart) {
+            Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock((Minecart) entity).getGlobalKey());
+            switch (material.name()) {
+                case "HOPPER":
+                    return new ItemStack(Material.HOPPER_MINECART);
+                case "COMMAND_BLOCK":
+                    return new ItemStack(Material.valueOf("COMMAND_BLOCK_MINECART"));
+                case "COMMAND":
+                    return new ItemStack(Material.COMMAND_MINECART);
+                case "TNT":
+                    return new ItemStack(ServerVersion.isLegacy() ? Material.EXPLOSIVE_MINECART : Material.valueOf("TNT_MINECART"));
+                case "FURNACE":
+                    return new ItemStack(ServerVersion.isLegacy() ? Material.POWERED_MINECART : Material.valueOf("FURNACE_MINECART"));
+                case "CHEST":
+                    return new ItemStack(ServerVersion.isLegacy() ? Material.STORAGE_MINECART : Material.valueOf("CHEST_MINECART"));
+                default:
+                    return new ItemStack(Material.MINECART);
+            }
+        }
+
+        throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
     }
 
 }
