@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.wrappers.player;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -226,11 +225,6 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public boolean hasPermissionWithoutOP(String permission) {
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(IslandPermission permission) {
         return false;
     }
 

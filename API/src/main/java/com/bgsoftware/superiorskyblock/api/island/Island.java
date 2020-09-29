@@ -456,26 +456,6 @@ public interface Island extends Comparable<Island> {
     /**
      * Check if a CommandSender has a permission.
      * @param sender The command-sender to check.
-     * @param islandPermission The permission to check.
-     *
-     * @deprecated See hasPermission(CommandSender, IslandPrivilege)
-     */
-    @Deprecated
-    boolean hasPermission(CommandSender sender, IslandPermission islandPermission);
-
-    /**
-     * Check if a player has a permission.
-     * @param superiorPlayer The player to check.
-     * @param islandPermission The permission to check.
-     *
-     * @deprecated See hasPermission(SuperiorPlayer, IslandPrivilege)
-     */
-    @Deprecated
-    boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission);
-
-    /**
-     * Check if a CommandSender has a permission.
-     * @param sender The command-sender to check.
      * @param islandPrivilege The permission to check.
      */
     boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege);
@@ -493,28 +473,6 @@ public interface Island extends Comparable<Island> {
      * @param islandPrivilege The permission to check.
      */
     boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege);
-
-    /**
-     * Set a permission to a specific role.
-     * @param playerRole The role to set the permission to.
-     * @param islandPermission The permission to set.
-     * @param value The value to give the permission.
-     *
-     * @deprecated See setPermission(PlayerRole, IslandPrivilege, Boolean)
-     */
-    @Deprecated
-    void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value);
-
-    /**
-     * Set a permission to a specific player.
-     * @param superiorPlayer The player to set the permission to.
-     * @param islandPermission The permission to set.
-     * @param value The value to give the permission.
-     *
-     * @deprecated See setPermission(SuperiorPlayer, IslandPrivilege, Boolean)
-     */
-    @Deprecated
-    void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value);
 
     /**
      * Set a permission to a specific role.
@@ -556,15 +514,6 @@ public interface Island extends Comparable<Island> {
      * @param superiorPlayer The player to check.
      */
     PermissionNode getPermissionNode(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Get the required role for a specific permission.
-     * @param islandPermission The permission to check.
-     *
-     * @deprecated See getRequiredPlayerRole(IslandPrivilege)
-     */
-    @Deprecated
-    PlayerRole getRequiredPlayerRole(IslandPermission islandPermission);
 
     /**
      * Get the required role for a specific permission.
@@ -1467,30 +1416,6 @@ public interface Island extends Comparable<Island> {
     /*
      *  Settings related methods
      */
-
-    /**
-     * Check whether a settings is enabled or not.
-     * @param islandSettings The settings to check.
-     * @deprecated See hasSettingsEnabled(IslandFlag)
-     */
-    @Deprecated
-    boolean hasSettingsEnabled(IslandSettings islandSettings);
-
-    /**
-     * Enable an island settings.
-     * @param islandSettings The settings to enable.
-     * @deprecated See enableSettings(IslandFlag)
-     */
-    @Deprecated
-    void enableSettings(IslandSettings islandSettings);
-
-    /**
-     * Disable an island settings.
-     * @param islandSettings The settings to disable.
-     * @deprecated See disableSettings(IslandFlag)
-     */
-    @Deprecated
-    void disableSettings(IslandSettings islandSettings);
 
     /**
      * Check whether a settings is enabled or not.

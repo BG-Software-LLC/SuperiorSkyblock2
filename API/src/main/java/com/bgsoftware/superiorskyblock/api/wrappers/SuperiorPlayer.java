@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.wrappers;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -236,14 +235,6 @@ public interface SuperiorPlayer {
      * Check whether or not the player has a permission without having op.
      */
     boolean hasPermissionWithoutOP(String permission);
-
-    /**
-     * Check whether or not the player has a permission on his island.
-     *
-     * @deprecated See hasPermission(IslandPrivilege)
-     */
-    @Deprecated
-    boolean hasPermission(IslandPermission permission);
 
     /**
      * Check whether or not the player has a permission on his island.

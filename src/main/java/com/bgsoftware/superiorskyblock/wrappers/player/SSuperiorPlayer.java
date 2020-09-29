@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -586,12 +585,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermissionWithoutOP(String permission) {
         Player player = asPlayer();
         return player != null && plugin.getProviders().hasPermission(player, permission);
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasPermission(IslandPermission permission) {
-        return hasPermission(IslandPrivilege.getByName(permission.name()));
     }
 
     @Override

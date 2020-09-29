@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.permissions;
 
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 
 @SuppressWarnings("WeakerAccess")
@@ -35,18 +33,6 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                 }catch(Exception ignored){}
             }
         }
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasPermission(IslandPermission permission) {
-        return hasPermission(IslandPrivilege.getByName(permission.name()));
-    }
-
-    @Override
-    @Deprecated
-    public void setPermission(IslandPermission permission, boolean value) {
-        setPermission(IslandPrivilege.getByName(permission.name()), value);
     }
 
     @Override

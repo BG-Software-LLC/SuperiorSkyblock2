@@ -6,9 +6,7 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
-import com.bgsoftware.superiorskyblock.api.island.IslandPermission;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.IslandSettings;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -916,18 +914,6 @@ public final class SIsland implements Island {
      */
 
     @Override
-    @Deprecated
-    public boolean hasPermission(CommandSender sender, IslandPermission islandPermission) {
-        return hasPermission(sender, IslandPrivilege.getByName(islandPermission.name()));
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission) {
-        return hasPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()));
-    }
-
-    @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege){
         return sender instanceof ConsoleCommandSender || hasPermission(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
     }
@@ -943,18 +929,6 @@ public final class SIsland implements Island {
     @Override
     public boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
         return getRequiredPlayerRole(islandPrivilege).getWeight() <= playerRole.getWeight();
-    }
-
-    @Override
-    @Deprecated
-    public void setPermission(PlayerRole playerRole, IslandPermission islandPermission, boolean value) {
-        setPermission(playerRole, IslandPrivilege.getByName(islandPermission.name()), value);
-    }
-
-    @Override
-    @Deprecated
-    public void setPermission(SuperiorPlayer superiorPlayer, IslandPermission islandPermission, boolean value) {
-        setPermission(superiorPlayer, IslandPrivilege.getByName(islandPermission.name()), value);
     }
 
     @Override
@@ -1038,12 +1012,6 @@ public final class SIsland implements Island {
     @Override
     public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
         return playerPermissions.get(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
-    }
-
-    @Override
-    @Deprecated
-    public PlayerRole getRequiredPlayerRole(IslandPermission islandPermission) {
-        return getRequiredPlayerRole(IslandPrivilege.getByName(islandPermission.name()));
     }
 
     @Override
@@ -2593,24 +2561,6 @@ public final class SIsland implements Island {
     /*
      *  Settings related methods
      */
-
-    @Override
-    @Deprecated
-    public boolean hasSettingsEnabled(IslandSettings islandSettings) {
-        return hasSettingsEnabled(IslandFlag.getByName(islandSettings.name()));
-    }
-
-    @Override
-    @Deprecated
-    public void enableSettings(IslandSettings islandSettings) {
-        enableSettings(IslandFlag.getByName(islandSettings.name()));
-    }
-
-    @Override
-    @Deprecated
-    public void disableSettings(IslandSettings islandSettings) {
-        disableSettings(IslandFlag.getByName(islandSettings.name()));
-    }
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
