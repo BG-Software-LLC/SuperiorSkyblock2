@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -136,9 +137,9 @@ public final class IslandUtils {
     }
 
     public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
-        List<ChunkPosition> allChunks = IslandUtils.getChunkCoords(island, false, false);
-        allChunks.stream().filter(chunkPosition -> !excludedChunkPositions.contains(chunkPosition))
-                .forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(island, chunkPosition, null));
+        List<ChunkPosition> chunksToDelete = IslandUtils.getChunkCoords(island, false, false);
+        chunksToDelete.removeAll(excludedChunkPositions);
+        chunksToDelete.forEach(chunkPosition -> plugin.getNMSBlocks().deleteChunk(island, chunkPosition, null));
     }
 
     public static void sendMessage(Island island, Locale message, List<UUID> ignoredMembers, Object... args){

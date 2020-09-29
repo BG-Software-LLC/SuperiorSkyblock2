@@ -168,8 +168,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                     if (event.getResult()) {
                         if(updateGamemode)
                             superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
-                        superiorPlayer.teleport(island);
-                        Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 2L);
+                        superiorPlayer.teleport(island, result -> {
+                            if(result)
+                                Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                        });
                     }
                 }
 
