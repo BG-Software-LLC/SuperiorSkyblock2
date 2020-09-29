@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -441,7 +442,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         }
 
         StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
-        stackedBlock.updateName();
+        Executor.sync(stackedBlock::updateName, 5L);
 
         if(amount > 1) {
             if (originalBlock == null) {
@@ -583,7 +584,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {
                 String[] sections = entry.split("=");
-                stackedBlocks.setStackedBlock(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), Key.of("AIR"));
+                stackedBlocks.setStackedBlock(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), ConstantKeys.AIR);
             }
         }
 

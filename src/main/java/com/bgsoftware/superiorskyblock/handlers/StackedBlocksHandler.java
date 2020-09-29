@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.holograms.Hologram;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.Maps;
@@ -104,11 +105,14 @@ public final class StackedBlocksHandler {
                 removeHologram();
             }
             else{
+                if(blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
+                    blockKey = Key.of(blockPosition.getBlock());
+                    if (blockKey.equals(ConstantKeys.AIR))
+                        return;
+                }
+
                 if(hologram == null)
                     hologram = plugin.getNMSHolograms().createHologram(blockPosition.parse().add(0.5, 1, 0.5));
-
-                if(blockKey == null)
-                    blockKey = Key.of(blockPosition.getBlock());
 
                 hologram.setHologramName(plugin.getSettings().stackedBlocksName
                         .replace("{0}", String.valueOf(amount))
