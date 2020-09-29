@@ -115,7 +115,7 @@ COMMAND_ARGUMENT_NAME: nom
 COMMAND_ARGUMENT_NEW_LEADER: nouveau-chef
 COMMAND_ARGUMENT_PAGE: page
 COMMAND_ARGUMENT_PERMISSION: permission
-COMMAND_ARGUMENT_PLAYER: player
+COMMAND_ARGUMENT_PLAYER: joueur
 COMMAND_ARGUMENT_PLAYER_NAME: nom-du-joueur
 COMMAND_ARGUMENT_PRIVATE: privé
 COMMAND_ARGUMENT_RATING: note
@@ -123,7 +123,7 @@ COMMAND_ARGUMENT_ROWS: lignes
 COMMAND_ARGUMENT_SCHEMATIC_NAME: nom-du-schémas
 COMMAND_ARGUMENT_SETTINGS: paramètres
 COMMAND_ARGUMENT_SIZE: taille
-COMMAND_ARGUMENT_UPGRADE_NAME: nom-de-l'upgrade
+COMMAND_ARGUMENT_UPGRADE_NAME: nom-de-l'amélioration
 COMMAND_ARGUMENT_VALUE: valeur
 COMMAND_ARGUMENT_WARP_NAME: nom-du-warp
 COMMAND_ARGUMENT_WORLD: monde
@@ -200,7 +200,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Obtenir des informations sur une île.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Se téléporter à l'emplacement de spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Activer/Désactiver le mode espion du chat
 COMMAND_DESCRIPTION_ADMIN_STATS: Afficher les statistiques du plugin.
-COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Sync upgrade values for an island.
+COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Synchroniser les valeurs des améliorations d'une île.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Réafficher une île dans le top des îles.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Dévérouiller un mode pour une île.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: Retirer de l'argent de la banque d'île d'un joueur.
@@ -400,14 +400,16 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lIle &e&l❘&r &7Limite d'Entitées:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIle &e&l❘&r &7  {0}: {1}'
-ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIle &e&l❘&r &7Multiplicateur de Cultures: {0}'
+ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIle &e&l❘&r &7Multiplicateur de Cultures:
+  {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIle &e&l❘&r &7Multiplicateur de Drops: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lIle &e&l❘&r &7Taux de Générateur:
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIle &e&l❘&r &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIle &e&l❘&r &7Taille de la bordure: {0}'
-ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIle &e&l❘&r &7Multiplicateur de Spawners: {0}'
+ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIle &e&l❘&r &7Multiplicateur de Spawners:
+  {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lIle &e&l❘&r &7Limite de membres: {0}'
 ISLAND_INFO_ADMIN_UPGRADES: |
   &e&lIle &e&l❘&r &7Améliorations:
@@ -533,7 +535,7 @@ NO_UPGRADE_PERMISSION: '&c&lErreur &e&l❘&r &7Vous n''avez pas la permission d'
 NO_WITHDRAW_PERMISSION: '&c&lErreur &e&l❘&r &7Vous devez être {0} afin de retirer de l''argent du compte de l''île.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErreur &e&l❘&r &7Vous n''avez pas suffisamment d''argent pour déposer {0}$ sur le compte de vôtre île.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErreur &e&l❘&r &7Vous n''avez pas suffisamment d''argent.'
-OPEN_MENU_WHILE_SLEEPING: '&7&oVous êtes trop fatigué pour interagir avec le menu vous ne pensez pas?'
+OPEN_MENU_WHILE_SLEEPING: '&7&oVous êtes trop fatigué pour interagir avec le menu vous ne pensez pas ?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel &e&l❘&r &7Panel de gestion de l'île &cDÉSACTIVÉ&7.
   &e&lPanel &e&l❘&r &7Tapez /is afin d'être téléporté sur votre île.
@@ -573,8 +575,10 @@ RATE_SUCCESS: '&e&lIle &e&l❘&r &7Vous avez noté cette île {0} étoile(s) !'
 REACHED_BLOCK_LIMIT: '&e&lAméliorations &e&l❘&r &7Vous avez atteint la limite de bloc d''île pour {0}.'
 RECALC_ALREADY_RUNNING: '&c&lErreur &e&l❘&r &7Votre île est déjà en cours de calcul.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lErreur &e&l❘&r &7Cette île est déjà en cours de calcul.'
-RECALC_ALL_ISLANDS: '&e&lIle &e&l❘&r &7Recalcul de toutes les îles...'
-RECALC_ALL_ISLANDS_DONE: '&e&lIle &e&l❘&r &7Recalcul des îles effectué avec succès.'
+RECALC_ALL_ISLANDS: ''
+# RECALC_ALL_ISLANDS: 'RECALC_ALL_ISLANDS: '&e&lIle &e&l❘&r &7Recalcul de toutes les îles...'
+RECALC_ALL_ISLANDS_DONE: ''
+# RECALC_ALL_ISLANDS_DONE: '&e&lIle &e&l❘&r &7Recalcul des îles effectué avec succès.'
 RECALC_PROCCESS_REQUEST: '&e&lIle &e&l❘&r &7Début du recalcul des îles...'
 RELOAD_COMPLETED: '&e&lIle &e&l❘&r &7Rechargement effectué !'
 RELOAD_PROCCESS_REQUEST: '&e&lIle &e&l❘&r &7Début du rechargement des configurations...'
