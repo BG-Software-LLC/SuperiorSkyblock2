@@ -656,11 +656,13 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerQuitWhileBank(PlayerQuitEvent e){
+    public void onPlayerQuitWhileBankOrPreview(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(-1);
         ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(-1);
         ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankCommandsToExecute(null);
+        if(plugin.getGrid().getIslandPreview(superiorPlayer) != null)
+            plugin.getGrid().cancelIslandPreview(superiorPlayer);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
