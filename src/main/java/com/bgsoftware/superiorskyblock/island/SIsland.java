@@ -264,8 +264,11 @@ public final class SIsland implements Island {
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
         String bankLimit = resultSet.getString("bankLimit");
-        if(bankLimit != null && !bankLimit.isEmpty())
-            this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
+        if(bankLimit != null && !bankLimit.isEmpty()) {
+            try {
+                this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
+            }catch (NumberFormatException ignored){}
+        }
 
         String blockCounts = resultSet.getString("blockCounts");
 

@@ -371,7 +371,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializeEffects(island.getPotionEffects()))
                 .setString(IslandSerializer.serializeIslandChest(island.getChest()))
                 .setString(island.getUniqueId().toString())
-                .setString(island.getBankLimit() + "")
+                .setString(BigDecimalFormatted.of(island.getBankLimitRaw()).getAsString())
                 .setLong(island.getLastInterestTime())
                 .setString(island.getOwner().getUniqueId().toString());
     }
@@ -433,7 +433,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializeEffects(island.getPotionEffects()))
                 .setString(IslandSerializer.serializeIslandChest(island.getChest()))
                 .setString(island.getUniqueId().toString())
-                .setString(island.getBankLimitRaw() + "")
+                .setString(BigDecimalFormatted.of(island.getBankLimitRaw()).getAsString())
                 .setLong(island.getLastInterestTime())
                 .execute(async);
     }
