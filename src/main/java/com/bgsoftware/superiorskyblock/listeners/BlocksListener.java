@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -363,9 +364,11 @@ public final class BlocksListener implements Listener {
 
     private boolean tryStack(Player player, ItemStack itemToDeposit, Location stackedBlock, Event event){
         return tryStack(plugin, player, !player.isSneaking() ? 1 : itemToDeposit.getAmount(), stackedBlock, depositedAmount -> {
-            ItemStack inHand = itemToDeposit.clone();
-            inHand.setAmount(depositedAmount);
-            ItemUtils.removeItem(inHand, event, player);
+            if(player.getGameMode() != GameMode.CREATIVE) {
+                ItemStack inHand = itemToDeposit.clone();
+                inHand.setAmount(depositedAmount);
+                ItemUtils.removeItem(inHand, event, player);
+            }
         });
     }
 
