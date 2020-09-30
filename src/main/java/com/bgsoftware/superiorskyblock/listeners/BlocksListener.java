@@ -341,7 +341,7 @@ public final class BlocksListener implements Listener {
             blockData = 0;
         }
 
-        else if(placeItem.getType().name().equals("CAULDRON_ITEM")){
+        else if(blockType == Material.CAULDRON && placeItem.getType().name().equals("CAULDRON_ITEM")){
             blockType = Material.valueOf("CAULDRON_ITEM");
         }
 
