@@ -475,6 +475,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         }
     }
 
+    @Override
+    public List<Location> getStackedBlocks() {
+        List<Location> stackedBlocks = new ArrayList<>();
+        this.stackedBlocks.getStackedBlocks().forEach(map -> stackedBlocks.addAll(map.keySet().stream().map(SBlockPosition::parse).collect(Collectors.toList())));
+        return stackedBlocks;
+    }
+
     public boolean hasBlockFailed(){
         return blockFailed;
     }

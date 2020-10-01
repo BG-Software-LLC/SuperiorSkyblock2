@@ -283,6 +283,11 @@ public interface GridManager {
     void setBlockAmount(Block block, int amount);
 
     /**
+     * Get all the stacked blocks on the server.
+     */
+    List<Location> getStackedBlocks();
+
+    /**
      * Calculate the worth of all the islands on the server.
      */
     void calcAllIslands();
