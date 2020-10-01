@@ -1369,6 +1369,11 @@ public interface Island extends Comparable<Island> {
      */
     Map<UUID, Rating> getRatings();
 
+    /**
+     * Remove all the ratings of the island.
+     */
+    void removeRatings();
+
     /*
      *  Missions related methods
      */

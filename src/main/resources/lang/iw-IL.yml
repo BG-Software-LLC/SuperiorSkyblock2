@@ -591,6 +591,7 @@ RATE_ANNOUNCEMENT: '&e&lיא | &75 ךותמ {1} ךלש יאה תא גריד {0}!
 RATE_CHANGE_OTHER: '&e&lיא | &7{1} ל {0} לש גורידה תא תיניש.'
 RATE_OWN_ISLAND: '&c&lהאיגש | &7ךלש יאה תא גרדל לוכי אל התא.'
 RATE_REMOVE_ALL: '&e&lיא | &7החלצהב {0} לש םיגורידה לכ תא תקחמ.'
+RATE_REMOVE_ALL_ISLANDS: '&e&lIsland | &7Successfully removed all ratings of all the islands.'
 RATE_SUCCESS: '&e&lיא | &7םיבכוכ {0} םע הזה יאה תא תגריד!'
 REACHED_BLOCK_LIMIT: '&e&lםיגורדש | &7{0} קולבה לש יאב םיקולבה תלבגמל תעגה.'
 RECALC_ALREADY_RUNNING: '&c&lError | &7Your island is already being recalculated.'

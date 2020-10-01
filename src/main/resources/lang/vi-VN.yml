@@ -652,6 +652,7 @@ RATE_ANNOUNCEMENT: '&e&lĐánh giá | &7{0} đã đánh giá đảo của bạn 
 RATE_CHANGE_OTHER: '&e&lĐánh giá | &7Bạn đã thay đổi đánh giá của đảo {0} thành {1}.'
 RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của bạn.'
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
+RATE_REMOVE_ALL_ISLANDS: '&e&lIsland | &7Successfully removed all ratings of all the islands.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
 REACHED_BLOCK_LIMIT: '&e&lNâng cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
 RECALC_ALREADY_RUNNING: '&c&lLỗi | &7Đảo của bạn đang được tính toán lại, vui lòng chờ.'

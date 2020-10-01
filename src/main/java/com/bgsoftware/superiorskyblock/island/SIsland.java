@@ -2501,6 +2501,16 @@ public final class SIsland implements Island {
         return ratings.toMap();
     }
 
+    @Override
+    public void removeRatings() {
+        SuperiorSkyblockPlugin.debug("Action: Remove Ratings, Island: " + owner.getName());
+        ratings.clear();
+
+        islandDataHandler.saveRatings();
+
+        MenuIslandRatings.refreshMenus();
+    }
+
     /*
      *  Missions related methods
      */
