@@ -246,10 +246,14 @@ public final class StringUtils {
         if(ServerVersion.isLessThan(ServerVersion.v1_16))
             return output;
 
-        Matcher matcher = HEX_COLOR_PATTERN.matcher(output);
+        while(true) {
+            Matcher matcher = HEX_COLOR_PATTERN.matcher(output);
 
-        if(matcher.find())
-            return matcher.replaceAll(parseHexColor(matcher.group(3)));
+            if(!matcher.find())
+                break;
+
+            output = matcher.replaceFirst(parseHexColor(matcher.group(3)));
+        }
 
         return output;
     }
