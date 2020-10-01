@@ -1203,6 +1203,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeRatings() {
+
+    }
+
+    @Override
     public void completeMission(Mission<?> mission) {
 
     }
