@@ -103,7 +103,8 @@ public final class IslandDeserializer {
         for(String entry : upgrades.split(",")) {
             try {
                 String[] sections = entry.split("=");
-                upgradesMap.add(sections[0], Integer.parseInt(sections[1]));
+                if(plugin.getUpgrades().getUpgrade(sections[0]) != null)
+                    upgradesMap.add(sections[0], Integer.parseInt(sections[1]));
             }catch(Exception ignored){}
         }
     }
