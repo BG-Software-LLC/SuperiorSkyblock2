@@ -628,7 +628,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         String item = resultSet.getString("item");
         Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
 
-        stackedBlocks.setStackedBlock(SBlockPosition.of(world, x, y, z), amount, blockKey);
+        if(!ConstantKeys.AIR.equals(blockKey))
+            stackedBlocks.setStackedBlock(SBlockPosition.of(world, x, y, z), amount, blockKey);
     }
 
     public void updateStackedBlockKeys(){
