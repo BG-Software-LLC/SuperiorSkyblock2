@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class SettingsHandler extends AbstractHandler {
+
+    public static boolean PLUGIN_RELOAD = false;
 
     public final String databaseType;
     public final String databaseMySQLAddress;
@@ -239,10 +242,14 @@ public final class SettingsHandler extends AbstractHandler {
         bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
+        if(PLUGIN_RELOAD && netherWorldEnabled && !Bukkit.getAllowNether())
+            SuperiorSkyblockPlugin.log("&cSeems like you have nether disabled in server.properties - nether islands will be disabled aswell.");
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = cfg.getString("worlds.nether.name", "");
         this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
         endWorldEnabled = cfg.getBoolean("worlds.end.enabled", false);
+        if(PLUGIN_RELOAD && netherWorldEnabled && !Bukkit.getAllowEnd())
+            SuperiorSkyblockPlugin.log("&cSeems like you have end disabled in server.properties - end islands will be disabled aswell.");
         endWorldUnlocked = cfg.getBoolean("worlds.end.unlock", false);
         String endWorldName = cfg.getString("worlds.end.name", "");
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;

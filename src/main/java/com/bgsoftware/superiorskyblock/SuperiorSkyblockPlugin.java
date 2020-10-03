@@ -310,7 +310,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public void reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
+        SettingsHandler.PLUGIN_RELOAD = true;
         settingsHandler = new SettingsHandler(this);
+        SettingsHandler.PLUGIN_RELOAD = false;
 
         blockValuesHandler.loadData();
         upgradesHandler.loadData();
