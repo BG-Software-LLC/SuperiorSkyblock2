@@ -305,6 +305,9 @@ public final class SIsland implements Island {
             Executor.sync(() -> giveInterest(true), ticksToNextInterest);
         }
 
+        if(getMobDropsRaw() == getWarpsLimitRaw())
+            setMobDropsMultiplier(-1);
+
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -2093,7 +2096,7 @@ public final class SIsland implements Island {
 
     @Override
     public double getMobDropsRaw() {
-        return warpsLimit.getValue();
+        return mobDrops.getValue();
     }
 
     @Override
