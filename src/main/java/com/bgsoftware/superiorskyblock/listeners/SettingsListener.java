@@ -284,9 +284,9 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(explodeLocation);
         if(island != null && (plugin.getSettings().spawnProtection || !island.isSpawn())){
             if((source instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
-                    source instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION) ||
+                    (source instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION)) ||
                     ((source instanceof Wither || source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
-                    (source instanceof Fireball && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL))) {
+                    (source instanceof Fireball && !(source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL))) {
                 return true;
             }
         }
