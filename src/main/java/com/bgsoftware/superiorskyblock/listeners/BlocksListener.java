@@ -37,6 +37,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -290,6 +291,12 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(BlockBreakEvent e){
         if(tryUnstack(e.getPlayer(), e.getBlock(), plugin))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onStackedBlockPhysics(BlockPhysicsEvent e){
+        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
             e.setCancelled(true);
     }
 
