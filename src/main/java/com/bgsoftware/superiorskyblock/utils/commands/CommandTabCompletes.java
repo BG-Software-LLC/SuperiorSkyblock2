@@ -36,10 +36,10 @@ public final class CommandTabCompletes {
 
     }
 
-    public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
+    public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument, boolean hideVanish){
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        return getOnlinePlayersWithIslands(plugin, argument, (onlinePlayer, onlineIsland) ->
+        return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
                 onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)));
     }
 
@@ -55,48 +55,54 @@ public final class CommandTabCompletes {
         return getPlayers(island.getIslandMembers(false), argument);
     }
 
-    public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument){
+    public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish){
         String lowerArgument = argument.toLowerCase();
         return Bukkit.getOnlinePlayers().stream().map(plugin.getPlayers()::getSuperiorPlayer)
-                .filter(onlinePlayer -> onlinePlayer.getName().toLowerCase().contains(lowerArgument))
+                .filter(onlinePlayer -> (!hideVanish || !plugin.getProviders().isVanished(onlinePlayer.asPlayer())) &&
+                        onlinePlayer.getName().toLowerCase().contains(lowerArgument))
                 .map(SuperiorPlayer::getName).collect(Collectors.toList());
     }
 
-    public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, Predicate<SuperiorPlayer> predicate){
+    public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish, Predicate<SuperiorPlayer> predicate){
         String lowerArgument = argument.toLowerCase();
         return Bukkit.getOnlinePlayers().stream().map(plugin.getPlayers()::getSuperiorPlayer)
-                .filter(onlinePlayer -> predicate.test(onlinePlayer) && onlinePlayer.getName().toLowerCase().contains(lowerArgument))
+                .filter(onlinePlayer -> (!hideVanish || !plugin.getProviders().isVanished(onlinePlayer.asPlayer())) &&
+                        predicate.test(onlinePlayer) && onlinePlayer.getName().toLowerCase().contains(lowerArgument))
                 .map(SuperiorPlayer::getName).collect(Collectors.toList());
     }
 
-    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument){
+    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish){
         Set<String> tabArguments = new HashSet<>();
         String lowerArgument = argument.toLowerCase();
 
         for(Player player : Bukkit.getOnlinePlayers()){
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            Island onlineIsland = onlinePlayer.getIsland();
-            if(onlinePlayer.getName().toLowerCase().contains(lowerArgument))
-                tabArguments.add(onlinePlayer.getName());
-            if(onlineIsland != null && onlineIsland.getName().toLowerCase().contains(lowerArgument))
-                tabArguments.add(onlineIsland.getName());
+            if(!hideVanish || !plugin.getProviders().isVanished(player)) {
+                Island onlineIsland = onlinePlayer.getIsland();
+                if (onlinePlayer.getName().toLowerCase().contains(lowerArgument))
+                    tabArguments.add(onlinePlayer.getName());
+                if (onlineIsland != null && onlineIsland.getName().toLowerCase().contains(lowerArgument))
+                    tabArguments.add(onlineIsland.getName());
+            }
         }
 
         return new ArrayList<>(tabArguments);
     }
 
-    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument, BiPredicate<SuperiorPlayer, Island> predicate){
+    public static List<String> getOnlinePlayersWithIslands(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish, BiPredicate<SuperiorPlayer, Island> predicate){
         Set<String> tabArguments = new HashSet<>();
         String lowerArgument = argument.toLowerCase();
 
         for(Player player : Bukkit.getOnlinePlayers()){
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            Island onlineIsland = onlinePlayer.getIsland();
-            if(predicate.test(onlinePlayer, onlineIsland)){
-                if(onlinePlayer.getName().toLowerCase().contains(lowerArgument))
-                    tabArguments.add(onlinePlayer.getName());
-                if(onlineIsland != null && onlineIsland.getName().toLowerCase().contains(lowerArgument))
-                    tabArguments.add(onlineIsland.getName());
+            if(!hideVanish || !plugin.getProviders().isVanished(player)) {
+                Island onlineIsland = onlinePlayer.getIsland();
+                if (predicate.test(onlinePlayer, onlineIsland)) {
+                    if (onlinePlayer.getName().toLowerCase().contains(lowerArgument))
+                        tabArguments.add(onlinePlayer.getName());
+                    if (onlineIsland != null && onlineIsland.getName().toLowerCase().contains(lowerArgument))
+                        tabArguments.add(onlineIsland.getName());
+                }
             }
         }
 

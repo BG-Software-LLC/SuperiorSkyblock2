@@ -666,3 +666,6 @@ bank-interest:
   # The maximum time that the island owner can be offline in order to be rewarded (in seconds).
   # Can be -1 in order to disable this restriction.
   recent-active: 86400
+
+# Should vanished players be hidden in tab completes?
+tab-complete-hide-vanished: true

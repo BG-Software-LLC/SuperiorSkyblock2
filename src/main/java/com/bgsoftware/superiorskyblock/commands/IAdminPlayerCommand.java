@@ -42,7 +42,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
         if(args.length == 3) {
             if(supportMultiplePlayers())
                 tabVariables.add("*");
-            tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[2]));
+            tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[2], false));
         }
         else{
             if(supportMultiplePlayers()) {

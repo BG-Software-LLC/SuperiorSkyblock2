@@ -136,7 +136,7 @@ public final class CmdSetRole implements IPermissibleCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return args.length == 2 ? island == null ?
-                CommandTabCompletes.getOnlinePlayers(plugin, args[1], onlinePlayer -> onlinePlayer.getIsland() != null) :
+                CommandTabCompletes.getOnlinePlayers(plugin, args[1], false, onlinePlayer -> onlinePlayer.getIsland() != null) :
                 CommandTabCompletes.getIslandMembers(island, args[1]) :
                 args.length == 3 ? CommandTabCompletes.getPlayerRoles(plugin, args[2], PlayerRole::isRoleLadder) : new ArrayList<>();
     }

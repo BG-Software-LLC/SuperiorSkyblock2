@@ -94,7 +94,7 @@ public final class CmdAdminSetLeader implements IAdminPlayerCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Island playerIsland = targetPlayer.getIsland();
-        return args.length != 4 ? new ArrayList<>() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], onlinePlayer -> {
+        return args.length != 4 ? new ArrayList<>() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], false, onlinePlayer -> {
             Island onlineIsland = onlinePlayer.getIsland();
             return !onlinePlayer.equals(targetPlayer) && onlineIsland != null && !onlineIsland.equals(playerIsland) &&
                     onlineIsland.getOwner().equals(onlinePlayer);

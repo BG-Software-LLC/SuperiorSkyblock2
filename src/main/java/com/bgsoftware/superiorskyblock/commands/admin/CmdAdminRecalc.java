@@ -86,7 +86,7 @@ public final class CmdAdminRecalc implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2]) : new ArrayList<>();
+        return args.length == 3 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2], false) : new ArrayList<>();
     }
 
 }

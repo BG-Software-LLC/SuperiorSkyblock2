@@ -120,7 +120,7 @@ public final class CmdInvite implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1],
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
                 onlinePlayer -> !island.isMember(onlinePlayer)) : new ArrayList<>();
     }
 

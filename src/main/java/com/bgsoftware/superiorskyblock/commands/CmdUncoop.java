@@ -90,7 +90,8 @@ public final class CmdUncoop implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1], island::isCoop) : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1],
+                plugin.getSettings().tabCompleteHideVanished, island::isCoop) : new ArrayList<>();
     }
 
 }

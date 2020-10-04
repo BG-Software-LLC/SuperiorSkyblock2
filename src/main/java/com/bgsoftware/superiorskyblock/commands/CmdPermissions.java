@@ -108,7 +108,7 @@ public final class CmdPermissions implements IPermissibleCommand {
             case 2:
                 if("reset".contains(args[1].toLowerCase()))
                     tabVariables.add("reset");
-                tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1]));
+                tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().tabCompleteHideVanished));
                 break;
             case 3:
                 break;
@@ -117,7 +117,7 @@ public final class CmdPermissions implements IPermissibleCommand {
         if(args.length == 2){
             if("reset".contains(args[1].toLowerCase()))
                 tabVariables.add("reset");
-            tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1]));
+            tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().tabCompleteHideVanished));
         }
         else if(args.length == 3){
             if("reset".contains(args[2].toLowerCase()))

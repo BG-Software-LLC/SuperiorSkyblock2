@@ -86,9 +86,10 @@ public final class CmdVisit implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], (onlinePlayer, onlineIsland) ->
-                onlineIsland != null && (onlineIsland.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
-                        (!onlineIsland.isLocked() || onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
+                (onlinePlayer, onlineIsland) -> onlineIsland != null && (onlineIsland.getVisitorsLocation() != null ||
+                        superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
+                        onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : new ArrayList<>();
     }
 
 }

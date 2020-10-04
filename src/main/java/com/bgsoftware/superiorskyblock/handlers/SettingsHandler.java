@@ -159,6 +159,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int bankInterestInterval;
     public final int bankInterestPercentage;
     public final int bankInterestRecentActive;
+    public final boolean tabCompleteHideVanished;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -384,6 +385,7 @@ public final class SettingsHandler extends AbstractHandler {
         bankInterestInterval = cfg.getInt("bank-interest.interval", 86400);
         bankInterestPercentage = cfg.getInt("bank-interest.percentage", 10);
         bankInterestRecentActive = cfg.getInt("bank-interest.recent-active", 86400);
+        tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
     }
 
     @Override
