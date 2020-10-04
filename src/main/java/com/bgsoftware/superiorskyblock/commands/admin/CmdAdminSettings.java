@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
 import org.bukkit.command.CommandSender;
@@ -57,4 +56,5 @@ public final class CmdAdminSettings implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
 }

@@ -2,11 +2,7 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerLanguage;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -57,20 +53,6 @@ public final class CmdLang implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_BIOME)){
-            List<String> list = new ArrayList<>();
-
-            for(Biome biome : Biome.values()){
-                if(biome.name().toLowerCase().contains(args[1].toLowerCase()))
-                    list.add(biome.name().toLowerCase());
-            }
-
-            return list;
-        }
-
         return new ArrayList<>();
     }
 

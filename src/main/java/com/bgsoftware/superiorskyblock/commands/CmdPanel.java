@@ -1,18 +1,20 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.menu.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class CmdPanel implements ISuperiorCommand {
 
@@ -53,12 +55,14 @@ public final class CmdPanel implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        if(superiorPlayer.getIsland() == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+        Island island = arguments.getKey();
+
+        if(island == null)
             return;
-        }
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(args.length > 1){
             if(args[1].equalsIgnoreCase("members")){
@@ -84,13 +88,7 @@ public final class CmdPanel implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            list.addAll(Stream.of("members", "visitors", "toggle")
-                    .filter(value -> value.contains(args[1].toLowerCase())).collect(Collectors.toList()));
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "members", "visitors", "toggle") : new ArrayList<>();
     }
+
 }

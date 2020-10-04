@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,51 +55,21 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        SuperiorPlayer targetPlayer = null;
-        Island island;
+        Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getSenderIsland(plugin, sender) :
+                CommandArguments.getIsland(plugin, sender, args[1]);
 
-        if(args.length == 1){
-            island = superiorPlayer.getIsland();
-        }
-        else{
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-        }
+        Island island = arguments.getKey();
 
-        if(island == null){
-            if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+        if(island == null)
             return;
-        }
 
+        SuperiorPlayer superiorPlayer = arguments.getValue();
         MenuWarps.openInventory(superiorPlayer, null, island);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
-        Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null && (superiorPlayer == null || island == null ||
-                        !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {
-                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1]) : new ArrayList<>();
     }
+
 }

@@ -3,26 +3,27 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdRankup implements ISuperiorCommand {
+public final class CmdRankup implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -60,28 +61,23 @@ public final class CmdRankup implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.RANKUP;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_RANKUP_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        Upgrade upgrade = CommandArguments.getTargetUpgrade(plugin, superiorPlayer, args[1]);
+
+        if(upgrade == null)
             return;
-        }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.RANKUP)){
-            Locale.NO_RANKUP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.RANKUP));
-            return;
-        }
 
-        String upgradeName = args[1];
-
-        if(!plugin.getUpgrades().isUpgrade(upgradeName)){
-            Locale.INVALID_UPGRADE.send(superiorPlayer, upgradeName, StringUtils.getUpgradesString(plugin));
-            return;
-        }
-
-        Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
         UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade), nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
@@ -101,7 +97,7 @@ public final class CmdRankup implements ISuperiorCommand {
         }
 
         else {
-            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
+            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
             double nextUpgradePrice = event.getResult().getValue();
 
@@ -133,22 +129,8 @@ public final class CmdRankup implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.RANKUP)){
-            List<String> list = new ArrayList<>();
-
-            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
-                if(upgrade.getName().toLowerCase().contains(args[1].toLowerCase()))
-                    list.add(upgrade.getName().toLowerCase());
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : new ArrayList<>();
     }
 
 }

@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -52,13 +54,14 @@ public final class CmdTeleport implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+        Island island = arguments.getKey();
+
+        if(island == null)
             return;
-        }
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(plugin.getSettings().homeWarmup > 0 && !superiorPlayer.hasBypassModeEnabled()) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().homeWarmup));

@@ -2,22 +2,19 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public final class CmdAdminMission implements ISuperiorCommand {
+public final class CmdAdminMission implements IAdminPlayerCommand {
 
     @Override
     public List<String> getAliases() {
@@ -55,29 +52,16 @@ public final class CmdAdminMission implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
+    public boolean supportMultiplePlayers() {
+        return false;
+    }
 
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[2]);
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
+        List<Mission<?>> missions = CommandArguments.getMultipleMissions(plugin, sender, args[4]);
+
+        if(missions.isEmpty())
             return;
-        }
-
-        List<Mission<?>> missions = new ArrayList<>();
-
-        if(args[4].equals("*")){
-            missions.addAll(plugin.getMissions().getAllMissions());
-        }
-        else{
-            Mission<?> mission = plugin.getMissions().getMission(args[4]);
-
-            if(mission == null){
-                Locale.INVALID_MISSION.send(sender, args[4]);
-                return;
-            }
-
-            missions.add(mission);
-        }
 
         if(args[3].equalsIgnoreCase("complete")){
             missions.forEach(mission -> plugin.getMissions().rewardMission(mission, targetPlayer, false, true));
@@ -100,31 +84,11 @@ public final class CmdAdminMission implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-        else if(args.length == 4){
-            list.addAll(Stream.of("complete", "reset").filter(subCommand -> subCommand.contains(args[3].toLowerCase())).collect(Collectors.toList()));
-        }
-        else if(args.length == 5 && (args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset"))){
-            for(Mission<?> mission : plugin.getMissions().getAllMissions()){
-                if (args[4].equals("*") || mission.getName().toLowerCase().contains(args[4].toLowerCase()))
-                    list.add(mission.getName());
-            }
-        }
-
-        return list;
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "complete", "reset") :
+                args.length == 5 && args[3].equalsIgnoreCase("complete") || args[3].equalsIgnoreCase("reset") ?
+                args[4].equals("*") ? CommandTabCompletes.getAllMissions(plugin) : CommandTabCompletes.getMissions(plugin, args[4]) :
+                new ArrayList<>();
     }
+
 }

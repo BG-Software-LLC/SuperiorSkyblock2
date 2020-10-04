@@ -6,13 +6,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class CmdMissions implements ISuperiorCommand {
 
@@ -72,13 +71,7 @@ public final class CmdMissions implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            list.addAll(Stream.of("members", "visitors", "toggle")
-                    .filter(value -> value.startsWith(args[1].toLowerCase())).collect(Collectors.toList()));
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "members", "visitors", "toggle") : new ArrayList<>();
     }
+
 }

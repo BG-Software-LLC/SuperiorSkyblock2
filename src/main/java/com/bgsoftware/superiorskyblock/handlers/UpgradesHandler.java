@@ -98,7 +98,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
 
     @Override
     public SUpgrade getUpgrade(String upgradeName){
-        return upgrades.get(upgradeName);
+        return upgrades.get(upgradeName.toLowerCase());
     }
 
     @Override

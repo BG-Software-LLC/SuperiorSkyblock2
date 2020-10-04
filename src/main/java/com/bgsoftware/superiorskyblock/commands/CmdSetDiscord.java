@@ -2,16 +2,16 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdSetDiscord implements ISuperiorCommand {
+public final class CmdSetDiscord implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -49,33 +49,20 @@ public final class CmdSetDiscord implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.SET_DISCORD;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_SET_DISCORD_PERMISSION;
+    }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_DISCORD)){
-            Locale.NO_SET_DISCORD_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_DISCORD));
-            return;
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(int i = 1; i < args.length; i++)
-            stringBuilder.append(" ").append(args[i]);
-
-        String discord = stringBuilder.toString().substring(1);
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        String discord = CommandArguments.buildLongString(args, 1, " ");
         island.setDiscord(discord);
         Locale.CHANGED_DISCORD.send(superiorPlayer, discord);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

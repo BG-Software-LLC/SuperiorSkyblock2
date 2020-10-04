@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -12,7 +14,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
@@ -55,35 +56,26 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        World world = Bukkit.getWorld(args[2]);
+        World world = CommandArguments.getWorld(sender, args[2]);
 
-        if(world == null){
-            Locale.INVALID_WORLD.send(sender, args[2]);
+        if(world == null)
             return;
-        }
 
-        String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
-        Location location;
+        Location location = CommandArguments.getLocation(sender, world, args[3], args[4], args[5]);
 
-        try{
-            int x = Integer.parseInt(args[3]), y = Integer.parseInt(args[4]), z = Integer.parseInt(args[5]);
-            location = new Location(world, x, y, z);
-        }catch (Throwable ex){
-            Locale.INVALID_BLOCK.send(sender, formattedLocation);
+        if(location == null)
             return;
-        }
 
-        int amount;
+        Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[4]);
 
-        try{
-            amount = Integer.parseInt(args[6]);
-        }catch (Exception ex){
-            Locale.INVALID_AMOUNT.send(sender, args[6]);
+        if(!arguments.getValue())
             return;
-        }
+
+        int amount = arguments.getKey();
 
         plugin.getGrid().setBlockAmount(location.getBlock(), amount);
 
+        String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
         Locale.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
     }
 
@@ -92,8 +84,7 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
         List<String> list = new ArrayList<>();
 
         if(args.length == 3){
-            list.addAll(Bukkit.getWorlds().stream().map(world -> world.getName().toLowerCase())
-                    .filter(name -> name.contains(args[2].toLowerCase())).collect(Collectors.toList()));
+            list = CommandTabCompletes.getWorlds(args[2]);
         }
 
         else if(sender instanceof Player){

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -60,12 +61,10 @@ public final class CmdMission implements ISuperiorCommand {
             return;
         }
 
-        Mission<?> mission = plugin.getMissions().getMission(args[2]);
+        Mission<?> mission = CommandArguments.getTargetMission(plugin, superiorPlayer, args[2]);
 
-        if(mission == null){
-            Locale.INVALID_MISSION.send(superiorPlayer, args[2]);
+        if(mission == null)
             return;
-        }
 
         List<String> requiredMissions = mission.getRequiredMissions();
 
@@ -98,4 +97,5 @@ public final class CmdMission implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
 }

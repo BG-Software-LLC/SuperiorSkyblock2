@@ -4,17 +4,13 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminSyncUpgrades implements ISuperiorCommand {
+public final class CmdAdminSyncUpgrades implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -56,30 +52,12 @@ public final class CmdAdminSyncUpgrades implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-        List<Island> islands = new ArrayList<>();
+    public boolean supportMultipleIslands() {
+        return true;
+    }
 
-        if(args[2].equalsIgnoreCase("*")){
-            islands.addAll(plugin.getGrid().getIslands());
-        }
-
-        else {
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-            if (island == null) {
-                if (args[2].equalsIgnoreCase(sender.getName()))
-                    Locale.INVALID_ISLAND.send(sender);
-                else if (targetPlayer == null)
-                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-                else
-                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-                return;
-            }
-
-            islands.add(island);
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         islands.forEach(Island::syncUpgrades);
 
         if(islands.size() > 1)
@@ -90,23 +68,4 @@ public final class CmdAdminSyncUpgrades implements ISuperiorCommand {
             Locale.SYNC_UPGRADES.send(sender, targetPlayer.getName());
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-
-        return list;
-    }
 }

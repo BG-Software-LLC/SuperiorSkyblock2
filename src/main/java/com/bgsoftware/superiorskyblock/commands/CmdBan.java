@@ -2,17 +2,19 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdBan implements ISuperiorCommand {
+public final class CmdBan implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -50,26 +52,21 @@ public final class CmdBan implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.BAN_MEMBER;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_BAN_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, superiorPlayer, args[1]);
+
+        if(targetPlayer == null)
             return;
-        }
-
-        if(!superiorPlayer.hasPermission(IslandPrivileges.BAN_MEMBER)){
-            Locale.NO_BAN_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.BAN_MEMBER));
-            return;
-        }
-
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
-            return;
-        }
 
         if(superiorPlayer.getIsland().isMember(targetPlayer) &&
                 !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
@@ -90,23 +87,8 @@ public final class CmdBan implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.BAN_MEMBER)){
-            List<String> list = new ArrayList<>();
-
-            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
-                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
-                        targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
-                    list.add(targetPlayer.getName());
-                }
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? CommandTabCompletes.getIslandMembersWithLowerRole(island, args[1], superiorPlayer.getPlayerRole()) : new ArrayList<>();
     }
+
 }

@@ -7,12 +7,12 @@ import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class CmdCreate implements ISuperiorCommand {
 
@@ -113,14 +113,8 @@ public final class CmdCreate implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         int argumentLength = plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2;
-        if(plugin.getSettings().schematicNameArgument && args.length == argumentLength){
-            String argument = args[argumentLength - 1].toLowerCase();
-            return plugin.getSchematics().getSchematics().stream()
-                    .filter(schematic -> !schematic.endsWith("_nether") && !schematic.endsWith("_the_end") &&
-                            schematic.toLowerCase().contains(argument))
-                    .collect(Collectors.toList());
-        }
-
-        return new ArrayList<>();
+        return plugin.getSettings().schematicNameArgument && args.length == argumentLength ?
+                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : new ArrayList<>();
     }
+
 }

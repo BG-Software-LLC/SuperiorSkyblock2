@@ -3,7 +3,10 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -51,25 +54,24 @@ public final class CmdTransfer implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer player = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = player.getIsland();
+        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        if (island == null) {
-            Locale.INVALID_ISLAND.send(player);
+        Island island = arguments.getKey();
+
+        if(island == null)
+            return;
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
+
+        if (!superiorPlayer.getPlayerRole().isLastRole()) {
+            Locale.NO_TRANSFER_PERMISSION.send(superiorPlayer);
             return;
         }
 
-        if (!player.getPlayerRole().isLastRole()) {
-            Locale.NO_TRANSFER_PERMISSION.send(player);
-            return;
-        }
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, superiorPlayer, args[1]);
 
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-
-        if (targetPlayer == null) {
-            Locale.INVALID_PLAYER.send(sender, args[1]);
+        if(targetPlayer == null)
             return;
-        }
 
         if (!island.isMember(targetPlayer)) {
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
@@ -77,7 +79,7 @@ public final class CmdTransfer implements ISuperiorCommand {
         }
 
         if (island.getOwner().getUniqueId().equals(targetPlayer.getUniqueId())) {
-            Locale.TRANSFER_ALREADY_LEADER.send(player);
+            Locale.TRANSFER_ALREADY_LEADER.send(superiorPlayer);
             return;
         }
 
@@ -89,20 +91,8 @@ public final class CmdTransfer implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.getPlayerRole().isLastRole()){
-            List<String> list = new ArrayList<>();
-
-            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
-                if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
-                    list.add(targetPlayer.getName());
-                }
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+        return args.length == 2 && island != null && superiorPlayer.getPlayerRole().isLastRole() ?
+                CommandTabCompletes.getIslandMembers(island, args[1]) : new ArrayList<>();
     }
 
 }

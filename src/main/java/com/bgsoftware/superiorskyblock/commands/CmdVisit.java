@@ -4,13 +4,12 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,18 +56,12 @@ public final class CmdVisit implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
+        Island targetIsland = CommandArguments.getIsland(plugin, sender, args[1]).getKey();
 
-        Island targetIsland = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-
-        if(targetIsland == null){
-            if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+        if(targetIsland == null)
             return;
-        }
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         Location visitLocation = targetIsland.getVisitorsLocation();
 
@@ -93,22 +86,9 @@ public final class CmdVisit implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island island = onlinePlayer.getIsland();
-                if (island != null && (island.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
-                        (!island.isLocked() || island.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) ) {
-                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(island.getName());
-                }
-            }
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], (onlinePlayer, onlineIsland) ->
+                onlineIsland != null && (onlineIsland.getVisitorsLocation() != null || superiorPlayer.hasBypassModeEnabled()) &&
+                        (!onlineIsland.isLocked() || onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : new ArrayList<>();
     }
+
 }

@@ -2,9 +2,13 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdExpel implements ISuperiorCommand {
+public final class CmdExpel implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -51,42 +55,44 @@ public final class CmdExpel implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.EXPEL_PLAYERS;
+    }
 
-        if(targetPlayer == null || !targetPlayer.asOfflinePlayer().isOnline()){
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_EXPEL_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island playerIsland, String[] args) {
+        CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[1]);
+
+        if(targetPlayer == null)
+            return;
+
+        if(!targetPlayer.asOfflinePlayer().isOnline()){
             Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
 
         Player target = targetPlayer.asPlayer();
-        Island island = plugin.getGrid().getIslandAt(target.getLocation());
+        Island targetIsland = plugin.getGrid().getIslandAt(target.getLocation());
 
-        if(island == null){
+        if(targetIsland == null){
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
             return;
         }
 
-        if(sender instanceof Player){
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-            Island playerIsland = plugin.getGrid().getIsland(superiorPlayer);
-
-            if(playerIsland == null){
-                Locale.INVALID_ISLAND.send(sender);
-                return;
-            }
-
-            if(!superiorPlayer.hasPermission(IslandPrivileges.EXPEL_PLAYERS)){
-                Locale.NO_EXPEL_PERMISSION.send(sender, island.getRequiredPlayerRole(IslandPrivileges.EXPEL_PLAYERS));
-                return;
-            }
-
-            if(!island.equals(playerIsland)){
+        // Checking requirements for players
+        if(superiorPlayer != null){
+            if(!targetIsland.equals(playerIsland)){
                 Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
 
-            if(island.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
+            if(!targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
                 Locale.PLAYER_EXPEL_BYPASS.send(sender);
                 return;
             }
@@ -99,21 +105,10 @@ public final class CmdExpel implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.EXPEL_BYPASS)){
-            List<String> list = new ArrayList<>();
-
-            for (SuperiorPlayer targetPlayer : superiorPlayer.getIsland().getIslandVisitors()) {
-                if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase()))
-                    list.add(targetPlayer.getName());
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length != 2 ? new ArrayList<>() : island != null ? CommandTabCompletes.getIslandVisitors(island, args[1]) :
+                CommandTabCompletes.getOnlinePlayers(plugin, args[1], onlinePlayer ->
+                        plugin.getGrid().getIslandAt(onlinePlayer.getLocation()) != null);
     }
+
 }

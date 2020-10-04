@@ -3,15 +3,14 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdSetPaypal implements ISuperiorCommand {
+public final class CmdSetPaypal implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -49,26 +48,19 @@ public final class CmdSetPaypal implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.SET_PAYPAL;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_SET_PAYPAL_PERMISSION;
+    }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_PAYPAL)){
-            Locale.NO_SET_PAYPAL_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_PAYPAL));
-            return;
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         island.setPaypal(args[1]);
         Locale.CHANGED_PAYPAL.send(superiorPlayer, args[1]);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

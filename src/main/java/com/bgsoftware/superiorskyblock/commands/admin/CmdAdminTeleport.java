@@ -4,19 +4,15 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdAdminTeleport implements ISuperiorCommand {
+public final class CmdAdminTeleport implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -56,42 +52,15 @@ public final class CmdAdminTeleport implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-
-        Island targetIsland = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-        if(targetIsland == null){
-            if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
-        }
-
-        Location visitLocation = targetIsland.getTeleportLocation(World.Environment.NORMAL);
-
-        superiorPlayer.teleport(visitLocation);
+    public boolean supportMultipleIslands() {
+        return false;
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island island = onlinePlayer.getIsland();
-                if (island != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(island.getName());
-                }
-            }
-        }
-
-        return list;
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        Location visitLocation = island.getTeleportLocation(World.Environment.NORMAL);
+        superiorPlayer.teleport(visitLocation);
     }
+
 }

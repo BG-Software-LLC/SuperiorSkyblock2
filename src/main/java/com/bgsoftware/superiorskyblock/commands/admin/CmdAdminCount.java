@@ -4,10 +4,11 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public final class CmdAdminCount implements ISuperiorCommand {
+public final class CmdAdminCount implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -60,20 +61,12 @@ public final class CmdAdminCount implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-        Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+    public boolean supportMultipleIslands() {
+        return false;
+    }
 
-        if (island == null) {
-            if (args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if (targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-            return;
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         if(args.length == 3){
             if(!(sender instanceof Player)){
                 Locale.sendMessage(sender, "&cYou must be a player in order to open the counts menu.", true);
@@ -106,12 +99,10 @@ public final class CmdAdminCount implements ISuperiorCommand {
         }
 
         else {
-            try {
-                Material.valueOf(materialName);
-            } catch (Exception ex) {
-                Locale.INVALID_MATERIAL.send(sender, args[3]);
+            Material material = CommandArguments.getMaterial(sender, materialName);
+
+            if(material == null)
                 return;
-            }
 
             int blockCount = island.getBlockCount(Key.of(materialName));
 

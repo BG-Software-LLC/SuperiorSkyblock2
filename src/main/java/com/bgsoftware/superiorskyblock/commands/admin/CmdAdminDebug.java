@@ -78,4 +78,5 @@ public final class CmdAdminDebug implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
 }

@@ -3,20 +3,21 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminSetEffect implements ISuperiorCommand {
+public final class CmdAdminSetEffect implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -59,45 +60,23 @@ public final class CmdAdminSetEffect implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-        List<Island> islands = new ArrayList<>();
+    public boolean supportMultipleIslands() {
+        return true;
+    }
 
-        if(args[2].equalsIgnoreCase("*")) {
-            islands.addAll(plugin.getGrid().getIslands());
-        }
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+        PotionEffectType potionEffectType = CommandArguments.getPotionEffect(sender, args[3]);
 
-        else{
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-            if (island == null) {
-                if (args[2].equalsIgnoreCase(sender.getName()))
-                    Locale.INVALID_ISLAND.send(sender);
-                else if (targetPlayer == null)
-                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-                else
-                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-                return;
-            }
-
-            islands.add(island);
-        }
-
-        PotionEffectType potionEffectType = PotionEffectType.getByName(args[3].toUpperCase());
-
-        if(potionEffectType == null){
-            Locale.INVALID_EFFECT.send(sender, args[3]);
+        if(potionEffectType == null)
             return;
-        }
 
-        int level;
+        Pair<Integer, Boolean> arguments = CommandArguments.getLevel(sender, args[3]);
 
-        try{
-            level = Integer.parseInt(args[4]);
-        }catch(IllegalArgumentException ex){
-            Locale.INVALID_LEVEL.send(sender, args[4]);
+        if(!arguments.getValue())
             return;
-        }
+
+        int level = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setPotionEffect(potionEffectType, level)));
 
@@ -110,35 +89,8 @@ public final class CmdAdminSetEffect implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-        else if(args.length == 4){
-            SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-            if(island != null){
-                for(PotionEffectType potionEffectType : PotionEffectType.values()){
-                    try {
-                        if (potionEffectType.getName().toLowerCase().contains(args[3].toLowerCase()))
-                            list.add(potionEffectType.getName().toLowerCase());
-                    }catch (Exception ignored){}
-                }
-            }
-        }
-
-        return list;
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getPotionEffects(args[3]) : new ArrayList<>();
     }
+
 }

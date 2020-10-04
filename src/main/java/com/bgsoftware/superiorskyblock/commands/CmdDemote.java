@@ -2,17 +2,19 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdDemote implements ISuperiorCommand {
+public final class CmdDemote implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -50,26 +52,21 @@ public final class CmdDemote implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.DEMOTE_MEMBERS;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_DEMOTE_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, superiorPlayer, args[1]);
+
+        if(targetPlayer == null)
             return;
-        }
-
-        if(!superiorPlayer.hasPermission(IslandPrivileges.DEMOTE_MEMBERS)){
-            Locale.NO_DEMOTE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEMOTE_MEMBERS));
-            return;
-        }
-
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
-            return;
-        }
 
         if(!island.isMember(targetPlayer)){
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
@@ -95,24 +92,10 @@ public final class CmdDemote implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.DEMOTE_MEMBERS)){
-            List<String> list = new ArrayList<>();
-
-            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
-                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
-                        targetPlayer.getPlayerRole().getPreviousRole() != null &&
-                        targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
-                    list.add(targetPlayer.getName());
-                }
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? CommandTabCompletes.getIslandMembers(island, args[1], islandMember ->
+                islandMember.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
+                        islandMember.getPlayerRole().getPreviousRole() != null) : new ArrayList<>();
     }
+
 }

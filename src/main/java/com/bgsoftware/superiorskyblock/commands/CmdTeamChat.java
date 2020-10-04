@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -50,13 +52,14 @@ public final class CmdTeamChat implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+        Island island = arguments.getKey();
+
+        if(island == null)
             return;
-        }
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(args.length == 1){
             if(superiorPlayer.hasTeamChatEnabled()){
@@ -68,19 +71,15 @@ public final class CmdTeamChat implements ISuperiorCommand {
         }
 
         else{
-            StringBuilder message = new StringBuilder();
-
-            for(int i = 1; i < args.length; i++)
-                message.append(" ").append(args[i]);
-
+            String message = CommandArguments.buildLongString(args, 1, " ");
             IslandUtils.sendMessage(island, Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
-                    superiorPlayer.getName(), message.toString().substring(1));
+                    superiorPlayer.getName(), message);
         }
-
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
 }

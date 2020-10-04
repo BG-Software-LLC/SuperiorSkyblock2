@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -263,6 +264,10 @@ public final class StringUtils {
 
     public static String stripColors(String str){
         return str == null ? null : STRIP_COLOR_PATTERN.matcher(str).replaceAll("");
+    }
+
+    public static boolean isValidName(SuperiorPlayer superiorPlayer, Island currentIsland, String islandName){
+        return isValidName(superiorPlayer.asPlayer(), currentIsland, islandName);
     }
 
     public static boolean isValidName(CommandSender sender, Island currentIsland, String islandName){

@@ -3,11 +3,12 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRate;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,21 +55,20 @@ public final class CmdRate implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island;
+        Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender) :
+                CommandArguments.getIsland(plugin, sender, args[1]);
 
-        if(args.length == 2){
-            SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-        }
-        else {
-            island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
-        }
+        Island island = arguments.getKey();
 
-        if(island == null || island.isSpawn()){
-            Locale.INVALID_ISLAND_LOCATION.send(superiorPlayer);
+        if(island == null)
+            return;
+
+        if(island.isSpawn()){
+            Locale.INVALID_ISLAND_LOCATION.send(sender);
             return;
         }
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(!plugin.getSettings().rateOwnIsland && island.equals(superiorPlayer.getIsland())){
             Locale.RATE_OWN_ISLAND.send(superiorPlayer);
@@ -82,21 +82,8 @@ public final class CmdRate implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island onlineIsland = onlinePlayer.getIsland();
-                if (onlineIsland != null && (plugin.getSettings().rateOwnIsland || !onlineIsland.equals(island))) {
-                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(player.getName());
-                    if(!onlineIsland.getName().isEmpty() && onlineIsland.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(onlineIsland.getName());
-                }
-            }
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], (onlinePlayer, onlineIsland) ->
+                onlineIsland != null && (plugin.getSettings().rateOwnIsland || !onlineIsland.equals(island))) : new ArrayList<>();
     }
+
 }

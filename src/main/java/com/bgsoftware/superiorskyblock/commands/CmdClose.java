@@ -3,15 +3,14 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdClose implements ISuperiorCommand {
+public final class CmdClose implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -49,26 +48,19 @@ public final class CmdClose implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.CLOSE_ISLAND;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_CLOSE_PERMISSION;
+    }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.CLOSE_ISLAND)){
-            Locale.NO_CLOSE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.CLOSE_ISLAND));
-            return;
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         island.setLocked(true);
         Locale.ISLAND_CLOSED.send(superiorPlayer);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

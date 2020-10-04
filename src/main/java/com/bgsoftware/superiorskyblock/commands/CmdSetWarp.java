@@ -2,17 +2,16 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdSetWarp implements ISuperiorCommand {
+public final class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -52,20 +51,17 @@ public final class CmdSetWarp implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.SET_WARP;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_SET_WARP_PERMISSION;
+    }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_WARP)){
-            Locale.NO_SET_WARP_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_WARP));
-            return;
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         if (!island.hasMoreWarpSlots()) {
             Locale.NO_MORE_WARPS.send(superiorPlayer);
             return;
@@ -87,8 +83,4 @@ public final class CmdSetWarp implements ISuperiorCommand {
         Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

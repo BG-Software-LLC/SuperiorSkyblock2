@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +27,9 @@ public final class CmdBalance implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "balance [" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
+        return "balance [" +
+                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
@@ -52,35 +54,15 @@ public final class CmdBalance implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer;
-        Island island;
+        Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getIslandWhereStanding(plugin, sender) :
+                CommandArguments.getIsland(plugin, sender, args[1]);
 
-        if(args.length == 1){
-            if(!(sender instanceof Player)){
-                Locale.sendMessage(sender, "&cYou must specify a player's name.", true);
-                return;
-            }
+        Island island = arguments.getKey();
 
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-
-            Island locationIsland = plugin.getGrid().getIslandAt(targetPlayer.getLocation());
-
-            island = locationIsland == null || locationIsland.isSpawn() ? targetPlayer.getIsland() : locationIsland;
-        }
-        else{
-            targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-            island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-        }
-
-        if(island == null){
-            if(args.length == 1 || args[1].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if(targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[1]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+        if(island == null)
             return;
-        }
+
+        SuperiorPlayer targetPlayer = arguments.getValue();
 
         if(targetPlayer != null && island == targetPlayer.getIsland())
             Locale.ISLAND_BANK_SHOW.send(sender, island.getIslandBank().getBalance());
@@ -92,24 +74,7 @@ public final class CmdBalance implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
-        Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null && (superiorPlayer == null || island == null ||
-                        !island.getOwner().getUniqueId().equals(player.getUniqueId()))) {
-                    if (player.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1]) : new ArrayList<>();
     }
+
 }

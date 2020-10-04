@@ -3,9 +3,11 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -51,13 +53,14 @@ public final class CmdBank implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(sender);
+        Island island = arguments.getKey();
+
+        if(island == null)
             return;
-        }
+
+        SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(args.length == 2 && args[1].equalsIgnoreCase("logs")){
             MenuBankLogs.openInventory(superiorPlayer, null, island);
@@ -71,4 +74,5 @@ public final class CmdBank implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return new ArrayList<>();
     }
+
 }

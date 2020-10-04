@@ -3,13 +3,12 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class CmdToggle implements ISuperiorCommand {
 
@@ -91,13 +90,8 @@ public final class CmdToggle implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 2){
-            list.addAll(Stream.of("border", "blocks")
-                    .filter(value -> value.contains(args[1].toLowerCase()) && sender.hasPermission("superior.island.toggle." +  value)).collect(Collectors.toList()));
-        }
-
-        return list;
+        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], var ->
+                        sender.hasPermission("superior.island.toggle." + var), "border", "blocks") : new ArrayList<>();
     }
+
 }

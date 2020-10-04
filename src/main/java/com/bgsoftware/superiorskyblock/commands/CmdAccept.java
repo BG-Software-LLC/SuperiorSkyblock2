@@ -3,18 +3,16 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.google.common.collect.Lists;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 public final class CmdAccept implements ISuperiorCommand {
 
@@ -106,24 +104,9 @@ public final class CmdAccept implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length == 2){
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
-            List<String> list = Lists.newArrayList();
-            Island island;
-
-            for(UUID uuid : plugin.getGrid().getAllIslands()){
-                island = plugin.getGrid().getIsland(plugin.getPlayers().getSuperiorPlayer(uuid));
-                if(island != null && island.isInvited(superiorPlayer)) {
-                    if(island.getOwner().getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(island.getOwner().getName());
-                    if(!island.getName().isEmpty() && island.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(island.getName());
-                }
-            }
-
-            return list;
-        }
-
-        return Lists.newArrayList();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], (onlinePlayer, onlineIsland) ->
+                onlineIsland != null && onlineIsland.isInvited(superiorPlayer)) : new ArrayList<>();
     }
+
 }

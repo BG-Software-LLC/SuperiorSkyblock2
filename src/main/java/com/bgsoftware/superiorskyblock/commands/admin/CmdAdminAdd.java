@@ -4,22 +4,19 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public final class CmdAdminAdd implements ISuperiorCommand {
+public final class CmdAdminAdd implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -60,26 +57,16 @@ public final class CmdAdminAdd implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer playerIsland = plugin.getPlayers().getSuperiorPlayer(args[2]);
-        Island island = playerIsland == null ? plugin.getGrid().getIsland(args[2]) : playerIsland.getIsland();
+    public boolean supportMultipleIslands() {
+        return false;
+    }
 
-        if (island == null) {
-            if (args[2].equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
-            else if (playerIsland == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-            else
-                Locale.INVALID_ISLAND_OTHER.send(sender, playerIsland.getName());
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[1]);
+
+        if(targetPlayer == null)
             return;
-        }
-
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[3]);
-
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[3]);
-            return;
-        }
 
         if(targetPlayer.getIsland() != null){
             Locale.PLAYER_ALREADY_IN_ISLAND.send(sender);
@@ -94,13 +81,13 @@ public final class CmdAdminAdd implements ISuperiorCommand {
         island.revokeInvite(targetPlayer);
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
 
-        if(playerIsland == null) {
+        if(superiorPlayer == null) {
             Locale.JOINED_ISLAND_NAME.send(targetPlayer, island.getName());
             Locale.ADMIN_ADD_PLAYER_NAME.send(sender, targetPlayer.getName(), island.getName());
         }
         else {
-            Locale.JOINED_ISLAND.send(targetPlayer, playerIsland.getName());
-            Locale.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), playerIsland.getName());
+            Locale.JOINED_ISLAND.send(targetPlayer, superiorPlayer.getName());
+            Locale.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), superiorPlayer.getName());
         }
 
         if(plugin.getSettings().teleportOnJoin && targetPlayer.isOnline())
@@ -110,25 +97,8 @@ public final class CmdAdminAdd implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-        else if(args.length == 4){
-            list.addAll(Stream.of("worth", "level").filter(arg -> arg.contains(args[3].toLowerCase())).collect(Collectors.toSet()));
-        }
-
-        return list;
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "worth", "level") : new ArrayList<>();
     }
+
 }

@@ -2,18 +2,20 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdKick implements ISuperiorCommand {
+public final class CmdKick implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -51,23 +53,23 @@ public final class CmdKick implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.KICK_MEMBER;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_KICK_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, superiorPlayer, args[1]);
+
+        if(targetPlayer == null)
             return;
-        }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.KICK_MEMBER)){
-            Locale.NO_KICK_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.KICK_MEMBER));
-            return;
-        }
-
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
-
-        if(targetPlayer == null || !island.isMember(targetPlayer)){
+        if(!island.isMember(targetPlayer)){
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return;
         }
@@ -87,23 +89,8 @@ public final class CmdKick implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(args.length == 2 && island != null && superiorPlayer.hasPermission(IslandPrivileges.KICK_MEMBER)){
-            List<String> list = new ArrayList<>();
-
-            for(SuperiorPlayer targetPlayer : island.getIslandMembers(false)){
-                if(targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole()) &&
-                        targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase())){
-                    list.add(targetPlayer.getName());
-                }
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? CommandTabCompletes.getIslandMembersWithLowerRole(island, args[1], superiorPlayer.getPlayerRole()) : new ArrayList<>();
     }
+
 }

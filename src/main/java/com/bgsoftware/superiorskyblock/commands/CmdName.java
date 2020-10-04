@@ -2,19 +2,18 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdName implements ISuperiorCommand {
+public final class CmdName implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -52,23 +51,20 @@ public final class CmdName implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.CHANGE_NAME;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_NAME_PERMISSION;
+    }
 
-        if(!superiorPlayer.hasPermission(IslandPrivileges.CHANGE_NAME)){
-            Locale.NO_NAME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.CHANGE_NAME));
-            return;
-        }
-
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         String islandName = args[1];
 
-        if(!StringUtils.isValidName(sender, island, islandName))
+        if(!StringUtils.isValidName(superiorPlayer, island, islandName))
             return;
 
         island.setName(islandName);
@@ -82,8 +78,4 @@ public final class CmdName implements ISuperiorCommand {
         Locale.CHANGED_NAME.send(superiorPlayer, coloredName);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

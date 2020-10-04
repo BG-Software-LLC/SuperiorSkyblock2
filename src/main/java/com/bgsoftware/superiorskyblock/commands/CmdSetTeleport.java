@@ -3,16 +3,15 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdSetTeleport implements ISuperiorCommand {
+public final class CmdSetTeleport implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases(){
@@ -50,21 +49,18 @@ public final class CmdSetTeleport implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.SET_HOME;
+    }
 
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_SET_HOME_PERMISSION;
+    }
 
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         Location newLocation = superiorPlayer.getLocation();
-
-        if(!superiorPlayer.hasPermission(IslandPrivileges.SET_HOME)){
-            Locale.NO_SET_HOME_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_HOME));
-            return;
-        }
 
         if (!island.isInsideRange(newLocation)) {
             Locale.TELEPORT_LOCATION_OUTSIDE_ISLAND.send(superiorPlayer);
@@ -75,8 +71,4 @@ public final class CmdSetTeleport implements ISuperiorCommand {
         Locale.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
     }
 
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
-    }
 }

@@ -3,16 +3,15 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdRatings implements ISuperiorCommand {
+public final class CmdRatings implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -50,25 +49,18 @@ public final class CmdRatings implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(island == null){
-            Locale.INVALID_ISLAND.send(superiorPlayer);
-            return;
-        }
-
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.RATINGS_SHOW)){
-            Locale.NO_RATINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.RATINGS_SHOW));
-            return;
-        }
-
-        MenuIslandRatings.openInventory(superiorPlayer, null, island);
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.RATINGS_SHOW;
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_RATINGS_PERMISSION;
     }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        MenuIslandRatings.openInventory(superiorPlayer, null, island);
+    }
+
 }

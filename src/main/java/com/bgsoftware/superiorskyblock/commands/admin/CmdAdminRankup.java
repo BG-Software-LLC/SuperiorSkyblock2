@@ -7,20 +7,20 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminRankup implements ISuperiorCommand {
+public final class CmdAdminRankup implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -62,44 +62,22 @@ public final class CmdAdminRankup implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-        List<Island> islands = new ArrayList<>();
+    public boolean supportMultipleIslands() {
+        return true;
+    }
 
-        if(args[2].equalsIgnoreCase("*")) {
-            islands.addAll(plugin.getGrid().getIslands());
-        }
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
+        Upgrade upgrade = CommandArguments.getTargetUpgrade(plugin, sender, args[3]);
 
-        else{
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
-
-            if (island == null) {
-                if (args[2].equalsIgnoreCase(sender.getName()))
-                    Locale.INVALID_ISLAND.send(sender);
-                else if (targetPlayer == null)
-                    Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(args[2]));
-                else
-                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
-                return;
-            }
-
-            islands.add(island);
-        }
-
-        String upgradeName = args[3];
-
-        if(!plugin.getUpgrades().isUpgrade(upgradeName)){
-            Locale.INVALID_UPGRADE.send(sender, upgradeName, StringUtils.getUpgradesString(plugin));
+        if(upgrade == null)
             return;
-        }
-
-        Upgrade upgrade = plugin.getUpgrades().getUpgrade(upgradeName);
 
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
             EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(
-                    null, island, upgradeName, upgradeLevel.getCommands(), upgradeLevel.getPrice());
+                    null, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
             if(!event.isCancelled()){
                 SuperiorPlayer owner = island.getOwner();
@@ -113,35 +91,16 @@ public final class CmdAdminRankup implements ISuperiorCommand {
         });
 
         if(islands.size() > 1)
-            Locale.RANKUP_SUCCESS_ALL.send(sender, upgradeName);
+            Locale.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
         else if(targetPlayer == null)
-            Locale.RANKUP_SUCCESS_NAME.send(sender, upgradeName, islands.get(0).getName());
+            Locale.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
         else
-            Locale.RANKUP_SUCCESS.send(sender, upgradeName, targetPlayer.getName());
+            Locale.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
-        if(args.length == 3){
-            for(Player player : Bukkit.getOnlinePlayers()){
-                SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-                Island playerIsland = onlinePlayer.getIsland();
-                if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(player.getName());
-                    if(!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
-                        list.add(playerIsland.getName());
-                }
-            }
-        }
-        else if(args.length == 4){
-            plugin.getUpgrades().getUpgrades().stream()
-                    .filter(upgrade -> upgrade.getName().toLowerCase().contains(args[3].toLowerCase()))
-                    .forEach(upgrade -> list.add(upgrade.getName().toLowerCase()));
-        }
-
-        return list;
+    public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : new ArrayList<>();
     }
+
 }

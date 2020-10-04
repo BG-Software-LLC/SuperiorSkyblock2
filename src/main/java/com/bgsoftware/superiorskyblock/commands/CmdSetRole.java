@@ -1,20 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdSetRole implements ISuperiorCommand {
+public final class CmdSetRole implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -54,47 +57,43 @@ public final class CmdSetRole implements ISuperiorCommand {
     }
 
     @Override
-    public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
+    public IslandPrivilege getPrivilege() {
+        return IslandPrivileges.SET_ROLE;
+    }
 
-        if(targetPlayer == null){
-            Locale.INVALID_PLAYER.send(sender, args[1]);
+    @Override
+    public Locale getPermissionLackMessage() {
+        return Locale.NO_SET_ROLE_PERMISSION;
+    }
+
+    @Override
+    public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island playerIsland, String[] args) {
+        CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
+        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[1]);
+
+        if(targetPlayer == null)
             return;
-        }
 
         if(targetPlayer.getName().equals(sender.getName())){
             Locale.SELF_ROLE_CHANGE.send(sender);
             return;
         }
 
-        PlayerRole playerRole = null;
+        PlayerRole playerRole = CommandArguments.getPlayerRole(sender, args[2]);
 
-        try{
-            playerRole = SPlayerRole.of(args[2]);
-        }catch(IllegalArgumentException ignored){}
+        if(playerRole == null)
+            return;
 
-        if(playerRole == null || !playerRole.isRoleLadder()){
+        if(!playerRole.isRoleLadder()){
             Locale.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
             return;
         }
 
-        Island island = targetPlayer.getIsland();
+        Island targetIsland = targetPlayer.getIsland();
 
-        if(sender instanceof Player){
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
-            island = superiorPlayer.getIsland();
-
-            if(island == null){
-                Locale.INVALID_ISLAND.send(superiorPlayer);
-                return;
-            }
-
-            if(!superiorPlayer.hasPermission(IslandPrivileges.SET_ROLE)){
-                Locale.NO_SET_ROLE_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_ROLE));
-                return;
-            }
-
-            if(!island.isMember(targetPlayer)){
+        // Checking requirements for players
+        if(superiorPlayer != null){
+            if(!playerIsland.isMember(targetPlayer)){
                 Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
@@ -104,8 +103,9 @@ public final class CmdSetRole implements ISuperiorCommand {
                 Locale.CANNOT_SET_ROLE.send(sender, playerRole);
                 return;
             }
-        }else {
-            if (island == null) {
+        }
+        else{
+            if (targetIsland == null) {
                 Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
                 return;
             }
@@ -134,32 +134,11 @@ public final class CmdSetRole implements ISuperiorCommand {
     }
 
     @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null && superiorPlayer.hasPermission(IslandPrivileges.SET_ROLE)){
-            List<String> list = new ArrayList<>();
-
-            if(args.length == 2) {
-                for(SuperiorPlayer targetPlayer : island.getIslandMembers(true)){
-                    if(targetPlayer.getName().toLowerCase().contains(args[1].toLowerCase()))
-                        list.add(targetPlayer.getName());
-                }
-            }
-            else if(args.length == 3){
-                for(PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-                    if(playerRole.isRoleLadder()) {
-                        String roleName = playerRole.toString().trim().toLowerCase();
-                        if (roleName.contains(args[2].toLowerCase()))
-                            list.add(roleName);
-                    }
-                }
-            }
-
-            return list;
-        }
-
-        return new ArrayList<>();
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
+        return args.length == 2 ? island == null ?
+                CommandTabCompletes.getOnlinePlayers(plugin, args[1], onlinePlayer -> onlinePlayer.getIsland() != null) :
+                CommandTabCompletes.getIslandMembers(island, args[1]) :
+                args.length == 3 ? CommandTabCompletes.getPlayerRoles(plugin, args[2], PlayerRole::isRoleLadder) : new ArrayList<>();
     }
+
 }
