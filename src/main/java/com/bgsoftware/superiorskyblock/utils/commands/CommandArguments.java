@@ -28,6 +28,10 @@ import java.util.List;
 
 public final class CommandArguments {
 
+    private CommandArguments() {
+
+    }
+
     public static Pair<Island, SuperiorPlayer> getIsland(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(argument) : targetPlayer.getIsland();
@@ -72,11 +76,11 @@ public final class CommandArguments {
         return new Pair<>(island, superiorPlayer);
     }
 
-    public static SuperiorPlayer getTargetPlayer(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
-        return getTargetPlayer(plugin, superiorPlayer.asPlayer(), argument);
+    public static SuperiorPlayer getPlayer(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
+        return getPlayer(plugin, superiorPlayer.asPlayer(), argument);
     }
 
-    public static SuperiorPlayer getTargetPlayer(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
+    public static SuperiorPlayer getPlayer(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
 
         if(targetPlayer == null)
@@ -92,7 +96,7 @@ public final class CommandArguments {
             players = plugin.getPlayers().getAllPlayers();
         }
         else {
-            SuperiorPlayer targetPlayer = getTargetPlayer(plugin, sender, argument);
+            SuperiorPlayer targetPlayer = getPlayer(plugin, sender, argument);
             if(targetPlayer != null)
                 players.add(targetPlayer);
         }
@@ -116,11 +120,11 @@ public final class CommandArguments {
         return new Pair<>(island, superiorPlayer);
     }
 
-    public static Mission<?> getTargetMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
-        return getTargetMission(plugin, superiorPlayer.asPlayer(), argument);
+    public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
+        return getMission(plugin, superiorPlayer.asPlayer(), argument);
     }
 
-    public static Mission<?> getTargetMission(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
+    public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
         Mission<?> mission = plugin.getMissions().getMission(argument);
 
         if(mission == null)
@@ -136,7 +140,7 @@ public final class CommandArguments {
             missions = plugin.getMissions().getAllMissions();
         }
         else {
-            Mission<?> mission = getTargetMission(plugin, sender, argument);
+            Mission<?> mission = getMission(plugin, sender, argument);
             if(mission != null)
                 missions.add(mission);
         }
@@ -144,11 +148,11 @@ public final class CommandArguments {
         return missions;
     }
 
-    public static Upgrade getTargetUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
-        return getTargetUpgrade(plugin, superiorPlayer.asPlayer(), argument);
+    public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
+        return getUpgrade(plugin, superiorPlayer.asPlayer(), argument);
     }
 
-    public static Upgrade getTargetUpgrade(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
+    public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(argument);
 
         if(upgrade == null)
@@ -157,11 +161,11 @@ public final class CommandArguments {
         return upgrade;
     }
 
-    public static String buildLongString(String[] args, int start, String spacer){
+    public static String buildLongString(String[] args, int start){
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = start; i < args.length; i++)
-            stringBuilder.append(spacer).append(args[i]);
+            stringBuilder.append(" ").append(args[i]);
 
         return stringBuilder.substring(1);
     }
@@ -243,7 +247,7 @@ public final class CommandArguments {
     }
 
     public static String getWarp(CommandSender sender, Island island, String[] args, int start){
-        String warpName = buildLongString(args, start, " ");
+        String warpName = buildLongString(args, start);
 
         if(island.getWarpLocation(warpName) == null){
             Locale.INVALID_WARP.send(sender, warpName);

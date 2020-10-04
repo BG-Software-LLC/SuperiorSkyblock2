@@ -68,7 +68,7 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Upgrade upgrade = CommandArguments.getTargetUpgrade(plugin, sender, args[3]);
+        Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
 
         if(upgrade == null)
             return;

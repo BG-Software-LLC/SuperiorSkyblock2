@@ -69,7 +69,7 @@ public final class CmdSetRole implements IPermissibleCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island playerIsland, String[] args) {
         CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
-        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[1]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[1]);
 
         if(targetPlayer == null)
             return;

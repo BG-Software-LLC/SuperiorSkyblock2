@@ -64,7 +64,7 @@ public final class CmdAdminSetLeader implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer leader, String[] args) {
-        SuperiorPlayer newLeader = CommandArguments.getTargetPlayer(plugin, sender, args[3]);
+        SuperiorPlayer newLeader = CommandArguments.getPlayer(plugin, sender, args[3]);
 
         if (newLeader == null)
             return;

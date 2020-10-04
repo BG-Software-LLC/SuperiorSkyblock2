@@ -68,7 +68,7 @@ public final class CmdTransfer implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, superiorPlayer, args[1]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
         if(targetPlayer == null)
             return;

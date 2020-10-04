@@ -72,7 +72,7 @@ public final class CmdRankup implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        Upgrade upgrade = CommandArguments.getTargetUpgrade(plugin, superiorPlayer, args[1]);
+        Upgrade upgrade = CommandArguments.getUpgrade(plugin, superiorPlayer, args[1]);
 
         if(upgrade == null)
             return;

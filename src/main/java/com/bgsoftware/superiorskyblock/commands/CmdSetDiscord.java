@@ -60,7 +60,7 @@ public final class CmdSetDiscord implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        String discord = CommandArguments.buildLongString(args, 1, " ");
+        String discord = CommandArguments.buildLongString(args, 1);
         island.setDiscord(discord);
         Locale.CHANGED_DISCORD.send(superiorPlayer, discord);
     }

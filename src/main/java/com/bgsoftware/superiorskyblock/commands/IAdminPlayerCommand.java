@@ -16,7 +16,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
     @Override
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if(!supportMultiplePlayers()){
-            SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[2]);
+            SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
             if(targetPlayer != null) {
                 Island playerIsland = targetPlayer.getIsland();
 
@@ -49,7 +49,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
             }
             else{
-                SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[2]);
+                SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
                 if(targetPlayer != null) {
                     tabVariables = adminTabComplete(plugin, sender, targetPlayer, args);
                 }

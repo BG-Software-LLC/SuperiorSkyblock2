@@ -63,7 +63,7 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        Upgrade upgrade = CommandArguments.getTargetUpgrade(plugin, sender, args[3]);
+        Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
 
         if(upgrade == null)
             return;

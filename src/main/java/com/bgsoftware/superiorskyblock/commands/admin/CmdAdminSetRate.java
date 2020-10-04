@@ -62,7 +62,7 @@ public final class CmdAdminSetRate implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        SuperiorPlayer targetPlayer = CommandArguments.getTargetPlayer(plugin, sender, args[3]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[3]);
 
         if(targetPlayer == null)
             return;

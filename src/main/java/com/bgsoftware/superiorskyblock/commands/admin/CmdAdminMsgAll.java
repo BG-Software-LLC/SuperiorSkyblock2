@@ -59,7 +59,7 @@ public final class CmdAdminMsgAll implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        String message = CommandArguments.buildLongString(args, 3, " ");
+        String message = CommandArguments.buildLongString(args, 3);
 
         islands.forEach(island -> island.sendMessage(message));
 

@@ -61,7 +61,7 @@ public final class CmdMission implements ISuperiorCommand {
             return;
         }
 
-        Mission<?> mission = CommandArguments.getTargetMission(plugin, superiorPlayer, args[2]);
+        Mission<?> mission = CommandArguments.getMission(plugin, superiorPlayer, args[2]);
 
         if(mission == null)
             return;

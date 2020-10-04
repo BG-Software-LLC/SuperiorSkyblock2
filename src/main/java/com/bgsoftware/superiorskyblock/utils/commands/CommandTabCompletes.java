@@ -32,6 +32,10 @@ import java.util.stream.Stream;
 
 public final class CommandTabCompletes {
 
+    private CommandTabCompletes() {
+
+    }
+
     public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
