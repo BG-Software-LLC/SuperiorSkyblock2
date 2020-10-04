@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.island.bank;
 
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -17,9 +17,9 @@ public final class SBankTransaction implements BankTransaction {
     private final long time;
     private final String date;
     private final String failureReason;
-    private final BigDecimalFormatted amount;
+    private final BigDecimal amount;
 
-    public SBankTransaction(UUID player, BankAction bankAction, int position, long time, String failureReason, BigDecimalFormatted amount){
+    public SBankTransaction(UUID player, BankAction bankAction, int position, long time, String failureReason, BigDecimal amount){
         this.player = player;
         this.bankAction = bankAction;
         this.position = position;
@@ -37,7 +37,7 @@ public final class SBankTransaction implements BankTransaction {
         this.time = Long.parseLong(resultSet.getString("time"));
         this.date = StringUtils.formatDate(time);
         this.failureReason = resultSet.getString("failureReason");
-        this.amount = BigDecimalFormatted.of(resultSet.getString("amount"));
+        this.amount = new BigDecimal(resultSet.getString("amount"));
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class SBankTransaction implements BankTransaction {
     }
 
     @Override
-    public BigDecimalFormatted getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 

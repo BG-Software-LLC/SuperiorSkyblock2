@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -643,8 +644,11 @@ public enum Locale {
         if(!isEmpty(locale)) {
             String msg = messages.get(locale);
 
-            for (int i = 0; i < objects.length; i++)
-                msg = msg.replace("{" + i + "}", objects[i].toString());
+            for (int i = 0; i < objects.length; i++) {
+                String objectString = objects[i] instanceof BigDecimal ?
+                        StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
+                msg = msg.replace("{" + i + "}", objectString);
+            }
 
             return msg;
         }

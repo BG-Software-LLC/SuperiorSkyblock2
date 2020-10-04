@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -224,11 +223,11 @@ public abstract class PlaceholderHook {
                                 if(value){
                                     if(sortingType.equals(SortingTypes.BY_WORTH)){
                                         return formattedValue ? StringUtils.fancyFormat(_island.getWorth(), superiorPlayer.getUserLocale()) :
-                                                rawValue ? BigDecimalFormatted.of(_island.getWorth()).getAsString() : _island.getWorth().toString();
+                                                rawValue ? _island.getWorth().toString() : StringUtils.format(_island.getWorth());
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_LEVEL)){
                                         return formattedValue ? StringUtils.fancyFormat(_island.getIslandLevel(), superiorPlayer.getUserLocale()) :
-                                                rawValue ? BigDecimalFormatted.of(_island.getIslandLevel()).getAsString() : _island.getIslandLevel().toString();
+                                                rawValue ? _island.getIslandLevel().toString() : StringUtils.format(_island.getIslandLevel());
                                     }
                                     else if(sortingType.equals(SortingTypes.BY_RATING)){
                                         return StringUtils.format(_island.getTotalRating());
@@ -298,29 +297,29 @@ public abstract class PlaceholderHook {
                     case "biome":
                         return StringUtils.format(island.getBiome().name());
                     case "level":
-                        return island.getIslandLevel().toString();
+                        return StringUtils.format(island.getIslandLevel());
                     case "level_raw":
-                        return BigDecimalFormatted.of(island.getIslandLevel()).getAsString();
+                        return island.getIslandLevel().toString();
                     case "level_format":
                         return StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale());
                     case "level_int":
                         return island.getIslandLevel().toBigInteger().toString();
                     case "worth":
-                        return island.getWorth().toString();
+                        return StringUtils.format(island.getWorth());
                     case "worth_raw":
-                        return BigDecimalFormatted.of(island.getWorth()).getAsString();
+                        return island.getWorth().toString();
                     case "worth_format":
                         return StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale());
                     case "worth_int":
                         return island.getWorth().toBigInteger().toString();
                     case "raw_worth":
-                        return island.getRawWorth().toString();
+                        return StringUtils.format(island.getRawWorth());
                     case "raw_worth_format":
                         return StringUtils.fancyFormat(island.getRawWorth(), superiorPlayer.getUserLocale());
                     case "bank":
-                        return island.getIslandBank().getBalance().toString();
+                        return StringUtils.format(island.getIslandBank().getBalance());
                     case "bank_raw":
-                        return BigDecimalFormatted.of(island.getIslandBank().getBalance()).getAsString();
+                        return island.getIslandBank().getBalance().toString();
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale());
                     case "hoppers_limit":
@@ -365,11 +364,11 @@ public abstract class PlaceholderHook {
                     case "creation_time":
                         return island.getCreationTimeDate();
                     case "total_worth":
-                        return plugin.getGrid().getTotalWorth().toString();
+                        return StringUtils.format(plugin.getGrid().getTotalWorth());
                     case "total_worth_format":
                         return StringUtils.fancyFormat(plugin.getGrid().getTotalWorth(), superiorPlayer.getUserLocale());
                     case "total_level":
-                        return plugin.getGrid().getTotalLevel().toString();
+                        return StringUtils.format(plugin.getGrid().getTotalLevel());
                     case "total_level_format":
                         return StringUtils.fancyFormat(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale());
                     case "nether_unlocked":

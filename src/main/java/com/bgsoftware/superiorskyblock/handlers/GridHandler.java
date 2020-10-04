@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -75,9 +74,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private SBlockPosition lastIsland;
     private boolean blockFailed = false;
 
-    private BigDecimalFormatted totalWorth = BigDecimalFormatted.ZERO;
+    private BigDecimal totalWorth = BigDecimal.ZERO;
     private long lastTimeWorthUpdate = 0;
-    private BigDecimalFormatted totalLevel = BigDecimalFormatted.ZERO;
+    private BigDecimal totalLevel = BigDecimal.ZERO;
     private long lastTimeLevelUpdate = 0;
 
     public GridHandler(SuperiorSkyblockPlugin plugin){
@@ -565,7 +564,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         if(currentTime - lastTimeWorthUpdate > 60000){
             lastTimeWorthUpdate = currentTime;
-            totalWorth = BigDecimalFormatted.ZERO;
+            totalWorth = BigDecimal.ZERO;
             for(Island island : getIslands())
                 totalWorth = totalWorth.add(island.getWorth());
         }
@@ -579,7 +578,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         if(currentTime - lastTimeLevelUpdate > 60000){
             lastTimeLevelUpdate = currentTime;
-            totalLevel = BigDecimalFormatted.ZERO;
+            totalLevel = BigDecimal.ZERO;
             for(Island island : getIslands())
                 totalLevel = totalLevel.add(island.getIslandLevel());
         }

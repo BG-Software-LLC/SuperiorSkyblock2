@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.island.data;
 
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -142,7 +141,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     @Override
     public void saveBankLimit() {
         Query.ISLAND_SET_BANK_LIMIT.getStatementHolder(this)
-                .setString(BigDecimalFormatted.of(island.getBankLimit()).getAsString())
+                .setString(island.getBankLimit() + "")
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -150,7 +149,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     @Override
     public void saveBonusWorth() {
         Query.ISLAND_SET_BONUS_WORTH.getStatementHolder(this)
-                .setString(BigDecimalFormatted.of(island.getBonusWorth()).getAsString())
+                .setString(island.getBonusWorth() + "")
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -158,7 +157,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     @Override
     public void saveBonusLevel() {
         Query.ISLAND_SET_BONUS_LEVEL.getStatementHolder(this)
-                .setString(BigDecimalFormatted.of(island.getBonusLevel()).getAsString())
+                .setString(island.getBonusLevel() + "")
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -338,7 +337,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializePermissions(island.getPlayerPermissions(), island.getRolePermissions()))
                 .setString(IslandSerializer.serializeUpgrades(island.getUpgrades()))
                 .setString(IslandSerializer.serializeWarps(island.getIslandWarps()))
-                .setString(BigDecimalFormatted.of(island.getIslandBank().getBalance()).getAsString())
+                .setString(island.getIslandBank().getBalance() + "")
                 .setInt(island.getIslandSizeRaw())
                 .setString(IslandSerializer.serializeBlockLimits(island.getCustomBlocksLimits()))
                 .setInt(island.getTeamLimitRaw())
@@ -348,7 +347,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getDiscord())
                 .setString(island.getPaypal())
                 .setInt(island.getWarpsLimitRaw())
-                .setString(BigDecimalFormatted.of(island.getBonusWorth()).getAsString())
+                .setString(island.getBonusWorth() + "")
                 .setBoolean(island.isLocked())
                 .setString(IslandSerializer.serializeBlockCounts(island.getBlockCounts()))
                 .setString(island.getName())
@@ -365,13 +364,13 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setLong(island.getLastTimeUpdate())
                 .setString(ChunksTracker.serialize(island))
                 .setString(IslandSerializer.serializeEntityLimits(island.getCustomEntitiesLimits()))
-                .setString(BigDecimalFormatted.of(island.getBonusLevel()).getAsString())
+                .setString(island.getBonusLevel() + "")
                 .setLong(island.getCreationTime())
                 .setInt(island.getCoopLimitRaw())
                 .setString(IslandSerializer.serializeEffects(island.getPotionEffects()))
                 .setString(IslandSerializer.serializeIslandChest(island.getChest()))
                 .setString(island.getUniqueId().toString())
-                .setString(BigDecimalFormatted.of(island.getBankLimitRaw()).getAsString())
+                .setString(island.getBankLimitRaw() + "")
                 .setLong(island.getLastInterestTime())
                 .setString(island.getOwner().getUniqueId().toString());
     }
@@ -399,7 +398,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializePermissions(island.getPlayerPermissions(), island.getRolePermissions()))
                 .setString(IslandSerializer.serializeUpgrades(island.getUpgrades()))
                 .setString(IslandSerializer.serializeWarps(island.getIslandWarps()))
-                .setString(BigDecimalFormatted.of(island.getIslandBank().getBalance()).getAsString())
+                .setString(island.getIslandBank().getBalance() + "")
                 .setInt(island.getIslandSizeRaw())
                 .setString(IslandSerializer.serializeBlockLimits(island.getCustomBlocksLimits()))
                 .setInt(island.getTeamLimitRaw())
@@ -409,7 +408,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getDiscord())
                 .setString(island.getPaypal())
                 .setInt(island.getWarpsLimitRaw())
-                .setString(BigDecimalFormatted.of(island.getBonusWorth()).getAsString())
+                .setString(island.getBonusWorth() + "")
                 .setBoolean(island.isLocked())
                 .setString(IslandSerializer.serializeBlockCounts(island.getBlockCounts()))
                 .setString(island.getName())
@@ -427,13 +426,13 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setLong(island.getLastTimeUpdate())
                 .setString(ChunksTracker.serialize(island))
                 .setString(IslandSerializer.serializeEntityLimits(island.getCustomEntitiesLimits()))
-                .setString(BigDecimalFormatted.of(island.getBonusLevel()).getAsString())
+                .setString(island.getBonusLevel() + "")
                 .setLong(island.getCreationTime())
                 .setInt(island.getCoopLimitRaw())
                 .setString(IslandSerializer.serializeEffects(island.getPotionEffects()))
                 .setString(IslandSerializer.serializeIslandChest(island.getChest()))
                 .setString(island.getUniqueId().toString())
-                .setString(BigDecimalFormatted.of(island.getBankLimitRaw()).getAsString())
+                .setString(island.getBankLimitRaw() + "")
                 .setLong(island.getLastInterestTime())
                 .execute(async);
     }

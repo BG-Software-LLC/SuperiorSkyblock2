@@ -49,7 +49,6 @@ import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -145,10 +144,10 @@ public final class SIsland implements Island {
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final Registry<String, SIslandWarp> warps = Registry.createRegistry();
-    private final SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
-    private final SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
-    private final SyncedObject<BigDecimalFormatted> bonusWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
-    private final SyncedObject<BigDecimalFormatted> bonusLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
+    private final SyncedObject<BigDecimal> islandWorth = SyncedObject.of(BigDecimal.ZERO);
+    private final SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
+    private final SyncedObject<BigDecimal> bonusWorth = SyncedObject.of(BigDecimal.ZERO);
+    private final SyncedObject<BigDecimal> bonusLevel = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
     private final Registry<World.Environment, Location> teleportLocations = Registry.createRegistry();
@@ -184,7 +183,7 @@ public final class SIsland implements Island {
     private final UpgradeValue<Double> cropGrowth = UpgradeValue.createDouble();
     private final UpgradeValue<Double> spawnerRates = UpgradeValue.createDouble();
     private final UpgradeValue<Double> mobDrops = UpgradeValue.createDouble();
-    private final UpgradeValue<BigDecimalFormatted> bankLimit = UpgradeValue.createBigDecimal();
+    private final UpgradeValue<BigDecimal> bankLimit = UpgradeValue.createBigDecimal();
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
@@ -211,8 +210,8 @@ public final class SIsland implements Island {
         if(!resultSet.getString("uniqueVisitors").contains(";"))
             islandDataHandler.saveUniqueVisitors();
 
-        this.islandBank.loadBalance(BigDecimalFormatted.of(resultSet.getString("islandBank")));
-        this.bonusWorth.set(BigDecimalFormatted.of(resultSet.getString("bonusWorth")));
+        this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank")));
+        this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth")));
         this.islandSize.set(resultSet.getInt("islandSize"));
         this.teamLimit.set(resultSet.getInt("teamLimit"));
         this.warpsLimit.set(resultSet.getInt("warpsLimit"));
@@ -227,7 +226,7 @@ public final class SIsland implements Island {
         this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
         this.description.set(resultSet.getString("description"));
         this.ignored.set(resultSet.getBoolean("ignored"));
-        this.bonusLevel.set(BigDecimalFormatted.of(resultSet.getString("bonusLevel")));
+        this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel")));
 
         String generatedSchematics = resultSet.getString("generatedSchematics");
         try{
@@ -266,7 +265,7 @@ public final class SIsland implements Island {
         String bankLimit = resultSet.getString("bankLimit");
         if(bankLimit != null && !bankLimit.isEmpty()) {
             try {
-                this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
+                this.bankLimit.set(new BigDecimal(bankLimit));
             }catch (NumberFormatException ignored){}
         }
 
@@ -1149,8 +1148,8 @@ public final class SIsland implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
         SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
-        SyncedObject<BigDecimalFormatted> islandWorth = SyncedObject.of(BigDecimalFormatted.ZERO);
-        SyncedObject<BigDecimalFormatted> islandLevel = SyncedObject.of(BigDecimalFormatted.ZERO);
+        SyncedObject<BigDecimal> islandWorth = SyncedObject.of(BigDecimal.ZERO);
+        SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
 
         Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
         Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
@@ -1519,7 +1518,7 @@ public final class SIsland implements Island {
     @Override
     public void setBankLimit(BigDecimal bankLimit) {
         SuperiorSkyblockPlugin.debug("Action: Set Bank Limit, Island: " + owner.getName() + ", Bank Limit: " + bankLimit);
-        this.bankLimit.set(BigDecimalFormatted.of(bankLimit));
+        this.bankLimit.set(bankLimit);
         islandDataHandler.saveBankLimit();
     }
 
@@ -1545,12 +1544,6 @@ public final class SIsland implements Island {
     @Override
     public long getLastInterestTime() {
         return lastInterest.get();
-    }
-
-    @Override
-    @Deprecated
-    public BigDecimal getMoneyInBankAsBigDecimal() {
-        return getMoneyInBank();
     }
 
     @Override
@@ -1614,7 +1607,7 @@ public final class SIsland implements Island {
         islandDataHandler.saveDirtyChunks();
     }
 
-    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
+    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimal> syncedIslandWorth, SyncedObject<BigDecimal> syncedIslandLevel){
         if(amount == 0)
             return;
 
@@ -1649,7 +1642,7 @@ public final class SIsland implements Island {
         }
     }
 
-    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimalFormatted> syncedIslandWorth, SyncedObject<BigDecimalFormatted> syncedIslandLevel){
+    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimal> syncedIslandWorth, SyncedObject<BigDecimal> syncedIslandLevel){
         KeyMap<Integer> blockCounts = new KeyMap<>();
         BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
 
@@ -1831,30 +1824,18 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public BigDecimal getWorthAsBigDecimal() {
-        return getWorth();
-    }
-
-    @Override
     public BigDecimal getWorth() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
-        BigDecimalFormatted islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
+        BigDecimal islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
         //noinspection BigDecimalMethodWithoutRoundingCalled
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
 
         finalIslandWorth = finalIslandWorth.add(bonusWorth);
 
         if(!plugin.getSettings().negativeWorth && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
-            finalIslandWorth = BigDecimalFormatted.of(0);
+            finalIslandWorth = BigDecimal.ZERO;
 
         return finalIslandWorth;
-    }
-
-    @Override
-    @Deprecated
-    public BigDecimal getRawWorthAsBigDecimal() {
-        return getRawWorth();
     }
 
     @Override
@@ -1871,8 +1852,7 @@ public final class SIsland implements Island {
     public void setBonusWorth(BigDecimal bonusWorth){
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Worth, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
 
-        BigDecimalFormatted newBonusWorth = BigDecimalFormatted.of(bonusWorth);
-        this.bonusWorth.set(newBonusWorth);
+        this.bonusWorth.set(bonusWorth);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
@@ -1890,8 +1870,7 @@ public final class SIsland implements Island {
     public void setBonusLevel(BigDecimal bonusLevel) {
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Level, Island: " + owner.getName() + ", Bonus: " + bonusLevel);
 
-        BigDecimalFormatted newBonusLevel = BigDecimalFormatted.of(bonusLevel);
-        this.bonusLevel.set(newBonusLevel);
+        this.bonusLevel.set(bonusLevel);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
@@ -1901,35 +1880,29 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public BigDecimal getIslandLevelAsBigDecimal() {
-        return getIslandLevel();
-    }
-
-    @Override
-    public BigDecimalFormatted getIslandLevel() {
-        BigDecimalFormatted bonusLevel = this.bonusLevel.get(), islandLevel = this.islandLevel.get().add(bonusLevel);
+    public BigDecimal getIslandLevel() {
+        BigDecimal bonusLevel = this.bonusLevel.get(), islandLevel = this.islandLevel.get().add(bonusLevel);
 
         if(plugin.getSettings().roundedIslandLevel) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
 
         if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
-            islandLevel = BigDecimalFormatted.of(0);
+            islandLevel = BigDecimal.ZERO;
 
         return islandLevel;
     }
 
     @Override
     public BigDecimal getRawLevel() {
-        BigDecimalFormatted islandLevel = this.islandLevel.get();
+        BigDecimal islandLevel = this.islandLevel.get();
 
         if(plugin.getSettings().roundedIslandLevel) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
 
         if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
-            islandLevel = BigDecimalFormatted.of(0);
+            islandLevel = BigDecimal.ZERO;
 
         return islandLevel;
     }
@@ -2985,7 +2958,7 @@ public final class SIsland implements Island {
         islandSize.setUpgrade(upgradeLevel.getBorderSize());
         cobbleGeneratorValues.setUpgradeString(upgradeLevel.getGeneratorAmounts(),true,false);
         islandEffects.setUpgrade(upgradeLevel.getPotionEffects());
-        bankLimit.setUpgrade(BigDecimalFormatted.of(upgradeLevel.getBankLimit()));
+        bankLimit.setUpgrade(upgradeLevel.getBankLimit());
     }
 
     private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth){

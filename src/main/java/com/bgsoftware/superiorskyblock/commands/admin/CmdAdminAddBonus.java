@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -90,7 +89,7 @@ public final class CmdAdminAddBonus implements ISuperiorCommand {
         BigDecimal bonus;
 
         try{
-            bonus = BigDecimalFormatted.of(args[4]);
+            bonus = new BigDecimal(args[4]);
         }catch(NumberFormatException ex){
             Locale.INVALID_AMOUNT.send(sender);
             return;

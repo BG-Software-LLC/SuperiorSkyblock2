@@ -89,8 +89,7 @@ public final class StringUtils {
     }
 
     public static String format(BigDecimal bigDecimal){
-        String s = numberFormatter.format(Double.parseDouble(bigDecimal instanceof BigDecimalFormatted ?
-                ((BigDecimalFormatted) bigDecimal).getAsString() : bigDecimal.toString()));
+        String s = numberFormatter.format(bigDecimal.toString());
 
         //Because of some issues with formatting, spaces are converted to ascii 160.
         s = s.replace(SPACE_ASCII, ' ');

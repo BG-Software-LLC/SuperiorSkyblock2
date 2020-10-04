@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -31,12 +30,12 @@ import java.util.UUID;
 public final class SIslandBank implements IslandBank {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final BigDecimalFormatted MONEY_FAILURE = BigDecimalFormatted.of(-1);
+    private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final SyncedObject<List<BankTransaction>> transactions = SyncedObject.of(new ArrayList<>());
     private final Registry<UUID, SyncedObject<List<BankTransaction>>> transactionsByPlayers = Registry.createRegistry();
-    private final SyncedObject<BigDecimalFormatted> balance = SyncedObject.of(BigDecimalFormatted.ZERO);
+    private final SyncedObject<BigDecimal> balance = SyncedObject.of(BigDecimal.ZERO);
     private final Island island;
 
     public SIslandBank(Island island){
@@ -44,11 +43,11 @@ public final class SIslandBank implements IslandBank {
     }
 
     @Override
-    public BigDecimalFormatted getBalance() {
+    public BigDecimal getBalance() {
         return balance.get();
     }
 
-    public void loadBalance(BigDecimalFormatted balance){
+    public void loadBalance(BigDecimal balance){
         setBalance(balance, false);
     }
 
@@ -83,7 +82,7 @@ public final class SIslandBank implements IslandBank {
         int position = transactions.readAndGet(List::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
-            bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", BigDecimalFormatted.of(amount));
+            bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
             setBalance(this.balance.get().add(amount), true);
 
             addTransaction(bankTransaction, true);
@@ -108,7 +107,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = transactions.readAndGet(List::size) + 1;
 
-        BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", BigDecimalFormatted.of(amount));
+        BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
         setBalance(this.balance.get().add(amount), true);
 
         addTransaction(bankTransaction, true);
@@ -148,7 +147,7 @@ public final class SIslandBank implements IslandBank {
             if (commandsToExecute == null || commandsToExecute.isEmpty()) {
                 failureReason = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
             } else {
-                String currentBalance = balance.get().getAsString();
+                String currentBalance = balance.get().toString();
                 failureReason = "";
                 commandsToExecute.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                         .replace("{0}", superiorPlayer.getName())
@@ -160,7 +159,7 @@ public final class SIslandBank implements IslandBank {
         int position = transactions.readAndGet(List::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
-            bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", BigDecimalFormatted.of(withdrawAmount));
+            bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
             setBalance(this.balance.get().subtract(withdrawAmount), true);
 
             addTransaction(bankTransaction, true);
@@ -184,7 +183,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = transactions.readAndGet(List::size) + 1;
 
-        BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", BigDecimalFormatted.of(amount));
+        BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", amount);
         setBalance(this.balance.get().subtract(amount), true);
 
         addTransaction(bankTransaction, true);
@@ -238,17 +237,17 @@ public final class SIslandBank implements IslandBank {
                     .setInt(bankTransaction.getPosition())
                     .setString(bankTransaction.getTime() + "")
                     .setString(bankTransaction.getFailureReason())
-                    .setString(BigDecimalFormatted.of(bankTransaction.getAmount()).getAsString())
+                    .setString(bankTransaction.getAmount() + "")
                     .execute(true);
         }
     }
 
-    private void setBalance(BigDecimalFormatted balance, boolean save){
+    private void setBalance(BigDecimal balance, boolean save){
         this.balance.set(balance);
 
         if(save){
             Query.ISLAND_SET_BANK.getStatementHolder((SIslandDataHandler) island.getDataHandler())
-                    .setString(balance.getAsString())
+                    .setString(balance + "")
                     .setString(island.getOwner().getUniqueId() + "")
                     .execute(true);
         }

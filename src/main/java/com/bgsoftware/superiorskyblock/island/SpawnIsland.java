@@ -719,12 +719,6 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public BigDecimal getMoneyInBankAsBigDecimal() {
-        return getMoneyInBank();
-    }
-
-    @Override
     public BigDecimal getMoneyInBank() {
         return BigDecimal.ZERO;
     }
@@ -820,20 +814,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public BigDecimal getWorthAsBigDecimal() {
-        return getWorth();
-    }
-
-    @Override
     public BigDecimal getWorth() {
         return BigDecimal.ZERO;
-    }
-
-    @Override
-    @Deprecated
-    public BigDecimal getRawWorthAsBigDecimal() {
-        return getRawWorth();
     }
 
     @Override
@@ -859,12 +841,6 @@ public final class SpawnIsland implements Island {
     @Override
     public void setBonusLevel(BigDecimal bonusLevel) {
 
-    }
-
-    @Override
-    @Deprecated
-    public BigDecimal getIslandLevelAsBigDecimal() {
-        return getIslandLevel();
     }
 
     @Override

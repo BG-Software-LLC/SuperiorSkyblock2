@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.BigDecimalFormatted;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 
+import java.math.BigDecimal;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -57,8 +57,8 @@ public final class UpgradeValue<T> {
         return new UpgradeValue<>(-1, 0, v -> v < 0, (v1, v2) -> v1 > v2);
     }
 
-    public static UpgradeValue<BigDecimalFormatted> createBigDecimal(){
-        return new UpgradeValue<>(BigDecimalFormatted.of(-2), BigDecimalFormatted.of(-1), v -> v.compareTo(BigDecimalFormatted.of(-1)) < 0, (v1, v2) -> v1.compareTo(v2) > 0);
+    public static UpgradeValue<BigDecimal> createBigDecimal(){
+        return new UpgradeValue<>(BigDecimal.valueOf(-2), BigDecimal.valueOf(-1), v -> v.compareTo(BigDecimal.valueOf(-1)) < 0, (v1, v2) -> v1.compareTo(v2) > 0);
     }
 
 }

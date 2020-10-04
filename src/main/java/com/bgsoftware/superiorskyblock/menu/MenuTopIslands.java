@@ -80,8 +80,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
                 itemBuilder.replaceName("{0}", islandName)
                         .replaceName("{1}", String.valueOf(place))
-                        .replaceName("{2}", island.getIslandLevel().toString())
-                        .replaceName("{3}", island.getWorth().toString())
+                        .replaceName("{2}", StringUtils.format(island.getIslandLevel()))
+                        .replaceName("{3}", StringUtils.format(island.getWorth()))
                         .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
                         .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
                         .replaceName("{7}", StringUtils.format(island.getTotalRating()))
