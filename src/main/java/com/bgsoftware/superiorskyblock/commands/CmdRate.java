@@ -68,7 +68,7 @@ public final class CmdRate implements ISuperiorCommand {
             return;
         }
 
-        SuperiorPlayer superiorPlayer = arguments.getValue();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if(!plugin.getSettings().rateOwnIsland && island.equals(superiorPlayer.getIsland())){
             Locale.RATE_OWN_ISLAND.send(superiorPlayer);

@@ -63,7 +63,7 @@ public final class CmdValues implements ISuperiorCommand {
         if(island == null)
             return;
 
-        SuperiorPlayer superiorPlayer = arguments.getValue();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         MenuValues.openInventory(superiorPlayer, null, island);
     }
 

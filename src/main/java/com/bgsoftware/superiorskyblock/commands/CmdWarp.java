@@ -63,7 +63,7 @@ public final class CmdWarp implements ISuperiorCommand {
         if(island == null)
             return;
 
-        SuperiorPlayer superiorPlayer = arguments.getValue();
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         MenuWarps.openInventory(superiorPlayer, null, island);
     }
 
