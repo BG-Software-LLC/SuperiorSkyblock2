@@ -161,13 +161,13 @@ public final class CommandArguments {
         return upgrade;
     }
 
-    public static String buildLongString(String[] args, int start){
+    public static String buildLongString(String[] args, int start, boolean colorize){
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = start; i < args.length; i++)
             stringBuilder.append(" ").append(args[i]);
 
-        return stringBuilder.substring(1);
+        return colorize ? StringUtils.translateColors(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
     public static PlayerRole getPlayerRole(CommandSender sender, String argument){
@@ -247,7 +247,7 @@ public final class CommandArguments {
     }
 
     public static String getWarp(CommandSender sender, Island island, String[] args, int start){
-        String warpName = buildLongString(args, start);
+        String warpName = buildLongString(args, start, false);
 
         if(island.getWarpLocation(warpName) == null){
             Locale.INVALID_WARP.send(sender, warpName);

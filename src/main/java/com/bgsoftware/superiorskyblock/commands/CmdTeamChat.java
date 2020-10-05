@@ -71,7 +71,7 @@ public final class CmdTeamChat implements ISuperiorCommand {
         }
 
         else{
-            String message = CommandArguments.buildLongString(args, 1);
+            String message = CommandArguments.buildLongString(args, 1, true);
             IslandUtils.sendMessage(island, Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
                     superiorPlayer.getName(), message);
         }

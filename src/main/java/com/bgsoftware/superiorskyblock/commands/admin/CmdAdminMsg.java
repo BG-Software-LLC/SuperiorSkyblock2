@@ -62,7 +62,7 @@ public final class CmdAdminMsg implements IAdminPlayerCommand {
             return;
         }
 
-        String message = CommandArguments.buildLongString(args, 3);
+        String message = CommandArguments.buildLongString(args, 3, true);
 
         Locale.sendMessage(targetPlayer, message, false);
         Locale.MESSAGE_SENT.send(sender, targetPlayer.getName());
