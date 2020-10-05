@@ -68,7 +68,7 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
         if(upgrade == null)
             return;
 
-        Pair<Integer, Boolean> arguments = CommandArguments.getLevel(sender, args[3]);
+        Pair<Integer, Boolean> arguments = CommandArguments.getLevel(sender, args[4]);
 
         if(!arguments.getValue())
             return;
