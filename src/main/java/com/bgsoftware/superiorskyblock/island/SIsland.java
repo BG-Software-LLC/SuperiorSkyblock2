@@ -295,13 +295,14 @@ public final class SIsland implements Island {
 
         this.lastInterest.set(resultSet.getLong("lastInterest"));
 
-        long currentTime = System.currentTimeMillis() / 1000;
-        long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
-        if(ticksToNextInterest <= 0) {
-            giveInterest(true);
-        }
-        else {
-            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+        if(plugin.getSettings().bankInterestEnabled) {
+            long currentTime = System.currentTimeMillis() / 1000;
+            long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
+            if (ticksToNextInterest <= 0) {
+                giveInterest(true);
+            } else {
+                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            }
         }
 
         if(getMobDropsRaw() == getWarpsLimitRaw())
