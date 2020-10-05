@@ -44,7 +44,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
                 tabVariables.add("*");
             tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[2], false));
         }
-        else{
+        else if(args.length > 3){
             if(supportMultiplePlayers()) {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
             }

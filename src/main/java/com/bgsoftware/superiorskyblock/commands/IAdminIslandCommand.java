@@ -36,7 +36,7 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
                 tabVariables.add("*");
             tabVariables.addAll(CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2], false));
         }
-        else{
+        else if(args.length > 3){
             if(supportMultipleIslands()) {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
             }
