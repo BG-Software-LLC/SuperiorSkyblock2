@@ -691,6 +691,7 @@ public enum Locale {
 
         if(!langFolder.exists()){
             plugin.saveResource("lang/en-US.yml", false);
+            plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);
             plugin.saveResource("lang/it-IT.yml", false);
             plugin.saveResource("lang/iw-IL.yml", false);
