@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -348,39 +347,30 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
             chunkConsumer.accept(chunk);
             if(updateChunk != null)
                 updateChunk.accept(chunk);
-            if(onFinish != null)
-                onFinish.run();
         }
 
         else{
-            Executor.createTask().runAsync(v -> {
-                try {
-                    Chunk loadedChunk = chunkLoader.a(world, chunkCoords.x, chunkCoords.z);
+            try {
+                Chunk loadedChunk = chunkLoader.a(world, chunkCoords.x, chunkCoords.z);
 
-                    if(loadedChunk != null)
-                        chunkConsumer.accept(loadedChunk);
+                if (loadedChunk != null) {
+                    chunkConsumer.accept(loadedChunk);
 
-                    return loadedChunk;
-                }catch (Exception ex){
-                    ex.printStackTrace();
-                    return null;
-                }
-            }).runSync(loadedChunk -> {
-                if(loadedChunk != null) {
                     if (saveChunk) {
                         if (SAVE_CHUNK.isValid())
                             SAVE_CHUNK.invoke(chunkLoader, world, loadedChunk, false);
-                        else try {
+                        else {
                             chunkLoader.a(world, loadedChunk);
-                        }catch (Exception ex){
-                            ex.printStackTrace();
                         }
                     }
                 }
-                if(onFinish != null)
-                    onFinish.run();
-            });
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
+
+        if(onFinish != null)
+            onFinish.run();
     }
 
     @Override
