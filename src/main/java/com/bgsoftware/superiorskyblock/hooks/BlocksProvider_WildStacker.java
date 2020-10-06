@@ -132,6 +132,9 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         public void onBarrelPlace(BarrelPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
 
+            if(island == null)
+                return;
+
             Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
             int increaseAmount = e.getBarrel().getStackAmount();
 
