@@ -40,7 +40,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
         List<String> tabVariables = new ArrayList<>();
 
         if(args.length == 3) {
-            if(supportMultiplePlayers())
+            if(supportMultiplePlayers() && "*".contains(args[2]))
                 tabVariables.add("*");
             tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[2], false));
         }
