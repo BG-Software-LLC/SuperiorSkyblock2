@@ -29,7 +29,6 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        //is admin unlockworld OmerBenGera nether enable
         return "admin unlockworld <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +

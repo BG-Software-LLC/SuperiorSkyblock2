@@ -341,7 +341,7 @@ public final class CommandArguments {
         World.Environment environment = null;
 
         try{
-            environment = World.Environment.valueOf(argument);
+            environment = World.Environment.valueOf(argument.toUpperCase());
         }catch(Exception ignored){}
 
         if(environment == null)
