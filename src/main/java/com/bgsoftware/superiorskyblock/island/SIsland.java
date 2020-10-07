@@ -210,8 +210,8 @@ public final class SIsland implements Island {
         if(!resultSet.getString("uniqueVisitors").contains(";"))
             islandDataHandler.saveUniqueVisitors();
 
-        this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank")));
-        this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth")));
+        parseNumbersSafe(() -> this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank"))));
+        parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
         this.islandSize.set(resultSet.getInt("islandSize"));
         this.teamLimit.set(resultSet.getInt("teamLimit"));
         this.warpsLimit.set(resultSet.getInt("warpsLimit"));
@@ -226,7 +226,7 @@ public final class SIsland implements Island {
         this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
         this.description.set(resultSet.getString("description"));
         this.ignored.set(resultSet.getBoolean("ignored"));
-        this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel")));
+        parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
 
         String generatedSchematics = resultSet.getString("generatedSchematics");
         try{
@@ -263,11 +263,8 @@ public final class SIsland implements Island {
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
         String bankLimit = resultSet.getString("bankLimit");
-        if(bankLimit != null && !bankLimit.isEmpty()) {
-            try {
-                this.bankLimit.set(new BigDecimal(bankLimit));
-            }catch (NumberFormatException ignored){}
-        }
+        if(bankLimit != null && !bankLimit.isEmpty())
+            parseNumbersSafe(() -> this.bankLimit.set(new BigDecimal(bankLimit)));
 
         String blockCounts = resultSet.getString("blockCounts");
 
@@ -2980,6 +2977,18 @@ public final class SIsland implements Island {
 
         this.lastInterest.set(lastInterest);
         islandDataHandler.saveLastInterestTime();
+    }
+
+    private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
+        try{
+            code.run();
+        }catch (NumberFormatException ignored){}
+    }
+
+    private interface SafeRunnable{
+
+        void run() throws SQLException;
+
     }
 
 }
