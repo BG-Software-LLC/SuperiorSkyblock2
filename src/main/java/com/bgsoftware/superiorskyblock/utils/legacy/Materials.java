@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.legacy;
 
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,11 +28,7 @@ public enum Materials {
 
     public Material toBukkitType(){
         try {
-            try {
-                return Material.valueOf(bukkitType);
-            } catch (IllegalArgumentException ex) {
-                return Material.valueOf(name());
-            }
+            return Material.valueOf(ServerVersion.isLegacy() ? bukkitType : name());
         }catch(Exception ex){
             throw new IllegalArgumentException("Couldn't cast " + name() + " into a bukkit enum. Contact Ome_R!");
         }
@@ -42,7 +39,7 @@ public enum Materials {
     }
 
     public ItemStack toBukkitItem(int amount){
-        return bukkitData == 0 ? new ItemStack(toBukkitType(), amount) : new ItemStack(toBukkitType(), amount, bukkitData);
+        return ServerVersion.isLegacy() ? new ItemStack(toBukkitType(), amount, bukkitData) : new ItemStack(toBukkitType(), amount);
     }
 
 }
