@@ -115,8 +115,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                             lore.add(line
                                     .replace("{0}", island.getOwner().getName())
                                     .replace("{1}", String.valueOf(place))
-                                    .replace("{2}", island.getIslandLevel().toString())
-                                    .replace("{3}", island.getWorth().toString())
+                                    .replace("{2}", StringUtils.format(island.getIslandLevel()))
+                                    .replace("{3}", StringUtils.format(island.getWorth()))
                                     .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
                                     .replace("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
                                     .replace("{7}", StringUtils.format(island.getTotalRating()))
