@@ -419,7 +419,10 @@ public final class CustomEventsListener implements Listener {
         toIsland.applyEffects(superiorPlayer);
 
         if(superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()){
-            Executor.sync(() -> toIsland.updateIslandFly(superiorPlayer), 5L);
+            Executor.sync(() -> {
+                if(player.isOnline())
+                    toIsland.updateIslandFly(superiorPlayer);
+            }, 5L);
         }
 
         Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
