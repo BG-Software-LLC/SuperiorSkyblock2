@@ -49,6 +49,12 @@ items:
   '$':
     type: BLACK_STAINED_GLASS_PANE
     name: '&f'
+  '!':
+    type: CLOCK
+    name: '&6Sort by creation time'
+  '-':
+    type: EMERALD
+    name: '&6Sort by money'
 
 sounds:
   '@':

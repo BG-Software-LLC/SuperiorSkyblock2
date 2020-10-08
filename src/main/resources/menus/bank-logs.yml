@@ -50,6 +50,12 @@ items:
     type: STAINED_GLASS_PANE
     data: 15
     name: '&f'
+  '!':
+    type: WATCH
+    name: '&6Sort by creation time'
+  '-':
+    type: EMERALD
+    name: '&6Sort by money'
 
 sounds:
   '@':
