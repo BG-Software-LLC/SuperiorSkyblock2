@@ -80,6 +80,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -98,6 +99,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
+    private static final ReflectField<Collection[]> ENTITY_SLICE_ARRAY = new ReflectField<>(Chunk.class, null, "entitySlices");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -438,11 +440,16 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
             Arrays.fill(chunk.getSections(), Chunk.a);
+
+
             try {
-                //noinspection SuspiciousArrayMethodCall
                 Arrays.fill(chunk.entitySlices, new UnsafeList<>());
             }catch (Throwable ex){
-                Arrays.fill(chunk.entitySlices, new net.minecraft.server.v1_16_R2.EntitySlice<>(Entity.class));
+                try{
+                    Arrays.fill(ENTITY_SLICE_ARRAY.get(chunk), new net.minecraft.server.v1_16_R2.EntitySlice<>(Entity.class));
+                }catch (Exception ex2){
+                    ex2.printStackTrace();
+                }
             }
 
             new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);

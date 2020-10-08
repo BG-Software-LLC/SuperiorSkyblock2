@@ -52,7 +52,7 @@ public final class ReflectField<T> {
             try {
                 for (String fieldName : fieldNames) {
                     field = clazz.getDeclaredField(fieldName);
-                    if (returnType.isAssignableFrom(field.getType())) {
+                    if (returnType == null || returnType.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         break;
                     }
