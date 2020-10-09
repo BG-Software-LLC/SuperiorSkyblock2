@@ -11,6 +11,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege ALL = IslandPrivilege.getByName("ALL");
     public static IslandPrivilege ANIMAL_BREED = IslandPrivilege.getByName("ANIMAL_BREED");
     public static IslandPrivilege ANIMAL_DAMAGE = IslandPrivilege.getByName("ANIMAL_DAMAGE");
+    public static IslandPrivilege ANIMAL_SHEAR = IslandPrivilege.getByName("ANIMAL_SHEAR");
     public static IslandPrivilege ANIMAL_SPAWN = IslandPrivilege.getByName("ANIMAL_SPAWN");
     public static IslandPrivilege BAN_MEMBER = IslandPrivilege.getByName("BAN_MEMBER");
     public static IslandPrivilege BREAK = IslandPrivilege.getByName("BREAK");

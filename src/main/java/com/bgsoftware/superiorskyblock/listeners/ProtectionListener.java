@@ -58,6 +58,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -767,6 +768,17 @@ public final class ProtectionListener implements Listener {
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
 
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEntityShearing(PlayerShearEntityEvent e){
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.ANIMAL_SHEAR)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
     }
 
     private static UUID getPlayerWhoDropped(Item item){

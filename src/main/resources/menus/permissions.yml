@@ -142,6 +142,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  animal_shear:
+    display-menu: true
+    permission-enabled:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: SHEARS
+      name: '&6Animal Shear'
+      lore:
+        - '&7Access to shear animals inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   animal_spawn:
     display-menu: true
     permission-enabled:
