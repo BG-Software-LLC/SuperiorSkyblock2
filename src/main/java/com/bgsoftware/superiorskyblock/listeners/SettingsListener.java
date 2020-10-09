@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

@@ -26,7 +26,7 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.wrappers.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;

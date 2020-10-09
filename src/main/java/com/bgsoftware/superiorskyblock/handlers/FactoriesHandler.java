@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.wrappers.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import org.bukkit.Location;
 
 import java.sql.ResultSet;

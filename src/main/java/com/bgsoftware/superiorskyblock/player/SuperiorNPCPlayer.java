@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.wrappers.player;
+package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
