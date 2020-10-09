@@ -108,6 +108,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.userLocale = LocaleUtils.getDefault();
     }
 
+    /*
+     *   General Methods
+     */
+
     @Override
     public UUID getUniqueId(){
         return uuid;
@@ -130,6 +134,21 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         playerDataHandler.saveTextureValue();
     }
 
+
+    @Override
+    public void updateLastTimeStatus() {
+        lastTimeStatus = System.currentTimeMillis() / 1000;
+
+        SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
+
+        playerDataHandler.saveLastTimeStatus();
+    }
+
+    @Override
+    public long getLastTimeStatus() {
+        return lastTimeStatus;
+    }
+
     @Override
     public void updateName(){
         this.name = asPlayer().getName();
@@ -137,22 +156,47 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public java.util.Locale getUserLocale() {
-        if(userLocale == null)
-            userLocale = LocaleUtils.getDefault();
-        return userLocale;
+    public Player asPlayer(){
+        return Bukkit.getPlayer(uuid);
     }
 
     @Override
-    public void setUserLocale(java.util.Locale userLocale) {
-        Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
-
-        SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
-
-        this.userLocale = userLocale;
-
-        playerDataHandler.saveUserLocale();
+    public OfflinePlayer asOfflinePlayer(){
+        return Bukkit.getOfflinePlayer(uuid);
     }
+
+    @Override
+    public boolean isOnline(){
+        OfflinePlayer offlinePlayer = asOfflinePlayer();
+        return offlinePlayer != null && offlinePlayer.isOnline();
+    }
+
+    @Override
+    public boolean hasFlyGamemode() {
+        Player player = asPlayer();
+        return player != null && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
+    }
+
+    @Override
+    public boolean hasPermission(String permission){
+        return permission.isEmpty() || asPlayer().hasPermission(permission);
+    }
+
+    @Override
+    public boolean hasPermissionWithoutOP(String permission) {
+        Player player = asPlayer();
+        return player != null && plugin.getProviders().hasPermission(player, permission);
+    }
+
+    @Override
+    public boolean hasPermission(IslandPrivilege permission){
+        Island island = getIsland();
+        return island != null && island.hasPermission(this, permission);
+    }
+
+    /*
+     *   Location Methods
+     */
 
     @Override
     public World getWorld(){
@@ -291,6 +335,15 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isInsideIsland() {
+        return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
+    }
+
+    /*
+     *   Island Methods
+     */
+
+    @Override
     public UUID getTeamLeader() {
         return getIslandLeader().getUniqueId();
     }
@@ -338,6 +391,45 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public int getDisbands() {
+        return disbands;
+    }
+
+    @Override
+    public boolean hasDisbands() {
+        return disbands > 0;
+    }
+
+    @Override
+    public void setDisbands(int disbands) {
+        SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
+        this.disbands = Math.max(disbands, 0);
+        playerDataHandler.saveDisbands();
+    }
+
+    /*
+     *   Preferences Methods
+     */
+
+    @Override
+    public java.util.Locale getUserLocale() {
+        if(userLocale == null)
+            userLocale = LocaleUtils.getDefault();
+        return userLocale;
+    }
+
+    @Override
+    public void setUserLocale(java.util.Locale userLocale) {
+        Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
+
+        SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
+
+        this.userLocale = userLocale;
+
+        playerDataHandler.saveUserLocale();
+    }
+
+    @Override
     public boolean hasWorldBorderEnabled() {
         return worldBorderEnabled;
     }
@@ -377,9 +469,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void toggleBypassMode(){
-        bypassModeEnabled = !bypassModeEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
+    public void toggleTeamChat() {
+        teamChatEnabled = !teamChatEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
     }
 
     @Override
@@ -391,26 +483,14 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void toggleTeamChat() {
-        teamChatEnabled = !teamChatEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
+    public void toggleBypassMode(){
+        bypassModeEnabled = !bypassModeEnabled;
+        SuperiorSkyblockPlugin.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
     }
 
     @Override
-    public boolean hasDisbands() {
-        return disbands > 0;
-    }
-
-    @Override
-    public int getDisbands() {
-        return disbands;
-    }
-
-    @Override
-    public void setDisbands(int disbands) {
-        SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
-        this.disbands = Math.max(disbands, 0);
-        playerDataHandler.saveDisbands();
+    public boolean hasToggledPanel() {
+        return toggledPanel;
     }
 
     @Override
@@ -418,11 +498,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.toggledPanel = toggledPanel;
         SuperiorSkyblockPlugin.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
         playerDataHandler.saveToggledPanel();
-    }
-
-    @Override
-    public boolean hasToggledPanel() {
-        return toggledPanel;
     }
 
     @Override
@@ -459,11 +534,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean isInsideIsland() {
-        return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
-    }
-
-    @Override
     public BorderColor getBorderColor() {
         return borderColor;
     }
@@ -475,19 +545,35 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         playerDataHandler.saveBorderColor();
     }
 
+    /*
+     *   Schematics Methods
+     */
+
     @Override
-    public void updateLastTimeStatus() {
-        lastTimeStatus = System.currentTimeMillis() / 1000;
-
-        SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
-
-        playerDataHandler.saveLastTimeStatus();
+    public BlockPosition getSchematicPos1() {
+        return schematicPos1;
     }
 
     @Override
-    public long getLastTimeStatus() {
-        return lastTimeStatus;
+    public void setSchematicPos1(Block block) {
+        this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
+        SuperiorSkyblockPlugin.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
     }
+
+    @Override
+    public SBlockPosition getSchematicPos2() {
+        return schematicPos2;
+    }
+
+    @Override
+    public void setSchematicPos2(Block block) {
+        this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
+        SuperiorSkyblockPlugin.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
+    }
+
+    /*
+     *   Missions Methods
+     */
 
     @Override
     public void completeMission(Mission<?> mission) {
@@ -538,66 +624,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         return Collections.unmodifiableMap(completedMissions.toMap());
     }
 
-    @Override
-    public BlockPosition getSchematicPos1() {
-        return schematicPos1;
-    }
-
-    @Override
-    public void setSchematicPos1(Block block) {
-        this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
-        SuperiorSkyblockPlugin.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
-    }
-
-    @Override
-    public SBlockPosition getSchematicPos2() {
-        return schematicPos2;
-    }
-
-    @Override
-    public void setSchematicPos2(Block block) {
-        this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
-        SuperiorSkyblockPlugin.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
-    }
-
-    @Override
-    public Player asPlayer(){
-        return Bukkit.getPlayer(uuid);
-    }
-
-    @Override
-    public OfflinePlayer asOfflinePlayer(){
-        return Bukkit.getOfflinePlayer(uuid);
-    }
-
-    @Override
-    public boolean isOnline(){
-        OfflinePlayer offlinePlayer = asOfflinePlayer();
-        return offlinePlayer != null && offlinePlayer.isOnline();
-    }
-
-    @Override
-    public boolean hasPermission(String permission){
-        return permission.isEmpty() || asPlayer().hasPermission(permission);
-    }
-
-    @Override
-    public boolean hasPermissionWithoutOP(String permission) {
-        Player player = asPlayer();
-        return player != null && plugin.getProviders().hasPermission(player, permission);
-    }
-
-    @Override
-    public boolean hasPermission(IslandPrivilege permission){
-        Island island = getIsland();
-        return island != null && island.hasPermission(this, permission);
-    }
-
-    @Override
-    public boolean hasFlyGamemode() {
-        Player player = asPlayer();
-        return player != null && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
-    }
+    /*
+     *   Data Methods
+     */
 
     @Override
     public void merge(SuperiorPlayer other){
@@ -623,6 +652,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public PlayerDataHandler getDataHandler() {
         return playerDataHandler;
     }
+
+    /*
+     *   Other Methods
+     */
 
     @Override
     public String toString() {

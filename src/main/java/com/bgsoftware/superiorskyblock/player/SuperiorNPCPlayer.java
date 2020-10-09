@@ -54,18 +54,53 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void updateLastTimeStatus() {
+
+    }
+
+    @Override
+    public long getLastTimeStatus() {
+        return System.currentTimeMillis() / 1000;
+    }
+
+    @Override
     public void updateName() {
 
     }
 
     @Override
-    public Locale getUserLocale() {
-        return com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
+    public Player asPlayer() {
+        return null;
     }
 
     @Override
-    public void setUserLocale(Locale locale) {
+    public OfflinePlayer asOfflinePlayer() {
+        return null;
+    }
 
+    @Override
+    public boolean isOnline() {
+        return false;
+    }
+
+    @Override
+    public boolean hasFlyGamemode() {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermissionWithoutOP(String permission) {
+        return false;
+    }
+
+    @Override
+    public boolean hasPermission(IslandPrivilege permission) {
+        return false;
     }
 
     @Override
@@ -99,6 +134,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isInsideIsland() {
+        return false;
+    }
+
+    @Override
     public UUID getTeamLeader() {
         return npc.getUniqueId();
     }
@@ -107,6 +147,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     public SuperiorPlayer getIslandLeader() {
         return this;
     }
+
 
     @Override
     public void setTeamLeader(UUID teamLeader) {
@@ -130,6 +171,31 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
+
+    }
+
+    @Override
+    public int getDisbands() {
+        return 0;
+    }
+
+    @Override
+    public boolean hasDisbands() {
+        return false;
+    }
+
+    @Override
+    public void setDisbands(int disbands) {
+
+    }
+
+    @Override
+    public Locale getUserLocale() {
+        return com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
+    }
+
+    @Override
+    public void setUserLocale(Locale locale) {
 
     }
 
@@ -169,7 +235,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void toggleBypassMode() {
+    public void toggleTeamChat() {
 
     }
 
@@ -179,88 +245,18 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void toggleTeamChat() {
-
-    }
-
-    @Override
-    public BlockPosition getSchematicPos1() {
-        return null;
-    }
-
-    @Override
-    public void setSchematicPos1(Block block) {
-
-    }
-
-    @Override
-    public BlockPosition getSchematicPos2() {
-        return null;
-    }
-
-    @Override
-    public void setSchematicPos2(Block block) {
-
-    }
-
-    @Override
-    public Player asPlayer() {
-        return null;
-    }
-
-    @Override
-    public OfflinePlayer asOfflinePlayer() {
-        return null;
-    }
-
-    @Override
-    public boolean isOnline() {
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(String permission) {
-        return false;
-    }
-
-    @Override
-    public boolean hasPermissionWithoutOP(String permission) {
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(IslandPrivilege permission) {
-        return false;
-    }
-
-    @Override
-    public boolean hasFlyGamemode() {
-        return false;
-    }
-
-    @Override
-    public int getDisbands() {
-        return 0;
-    }
-
-    @Override
-    public boolean hasDisbands() {
-        return false;
-    }
-
-    @Override
-    public void setDisbands(int disbands) {
-
-    }
-
-    @Override
-    public void setToggledPanel(boolean toggledPanel) {
+    public void toggleBypassMode() {
 
     }
 
     @Override
     public boolean hasToggledPanel() {
         return false;
+    }
+
+    @Override
+    public void setToggledPanel(boolean toggledPanel) {
+
     }
 
     @Override
@@ -284,11 +280,6 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public boolean isInsideIsland() {
-        return false;
-    }
-
-    @Override
     public BorderColor getBorderColor() {
         return BorderColor.BLUE;
     }
@@ -299,13 +290,23 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void updateLastTimeStatus() {
+    public BlockPosition getSchematicPos1() {
+        return null;
+    }
+
+    @Override
+    public void setSchematicPos1(Block block) {
 
     }
 
     @Override
-    public long getLastTimeStatus() {
-        return System.currentTimeMillis() / 1000;
+    public BlockPosition getSchematicPos2() {
+        return null;
+    }
+
+    @Override
+    public void setSchematicPos2(Block block) {
+
     }
 
     @Override

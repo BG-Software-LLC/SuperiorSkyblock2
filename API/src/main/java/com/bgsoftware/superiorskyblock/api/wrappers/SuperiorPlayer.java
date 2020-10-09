@@ -20,6 +20,10 @@ import java.util.function.Consumer;
 
 public interface SuperiorPlayer {
 
+    /*
+     *   General Methods
+     */
+
     /**
      * Get the UUID of the player.
      */
@@ -42,20 +46,58 @@ public interface SuperiorPlayer {
     void setTextureValue(String textureValue);
 
     /**
+     * Update the last time player joined or left the server.
+     */
+    void updateLastTimeStatus();
+
+    /**
+     * Get the last time player joined or left the server.
+     */
+    long getLastTimeStatus();
+
+    /**
      * Update the cached name with the current player's name.
      */
     void updateName();
 
     /**
-     * Get the locale of the player.
+     * Get the player object.
      */
-    Locale getUserLocale();
+    Player asPlayer();
 
     /**
-     * Set the locale of the player.
-     * @param locale The locale to set.
+     * Get the offline-player object.
      */
-    void setUserLocale(Locale locale);
+    OfflinePlayer asOfflinePlayer();
+
+    /**
+     * Check whether or not the player is online.
+     */
+    boolean isOnline();
+
+    /**
+     * Check whether or not this player is in a gamemode with fly mode enabled.
+     */
+    boolean hasFlyGamemode();
+
+    /**
+     * Check whether or not the player has a permission.
+     */
+    boolean hasPermission(String permission);
+
+    /**
+     * Check whether or not the player has a permission without having op.
+     */
+    boolean hasPermissionWithoutOP(String permission);
+
+    /**
+     * Check whether or not the player has a permission on his island.
+     */
+    boolean hasPermission(IslandPrivilege permission);
+
+    /*
+     *   Location Methods
+     */
 
     /**
      * Get the world that the player is inside.
@@ -92,6 +134,15 @@ public interface SuperiorPlayer {
      * @param result Consumer that will be ran when task is finished.
      */
     void teleport(Island island, Consumer<Boolean> result);
+
+    /**
+     * Check whether or not the player is inside their island.
+     */
+    boolean isInsideIsland();
+
+    /*
+     *   Island Methods
+     */
 
     /**
      * Get the island owner of the player's island.
@@ -140,6 +191,36 @@ public interface SuperiorPlayer {
     void setPlayerRole(PlayerRole playerRole);
 
     /**
+     * Get the amount of left disbands.
+     */
+    int getDisbands();
+
+    /**
+     * Check whether or not the player has more disbands.
+     */
+    boolean hasDisbands();
+
+    /**
+     * Check whether or not the player has a permission.
+     */
+    void setDisbands(int disbands);
+
+    /*
+     *   Preferences Methods
+     */
+
+    /**
+     * Get the locale of the player.
+     */
+    Locale getUserLocale();
+
+    /**
+     * Set the locale of the player.
+     * @param locale The locale to set.
+     */
+    void setUserLocale(Locale locale);
+
+    /**
      * Check whether or not the world border is enabled for the player.
      */
     boolean hasWorldBorderEnabled();
@@ -175,9 +256,9 @@ public interface SuperiorPlayer {
     boolean hasTeamChatEnabled();
 
     /**
-     * Toggle the bypass mode for the player.
+     * Toggle the team chat for the player.
      */
-    void toggleBypassMode();
+    void toggleTeamChat();
 
     /**
      * Check whether or not the bypass mode is enabled for the player.
@@ -185,9 +266,54 @@ public interface SuperiorPlayer {
     boolean hasBypassModeEnabled();
 
     /**
-     * Toggle the team chat for the player.
+     * Toggle the bypass mode for the player.
      */
-    void toggleTeamChat();
+    void toggleBypassMode();
+
+    /**
+     * Check whether or not the player has their panel toggled.
+     */
+    boolean hasToggledPanel();
+
+    /**
+     * Set whether or not the player has their panel toggled.
+     */
+    void setToggledPanel(boolean toggledPanel);
+
+    /**
+     * Set whether or not the player has flying enabled.
+     */
+    boolean hasIslandFlyEnabled();
+
+    /**
+     * Toggle flying mode.
+     */
+    void toggleIslandFly();
+
+    /**
+     * Check whether or not the player has admin spy mode enabled.
+     */
+    boolean hasAdminSpyEnabled();
+
+    /**
+     * Toggle admin spy mode.
+     */
+    void toggleAdminSpy();
+
+    /**
+     * Get the border color of the player.
+     */
+    BorderColor getBorderColor();
+
+    /**
+     * Set the border color for the player.
+     * @param borderColor The color to set.
+     */
+    void setBorderColor(BorderColor borderColor);
+
+    /*
+     *   Schematics Methods
+     */
 
     /**
      * Get the first schematic position of the player. May be null.
@@ -211,111 +337,9 @@ public interface SuperiorPlayer {
      */
     void setSchematicPos2(Block block);
 
-    /**
-     * Get the player object.
+    /*
+     *   Missions Methods
      */
-    Player asPlayer();
-
-    /**
-     * Get the offline-player object.
-     */
-    OfflinePlayer asOfflinePlayer();
-
-    /**
-     * Check whether or not the player is online.
-     */
-    boolean isOnline();
-
-    /**
-     * Check whether or not the player has a permission.
-     */
-    boolean hasPermission(String permission);
-
-    /**
-     * Check whether or not the player has a permission without having op.
-     */
-    boolean hasPermissionWithoutOP(String permission);
-
-    /**
-     * Check whether or not the player has a permission on his island.
-     */
-    boolean hasPermission(IslandPrivilege permission);
-
-    /**
-     * Check whether or not this player is in a gamemode with fly mode enabled.
-     */
-    boolean hasFlyGamemode();
-
-    /**
-     * Get the amount of left disbands.
-     */
-    int getDisbands();
-
-    /**
-     * Check whether or not the player has more disbands.
-     */
-    boolean hasDisbands();
-
-    /**
-     * Check whether or not the player has a permission.
-     */
-    void setDisbands(int disbands);
-
-    /**
-     * Set whether or not the player has their panel toggled.
-     */
-    void setToggledPanel(boolean toggledPanel);
-
-    /**
-     * Check whether or not the player has their panel toggled.
-     */
-    boolean hasToggledPanel();
-
-    /**
-     * Set whether or not the player has flying enabled.
-     */
-    boolean hasIslandFlyEnabled();
-
-    /**
-     * Toggle flying mode.
-     */
-    void toggleIslandFly();
-
-    /**
-     * Check whether or not the player has admin spy mode enabled.
-     */
-    boolean hasAdminSpyEnabled();
-
-    /**
-     * Toggle admin spy mode.
-     */
-    void toggleAdminSpy();
-
-    /**
-     * Check whether or not the player is inside their island.
-     */
-    boolean isInsideIsland();
-
-    /**
-     * Get the border color of the player.
-     */
-    BorderColor getBorderColor();
-
-    /**
-     * Set the border color for the player.
-     * @param borderColor The color to set.
-     */
-    void setBorderColor(BorderColor borderColor);
-
-    /**
-     * Update the last time player joined or left the server.
-     */
-    void updateLastTimeStatus();
-
-    /**
-     * Get the last time player joined or left the server.
-     */
-    long getLastTimeStatus();
 
     /**
      * Complete a mission.
@@ -356,6 +380,10 @@ public interface SuperiorPlayer {
      * Get all the completed missions with the amount of times they were completed.
      */
     Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
+
+    /*
+     *   Data Methods
+     */
 
     /**
      * Merge another player into this object.
