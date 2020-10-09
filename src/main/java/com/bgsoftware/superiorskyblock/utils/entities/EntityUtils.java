@@ -10,6 +10,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Flying;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.LivingEntity;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.AbstractHorseInventory;
@@ -133,14 +135,11 @@ public final class EntityUtils {
     }
 
     public static boolean isMonster(EntityType entityType){
-        switch (entityType.name()){
-            case "SLIME":
-            case "MAGMA_CUBE":
-            case "PHANTOM":
-                return true;
-            default:
-                return Monster.class.isAssignableFrom(entityType.getEntityClass());
-        }
+        return Monster.class.isAssignableFrom(entityType.getEntityClass()) ||
+                // Checks for slimes & magma cubes
+                Slime.class.isAssignableFrom(entityType.getEntityClass()) ||
+                // Checks for ghasts and phantoms
+                Flying.class.isAssignableFrom(entityType.getEntityClass());
     }
 
     public static boolean isAnimal(EntityType entityType){
