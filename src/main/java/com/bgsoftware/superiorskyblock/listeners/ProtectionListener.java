@@ -20,6 +20,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
@@ -551,6 +552,9 @@ public final class ProtectionListener implements Listener {
         if(island != null && !island.hasPermission(damagerPlayer, islandPermission)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(damagerPlayer);
+
+            if(e.getDamager() instanceof Arrow && e.getEntity().getFireTicks() > 0)
+                e.getEntity().setFireTicks(0);
         }
     }
 
