@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.wrappers;
 
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -94,6 +95,21 @@ public interface SuperiorPlayer {
      * Check whether or not the player has a permission on his island.
      */
     boolean hasPermission(IslandPrivilege permission);
+
+    /**
+     * Check whether or not this player can hit another player.
+     *
+     * Players cannot hit each other if one of the followings is true:
+     * 1) They are inside an island that has pvp disabled.
+     * 2) One of them has pvp warm-up.
+     * 3) They are both in the same island, and they hit each other outside of a pvp world.
+     * 4) One of the players isn't online (duh?)
+     * 5) The target player is inside an island as a visitor and can't take damage.
+     * 6) The target player is inside an island as a coop and can't take damage.
+     *
+     * @param other The other player to check.
+     */
+    HitActionResult canHit(SuperiorPlayer other);
 
     /*
      *   Location Methods

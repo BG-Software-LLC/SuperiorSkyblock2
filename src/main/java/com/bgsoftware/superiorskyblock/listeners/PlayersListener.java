@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
@@ -38,12 +38,14 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
@@ -279,28 +281,51 @@ public final class PlayersListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onVisitorDamage(EntityDamageEvent e){
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onPlayerAttack(EntityDamageByEntityEvent e){
         if(!(e.getEntity() instanceof Player))
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
+        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
 
-        if(superiorPlayer instanceof SuperiorNPCPlayer)
+        if(targetPlayer instanceof SuperiorNPCPlayer)
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(EntityUtils.isPlayerDamager(e)){
-            if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToPvP())
-                e.setCancelled(true);
+        SuperiorPlayer damagerPlayer = EntityUtils.getPlayerDamager(e);
+
+        if(damagerPlayer == null)
             return;
+
+        boolean cancelFlames = false, cancelEvent = false;
+        Locale messageToSend = null;
+
+        HitActionResult hitActionResult = damagerPlayer.canHit(targetPlayer);
+
+        switch (hitActionResult){
+            case ISLAND_TEAM_PVP:
+                messageToSend = Locale.HIT_ISLAND_MEMBER;
+                break;
+            case ISLAND_PVP_DISABLE:
+            case TARGET_ISLAND_PVP_DISABLE:
+                messageToSend = Locale.HIT_PLAYER_IN_ISLAND;
+                break;
         }
 
-        if(island != null && (!(island instanceof SpawnIsland) || plugin.getSettings().spawnProtection) &&
-                island.isVisitor(superiorPlayer, !plugin.getSettings().coopDamage) && !plugin.getSettings().visitorsDamage) {
-            e.setCancelled(true);
+        if(hitActionResult != HitActionResult.SUCCESS) {
+            cancelFlames = true;
+            cancelEvent = true;
         }
+
+        if(cancelEvent)
+            e.setCancelled(true);
+
+        if(messageToSend != null)
+            messageToSend.send(damagerPlayer);
+
+        if(cancelFlames && e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
+            targetPlayer.asPlayer().setFireTicks(0);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

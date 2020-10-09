@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -101,6 +102,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public boolean hasPermission(IslandPrivilege permission) {
         return false;
+    }
+
+    @Override
+    public HitActionResult canHit(SuperiorPlayer other) {
+        return HitActionResult.NOT_ONLINE;
     }
 
     @Override

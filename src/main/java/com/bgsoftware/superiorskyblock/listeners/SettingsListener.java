@@ -1,24 +1,20 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
@@ -38,7 +34,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
 
 @SuppressWarnings("unused")
 public final class SettingsListener implements Listener {
@@ -183,54 +178,6 @@ public final class SettingsListener implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerAttack(EntityDamageByEntityEvent e){
-        if(!(e.getEntity() instanceof Player))
-            return;
-
-        SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity());
-
-        if(targetPlayer instanceof SuperiorNPCPlayer)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-        SuperiorPlayer damagerPlayer;
-
-        if(e.getDamager() instanceof Player){
-            damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getDamager());
-        }
-
-        else if(e.getDamager() instanceof Projectile){
-            ProjectileSource shooter = ((Projectile) e.getDamager()).getShooter();
-            if(shooter instanceof Player)
-                damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) ((Projectile) e.getDamager()).getShooter());
-            else return;
-        }
-
-        else return;
-
-        boolean cancelFlames = false;
-
-        if(!damagerPlayer.equals(targetPlayer) && damagerPlayer.getIslandLeader().equals(targetPlayer.getIslandLeader()) &&
-                !plugin.getSettings().pvpWorlds.contains(targetPlayer.getWorld().getName())){
-            e.setCancelled(true);
-            Locale.HIT_ISLAND_MEMBER.send(damagerPlayer);
-            cancelFlames = true;
-        }
-
-        else if (!damagerPlayer.equals(targetPlayer) && island != null && (plugin.getSettings().spawnProtection || !island.isSpawn()) &&
-                !island.hasSettingsEnabled(IslandFlags.PVP)) {
-            e.setCancelled(true);
-            Locale.HIT_PLAYER_IN_ISLAND.send(damagerPlayer);
-            cancelFlames = true;
-        }
-
-        //Disable flame
-        if(cancelFlames && e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
-            targetPlayer.asPlayer().setFireTicks(0);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -18,6 +19,7 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -52,7 +54,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Registry<Mission<?>, Integer> completedMissions = Registry.createRegistry();
-    private final PlayerDataHandler playerDataHandler = new SPlayerDataHandler(this);
+    private final SPlayerDataHandler playerDataHandler = new SPlayerDataHandler(this);
     private final UUID uuid;
 
     private UUID islandLeaderFromCache;
@@ -192,6 +194,63 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermission(IslandPrivilege permission){
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
+    }
+
+    private static HitActionResult checkPvPAllow(SuperiorPlayer player, boolean target){
+        // Checks for online status
+        if(!player.isOnline())
+            return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
+
+        // Checks for pvp warm-up
+        if(((SPlayerDataHandler) player.getDataHandler()).isImmunedToPvP())
+            return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
+
+        Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
+
+        if(standingIsland != null && (plugin.getSettings().spawnProtection || !standingIsland.isSpawn())){
+            // Checks for pvp status
+            if(!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
+                return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
+
+            // Checks for coop damage
+            if(standingIsland.isCoop(player) && !plugin.getSettings().coopDamage)
+                return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
+
+            // Checks for visitors damage
+            if(standingIsland.isVisitor(player, false) && !plugin.getSettings().visitorsDamage)
+                return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
+        }
+
+        return HitActionResult.SUCCESS;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public HitActionResult canHit(SuperiorPlayer other) {
+        // Players can hit themselves
+        if(equals(other))
+            return HitActionResult.SUCCESS;
+
+        // Checks for island teammates pvp
+        if(getIslandLeader().equals(other.getIslandLeader()) &&
+                !plugin.getSettings().pvpWorlds.contains(getWorld().getName()))
+            return HitActionResult.ISLAND_TEAM_PVP;
+
+        // Checks if this player can bypass all pvp restrictions
+        {
+            HitActionResult selfResult = checkPvPAllow(this, false);
+            if (selfResult != HitActionResult.SUCCESS)
+                return selfResult;
+        }
+
+        // Checks if target player can bypass all pvp restrictions
+        {
+            HitActionResult targetResult = checkPvPAllow(other, true);
+            if (targetResult != HitActionResult.SUCCESS)
+                return targetResult;
+        }
+
+        return HitActionResult.SUCCESS;
     }
 
     /*

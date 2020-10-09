@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.entities;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
@@ -104,6 +105,19 @@ public final class EntityUtils {
         }
 
         return false;
+    }
+
+    public static SuperiorPlayer getPlayerDamager(EntityDamageByEntityEvent event){
+        if(event.getDamager() instanceof Projectile){
+            ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();
+            if(shooter instanceof Player)
+                return plugin.getPlayers().getSuperiorPlayer((Player) shooter);
+        }
+        else if(event.getDamager() instanceof Player){
+            return plugin.getPlayers().getSuperiorPlayer((Player) event.getDamager());
+        }
+
+        return null;
     }
 
     public static Key getLimitEntityType(Entity entity){
