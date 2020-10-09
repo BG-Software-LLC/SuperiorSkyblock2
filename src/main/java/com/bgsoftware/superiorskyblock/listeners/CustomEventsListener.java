@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -31,7 +32,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -68,15 +68,9 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameBreak(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof ItemFrame) {
-            Player shooter;
+            SuperiorPlayer damager = EntityUtils.getPlayerDamager(e);
 
-            if(e.getDamager() instanceof Player)
-                shooter = (Player) e.getDamager();
-            else if(e.getDamager() instanceof Projectile && ((Projectile) e.getDamager()).getShooter() instanceof Player)
-                shooter = (Player) ((Projectile) e.getDamager()).getShooter();
-            else return;
-
-            if(!ProtectionListener.IMP.onItemFrameBreak(shooter, (ItemFrame) e.getEntity()))
+            if(damager != null && !ProtectionListener.IMP.onItemFrameBreak(damager, (ItemFrame) e.getEntity()))
                 e.setCancelled(true);
         }
     }

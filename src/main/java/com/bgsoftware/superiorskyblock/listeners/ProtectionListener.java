@@ -29,7 +29,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -292,12 +291,11 @@ public final class ProtectionListener implements Listener {
         return true;
     }
 
-    public boolean onItemFrameBreak(Player player, ItemFrame itemFrame){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+    public boolean onItemFrameBreak(SuperiorPlayer superiorPlayer, ItemFrame itemFrame){
         Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
 
         if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
                 Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 return false;
             }
@@ -306,7 +304,7 @@ public final class ProtectionListener implements Listener {
         }
 
         if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
-            Locale.sendProtectionMessage(player);
+            Locale.sendProtectionMessage(superiorPlayer);
             return false;
         }
 
@@ -528,21 +526,11 @@ public final class ProtectionListener implements Listener {
         if(e.getEntity() instanceof Painting || e.getEntity() instanceof ItemFrame || e.getEntity() instanceof Player)
             return;
 
-        Player damager = null;
+        SuperiorPlayer damagerPlayer = EntityUtils.getPlayerDamager(e);
 
-        if(e.getDamager() instanceof Player){
-            damager = (Player) e.getDamager();
-        }
-        else if(e.getDamager() instanceof Projectile){
-            Projectile projectile = (Projectile) e.getDamager();
-            if(projectile.getShooter() instanceof Player)
-                damager = (Player) projectile.getShooter();
-        }
-
-        if(damager == null)
+        if(damagerPlayer == null)
             return;
 
-        SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer(damager);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         IslandPrivilege islandPermission = EntityUtils.isMonster(e.getEntityType()) ?

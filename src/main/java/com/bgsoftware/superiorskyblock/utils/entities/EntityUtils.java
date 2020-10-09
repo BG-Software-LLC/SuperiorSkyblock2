@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
@@ -90,21 +89,6 @@ public final class EntityUtils {
 
     public static void clearEntityEquipment(LivingEntity livingEntity){
         entityContent.remove(livingEntity.getUniqueId());
-    }
-
-    public static boolean isPlayerDamager(EntityDamageEvent e){
-        if(e instanceof EntityDamageByEntityEvent){
-            EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) e;
-            if(event.getDamager() instanceof Projectile){
-                ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();
-                return shooter instanceof Player;
-            }
-            else {
-                return event.getDamager() instanceof Player;
-            }
-        }
-
-        return false;
     }
 
     public static SuperiorPlayer getPlayerDamager(EntityDamageByEntityEvent event){
