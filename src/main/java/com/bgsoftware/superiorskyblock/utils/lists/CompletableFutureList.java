@@ -17,12 +17,14 @@ public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<
 
     public void forEachCompleted(Consumer<? super E> consumer, BiConsumer<CompletableFuture<E>, Throwable> onFailure){
         for(CompletableFuture<E> completableFuture : this){
-            try{
-                consumer.accept(completableFuture.get());
-            }catch (Exception ex){
-                onFailure.accept(completableFuture, ex);
-            }
+            completableFuture.whenComplete((e, ex) -> {
+                if(ex == null)
+                    consumer.accept(e);
+                else
+                    onFailure.accept(completableFuture, ex);
+            });
         }
+        CompletableFuture.allOf(toArray(new CompletableFuture[0])).join();
     }
 
 }
