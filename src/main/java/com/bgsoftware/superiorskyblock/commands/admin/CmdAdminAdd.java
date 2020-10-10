@@ -63,7 +63,7 @@ public final class CmdAdminAdd implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[1]);
+        SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
 
         if(targetPlayer == null)
             return;
