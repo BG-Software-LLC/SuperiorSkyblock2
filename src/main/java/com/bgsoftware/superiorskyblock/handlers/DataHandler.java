@@ -353,8 +353,13 @@ public final class DataHandler extends AbstractHandler {
         ((SIslandDataHandler) island.getDataHandler()).executeInsertStatement(true);
     }
 
-    public void deleteIsland(Island island){
-        Executor.async(() -> SQLHelper.executeUpdate("DELETE FROM {prefix}islands WHERE owner = '" + island.getOwner().getUniqueId() + "';"));
+    public void deleteIsland(Island island, boolean async){
+        if (async && Bukkit.isPrimaryThread()) {
+            Executor.async(() -> deleteIsland(island, false));
+            return;
+        }
+
+        SQLHelper.executeUpdate("DELETE FROM {prefix}islands WHERE owner = '" + island.getOwner().getUniqueId() + "';");
     }
 
     public void insertPlayer(SuperiorPlayer player){

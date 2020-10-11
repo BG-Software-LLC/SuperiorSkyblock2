@@ -79,6 +79,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private BigDecimal totalLevel = BigDecimal.ZERO;
     private long lastTimeLevelUpdate = 0;
 
+    private boolean pluginDisable = false;
+
     public GridHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
         stackedBlocks = new StackedBlocksHandler(plugin);
@@ -238,7 +240,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });
         islands.remove(island.getOwner().getUniqueId());
-        plugin.getDataHandler().deleteIsland(island);
+        plugin.getDataHandler().deleteIsland(island, !pluginDisable);
         ChunksTracker.removeIsland(island);
     }
 
@@ -584,6 +586,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         }
 
         return totalLevel;
+    }
+
+    public void disablePlugin(){
+        this.pluginDisable = true;
     }
 
     public void loadGrid(ResultSet resultSet) throws SQLException {

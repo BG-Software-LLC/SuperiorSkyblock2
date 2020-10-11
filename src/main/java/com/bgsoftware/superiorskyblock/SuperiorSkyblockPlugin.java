@@ -221,6 +221,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             dataHandler.saveDatabase(false);
             missionsHandler.saveMissionsData();
 
+            gridHandler.disablePlugin();
+
             for(Island island : gridHandler.getIslandsToPurge())
                 island.disbandIsland();
 
