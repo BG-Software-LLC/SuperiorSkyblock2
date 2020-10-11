@@ -175,14 +175,14 @@ public final class SIsland implements Island {
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects = SyncedObject.of(new HashMap<>());
 
-    private final SyncedObject<UpgradeValue<Integer>> islandSize = SyncedObject.of(UpgradeValue.ZERO);
-    private final SyncedObject<UpgradeValue<Integer>> warpsLimit = SyncedObject.of(UpgradeValue.ZERO);
-    private final SyncedObject<UpgradeValue<Integer>> teamLimit = SyncedObject.of(UpgradeValue.ZERO);
-    private final SyncedObject<UpgradeValue<Integer>> coopLimit = SyncedObject.of(UpgradeValue.ZERO);
-    private final SyncedObject<UpgradeValue<Double>> cropGrowth = SyncedObject.of(UpgradeValue.ZERO_DOUBLE);
-    private final SyncedObject<UpgradeValue<Double>> spawnerRates = SyncedObject.of(UpgradeValue.ZERO_DOUBLE);
-    private final SyncedObject<UpgradeValue<Double>> mobDrops = SyncedObject.of(UpgradeValue.ZERO_DOUBLE);
-    private final SyncedObject<UpgradeValue<BigDecimal>> bankLimit = SyncedObject.of(UpgradeValue.ZERO_BIG_DECIMAL);
+    private final SyncedObject<UpgradeValue<Integer>> islandSize = SyncedObject.of(UpgradeValue.NEGATIVE);
+    private final SyncedObject<UpgradeValue<Integer>> warpsLimit = SyncedObject.of(UpgradeValue.NEGATIVE);
+    private final SyncedObject<UpgradeValue<Integer>> teamLimit = SyncedObject.of(UpgradeValue.NEGATIVE);
+    private final SyncedObject<UpgradeValue<Integer>> coopLimit = SyncedObject.of(UpgradeValue.NEGATIVE);
+    private final SyncedObject<UpgradeValue<Double>> cropGrowth = SyncedObject.of(UpgradeValue.NEGATIVE_DOUBLE);
+    private final SyncedObject<UpgradeValue<Double>> spawnerRates = SyncedObject.of(UpgradeValue.NEGATIVE_DOUBLE);
+    private final SyncedObject<UpgradeValue<Double>> mobDrops = SyncedObject.of(UpgradeValue.NEGATIVE_DOUBLE);
+    private final SyncedObject<UpgradeValue<BigDecimal>> bankLimit = SyncedObject.of(new UpgradeValue<>(new BigDecimal(-2), true));
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
