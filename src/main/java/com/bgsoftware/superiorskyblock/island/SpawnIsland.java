@@ -689,6 +689,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setLastTimeUpdate(long lastTimeUpdate) {
+
+    }
+
+    @Override
     public IslandBank getIslandBank() {
         return null;
     }
