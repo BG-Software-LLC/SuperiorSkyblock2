@@ -263,8 +263,7 @@ public final class SIsland implements Island {
         this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
         this.coopLimit.set(resultSet.getInt("coopLimit"));
         String bankLimit = resultSet.getString("bankLimit");
-        if(bankLimit != null && !bankLimit.isEmpty())
-            parseNumbersSafe(() -> this.bankLimit.set(new BigDecimal(bankLimit)));
+        parseNumbersSafe(() -> this.bankLimit.set(new BigDecimal(bankLimit)));
 
         String blockCounts = resultSet.getString("blockCounts");
 
@@ -2982,7 +2981,7 @@ public final class SIsland implements Island {
     private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
         try{
             code.run();
-        }catch (NumberFormatException ignored){}
+        }catch (NumberFormatException | NullPointerException ignored){}
     }
 
     private interface SafeRunnable{
