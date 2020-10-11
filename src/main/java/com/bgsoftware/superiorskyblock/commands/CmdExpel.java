@@ -72,7 +72,7 @@ public final class CmdExpel implements IPermissibleCommand {
         if(targetPlayer == null)
             return;
 
-        if(!targetPlayer.asOfflinePlayer().isOnline()){
+        if(!targetPlayer.isOnline()){
             Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
@@ -92,7 +92,7 @@ public final class CmdExpel implements IPermissibleCommand {
                 return;
             }
 
-            if(!targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
+            if(targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
                 Locale.PLAYER_EXPEL_BYPASS.send(sender);
                 return;
             }
