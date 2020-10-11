@@ -413,6 +413,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   &e&lIsla | &7Mejoras:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lIsla | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_VALUE_SYNCED: '&a∞'
 ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lIsla | &7Limite de Warps: {0}'
 ISLAND_INFO_BANK: '&e&lIsla | &7Banco: {0}'
 ISLAND_INFO_BONUS: '&e&lIsla | &7Valor de Bonus: {0}'

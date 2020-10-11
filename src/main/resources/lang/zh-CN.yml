@@ -413,6 +413,7 @@ ISLAND_INFO_ADMIN_UPGRADES: |
   &e&l岛屿 | &7空岛升级:
   {0}
 ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&l岛屿 | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_VALUE_SYNCED: '&a∞'
 ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lIsland | &7Warps Limit: {0}'
 ISLAND_INFO_BANK: '&e&l岛屿 | &7银行: {0}'
 ISLAND_INFO_BONUS: '&e&l岛屿 | &7岛屿奖励: {0}'
