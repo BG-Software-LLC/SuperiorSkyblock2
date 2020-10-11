@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,8 +13,9 @@ import java.util.Objects;
 public class SUpgrade implements Upgrade {
 
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
-            new HashSet<>(), -1, -1, -1, -1, -1, -1, -1,
-            new KeyMap<>(), new KeyMap<>(), new KeyMap<>(), new HashMap<>(), new BigDecimal(-1));
+            new HashSet<>(), UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE,
+            UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE,
+            new KeyMap<>(), new KeyMap<>(), new KeyMap<>(), new HashMap<>(), UpgradeValue.NEGATIVE_BIG_DECIMAL);
 
     private final String name;
 

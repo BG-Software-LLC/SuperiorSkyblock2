@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -41,8 +42,8 @@ public final class SettingsHandler extends AbstractHandler {
     public final int maxIslandSize;
     public final String islandCommand;
     public final int defaultIslandSize;
-    public final KeyMap<Integer> defaultBlockLimits;
-    public final KeyMap<Integer> defaultEntityLimits;
+    public final KeyMap<UpgradeValue<Integer>> defaultBlockLimits;
+    public final KeyMap<UpgradeValue<Integer>> defaultEntityLimits;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
@@ -111,7 +112,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
-    public final KeyMap<Integer> defaultGenerator;
+    public final KeyMap<UpgradeValue<Integer>> defaultGenerator;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
     public final String dateFormat;
@@ -194,14 +195,14 @@ public final class SettingsHandler extends AbstractHandler {
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultBlockLimits.put(Key.of(key), Integer.parseInt(limit));
+            defaultBlockLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultEntityLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.entity-limits")){
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultEntityLimits.put(Key.of(key), Integer.parseInt(limit));
+            defaultEntityLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
@@ -294,7 +295,7 @@ public final class SettingsHandler extends AbstractHandler {
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator.put(key, Integer.parseInt(percentage));
+            defaultGenerator.put(key, new UpgradeValue<>(Integer.parseInt(percentage), true));
         }
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
         commandsCooldown = Registry.createRegistry();

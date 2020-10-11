@@ -935,12 +935,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return IslandUtils.NO_LIMIT;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return IslandUtils.NO_LIMIT;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
@@ -980,12 +980,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return IslandUtils.NO_LIMIT;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
     public int getEntityLimit(Key key) {
-        return IslandUtils.NO_LIMIT;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override

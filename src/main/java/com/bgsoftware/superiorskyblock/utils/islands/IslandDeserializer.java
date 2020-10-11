@@ -19,15 +19,16 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeKeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeMap;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 
 public final class IslandDeserializer {
@@ -134,26 +135,34 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeBlockLimits(String blocks, UpgradeKeyMap blockLimits){
+    public static void deserializeBlockLimits(String blocks, SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits){
+        blockLimits.write(_blockLimits -> deserializeBlockLimits(blocks, _blockLimits));
+    }
+
+    public static void deserializeBlockLimits(String blocks, KeyMap<UpgradeValue<Integer>> blockLimits){
         if(blocks == null)
             return;
 
         for(String limit : blocks.split(",")){
             try {
                 String[] sections = limit.split("=");
-                blockLimits.set(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                blockLimits.put(Key.of(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
             }catch(Exception ignored){}
         }
     }
 
-    public static void deserializeEntityLimits(String entities, UpgradeKeyMap entityLimits){
+    public static void deserializeEntityLimits(String entities, SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits){
+        entityLimits.write(_entityLimits -> deserializeEntityLimits(entities, _entityLimits));
+    }
+
+    public static void deserializeEntityLimits(String entities, KeyMap<UpgradeValue<Integer>> entityLimits){
         if(entities == null)
             return;
 
         for(String limit : entities.split(",")){
             try {
                 String[] sections = limit.split("=");
-                entityLimits.set(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                entityLimits.put(Key.of(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
             }catch(Exception ignored){}
         }
     }
@@ -200,14 +209,18 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeGenerators(String generator, UpgradeKeyMap cobbleGenerator){
+    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGenerator){
+        cobbleGenerator.write(_cobbleGenerator -> deserializeGenerators(generator, _cobbleGenerator));
+    }
+
+    public static void deserializeGenerators(String generator, KeyMap<UpgradeValue<Integer>> cobbleGenerator){
         if(generator == null)
             return;
 
         for(String limit : generator.split(",")){
             try {
                 String[] sections = limit.split("=");
-                cobbleGenerator.set(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                cobbleGenerator.put(Key.of(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
             }catch(Exception ignored){}
         }
     }
@@ -229,7 +242,11 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeEffects(String effects, UpgradeMap<PotionEffectType> islandEffects){
+    public static void deserializeEffects(String effects, SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects){
+        islandEffects.write(_islandEffects -> deserializeEffects(effects, _islandEffects));
+    }
+
+    public static void deserializeEffects(String effects, Map<PotionEffectType, UpgradeValue<Integer>> islandEffects){
         if(effects == null)
             return;
 
@@ -237,7 +254,7 @@ public final class IslandDeserializer {
             String[] sections = effect.split("=");
             PotionEffectType potionEffectType = PotionEffectType.getByName(sections[0]);
             if(potionEffectType != null)
-                islandEffects.set(potionEffectType, Integer.parseInt(sections[1]));
+                islandEffects.put(potionEffectType, new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
         }
     }
 

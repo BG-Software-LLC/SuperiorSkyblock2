@@ -1,64 +1,36 @@
 package com.bgsoftware.superiorskyblock.utils.upgrades;
 
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-
 import java.math.BigDecimal;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public final class UpgradeValue<T> {
+public class UpgradeValue<T> {
 
-    private final SyncedObject<Pair<T, T>> value;
-    private final T defaultUpgradeValue;
-    private final Predicate<T> syncValue;
-    private final BiPredicate<T, T> isGreater;
+    public static final UpgradeValue<Integer> ZERO = new UpgradeValue<>(0, false);
+    public static final UpgradeValue<Double> ZERO_DOUBLE = new UpgradeValue<>(0D, false);
+    public static final UpgradeValue<BigDecimal> ZERO_BIG_DECIMAL = new UpgradeValue<>(BigDecimal.ZERO, false);
 
-    private UpgradeValue(T value, T upgradeValue, Predicate<T> syncValue, BiPredicate<T, T> isGreater){
-        this.value = SyncedObject.of(new Pair<>(value, upgradeValue));
-        this.defaultUpgradeValue = upgradeValue;
-        this.syncValue = syncValue;
-        this.isGreater = isGreater;
+    public static final UpgradeValue<Integer> NEGATIVE = new UpgradeValue<>(-1, false);
+    public static final UpgradeValue<Double> NEGATIVE_DOUBLE = new UpgradeValue<>(-1D, false);
+    public static final UpgradeValue<BigDecimal> NEGATIVE_BIG_DECIMAL = new UpgradeValue<>(new BigDecimal(-1), false);
+
+    private final boolean upgradeValue;
+    private final T value;
+
+    public UpgradeValue(T value, Predicate<T> shouldBeSync){
+        this(value, shouldBeSync.test(value));
+    }
+
+    public UpgradeValue(T value, boolean upgradeValue){
+        this.upgradeValue = upgradeValue;
+        this.value = value;
     }
 
     public T get(){
-        Pair<T, T> pair = value.get();
-        return syncValue.test(pair.getKey()) ? pair.getValue() : pair.getKey();
+        return value;
     }
 
-    public T getValue(){
-        return value.get().getKey();
-    }
-
-    public T getUpgradeValue(){
-        return value.get().getValue();
-    }
-
-    public void set(T value){
-        this.value.write(pair -> pair.setKey(value));
-    }
-
-    public void setUpgrade(T value){
-        Pair<T, T> pair = this.value.get();
-        if(isGreater.test(value, pair.getValue())){
-            this.value.write(_pair -> _pair.setValue(value));
-        }
-    }
-
-    public void clearUpgrade(){
-        this.value.write(pair -> pair.setValue(defaultUpgradeValue));
-    }
-
-    public static UpgradeValue<Double> createDouble(){
-        return new UpgradeValue<>(-1D, 0D, v -> v < 0, (v1, v2) -> v1 > v2);
-    }
-
-    public static UpgradeValue<Integer> createInteger(){
-        return new UpgradeValue<>(-1, 0, v -> v < 0, (v1, v2) -> v1 > v2);
-    }
-
-    public static UpgradeValue<BigDecimal> createBigDecimal(){
-        return new UpgradeValue<>(BigDecimal.valueOf(-2), BigDecimal.valueOf(-1), v -> v.compareTo(BigDecimal.valueOf(-1)) < 0, (v1, v2) -> v1.compareTo(v2) > 0);
+    public boolean isSynced(){
+        return upgradeValue;
     }
 
 }

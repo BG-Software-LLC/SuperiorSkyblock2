@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
@@ -57,35 +58,35 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                     String[] sections = line.split(";");
                     requirements.add(new Pair<>(sections[0], StringUtils.translateColors(sections[1])));
                 }
-                double cropGrowth = levelSection.getDouble("crop-growth", -1D);
-                double spawnerRates = levelSection.getDouble("spawner-rates", -1D);
-                double mobDrops = levelSection.getDouble("mob-drops", -1D);
-                int teamLimit = levelSection.getInt("team-limit", -1);
-                int warpsLimit = levelSection.getInt("warps-limit", -1);
-                int coopLimit = levelSection.getInt("coop-limit", -1);
-                int borderSize = levelSection.getInt("border-size", -1);
-                BigDecimal bankLimit = new BigDecimal(levelSection.getString("bank-limit", "-1"));
-                KeyMap<Integer> blockLimits = new KeyMap<>();
+                UpgradeValue<Double> cropGrowth = new UpgradeValue<>(levelSection.getDouble("crop-growth", -1D), true);
+                UpgradeValue<Double> spawnerRates = new UpgradeValue<>(levelSection.getDouble("spawner-rates", -1D), true);
+                UpgradeValue<Double> mobDrops = new UpgradeValue<>(levelSection.getDouble("mob-drops", -1D), true);
+                UpgradeValue<Integer> teamLimit = new UpgradeValue<>(levelSection.getInt("team-limit", -1), true);
+                UpgradeValue<Integer> warpsLimit = new UpgradeValue<>(levelSection.getInt("warps-limit", -1), true);
+                UpgradeValue<Integer> coopLimit = new UpgradeValue<>(levelSection.getInt("coop-limit", -1), true);
+                UpgradeValue<Integer> borderSize = new UpgradeValue<>(levelSection.getInt("border-size", -1), true);
+                UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
+                KeyMap<UpgradeValue<Integer>> blockLimits = new KeyMap<>();
                 if(levelSection.contains("block-limits")){
                     for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
-                        blockLimits.put(block, levelSection.getInt("block-limits." + block));
+                        blockLimits.put(block, new UpgradeValue<>(levelSection.getInt("block-limits." + block), true));
                 }
-                KeyMap<Integer> entityLimits = new KeyMap<>();
+                KeyMap<UpgradeValue<Integer>> entityLimits = new KeyMap<>();
                 if(levelSection.contains("entity-limits")){
                     for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
-                        entityLimits.put(entity.toUpperCase(), levelSection.getInt("entity-limits." + entity));
+                        entityLimits.put(entity.toUpperCase(), new UpgradeValue<>(levelSection.getInt("entity-limits." + entity), true));
                 }
-                KeyMap<Integer> generatorRates = new KeyMap<>();
+                KeyMap<UpgradeValue<Integer>> generatorRates = new KeyMap<>();
                 if(levelSection.contains("generator-rates")){
                     for(String block : levelSection.getConfigurationSection("generator-rates").getKeys(false))
-                        generatorRates.put(block, levelSection.getInt("generator-rates." + block));
+                        generatorRates.put(block, new UpgradeValue<>(levelSection.getInt("generator-rates." + block), true));
                 }
-                Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+                Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
                 if(levelSection.contains("island-effects")){
                     for(String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                         PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
                         if(potionEffectType != null)
-                            islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
+                            islandEffects.put(potionEffectType, new UpgradeValue<>(levelSection.getInt("island-effects." + effect) - 1, true));
                     }
                 }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public final class IslandUtils {
 
     public static final String VISITORS_WARP_NAME = "visit";
-    public static final int NO_LIMIT = -1;
+    public static final UpgradeValue<Integer> NO_LIMIT = UpgradeValue.NEGATIVE;
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
