@@ -710,6 +710,12 @@ public interface Island extends Comparable<Island> {
      */
     long getLastTimeUpdate();
 
+    /**
+     * Set the last time the island was updated.
+     * @param lastTimeUpdate The last time the island was updated.
+     */
+    void setLastTimeUpdate(long lastTimeUpdate);
+
     /*
      *  Bank related methods
      */

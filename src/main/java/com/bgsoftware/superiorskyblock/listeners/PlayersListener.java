@@ -192,7 +192,7 @@ public final class PlayersListener implements Listener {
             boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
                     !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) &&  _superiorPlayer.isOnline());
             if(!anyOnline)
-                island.updateLastTime();
+                island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
         }
 
         for(Island _island : plugin.getGrid().getIslands()){
