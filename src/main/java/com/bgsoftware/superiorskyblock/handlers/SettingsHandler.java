@@ -201,7 +201,7 @@ public final class SettingsHandler extends AbstractHandler {
         for(String line : cfg.getStringList("default-values.entity-limits")){
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
-            String limit = sections.length == 2 ? sections[0] : sections[1];
+            String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultEntityLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
