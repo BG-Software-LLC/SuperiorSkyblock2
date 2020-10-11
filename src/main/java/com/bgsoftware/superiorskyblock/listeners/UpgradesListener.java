@@ -42,7 +42,9 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -104,10 +106,36 @@ public final class UpgradesListener implements Listener {
         double mobDropsMultiplier = island.getMobDropsMultiplier();
 
         if(mobDropsMultiplier > 1){
-            for(ItemStack itemStack : e.getDrops()){
+            List<ItemStack> dropItems = new ArrayList<>(e.getDrops());
+            for(ItemStack itemStack : dropItems){
                 if(itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack) &&
                         !plugin.getNMSTags().getNBTTag(itemStack).getValue().containsKey("WildChests")) {
-                    itemStack.setAmount((int) (itemStack.getAmount() * mobDropsMultiplier));
+                    int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);
+                    int stackAmounts = newAmount / itemStack.getMaxStackSize();
+                    int leftOvers = newAmount % itemStack.getMaxStackSize();
+                    boolean usedOriginal = false;
+
+                    if(stackAmounts > 0){
+                        itemStack.setAmount(itemStack.getMaxStackSize());
+                        usedOriginal = true;
+
+                        ItemStack stackItem = itemStack.clone();
+                        stackItem.setAmount(itemStack.getMaxStackSize());
+
+                        for(int i = 0; i < stackAmounts - 1; i++)
+                            e.getDrops().add(itemStack.clone());
+                    }
+
+                    if(leftOvers > 0) {
+                        if(usedOriginal){
+                            ItemStack leftOversItem = itemStack.clone();
+                            leftOversItem.setAmount(leftOvers);
+                            e.getDrops().add(leftOversItem);
+                        }
+                        else {
+                            itemStack.setAmount(leftOvers);
+                        }
+                    }
                 }
             }
         }
