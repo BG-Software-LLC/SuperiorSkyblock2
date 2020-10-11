@@ -129,20 +129,22 @@ public final class EntityUtils {
     }
 
     public static boolean canBypassEntityLimit(Entity entity){
-        return !(entity instanceof  ArmorStand) || !((ArmorStand) entity).isVisible();
+        return !(entity instanceof ArmorStand) || !((ArmorStand) entity).isVisible();
     }
 
     public static boolean isMonster(EntityType entityType){
-        return Monster.class.isAssignableFrom(entityType.getEntityClass()) ||
+        Class<? extends Entity> entityClass = entityType.getEntityClass();
+        return entityClass != null && (Monster.class.isAssignableFrom(entityClass) ||
                 // Checks for slimes & magma cubes
-                Slime.class.isAssignableFrom(entityType.getEntityClass()) ||
+                Slime.class.isAssignableFrom(entityClass) ||
                 // Checks for ghasts and phantoms
-                Flying.class.isAssignableFrom(entityType.getEntityClass());
+                Flying.class.isAssignableFrom(entityClass));
     }
 
     public static boolean isAnimal(EntityType entityType){
-        return Creature.class.isAssignableFrom(entityType.getEntityClass()) ||
-                Ambient.class.isAssignableFrom(entityType.getEntityClass());
+        Class<? extends Entity> entityClass = entityType.getEntityClass();
+        return entityClass != null && (Creature.class.isAssignableFrom(entityType.getEntityClass()) ||
+                Ambient.class.isAssignableFrom(entityType.getEntityClass()));
     }
 
     private static <T> boolean contains(T[] arr, T val){
