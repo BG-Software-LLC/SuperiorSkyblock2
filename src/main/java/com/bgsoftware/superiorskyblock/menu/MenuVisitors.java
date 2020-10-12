@@ -103,8 +103,8 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
         new MenuVisitors(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuVisitors.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuVisitors.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

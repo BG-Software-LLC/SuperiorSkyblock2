@@ -251,8 +251,13 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         new MenuPermissions(superiorPlayer, island, permissionHolder).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuPermissions.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuPermissions.class, superiorMenu -> superiorMenu.island.equals(island));
+    }
+
+    public static void refreshMenus(Island island, Object permissionHolder){
+        SuperiorMenu.refreshMenus(MenuPermissions.class, superiorMenu -> superiorMenu.island.equals(island) &&
+                superiorMenu.permissionHolder.equals(permissionHolder));
     }
 
     public static void updatePermission(IslandPrivilege islandPrivilege){

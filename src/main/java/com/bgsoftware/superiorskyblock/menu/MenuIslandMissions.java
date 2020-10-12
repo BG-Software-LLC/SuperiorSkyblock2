@@ -162,8 +162,8 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
         new MenuIslandMissions(superiorPlayer).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuIslandMissions.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuIslandMissions.class, superiorMenu -> island.equals(superiorMenu.superiorPlayer.getIsland()));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

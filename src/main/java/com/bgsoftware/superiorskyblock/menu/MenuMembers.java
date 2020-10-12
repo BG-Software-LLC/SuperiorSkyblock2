@@ -85,8 +85,8 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
         new MenuMembers(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuMembers.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuMembers.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

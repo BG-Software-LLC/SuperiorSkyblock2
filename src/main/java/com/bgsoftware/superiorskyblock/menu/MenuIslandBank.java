@@ -136,8 +136,8 @@ public final class MenuIslandBank extends SuperiorMenu {
         new MenuIslandBank(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuIslandBank.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuIslandBank.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     public static void handleTransaction(SuperiorPlayer superiorPlayer, BankTransaction bankTransaction, int clickedSlot){

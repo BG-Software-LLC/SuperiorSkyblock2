@@ -89,8 +89,8 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
         new MenuIslandRatings(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuIslandRatings.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuIslandRatings.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

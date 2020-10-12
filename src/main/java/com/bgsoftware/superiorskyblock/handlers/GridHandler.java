@@ -383,7 +383,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
         SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
-        islands.sort(sortingType, onFinish);
+        islands.sort(sortingType, () -> {
+            MenuTopIslands.refreshMenus(sortingType);
+            if(onFinish != null)
+                onFinish.run();
+        });
     }
 
     @Override

@@ -109,7 +109,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
     }
 
     public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuGlobalWarps.class);
+        SuperiorMenu.refreshMenus(MenuGlobalWarps.class, superiorMenu -> true);
     }
 
     private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer){

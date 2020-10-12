@@ -84,8 +84,8 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
         new MenuCoops(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuCoops.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuCoops.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
 }

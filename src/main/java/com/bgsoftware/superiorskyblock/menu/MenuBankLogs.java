@@ -128,8 +128,8 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         new MenuBankLogs(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuBankLogs.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuBankLogs.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

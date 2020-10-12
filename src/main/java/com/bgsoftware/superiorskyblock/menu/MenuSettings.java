@@ -136,8 +136,8 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         new MenuSettings(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuSettings.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuSettings.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     public static void updateSettings(IslandFlag islandFlag){

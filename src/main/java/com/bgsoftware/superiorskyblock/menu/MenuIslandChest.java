@@ -122,8 +122,8 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
         }
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuIslandChest.class);
+    public static void refreshMenus(Island island){
+        SuperiorMenu.refreshMenus(MenuIslandChest.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
 }

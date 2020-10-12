@@ -73,8 +73,4 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
         new MenuPlayerLanguage(superiorPlayer).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuPlayerLanguage.class);
-    }
-
 }

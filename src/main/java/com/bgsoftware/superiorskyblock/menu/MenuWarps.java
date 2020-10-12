@@ -107,8 +107,8 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
         }
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuWarps.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuWarps.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private String ensureNotNull(String check){

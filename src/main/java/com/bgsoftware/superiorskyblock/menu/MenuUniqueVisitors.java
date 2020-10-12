@@ -94,8 +94,8 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
         new MenuUniqueVisitors(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuUniqueVisitors.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuUniqueVisitors.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
 }

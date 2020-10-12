@@ -354,8 +354,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         plugin.getGrid().sortIslands(sortingType, () -> new MenuTopIslands(superiorPlayer, sortingType).open(previousMenu));
     }
 
-    public static void refreshMenus(){
-        SuperiorMenu.refreshMenus(MenuTopIslands.class);
+    public static void refreshMenus(SortingType sortingType){
+        SuperiorMenu.refreshMenus(MenuTopIslands.class, superiorMenu -> superiorMenu.sortingType.equals(sortingType));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

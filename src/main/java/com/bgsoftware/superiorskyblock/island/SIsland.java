@@ -29,7 +29,6 @@ import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
-import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
@@ -444,7 +443,7 @@ public final class SIsland implements Island {
         superiorPlayer.setIslandLeader(owner);
         superiorPlayer.setPlayerRole(playerRole);
 
-        MenuMembers.refreshMenus();
+        MenuMembers.refreshMenus(this);
 
         if (superiorPlayer.isOnline())
             updateIslandFly(superiorPlayer);
@@ -476,7 +475,7 @@ public final class SIsland implements Island {
 
         MenuMemberManage.destroyMenus(superiorPlayer);
         MenuMemberRole.destroyMenus(superiorPlayer);
-        MenuMembers.refreshMenus();
+        MenuMembers.refreshMenus(this);
 
         islandDataHandler.saveMembers();
     }
@@ -516,7 +515,7 @@ public final class SIsland implements Island {
     public void addCoop(SuperiorPlayer superiorPlayer) {
         SuperiorSkyblockPlugin.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         coop.write(coop -> coop.add(superiorPlayer));
-        MenuCoops.refreshMenus();
+        MenuCoops.refreshMenus(this);
     }
 
     @Override
@@ -529,7 +528,7 @@ public final class SIsland implements Island {
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
 
-        MenuCoops.refreshMenus();
+        MenuCoops.refreshMenus(this);
     }
 
     @Override
@@ -587,14 +586,14 @@ public final class SIsland implements Island {
                 uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, System.currentTimeMillis())));
             }
 
-            MenuUniqueVisitors.refreshMenus();
+            MenuUniqueVisitors.refreshMenus(this);
 
             islandDataHandler.saveUniqueVisitors();
         }
 
         updateLastTime();
 
-        MenuVisitors.refreshMenus();
+        MenuVisitors.refreshMenus(this);
     }
 
     @Override
@@ -967,7 +966,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.savePermissions();
 
-        MenuPermissions.refreshMenus();
+        MenuPermissions.refreshMenus(this);
     }
 
     @Override
@@ -989,7 +988,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.savePermissions();
 
-        MenuPermissions.refreshMenus();
+        MenuPermissions.refreshMenus(this, superiorPlayer);
     }
 
     @Override
@@ -1005,7 +1004,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.savePermissions();
 
-        MenuPermissions.refreshMenus();
+        MenuPermissions.refreshMenus(this, superiorPlayer);
     }
 
     @Override
@@ -1235,8 +1234,8 @@ public final class SIsland implements Island {
             if(snapshot != null)
                 snapshot.delete();
 
-            MenuValues.refreshMenus();
-            MenuCounts.refreshMenus();
+            MenuValues.refreshMenus(this);
+            MenuCounts.refreshMenus(this);
 
             saveBlockCounts(oldWorth, oldLevel);
 
@@ -1793,9 +1792,8 @@ public final class SIsland implements Island {
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-                    MenuTopIslands.refreshMenus();
-                    MenuValues.refreshMenus();
-                    MenuCounts.refreshMenus();
+                    MenuValues.refreshMenus(this);
+                    MenuCounts.refreshMenus(this);
                 }
             }
         }
@@ -1862,7 +1860,6 @@ public final class SIsland implements Island {
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-        MenuTopIslands.refreshMenus();
 
         islandDataHandler.saveBonusWorth();
     }
@@ -1880,7 +1877,6 @@ public final class SIsland implements Island {
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-        MenuTopIslands.refreshMenus();
 
         islandDataHandler.saveBonusLevel();
     }
@@ -1926,9 +1922,8 @@ public final class SIsland implements Island {
             blocksUpdateCounter = 0;
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
             plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-            MenuTopIslands.refreshMenus();
-            MenuValues.refreshMenus();
-            MenuCounts.refreshMenus();
+            MenuValues.refreshMenus(this);
+            MenuCounts.refreshMenus(this);
         }
 
         else{
@@ -1982,7 +1977,7 @@ public final class SIsland implements Island {
         if(upgradeLevel.getBorderSize() != -1)
             updateBorder();
 
-        MenuUpgrades.refreshMenus();
+        MenuUpgrades.refreshMenus(this);
     }
 
     @Override
@@ -2355,7 +2350,7 @@ public final class SIsland implements Island {
         islandDataHandler.saveWarps();
 
         MenuGlobalWarps.refreshMenus();
-        MenuWarps.refreshMenus();
+        MenuWarps.refreshMenus(this);
     }
 
     @Override
@@ -2421,7 +2416,7 @@ public final class SIsland implements Island {
         islandDataHandler.saveWarps();
 
         MenuGlobalWarps.refreshMenus();
-        MenuWarps.refreshMenus();
+        MenuWarps.refreshMenus(this);
     }
 
     @Override
@@ -2459,7 +2454,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.saveRatings();
 
-        MenuIslandRatings.refreshMenus();
+        MenuIslandRatings.refreshMenus(this);
     }
 
     @Override
@@ -2489,7 +2484,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.saveRatings();
 
-        MenuIslandRatings.refreshMenus();
+        MenuIslandRatings.refreshMenus(this);
     }
 
     /*
@@ -2504,7 +2499,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.saveMissions();
 
-        MenuIslandMissions.refreshMenus();
+        MenuIslandMissions.refreshMenus(this);
     }
 
     @Override
@@ -2523,7 +2518,7 @@ public final class SIsland implements Island {
 
         mission.clearData(getOwner());
 
-        MenuIslandMissions.refreshMenus();
+        MenuIslandMissions.refreshMenus(this);
     }
 
     @Override
@@ -2630,7 +2625,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.saveSettings();
 
-        MenuSettings.refreshMenus();
+        MenuSettings.refreshMenus(this);
     }
 
     @Override
@@ -2654,7 +2649,7 @@ public final class SIsland implements Island {
                 break;
         }
 
-        MenuSettings.refreshMenus();
+        MenuSettings.refreshMenus(this);
     }
 
     /*

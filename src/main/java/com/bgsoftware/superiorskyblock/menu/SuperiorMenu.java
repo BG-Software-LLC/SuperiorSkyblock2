@@ -396,8 +396,8 @@ public abstract class SuperiorMenu implements InventoryHolder {
         superiorPlayer.asPlayer().closeInventory();
     }
 
-    protected static <T extends SuperiorMenu> void refreshMenus(Class<T> menuClazz){
-        runActionOnMenus(menuClazz, superiorMenu -> true, ((player, superiorMenu) -> {
+    protected static <T extends SuperiorMenu> void refreshMenus(Class<T> menuClazz, Predicate<T> predicate){
+        runActionOnMenus(menuClazz, predicate, ((player, superiorMenu) -> {
             superiorMenu.previousMove = false;
             superiorMenu.open(superiorMenu.previousMenu);
         }));

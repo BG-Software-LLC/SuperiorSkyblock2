@@ -271,12 +271,11 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
-        MenuCounts menuCounts = new MenuCounts(superiorPlayer, island);
-        menuCounts.open(previousMenu);
+        new MenuCounts(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuCounts.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuCounts.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static Material getSafeMaterial(String value){

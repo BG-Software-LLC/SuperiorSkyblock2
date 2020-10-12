@@ -153,8 +153,8 @@ public final class MenuUpgrades extends SuperiorMenu {
         new MenuUpgrades(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(){
-        refreshMenus(MenuUpgrades.class);
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuUpgrades.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     private static boolean convertOldGUI(YamlConfiguration newMenu){

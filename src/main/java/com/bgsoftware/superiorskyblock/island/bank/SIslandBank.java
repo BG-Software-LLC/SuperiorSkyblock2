@@ -89,8 +89,8 @@ public final class SIslandBank implements IslandBank {
 
             IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
 
-            MenuIslandBank.refreshMenus();
-            MenuBankLogs.refreshMenus();
+            MenuIslandBank.refreshMenus(island);
+            MenuBankLogs.refreshMenus(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -112,15 +112,15 @@ public final class SIslandBank implements IslandBank {
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus();
-        MenuBankLogs.refreshMenus();
+        MenuIslandBank.refreshMenus(island);
+        MenuBankLogs.refreshMenus(island);
 
         return bankTransaction;
     }
 
     public void giveMoneyRaw(BigDecimal amount){
         setBalance(this.balance.get().add(amount), true);
-        MenuIslandBank.refreshMenus();
+        MenuIslandBank.refreshMenus(island);
     }
 
     @Override
@@ -166,8 +166,8 @@ public final class SIslandBank implements IslandBank {
 
             IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
 
-            MenuIslandBank.refreshMenus();
-            MenuBankLogs.refreshMenus();
+            MenuIslandBank.refreshMenus(island);
+            MenuBankLogs.refreshMenus(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -188,8 +188,8 @@ public final class SIslandBank implements IslandBank {
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus();
-        MenuBankLogs.refreshMenus();
+        MenuIslandBank.refreshMenus(island);
+        MenuBankLogs.refreshMenus(island);
 
         return bankTransaction;
     }
