@@ -66,7 +66,7 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
         if(location == null)
             return;
 
-        Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[4]);
+        Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[6]);
 
         if(!arguments.getValue())
             return;
