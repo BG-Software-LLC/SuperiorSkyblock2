@@ -165,7 +165,13 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     public BigDecimal convertValueToLevel(BigDecimal value){
         try {
-            return new BigDecimal(engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.toString()), bindings).toString());
+            Object obj = engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.toString()), bindings);
+
+            // Checking for division by 0
+            if(obj.equals(Double.POSITIVE_INFINITY) || obj.equals(Double.NEGATIVE_INFINITY))
+                obj = 0D;
+
+            return new BigDecimal(obj.toString());
         }catch(Exception ex){
             ex.printStackTrace();
             return value;
