@@ -197,9 +197,10 @@ public final class PlayersListener implements Listener {
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
-                if(!EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE))
-                _island.removeCoop(superiorPlayer);
-                IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                if(EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
+                    _island.removeCoop(superiorPlayer);
+                    IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                }
             }
         }
     }

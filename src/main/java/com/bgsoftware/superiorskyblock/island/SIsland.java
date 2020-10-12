@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
+import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
@@ -515,6 +516,7 @@ public final class SIsland implements Island {
     public void addCoop(SuperiorPlayer superiorPlayer) {
         SuperiorSkyblockPlugin.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         coop.write(coop -> coop.add(superiorPlayer));
+        MenuCoops.refreshMenus();
     }
 
     @Override
@@ -526,6 +528,8 @@ public final class SIsland implements Island {
             SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
+
+        MenuCoops.refreshMenus();
     }
 
     @Override
