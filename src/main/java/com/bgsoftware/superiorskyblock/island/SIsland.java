@@ -661,8 +661,10 @@ public final class SIsland implements Island {
     public Map<World.Environment, Location> getTeleportLocations(){
         return teleportLocations.readAndGet(teleportLocations -> {
             Map<World.Environment, Location> map = new HashMap<>();
-            for (World.Environment env : World.Environment.values())
-                map.put(env, teleportLocations[env.ordinal()]);
+            for (World.Environment env : World.Environment.values()) {
+                if(teleportLocations[env.ordinal()] != null)
+                    map.put(env, teleportLocations[env.ordinal()]);
+            }
             return Collections.unmodifiableMap(map);
         });
     }
