@@ -498,7 +498,7 @@ ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore delle colture:
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore dei drops dei mob:
   {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&lIsola | &7Percentuali del generatore:
+  &e&lIsola | &7Percentuali del generatore ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsola | &7  {0}: {1}%'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsola | &7Dimensione dei bordi: {0}'

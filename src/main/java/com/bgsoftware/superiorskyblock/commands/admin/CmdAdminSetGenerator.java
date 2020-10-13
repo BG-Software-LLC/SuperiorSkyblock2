@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_VALUE.getMessage(locale) + ">";
+                Locale.COMMAND_ARGUMENT_VALUE.getMessage(locale) + "> [" +
+                Locale.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
     }
 
     @Override
@@ -53,7 +54,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
 
     @Override
     public int getMaxArgs() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -96,12 +97,17 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
             return;
         }
 
+        World.Environment environment = args.length == 5 ? World.Environment.NORMAL : CommandArguments.getEnvironment(sender, args[5]);
+
+        if(environment == null)
+            return;
+
         Executor.data(() -> islands.forEach(island -> {
             if(percentage){
-                island.setGeneratorPercentage(material, Math.max(0, Math.min(100, amount)));
+                island.setGeneratorPercentage(material, Math.max(0, Math.min(100, amount)), environment);
             }
             else{
-                island.setGeneratorAmount(material, amount);
+                island.setGeneratorAmount(material, amount, environment);
             }
         }));
 
@@ -115,7 +121,8 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) : new ArrayList<>();
+        return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
+                args.length == 6 ? CommandTabCompletes.getWorlds(args[5]) : new ArrayList<>();
     }
 
 }

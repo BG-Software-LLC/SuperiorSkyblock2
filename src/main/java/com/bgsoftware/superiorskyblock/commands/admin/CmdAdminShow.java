@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import io.netty.util.internal.StringUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
@@ -230,16 +231,21 @@ public final class CmdAdminShow implements IAdminIslandCommand {
 
         // Island generator rates
         if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)){
-            StringBuilder generatorString = new StringBuilder();
-            for(Map.Entry<String, Integer> entry : island.getGeneratorPercentages().entrySet()){
-                Key key = Key.of(entry.getKey());
-                generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale, StringUtils.format(entry.getKey()),
-                        StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key)), island.getGeneratorAmount(key)));
-                if(!island.getCustomGeneratorAmounts().containsKey(key))
-                    generatorString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                generatorString.append("\n");
+            for(World.Environment environment : World.Environment.values()) {
+                StringBuilder generatorString = new StringBuilder();
+                for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
+                    Key key = Key.of(entry.getKey());
+                    generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
+                            StringUtils.format(entry.getKey()),
+                            StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
+                            island.getGeneratorAmount(key, environment))
+                    );
+                    if (!island.getCustomGeneratorAmounts(environment).containsKey(key))
+                        generatorString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                    generatorString.append("\n");
+                }
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString, StringUtils.format(environment.name())));
             }
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString));
         }
 
         // Island effects

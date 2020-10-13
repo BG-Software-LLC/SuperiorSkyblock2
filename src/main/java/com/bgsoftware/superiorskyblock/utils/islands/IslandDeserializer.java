@@ -209,20 +209,33 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGenerator){
-        cobbleGenerator.write(_cobbleGenerator -> deserializeGenerators(generator, _cobbleGenerator));
-    }
-
-    public static void deserializeGenerators(String generator, KeyMap<UpgradeValue<Integer>> cobbleGenerator){
+    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGenerator){
         if(generator == null)
             return;
 
-        for(String limit : generator.split(",")){
-            try {
-                String[] sections = limit.split("=");
-                cobbleGenerator.put(Key.of(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
-            }catch(Exception ignored){}
+        if(generator.contains(";")){
+            for(String env : generator.split(";")){
+                String[] sections = env.split(":");
+                try{
+                    World.Environment environment = World.Environment.valueOf(sections[0]);
+                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = SyncedObject.of(new KeyMap<>()));
+                }catch (Exception ignored){}
+            }
         }
+        else {
+            deserializeGenerators(generator, cobbleGenerator[0] = SyncedObject.of(new KeyMap<>()));
+        }
+    }
+
+    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGenerator){
+        cobbleGenerator.write(_cobbleGenerator -> {
+            for (String limit : generator.split(",")) {
+                try {
+                    String[] sections = limit.split("=");
+                    _cobbleGenerator.put(Key.of(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
+                } catch (Exception ignored) {}
+            }
+        });
     }
 
     public static void deserializeLocations(String locationParam, SyncedObject<Location[]> locations){

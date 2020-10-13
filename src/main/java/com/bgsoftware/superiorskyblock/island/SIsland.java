@@ -171,7 +171,7 @@ public final class SIsland implements Island {
      */
 
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits = SyncedObject.of(new KeyMap<>());
-    private final SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = SyncedObject.of(new KeyMap<>());
+    private final SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGeneratorValues = new SyncedObject[3];
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects = SyncedObject.of(new HashMap<>());
 
@@ -1997,7 +1997,8 @@ public final class SIsland implements Island {
     }
 
     public void syncUpgrades(boolean overrideCustom){
-        clearGeneratorAmounts();
+        for(World.Environment environment : World.Environment.values())
+            clearGeneratorAmounts(environment);
         clearEffects();
         clearBlockLimits();
         clearEntitiesLimits();
@@ -2663,84 +2664,149 @@ public final class SIsland implements Island {
      */
 
     @Override
+    @Deprecated
     public void setGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, int percentage) {
-        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Percentage: " + percentage);
+        setGeneratorPercentage(key, percentage, World.Environment.NORMAL);
+    }
+
+    @Override
+    public void setGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, int percentage, World.Environment environment) {
+        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Percentage: " + percentage + ", World: " + environment);
+
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, true);
 
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100, "Percentage must be between 0 and 100 - got " + percentage + ".");
 
         if(percentage == 0){
-            setGeneratorAmount(key, 0);
+            setGeneratorAmount(key, 0, environment);
         }
         else if(percentage == 100){
             cobbleGeneratorValues.write(Map::clear);
-            setGeneratorAmount(key, 1);
+            setGeneratorAmount(key, 1, environment);
         }
         else {
             //Removing the key from the generator
-            setGeneratorAmount(key, 0);
-            int totalAmount = getGeneratorTotalAmount();
+            setGeneratorAmount(key, 0, environment);
+            int totalAmount = getGeneratorTotalAmount(environment);
             double realPercentage = percentage / 100D;
             double amount = (realPercentage * totalAmount) / (1 - realPercentage);
             if(amount < 1){
-                cobbleGeneratorValues.write(cobbleGeneratorValues -> cobbleGeneratorValues.entrySet()
+                cobbleGeneratorValues.write(_cobbleGeneratorValues -> _cobbleGeneratorValues.entrySet()
                         .forEach(entry -> entry.setValue(new UpgradeValue<>(entry.getValue().get() * 10, entry.getValue().isSynced()))));
                 amount *= 10;
             }
-            setGeneratorAmount(key, (int) Math.round(amount));
+            setGeneratorAmount(key, (int) Math.round(amount), environment);
         }
     }
 
     @Override
+    @Deprecated
     public int getGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        int totalAmount = getGeneratorTotalAmount();
-        return totalAmount == 0 ? 0 : (getGeneratorAmount(key) * 100) / totalAmount;
+        return getGeneratorPercentage(key, World.Environment.NORMAL);
     }
 
     @Override
+    public int getGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+        int totalAmount = getGeneratorTotalAmount(environment);
+        return totalAmount == 0 ? 0 : (getGeneratorAmount(key, environment) * 100) / totalAmount;
+    }
+
+    @Override
+    @Deprecated
     public Map<String, Integer> getGeneratorPercentages() {
-        return getGeneratorAmounts().keySet().stream().collect(Collectors.toMap(key -> key, key -> getGeneratorAmount(Key.of(key))));
+        return getGeneratorPercentages(World.Environment.NORMAL);
     }
 
     @Override
+    public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
+        return getGeneratorAmounts(environment).keySet().stream().collect(Collectors.toMap(key -> key,
+                key -> getGeneratorAmount(Key.of(key), environment)));
+    }
+
+    @Override
+    @Deprecated
     public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+        setGeneratorAmount(key, amount, World.Environment.NORMAL);
+    }
+
+    @Override
+    public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, World.Environment environment) {
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, true);
         int finalAmount = Math.max(0, amount);
-        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + finalAmount);
+        SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + finalAmount + ", World: " + environment);
         cobbleGeneratorValues.write(map -> map.put(key, new UpgradeValue<>(finalAmount, false)));
         islandDataHandler.saveGenerators();
     }
 
     @Override
+    @Deprecated
     public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return cobbleGeneratorValues.readAndGet(map -> map.getOrDefault(key, UpgradeValue.ZERO).get());
+        return getGeneratorAmount(key, World.Environment.NORMAL);
     }
 
     @Override
-    public int getGeneratorTotalAmount() {
+    public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
+        return (cobbleGeneratorValues == null ? UpgradeValue.ZERO : cobbleGeneratorValues
+                .readAndGet(map -> map.getOrDefault(key, UpgradeValue.ZERO))).get();
+    }
+
+    @Override
+    @Deprecated
+    public int getGeneratorTotalAmount(){
+        return getGeneratorTotalAmount(World.Environment.NORMAL);
+    }
+
+    @Override
+    public int getGeneratorTotalAmount(World.Environment environment) {
         int totalAmount = 0;
-        for(int amt : getGeneratorAmounts().values())
+        for(int amt : getGeneratorAmounts(environment).values())
             totalAmount += amt;
         return totalAmount;
     }
 
-
     @Override
-    public Map<String, Integer> getGeneratorAmounts() {
-        return this.cobbleGeneratorValues.readAndGet(cobbleGeneratorValues -> cobbleGeneratorValues.entrySet().stream()
-                .collect(Collectors.toMap(entry -> entry.getKey().toString(), entry -> entry.getValue().get())));
+    @Deprecated
+    public Map<String, Integer> getGeneratorAmounts(){
+        return getGeneratorAmounts(World.Environment.NORMAL);
     }
 
     @Override
+    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
+        return cobbleGeneratorValues == null ? new HashMap<>() : cobbleGeneratorValues.readAndGet(_cobbleGeneratorValues ->
+                _cobbleGeneratorValues.entrySet().stream().collect(Collectors.toMap(
+                        entry -> entry.getKey().toString(),
+                        entry -> entry.getValue().get())
+                ));
+    }
+
+    @Override
+    @Deprecated
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts() {
-        return this.cobbleGeneratorValues.readAndGet(cobbleGeneratorValues -> cobbleGeneratorValues.entrySet().stream()
+        return getCustomGeneratorAmounts(World.Environment.NORMAL);
+    }
+
+    @Override
+    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
+        return cobbleGeneratorValues == null ? new HashMap<>() : cobbleGeneratorValues.readAndGet(_cobbleGeneratorValues ->
+                _cobbleGeneratorValues.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
 
     @Override
+    @Deprecated
     public String[] getGeneratorArray() {
-        String[] newCobbleGenerator = new String[getGeneratorTotalAmount()];
+        return getGeneratorArray(World.Environment.NORMAL);
+    }
+
+    @Override
+    public String[] getGeneratorArray(World.Environment environment) {
+        String[] newCobbleGenerator = new String[getGeneratorTotalAmount(environment)];
         int index = 0;
-        for(Map.Entry<String, Integer> entry : getGeneratorAmounts().entrySet()){
+        for(Map.Entry<String, Integer> entry : getGeneratorAmounts(environment).entrySet()){
             for(int i = 0; i < entry.getValue() && index < newCobbleGenerator.length; i++, index++){
                 newCobbleGenerator[index] = entry.getKey();
             }
@@ -2749,10 +2815,19 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public void clearGeneratorAmounts() {
-        SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName());
-        cobbleGeneratorValues.write(Map::clear);
-        islandDataHandler.saveGenerators();
+        clearGeneratorAmounts(World.Environment.NORMAL);
+    }
+
+    @Override
+    public void clearGeneratorAmounts(World.Environment environment) {
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
+        SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName() + ", World: " + environment);
+        if(cobbleGeneratorValues != null) {
+            cobbleGeneratorValues.write(Map::clear);
+            islandDataHandler.saveGenerators();
+        }
     }
 
     /*
@@ -2921,13 +2996,18 @@ public final class SIsland implements Island {
             }
         });
 
-        cobbleGeneratorValues.write(cobbleGeneratorValues -> {
-            for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues.keySet()){
-                UpgradeValue<Integer> defaultValue = plugin.getSettings().defaultGenerator.get(key);
-                if(defaultValue != null && (int) cobbleGeneratorValues.get(key).get() == defaultValue.get())
-                    cobbleGeneratorValues.put(key, defaultValue);
+        for(int i = 0; i < cobbleGeneratorValues.length; i++){
+            KeyMap<UpgradeValue<Integer>> defaultGenerator = plugin.getSettings().defaultGenerator[i];
+            if(defaultGenerator != null){
+                cobbleGeneratorValues[i].write(cobbleGeneratorValues -> {
+                    for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues.keySet()){
+                        UpgradeValue<Integer> defaultValue = defaultGenerator.get(key);
+                        if(defaultValue != null && (int) cobbleGeneratorValues.get(key).get() == defaultValue.get())
+                            cobbleGeneratorValues.put(key, defaultValue);
+                    }
+                });
             }
-        });
+        }
 
         if(getIslandSize() == plugin.getSettings().defaultIslandSize)
             islandSize.set(DefaultUpgradeLevel.getInstance().getBorderSizeUpgradeValue());
@@ -3001,9 +3081,13 @@ public final class SIsland implements Island {
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
                 .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
 
-        cobbleGeneratorValues.write(cobbleGeneratorValues -> new HashSet<>(cobbleGeneratorValues.entrySet()).stream()
-                .filter(entry -> overrideCustom || entry.getValue().isSynced())
-                .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
+        for(int i = 0; i < cobbleGeneratorValues.length; i++) {
+            if(cobbleGeneratorValues[i] != null) {
+                cobbleGeneratorValues[i].write(cobbleGeneratorValues -> new HashSet<>(cobbleGeneratorValues.entrySet()).stream()
+                        .filter(entry -> overrideCustom || entry.getValue().isSynced())
+                        .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
+            }
+        }
 
         islandEffects.write(islandEffects -> new HashSet<>(islandEffects.entrySet()).stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
@@ -3059,14 +3143,19 @@ public final class SIsland implements Island {
             }
         });
 
-        cobbleGeneratorValues.write(cobbleGeneratorValues -> {
-            if(!upgradeLevel.getGeneratorUpgradeValue().isEmpty()) {
-                new HashSet<>(cobbleGeneratorValues.entrySet()).stream().filter(entry -> entry.getValue().isSynced())
-                        .forEach(entry -> cobbleGeneratorValues.remove(entry.getKey()));
+        for(int i = 0; i < cobbleGeneratorValues.length; i++) {
+            KeyMap<UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+            if(levelGenerator != null) {
+                getCobbleGeneratorValues(i, true).write(cobbleGeneratorValues -> {
+                    if (!levelGenerator.isEmpty()) {
+                        new HashSet<>(cobbleGeneratorValues.entrySet()).stream().filter(entry -> entry.getValue().isSynced())
+                                .forEach(entry -> cobbleGeneratorValues.remove(entry.getKey()));
+                    }
+                    for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> entry : levelGenerator.entrySet())
+                        cobbleGeneratorValues.put(entry.getKey(), entry.getValue());
+                });
             }
-            for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> entry : upgradeLevel.getGeneratorUpgradeValue().entrySet())
-                cobbleGeneratorValues.put(entry.getKey(), entry.getValue());
-        });
+        }
 
         islandEffects.write(islandEffects -> {
             for(Map.Entry<PotionEffectType, UpgradeValue<Integer>> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()){
@@ -3095,6 +3184,19 @@ public final class SIsland implements Island {
 
         this.lastInterest.set(lastInterest);
         islandDataHandler.saveLastInterestTime();
+    }
+
+    private SyncedObject<KeyMap<UpgradeValue<Integer>>> getCobbleGeneratorValues(World.Environment environment, boolean createNew){
+        return getCobbleGeneratorValues(environment.ordinal(), createNew);
+    }
+
+    private SyncedObject<KeyMap<UpgradeValue<Integer>>> getCobbleGeneratorValues(int index, boolean createNew){
+        SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = this.cobbleGeneratorValues[index];
+
+        if(cobbleGeneratorValues == null && createNew)
+            cobbleGeneratorValues = this.cobbleGeneratorValues[index] = SyncedObject.of(new KeyMap<>());
+
+        return cobbleGeneratorValues;
     }
 
     private static void parseNumbersSafe(SafeRunnable code) throws SQLException {

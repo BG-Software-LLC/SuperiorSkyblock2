@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import java.io.File;
 import java.sql.*;
@@ -340,9 +341,18 @@ public final class DataHandler extends AbstractHandler {
     }
 
     private String getDefaultGenerator() {
-        StringBuilder stringBuilder = new StringBuilder();
-        plugin.getSettings().defaultGenerator.forEach((key, value) -> stringBuilder.append(",").append(key).append("=").append(value));
-        return stringBuilder.length() == 0 ? stringBuilder.toString() : stringBuilder.substring(1);
+        StringBuilder generatorsBuilder = new StringBuilder();
+        for(int i = 0; i < plugin.getSettings().defaultGenerator.length; i++) {
+            if(plugin.getSettings().defaultGenerator[i] != null) {
+                StringBuilder generatorBuilder = new StringBuilder();
+                World.Environment environment = World.Environment.values()[i];
+                plugin.getSettings().defaultGenerator[i].forEach((key, value) ->
+                        generatorBuilder.append(",").append(key).append("=").append(value));
+                generatorsBuilder.append(";").append(environment).append(":")
+                        .append(generatorBuilder.length() == 0 ? "" : generatorBuilder.toString().substring(1));
+            }
+        }
+        return generatorsBuilder.length() == 0 ? "" : generatorsBuilder.toString().substring(1);
     }
 
     public void closeConnection(){

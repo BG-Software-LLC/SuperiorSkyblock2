@@ -421,7 +421,7 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lיא | &7הלידג סונוב: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lיא | &7םיבוממ םיטירפ סונוב: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&lיא | &7רוטארנג:
+  &e&lיא | &7רוטארנג ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lיא | &7לובגה לדוג: {0}'

@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryType;
@@ -112,7 +113,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
-    public final KeyMap<UpgradeValue<Integer>> defaultGenerator;
+    public final KeyMap<UpgradeValue<Integer>>[] defaultGenerator;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
     public final String dateFormat;
@@ -290,12 +291,17 @@ public final class SettingsHandler extends AbstractHandler {
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
-        defaultGenerator = new KeyMap<>();
-        for(String line : cfg.getStringList("default-values.generator")){
-            String[] sections = line.split(":");
-            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
-            String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator.put(key, new UpgradeValue<>(Integer.parseInt(percentage), true));
+        defaultGenerator = new KeyMap[3];
+        if(cfg.isConfigurationSection("default-values.generator")){
+            for(String env : cfg.getConfigurationSection("default-values.generator").getKeys(false)){
+                try{
+                    World.Environment environment = World.Environment.valueOf(env.toUpperCase());
+                    loadGenerator(cfg.getStringList("default-values.generator." + env), environment.ordinal());
+                }catch (Exception ignored){}
+            }
+        }
+        else {
+            loadGenerator(cfg.getStringList("default-values.generator"), 0);
         }
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
         commandsCooldown = Registry.createRegistry();
@@ -515,6 +521,16 @@ public final class SettingsHandler extends AbstractHandler {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         return cfg.getStringList("interactables");
+    }
+
+    private void loadGenerator(List<String> lines, int index){
+        for(String line : lines){
+            defaultGenerator[index] = new KeyMap<>();
+            String[] sections = line.split(":");
+            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String percentage = sections.length == 2 ? sections[1] : sections[2];
+            defaultGenerator[index].put(key, new UpgradeValue<>(Integer.parseInt(percentage), true));
+        }
     }
 
 }

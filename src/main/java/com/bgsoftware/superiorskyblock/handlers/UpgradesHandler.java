@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
@@ -76,10 +77,22 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                     for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                         entityLimits.put(entity.toUpperCase(), new UpgradeValue<>(levelSection.getInt("entity-limits." + entity), true));
                 }
-                KeyMap<UpgradeValue<Integer>> generatorRates = new KeyMap<>();
+                KeyMap<UpgradeValue<Integer>>[] generatorRates = new KeyMap[3];
                 if(levelSection.contains("generator-rates")){
-                    for(String block : levelSection.getConfigurationSection("generator-rates").getKeys(false))
-                        generatorRates.put(block, new UpgradeValue<>(levelSection.getInt("generator-rates." + block), true));
+                    for(String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
+                        try{
+                            int index = World.Environment.valueOf(blockOrEnv.toUpperCase()).ordinal();
+                            for(String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
+                                if(generatorRates[index] == null)
+                                    generatorRates[index] = new KeyMap<>();
+                                generatorRates[index].put(block, new UpgradeValue<>(levelSection.getInt("generator-rates." + blockOrEnv + "." + block), true));
+                            }
+                        }catch (Exception ex) {
+                            if(generatorRates[0] == null)
+                                generatorRates[0] = new KeyMap<>();
+                            generatorRates[0].put(blockOrEnv, new UpgradeValue<>(levelSection.getInt("generator-rates." + blockOrEnv), true));
+                        }
+                    }
                 }
                 Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
                 if(levelSection.contains("island-effects")){

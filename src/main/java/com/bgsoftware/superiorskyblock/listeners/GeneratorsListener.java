@@ -44,7 +44,7 @@ public final class GeneratorsListener implements Listener {
         if(!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
             return;
 
-        String[] cachedMaterials = island.getGeneratorArray();
+        String[] cachedMaterials = island.getGeneratorArray(block.getWorld().getEnvironment());
 
         if(cachedMaterials.length == 0)
             return;

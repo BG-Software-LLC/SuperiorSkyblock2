@@ -403,7 +403,7 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&l岛屿 | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&l岛屿 | &7农作物生长速度: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&l岛屿 | &7掉落物概率: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&l岛屿 | &7空岛矿机:
+  &e&l岛屿 | &7空岛矿机 ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&l岛屿 | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&l岛屿 | &7边界范围: {0}'

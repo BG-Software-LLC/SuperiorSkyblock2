@@ -1249,17 +1249,37 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
+
+    }
+
+    @Override
     public int getGeneratorPercentage(Key key) {
         return 0;
     }
 
     @Override
+    public int getGeneratorPercentage(Key key, World.Environment environment) {
+        return 0;
+    }
+
+    @Override
     public Map<String, Integer> getGeneratorPercentages() {
-        return null;
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
+        return new HashMap<>();
     }
 
     @Override
     public void setGeneratorAmount(Key key, int amount) {
+
+    }
+
+    @Override
+    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
 
     }
 
@@ -1269,7 +1289,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public int getGeneratorAmount(Key key, World.Environment environment) {
+        return 0;
+    }
+
+    @Override
     public int getGeneratorTotalAmount() {
+        return 0;
+    }
+
+    @Override
+    public int getGeneratorTotalAmount(World.Environment environment) {
         return 0;
     }
 
@@ -1279,7 +1309,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
+        return new HashMap<>();
+    }
+
+    @Override
     public Map<Key, Integer> getCustomGeneratorAmounts() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         return new HashMap<>();
     }
 
@@ -1289,7 +1329,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public String[] getGeneratorArray(World.Environment environment) {
+        return new String[0];
+    }
+
+    @Override
     public void clearGeneratorAmounts() {
+
+    }
+
+    @Override
+    public void clearGeneratorAmounts(World.Environment environment) {
 
     }
 

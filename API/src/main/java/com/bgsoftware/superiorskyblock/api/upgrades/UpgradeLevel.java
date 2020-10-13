@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -119,13 +120,32 @@ public interface UpgradeLevel {
     /**
      * Get the generator rate of a block for this level.
      * @param key The block to check.
+     *
+     * @deprecated Check getGeneratorAmount(Key, World.Environment)
      */
+    @Deprecated
     int getGeneratorAmount(Key key);
 
     /**
      * Get all the generator rates for this level.
+     *
+     * @deprecated Check getGeneratorAmounts(World.Environment)
      */
+    @Deprecated
     Map<String, Integer> getGeneratorAmounts();
+
+    /**
+     * Get the generator rate of a block for this level in a specific world.
+     * @param key The block to check.
+     * @param environment The world environment
+     */
+    int getGeneratorAmount(Key key, World.Environment environment);
+
+    /**
+     * Get all the generator rates for this level in a specific world.
+     * @param environment The world environment
+     */
+    Map<String, Integer> getGeneratorAmounts(World.Environment environment);
 
     /**
      * Get the potion effect for this level.

@@ -1425,7 +1425,13 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
-     * Set a percentage for a specific key.
+     * @deprecated See setGeneratorPercentage(Key, Integer, World.Environment)
+     */
+    @Deprecated
+    void setGeneratorPercentage(Key key, int percentage);
+
+    /**
+     * Set a percentage for a specific key in a specific world.
      * Percentage can be between 0 and 100 (0 will remove the key from the list).
      *
      * This function sets the amount of the key using the following formula:
@@ -1436,53 +1442,128 @@ public interface Island extends Comparable<Island> {
      *
      * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
      */
-    void setGeneratorPercentage(Key key, int percentage);
+    void setGeneratorPercentage(Key key, int percentage, World.Environment environment);
 
     /**
      * Get the percentage for a specific key.
      * The formula is (amount * 100) / total_amount.
+     *
+     * @deprecated See getGeneratorPercentage(Key, World.Environment)
      */
+    @Deprecated
     int getGeneratorPercentage(Key key);
 
     /**
-     * Get the percentages of the materials for the cobblestone generator in the island.
+     * Get the percentage for a specific key in a specific world.
+     * The formula is (amount * 100) / total_amount.
+     * @param key The material key
+     * @param environment The world environment.
      */
+    int getGeneratorPercentage(Key key, World.Environment environment);
+
+    /**
+     * Get the percentages of the materials for the cobblestone generator in the island.
+     *
+     * @deprecated See getGeneratorPercentages(World.Environment)
+     */
+    @Deprecated
     Map<String, Integer> getGeneratorPercentages();
 
     /**
-     * Set an amount for a specific key.
+     * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
      */
+    Map<String, Integer> getGeneratorPercentages(World.Environment environment);
+
+    /**
+     * Set an amount for a specific key.
+     *
+     * @deprecated See setGeneratorAmount(Key, Integer, World.Environment)
+     */
+    @Deprecated
     void setGeneratorAmount(Key key, int amount);
 
     /**
-     * Get the amount of a specific key.
+     * Set an amount for a specific key in a specific world.
      */
+    void setGeneratorAmount(Key key, int amount, World.Environment environment);
+
+    /**
+     * Get the amount of a specific key.
+     *
+     * @deprecated See getGeneratorAmount(Key, World.Environment)
+     */
+    @Deprecated
     int getGeneratorAmount(Key key);
+
+    /**
+     * Get the amount of a specific key in a specific world.
+     */
+    int getGeneratorAmount(Key key, World.Environment environment);
+
+    /**
+     * Get the total amount of all the generator keys together.
+     *
+     * @deprecated See getGeneratorTotalAmount(World.Environment)
+     */
+    @Deprecated
+    int getGeneratorTotalAmount();
 
     /**
      * Get the total amount of all the generator keys together.
      */
-    int getGeneratorTotalAmount();
+    int getGeneratorTotalAmount(World.Environment environment);
+
+    /**
+     * Get the amounts of the materials for the cobblestone generator in the island.
+     *
+     * @deprecated See getGeneratorAmounts(World.Environment)
+     */
+    @Deprecated
+    Map<String, Integer> getGeneratorAmounts();
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
      */
-    Map<String, Integer> getGeneratorAmounts();
+    Map<String, Integer> getGeneratorAmounts(World.Environment environment);
+
+    /**
+     * Get the custom amounts of the materials for the cobblestone generator in the island.
+     *
+     * @deprecated See getCustomGeneratorAmounts(World.Environment)
+     */
+    @Deprecated
+    Map<Key, Integer> getCustomGeneratorAmounts();
 
     /**
      * Get the custom amounts of the materials for the cobblestone generator in the island.
      */
-    Map<Key, Integer> getCustomGeneratorAmounts();
+    Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment);
+
+    /**
+     * Get an array of materials for the cobblestone generator.
+     *
+     * @deprecated See getGeneratorArray(World.Environment)
+     */
+    @Deprecated
+    String[] getGeneratorArray();
 
     /**
      * Get an array of materials for the cobblestone generator.
      */
-    String[] getGeneratorArray();
+    String[] getGeneratorArray(World.Environment environment);
+
+    /**
+     * Clear all the custom generator amounts for this island.
+     *
+     * @deprecated See clearGeneratorAmounts(World.Environment)
+     */
+    @Deprecated
+    void clearGeneratorAmounts();
 
     /**
      * Clear all the custom generator amounts for this island.
      */
-    void clearGeneratorAmounts();
+    void clearGeneratorAmounts(World.Environment environment);
 
     /*
      *  Schematic methods

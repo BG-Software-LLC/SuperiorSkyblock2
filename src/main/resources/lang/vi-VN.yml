@@ -460,7 +460,7 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lĐảo Thần | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lNâng cấp | &7Cây trồng đa cấp: {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lNâng cấp | &7Drops đa cấp: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&lĐảo Thần | &7Tỉ lệ máy tạo quặng:
+  &e&lĐảo Thần | &7Tỉ lệ máy tạo quặng ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng cấp | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lNâng cấp | &7Kích thước bo: {0}'

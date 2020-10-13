@@ -403,7 +403,7 @@ ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lIsla | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&lIsla | &7Tasas de generación:
+  &e&lIsla | &7Tasas de generación ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsla | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsla | &7Tamaño del borde: {0}'

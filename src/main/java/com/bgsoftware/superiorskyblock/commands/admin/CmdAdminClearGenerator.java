@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -28,7 +30,8 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
         return "admin cleargenerator <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> [" +
+                Locale.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
     }
 
     @Override
@@ -43,7 +46,7 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
 
     @Override
     public int getMaxArgs() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -58,7 +61,12 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Executor.data(() -> islands.forEach(Island::clearGeneratorAmounts));
+        World.Environment environment = args.length == 4 ? World.Environment.NORMAL : CommandArguments.getEnvironment(sender, args[3]);
+
+        if(environment == null)
+            return;
+
+        Executor.data(() -> islands.forEach(island -> island.clearGeneratorAmounts(environment)));
 
         if(islands.size() != 1)
             Locale.GENERATOR_CLEARED_ALL.send(sender);

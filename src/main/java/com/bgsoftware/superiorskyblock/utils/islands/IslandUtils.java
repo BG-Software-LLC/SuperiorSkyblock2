@@ -148,9 +148,9 @@ public final class IslandUtils {
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
     }
 
-    public static double getGeneratorPercentageDecimal(Island island, com.bgsoftware.superiorskyblock.api.key.Key key){
-        int totalAmount = island.getGeneratorTotalAmount();
-        return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key) * 100D) / totalAmount;
+    public static double getGeneratorPercentageDecimal(Island island, com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment){
+        int totalAmount = island.getGeneratorTotalAmount(environment);
+        return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, environment) * 100D) / totalAmount;
     }
 
 }

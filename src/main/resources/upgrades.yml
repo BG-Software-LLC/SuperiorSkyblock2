@@ -185,17 +185,19 @@ upgrades:
     '1':
       price: 25000.0
       generator-rates:
-        STONE: 95
-        COAL_ORE: 5
+        normal:
+          STONE: 95
+          COAL_ORE: 5
       commands:
         - 'island admin setupgrade %player% generator-rates 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 2!'
     '2':
       price: 75000.0
       generator-rates:
-        STONE: 92
-        COAL_ORE: 5
-        REDSTONE_ORE: 3
+        normal:
+          STONE: 92
+          COAL_ORE: 5
+          REDSTONE_ORE: 3
       commands:
         - 'island admin setupgrade %player% generator-rates 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 3!'
@@ -203,25 +205,27 @@ upgrades:
       price: 150000.0
       permission: 'upgrade.gen.donor'
       generator-rates:
-        STONE: 80
-        COAL_ORE: 8
-        REDSTONE_ORE: 6
-        LAPIS_ORE: 4
-        IRON_ORE: 2
+        normal:
+          STONE: 80
+          COAL_ORE: 8
+          REDSTONE_ORE: 6
+          LAPIS_ORE: 4
+          IRON_ORE: 2
       commands:
         - 'island admin setupgrade %player% generator-rates 4'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 4!'
     '4':
       price: 0.0
       generator-rates:
-        STONE: 65
-        COAL_ORE: 10
-        REDSTONE_ORE: 9
-        LAPIS_ORE: 6
-        IRON_ORE: 4
-        GOLD_ORE: 3
-        DIAMOND_ORE: 2
-        EMERALD_ORE: 1
+        normal:
+          STONE: 65
+          COAL_ORE: 10
+          REDSTONE_ORE: 9
+          LAPIS_ORE: 6
+          IRON_ORE: 4
+          GOLD_ORE: 3
+          DIAMOND_ORE: 2
+          EMERALD_ORE: 1
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for generator.'
   minecarts-limit:

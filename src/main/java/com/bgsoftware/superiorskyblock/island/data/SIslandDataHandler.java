@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island.data;
 
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -9,6 +10,8 @@ import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import org.bukkit.World;
+
+import java.util.Map;
 
 public final class SIslandDataHandler extends DatabaseObject implements IslandDataHandler {
 
@@ -269,7 +272,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     @Override
     public void saveGenerators() {
         Query.ISLAND_SET_GENERATOR.getStatementHolder(this)
-                .setString(IslandSerializer.serializeGenerator(island.getCustomGeneratorAmounts()))
+                .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -356,7 +359,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
                 .setString(IslandSerializer.serializeSettings(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
-                .setString(IslandSerializer.serializeGenerator(island.getCustomGeneratorAmounts()))
+                .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
                 .setString(island.getGeneratedSchematicsFlag() + "")
                 .setString(island.getSchematicName())
                 .setString(IslandSerializer.serializePlayersWithTimes(island.getUniqueVisitorsWithTimes()))
@@ -418,7 +421,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
                 .setString(IslandSerializer.serializeSettings(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
-                .setString(IslandSerializer.serializeGenerator(island.getCustomGeneratorAmounts()))
+                .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
                 .setString(island.getGeneratedSchematicsFlag() + "")
                 .setString(island.getSchematicName())
                 .setString(IslandSerializer.serializePlayersWithTimes(island.getUniqueVisitorsWithTimes()))
@@ -435,6 +438,13 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getBankLimitRaw() + "")
                 .setLong(island.getLastInterestTime())
                 .execute(async);
+    }
+
+    private Map<Key, Integer>[] getIslandGenerators(){
+        Map<Key, Integer>[] customGeneratorAmounts = new Map[3];
+        for(World.Environment environment : World.Environment.values())
+            customGeneratorAmounts[environment.ordinal()] = island.getCustomGeneratorAmounts(environment);
+        return customGeneratorAmounts;
     }
 
 }

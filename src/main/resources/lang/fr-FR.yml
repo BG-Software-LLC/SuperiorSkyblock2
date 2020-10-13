@@ -404,7 +404,7 @@ ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Cultures:
   {0}'
 ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Drops: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
-  &e&lIle | &7Taux de Générateur:
+  &e&lIle | &7Taux de Générateur ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIle | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIle | &7Taille de la bordure: {0}'

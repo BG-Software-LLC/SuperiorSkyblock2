@@ -158,7 +158,7 @@ public interface IslandDataHandler {
     void saveSettings();
 
     /**
-     * Save the generator rates of the island.
+     * Save the generator rates of the island in all the worlds.
      */
     void saveGenerators();
 

@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import org.bukkit.Location;
@@ -33,18 +32,10 @@ public final class IslandSerializer {
 
     }
 
-    public static String serializePlayers(SyncedObject<? extends Collection<SuperiorPlayer>> collection) {
-        return collection.readAndGet(IslandSerializer::serializePlayers);
-    }
-
     public static String serializePlayers(Collection<SuperiorPlayer> collection) {
         StringBuilder builder = new StringBuilder();
         collection.forEach(superiorPlayer -> builder.append(",").append(superiorPlayer.getUniqueId().toString()));
         return builder.toString();
-    }
-
-    public static String serializePlayersWithTimes(SyncedObject<? extends Collection<Pair<SuperiorPlayer, Long>>> collection) {
-        return collection.readAndGet(IslandSerializer::serializePlayersWithTimes);
     }
 
     public static String serializePlayersWithTimes(Collection<Pair<SuperiorPlayer, Long>> collection) {
@@ -130,11 +121,17 @@ public final class IslandSerializer {
         return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
     }
 
-    public static String serializeGenerator(Map<Key, Integer> cobbleGenerator){
-        StringBuilder missionsBuilder = new StringBuilder();
-        cobbleGenerator.forEach((key, value) ->
-                missionsBuilder.append(",").append(key).append("=").append(value));
-        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+    public static String serializeGenerator(Map<Key, Integer>[] cobbleGenerators){
+        StringBuilder generatorsBuilder = new StringBuilder();
+        for(int i = 0; i < cobbleGenerators.length; i++) {
+            StringBuilder generatorBuilder = new StringBuilder();
+            World.Environment environment = World.Environment.values()[i];
+            cobbleGenerators[i].forEach((key, value) ->
+                    generatorBuilder.append(",").append(key).append("=").append(value));
+            generatorsBuilder.append(";").append(environment).append(":")
+                    .append(generatorBuilder.length() == 0 ? "" : generatorBuilder.toString().substring(1));
+        }
+        return generatorsBuilder.length() == 0 ? "" : generatorsBuilder.toString().substring(1);
     }
 
     public static String serializeLocations(Map<World.Environment, Location> locations){

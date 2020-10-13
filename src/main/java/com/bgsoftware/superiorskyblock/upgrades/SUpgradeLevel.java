@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,6 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +36,8 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Set<Pair<String, String>> requirements;
     private final UpgradeValue<Double> cropGrowth, spawnerRates, mobDrops;
     private final UpgradeValue<Integer> teamLimit, warpsLimit, coopLimit, borderSize;
-    private final KeyMap<UpgradeValue<Integer>> blockLimits, entityLimits, generatorRates;
+    private final KeyMap<UpgradeValue<Integer>> blockLimits, entityLimits;
+    private final KeyMap<UpgradeValue<Integer>>[] generatorRates;
     private final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects;
     private final UpgradeValue<BigDecimal> bankLimit;
 
@@ -44,7 +47,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          UpgradeValue<Double> cropGrowth, UpgradeValue<Double> spawnerRates, UpgradeValue<Double> mobDrops,
                          UpgradeValue<Integer> teamLimit, UpgradeValue<Integer> warpsLimit, UpgradeValue<Integer> coopLimit,
                          UpgradeValue<Integer> borderSize, KeyMap<UpgradeValue<Integer>> blockLimits,
-                         KeyMap<UpgradeValue<Integer>> entityLimits, KeyMap<UpgradeValue<Integer>> generatorRates,
+                         KeyMap<UpgradeValue<Integer>> entityLimits, KeyMap<UpgradeValue<Integer>>[] generatorRates,
                          Map<PotionEffectType, UpgradeValue<Integer>> islandEffects, UpgradeValue<BigDecimal> bankLimit){
         this.level = level;
         this.price = price;
@@ -211,17 +214,29 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getGeneratorAmount(Key key) {
-        return generatorRates.getOrDefault(key, UpgradeValue.ZERO).get();
+        return getGeneratorAmount(key, World.Environment.NORMAL);
     }
 
     @Override
     public Map<String, Integer> getGeneratorAmounts() {
-        return this.generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
+        return getGeneratorAmounts(World.Environment.NORMAL);
+    }
+
+    @Override
+    public int getGeneratorAmount(Key key, World.Environment environment) {
+        KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
+        return (generatorRates == null ? UpgradeValue.ZERO : generatorRates.getOrDefault(key, UpgradeValue.ZERO)).get();
+    }
+
+    @Override
+    public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
+        KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
+        return generatorRates == null ? new HashMap<>() : generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 entry -> entry.getValue().get()));
     }
 
-    public KeyMap<UpgradeValue<Integer>> getGeneratorUpgradeValue(){
+    public KeyMap<UpgradeValue<Integer>>[] getGeneratorUpgradeValue(){
         return generatorRates;
     }
 
