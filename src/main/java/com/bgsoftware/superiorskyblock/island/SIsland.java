@@ -149,7 +149,7 @@ public final class SIsland implements Island {
     private final SyncedObject<BigDecimal> bonusLevel = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
-    private final Registry<World.Environment, Location> teleportLocations = Registry.createRegistry();
+    private final SyncedObject<Location[]> teleportLocations = SyncedObject.of(new Location[3]);
     private final SyncedObject<Location> visitorsLocation = SyncedObject.of(null);
     private final SyncedObject<Boolean> locked = SyncedObject.of(false);
     private final SyncedObject<String> islandName = SyncedObject.of("");
@@ -641,7 +641,7 @@ public final class SIsland implements Island {
 
     @Override
     public Location getTeleportLocation(World.Environment environment) {
-        Location teleportLocation = teleportLocations.get(environment);
+        Location teleportLocation = teleportLocations.readAndGet(teleportLocations -> teleportLocations[environment.ordinal()]);
 
         if (teleportLocation == null)
             teleportLocation = getCenter(environment);
@@ -659,13 +659,19 @@ public final class SIsland implements Island {
 
     @Override
     public Map<World.Environment, Location> getTeleportLocations(){
-        return Collections.unmodifiableMap(teleportLocations.toMap());
+        return teleportLocations.readAndGet(teleportLocations -> {
+            Map<World.Environment, Location> map = new HashMap<>();
+            for (World.Environment env : World.Environment.values())
+                map.put(env, teleportLocations[env.ordinal()]);
+            return Collections.unmodifiableMap(map);
+        });
     }
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
         SuperiorSkyblockPlugin.debug("Action: Change Teleport Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(teleportLocation));
-        teleportLocations.add(teleportLocation.getWorld().getEnvironment(), teleportLocation.clone());
+        teleportLocations.write(teleportLocations ->
+                teleportLocations[teleportLocation.getWorld().getEnvironment().ordinal()] = teleportLocation.clone());
         islandDataHandler.saveTeleportLocation();
     }
 

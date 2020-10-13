@@ -225,7 +225,11 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeLocations(String locationParam, Registry<World.Environment, Location> locations){
+    public static void deserializeLocations(String locationParam, SyncedObject<Location[]> locations){
+        locations.write(_locations -> deserializeLocations(locationParam, _locations));
+    }
+
+    public static void deserializeLocations(String locationParam, Location[] locations){
         if(locationParam == null)
             return;
         
@@ -237,7 +241,7 @@ public final class IslandDeserializer {
             try {
                 String[] locationSection = worldSection.split("=");
                 String environment = locationSection[0].toUpperCase();
-                locations.add(World.Environment.valueOf(environment), LocationUtils.getLocation(locationSection[1]));
+                locations[World.Environment.valueOf(environment).ordinal()] = LocationUtils.getLocation(locationSection[1]);
             }catch(Exception ignored){}
         }
     }
