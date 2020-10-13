@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -79,9 +81,18 @@ public final class GeneratorsListener implements Listener {
     }
 
     private boolean hasWaterNearby(Block block){
-        for(BlockFace blockFace : nearbyFaces) {
-            if(plugin.getNMSBlocks().isWaterLogged(block.getRelative(blockFace)))
-                return true;
+        if(ServerVersion.isAtLeast(ServerVersion.v1_16) &&
+                block.getWorld().getEnvironment() == World.Environment.NETHER) {
+            for (BlockFace blockFace : nearbyFaces) {
+                if (block.getRelative(blockFace).getType().name().equals("BLUE_ICE"))
+                    return true;
+            }
+        }
+        else{
+            for (BlockFace blockFace : nearbyFaces) {
+                if (plugin.getNMSBlocks().isWaterLogged(block.getRelative(blockFace)))
+                    return true;
+            }
         }
 
         return false;
