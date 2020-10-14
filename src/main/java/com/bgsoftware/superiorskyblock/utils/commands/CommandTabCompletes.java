@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -253,6 +254,13 @@ public final class CommandTabCompletes {
         return IslandFlag.values().stream()
                 .filter(islandFlag -> islandFlag.getName().toLowerCase().contains(lowerArgument))
                 .map(islandFlag -> islandFlag.getName().toLowerCase()).collect(Collectors.toList());
+    }
+
+    public static List<String> getEnvironments(String argument){
+        String lowerArgument = argument.toLowerCase();
+        return Arrays.stream(World.Environment.values())
+                .filter(environment -> environment.name().toLowerCase().contains(lowerArgument))
+                .map(environment -> environment.name().toLowerCase()).collect(Collectors.toList());
     }
 
     private static List<String> getPlayers(Collection<SuperiorPlayer> players, String argument){

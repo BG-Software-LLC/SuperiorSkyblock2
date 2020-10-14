@@ -122,7 +122,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getWorlds(args[5]) : new ArrayList<>();
+                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : new ArrayList<>();
     }
 
 }
