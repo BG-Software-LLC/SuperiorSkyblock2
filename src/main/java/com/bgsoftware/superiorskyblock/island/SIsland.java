@@ -3001,6 +3001,8 @@ public final class SIsland implements Island {
         for(int i = 0; i < cobbleGeneratorValues.length; i++){
             KeyMap<UpgradeValue<Integer>> defaultGenerator = plugin.getSettings().defaultGenerator[i];
             if(defaultGenerator != null){
+                if(cobbleGeneratorValues[i] == null)
+                    cobbleGeneratorValues[i] = SyncedObject.of(new KeyMap<>());
                 cobbleGeneratorValues[i].write(cobbleGeneratorValues -> {
                     for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues.keySet()){
                         UpgradeValue<Integer> defaultValue = defaultGenerator.get(key);
