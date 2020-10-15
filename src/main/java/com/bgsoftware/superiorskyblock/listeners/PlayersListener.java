@@ -329,8 +329,8 @@ public final class PlayersListener implements Listener {
             targetPlayer.asPlayer().setFireTicks(0);
     }
 
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
@@ -349,14 +349,8 @@ public final class PlayersListener implements Listener {
                     Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
             }
         }
-    }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        Island island = superiorPlayer.getIsland();
-
-        if(!superiorPlayer.hasTeamChatEnabled()){
+        else{
             String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
                     plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName());
 
