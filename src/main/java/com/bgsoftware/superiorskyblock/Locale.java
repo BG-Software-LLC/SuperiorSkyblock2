@@ -6,13 +6,20 @@ import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -623,11 +630,8 @@ public enum Locale {
     WITHDRAW_ERROR,
     WORLD_NOT_UNLOCKED;
 
-    private static Set<java.util.Locale> locales = new HashSet<>();
-    private static java.util.Locale defaultLocale = null;
-
     private final String defaultMessage;
-    private final Registry<java.util.Locale, String> messages = Registry.createRegistry();
+    private final Registry<java.util.Locale, MessageContainer> messages = Registry.createRegistry();
 
     Locale(){
         this(null);
@@ -638,23 +642,12 @@ public enum Locale {
     }
 
     public boolean isEmpty(java.util.Locale locale){
-        return messages.get(locale, "").isEmpty();
+        MessageContainer messageContainer = messages.get(locale);
+        return messageContainer == null || messageContainer.getMessage().isEmpty();
     }
 
     public String getMessage(java.util.Locale locale, Object... objects){
-        if(!isEmpty(locale)) {
-            String msg = messages.get(locale);
-
-            for (int i = 0; i < objects.length; i++) {
-                String objectString = objects[i] instanceof BigDecimal ?
-                        StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
-                msg = msg.replace("{" + i + "}", objectString);
-            }
-
-            return msg;
-        }
-
-        return defaultMessage;
+        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects);
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects){
@@ -666,20 +659,21 @@ public enum Locale {
     }
 
     public void send(CommandSender sender, java.util.Locale locale, Object... objects){
-        String message = getMessage(locale, objects);
-        if(message != null && sender != null)
-            sendMessage(sender, message, false);
+        MessageContainer messageContainer = messages.get(locale);
+        if(messageContainer != null)
+            messageContainer.sendMessage(sender, objects);
     }
 
-    private void setMessage(java.util.Locale locale, String message){
-        if(message == null)
-            message = "";
-        messages.add(locale, message);
+    private void setMessage(java.util.Locale locale, MessageContainer messageContainer){
+        messages.add(locale, messageContainer);
     }
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Set<UUID> noInteractMessages = new HashSet<>();
     private static final Set<UUID> noSchematicMessages = new HashSet<>();
+
+    private static Set<java.util.Locale> locales = new HashSet<>();
+    private static java.util.Locale defaultLocale = null;
 
     public static void reload(){
         SuperiorSkyblockPlugin.log("Loading messages started...");
@@ -724,7 +718,12 @@ public enum Locale {
             cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
 
             for(Locale locale : values()){
-                locale.setMessage(fileLocale, StringUtils.translateColors(cfg.getString(locale.name(), "")));
+                if(cfg.isConfigurationSection(locale.name())){
+                    locale.setMessage(fileLocale, new ComplexMessage(locale.name(), cfg.getConfigurationSection(locale.name())));
+                }
+                else {
+                    locale.setMessage(fileLocale, new RawMessage(locale.name(), StringUtils.translateColors(cfg.getString(locale.name(), ""))));
+                }
 
                 if(countMessages)
                     messagesAmount++;
@@ -787,8 +786,152 @@ public enum Locale {
         }
     }
 
+    private static String replaceArgs(String msg, Object... objects){
+        if(msg == null)
+            return null;
+
+        for (int i = 0; i < objects.length; i++) {
+            String objectString = objects[i] instanceof BigDecimal ?
+                    StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
+            msg = msg.replace("{" + i + "}", objectString);
+        }
+
+        return msg;
+    }
+
     public static java.util.Locale getDefaultLocale(){
         return defaultLocale;
+    }
+
+    private static abstract class MessageContainer{
+
+        protected final String name;
+
+        MessageContainer(String name){
+            this.name = name;
+        }
+
+        abstract String getMessage();
+
+        abstract void sendMessage(CommandSender sender, Object... objects);
+
+    }
+
+    private static final class RawMessage extends MessageContainer{
+
+        private final String message;
+
+        RawMessage(String name, String message){
+            super(name);
+            this.message = message;
+        }
+
+        @Override
+        String getMessage() {
+            return message;
+        }
+
+        @Override
+        void sendMessage(CommandSender sender, Object... objects) {
+            if(message != null && !message.isEmpty())
+                sender.sendMessage(replaceArgs(message, objects));
+        }
+    }
+
+    private static final class ComplexMessage extends MessageContainer{
+
+        private final TextComponent[] textComponents;
+        private final String rawMessage, actionBarMessage, titleMessage, subtitleMessage;
+        private final int fadeIn, duration, fadeOut;
+
+        ComplexMessage(String name, ConfigurationSection section){
+            super(name);
+
+            List<TextComponent> textComponents = new ArrayList<>();
+            StringBuilder stringBuilder = new StringBuilder();
+            String actionBarMessage = "", titleMessage = null, subtitleMessage = null;
+            int fadeIn = -1, fadeOut = -1, duration = -1;
+
+            for(String key : section.getKeys(false)){
+                if(key.equals("action-bar")){
+                    actionBarMessage = StringUtils.translateColors(section.getString(key + ".text"));
+                }
+
+                else if(key.equals("title")){
+                    titleMessage = StringUtils.translateColors(section.getString(key + ".title"));
+                    subtitleMessage = StringUtils.translateColors(section.getString(key + ".sub-title"));
+                    fadeIn = section.getInt(key + ".fade-in");
+                    duration = section.getInt(key + ".duration");
+                    fadeOut = section.getInt(key + ".fade-out");
+                }
+
+                else {
+                    String message = StringUtils.translateColors(section.getString(key + ".text"));
+                    stringBuilder.append(message);
+
+                    TextComponent textComponent = new TextComponent(message);
+                    textComponents.add(textComponent);
+
+                    String toolTipMessage = section.getString(key + ".tooltip");
+                    if (toolTipMessage != null) {
+                        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                new BaseComponent[]{new TextComponent(StringUtils.translateColors(toolTipMessage))}));
+                    }
+
+                    String commandMessage = section.getString(key + ".command");
+                    if (commandMessage != null)
+                        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
+                }
+            }
+
+            this.textComponents = textComponents.toArray(new TextComponent[0]);
+            this.rawMessage = stringBuilder.toString();
+            this.actionBarMessage = actionBarMessage;
+            this.titleMessage = titleMessage;
+            this.subtitleMessage = subtitleMessage;
+            this.fadeIn = fadeIn;
+            this.duration = duration;
+            this.fadeOut = fadeOut;
+        }
+
+        @Override
+        public String getMessage() {
+            return rawMessage;
+        }
+
+        @Override
+        void sendMessage(CommandSender sender, Object... objects) {
+            if(!(sender instanceof Player)){
+                sender.sendMessage(rawMessage);
+            }
+            else {
+                BaseComponent[] duplicate = replaceArgs(textComponents, objects);
+                ((Player) sender).spigot().sendMessage(duplicate);
+                if(actionBarMessage != null)
+                    plugin.getNMSAdapter().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
+
+                plugin.getNMSAdapter().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
+                        Locale.replaceArgs(subtitleMessage, objects), fadeIn, duration, fadeOut);
+            }
+        }
+
+        private static BaseComponent[] replaceArgs(BaseComponent[] textComponents, Object... objects){
+            BaseComponent[] duplicate = new BaseComponent[textComponents.length];
+
+            for(int i = 0; i < textComponents.length; i++){
+                duplicate[i] = textComponents[i].duplicate();
+                if(duplicate[i] instanceof TextComponent) {
+                    TextComponent textComponent = (TextComponent) duplicate[i];
+                    textComponent.setText(Locale.replaceArgs(textComponent.getText(), objects));
+                }
+                HoverEvent hoverEvent = duplicate[i].getHoverEvent();
+                if(hoverEvent != null)
+                    duplicate[i].setHoverEvent(new HoverEvent(hoverEvent.getAction(), replaceArgs(hoverEvent.getValue(), objects)));
+            }
+
+            return duplicate;
+        }
+
     }
 
 }

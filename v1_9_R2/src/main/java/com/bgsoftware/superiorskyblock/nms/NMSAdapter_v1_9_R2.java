@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_9_R2.Block;
 import net.minecraft.server.v1_9_R2.BlockPosition;
 import net.minecraft.server.v1_9_R2.Chunk;
@@ -14,7 +16,9 @@ import net.minecraft.server.v1_9_R2.EnumParticle;
 import net.minecraft.server.v1_9_R2.Item;
 import net.minecraft.server.v1_9_R2.MinecraftKey;
 import net.minecraft.server.v1_9_R2.MinecraftServer;
+import net.minecraft.server.v1_9_R2.PacketPlayOutTitle;
 import net.minecraft.server.v1_9_R2.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_9_R2.PlayerConnection;
 import net.minecraft.server.v1_9_R2.PlayerInteractManager;
 import net.minecraft.server.v1_9_R2.SoundCategory;
 import net.minecraft.server.v1_9_R2.SoundEffectType;
@@ -36,6 +40,7 @@ import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_9_R2.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
@@ -260,6 +265,30 @@ public final class NMSAdapter_v1_9_R2 implements NMSAdapter {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         return ((CraftAnimals) animals).getHandle().e(CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public void sendActionBar(Player player, String message) {
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+    }
+
+    @Override
+    public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+
+        PacketPlayOutTitle times;
+        if (title != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, CraftChatMessage.fromString(title)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        if (subtitle != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, CraftChatMessage.fromString(subtitle)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        times = new PacketPlayOutTitle(fadeIn, duration, fadeOut);
+        playerConnection.sendPacket(times);
     }
 
 }

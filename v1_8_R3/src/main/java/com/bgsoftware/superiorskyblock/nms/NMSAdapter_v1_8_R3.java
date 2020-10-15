@@ -15,7 +15,10 @@ import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_8_R3.PlayerConnection;
 import net.minecraft.server.v1_8_R3.PlayerInteractManager;
 import net.minecraft.server.v1_8_R3.TileEntityMobSpawner;
 import net.minecraft.server.v1_8_R3.World;
@@ -34,6 +37,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
@@ -256,6 +260,31 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         return ((CraftAnimals) animals).getHandle().d(CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public void sendActionBar(Player player, String message) {
+        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(CraftChatMessage.fromString(message)[0], (byte) 2);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
+    }
+
+    @Override
+    public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+
+        PacketPlayOutTitle times;
+        if (title != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, CraftChatMessage.fromString(title)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        if (subtitle != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, CraftChatMessage.fromString(subtitle)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        times = new PacketPlayOutTitle(fadeIn, duration, fadeOut);
+        playerConnection.sendPacket(times);
     }
 
 }

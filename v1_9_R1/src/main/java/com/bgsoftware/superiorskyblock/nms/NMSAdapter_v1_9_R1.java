@@ -14,7 +14,10 @@ import net.minecraft.server.v1_9_R1.EnumParticle;
 import net.minecraft.server.v1_9_R1.Item;
 import net.minecraft.server.v1_9_R1.MinecraftKey;
 import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_9_R1.PacketPlayOutTitle;
 import net.minecraft.server.v1_9_R1.PacketPlayOutWorldBorder;
+import net.minecraft.server.v1_9_R1.PlayerConnection;
 import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 import net.minecraft.server.v1_9_R1.SoundCategory;
 import net.minecraft.server.v1_9_R1.SoundEffectType;
@@ -36,6 +39,7 @@ import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_9_R1.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
@@ -262,5 +266,29 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
         return ((CraftAnimals) animals).getHandle().e(CraftItemStack.asNMSCopy(itemStack));
     }
 
+    @Override
+    public void sendActionBar(Player player, String message) {
+        PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(CraftChatMessage.fromString(message)[0], (byte) 2);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
+    }
+
+    @Override
+    public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
+
+        PacketPlayOutTitle times;
+        if (title != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, CraftChatMessage.fromString(title)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        if (subtitle != null) {
+            times = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, CraftChatMessage.fromString(subtitle)[0]);
+            playerConnection.sendPacket(times);
+        }
+
+        times = new PacketPlayOutTitle(fadeIn, duration, fadeOut);
+        playerConnection.sendPacket(times);
+    }
 
 }

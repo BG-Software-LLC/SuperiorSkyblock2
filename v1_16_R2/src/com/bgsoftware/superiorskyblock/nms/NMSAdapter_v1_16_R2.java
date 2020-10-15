@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R2.BiomeBase;
 import net.minecraft.server.v1_16_R2.BiomeStorage;
 import net.minecraft.server.v1_16_R2.Block;
@@ -303,6 +305,17 @@ public final class NMSAdapter_v1_16_R2 implements NMSAdapter {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         return ((CraftAnimals) animals).getHandle().k(CraftItemStack.asNMSCopy(itemStack));
+    }
+
+    @Override
+    public void sendActionBar(Player player, String message) {
+        //noinspection deprecation
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
+    }
+
+    @Override
+    public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
+        player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {
