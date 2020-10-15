@@ -70,13 +70,8 @@ public final class CmdAdminKick implements IAdminPlayerCommand {
             return;
         }
 
-        EventsCaller.callIslandKickEvent(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, targetPlayer, targetIsland);
-
-        targetIsland.kickMember(targetPlayer);
-
-        IslandUtils.sendMessage(targetIsland, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), sender.getName());
-
-        Locale.GOT_KICKED.send(targetPlayer, sender.getName());
+        IslandUtils.handleKickPlayer(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null,
+                sender.getName(), targetIsland, targetPlayer);
     }
 
 }

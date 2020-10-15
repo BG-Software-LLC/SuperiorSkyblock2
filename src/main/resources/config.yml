@@ -346,8 +346,14 @@ default-placeholders:
 - 'superior_island_level:0'
 - 'superior_island_worth:0'
 
+# Should a confirm gui be displayed when /is ban is executed.
+ban-confirm: true
+
 # Should a confirm gui be displayed when /is disband is executed.
 disband-confirm: true
+
+# Should a confirm gui be displayed when /is kick is executed.
+kick-confirm: true
 
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, WildStacker

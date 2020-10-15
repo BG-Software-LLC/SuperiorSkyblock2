@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuConfirmKick;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -69,23 +69,15 @@ public final class CmdKick implements IPermissibleCommand {
         if(targetPlayer == null)
             return;
 
-        if(!island.isMember(targetPlayer)){
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+        if(!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer))
             return;
+
+        if(plugin.getSettings().kickConfirm) {
+            MenuConfirmKick.openInventory(superiorPlayer, null, targetPlayer);
         }
-
-        if(!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())){
-            Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
-            return;
+        else {
+            IslandUtils.handleKickPlayer(superiorPlayer, island, targetPlayer);
         }
-
-        EventsCaller.callIslandKickEvent(superiorPlayer, targetPlayer, island);
-
-        island.kickMember(targetPlayer);
-
-        IslandUtils.sendMessage(island, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
-
-        Locale.GOT_KICKED.send(targetPlayer, superiorPlayer.getName());
     }
 
     @Override

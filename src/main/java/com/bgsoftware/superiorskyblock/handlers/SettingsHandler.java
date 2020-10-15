@@ -96,7 +96,9 @@ public final class SettingsHandler extends AbstractHandler {
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
     public final Registry<String, String> defaultPlaceholders;
+    public final boolean banConfirm;
     public final boolean disbandConfirm;
+    public final boolean kickConfirm;
     public final String spawnersProvider;
     public final boolean disbandInventoryClear;
     public final boolean islandNamesRequiredForCreation;
@@ -275,7 +277,9 @@ public final class SettingsHandler extends AbstractHandler {
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
                 line -> line.split(":")[1]
         )));
+        banConfirm = cfg.getBoolean("ban-confirm");
         disbandConfirm = cfg.getBoolean("disband-confirm");
+        kickConfirm = cfg.getBoolean("kick-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
         islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -68,22 +69,15 @@ public final class CmdBan implements IPermissibleCommand {
         if(targetPlayer == null)
             return;
 
-        if(superiorPlayer.getIsland().isMember(targetPlayer) &&
-                !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+        if(!IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer))
             return;
+
+        if(plugin.getSettings().banConfirm){
+            MenuConfirmBan.openInventory(superiorPlayer, null, targetPlayer);
         }
-
-        if(island.isBanned(targetPlayer)){
-            Locale.PLAYER_ALREADY_BANNED.send(superiorPlayer);
-            return;
+        else {
+            IslandUtils.handleBanPlayer(superiorPlayer, island, targetPlayer);
         }
-
-        island.banMember(targetPlayer);
-
-        IslandUtils.sendMessage(island, Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
-
-        Locale.GOT_BANNED.send(targetPlayer, island.getOwner().getName());
     }
 
     @Override

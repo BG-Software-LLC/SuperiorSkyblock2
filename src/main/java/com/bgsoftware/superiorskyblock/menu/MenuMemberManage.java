@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
@@ -36,11 +38,29 @@ public final class MenuMemberManage extends SuperiorMenu {
         }
 
         else if(banSlot.contains(e.getRawSlot())){
-            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "ban " + targetPlayer.getName());
+            if(plugin.getSettings().banConfirm){
+                Island island = superiorPlayer.getIsland();
+                if(IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer)) {
+                    previousMove = false;
+                    MenuConfirmBan.openInventory(superiorPlayer, this, targetPlayer);
+                }
+            }
+            else {
+                CommandUtils.dispatchSubCommand(e.getWhoClicked(), "ban " + targetPlayer.getName());
+            }
         }
 
         else if(kickSlot.contains(e.getRawSlot())){
-            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
+            if(plugin.getSettings().kickConfirm){
+                Island island = superiorPlayer.getIsland();
+                if(IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer)) {
+                    previousMove = false;
+                    MenuConfirmKick.openInventory(superiorPlayer, this, targetPlayer);
+                }
+            }
+            else {
+                CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
+            }
         }
     }
 

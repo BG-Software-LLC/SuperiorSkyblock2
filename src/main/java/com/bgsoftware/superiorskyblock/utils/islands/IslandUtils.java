@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -151,6 +152,57 @@ public final class IslandUtils {
     public static double getGeneratorPercentageDecimal(Island island, com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment){
         int totalAmount = island.getGeneratorTotalAmount(environment);
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, environment) * 100D) / totalAmount;
+    }
+
+    public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer){
+        if(!island.isMember(targetPlayer)){
+            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            return false;
+        }
+
+        if(!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())){
+            Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void handleKickPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target){
+        handleKickPlayer(caller, caller.getName(), island, target);
+    }
+
+    public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target){
+        EventsCaller.callIslandKickEvent(caller, target, island);
+
+        island.kickMember(target);
+
+        IslandUtils.sendMessage(island, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
+
+        Locale.GOT_KICKED.send(target, callerName);
+    }
+
+    public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer){
+        if(superiorPlayer.getIsland().isMember(targetPlayer) &&
+                !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
+            Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            return false;
+        }
+
+        if(island.isBanned(targetPlayer)){
+            Locale.PLAYER_ALREADY_BANNED.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target){
+        island.banMember(target);
+
+        IslandUtils.sendMessage(island, Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
+
+        Locale.GOT_BANNED.send(target, island.getOwner().getName());
     }
 
 }
