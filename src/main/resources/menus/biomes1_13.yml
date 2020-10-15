@@ -14,6 +14,9 @@ pattern:
   - '# # @ # ^ # * # #'
   - '$ $ $ $ $ $ $ $ $'
 
+# Should the current biome be glowing?
+current-biome-glow: false
+
 items:
   '$':
     type: BLACK_STAINED_GLASS_PANE

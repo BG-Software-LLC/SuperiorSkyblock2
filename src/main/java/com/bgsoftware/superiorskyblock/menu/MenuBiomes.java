@@ -2,12 +2,14 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class MenuBiomes extends SuperiorMenu {
+
+    private static boolean currentBiomeGlow = false;
 
     private MenuBiomes(SuperiorPlayer superiorPlayer){
         super("menuBiomes", superiorPlayer);
@@ -85,6 +89,7 @@ public final class MenuBiomes extends SuperiorMenu {
     @Override
     protected Inventory buildInventory(Function<String, String> titleReplacer) {
         Inventory inv = super.buildInventory(titleReplacer);
+        Island island = superiorPlayer.getIsland();
 
         for(Biome biome : Biome.values()){
             String biomeName = biome.name().toLowerCase();
@@ -96,7 +101,12 @@ public final class MenuBiomes extends SuperiorMenu {
                 if(!superiorPlayer.hasPermission(permission))
                     biomeItem = (ItemBuilder) getData(biomeName + "-no-access-item");
 
-                inv.setItem(slot, biomeItem.clone().build(superiorPlayer));
+                biomeItem = biomeItem.clone();
+
+                if(currentBiomeGlow && island.getBiome() == biome)
+                    biomeItem.withEnchant(EnchantsUtils.getGlowEnchant(), 1);
+
+                inv.setItem(slot, biomeItem.build(superiorPlayer));
             }
         }
 
@@ -116,6 +126,8 @@ public final class MenuBiomes extends SuperiorMenu {
         if(convertOldGUI(cfg)){
             cfg.save(file);
         }
+
+        currentBiomeGlow = cfg.getBoolean("current-biome-glow", false);
 
         /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
 
