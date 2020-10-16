@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
@@ -32,6 +33,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
@@ -267,6 +269,15 @@ public final class EventsCaller {
         IslandUncoopPlayerEvent islandUncoopPlayerEvent = new IslandUncoopPlayerEvent(island, player, target, uncoopReason);
         Bukkit.getPluginManager().callEvent(islandUncoopPlayerEvent);
         return !islandUncoopPlayerEvent.isCancelled();
+    }
+
+    public static void callIslandChunkResetEvent(Island island, ChunkPosition chunkPosition){
+        if(plugin.getSettings().disabledEvents.contains("islandchunkresetevent"))
+            return;
+
+        IslandChunkResetEvent islandChunkResetEvent = new IslandChunkResetEvent(island, chunkPosition.getWorld(),
+                chunkPosition.getX(), chunkPosition.getZ());
+        Bukkit.getPluginManager().callEvent(islandChunkResetEvent);
     }
 
 }
