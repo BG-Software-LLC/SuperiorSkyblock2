@@ -811,9 +811,9 @@ public final class SIsland implements Island {
         }
 
         for(int i = 0; i < chunkPositions.size() - 1; i++)
-            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
+            IslandUtils.deleteChunk(this, chunkPositions.get(i), null);
 
-        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+        IslandUtils.deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
     }
 
     @Override
@@ -832,9 +832,9 @@ public final class SIsland implements Island {
         }
 
         for(int i = 0; i < chunkPositions.size() - 1; i++)
-            plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(i), null);
+            IslandUtils.deleteChunk(this, chunkPositions.get(i), null);
 
-        plugin.getNMSBlocks().deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+        IslandUtils.deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
     }
 
     @Override
@@ -1104,8 +1104,6 @@ public final class SIsland implements Island {
         });
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
-
-        plugin.getGrid().removeStackedBlocks(this);
 
         resetChunks(true);
 

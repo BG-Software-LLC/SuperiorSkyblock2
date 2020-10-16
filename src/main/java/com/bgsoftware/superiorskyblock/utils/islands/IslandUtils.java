@@ -205,4 +205,9 @@ public final class IslandUtils {
         Locale.GOT_BANNED.send(target, island.getOwner().getName());
     }
 
+    public static void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish){
+        plugin.getNMSBlocks().deleteChunk(island, chunkPosition, onFinish);
+        plugin.getGrid().removeStackedBlocks(island, chunkPosition);
+    }
+
 }

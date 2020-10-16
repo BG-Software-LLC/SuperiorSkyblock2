@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -53,7 +54,7 @@ public final class BlockChangeTask {
                     interactedChunks.add(entry.getKey());
                     interactedBlocks.addAll(entry.getValue());
 
-                    plugin.getNMSBlocks().deleteChunk(island, entry.getKey(), null);
+                    IslandUtils.deleteChunk(island, entry.getKey(), null);
 
                     if(island.isInsideRange(chunk))
                         plugin.getNMSBlocks().startTickingChunk(island, chunk, false);

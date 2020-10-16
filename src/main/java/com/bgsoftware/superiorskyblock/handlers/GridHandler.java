@@ -491,20 +491,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         return blockFailed;
     }
 
-    public void removeStackedBlocks(Island island){
-        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder((SIslandDataHandler) island.getDataHandler());
+    public void removeStackedBlocks(Island island, ChunkPosition chunkPosition){
+        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder(
+                (SIslandDataHandler) island.getDataHandler());
         stackedBlocksHolder.prepareBatch();
 
-        IslandUtils.getChunkCoords(island, true, false).forEach(chunkPosition -> {
-            Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks = this.stackedBlocks.removeStackedBlocks(chunkPosition);
-            if(stackedBlocks != null)
-                stackedBlocks.values().forEach(stackedBlock -> {
-                    stackedBlock.removeHologram();
-                    SBlockPosition blockPosition = stackedBlock.getBlockPosition();
-                    stackedBlocksHolder.setString(blockPosition.getWorldName()).setInt(blockPosition.getX())
-                            .setInt(blockPosition.getY()).setInt(blockPosition.getZ()).addBatch();
-                });
-        });
+        Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks =
+                this.stackedBlocks.removeStackedBlocks(chunkPosition);
+
+        if(stackedBlocks != null) {
+            stackedBlocks.values().forEach(stackedBlock -> {
+                stackedBlock.removeHologram();
+                SBlockPosition blockPosition = stackedBlock.getBlockPosition();
+                stackedBlocksHolder.setString(blockPosition.getWorldName()).setInt(blockPosition.getX())
+                        .setInt(blockPosition.getY()).setInt(blockPosition.getZ()).addBatch();
+            });
+        }
 
         stackedBlocksHolder.execute(true);
     }
