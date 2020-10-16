@@ -1354,6 +1354,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setSchematicGenerate(World.Environment environment, boolean generated) {
+
+    }
+
+    @Override
     public int getGeneratedSchematicsFlag() {
         return 0;
     }

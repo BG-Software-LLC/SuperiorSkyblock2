@@ -1582,6 +1582,13 @@ public interface Island extends Comparable<Island> {
     void setSchematicGenerate(World.Environment environment);
 
     /**
+     * Set schematic generated flag.
+     * @param environment The environment to set.
+     * @param generated The flag to set.
+     */
+    void setSchematicGenerate(World.Environment environment, boolean generated);
+
+    /**
      * Get the generated schematics flag.
      */
     int getGeneratedSchematicsFlag();

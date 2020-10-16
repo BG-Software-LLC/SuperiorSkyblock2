@@ -171,6 +171,7 @@ COMMAND_DESCRIPTION_ADMIN_RECALC: 重新计算一个岛屿的价值.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: 重载插件.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: 移除一个玩家给出的所有岛屿评分.
+COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world to an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: 新建一个岛屿预设图.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: 给一个岛屿设置生物群系.
@@ -583,6 +584,9 @@ RECALC_PROCCESS_REQUEST: '&e&l岛屿 | &7处理请求中...'
 RELOAD_COMPLETED: '&e&l岛屿 | &7插件已重载'
 RELOAD_PROCCESS_REQUEST: '&e&l岛屿 | &7开始重载插件配置...'
 REVOKE_INVITE_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7取消了对 &b{1} &7的岛屿团队邀请.'
+RESET_WORLD_SUCCEED: '&e&lIsland | &7Successfully reset the world {0} for {1}''s island.'
+RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for all the islands.'
+RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&l错误 | &7新的岛屿名不能和之前相同.'
 SCHEMATIC_LEFT_SELECT: '&e&l岛屿预设 | &7选定点 #2 ({0})'
 SCHEMATIC_NOT_READY: '&c&l错误 | &7你没有选定两个点.'

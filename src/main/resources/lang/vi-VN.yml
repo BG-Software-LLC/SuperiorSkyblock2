@@ -201,6 +201,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác v�
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: 'Remove a block limit from an island.'
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Xóa tất cả các xếp hạng được cung cấp bởi
   một người chơi.
+COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world to an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Tạo các schematic cho plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: 'Set a bank limit to an island.'
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Đặt quần xã cho đảo.
@@ -665,6 +666,9 @@ RELOAD_COMPLETED: '&e&lĐảo Thần | &7Tải lại xong!'
 RELOAD_PROCCESS_REQUEST: '&e&lĐảo Thần | &7Bắt đầu tải lại config...'
 REVOKE_INVITE_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thu hồi lời mời của {1} đến hòn
   đảo.'
+RESET_WORLD_SUCCEED: '&e&lIsland | &7Successfully reset the world {0} for {1}''s island.'
+RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for all the islands.'
+RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&lLỗi | &7Bạn phải nhập một tên khác với tên đảo hiện tại   của
   bạn.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #2 ({0})'

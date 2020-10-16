@@ -2844,9 +2844,23 @@ public final class SIsland implements Island {
 
     @Override
     public void setSchematicGenerate(World.Environment environment) {
+        setSchematicGenerate(environment, true);
+    }
+
+    @Override
+    public void setSchematicGenerate(World.Environment environment, boolean generated) {
         SuperiorSkyblockPlugin.debug("Action: Set Schematic, Island: " + owner.getName() + ", Environment: " + environment);
-        int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
-        int generatedSchematics = this.generatedSchematics.get() | n;
+        int generatedSchematics;
+
+        if(generated) {
+            int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
+            generatedSchematics = this.generatedSchematics.get() | n;
+        }
+        else {
+            int n = environment == World.Environment.NORMAL ? 7 : environment == World.Environment.NETHER ? 11 : 14;
+            generatedSchematics = this.generatedSchematics.get() & n;
+        }
+
         this.generatedSchematics.set(generatedSchematics);
         islandDataHandler.saveGeneratedSchematics();
     }

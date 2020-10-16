@@ -221,7 +221,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attivit√
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da un'isola.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite da
   un giocatore.
-
+COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world to an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Imposta un limite di banca per un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
@@ -722,6 +722,9 @@ RECALC_PROCCESS_REQUEST: '&e&lIsola | &7Elaborazione della richiesta...'
 RELOAD_COMPLETED: '&e&lIsola | &7Il reload √® terminato!'
 RELOAD_PROCCESS_REQUEST: '&e&lIsola | &7Starting to reload configurations...'
 REVOKE_INVITE_ANNOUNCEMENT: '&e&lIsola | &7{0} ha revocato l''invito di {1}.'
+RESET_WORLD_SUCCEED: '&e&lIsland | &7Successfully reset the world {0} for {1}''s island.'
+RESET_WORLD_SUCCEED_ALL: '&e&lIsland | &7Successfully reset the world {0} for all the islands.'
+RESET_WORLD_SUCCEED_NAME: '&e&lIsland | &7Successfully reset the world {0} for {1}.'
 SAME_NAME_CHANGE: '&c&lErrore | &7Devi inserire un nome diverso dal tuo attuale nome
   dell''isola.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Posizione selezionata #2 ({0})'
