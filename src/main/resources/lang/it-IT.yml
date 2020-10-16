@@ -221,7 +221,7 @@ COMMAND_DESCRIPTION_ADMIN_RELOAD: Ricarica tutte le configurazioni e le attivit√
 COMMAND_DESCRIPTION_ADMIN_REMOVE_BLOCK_LIMIT: Rimuovi il limite di un blocco da un'isola.
 COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS: Rimuovi tutte le valutazioni fornite da
   un giocatore.
-COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world to an island.'
+COMMAND_DESCRIPTION_ADMIN_RESET_WORLD: 'Reset a world for an island.'
 COMMAND_DESCRIPTION_ADMIN_SCHEMATIC: Crea una schematica per il plugin.
 COMMAND_DESCRIPTION_ADMIN_SET_BANK_LIMIT: Imposta un limite di banca per un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_BIOME: Imposta il bioma di un'isola.
