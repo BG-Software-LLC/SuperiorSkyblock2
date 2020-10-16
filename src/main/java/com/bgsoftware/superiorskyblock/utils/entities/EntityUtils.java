@@ -129,7 +129,7 @@ public final class EntityUtils {
     }
 
     public static boolean canBypassEntityLimit(Entity entity){
-        return !(entity instanceof ArmorStand) || !((ArmorStand) entity).isVisible();
+        return entity instanceof ArmorStand && !((ArmorStand) entity).isVisible();
     }
 
     public static boolean isMonster(EntityType entityType){
