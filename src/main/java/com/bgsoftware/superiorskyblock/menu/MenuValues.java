@@ -73,7 +73,10 @@ public final class MenuValues extends SuperiorMenu {
 
     @Override
     public Inventory getInventory() {
-        return buildInventory(title -> title.replace("{0}", island.getOwner().getName()).replace("{1}", island.getWorth().toString()));
+        return buildInventory(title -> title
+                .replace("{0}", island.getOwner().getName())
+                .replace("{1}", StringUtils.format(island.getWorth()))
+        );
     }
 
     public static void init(){
