@@ -220,6 +220,8 @@ permissions:
             description: Remove a block limit for an island.
           superior.admin.removeratings:
             description: Remove all ratings given by a player.
+          superior.admin.resetworld:
+            description: Reset a world for an island.
           superior.admin.schematic:
             description: Create schematics for the plugin.
           superior.admin.setbanklimit:
