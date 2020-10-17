@@ -246,7 +246,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, true, 65535);
+        PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, false, 65535);
 
         AxisAlignedBB bb = new AxisAlignedBB((bukkitChunk.getX() << 4) - 120, 0, (bukkitChunk.getZ() << 4) - 120,
                 (bukkitChunk.getX() << 4) + 120, 256, (bukkitChunk.getZ() << 4) + 120);
