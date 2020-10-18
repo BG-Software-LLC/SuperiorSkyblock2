@@ -69,6 +69,11 @@ public final class CmdCoop implements IPermissibleCommand {
         if(targetPlayer == null)
             return;
 
+        if(!targetPlayer.isOnline()){
+            Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
+            return;
+        }
+
         if(island.isMember(targetPlayer)){
             Locale.ALREADY_IN_ISLAND_OTHER.send(superiorPlayer);
             return;
