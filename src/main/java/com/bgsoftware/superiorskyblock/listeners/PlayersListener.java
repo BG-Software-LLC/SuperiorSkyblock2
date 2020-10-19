@@ -329,7 +329,7 @@ public final class PlayersListener implements Listener {
             targetPlayer.asPlayer().setFireTicks(0);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
