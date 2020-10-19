@@ -96,8 +96,11 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], IntStream.range(1, island.getChestSize() + 1)) :
-                args.length == 5 ? CommandTabCompletes.getCustomComplete(args[4], IntStream.range(1, 7)) : new ArrayList<>();
+        return args.length == 4 && island != null ?
+                CommandTabCompletes.getCustomComplete(args[3], IntStream.range(1, island.getChestSize() + 1)) :
+                args.length == 5 && island != null ?
+                CommandTabCompletes.getCustomComplete(args[4], IntStream.range(1, 7)) :
+                new ArrayList<>();
     }
 
 }
