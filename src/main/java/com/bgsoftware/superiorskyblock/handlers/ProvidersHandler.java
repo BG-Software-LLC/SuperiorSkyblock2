@@ -122,8 +122,13 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 }
             }
 
-            if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms"))
-                runSafe(() -> permissionsProvider = new PermissionsProvider_LuckPerms());
+            if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
+                runSafe(() -> {
+                    PermissionsProvider permissionsProvider = new PermissionsProvider_LuckPerms();
+                    if(permissionsProvider.isCompatible())
+                        this.permissionsProvider = permissionsProvider;
+                });
+            }
 
             if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
                 runSafe(() -> pricesProvider = new PricesProvider_ShopGUIPlus());
