@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -95,6 +96,12 @@ public final class MenuIslandBank extends SuperiorMenu {
         for(String itemChar : cfg.getConfigurationSection("items").getKeys(false)){
             if(cfg.contains("items." + itemChar + ".bank-action")){
                 List<Integer> slots = charSlots.get(itemChar.toCharArray()[0]);
+
+                if(slots == null){
+                    SuperiorSkyblockPlugin.log("&cThe item '" + itemChar.toCharArray()[0] + "' in island bank has no slots, skipping...");
+                    continue;
+                }
+
                 SoundWrapper successSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
                 SoundWrapper failSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
 

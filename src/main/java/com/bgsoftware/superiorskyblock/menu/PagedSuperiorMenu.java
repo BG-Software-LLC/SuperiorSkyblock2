@@ -148,6 +148,9 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     }
 
     public void setSlots(List<Integer> slots) {
+        if(slots == null)
+            throw new IllegalArgumentException("The menu " + getIdentifier() + " doesn't have any available slots.");
+
         addData("slots", slots);
         slots.sort(Integer::compareTo);
     }
