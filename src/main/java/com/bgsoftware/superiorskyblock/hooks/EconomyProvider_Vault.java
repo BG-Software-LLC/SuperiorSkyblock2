@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import net.milkbowl.vault.economy.Economy;
@@ -12,18 +13,17 @@ import java.math.BigDecimal;
 
 public final class EconomyProvider_Vault implements EconomyProvider {
 
-    private final Economy econ;
+    private static Economy econ;
 
-    public EconomyProvider_Vault() throws RuntimeException{
-        if (Bukkit.getPluginManager().getPlugin("Vault") == null)
-            throw new RuntimeException();
-
+    public static boolean isCompatible(){
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
+        if (rsp != null)
+            econ = rsp.getProvider();
 
-        if (rsp == null)
-            throw new RuntimeException();
+        if(econ != null)
+            SuperiorSkyblockPlugin.log("Using Vault as an economy provider.");
 
-        econ = rsp.getProvider();
+        return econ != null;
     }
 
     @Override

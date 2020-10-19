@@ -60,6 +60,8 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                 }
 
             }, ConstantKeys.CAULDRON);
+
+            SuperiorSkyblockPlugin.log("Using WildStacker as a spawners provider.");
         }
     }
 

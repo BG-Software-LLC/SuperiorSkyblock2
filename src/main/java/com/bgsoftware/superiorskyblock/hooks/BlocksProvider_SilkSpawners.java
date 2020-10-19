@@ -22,6 +22,7 @@ public final class BlocksProvider_SilkSpawners implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new BlocksProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using SilkSpawners as a spawners provider.");
         }
     }
 

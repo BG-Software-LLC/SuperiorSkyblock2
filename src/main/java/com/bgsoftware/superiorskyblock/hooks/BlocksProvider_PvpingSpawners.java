@@ -25,6 +25,7 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using PvpingSpawners as a spawners provider.");
         }
     }
 

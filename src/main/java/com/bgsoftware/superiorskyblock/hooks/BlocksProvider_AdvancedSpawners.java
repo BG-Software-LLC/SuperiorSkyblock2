@@ -23,6 +23,7 @@ public final class BlocksProvider_AdvancedSpawners implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new BlocksProvider_AdvancedSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using AdvancedSpawners as a spawners provider.");
         }
     }
 

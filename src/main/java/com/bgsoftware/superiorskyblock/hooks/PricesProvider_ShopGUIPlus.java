@@ -17,6 +17,10 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
     private static final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
     private static final KeyMap<Double> cachedPrices = new KeyMap<>();
 
+    public PricesProvider_ShopGUIPlus(){
+        SuperiorSkyblockPlugin.log("Using ShopGUIPlus as a prices provider.");
+    }
+
     @Override
     public BigDecimal getPrice(Key key) {
         double price = cachedPrices.getOrDefault(key, 0D);

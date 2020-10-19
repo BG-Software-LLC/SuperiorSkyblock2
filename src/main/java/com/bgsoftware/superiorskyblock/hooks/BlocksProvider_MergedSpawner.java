@@ -23,6 +23,7 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new BlocksProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using MergedSpawner as a spawners provider.");
         }
     }
 

@@ -9,20 +9,17 @@ import org.bukkit.entity.Player;
 
 public final class PermissionsProvider_LuckPerms implements PermissionsProvider {
 
-    private final LuckPerms luckPerms;
+    private static LuckPerms luckPerms = null;
 
-    public PermissionsProvider_LuckPerms(){
-        luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
-    }
-
-    @Override
-    public boolean isCompatible() {
+    public static boolean isCompatible() {
         try {
             CachedDataManager.class.getMethod("getPermissionData");
+            luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
+            SuperiorSkyblockPlugin.log("Using LuckPerms as a permissions provider.");
             return true;
         }catch (Throwable ex){
             SuperiorSkyblockPlugin.log("&cYou are using an outdated version of LuckPerms. " +
-                    "It's recommended to update for more optimized experience (v5.1+).");
+                    "It's recommended to update for a more optimized experience (v5.1+).");
             return false;
         }
     }

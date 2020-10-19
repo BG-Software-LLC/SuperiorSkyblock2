@@ -28,6 +28,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using EpicSpawners as a spawners provider.");
         }
     }
 

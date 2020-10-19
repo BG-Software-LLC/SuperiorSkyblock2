@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 public final class PlaceholderHook_PAPI extends PlaceholderHook {
 
     PlaceholderHook_PAPI(){
+        SuperiorSkyblockPlugin.log("Using PlaceholderAPI for placeholders support.");
         new EZPlaceholder().register();
     }
 

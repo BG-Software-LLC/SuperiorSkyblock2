@@ -29,6 +29,7 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+            SuperiorSkyblockPlugin.log("Using UltimateStacker as a spawners provider.");
         }
     }
 
