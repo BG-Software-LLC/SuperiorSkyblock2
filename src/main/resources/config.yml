@@ -356,7 +356,7 @@ disband-confirm: true
 kick-confirm: true
 
 # If you want a specific spawners provider to use, specify it here.
-# Providers: Auto, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, WildStacker
+# Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
 
 # Should inventories of island members get cleared after disbanding their island?

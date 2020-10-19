@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_RoseStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
@@ -97,29 +98,33 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
+                boolean auto = spawnersProvider.equalsIgnoreCase("Auto");
 
                 if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
-                        (spawnersProvider.equalsIgnoreCase("MergedSpawner") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_MergedSpawner()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
-                        (spawnersProvider.equalsIgnoreCase("AdvancedSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_AdvancedSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                        (spawnersProvider.equalsIgnoreCase("WildStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("WildStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_WildStacker()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
                         Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
-                        (spawnersProvider.equalsIgnoreCase("SilkSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_SilkSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
-                        (spawnersProvider.equalsIgnoreCase("PvpingSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_PvpingSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
-                        (spawnersProvider.equalsIgnoreCase("EpicSpawners") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_EpicSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
-                        (spawnersProvider.equalsIgnoreCase("UltimateStacker") || spawnersProvider.equalsIgnoreCase("Auto"))) {
+                        (auto || spawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_UltimateStacker()));
+                } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
+                        (auto || spawnersProvider.equalsIgnoreCase("RoseStacker"))) {
+                    runSafe(() -> setSpawnersProvider(new BlocksProvider_RoseStacker()));
                 }
             }
 
