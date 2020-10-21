@@ -204,7 +204,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName) {
         Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schemName.toLowerCase());
-        if(previewLocation != null) {
+        if(previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if(result){
                     islandPreviews.add(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
