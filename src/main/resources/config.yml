@@ -676,3 +676,6 @@ bank-interest:
 
 # Should vanished players be hidden in tab completes?
 tab-complete-hide-vanished: true
+
+# When enabled, the drops multiplier will only multiply drops of entities that were killed by players.
+drops-upgrade-players-multiply: false

@@ -24,11 +24,13 @@ import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -41,6 +43,7 @@ import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -102,6 +105,27 @@ public final class UpgradesListener implements Listener {
 
         if(e.getEntity() instanceof Player)
             return;
+
+        if(plugin.getSettings().dropsUpgradePlayersMultiply){
+            EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
+            if(!(lastDamage instanceof EntityDamageByEntityEvent))
+                return;
+
+            EntityDamageByEntityEvent lastDamageEvent = (EntityDamageByEntityEvent) lastDamage;
+            Entity damager = null;
+
+            if(lastDamageEvent.getDamager() instanceof Player){
+                damager = lastDamageEvent.getDamager();
+            }
+            else if(lastDamageEvent.getDamager() instanceof Projectile){
+                ProjectileSource projectileSource = ((Projectile) lastDamageEvent.getDamager()).getShooter();
+                if(projectileSource instanceof Player)
+                    damager = (Player) projectileSource;
+            }
+
+            if(!(damager instanceof Player))
+                return;
+        }
 
         double mobDropsMultiplier = island.getMobDropsMultiplier();
 
