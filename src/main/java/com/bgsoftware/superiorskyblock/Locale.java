@@ -655,7 +655,8 @@ public enum Locale {
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects){
-        send(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale(), objects);
+        if(superiorPlayer.isOnline())
+            send(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale(), objects);
     }
 
     public void send(CommandSender sender, Object... objects){
