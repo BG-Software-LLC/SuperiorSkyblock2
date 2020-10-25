@@ -34,6 +34,11 @@ public final class SIslandChest implements IslandChest {
     }
 
     @Override
+    public Island getIsland() {
+        return island;
+    }
+
+    @Override
     public int getIndex() {
         return index;
     }
