@@ -891,6 +891,11 @@ public interface Island extends Comparable<Island> {
     Map<Key, Integer> getBlockCounts();
 
     /**
+     * Clear all the block counts of the island.
+     */
+    void clearBlockCounts();
+
+    /**
      * Get the amount of blocks that are on the island.
      * Unlike getBlockCount(Key), this method returns the count for
      * the exactly block that is given as a parameter.

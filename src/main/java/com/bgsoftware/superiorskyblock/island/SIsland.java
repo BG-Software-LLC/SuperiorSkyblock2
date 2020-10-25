@@ -1829,6 +1829,13 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public void clearBlockCounts() {
+        blockCounts.write(Map::clear);
+        islandWorth.set(BigDecimal.ZERO);
+        islandLevel.set(BigDecimal.ZERO);
+    }
+
+    @Override
     public int getExactBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key) {
         return blockCounts.readAndGet(blockCounts -> blockCounts.getRaw(key, 0));
     }

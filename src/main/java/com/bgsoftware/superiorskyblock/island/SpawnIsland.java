@@ -814,6 +814,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void clearBlockCounts() {
+
+    }
+
+    @Override
     public int getExactBlockCount(Key key) {
         return 0;
     }
