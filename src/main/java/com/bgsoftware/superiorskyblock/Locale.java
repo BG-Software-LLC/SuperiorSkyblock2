@@ -911,7 +911,10 @@ public enum Locale {
             }
             else {
                 BaseComponent[] duplicate = replaceArgs(textComponents, objects);
-                ((Player) sender).spigot().sendMessage(duplicate);
+                
+                if(duplicate.length > 0)
+                    ((Player) sender).spigot().sendMessage(duplicate);
+
                 if(actionBarMessage != null)
                     plugin.getNMSAdapter().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
 
