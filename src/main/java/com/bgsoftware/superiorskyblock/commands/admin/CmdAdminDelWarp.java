@@ -67,6 +67,9 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         String warpName = CommandArguments.getWarp(sender, island, args, 3);
 
+        if(warpName == null)
+            return;
+
         boolean breakSign = false;
 
         Block signBlock = island.getWarpLocation(warpName).getBlock();
