@@ -151,7 +151,7 @@ public abstract class PlaceholderHook {
 
                 else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                     String keyName = matcher.group(1).toUpperCase();
-                    return String.valueOf(island.getBlockCount(Key.of(keyName)));
+                    return StringUtils.format(island.getBlockCountAsBigInteger(Key.of(keyName)));
                 }
 
                 else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {

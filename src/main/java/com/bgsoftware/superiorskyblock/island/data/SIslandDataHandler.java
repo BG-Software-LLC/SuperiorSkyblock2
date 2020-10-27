@@ -299,7 +299,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
         setFullUpdated(Query.ISLAND_SET_BLOCK_COUNTS);
         //Saving blocks.
         Query.ISLAND_SET_BLOCK_COUNTS.getStatementHolder(this)
-                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCounts()))
+                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -352,7 +352,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setInt(island.getWarpsLimitRaw())
                 .setString(island.getBonusWorth() + "")
                 .setBoolean(island.isLocked())
-                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCounts()))
+                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
                 .setString(island.getName())
                 .setString(island.getDescription())
                 .setString(IslandSerializer.serializeRatings(island.getRatings()))
@@ -413,7 +413,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setInt(island.getWarpsLimitRaw())
                 .setString(island.getBonusWorth() + "")
                 .setBoolean(island.isLocked())
-                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCounts()))
+                .setString(IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
                 .setString(island.getName())
                 .setString(LocationUtils.getLocation(island.getVisitorsLocation()))
                 .setString(island.getDescription())

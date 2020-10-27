@@ -91,6 +91,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -104,6 +105,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
+    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
 
     protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -141,7 +143,7 @@ public final class SIsland implements Island {
     private final Registry<IslandPrivilege, PlayerRole> rolePermissions = Registry.createRegistry();
     private final Registry<IslandFlag, Byte> islandSettings = Registry.createRegistry();
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
-    private final SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
+    private final SyncedObject<KeyMap<BigInteger>> blockCounts = SyncedObject.of(new KeyMap<>());
     private final Registry<String, SIslandWarp> warps = Registry.createRegistry();
     private final SyncedObject<BigDecimal> islandWorth = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
@@ -171,6 +173,7 @@ public final class SIsland implements Island {
      */
 
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits = SyncedObject.of(new KeyMap<>());
+    @SuppressWarnings("all")
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGeneratorValues = new SyncedObject[3];
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects = SyncedObject.of(new HashMap<>());
@@ -1153,7 +1156,7 @@ public final class SIsland implements Island {
         }
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
-        SyncedObject<KeyMap<Integer>> blockCounts = SyncedObject.of(new KeyMap<>());
+        SyncedObject<KeyMap<BigInteger>> blockCounts = SyncedObject.of(new KeyMap<>());
         SyncedObject<BigDecimal> islandWorth = SyncedObject.of(BigDecimal.ZERO);
         SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
 
@@ -1605,6 +1608,11 @@ public final class SIsland implements Island {
 
     @Override
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+        handleBlockPlace(key, BigInteger.valueOf(amount), save);
+    }
+
+    @Override
+    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
         handleBlockPlace(key, amount, save, blockCounts, islandWorth, islandLevel);
     }
 
@@ -1615,8 +1623,18 @@ public final class SIsland implements Island {
         islandDataHandler.saveDirtyChunks();
     }
 
-    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimal> syncedIslandWorth, SyncedObject<BigDecimal> syncedIslandLevel){
-        if(amount == 0)
+    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save,
+                                  SyncedObject<KeyMap<BigInteger>> syncedBlockCounts,
+                                  SyncedObject<BigDecimal> syncedIslandWorth,
+                                  SyncedObject<BigDecimal> syncedIslandLevel){
+        handleBlockPlace(key, BigInteger.valueOf(amount), save, syncedBlockCounts, syncedIslandWorth, syncedIslandLevel);
+    }
+
+    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save,
+                                  SyncedObject<KeyMap<BigInteger>> syncedBlockCounts,
+                                  SyncedObject<BigDecimal> syncedIslandWorth,
+                                  SyncedObject<BigDecimal> syncedIslandLevel){
+        if(amount.compareTo(BigInteger.ZERO) == 0)
             return;
 
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
@@ -1651,8 +1669,11 @@ public final class SIsland implements Island {
         }
     }
 
-    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks, boolean save, SyncedObject<KeyMap<Integer>> syncedBlockCounts, SyncedObject<BigDecimal> syncedIslandWorth, SyncedObject<BigDecimal> syncedIslandLevel){
-        KeyMap<Integer> blockCounts = new KeyMap<>();
+    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks, boolean save,
+                                  SyncedObject<KeyMap<BigInteger>> syncedBlockCounts,
+                                  SyncedObject<BigDecimal> syncedIslandWorth,
+                                  SyncedObject<BigDecimal> syncedIslandLevel){
+        KeyMap<BigInteger> blockCounts = new KeyMap<>();
         BigDecimal blocksValues = BigDecimal.ZERO, blocksLevels = BigDecimal.ZERO;
 
         syncedBlockCounts.read(blockCounts::putAll);
@@ -1694,14 +1715,19 @@ public final class SIsland implements Island {
             saveBlockCounts(BigDecimal.ZERO, BigDecimal.ZERO);
     }
 
-    private void addCounts(KeyMap<Integer> blockCounts, SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits,
+    private void addCounts(KeyMap<BigInteger> blockCounts, SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits,
                            com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+        addCounts(blockCounts, blockLimits, key, BigInteger.valueOf(amount));
+    }
+
+    private void addCounts(KeyMap<BigInteger> blockCounts, SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits,
+                           com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
         SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
 
-        int currentAmount = blockCounts.getRaw(valueKey, 0);
-        blockCounts.put(valueKey, currentAmount + amount);
+        BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
+        blockCounts.put(valueKey, currentAmount.add(amount));
 
         if(!rawKeyPlacements) {
             Key limitKey = blockLimits.readAndGet(map -> map.getKey(valueKey));
@@ -1710,8 +1736,8 @@ public final class SIsland implements Island {
 
             if (!limitKey.equals(valueKey)) {
                 SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount);
-                currentAmount = blockCounts.getRaw(limitKey, 0);
-                blockCounts.put(limitKey, currentAmount + amount);
+                currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
+                blockCounts.put(limitKey, currentAmount.add(amount));
                 limitCount = true;
             }
 
@@ -1719,8 +1745,8 @@ public final class SIsland implements Island {
                     (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                             plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
                 SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount);
-                currentAmount = blockCounts.getRaw(globalKey, 0);
-                blockCounts.put(globalKey, currentAmount + amount);
+                currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
+                blockCounts.put(globalKey, currentAmount.add(amount));
             }
         }
     }
@@ -1747,6 +1773,11 @@ public final class SIsland implements Island {
 
     @Override
     public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+        handleBlockBreak(key, BigInteger.valueOf(amount), save);
+    }
+
+    @Override
+    public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
@@ -1805,27 +1836,49 @@ public final class SIsland implements Island {
         }
     }
 
-    private void removeCounts(KeyMap<Integer> blockCounts, com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+    private void removeCounts(KeyMap<BigInteger> blockCounts, com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
         SuperiorSkyblockPlugin.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
-        int currentAmount = blockCounts.getRaw(key, 0);
-        if(currentAmount <= amount)
+        BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
+        if(currentAmount.compareTo(amount) <= 0)
             blockCounts.remove(key);
         else
-            blockCounts.put(key, currentAmount - amount);
+            blockCounts.put(key, currentAmount.subtract(amount));
     }
 
     @Override
+    @Deprecated
     public int getBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key){
-        return blockCounts.readAndGet(blockCounts -> blockCounts.getOrDefault(key, 0));
+        return getBlockCountAsBigInteger(key).max(MAX_INT).intValue();
     }
 
     @Override
+    public BigInteger getBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return blockCounts.readAndGet(blockCounts -> blockCounts.getOrDefault(key, BigInteger.ZERO));
+    }
+
+    @Override
+    @Deprecated
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlockCounts() {
+        return getBlockCountsAsBigInteger().entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().max(MAX_INT).intValue()
+        ));
+    }
+
+    @Override
+    public Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> getBlockCountsAsBigInteger() {
         return blockCounts.readAndGet(blockCounts -> new HashMap<>(blockCounts.asKeyMap()));
     }
 
-    public KeyMap<Integer> getRawBlockCounts(){
-        return blockCounts.readAndGet(KeyMap::new);
+    @Override
+    @Deprecated
+    public int getExactBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return getExactBlockCountAsBigInteger(key).max(MAX_INT).intValue();
+    }
+
+    @Override
+    public BigInteger getExactBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return blockCounts.readAndGet(blockCounts -> blockCounts.getRaw(key, BigInteger.ZERO));
     }
 
     @Override
@@ -1833,11 +1886,6 @@ public final class SIsland implements Island {
         blockCounts.write(Map::clear);
         islandWorth.set(BigDecimal.ZERO);
         islandLevel.set(BigDecimal.ZERO);
-    }
-
-    @Override
-    public int getExactBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return blockCounts.readAndGet(blockCounts -> blockCounts.getRaw(key, 0));
     }
 
     @Override
@@ -2139,13 +2187,15 @@ public final class SIsland implements Island {
 
         //Checking for the specific provided key.
         if(blockLimit > IslandUtils.NO_LIMIT.get())
-            return getBlockCount(key) + amount > blockLimit;
+            return getBlockCountAsBigInteger(key).add(BigInteger.valueOf(amount))
+                    .compareTo(BigInteger.valueOf(blockLimit)) > 0;
 
         //Getting the global key values.
         key = Key.of(key.getGlobalKey());
         blockLimit = getBlockLimit(key);
 
-        return blockLimit > IslandUtils.NO_LIMIT.get() && getBlockCount(key) + amount > blockLimit;
+        return blockLimit > IslandUtils.NO_LIMIT.get() && getBlockCountAsBigInteger(key)
+                .add(BigInteger.valueOf(amount)).compareTo(BigInteger.valueOf(blockLimit)) > 0;
     }
 
     @Override
@@ -3104,9 +3154,9 @@ public final class SIsland implements Island {
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
                 .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
 
-        for(int i = 0; i < cobbleGeneratorValues.length; i++) {
-            if(cobbleGeneratorValues[i] != null) {
-                cobbleGeneratorValues[i].write(cobbleGeneratorValues -> new HashSet<>(cobbleGeneratorValues.entrySet()).stream()
+        for (SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValue : cobbleGeneratorValues) {
+            if (cobbleGeneratorValue != null) {
+                cobbleGeneratorValue.write(cobbleGeneratorValues -> new HashSet<>(cobbleGeneratorValues.entrySet()).stream()
                         .filter(entry -> overrideCustom || entry.getValue().isSynced())
                         .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
             }

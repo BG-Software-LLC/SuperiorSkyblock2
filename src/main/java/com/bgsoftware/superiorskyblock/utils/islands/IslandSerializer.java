@@ -20,6 +20,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,10 +67,10 @@ public final class IslandSerializer {
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
-    public static String serializeBlockCounts(Map<Key, Integer> blocks){
+    public static String serializeBlockCounts(Map<Key, BigInteger> blocks){
         StringBuilder blockCounts = new StringBuilder();
-        blocks.keySet().forEach(blockKey ->
-                blockCounts.append(";").append(blockKey).append("=").append(blocks.get(blockKey)));
+        blocks.forEach((blockKey, amount) ->
+                blockCounts.append(";").append(blockKey).append("=").append(amount));
         return blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1);
     }
 

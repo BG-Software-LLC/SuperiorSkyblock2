@@ -27,6 +27,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -130,7 +131,7 @@ public final class IslandDeserializer {
         for(String entry : blocks.split(";")){
             try{
                 String[] sections = entry.split("=");
-                island.handleBlockPlace(Key.of(sections[0]), Integer.parseInt(sections[1]), false);
+                island.handleBlockPlace(Key.of(sections[0]), new BigInteger(sections[1]), false);
             }catch(Exception ignored){}
         }
     }

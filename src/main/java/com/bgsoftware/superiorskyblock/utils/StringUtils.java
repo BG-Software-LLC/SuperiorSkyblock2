@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -87,6 +88,10 @@ public final class StringUtils {
 
     public static String format(double d){
         return format(BigDecimal.valueOf(d));
+    }
+
+    public static String format(BigInteger bigInteger){
+        return format(new BigDecimal(bigInteger));
     }
 
     public static String format(BigDecimal bigDecimal){

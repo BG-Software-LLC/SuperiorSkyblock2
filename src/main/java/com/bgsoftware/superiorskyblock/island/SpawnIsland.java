@@ -41,6 +41,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -774,6 +775,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
+
+    }
+
+    @Override
     public void handleBlocksPlace(Map<Key, Integer> blocks) {
 
     }
@@ -804,8 +810,18 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
+
+    }
+
+    @Override
     public int getBlockCount(Key key) {
         return 0;
+    }
+
+    @Override
+    public BigInteger getBlockCountAsBigInteger(Key key) {
+        return BigInteger.ZERO;
     }
 
     @Override
@@ -814,13 +830,23 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public void clearBlockCounts() {
-
+    public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
+        return new HashMap<>();
     }
 
     @Override
     public int getExactBlockCount(Key key) {
         return 0;
+    }
+
+    @Override
+    public BigInteger getExactBlockCountAsBigInteger(Key key) {
+        return BigInteger.ZERO;
+    }
+
+    @Override
+    public void clearBlockCounts() {
+
     }
 
     @Override

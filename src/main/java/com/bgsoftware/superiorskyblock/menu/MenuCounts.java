@@ -20,14 +20,16 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> {
+public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger>> {
 
+    private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
     private static final Map<String, String> blocksToItems = new HashMap<>();
 
     static {
@@ -159,7 +161,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
     }
 
     @Override
-    public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> block) {
+    public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
     }
 
     @Override
@@ -168,12 +170,12 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> block) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
         try {
             Key rawKey = (Key) block.getKey();
             Key blockKey = plugin.getBlockValues().convertKey(rawKey);
 
-            int amount = block.getValue();
+            BigDecimal amount = new BigDecimal(block.getValue());
 
             if (blocksToItems.containsKey(blockKey.getGlobalKey())) {
                 String[] item = blocksToItems.get(blockKey.getGlobalKey()).split(":");
@@ -223,13 +225,13 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
                     .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
                     .replaceAll("{0}", StringUtils.format(materialName))
                     .replaceAll("{1}", amount + "")
-                    .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockWorth(rawKey).multiply(BigDecimal.valueOf(amount))))
-                    .replaceAll("{3}", StringUtils.format(plugin.getBlockValues().getBlockLevel(rawKey).multiply(BigDecimal.valueOf(amount))))
-                    .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(rawKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
-                    .replaceAll("{5}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(rawKey).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                    .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockWorth(rawKey).multiply(amount)))
+                    .replaceAll("{3}", StringUtils.format(plugin.getBlockValues().getBlockLevel(rawKey).multiply(amount)))
+                    .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(rawKey).multiply(amount), superiorPlayer.getUserLocale()))
+                    .replaceAll("{5}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(rawKey).multiply(amount), superiorPlayer.getUserLocale()))
                     .build(superiorPlayer);
 
-            itemStack.setAmount(Math.max(1, Math.min(64, amount)));
+            itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());
 
             return itemStack;
         }catch(Exception ex){
@@ -239,8 +241,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
     }
 
     @Override
-    protected List<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> requestObjects() {
-        return island.getBlockCounts().entrySet().stream().sorted((o1, o2) -> {
+    protected List<Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger>> requestObjects() {
+        return island.getBlockCountsAsBigInteger().entrySet().stream().sorted((o1, o2) -> {
             Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
             Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());
             int compare = plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);

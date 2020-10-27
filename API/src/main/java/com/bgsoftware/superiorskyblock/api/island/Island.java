@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -838,6 +839,14 @@ public interface Island extends Comparable<Island> {
     void handleBlockPlace(Key key, int amount, boolean save);
 
     /**
+     * Handle a placement of a block's key with a specific amount.
+     * @param key The block's key that was placed.
+     * @param amount The amount of the block.
+     * @param save Whether or not the block counts should be saved into database.
+     */
+    void handleBlockPlace(Key key, BigInteger amount, boolean save);
+
+    /**
      * Handle placements of many blocks in one time.
      * @param blocks All the blocks to place.
      */
@@ -880,20 +889,48 @@ public interface Island extends Comparable<Island> {
     void handleBlockBreak(Key key, int amount, boolean save);
 
     /**
+     * Handle a break of a block with a specific amount.
+     * @param key The block's key that was broken.
+     * @param amount The amount of the block.
+     * @param save Whether or not the block counts should be saved into the database.
+     */
+    void handleBlockBreak(Key key, BigInteger amount, boolean save);
+
+    /**
+     * Get the amount of blocks that are on the island.
+     * @param key The block's key to check.
+     * @deprecated See getBlockCountAsBigInteger
+     */
+    @Deprecated
+    int getBlockCount(Key key);
+
+    /**
      * Get the amount of blocks that are on the island.
      * @param key The block's key to check.
      */
-    int getBlockCount(Key key);
+    BigInteger getBlockCountAsBigInteger(Key key);
+
+    /**
+     * Get all the blocks that are on the island.
+     * @deprecated See getBlockCountsAsBigInteger
+     */
+    @Deprecated
+    Map<Key, Integer> getBlockCounts();
 
     /**
      * Get all the blocks that are on the island.
      */
-    Map<Key, Integer> getBlockCounts();
+    Map<Key, BigInteger> getBlockCountsAsBigInteger();
 
     /**
-     * Clear all the block counts of the island.
+     * Get the amount of blocks that are on the island.
+     * Unlike getBlockCount(Key), this method returns the count for
+     * the exactly block that is given as a parameter.
+     * @param key The block's key to check.
+     * @deprecated See getExactBlockCountAsBigInteger
      */
-    void clearBlockCounts();
+    @Deprecated
+    int getExactBlockCount(Key key);
 
     /**
      * Get the amount of blocks that are on the island.
@@ -901,7 +938,12 @@ public interface Island extends Comparable<Island> {
      * the exactly block that is given as a parameter.
      * @param key The block's key to check.
      */
-    int getExactBlockCount(Key key);
+    BigInteger getExactBlockCountAsBigInteger(Key key);
+
+    /**
+     * Clear all the block counts of the island.
+     */
+    void clearBlockCounts();
 
     /**
      * Get the worth value of the island, including the money in the bank.

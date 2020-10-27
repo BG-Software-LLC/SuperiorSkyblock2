@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,8 +86,9 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             java.util.Locale locale = LocaleUtils.getLocale(sender);
 
             if(!Locale.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)){
-                for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getBlockCounts().entrySet()){
-                    materialsBuilder.append(", ").append(Locale.BLOCK_COUNTS_CHECK_MATERIAL.getMessage(locale, entry.getValue(), StringUtils.format(entry.getKey().toString())));
+                for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()){
+                    materialsBuilder.append(", ").append(Locale.BLOCK_COUNTS_CHECK_MATERIAL
+                            .getMessage(locale, StringUtils.format(entry.getValue()), StringUtils.format(entry.getKey().toString())));
                 }
             }
 
@@ -104,12 +106,12 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             if(material == null)
                 return;
 
-            int blockCount = island.getBlockCount(Key.of(materialName));
+            BigInteger blockCount = island.getBlockCountAsBigInteger(Key.of(materialName));
 
-            if (blockCount > 1)
+            if (blockCount.compareTo(BigInteger.ONE) > 0)
                 materialName = materialName + "s";
 
-            Locale.BLOCK_COUNT_CHECK.send(sender, blockCount, StringUtils.format(materialName));
+            Locale.BLOCK_COUNT_CHECK.send(sender, StringUtils.format(blockCount), StringUtils.format(materialName));
         }
     }
 

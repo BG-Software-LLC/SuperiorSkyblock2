@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 public final class MenuValues extends SuperiorMenu {
 
+    private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
     private final Island island;
 
     private MenuValues(SuperiorPlayer superiorPlayer, Island island){
@@ -53,16 +55,17 @@ public final class MenuValues extends SuperiorMenu {
         for(int slot = 0; slot < inventory.getSize(); slot++){
             if(containsData(slot + "")){
                 Key block = (Key) getData(slot + "");
-                int amount = block.getGlobalKey().contains("SPAWNER") ? island.getExactBlockCount(block) : island.getBlockCount(block);
+                BigDecimal amount = new BigDecimal(block.getGlobalKey().contains("SPAWNER") ?
+                        island.getExactBlockCountAsBigInteger(block) : island.getBlockCountAsBigInteger(block));
                 if(inventory.getItem(slot) != null) {
                     ItemStack itemStack = new ItemBuilder(inventory.getItem(slot))
                             .replaceAll("{0}", amount + "")
-                            .replaceAll("{1}", StringUtils.format(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount))))
-                            .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount))))
-                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
-                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(BigDecimal.valueOf(amount)), superiorPlayer.getUserLocale()))
+                            .replaceAll("{1}", StringUtils.format(plugin.getBlockValues().getBlockWorth(block).multiply(amount)))
+                            .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(amount)))
+                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(amount), superiorPlayer.getUserLocale()))
+                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(amount), superiorPlayer.getUserLocale()))
                             .build(superiorPlayer);
-                    itemStack.setAmount(Math.max(1, Math.min(64, amount)));
+                    itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());
                     inventory.setItem(slot, itemStack);
                 }
             }
