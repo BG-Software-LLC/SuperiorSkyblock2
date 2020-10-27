@@ -679,3 +679,6 @@ tab-complete-hide-vanished: true
 
 # When enabled, the drops multiplier will only multiply drops of entities that were killed by players.
 drops-upgrade-players-multiply: false
+
+# The delay between protected messages (in ticks)
+protected-message-delay: 60

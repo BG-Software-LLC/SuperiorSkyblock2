@@ -165,6 +165,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int bankInterestRecentActive;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
+    public final long protectedMessageDelay;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -399,6 +400,7 @@ public final class SettingsHandler extends AbstractHandler {
         bankInterestRecentActive = cfg.getInt("bank-interest.recent-active", 86400);
         tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
+        protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);
     }
 
     @Override

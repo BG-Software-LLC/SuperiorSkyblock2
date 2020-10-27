@@ -765,7 +765,7 @@ public enum Locale {
         if(!noInteractMessages.contains(player.getUniqueId())){
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player, locale);
-            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), 60L);
+            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().protectedMessageDelay);
         }
     }
 
