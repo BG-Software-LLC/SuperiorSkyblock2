@@ -79,7 +79,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
         boolean privateFlag = args.length == 3 && args[2].equalsIgnoreCase("true");
 
-        island.setWarpLocation(args[1], superiorPlayer.getLocation(), privateFlag);
+        island.setWarpLocation(args[1].trim(), superiorPlayer.getLocation(), privateFlag);
         Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
     }
 

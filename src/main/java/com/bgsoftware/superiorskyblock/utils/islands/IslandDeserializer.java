@@ -119,7 +119,7 @@ public final class IslandDeserializer {
             try {
                 String[] sections = entry.split("=");
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
-                warpsMap.add(StringUtils.stripColors(sections[0]), new SIslandWarp(FileUtils.toLocation(sections[1]), privateFlag));
+                warpsMap.add(StringUtils.stripColors(sections[0].trim()), new SIslandWarp(FileUtils.toLocation(sections[1]), privateFlag));
             }catch(Exception ignored){}
         }
     }
