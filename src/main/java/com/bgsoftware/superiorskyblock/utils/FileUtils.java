@@ -124,6 +124,7 @@ public final class FileUtils {
         menu.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menu.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
         menu.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
+        menu.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
 
         List<String> pattern = cfg.getStringList("pattern");
 

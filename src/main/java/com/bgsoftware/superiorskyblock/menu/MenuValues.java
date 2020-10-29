@@ -103,6 +103,7 @@ public final class MenuValues extends SuperiorMenu {
         menuValues.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuValues.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
         menuValues.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
+        menuValues.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
 
         List<String> pattern = cfg.getStringList("pattern");
         int backButton = -1;

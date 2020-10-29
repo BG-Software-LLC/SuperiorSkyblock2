@@ -254,6 +254,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         menuTopIslands.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuTopIslands.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
         menuTopIslands.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
+        menuTopIslands.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
 
         List<String> pattern = cfg.getStringList("pattern");
 

@@ -108,6 +108,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
         getData().rowsSize = rowsSize;
     }
 
+    public void setOpeningSound(SoundWrapper openingSound){
+        getData().openingSound = openingSound;
+    }
+
     public void setInventoryType(InventoryType inventoryType){
         getData().inventoryType = inventoryType;
     }
@@ -292,6 +296,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
             player.openInventory(inventory);
 
+            SoundWrapper openingSound = getData().openingSound;
+
+            if(openingSound != null)
+                openingSound.playSound(player);
+
             refreshing = false;
 
             this.previousMenu = previousMenu != null ? previousMenu : previousMove ? currentMenu : null;
@@ -434,6 +443,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         private String title = "";
         private InventoryType inventoryType = InventoryType.CHEST;
         private int rowsSize = 6;
+        private SoundWrapper openingSound = null;
 
     }
 

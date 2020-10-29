@@ -150,6 +150,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
         menuIslandCreation.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
         menuIslandCreation.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
         menuIslandCreation.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
+        menuIslandCreation.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
 
         List<String> pattern = cfg.getStringList("pattern");
 
