@@ -316,7 +316,9 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
 
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
             Arrays.fill(chunk.getSections(), null);
-            Arrays.fill(chunk.entitySlices, new UnsafeList<>());
+
+            for(int i = 0; i < chunk.entitySlices.length; i++)
+                chunk.entitySlices[i] = new UnsafeList<>();
 
             //noinspection all
             new HashSet<>((Set<BlockPosition>) chunk.tileEntities.keySet()).forEach(chunk.world::t);

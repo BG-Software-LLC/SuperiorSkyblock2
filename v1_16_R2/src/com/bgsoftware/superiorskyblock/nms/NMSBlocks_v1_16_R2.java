@@ -443,10 +443,13 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
 
             try {
-                Arrays.fill(chunk.entitySlices, new UnsafeList<>());
+                for(int i = 0; i < chunk.entitySlices.length; i++)
+                    chunk.entitySlices[i] = new UnsafeList<>();
             }catch (Throwable ex){
                 try{
-                    Arrays.fill(ENTITY_SLICE_ARRAY.get(chunk), new net.minecraft.server.v1_16_R2.EntitySlice<>(Entity.class));
+                    Collection[] arr = ENTITY_SLICE_ARRAY.get(chunk);
+                    for(int i = 0; i < arr.length; i++)
+                        arr[i] = new net.minecraft.server.v1_16_R2.EntitySlice<>(Entity.class);
                 }catch (Exception ex2){
                     ex2.printStackTrace();
                 }
