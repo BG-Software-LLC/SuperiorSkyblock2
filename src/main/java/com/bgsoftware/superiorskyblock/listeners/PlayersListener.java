@@ -283,7 +283,7 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onPlayerAttack(EntityDamageByEntityEvent e){
+    public void onPlayerDamage(EntityDamageEvent e){
         if(!(e.getEntity() instanceof Player))
             return;
 
@@ -294,10 +294,18 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        SuperiorPlayer damagerPlayer = EntityUtils.getPlayerDamager(e);
+        SuperiorPlayer damagerPlayer = !(e instanceof EntityDamageByEntityEvent) ? null :
+                EntityUtils.getPlayerDamager((EntityDamageByEntityEvent) e);
 
-        if(damagerPlayer == null)
+        if(damagerPlayer == null) {
+            if(island != null){
+                if((!plugin.getSettings().visitorsDamage && island.isVisitor(targetPlayer, false)) ||
+                        (!plugin.getSettings().coopDamage && island.isVisitor(targetPlayer, true)))
+                    e.setCancelled(true);
+            }
+
             return;
+        }
 
         boolean cancelFlames = false, cancelEvent = false;
         Locale messageToSend = null;
@@ -325,7 +333,8 @@ public final class PlayersListener implements Listener {
         if(messageToSend != null)
             messageToSend.send(damagerPlayer);
 
-        if(cancelFlames && e.getDamager() instanceof Arrow && targetPlayer.asPlayer().getFireTicks() > 0)
+        if(cancelFlames && ((EntityDamageByEntityEvent) e).getDamager() instanceof Arrow &&
+                targetPlayer.asPlayer().getFireTicks() > 0)
             targetPlayer.asPlayer().setFireTicks(0);
     }
 
