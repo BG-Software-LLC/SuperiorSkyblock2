@@ -2143,15 +2143,19 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlocksLimits() {
-        return this.blockLimits.readAndGet(blockLimits -> blockLimits.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+        KeyMap<Integer> keyMap = new KeyMap<>();
+        keyMap.putAll(this.blockLimits.readAndGet(blockLimits -> blockLimits.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))));
+        return keyMap;
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomBlocksLimits() {
-        return this.blockLimits.readAndGet(blockLimits -> blockLimits.entrySet().stream()
+        KeyMap<Integer> keyMap = new KeyMap<>();
+        keyMap.putAll(this.blockLimits.readAndGet(blockLimits -> blockLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))));
+        return keyMap;
     }
 
     @Override
@@ -2219,15 +2223,19 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getEntitiesLimitsAsKeys() {
-        return this.entityLimits.readAndGet(entityLimits -> entityLimits.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+        KeyMap<Integer> keyMap = new KeyMap<>();
+        keyMap.putAll(this.entityLimits.readAndGet(entityLimits -> entityLimits.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))));
+        return keyMap;
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomEntitiesLimits() {
-        return this.entityLimits.readAndGet(entityLimits -> entityLimits.entrySet().stream()
+        KeyMap<Integer> keyMap = new KeyMap<>();
+        keyMap.putAll(this.entityLimits.readAndGet(entityLimits -> entityLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))));
+        return keyMap;
     }
 
     @Override
@@ -2847,10 +2855,16 @@ public final class SIsland implements Island {
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
-        return cobbleGeneratorValues == null ? new HashMap<>() : cobbleGeneratorValues.readAndGet(_cobbleGeneratorValues ->
+
+        if(cobbleGeneratorValues == null)
+            return new HashMap<>();
+
+        KeyMap<Integer> keyMap = new KeyMap<>();
+        keyMap.putAll(cobbleGeneratorValues.readAndGet(_cobbleGeneratorValues ->
                 _cobbleGeneratorValues.entrySet().stream()
-                .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+                        .filter(entry -> !entry.getValue().isSynced())
+                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))));
+        return keyMap;
     }
 
     @Override
