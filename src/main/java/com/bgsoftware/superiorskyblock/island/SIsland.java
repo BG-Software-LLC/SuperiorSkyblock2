@@ -448,8 +448,12 @@ public final class SIsland implements Island {
 
         MenuMembers.refreshMenus(this);
 
-        if (superiorPlayer.isOnline())
+        updateLastTime();
+
+        if (superiorPlayer.isOnline()) {
             updateIslandFly(superiorPlayer);
+            setCurrentlyActive();
+        }
 
         islandDataHandler.saveMembers();
     }
