@@ -1852,7 +1852,7 @@ public final class SIsland implements Island {
     @Override
     @Deprecated
     public int getBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key){
-        return getBlockCountAsBigInteger(key).max(MAX_INT).intValue();
+        return getBlockCountAsBigInteger(key).min(MAX_INT).intValue();
     }
 
     @Override
@@ -1865,7 +1865,7 @@ public final class SIsland implements Island {
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlockCounts() {
         return getBlockCountsAsBigInteger().entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                entry -> entry.getValue().max(MAX_INT).intValue()
+                entry -> entry.getValue().min(MAX_INT).intValue()
         ));
     }
 
@@ -1877,7 +1877,7 @@ public final class SIsland implements Island {
     @Override
     @Deprecated
     public int getExactBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return getExactBlockCountAsBigInteger(key).max(MAX_INT).intValue();
+        return getExactBlockCountAsBigInteger(key).min(MAX_INT).intValue();
     }
 
     @Override
