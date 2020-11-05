@@ -91,8 +91,9 @@ public final class CmdTeam implements ISuperiorCommand {
                 members.forEach(islandMember -> {
                     PlayerRole playerRole = islandMember.getPlayerRole();
                     long time = islandMember.getLastTimeStatus() == -1 ? -1 : ((System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus()) * 1000;
+                    boolean onlinePlayer = islandMember.isOnline() && !plugin.getProviders().isVanished(islandMember.asPlayer());
                     rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
-                            islandMember.getName(), islandMember.isOnline() ? onlineStatus : offlineStatus, StringUtils.formatTime(locale, time))).append("\n");
+                            islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus, StringUtils.formatTime(locale, time))).append("\n");
                 });
 
                 rolesStrings.keys().stream()
