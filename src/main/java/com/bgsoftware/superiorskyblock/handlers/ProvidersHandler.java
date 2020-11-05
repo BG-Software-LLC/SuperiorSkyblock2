@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Vault;
-import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
@@ -130,10 +129,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
             if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms") && PermissionsProvider_LuckPerms.isCompatible()) {
                 runSafe(() -> this.permissionsProvider = new PermissionsProvider_LuckPerms());
-            }
-
-            else if(Bukkit.getPluginManager().isPluginEnabled("Vault") && PermissionsProvider_Vault.isCompatible()) {
-                runSafe(() -> this.permissionsProvider = new PermissionsProvider_Vault());
             }
 
             if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
