@@ -312,6 +312,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return worldsProvider.isEndUnlocked();
     }
 
+    public boolean hasCustomWorldsSupport(){
+        return !(worldsProvider instanceof WorldsProvider_Default);
+    }
+
     public BigDecimal getBalanceForBanks(SuperiorPlayer superiorPlayer){
         return bankEconomyProvider.getBalance(superiorPlayer);
     }
