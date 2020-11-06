@@ -259,7 +259,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
             return true;
         }catch(Exception ex){
-            ex.printStackTrace();
+            log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
             return false;
         }
     }
