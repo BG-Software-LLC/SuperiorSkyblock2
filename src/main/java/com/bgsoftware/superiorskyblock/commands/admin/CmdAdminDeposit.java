@@ -65,7 +65,7 @@ public final class CmdAdminDeposit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        BigDecimal amount = CommandArguments.getBigDecimalAmount(sender, args[4]);
+        BigDecimal amount = CommandArguments.getBigDecimalAmount(sender, args[3]);
 
         if(amount == null)
             return;
