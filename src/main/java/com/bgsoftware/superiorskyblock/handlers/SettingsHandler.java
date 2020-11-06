@@ -532,8 +532,8 @@ public final class SettingsHandler extends AbstractHandler {
     }
 
     private void loadGenerator(List<String> lines, int index){
+        defaultGenerator[index] = new KeyMap<>();
         for(String line : lines){
-            defaultGenerator[index] = new KeyMap<>();
             String[] sections = line.split(":");
             String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
