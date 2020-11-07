@@ -37,6 +37,8 @@ public final class MenuValues extends SuperiorMenu {
     private MenuValues(SuperiorPlayer superiorPlayer, Island island){
         super("menuValues", superiorPlayer);
         this.island = island;
+        if(island != null)
+            updateTargetPlayer(island.getOwner());
     }
 
     @Override
@@ -64,7 +66,7 @@ public final class MenuValues extends SuperiorMenu {
                             .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(amount)))
                             .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(amount), superiorPlayer.getUserLocale()))
                             .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(amount), superiorPlayer.getUserLocale()))
-                            .build(superiorPlayer);
+                            .build();
                     itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());
                     inventory.setItem(slot, itemStack);
                 }
