@@ -135,14 +135,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 runSafe(() -> pricesProvider = new PricesProvider_ShopGUIPlus());
 
             if(Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket"))
-                runSafe(() -> vanishProvider = new VanishProvider_VanishNoPacket());
+                runSafe(() -> vanishProvider = new VanishProvider_VanishNoPacket(plugin));
             else if(Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
                     Bukkit.getPluginManager().isPluginEnabled("PremiumVanish"))
-                runSafe(() -> vanishProvider = new VanishProvider_SuperVanish());
+                runSafe(() -> vanishProvider = new VanishProvider_SuperVanish(plugin));
             else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-                runSafe(() -> vanishProvider = new VanishProvider_Essentials());
+                runSafe(() -> vanishProvider = new VanishProvider_Essentials(plugin));
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
-                runSafe(() -> vanishProvider = new VanishProvider_CMI());
+                runSafe(() -> vanishProvider = new VanishProvider_CMI(plugin));
 
             if(hasPaperAsyncSupport()){
                 try {
