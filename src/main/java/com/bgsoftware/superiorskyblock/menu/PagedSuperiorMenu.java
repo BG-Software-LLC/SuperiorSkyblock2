@@ -44,8 +44,9 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
             if(slot >= 0) {
                 if (objectIndex < objects.size()) {
-                    inventory.setItem(slot, getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex)));
-                    if(inventory.getItem(slot) == null)
+                    ItemStack itemStack = getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex));
+                    inventory.setItem(slot, itemStack);
+                    if(itemStack == null)
                         SuperiorSkyblockPlugin.log("Warning: Cannot get item-type of " + objects.get(objectIndex));
                 } else {
                     inventory.setItem(slot, getNullItem());
