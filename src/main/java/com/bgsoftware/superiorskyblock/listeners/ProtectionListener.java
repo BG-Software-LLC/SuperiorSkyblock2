@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.GameMode;
@@ -120,7 +121,8 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(plugin.getSettings().valuableBlocks.contains(blockType.name()) && !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
+        if(plugin.getSettings().valuableBlocks.contains(Key.of(e.getBlock())) &&
+                !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
@@ -175,7 +177,8 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if(plugin.getSettings().valuableBlocks.contains(blockType.name()) && !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
+        if(plugin.getSettings().valuableBlocks.contains(Key.of(blockState)) &&
+                !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());
             return;
