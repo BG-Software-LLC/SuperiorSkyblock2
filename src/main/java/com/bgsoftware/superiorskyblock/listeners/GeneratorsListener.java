@@ -13,7 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
@@ -44,20 +44,29 @@ public final class GeneratorsListener implements Listener {
         if(!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
             return;
 
-        String[] cachedMaterials = island.getGeneratorArray(block.getWorld().getEnvironment());
+        World.Environment environment = block.getWorld().getEnvironment();
+        Map<String, Integer> generatorAmounts = island.getGeneratorAmounts(environment);
 
-        if(cachedMaterials.length == 0)
+        int totalGeneratorAmounts = island.getGeneratorTotalAmount(environment);
+
+        if(totalGeneratorAmounts == 0)
             return;
 
-        boolean onlyOneMaterial = Arrays.stream(cachedMaterials).allMatch(s -> cachedMaterials[0].equals(s));
+        String newState = "COBBLESTONE";
 
-        String newState;
-
-        if(cachedMaterials.length == 1){
-            newState = cachedMaterials[0];
+        if(totalGeneratorAmounts == 1){
+            newState = generatorAmounts.keySet().iterator().next();
         }
-        else {
-            newState = cachedMaterials[ThreadLocalRandom.current().nextInt(cachedMaterials.length)];
+        else{
+            int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
+            int currentIndex = 0;
+            for(Map.Entry<String, Integer> entry : generatorAmounts.entrySet()){
+                currentIndex += entry.getValue();
+                if(generatedIndex < currentIndex){
+                    newState = entry.getKey();
+                    break;
+                }
+            }
         }
 
         String[] typeSections = newState.split(":");

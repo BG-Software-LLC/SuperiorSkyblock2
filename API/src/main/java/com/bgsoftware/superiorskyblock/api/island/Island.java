@@ -1589,14 +1589,17 @@ public interface Island extends Comparable<Island> {
     /**
      * Get an array of materials for the cobblestone generator.
      *
-     * @deprecated See getGeneratorArray(World.Environment)
+     * @deprecated Not used anymore.
      */
     @Deprecated
     String[] getGeneratorArray();
 
     /**
      * Get an array of materials for the cobblestone generator.
+     *
+     * @deprecated Not used anymore.
      */
+    @Deprecated
     String[] getGeneratorArray(World.Environment environment);
 
     /**
