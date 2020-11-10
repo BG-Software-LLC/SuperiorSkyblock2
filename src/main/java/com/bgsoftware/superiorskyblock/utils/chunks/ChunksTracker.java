@@ -74,7 +74,7 @@ public final class ChunksTracker {
         Map<String, StringBuilder> worlds = new HashMap<>();
 
         for(ChunkPosition dirtyChunk : dirtyChunks){
-            worlds.computeIfAbsent(dirtyChunk.getWorld().getName(), sb -> new StringBuilder())
+            worlds.computeIfAbsent(dirtyChunk.getWorldName(), sb -> new StringBuilder())
                     .append(";").append(dirtyChunk.getX()).append(",").append(dirtyChunk.getZ());
         }
 

@@ -28,6 +28,10 @@ public final class ChunkPosition {
         return Bukkit.getWorld(worldName);
     }
 
+    public String getWorldName() {
+        return worldName;
+    }
+
     public int getX() {
         return x;
     }
