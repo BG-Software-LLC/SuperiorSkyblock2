@@ -156,7 +156,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int islandChestsDefaultPage;
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
-    public final List<String> valuableBlocks;
+    public final KeySet valuableBlocks;
     public final Registry<String, Location> islandPreviewLocations;
     public final boolean bankLogs;
     public final boolean bankInterestEnabled;
@@ -387,7 +387,7 @@ public final class SettingsHandler extends AbstractHandler {
                 commandAliases.put(label.toLowerCase(), cfg.getStringList("command-aliases." + label));
             }
         }
-        valuableBlocks = cfg.getStringList("valuable-blocks");
+        valuableBlocks = new KeySet(cfg.getStringList("valuable-blocks"));
         islandPreviewLocations = Registry.createRegistry();
         if(cfg.isConfigurationSection("preview-islands")){
             for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
