@@ -8,6 +8,11 @@ public interface PlayerRole {
     int getId();
 
     /**
+     * Get the name of the role.
+     */
+    String getName();
+
+    /**
      * Get the weight of the role in the ladder.
      */
     int getWeight();

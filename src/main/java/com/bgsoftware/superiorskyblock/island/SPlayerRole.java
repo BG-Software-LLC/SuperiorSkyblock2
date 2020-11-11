@@ -13,7 +13,7 @@ public final class SPlayerRole implements PlayerRole {
 
     private final String name;
     private final int id, weight;
-    private RolePermissionNode defaultPermissions;
+    private final RolePermissionNode defaultPermissions;
 
     public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole){
         this.name = name;
@@ -31,6 +31,11 @@ public final class SPlayerRole implements PlayerRole {
     @Override
     public int getId() {
         return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override
