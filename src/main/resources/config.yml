@@ -446,6 +446,11 @@ commands-cooldown:
     cooldown: 30000
     bypass-permission: superior.cooldown.bypass.recalc
 
+# Set a cooldown for upgrading island values.
+# Cooldowns are in milliseconds.
+# You can disable this cooldown by setting it to -1.
+upgrade-cooldown: -1
+
 # Set the number formatting to be used.
 # You can see a list of formats under the "Language Tag" column here:
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html

@@ -658,6 +658,7 @@ UNLOCK_WORLD_ANNOUNCEMENT: '&e&l岛屿维度 | &7你的岛屿解锁了新的世�
 UNSAFE_WARP: '&e&l岛屿 | &7&o这个岛屿地标传送点不安全，请检查一下.'
 UPDATED_PERMISSION: '&e&l岛屿 | &7更新了岛屿的 &b{0} &7权限.'
 UPDATED_SETTINGS: '&e&l岛屿 | &7更新了岛屿的 &b{0} &7设置.'
+UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&l错误 | &7这个岛屿不能在他人岛屿中使用.'
 WARP_ALREADY_EXIST: '&c&l错误 | &7已经有一个岛屿地标叫这个名字了.'
 WITHDRAW_ALL_MONEY: |-

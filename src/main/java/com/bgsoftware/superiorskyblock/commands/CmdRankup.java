@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -77,7 +78,6 @@ public final class CmdRankup implements IPermissibleCommand {
         if(upgrade == null)
             return;
 
-
         UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade), nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
@@ -87,37 +87,43 @@ public final class CmdRankup implements IPermissibleCommand {
             return;
         }
 
-        String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
-
         boolean hasNextLevel;
 
-        if(!requiredCheckFailure.isEmpty()){
-            Locale.sendMessage(superiorPlayer, requiredCheckFailure, false);
+        if(island.hasActiveUpgradeCooldown()){
+            long timeNow = System.currentTimeMillis(), lastUpgradeTime = island.getLastTimeUpgrade();
+            Locale.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+                    lastUpgradeTime + plugin.getSettings().upgradeCooldown - timeNow));
             hasNextLevel = false;
         }
-
         else {
-            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
+            String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
 
-            double nextUpgradePrice = event.getResult().getValue();
-
-            if (event.isCancelled()) {
-                hasNextLevel = false;
-            } else if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextUpgradePrice)) < 0){
-                Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
+            if (!requiredCheckFailure.isEmpty()) {
+                Locale.sendMessage(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                if (nextUpgradePrice > 0)
-                    plugin.getProviders().withdrawMoney(superiorPlayer, nextUpgradePrice);
+                EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
 
-                for (String command : event.getResult().getKey()) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
-                            .replace("%player%", superiorPlayer.getName())
-                            .replace("%leader%", island.getOwner().getName()))
-                    );
+                double nextUpgradePrice = event.getResult().getValue();
+
+                if (event.isCancelled()) {
+                    hasNextLevel = false;
+                } else if (plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextUpgradePrice)) < 0) {
+                    Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
+                    hasNextLevel = false;
+                } else {
+                    if (nextUpgradePrice > 0)
+                        plugin.getProviders().withdrawMoney(superiorPlayer, nextUpgradePrice);
+
+                    for (String command : event.getResult().getKey()) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
+                                .replace("%player%", superiorPlayer.getName())
+                                .replace("%leader%", island.getOwner().getName()))
+                        );
+                    }
+
+                    hasNextLevel = true;
                 }
-
-                hasNextLevel = true;
             }
         }
 

@@ -755,6 +755,7 @@ UNSAFE_WARP: '&e&lĐảo Thần | &7&oCó vẻ như khu vực này không an to�
   khu vực khác.'
 UPDATED_PERMISSION: '&e&lĐảo Thần | &7Cập nhập quyền cho {0}.'
 UPDATED_SETTINGS: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh của đảo {0}.'
+UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
 WITHDRAW_ALL_MONEY: |-

@@ -930,6 +930,16 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public long getLastTimeUpgrade() {
+        return -1;
+    }
+
+    @Override
+    public boolean hasActiveUpgradeCooldown() {
+        return false;
+    }
+
+    @Override
     public double getCropGrowthMultiplier() {
         return 1;
     }

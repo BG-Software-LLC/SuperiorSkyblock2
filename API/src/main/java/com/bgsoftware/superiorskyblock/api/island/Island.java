@@ -1046,6 +1046,16 @@ public interface Island extends Comparable<Island> {
     void updateUpgrades();
 
     /**
+     * Get the last time the island was upgraded.
+     */
+    long getLastTimeUpgrade();
+
+    /**
+     * Check if the island has an active upgrade cooldown.
+     */
+    boolean hasActiveUpgradeCooldown();
+
+    /**
      * Get the crop-growth multiplier for the island.
      */
     double getCropGrowthMultiplier();

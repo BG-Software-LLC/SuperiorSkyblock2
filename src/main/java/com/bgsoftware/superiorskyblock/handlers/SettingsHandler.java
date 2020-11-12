@@ -122,6 +122,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean disableRedstoneAFK;
     public final boolean disableSpawningAFK;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
+    public final long upgradeCooldown;
     public final String numberFormat;
     public final String dateFormat;
     public final boolean skipOneItemMenus;
@@ -330,6 +331,7 @@ public final class SettingsHandler extends AbstractHandler {
             String permission = cfg.getString("commands-cooldown." + subCommand + ".bypass-permission");
             commandsCooldown.add(subCommand, new Pair<>(cooldown, permission));
         }
+        upgradeCooldown = cfg.getLong("upgrade-cooldown", -1L);
         numberFormat = cfg.getString("number-format", "en-US");
         StringUtils.setNumberFormatter(numberFormat);
         dateFormat = cfg.getString("date-format", "dd/MM/yyyy HH:mm:ss");

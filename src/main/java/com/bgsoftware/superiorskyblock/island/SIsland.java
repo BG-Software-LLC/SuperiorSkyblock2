@@ -167,6 +167,7 @@ public final class SIsland implements Island {
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
     private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().islandChestsDefaultPage]);
     private final SyncedObject<Long> lastInterest = SyncedObject.of(-1L);
+    private final SyncedObject<Long> lastUpgradeTime = SyncedObject.of(-1L);
 
     /*
      * Island multipliers & limits
@@ -2042,6 +2043,8 @@ public final class SIsland implements Island {
 
         upgrades.add(upgrade.getName(), Math.min(upgrade.getMaxUpgradeLevel(), level));
 
+        lastUpgradeTime.set(System.currentTimeMillis());
+
         islandDataHandler.saveUpgrades();
 
         UpgradeLevel upgradeLevel = getUpgradeLevel(upgrade);
@@ -2095,6 +2098,18 @@ public final class SIsland implements Island {
         syncUpgrade(DefaultUpgradeLevel.getInstance(), false);
         // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), false));
+    }
+
+    @Override
+    public long getLastTimeUpgrade() {
+        return lastUpgradeTime.get();
+    }
+
+    @Override
+    public boolean hasActiveUpgradeCooldown() {
+        long lastTimeUpgrade = getLastTimeUpgrade(), currentTime = System.currentTimeMillis(),
+                upgradeCooldown = plugin.getSettings().upgradeCooldown;
+        return upgradeCooldown > 0 && lastTimeUpgrade > 0 && currentTime - lastTimeUpgrade <= upgradeCooldown;
     }
 
     @Override
