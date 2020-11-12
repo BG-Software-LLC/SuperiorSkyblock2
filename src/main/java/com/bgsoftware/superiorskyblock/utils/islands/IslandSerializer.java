@@ -168,4 +168,11 @@ public final class IslandSerializer {
         return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
     }
 
+    public static String serializeRoleLimits(Map<PlayerRole, Integer> roles){
+        StringBuilder rolelimits = new StringBuilder();
+        roles.forEach((playerRole, limit) ->
+                rolelimits.append(",").append(playerRole.getId()).append("=").append(limit));
+        return rolelimits.length() == 0 ? "" : rolelimits.toString().substring(1);
+    }
+
 }

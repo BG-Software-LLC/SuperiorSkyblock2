@@ -291,4 +291,22 @@ public final class IslandDeserializer {
         islandChestSync.set(islandChests);
     }
 
+    public static void deserializeRoleLimits(String roles, SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits){
+        roleLimits.write(_roleLimits -> deserializeRoleLimits(roles, _roleLimits));
+    }
+
+    public static void deserializeRoleLimits(String roles, Map<PlayerRole, UpgradeValue<Integer>> roleLimits){
+        if(roles == null)
+            return;
+
+        for(String limit : roles.split(",")){
+            try {
+                String[] sections = limit.split("=");
+                PlayerRole playerRole = SPlayerRole.fromId(Integer.parseInt(sections[0]));
+                if(playerRole != null)
+                    roleLimits.put(playerRole, new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
+            }catch(Exception ignored){}
+        }
+    }
+
 }

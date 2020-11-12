@@ -86,6 +86,9 @@ CHANGED_NAME: '&e&lיא | &7{0} ל ךלש יאה לש םשה תא תיניש.'
 CHANGED_NAME_OTHER: '&e&lיא | &7{1} ל {0} לש יאה לש םשה תא תיניש.'
 CHANGED_NAME_OTHER_NAME: '&e&lיא | &7{1} ל {0} יאה לש םשה תא תיניש.'
 CHANGED_PAYPAL: '&e&lיא | &7{0} ל החלצהב ןכדוע יאה לש לאפייפה.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lםיגורדש | &7החלצהב ןכדוע {0} לש יאה לש םירנואפסה לש רוגישה
   סונוב.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lםיגורדש | &7החלצהב ןכדוע םייאה לכ לש םירנואפסה לש
@@ -197,6 +200,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: רחא ןקחש לש יא לש םיבו
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: םייאה לכל תמייוסמ תושרל תרתומה הגרדה תא
   תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: יאל ןתנ ןקחשש גוריד תונשל.
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: יאל הרדגה ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: רוטרנ'גמ והשלכ רמוח לש זוחא תונשל.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: ןקחש לש יא לש לדוג תונשל.
@@ -425,6 +429,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lיא | &7רוטארנג ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lיא | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lיא | &7לובגה לדוג: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lיא | &7םירנואפס סונוב: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lיא | &7הצובק תלבגה: {0}'

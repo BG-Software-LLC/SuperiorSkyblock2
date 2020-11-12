@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import io.netty.util.internal.StringUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
@@ -255,6 +254,18 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                 blocksString.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale, StringUtils.format(entry.getKey().getName()), entry.getValue() + 1)).append("\n");
             }
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
+        }
+
+        // Island entity limits
+        if(!Locale.ISLAND_INFO_ADMIN_ROLE_LIMITS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE.isEmpty(locale)){
+            StringBuilder entitiesString = new StringBuilder();
+            for(Map.Entry<PlayerRole, Integer> entry : island.getRoleLimits().entrySet()){
+                entitiesString.append(Locale.ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE.getMessage(locale, entry.getKey(), entry.getValue()));
+                if(!island.getCustomRoleLimits().containsKey(entry.getKey()))
+                    entitiesString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                entitiesString.append("\n");
+            }
+            infoMessage.append(Locale.ISLAND_INFO_ADMIN_ROLE_LIMITS.getMessage(locale, entitiesString));
         }
 
         // Island members

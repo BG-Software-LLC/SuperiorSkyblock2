@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -45,6 +47,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int defaultIslandSize;
     public final KeyMap<UpgradeValue<Integer>> defaultBlockLimits;
     public final KeyMap<UpgradeValue<Integer>> defaultEntityLimits;
+    public final KeyMap<UpgradeValue<Integer>>[] defaultGenerator;
     public final int defaultWarpsLimit;
     public final int defaultTeamLimit;
     public final int defaultCoopLimit;
@@ -52,6 +55,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final double defaultSpawnerRates;
     public final double defaultMobDrops;
     public final BigDecimal defaultBankLimit;
+    public final Map<Integer, UpgradeValue<Integer>> defaultRoleLimits;
     public final int islandsHeight;
     public final boolean worldBordersEnabled;
     public final boolean stackedBlocksEnabled;
@@ -117,7 +121,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean disableRedstoneOffline;
     public final boolean disableRedstoneAFK;
     public final boolean disableSpawningAFK;
-    public final KeyMap<UpgradeValue<Integer>>[] defaultGenerator;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
     public final String dateFormat;
@@ -218,6 +221,13 @@ public final class SettingsHandler extends AbstractHandler {
         defaultSpawnerRates = cfg.getDouble("default-values.spawner-rates", 1D);
         defaultMobDrops = cfg.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(cfg.getString("default-values.bank-limit", "-1"));
+        defaultRoleLimits = new HashMap<>();
+        for(String line : cfg.getStringList("default-values.role-limits")){
+            String[] sections = line.split(":");
+            try {
+                defaultRoleLimits.put(Integer.parseInt(sections[0]), new UpgradeValue<>(Integer.parseInt(sections[1]), true));
+            }catch (NumberFormatException ignored){}
+        }
         islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);

@@ -238,6 +238,14 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     }
 
     @Override
+    public void saveRolesLimits() {
+        Query.ISLAND_SET_ROLE_LIMITS.getStatementHolder(this)
+                .setString(IslandSerializer.serializeRoleLimits(island.getRoleLimits()))
+                .setString(island.getOwner().getUniqueId().toString())
+                .execute(true);
+    }
+
+    @Override
     public void saveWarps() {
         Query.ISLAND_SET_WARPS.getStatementHolder(this)
                 .setString(IslandSerializer.serializeWarps(island.getIslandWarps()))
@@ -375,6 +383,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getUniqueId().toString())
                 .setString(island.getBankLimitRaw() + "")
                 .setLong(island.getLastInterestTime())
+                .setString(IslandSerializer.serializeRoleLimits(island.getRoleLimits()))
                 .setString(island.getOwner().getUniqueId().toString());
     }
 
@@ -437,6 +446,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getUniqueId().toString())
                 .setString(island.getBankLimitRaw() + "")
                 .setLong(island.getLastInterestTime())
+                .setString(IslandSerializer.serializeRoleLimits(island.getRoleLimits()))
                 .execute(async);
     }
 

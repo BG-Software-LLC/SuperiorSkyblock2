@@ -114,6 +114,9 @@ CHANGED_NAME_OTHER: '&e&lIsola | &7Hai cambiato il nome della tua isola da {0} a
 CHANGED_NAME_OTHER_NAME: '&e&lIsola | &7Hai cambiato il nome dell''isola di {0} a
   {1}.'
 CHANGED_PAYPAL: '&e&lIsola | &7Paypal dell''isola cambiato con successo in {0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lAggiornamenti | &7Aggiornato con successo il moltiplicatore
   degli spawner dell''isola di {0}.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lAggiornamenti | &7Aggiornata con successo il moltiplicatore
@@ -243,6 +246,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Imposta il moltiplicatore di drops dei 
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Imposta un ruolo richiesto per avere un'autorizzazione,
   in tutte le isole.
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: Imposta la valutazione di un giocatore.
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Attiva/disattiva le impostazioni di un'isola.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Modifica la percentuale di generazione di
   un materiale dal generatore di ciottoli.
@@ -502,6 +506,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lIsola | &7Percentuali del generatore:
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsola | &7  {0}: {1}%'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsola | &7Dimensione dei bordi: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIsola | &7Moltiplicatore dei generatori
   di mob: {0}'

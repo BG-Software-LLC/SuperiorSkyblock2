@@ -111,6 +111,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<SuperiorPlayer> getBannedPlayers() {
         return new ArrayList<>();
     }
@@ -1076,7 +1081,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimit() {
-        return 0;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
@@ -1091,12 +1096,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getWarpsLimit() {
-        return 0;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
     public int getWarpsLimitRaw() {
-        return 0;
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
@@ -1137,6 +1142,31 @@ public final class SpawnIsland implements Island {
     @Override
     public void clearEffects() {
 
+    }
+
+    @Override
+    public void setRoleLimit(PlayerRole playerRole, int limit) {
+
+    }
+
+    @Override
+    public int getRoleLimit(PlayerRole playerRole) {
+        return IslandUtils.NO_LIMIT.get();
+    }
+
+    @Override
+    public int getRoleLimitRaw(PlayerRole playerRole) {
+        return IslandUtils.NO_LIMIT.get();
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getCustomRoleLimits() {
+        return new HashMap<>();
     }
 
     @Override

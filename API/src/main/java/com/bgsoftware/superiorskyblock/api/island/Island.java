@@ -70,6 +70,12 @@ public interface Island extends Comparable<Island> {
     List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
 
     /**
+     * Get the list of members of the island with specific roles.
+     * @param playerRoles The roles to filter with.
+     */
+    List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles);
+
+    /**
      * Get the list of all banned players.
      */
     List<SuperiorPlayer> getBannedPlayers();
@@ -1292,6 +1298,35 @@ public interface Island extends Comparable<Island> {
      * Remove all the effects from the island.
      */
     void clearEffects();
+
+    /**
+     * Set the limit of the amount of players that can have the role in the island.
+     * @param playerRole The role to set the limit to.
+     * @param limit The limit to set.
+     */
+    void setRoleLimit(PlayerRole playerRole, int limit);
+
+    /**
+     * Get the limit of players that can have the same role at a time.
+     * @param playerRole The role to check.
+     */
+    int getRoleLimit(PlayerRole playerRole);
+
+    /**
+     * Get the limit of players that can have the same role at a time that was set using a command.
+     * @param playerRole The role to check.
+     */
+    int getRoleLimitRaw(PlayerRole playerRole);
+
+    /**
+     * Get all the role limits for the island.
+     */
+    Map<PlayerRole, Integer> getRoleLimits();
+
+    /**
+     * Get all the custom role limits for the island.
+     */
+    Map<PlayerRole, Integer> getCustomRoleLimits();
 
     /*
      *  Warps related methods

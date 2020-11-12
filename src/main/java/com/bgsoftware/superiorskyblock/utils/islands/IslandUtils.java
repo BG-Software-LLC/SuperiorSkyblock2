@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
@@ -209,6 +211,10 @@ public final class IslandUtils {
         plugin.getNMSBlocks().deleteChunk(island, chunkPosition, onFinish);
         plugin.getGrid().removeStackedBlocks(island, chunkPosition);
         EventsCaller.callIslandChunkResetEvent(island, chunkPosition);
+    }
+
+    public static boolean isValidRoleForLimit(PlayerRole playerRole){
+        return playerRole.isRoleLadder() && !playerRole.isFirstRole() && !playerRole.isLastRole();
     }
 
 }

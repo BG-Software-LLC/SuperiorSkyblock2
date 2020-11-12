@@ -74,14 +74,32 @@ public final class CmdPromote implements IPermissibleCommand {
         }
 
         PlayerRole playerRole = targetPlayer.getPlayerRole();
-        PlayerRole nextRole = playerRole.getNextRole();
 
-        if(playerRole.isLastRole() || nextRole.isLastRole()){
+        if(playerRole.isLastRole()){
             Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
-        if(!playerRole.isLessThan(superiorPlayer.getPlayerRole()) || nextRole.isHigherThan(superiorPlayer.getPlayerRole())){
+        if(!playerRole.isLessThan(superiorPlayer.getPlayerRole())){
+            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            return;
+        }
+
+        PlayerRole nextRole = playerRole;
+        int roleLimit;
+
+        do{
+            nextRole = nextRole.getNextRole();
+            roleLimit = nextRole == null ? -1 : island.getRoleLimit(nextRole);
+        }while (nextRole != null && !nextRole.isLastRole() && !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
+                roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
+
+        if(nextRole == null || nextRole.isLastRole()){
+            Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
+            return;
+        }
+
+        if(nextRole.isHigherThan(superiorPlayer.getPlayerRole())){
             Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }

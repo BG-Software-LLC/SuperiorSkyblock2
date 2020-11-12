@@ -15,7 +15,8 @@ public class SUpgrade implements Upgrade {
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, 0, new ArrayList<>(), "",
             new HashSet<>(), UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE,
             UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE,
-            new KeyMap<>(), new KeyMap<>(), new KeyMap[3], new HashMap<>(), UpgradeValue.NEGATIVE_BIG_DECIMAL);
+            new KeyMap<>(), new KeyMap<>(), new KeyMap[3], new HashMap<>(), UpgradeValue.NEGATIVE_BIG_DECIMAL,
+            new HashMap<>());
 
     private final String name;
 

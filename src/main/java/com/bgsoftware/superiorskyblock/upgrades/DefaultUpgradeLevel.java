@@ -27,7 +27,8 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
                 plugin.getSettings().defaultEntityLimits,
                 plugin.getSettings().defaultGenerator,
                 new HashMap<>(),
-                newSyncedBigDecimalValue(v -> plugin.getSettings().defaultBankLimit)
+                newSyncedBigDecimalValue(v -> plugin.getSettings().defaultBankLimit),
+                plugin.getSettings().defaultRoleLimits
         );
     }
 

@@ -81,6 +81,9 @@ CHANGED_NAME: '&e&l岛屿 | &7你将岛屿更名为 &b{0}&7.'
 CHANGED_NAME_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿更名为 &b{1}&7.'
 CHANGED_NAME_OTHER_NAME: '&e&l岛屿 | &7你将这个岛屿名从 &b{0} &7更名为 &b{1}&7.'
 CHANGED_PAYPAL: '&e&l岛屿 | &7成功设置岛屿Paypal为 &b{0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&l岛屿升级 | &7成功升级{0}的岛屿刷怪率！'
 CHANGED_SPAWNER_RATES_ALL: '&e&l岛屿升级 | &7成功为所有岛屿更新刷怪率！'
 CHANGED_SPAWNER_RATES_NAME: '&e&l岛屿升级 | &7成功升级岛屿{0}的刷怪率！'
@@ -187,6 +190,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 把一个岛屿转让给他人.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 更新其他玩家岛屿的怪物掉落倍率.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 为所有岛屿更新职位的权限.
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: 修改其他玩家给出的岛屿评分.
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: 修改其他玩家的岛屿设置.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: 修改其他玩家岛屿的空岛矿机概率.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 修改其他玩家的岛屿边界范围.
@@ -407,6 +411,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&l岛屿 | &7空岛矿机 ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&l岛屿 | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&l岛屿 | &7边界范围: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&l岛屿 | &7生物生成率: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&l岛屿 | &7团队最大人数: {0}'

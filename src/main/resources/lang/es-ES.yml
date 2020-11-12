@@ -81,6 +81,9 @@ CHANGED_NAME: '&e&lIsla | &7Cambiaste el nombre de tu isla a {0}.'
 CHANGED_NAME_OTHER: '&e&lIsla | &7Cambiaste el nombre de la {0} isla a {1}.'
 CHANGED_NAME_OTHER_NAME: '&e&lIsla | &7Cambiaste el nombre de {0} a {1}.'
 CHANGED_PAYPAL: '&e&lIsla | &7Se cambió el PayPal de la isla {0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lMejoras| &7Se actualizó con éxito el multiplicador de tasas de spawn de la isla de {0}.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lMejoras| &7Se actualizó con éxito el multiplicador de tasas de spawn de todas las islas.'
 CHANGED_SPAWNER_RATES_NAME: '&e&lMejoras| &7Se actualizó con éxito el multiplicador de tasas de spawn de {0}.'
@@ -187,6 +190,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Transfiere una isla a otra persona.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Establece el multiplicador de drop de los mobs para la isla de otro jugador'
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 'Establezca un rol obligatorio para obtener un permiso para todas las islas.'
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: 'Establece la calificación de otro jugador.'
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: 'Alternar la configuración de una isla específica.'
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: 'Cambiar el porcentaje de un material para el generador de adoquines.'
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 'Cambia el tamaño de la isla de otro jugador.'
@@ -407,6 +411,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lIsla | &7Tasas de generación ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsla | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsla | &7Tamaño del borde: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIsla | &7Multiplicador de Spawners: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lIsla | &7Límite de equipo: {0}'

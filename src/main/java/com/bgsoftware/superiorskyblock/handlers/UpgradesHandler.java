@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
@@ -102,9 +103,17 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                             islandEffects.put(potionEffectType, new UpgradeValue<>(levelSection.getInt("island-effects." + effect) - 1, true));
                     }
                 }
+                Map<Integer, UpgradeValue<Integer>> rolesLimits = new HashMap<>();
+                if(levelSection.contains("role-limits")){
+                    for(String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
+                        try {
+                            rolesLimits.put(Integer.parseInt(roleId), new UpgradeValue<>(levelSection.getInt("role-limits." + roleId), true));
+                        }catch (NumberFormatException ignored){}
+                    }
+                }
                 upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,
                         cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
-                        entityLimits, generatorRates, islandEffects, bankLimit));
+                        entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
             }
             this.upgrades.add(upgradeName, upgrade);
         }

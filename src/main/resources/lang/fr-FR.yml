@@ -81,6 +81,9 @@ CHANGED_NAME: '&e&lIle | &7Vous avez changé le nom de votre île pour {0}.'
 CHANGED_NAME_OTHER: '&e&lIle | &7Vous avez changé le nom de l''île de {0} pour {1}.'
 CHANGED_NAME_OTHER_NAME: '&e&lIle | &7Vous avez changé le nom de {0} pour {1}.'
 CHANGED_PAYPAL: '&e&lIle | &7Vous avez changé le paypal de l''île pour {0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lAméliorations | &7Vous avez changé le multiplicateur de taux des spawners de l''île de {0}.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lAméliorations | &7Vous avez changé le multiplicateur de taux des spawners de toutes les îles.'
 CHANGED_SPAWNER_RATES_NAME: '&e&lAméliorations | &7Vous avez changé le multiplicateur de taux des spawners de {0}.'
@@ -188,6 +191,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_LEADER: Transférer une île à quelqu'un d'autre.
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Définir le multiplicateur de drops de mobs de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Définir un rôle nécéssaire à une permission pour toutes les îles.
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: Définir une note à la place d'un joueur.
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Activer/Désactiver les paramètres pour une île spécifique.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Changer le poucentage d'un matériau pour le générateur de cobble.
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: Changer la taille de l'île d'un joueur.
@@ -408,6 +412,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lIle | &7Taux de Générateur:
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIle | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIle | &7Taille de la bordure: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Spawners:
   {0}'

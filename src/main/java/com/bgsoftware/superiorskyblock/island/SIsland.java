@@ -186,6 +186,7 @@ public final class SIsland implements Island {
     private final SyncedObject<UpgradeValue<Double>> spawnerRates = SyncedObject.of(UpgradeValue.NEGATIVE_DOUBLE);
     private final SyncedObject<UpgradeValue<Double>> mobDrops = SyncedObject.of(UpgradeValue.NEGATIVE_DOUBLE);
     private final SyncedObject<UpgradeValue<BigDecimal>> bankLimit = SyncedObject.of(new UpgradeValue<>(new BigDecimal(-2), true));
+    private final SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits = SyncedObject.of(new HashMap<>());
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
@@ -208,6 +209,7 @@ public final class SIsland implements Island {
         IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
         IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
         IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
+        IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
 
         if(!resultSet.getString("uniqueVisitors").contains(";"))
             islandDataHandler.saveUniqueVisitors();
@@ -377,6 +379,20 @@ public final class SIsland implements Island {
             members.add(owner);
 
         this.members.read(members::addAll);
+
+        return members;
+    }
+
+    @Override
+    public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
+        List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
+        List<SuperiorPlayer> members = new ArrayList<>();
+
+        if(rolesToFilter.contains(SPlayerRole.lastRole()))
+            members.add(owner);
+
+        members.addAll(this.members.readAndGet(_members -> _members.stream().filter(superiorPlayer ->
+                rolesToFilter.contains(superiorPlayer.getPlayerRole())).collect(Collectors.toList())));
 
         return members;
     }
@@ -2403,6 +2419,46 @@ public final class SIsland implements Island {
         islandDataHandler.saveIslandEffects();
     }
 
+    @Override
+    public void setRoleLimit(PlayerRole playerRole, int limit) {
+        SuperiorSkyblockPlugin.debug("Action: Set Role Limit, Island: " + owner.getName() + ", Role: " + playerRole.getName() + ", Limit: " + limit);
+
+        if(limit < 0) {
+            roleLimits.write(map -> map.remove(playerRole));
+        }
+        else {
+            roleLimits.write(map -> map.put(playerRole, new UpgradeValue<>(limit, false)));
+        }
+
+        islandDataHandler.saveRolesLimits();
+    }
+
+    @Override
+    public int getRoleLimit(PlayerRole playerRole) {
+        return roleLimits.readAndGet(map -> map.getOrDefault(playerRole, UpgradeValue.NEGATIVE).get());
+    }
+
+    @Override
+    public int getRoleLimitRaw(PlayerRole playerRole) {
+        return roleLimits.readAndGet(map -> {
+            UpgradeValue<Integer> upgradeValue =  map.getOrDefault(playerRole, UpgradeValue.NEGATIVE);
+            return upgradeValue.isSynced() ? -1 : upgradeValue.get();
+        });
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        return roleLimits.readAndGet(rolesLimits -> rolesLimits.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getCustomRoleLimits() {
+        return this.roleLimits.readAndGet(roleLimits -> roleLimits.entrySet().stream()
+                .filter(entry -> !entry.getValue().isSynced())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get())));
+    }
+
     /*
      *  Warps related methods
      */
@@ -3183,6 +3239,10 @@ public final class SIsland implements Island {
         islandEffects.write(islandEffects -> new HashSet<>(islandEffects.entrySet()).stream()
                 .filter(entry -> overrideCustom || entry.getValue().isSynced())
                 .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
+
+        roleLimits.write(roleLimits -> new HashSet<>(roleLimits.entrySet()).stream()
+                .filter(entry -> overrideCustom || entry.getValue().isSynced())
+                .forEach(entry -> entry.setValue(new UpgradeValue<>(-1, true))));
     }
 
     private void syncUpgrade(SUpgradeLevel upgradeLevel, boolean overrideCustom){
@@ -3253,6 +3313,14 @@ public final class SIsland implements Island {
                 UpgradeValue<Integer> currentValue = islandEffects.get(entry.getKey());
                 if(currentValue == null || entry.getValue().get() > currentValue.get())
                     islandEffects.put(entry.getKey(), entry.getValue());
+            }
+        });
+
+        roleLimits.write(roleLimits -> {
+            for(Map.Entry<PlayerRole, UpgradeValue<Integer>> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()){
+                UpgradeValue<Integer> currentValue = roleLimits.get(entry.getKey());
+                if(currentValue == null || entry.getValue().get() > currentValue.get())
+                    roleLimits.put(entry.getKey(), entry.getValue());
             }
         });
     }

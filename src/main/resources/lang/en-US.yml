@@ -81,6 +81,9 @@ CHANGED_NAME: '&e&lIsland | &7You changed your island''s name to {0}.'
 CHANGED_NAME_OTHER: '&e&lIsland | &7You changed the {0} island''s name to {1}.'
 CHANGED_NAME_OTHER_NAME: '&e&lIsland | &7You changed the name of {0} to {1}.'
 CHANGED_PAYPAL: '&e&lIsland | &7Successfully changed island paypal to {0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lUpgrades | &7Successfully updated the spawner rates multiplier of {0}''s island.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lUpgrades | &7Successfully updated the spawner rates multiplier of all the islands.'
 CHANGED_SPAWNER_RATES_NAME: '&e&lUpgrades | &7Successfully updated the spawner rates multiplier of {0}.'
@@ -187,6 +190,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_LEADER: 'Transfer an island to someone else.'
 COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: 'Set the mob drops multiplier for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: 'Set a required role for a permission for all the islands.'
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: 'Set the rating of another player.'
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: 'Toggle settings for a specific island.'
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: 'Change percentage of a material for the cobblestone generator.'
 COMMAND_DESCRIPTION_ADMIN_SET_SIZE: 'Change another player''s island size.'
@@ -407,6 +411,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lIsland | &7Generator Rates ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIsland | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIsland | &7Border Size: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIsland | &7Spawners Multiplier: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lIsland | &7Team Limit: {0}'

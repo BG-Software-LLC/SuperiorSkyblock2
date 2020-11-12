@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.upgrades;
 
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -40,6 +42,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final KeyMap<UpgradeValue<Integer>>[] generatorRates;
     private final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects;
     private final UpgradeValue<BigDecimal> bankLimit;
+    private final Map<Integer, UpgradeValue<Integer>> roleLimits;
 
     private ItemData itemData;
 
@@ -48,7 +51,8 @@ public class SUpgradeLevel implements UpgradeLevel {
                          UpgradeValue<Integer> teamLimit, UpgradeValue<Integer> warpsLimit, UpgradeValue<Integer> coopLimit,
                          UpgradeValue<Integer> borderSize, KeyMap<UpgradeValue<Integer>> blockLimits,
                          KeyMap<UpgradeValue<Integer>> entityLimits, KeyMap<UpgradeValue<Integer>>[] generatorRates,
-                         Map<PotionEffectType, UpgradeValue<Integer>> islandEffects, UpgradeValue<BigDecimal> bankLimit){
+                         Map<PotionEffectType, UpgradeValue<Integer>> islandEffects, UpgradeValue<BigDecimal> bankLimit,
+                         Map<Integer, UpgradeValue<Integer>> roleLimits){
         this.level = level;
         this.price = price;
         this.commands = commands;
@@ -66,6 +70,7 @@ public class SUpgradeLevel implements UpgradeLevel {
         this.generatorRates = generatorRates;
         this.islandEffects = islandEffects;
         this.bankLimit = bankLimit;
+        this.roleLimits = roleLimits;
     }
 
     @Override
@@ -262,6 +267,30 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     public UpgradeValue<BigDecimal> getBankLimitUpgradeValue(){
         return bankLimit;
+    }
+
+    @Override
+    public int getRoleLimit(PlayerRole playerRole) {
+        return roleLimits.getOrDefault(playerRole.getId(), UpgradeValue.ZERO).get();
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        return roleLimits.entrySet().stream()
+                .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
+                .collect(Collectors.toMap(
+                        entry -> SPlayerRole.fromId(entry.getKey()),
+                        entry -> entry.getValue().get()
+                ));
+    }
+
+    public Map<PlayerRole, UpgradeValue<Integer>> getRoleLimitsUpgradeValue(){
+        return roleLimits.entrySet().stream()
+                .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
+                .collect(Collectors.toMap(
+                        entry -> SPlayerRole.fromId(entry.getKey()),
+                        Map.Entry::getValue
+                ));
     }
 
     public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){

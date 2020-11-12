@@ -78,9 +78,15 @@ public final class CmdDemote implements IPermissibleCommand {
             return;
         }
 
-        PlayerRole previousRole = targetPlayer.getPlayerRole().getPreviousRole();
+        PlayerRole previousRole = targetPlayer.getPlayerRole();
+        int roleLimit;
 
-        if(previousRole == null){
+        do {
+            previousRole = previousRole.getPreviousRole();
+            roleLimit = previousRole == null ? -1 : island.getRoleLimit(previousRole);
+        }while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
+
+        if (previousRole == null) {
             Locale.LAST_ROLE_DEMOTE.send(superiorPlayer);
             return;
         }

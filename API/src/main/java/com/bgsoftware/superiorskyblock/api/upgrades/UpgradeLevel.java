@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.upgrades;
 
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.World;
@@ -162,5 +163,16 @@ public interface UpgradeLevel {
      * Get the bank limit of this level.
      */
     BigDecimal getBankLimit();
+
+    /**
+     * Get a limit of a role for this level.
+     * @param playerRole The role to check.
+     */
+    int getRoleLimit(PlayerRole playerRole);
+
+    /**
+     * Get the role limits of this level.
+     */
+    Map<PlayerRole, Integer> getRoleLimits();
 
 }

@@ -60,9 +60,31 @@ public final class CmdAdminPromote implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        PlayerRole currentRole = targetPlayer.getPlayerRole(), nextRole = currentRole.getNextRole();
+        Island island = targetPlayer.getIsland();
 
-        if(currentRole.isLastRole() || nextRole.isLastRole()){
+        if(island == null){
+            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            return;
+        }
+
+        PlayerRole currentRole = targetPlayer.getPlayerRole();
+
+        if(currentRole.isLastRole()){
+            Locale.LAST_ROLE_PROMOTE.send(sender);
+            return;
+        }
+
+        PlayerRole nextRole = currentRole;
+        int roleLimit;
+
+
+        do{
+            nextRole = nextRole.getNextRole();
+            roleLimit = nextRole == null ? -1 : island.getRoleLimit(nextRole);
+        }while (nextRole != null && !nextRole.isLastRole() &&
+                roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
+
+        if(nextRole == null || nextRole.isLastRole()){
             Locale.LAST_ROLE_PROMOTE.send(sender);
             return;
         }

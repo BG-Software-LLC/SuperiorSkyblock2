@@ -99,6 +99,9 @@ CHANGED_NAME: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên đảo bạn 
 CHANGED_NAME_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên đảo của {0} thành {1}.'
 CHANGED_NAME_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên của {0} thành {1}.'
 CHANGED_PAYPAL: '&e&lNâng cấp | &7Thay đổi thành công đảo paypal thành {0}.'
+CHANGED_ROLE_LIMIT: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}''s island.'
+CHANGED_ROLE_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for all the islands.'
+CHANGED_ROLE_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the limit of the role {0} for {1}.'
 CHANGED_SPAWNER_RATES: '&e&lNâng cấp | &7Nâng cấp thành công tỉ lệ spawner đảo của
   {0}.'
 CHANGED_SPAWNER_RATES_ALL: '&e&lĐiều Chỉnh | &7Cập nhập thành công tỷ lệ nhân giống
@@ -221,6 +224,7 @@ COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS: Đặt số lượng mob drop cho đả
 COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION: Đặt vai trò bắt buộc để cấp quyền cho tất
   cả các đảo.
 COMMAND_DESCRIPTION_ADMIN_SET_RATE: Đặt đánh giá của người chơi khác.
+COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT: 'Set role limit for another player''s island.'
 COMMAND_DESCRIPTION_ADMIN_SET_SETTINGS: Chuyển đổi cài đặt cho một hòn đảo cụ thể.
 COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR: Thay đổi tỷ lệ phần trăm của vật liệu cho
   máy tạo quặng.
@@ -464,6 +468,10 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lĐảo Thần | &7Tỉ lệ máy tạo quặng ({1}):
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng cấp | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_ROLE_LIMITS: |
+  &e&lIsland | &7Role Limits:
+  {0}
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lNâng cấp | &7Kích thước bo: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lNâng cấp | &7Spawners đa cấp: {0}'
 ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lNâng cấp | &7Giới hạn đội: {0}'

@@ -121,6 +121,13 @@ public final class CmdSetRole implements IPermissibleCommand {
             return;
         }
 
+        int roleLimit = targetIsland.getRoleLimit(playerRole);
+
+        if(roleLimit >= 0 && targetIsland.getIslandMembers(playerRole).size() >= roleLimit){
+            Locale.CANNOT_SET_ROLE.send(sender, playerRole);
+            return;
+        }
+
         PlayerRole currentRole = targetPlayer.getPlayerRole();
         targetPlayer.setPlayerRole(playerRole);
 

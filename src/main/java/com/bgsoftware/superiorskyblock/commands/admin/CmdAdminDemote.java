@@ -69,12 +69,20 @@ public final class CmdAdminDemote implements IAdminPlayerCommand {
             return;
         }
 
-        if(currentRole.isFirstRole()){
+        PlayerRole previousRole = currentRole;
+        int roleLimit;
+
+        do {
+            previousRole = previousRole.getPreviousRole();
+            roleLimit = previousRole == null ? -1 : island.getRoleLimit(previousRole);
+        }while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
+
+        if(previousRole == null){
             Locale.LAST_ROLE_DEMOTE.send(sender);
             return;
         }
 
-        targetPlayer.setPlayerRole(currentRole.getPreviousRole());
+        targetPlayer.setPlayerRole(previousRole);
 
         Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
         Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());

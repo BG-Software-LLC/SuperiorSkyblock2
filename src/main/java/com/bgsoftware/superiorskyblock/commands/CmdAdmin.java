@@ -84,6 +84,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminSetMobDrops(), false);
         registerCommand(new CmdAdminSetPermission(), false);
         registerCommand(new CmdAdminSetRate(), false);
+        registerCommand(new CmdAdminSetRoleLimit(), false);
         registerCommand(new CmdAdminSetSettings(), false);
         registerCommand(new CmdAdminSetSize(), false);
         registerCommand(new CmdAdminSetSpawn(), false);
