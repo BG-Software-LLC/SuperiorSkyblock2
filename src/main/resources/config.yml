@@ -423,6 +423,14 @@ default-settings:
 # This should increase performance on the server.
 disable-redstone-offline: true
 
+# Settings related to afk integrations.
+# Supported AFK plugins: Essentials, CMI
+afk-integrations:
+  # Should redstone be disabled when all the players inside the island are AFK?
+  disable-redstone: false
+  # Should mob spawning be disabled when all the players inside the island are AFK?
+  disable-spawning: false
+
 # A list of commands that should have cooldown.
 # Cooldowns are in milliseconds.
 # You can disable this section by using:

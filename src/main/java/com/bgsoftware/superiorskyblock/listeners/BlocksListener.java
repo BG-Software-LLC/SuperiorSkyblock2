@@ -247,15 +247,31 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockRedstone(BlockRedstoneEvent e){
-        if(!plugin.getSettings().disableRedstoneOffline)
+        if(!plugin.getSettings().disableRedstoneOffline && !plugin.getSettings().disableRedstoneAFK)
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island == null || island.isSpawn() || island.getLastTimeUpdate() == -1)
+        if(island == null || island.isSpawn())
             return;
 
-        e.setNewCurrent(0);
+        if((plugin.getSettings().disableRedstoneOffline && island.getLastTimeUpdate() != -1) ||
+                (plugin.getSettings().disableRedstoneAFK && island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
+            e.setNewCurrent(0);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntitySpawn(CreatureSpawnEvent e){
+        if(!plugin.getSettings().disableSpawningAFK)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null || island.isSpawn() || !island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))
+            return;
+
+        e.setCancelled(true);
     }
 
     /*

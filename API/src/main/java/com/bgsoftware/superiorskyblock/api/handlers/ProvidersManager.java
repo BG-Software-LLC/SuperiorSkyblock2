@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
@@ -32,5 +33,11 @@ public interface ProvidersManager {
      * @param economyProvider The economy provider to set.
      */
     void setBankEconomyProvider(EconomyProvider economyProvider);
+
+    /**
+     * Add AFK Provider to the plugin.
+     * @param afkProvider The afk-provider to add.
+     */
+    void addAFKProvider(AFKProvider afkProvider);
 
 }

@@ -180,6 +180,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isAFK() {
+        Player player = asPlayer();
+        return player != null && plugin.getProviders().isAFK(player);
+    }
+
+    @Override
     public boolean hasPermission(String permission){
         return permission.isEmpty() || asPlayer().hasPermission(permission);
     }

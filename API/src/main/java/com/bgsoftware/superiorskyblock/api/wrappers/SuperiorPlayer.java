@@ -82,6 +82,11 @@ public interface SuperiorPlayer {
     boolean hasFlyGamemode();
 
     /**
+     * Check whether or not the player is AFK.
+     */
+    boolean isAFK();
+
+    /**
      * Check whether or not the player has a permission.
      */
     boolean hasPermission(String permission);

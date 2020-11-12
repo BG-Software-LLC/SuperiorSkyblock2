@@ -115,6 +115,8 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
+    public final boolean disableRedstoneAFK;
+    public final boolean disableSpawningAFK;
     public final KeyMap<UpgradeValue<Integer>>[] defaultGenerator;
     public final Registry<String, Pair<Integer, String>> commandsCooldown;
     public final String numberFormat;
@@ -310,6 +312,8 @@ public final class SettingsHandler extends AbstractHandler {
             loadGenerator(cfg.getStringList("default-values.generator"), 0);
         }
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
+        disableRedstoneAFK = cfg.getBoolean("afk-integrations.disable-redstone", false);
+        disableSpawningAFK = cfg.getBoolean("afk-integrations.disable-spawning", true);
         commandsCooldown = Registry.createRegistry();
         for(String subCommand : cfg.getConfigurationSection("commands-cooldown").getKeys(false)){
             int cooldown = cfg.getInt("commands-cooldown." + subCommand + ".cooldown");

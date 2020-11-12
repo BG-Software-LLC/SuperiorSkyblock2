@@ -2,11 +2,14 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
+import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.AFKProvider_CMI;
+import com.bgsoftware.superiorskyblock.hooks.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
@@ -53,7 +56,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -71,6 +76,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private VanishProvider vanishProvider = player -> false;
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
+
+    private List<AFKProvider> AFKProvidersList = new ArrayList<>();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -144,6 +151,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
                 runSafe(() -> vanishProvider = new VanishProvider_CMI(plugin));
 
+            if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
+                runSafe(() -> addAFKProvider(new AFKProvider_CMI()));
+            if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
+                runSafe(() -> addAFKProvider(new AFKProvider_Essentials()));
+
             if(hasPaperAsyncSupport()){
                 try {
                     asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
@@ -198,6 +210,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     public void setBankEconomyProvider(EconomyProvider bankEconomyProvider) {
         Preconditions.checkArgument(bankEconomyProvider != null, "EconomyProvider cannot be null.");
         this.bankEconomyProvider = bankEconomyProvider;
+    }
+
+    @Override
+    public void addAFKProvider(AFKProvider afkProvider) {
+        AFKProvidersList.add(afkProvider);
     }
 
     public Pair<Integer, String> getSpawner(Location location){
@@ -346,6 +363,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
         return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
+    }
+
+    public boolean isAFK(Player player){
+        return AFKProvidersList.stream().anyMatch(afkProvider -> afkProvider.isAFK(player));
     }
 
     private static boolean hasPaperAsyncSupport(){
