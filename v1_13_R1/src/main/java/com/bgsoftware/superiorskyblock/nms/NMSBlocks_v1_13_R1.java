@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
-import net.minecraft.server.v1_13_R1.AxisAlignedBB;
 import net.minecraft.server.v1_13_R1.BiomeBase;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockBed;
@@ -34,7 +33,7 @@ import net.minecraft.server.v1_13_R1.ChunkConverter;
 import net.minecraft.server.v1_13_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_13_R1.ChunkProviderServer;
 import net.minecraft.server.v1_13_R1.ChunkSection;
-import net.minecraft.server.v1_13_R1.Entity;
+import net.minecraft.server.v1_13_R1.EntityHuman;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
 import net.minecraft.server.v1_13_R1.EnumSkyBlock;
 import net.minecraft.server.v1_13_R1.HeightMap;
@@ -45,9 +44,11 @@ import net.minecraft.server.v1_13_R1.IChunkAccess;
 import net.minecraft.server.v1_13_R1.IChunkLoader;
 import net.minecraft.server.v1_13_R1.ITickable;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R1.Packet;
 import net.minecraft.server.v1_13_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutUnloadChunk;
+import net.minecraft.server.v1_13_R1.PlayerChunkMap;
 import net.minecraft.server.v1_13_R1.PlayerConnection;
 import net.minecraft.server.v1_13_R1.ProtoChunk;
 import net.minecraft.server.v1_13_R1.ProtoChunkExtension;
@@ -167,19 +168,11 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
 
     @Override
     public void setBlock(Location location, Material material, byte data) {
-        World world = ((CraftWorld) location.getWorld()).getHandle();
+        WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, getCombinedId(material, data), null, null);
-
-        AxisAlignedBB bb = new AxisAlignedBB(blockPosition.getX() - 60, 0, blockPosition.getZ() - 60,
-                blockPosition.getX() + 60, 256, blockPosition.getZ() + 60);
-
-        PacketPlayOutBlockChange packetPlayOutBlockChange = new PacketPlayOutBlockChange(world, blockPosition);
-
-        for(Entity entity : world.getEntities(null, bb)){
-            if(entity instanceof EntityPlayer)
-                ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutBlockChange);
-        }
+        sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
+                new PacketPlayOutBlockChange(world, blockPosition));
     }
 
     @SuppressWarnings("unchecked")
@@ -346,18 +339,8 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-
-        PacketPlayOutMapChunk packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, 65535);
-
-        AxisAlignedBB bb = new AxisAlignedBB((bukkitChunk.getX() << 4) - 120, 0, (bukkitChunk.getZ() << 4) - 120,
-                (bukkitChunk.getX() << 4) + 120, 256, (bukkitChunk.getZ() << 4) + 120);
-
-        Executor.ensureMain(() -> {
-            for(Entity entity : chunk.getWorld().getEntities(null, bb)){
-                if(entity instanceof EntityPlayer)
-                    ((EntityPlayer) entity).playerConnection.sendPacket(packetPlayOutMapChunk);
-            }
-        });
+        sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+                new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override
@@ -589,6 +572,14 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
         BlockData blockData = block.getBlockData();
 
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+    }
+
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for(EntityHuman entityHuman : worldServer.players){
+            if(entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
