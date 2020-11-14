@@ -49,7 +49,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
             }
             else{
-                SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
+                SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
                 if(targetPlayer != null) {
                     tabVariables = adminTabComplete(plugin, sender, targetPlayer, args);
                 }
