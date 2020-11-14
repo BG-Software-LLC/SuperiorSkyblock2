@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
@@ -72,7 +73,18 @@ public final class CmdAdminMission implements IAdminPlayerCommand {
             return;
         }
         else if(args[3].equalsIgnoreCase("reset")){
-            missions.forEach(targetPlayer::resetMission);
+            Island island = targetPlayer.getIsland();
+
+            missions.forEach(mission -> {
+                if(mission.getIslandMission()){
+                    if(island != null)
+                        island.resetMission(mission);
+                }
+                else{
+                    targetPlayer.resetMission(mission);
+                }
+            });
+
             if(missions.size() == 1)
                 Locale.MISSION_STATUS_RESET.send(sender, missions.get(0).getName(), targetPlayer.getName());
             else
