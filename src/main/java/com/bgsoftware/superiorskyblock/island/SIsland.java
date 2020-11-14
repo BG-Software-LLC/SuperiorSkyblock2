@@ -306,9 +306,6 @@ public final class SIsland implements Island {
             }
         }
 
-        if(getMobDropsRaw() == getWarpsLimitRaw())
-            this.mobDrops.set(new UpgradeValue<>(-1D, true));
-
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
