@@ -77,7 +77,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
             int progressValue = mission.getProgressValue(superiorPlayer);
             int amountCompleted = superiorPlayer.getAmountMissionCompleted(mission);
 
-            ItemStack itemStack = completed ? missionData.completed.build(superiorPlayer) :
+            ItemStack itemStack = completed ? missionData.completed.clone().build(superiorPlayer) :
                     plugin.getMissions().canComplete(superiorPlayer, mission) ?
                             missionData.canComplete.clone()
                                     .replaceAll("{0}", percentage + "")
