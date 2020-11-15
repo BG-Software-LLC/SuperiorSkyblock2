@@ -50,21 +50,25 @@ public final class SlimefunHook implements ProtectionModule, Listener {
         if(protectableAction == ProtectableAction.PVP)
             return island != null && island.hasSettingsEnabled(IslandFlags.PVP);
 
-        IslandPrivilege islandPrivilege = null;
+        IslandPrivilege islandPrivilege;
 
-        switch (protectableAction){
-            case BREAK_BLOCK:
+        switch (protectableAction.name()){
+            case "BREAK_BLOCK":
                 islandPrivilege = IslandPrivileges.BREAK;
                 break;
-            case PLACE_BLOCK:
+            case "PLACE_BLOCK":
                 islandPrivilege = IslandPrivileges.BUILD;
                 break;
-            case ACCESS_INVENTORIES:
+            case "ACCESS_INVENTORIES":
+            case "INTERACT_BLOCK":
                 islandPrivilege = IslandPrivileges.CHEST_ACCESS;
+                break;
+            default:
+                islandPrivilege = IslandPrivileges.INTERACT;
                 break;
         }
 
-        return islandPrivilege != null && island != null && island.hasPermission(superiorPlayer, islandPrivilege);
+        return island != null && island.hasPermission(superiorPlayer, islandPrivilege);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
