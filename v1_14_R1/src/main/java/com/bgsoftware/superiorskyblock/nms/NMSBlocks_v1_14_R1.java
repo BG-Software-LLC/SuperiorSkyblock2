@@ -53,6 +53,7 @@ import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_14_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
 import net.minecraft.server.v1_14_R1.PlayerConnection;
+import net.minecraft.server.v1_14_R1.PlayerMap;
 import net.minecraft.server.v1_14_R1.ProtoChunk;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.TileEntitySign;
@@ -94,6 +95,7 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
 
     private static final ReflectField<Boolean> RANDOM_TICK = new ReflectField<>(Block.class, Boolean.class, "randomTick");
+    private static final ReflectField<PlayerMap> PLAYER_MAP_FIELD = new ReflectField<>(PlayerChunkMap.class, PlayerMap.class, "playerMap");
 
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
 
@@ -607,7 +609,7 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
 
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-        playerChunkMap.a(new ChunkCoordIntPair(chunkX, chunkX), false)
+        PLAYER_MAP_FIELD.get(playerChunkMap).a(1)
                 .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
     }
 
