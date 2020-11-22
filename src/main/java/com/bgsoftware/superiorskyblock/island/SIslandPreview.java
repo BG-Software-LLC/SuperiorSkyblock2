@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import org.bukkit.Location;
 
 public final class SIslandPreview implements IslandPreview {
@@ -21,6 +22,19 @@ public final class SIslandPreview implements IslandPreview {
         this.previewLocation = previewLocation;
         this.schematic = schematic;
         this.islandName = islandName;
+
+        PlayerChat.listen(superiorPlayer.asPlayer(), message -> {
+            if(message.equalsIgnoreCase("CONFIRM")){
+                handleConfirm();
+                return true;
+            }
+            else if(message.equalsIgnoreCase("CANCEL")){
+                handleCancel();
+                return true;
+            }
+
+            return false;
+        });
     }
 
     @Override
@@ -46,6 +60,7 @@ public final class SIslandPreview implements IslandPreview {
     @Override
     public void handleConfirm() {
         MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematic, false);
+        PlayerChat.remove(superiorPlayer.asPlayer());
     }
 
     @Override

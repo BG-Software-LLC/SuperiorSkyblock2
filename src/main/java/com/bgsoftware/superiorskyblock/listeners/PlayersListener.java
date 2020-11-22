@@ -6,15 +6,14 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
-import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -65,7 +64,6 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -348,6 +346,13 @@ public final class PlayersListener implements Listener {
             targetPlayer.asPlayer().setFireTicks(0);
     }
 
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlayerChatListen(AsyncPlayerChatEvent e){
+        PlayerChat playerChat = PlayerChat.getChatListener(e.getPlayer());
+        if(playerChat != null && playerChat.supply(e.getMessage()))
+            e.setCancelled(true);
+    }
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerAsyncChat(AsyncPlayerChatEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -626,25 +631,6 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerChatWhilePreview(AsyncPlayerChatEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        IslandPreview islandPreview = plugin.getGrid().getIslandPreview(superiorPlayer);
-
-        if(islandPreview == null)
-            return;
-
-        if(e.getMessage().equalsIgnoreCase("CONFIRM")){
-            e.setCancelled(true);
-            islandPreview.handleConfirm();
-        }
-        else if(e.getMessage().equalsIgnoreCase("CANCEL")){
-            e.setCancelled(true);
-            islandPreview.handleCancel();
-        }
-
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerTeleportWhilePreview(PlayerTeleportEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
@@ -657,53 +643,8 @@ public final class PlayersListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerChatWhileBank(AsyncPlayerChatEvent e){
+    public void onPlayerQuitWhilePreview(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-
-        boolean fromBank = false;
-
-        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankWithdrawSlot() >= 0){
-            e.setCancelled(true);
-            fromBank = true;
-
-            try{
-                BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
-                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().withdrawMoney(superiorPlayer, amount,
-                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankCommandsToExecute());
-                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction,
-                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankWithdrawSlot());
-            }catch(IllegalArgumentException ex){
-                Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
-            }
-        }
-        else if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankDepositSlot() >= 0){
-            e.setCancelled(true);
-            fromBank = true;
-
-            try{
-                BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(e.getMessage()));
-                BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, amount);
-                MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction,
-                        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getBankDepositSlot());
-            }catch(IllegalArgumentException ex){
-                Locale.INVALID_AMOUNT.send(superiorPlayer, e.getMessage());
-            }
-        }
-
-        if(fromBank) {
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(-1);
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(-1);
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankCommandsToExecute(null);
-            MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onPlayerQuitWhileBankOrPreview(PlayerQuitEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(-1);
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(-1);
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankCommandsToExecute(null);
         if(plugin.getGrid().getIslandPreview(superiorPlayer) != null)
             plugin.getGrid().cancelIslandPreview(superiorPlayer);
     }

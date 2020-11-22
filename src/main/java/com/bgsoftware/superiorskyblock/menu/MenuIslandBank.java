@@ -6,10 +6,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
@@ -41,10 +42,26 @@ public final class MenuIslandBank extends SuperiorMenu {
 
             if(withdrawValue instanceof Double){
                 if((double) withdrawValue <= 0){
-                    ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankWithdrawSlot(e.getRawSlot());
+                    int withdrawSlot = e.getRawSlot();
                     previousMove = false;
                     e.getWhoClicked().closeInventory();
                     Locale.BANK_WITHDRAW_CUSTOM.send(superiorPlayer);
+
+                    PlayerChat.listen((Player) e.getWhoClicked(), message -> {
+                        try{
+                            BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
+                            BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank()
+                                    .withdrawMoney(superiorPlayer, newAmount, null);
+                            MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, withdrawSlot);
+                        }catch (IllegalArgumentException ex){
+                            Locale.INVALID_AMOUNT.send(superiorPlayer, message);
+                        }
+
+                        MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+
+                        return true;
+                    });
+
                     return;
                 }
                 amount = amount.multiply(BigDecimal.valueOf(((double) withdrawValue) / 100D));
@@ -61,10 +78,25 @@ public final class MenuIslandBank extends SuperiorMenu {
         else if(containsData(e.getRawSlot() + "-deposit")){
             double depositPercentage = (Double) getData(e.getRawSlot() + "-deposit");
             if(depositPercentage <= 0){
-                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setBankDepositSlot(e.getRawSlot());
+                int depositSlot = e.getRawSlot();
                 previousMove = false;
                 e.getWhoClicked().closeInventory();
                 Locale.BANK_DEPOSIT_CUSTOM.send(superiorPlayer);
+
+                PlayerChat.listen((Player) e.getWhoClicked(), message -> {
+                    try{
+                        BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
+                        BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, newAmount);
+                        MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, depositSlot);
+                    }catch(IllegalArgumentException ex){
+                        Locale.INVALID_AMOUNT.send(superiorPlayer, message);
+                    }
+
+                    MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+
+                    return true;
+                });
+
             }
             else {
                 BigDecimal amount = plugin.getProviders().getBalanceForBanks(superiorPlayer).multiply(BigDecimal.valueOf(depositPercentage / 100D));

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
@@ -223,6 +224,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             });
+            PlayerChat.remove(superiorPlayer.asPlayer());
         }
     }
 

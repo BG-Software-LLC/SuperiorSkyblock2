@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.List;
 import java.util.Locale;
 
 public final class SPlayerDataHandler extends DatabaseObject implements PlayerDataHandler {
@@ -19,10 +18,6 @@ public final class SPlayerDataHandler extends DatabaseObject implements PlayerDa
     private boolean immuneToPvP = false;
     private boolean immuneToTeleport = false;
     private boolean leavingFlag = false;
-
-    private int bankWithdrawSlot = -1;
-    private int bankDepositSlot = -1;
-    private List<String> bankCommandsToExecute;
 
     private BukkitTask teleportTask = null;
 
@@ -210,30 +205,6 @@ public final class SPlayerDataHandler extends DatabaseObject implements PlayerDa
 
     public boolean isImmunedToTeleport(){
         return immuneToTeleport;
-    }
-
-    public int getBankWithdrawSlot(){
-        return bankWithdrawSlot;
-    }
-
-    public void setBankWithdrawSlot(int bankWithdrawSlot){
-        this.bankWithdrawSlot = bankWithdrawSlot;
-    }
-
-    public int getBankDepositSlot(){
-        return bankDepositSlot;
-    }
-
-    public void setBankDepositSlot(int bankDepositSlot){
-        this.bankDepositSlot = bankDepositSlot;
-    }
-
-    public void setBankCommandsToExecute(List<String> bankCommandsToExecute) {
-        this.bankCommandsToExecute = bankCommandsToExecute;
-    }
-
-    public List<String> getBankCommandsToExecute() {
-        return bankCommandsToExecute;
     }
 
 }
