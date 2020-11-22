@@ -58,6 +58,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                         }
 
                         MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                        PlayerChat.remove((Player) e.getWhoClicked());
 
                         return true;
                     });
@@ -93,6 +94,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                     }
 
                     MenuIslandBank.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                    PlayerChat.remove((Player) e.getWhoClicked());
 
                     return true;
                 });
