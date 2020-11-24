@@ -61,13 +61,25 @@ public final class ChunksListener implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkUnloadMonitor(ChunkUnloadEvent e){
+        if(plugin.getGrid() == null || !plugin.getGrid().isIslandsWorld(e.getWorld()))
+            return;
+
+        plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk()))
+                .forEach(StackedBlocksHandler.StackedBlock::removeHologram);
+
+        Island island = plugin.getGrid().getIslandAt(e.getChunk());
+
+        if(island == null)
+            return;
 
         plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), true);
 
-        if(island != null && !island.isSpawn() && !plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+        if(!island.isSpawn() && !plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
-
-        plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk())).forEach(StackedBlocksHandler.StackedBlock::removeHologram);
     }
 
     @EventHandler
