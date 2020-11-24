@@ -30,6 +30,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -691,7 +692,8 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerFish(ProjectileLaunchEvent e){
-        if(!(e.getEntity() instanceof FishHook))
+        if(!(e.getEntity() instanceof FishHook) &&
+                (ServerVersion.isLessThan(ServerVersion.v1_13) || !(e.getEntity() instanceof Trident)))
             return;
 
         ProjectileSource projectileSource = e.getEntity().getShooter();
@@ -705,7 +707,10 @@ public final class ProtectionListener implements Listener {
         if(island == null)
             return;
 
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.FISH)){
+        IslandPrivilege islandPrivilege = e.getEntity() instanceof FishHook ?
+                IslandPrivileges.FISH : IslandPrivileges.PICKUP_DROPS;
+
+        if(!island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
         }
