@@ -122,6 +122,20 @@ public final class ItemUtils {
         return new BigInteger(1, outputStream.toByteArray()).toString(32);
     }
 
+    public static String serializeItem(ItemStack itemStack){
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutput = new DataOutputStream(outputStream);
+
+        try {
+            TagUtils.itemToCompound(itemStack).write(dataOutput);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return "";
+        }
+
+        return new BigInteger(1, outputStream.toByteArray()).toString(32);
+    }
+
     public static ItemStack[] deserialize(String serialized){
         ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
         CompoundTag compoundTag;
@@ -142,6 +156,19 @@ public final class ItemUtils {
         }
 
         return contents;
+    }
+
+    public static ItemStack deserializeItem(String serialized){
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
+
+        try{
+            CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
+            return TagUtils.compoundToItem(compoundTag);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return null;
     }
 
     private static boolean isValidAndSpawnEgg(ItemStack itemStack){

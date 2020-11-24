@@ -211,7 +211,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
                 }
                 else {
-                    MenuWarps.openInventory(superiorPlayer, this, island);
+                    MenuWarpCategories.openInventory(superiorPlayer, this, island);
                 }
             } else if(plugin.getSettings().valuesMenu) {
                 MenuValues.openInventory(superiorPlayer, this, island);

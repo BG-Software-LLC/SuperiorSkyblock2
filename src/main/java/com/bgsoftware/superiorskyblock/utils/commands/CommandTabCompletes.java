@@ -112,7 +112,7 @@ public final class CommandTabCompletes {
 
     public static List<String> getIslandWarps(Island island, String argument){
         String lowerArgument = argument.toLowerCase();
-        return island.getAllWarps().stream().filter(warpName -> warpName.toLowerCase().contains(lowerArgument))
+        return island.getIslandWarps().keySet().stream().filter(warpName -> warpName.toLowerCase().contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 

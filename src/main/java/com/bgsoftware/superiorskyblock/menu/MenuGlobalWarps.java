@@ -37,7 +37,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
         }
         else{
-            MenuWarps.openInventory(superiorPlayer, this, island);
+            MenuWarpCategories.openInventory(superiorPlayer, this, island);
         }
     }
 
@@ -52,7 +52,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
                     .replaceAll("{0}", island.getOwner().getName())
                     .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                    .replaceAll("{2}", island.getAllWarps().size() + "").build(island.getOwner());
+                    .replaceAll("{2}", island.getIslandWarps().size() + "").build(island.getOwner());
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
             throw ex;
@@ -118,9 +118,9 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
                     if(visitorWarps)
                         return island.getVisitorsLocation() != null;
                     else if(island.equals(superiorPlayer.getIsland()))
-                        return !island.getAllWarps().isEmpty();
+                        return !island.getIslandWarps().isEmpty();
                     else
-                        return island.getAllWarps().stream().anyMatch(warp -> !island.isWarpPrivate(warp));
+                        return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
                 });
     }
 

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -246,15 +247,14 @@ public final class CommandArguments {
         return getInt(sender, argument, Locale.INVALID_SIZE);
     }
 
-    public static String getWarp(CommandSender sender, Island island, String[] args, int start){
+    public static IslandWarp getWarp(CommandSender sender, Island island, String[] args, int start){
         String warpName = buildLongString(args, start, false);
+        IslandWarp islandWarp = island.getWarp(warpName);
 
-        if(island.getWarpLocation(warpName) == null){
+        if(islandWarp == null)
             Locale.INVALID_WARP.send(sender, warpName);
-            return null;
-        }
 
-        return warpName;
+        return islandWarp;
     }
 
     public static Biome getBiome(CommandSender sender, String argument){

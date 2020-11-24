@@ -7,13 +7,14 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -25,6 +26,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigInteger;
@@ -111,15 +113,31 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeWarps(String warps, Registry<String, SIslandWarp> warpsMap){
+    public static void deserializeWarps(String warps, Island island){
+        island.createWarpCategory("__default__");
+
         if(warps == null)
             return;
 
         for(String entry : warps.split(";")) {
             try {
                 String[] sections = entry.split("=");
+                String name = StringUtils.stripColors(sections[0].trim());
+                WarpCategory warpCategory = null;
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
-                warpsMap.add(StringUtils.stripColors(sections[0].trim()), new SIslandWarp(FileUtils.toLocation(sections[1]), privateFlag));
+
+                if(name.contains("-")){
+                    String[] nameSections = name.split("-");
+                    warpCategory = island.createWarpCategory(nameSections[0]);
+                    name = nameSections[1];
+                }
+
+                IslandWarp islandWarp = island.createWarp(name, FileUtils.toLocation(sections[1]), warpCategory);
+                islandWarp.setPrivateFlag(privateFlag);
+
+                if(sections.length == 4)
+                    islandWarp.setIcon(ItemUtils.deserializeItem(sections[3]));
+
             }catch(Exception ignored){}
         }
     }
@@ -305,6 +323,25 @@ public final class IslandDeserializer {
                 PlayerRole playerRole = SPlayerRole.fromId(Integer.parseInt(sections[0]));
                 if(playerRole != null)
                     roleLimits.put(playerRole, new UpgradeValue<>(Integer.parseInt(sections[1]), i -> i < 0));
+            }catch(Exception ignored){}
+        }
+    }
+
+    public static void deserializeWarpCategories(String warpCategories, Island island){
+        if(warpCategories == null)
+            return;
+
+        for(String entry : warpCategories.split(";")) {
+            try {
+                String[] sections = entry.split("=");
+                String name = StringUtils.stripColors(sections[0].trim());
+                int slot = Integer.parseInt(sections[1]);
+                ItemStack icon = ItemUtils.deserializeItem(sections[2]);
+
+                WarpCategory warpCategory = island.createWarpCategory(name);
+                warpCategory.setSlot(slot);
+                if(icon != null)
+                    warpCategory.setIcon(icon);
             }catch(Exception ignored){}
         }
     }

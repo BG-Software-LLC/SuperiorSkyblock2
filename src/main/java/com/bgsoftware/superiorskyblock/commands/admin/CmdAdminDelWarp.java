@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
@@ -65,14 +66,14 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        String warpName = CommandArguments.getWarp(sender, island, args, 3);
+        IslandWarp islandWarp = CommandArguments.getWarp(sender, island, args, 3);
 
-        if(warpName == null)
+        if(islandWarp == null)
             return;
 
         boolean breakSign = false;
 
-        Block signBlock = island.getWarpLocation(warpName).getBlock();
+        Block signBlock = islandWarp.getLocation().getBlock();
         if(signBlock.getState() instanceof Sign){
             signBlock.setType(Material.AIR);
             signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
@@ -83,10 +84,10 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
             island.setVisitorsLocation(null);
         }
         else{
-            island.deleteWarp(warpName);
+            island.deleteWarp(islandWarp.getName());
         }
 
-        Locale.DELETE_WARP.send(sender, warpName);
+        Locale.DELETE_WARP.send(sender, islandWarp.getName());
 
         if(breakSign){
             Locale.DELETE_WARP_SIGN_BROKE.send(sender);

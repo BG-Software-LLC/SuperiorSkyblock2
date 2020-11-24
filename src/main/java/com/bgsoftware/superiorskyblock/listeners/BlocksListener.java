@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.Locale;
@@ -599,7 +600,7 @@ public final class BlocksListener implements Listener {
         warpLocation.setYaw(superiorPlayer.getLocation().getYaw());
 
         if(lines[0].equalsIgnoreCase(plugin.getSettings().signWarpLine)){
-            if (!island.hasMoreWarpSlots()) {
+            if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
                 if(message)
                     Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
@@ -610,7 +611,7 @@ public final class BlocksListener implements Listener {
             String warpName = StringUtils.stripColors(lines[1].trim());
             boolean privateFlag = lines[2].equalsIgnoreCase("private");
 
-            if(warpName.replace(" ", "").isEmpty() || island.getWarpLocation(warpName) != null){
+            if(warpName.replace(" ", "").isEmpty() || island.getWarp(warpName) != null){
                 if(message)
                     Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
@@ -620,7 +621,8 @@ public final class BlocksListener implements Listener {
                 List<String> signWarp = plugin.getSettings().signWarp;
                 for (int i = 0; i < signWarp.size(); i++)
                     lines[i] = signWarp.get(i).replace("{0}", warpName);
-                island.setWarpLocation(warpName, warpLocation, privateFlag);
+                IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
+                islandWarp.setPrivateFlag(privateFlag);
                 if(message)
                     Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
             }
@@ -629,7 +631,7 @@ public final class BlocksListener implements Listener {
         }
 
         else if(lines[0].equalsIgnoreCase(plugin.getSettings().visitorsSignLine)){
-            if (!island.hasMoreWarpSlots()) {
+            if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
                 if(message)
                     Locale.NO_MORE_WARPS.send(superiorPlayer);
                 for (int i = 0; i < 4; i++)
@@ -677,7 +679,7 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
-        if(island.isWarpLocation(sign.getLocation())){
+        if(island.getWarp(sign.getLocation()) != null){
             island.deleteWarp(superiorPlayer, sign.getLocation());
         }
         else{

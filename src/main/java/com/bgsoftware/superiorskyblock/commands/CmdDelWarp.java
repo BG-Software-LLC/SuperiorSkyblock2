@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -73,14 +74,17 @@ public final class CmdDelWarp implements IPermissibleCommand {
 
         String warpName = warpNameBuilder.length() == 0 ? "" : warpNameBuilder.substring(1);
 
-        if(island.getWarpLocation(warpName) == null){
+        IslandWarp islandWarp = island.getWarp(warpName);
+
+        if(islandWarp == null){
             Locale.INVALID_WARP.send(superiorPlayer, warpName);
             return;
         }
 
         boolean breakSign = false;
 
-        Block signBlock = island.getWarpLocation(warpName).getBlock();
+        Block signBlock = islandWarp.getLocation().getBlock();
+
         if(signBlock.getState() instanceof Sign){
             signBlock.setType(Material.AIR);
             signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -97,8 +98,14 @@ public final class IslandSerializer {
 
     public static String serializeWarps(Map<String, IslandWarp> warps){
         StringBuilder warpsBuilder = new StringBuilder();
-        warps.forEach((warpName, warpData) -> warpsBuilder.append(";").append(warpName).append("=")
-                .append(FileUtils.fromLocation(warpData.getLocation())).append("=").append(warpData.hasPrivateFlag()));
+        warps.values().forEach(islandWarp -> {
+            String warpName = islandWarp.getCategory() == null ? islandWarp.getName() :
+                    islandWarp.getCategory().getName() + "-" + islandWarp.getName();
+            warpsBuilder.append(";").append(warpName).append("=")
+                    .append(FileUtils.fromLocation(islandWarp.getLocation())).append("=").append(islandWarp.hasPrivateFlag());
+            if(islandWarp.getRawIcon() != null)
+                warpsBuilder.append("=").append(ItemUtils.serializeItem(islandWarp.getRawIcon()));
+        });
         return warpsBuilder.length() == 0 ? "" : warpsBuilder.toString().substring(1);
     }
 
@@ -173,6 +180,16 @@ public final class IslandSerializer {
         roles.forEach((playerRole, limit) ->
                 rolelimits.append(",").append(playerRole.getId()).append("=").append(limit));
         return rolelimits.length() == 0 ? "" : rolelimits.toString().substring(1);
+    }
+
+    public static String serializeWarpCategories(Map<String, WarpCategory> warpCategories){
+        StringBuilder warpCategoriesBuilder = new StringBuilder();
+        warpCategories.values().forEach(warpCategory ->
+            warpCategoriesBuilder.append(";").append(warpCategory.getName()).append("=")
+                    .append(warpCategory.getSlot()).append("=")
+                    .append(ItemUtils.serializeItem(warpCategory.getRawIcon()))
+        );
+        return warpCategoriesBuilder.length() == 0 ? "" : warpCategoriesBuilder.toString().substring(1);
     }
 
 }

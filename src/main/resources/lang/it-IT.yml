@@ -171,6 +171,7 @@ COMMAND_ARGUMENT_TIME: tempo
 COMMAND_ARGUMENT_UPGRADE_NAME: nome-aggiornamento
 COMMAND_ARGUMENT_VALUE: valore
 COMMAND_ARGUMENT_WARP_NAME: nome-warp
+COMMAND_ARGUMENT_WARP_CATEGORY: 'warp-category'
 COMMAND_ARGUMENT_WORLD: world
 COMMAND_COOLDOWN_FORMAT: '&c&lErrore | &7È possibile utilizzare questo comando tra
   {0}.'
@@ -432,6 +433,7 @@ INVALID_ISLAND_PERMISSION: |
 INVALID_LEVEL: '&c&lErrore | &7Livello non valido {0}.'
 INVALID_LIMIT: '&c&lErrore | &7Limite non valido {0}.'
 INVALID_MATERIAL: '&c&lErrore | &7Materiale non valido {0}.'
+INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lErrore | &7Missione non valida {0}.'
 INVALID_MULTIPLIER: '&c&lErrore | &7Moltiplicatore non valido {0}.'
 INVALID_PAGE: '&c&lErrore| &7Invalid page {0}.'
@@ -449,6 +451,7 @@ INVALID_SETTINGS: |
   &c&lErrore | &7Impossibile trovare le impostazioni dell''isola {0}.
   &c&lErrore | &7Impostazioni dell'isola: {1}
 INVALID_SIZE: '&c&lErrore | &7Dimensioni non valide {0}.'
+INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TOGGLE_MODE: '&c&lErrore | &7Non è possibile attivare/disattivare {0}.'
 INVALID_UPGRADE: |
   &c&lErrore | &7Impossibile trovare un aggiornamento chiamato {0}.
@@ -817,6 +820,28 @@ UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&lErrore | &7Non puoi usare questo comando quando ti trovi
   sopra ad altre isole.'
 WARP_ALREADY_EXIST: '&c&lErrore | &7C''è già una warp con questo nome.'
+WARP_CATEGORY_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
+WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
+WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
+WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
+WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
+WARP_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
+WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another warp.'
+WARP_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the warp to {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBanca | &7La banca dell'isola ha solo {0} dollari al suo interno.
   &e&lBanca | &7&oPrelevamento di tutti i soldi..."

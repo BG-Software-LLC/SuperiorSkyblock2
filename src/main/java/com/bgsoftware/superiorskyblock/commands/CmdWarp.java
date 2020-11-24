@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.MenuWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
@@ -64,7 +64,7 @@ public final class CmdWarp implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        MenuWarps.openInventory(superiorPlayer, null, island);
+        MenuWarpCategories.openInventory(superiorPlayer, null, island);
     }
 
     @Override

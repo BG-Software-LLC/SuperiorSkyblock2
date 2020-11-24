@@ -318,6 +318,18 @@ public final class StringUtils {
         return dateFormatter.format(new Date(time));
     }
 
+    public static String removeNonAlphabet(String text, List<Character> allowedChars){
+        StringBuilder newText = new StringBuilder();
+
+        for(char ch : text.toCharArray()){
+            if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') ||
+                    (ch >= '1' && ch <= '9') || allowedChars.contains(ch))
+                newText.append(ch);
+        }
+
+        return newText.toString();
+    }
+
     private static String parseHexColor(String hexColor){
         if(hexColor.length() != 6 && hexColor.length() != 3)
             return hexColor;

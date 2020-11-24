@@ -1,0 +1,115 @@
+package com.bgsoftware.superiorskyblock.menu;
+
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import java.io.File;
+import java.util.List;
+import java.util.function.Function;
+
+public final class MenuWarpCategories extends SuperiorMenu {
+
+    public static int rowsSize;
+    private static List<String> editLore;
+
+    private final Island island;
+
+    private MenuWarpCategories(SuperiorPlayer superiorPlayer, Island island){
+        super("menuWarpCategories", superiorPlayer);
+        this.island = island;
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent e) {
+        for(WarpCategory warpCategory : island.getWarpCategories().values()){
+            if(e.getRawSlot() == warpCategory.getSlot()){
+                if(e.getClick().name().contains("RIGHT")){
+                    previousMove = false;
+                    MenuWarpCategoryManage.openInventory(superiorPlayer, this, warpCategory);
+                }
+                else {
+                    previousMove = false;
+                    MenuWarps.openInventory(superiorPlayer, this, warpCategory);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
+    }
+
+    @Override
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inventory = super.buildInventory(titleReplacer);
+
+        for(WarpCategory warpCategory : island.getWarpCategories().values()) {
+            ItemStack iconItem;
+
+            if(editLore.isEmpty()){
+                iconItem = warpCategory.getIcon(island.getOwner());
+            }
+            else {
+                iconItem = new ItemBuilder(warpCategory.getIcon(null))
+                        .appendLore(editLore)
+                        .build(island.getOwner());
+            }
+
+            inventory.setItem(warpCategory.getSlot(), iconItem);
+        }
+
+        return inventory;
+    }
+
+    public static void init(){
+        MenuWarpCategories menuWarpCategories = new MenuWarpCategories(null, null);
+
+        File file = new File(plugin.getDataFolder(), "menus/warp-categories.yml");
+
+        if(!file.exists())
+            FileUtils.saveResource("menus/warp-categories.yml");
+
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategories, "warp-categories.yml", cfg);
+
+        charSlots.delete();
+
+        rowsSize = menuWarpCategories.getRowsSize();
+        editLore = cfg.getStringList("edit-lore");
+
+        menuWarpCategories.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
+        MenuWarpCategories menuWarpCategories = new MenuWarpCategories(superiorPlayer, island);
+        if(hasOnlyOneItem(island)){
+            MenuWarps.openInventory(superiorPlayer, previousMenu, getOnlyOneItem(island));
+        }
+        else {
+            menuWarpCategories.open(previousMenu);
+        }
+    }
+
+    public static void refreshMenus(Island island){
+        refreshMenus(MenuWarpCategories.class, superiorMenu -> superiorMenu.island.equals(island));
+    }
+
+    private static boolean hasOnlyOneItem(Island island){
+        return island.getWarpCategories().size() <= 1;
+    }
+
+    private static WarpCategory getOnlyOneItem(Island island){
+        return island.getWarpCategories().values().stream().findFirst().orElse(island.getWarpCategory("__default__"));
+    }
+
+}

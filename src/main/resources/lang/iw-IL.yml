@@ -137,6 +137,7 @@ COMMAND_ARGUMENT_TIME: ןמז
 COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
 COMMAND_ARGUMENT_VALUE: יווש
 COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
+COMMAND_ARGUMENT_WARP_CATEGORY: 'warp-category'
 COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&c&lהאיגש | &7{0} ב הדוקפב בוש שמתשהל לוכי התא.'
 COMMAND_DESCRIPTION_ACCEPT: םינקחשמ יאל הנמזה רשאל.
@@ -362,6 +363,7 @@ INVALID_ISLAND_PERMISSION: |
 INVALID_LEVEL: '&c&lהאיגש | &7{0} תיקוח אל המר.'
 INVALID_LIMIT: '&c&lהאיגש | &7{0} תיקוח אל הלבגמ.'
 INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
+INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
@@ -379,6 +381,7 @@ INVALID_SETTINGS: |
   &c&lהאיגש | &7{0} םשה םע תורדגה אוצמל ןתינ אל.
   &c&lהאיגש | &7{1} :תורדגה
 INVALID_SIZE: '&c&lהאיגש | &7{0} יקוח אל לדוג.'
+INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TOGGLE_MODE: '&c&lהאיגש | &7{0} בצמ ףילחהל ןתינ אל.'
 INVALID_UPGRADE: |
   &c&lהאיגש | &7{0} םשה םע גורדש אוצמל היה ןתינ אל.
@@ -681,6 +684,28 @@ UPDATED_SETTINGS: '&e&lיא | &7{0} תורדגהה ונכדוע.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&lהאיגש | &7םירחא םייאב וזה הדוקפב שמתשהל לוכי אל התא.'
 WARP_ALREADY_EXIST: '&c&lהאיגש | &7הזה םשה םע םוקימ םייק רבכ.'
+WARP_CATEGORY_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
+WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
+WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
+WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
+WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
+WARP_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
+WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another warp.'
+WARP_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the warp to {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lקנב | &7וכותב םירלוד {0} קר שי יאה לש קנבב.
   &e&lקנב | &7&oףסכה לכ תא ךשומ...

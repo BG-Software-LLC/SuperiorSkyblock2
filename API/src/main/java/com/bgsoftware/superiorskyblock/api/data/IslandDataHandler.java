@@ -197,4 +197,9 @@ public interface IslandDataHandler {
      */
     void saveUniqueVisitors();
 
+    /**
+     * Save the warp categories of the island.
+     */
+    void saveWarpCategories();
+
 }

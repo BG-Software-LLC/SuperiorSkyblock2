@@ -155,6 +155,7 @@ COMMAND_ARGUMENT_TIME: thoi-gian
 COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
+COMMAND_ARGUMENT_WARP_CATEGORY: 'warp-category'
 COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&c&lLỗi | &7Bạn chỉ có thể sử dụng lệnh trong {0}.'
 COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
@@ -399,6 +400,7 @@ INVALID_ISLAND_PERMISSION: |
 INVALID_LEVEL: '&c&lLỗi | &7Cấp độ không hợp lệ {0}.'
 INVALID_LIMIT: '&c&lLỗi | &7Giới hạn không hợp lệ {0}.'
 INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
+INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
@@ -416,6 +418,7 @@ INVALID_SETTINGS: |
   &c&lLỗi | &7Không thể tìm thấy cài đặt đảo {0}.
   &c&lLỗi | &7Các điều chỉnh đảo: {1}
 INVALID_SIZE: '&c&lLỗi | &7Kích thước không hợp lệ {0}.'
+INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TOGGLE_MODE: '&c&lLỗi | &7Không thể chuyển đổi {0}.'
 INVALID_UPGRADE: |
   &c&lLỗi | &7Không thể tìm thấy bản nâng cấp được gọi là {0}.
@@ -758,6 +761,28 @@ UPDATED_SETTINGS: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều ch�
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
+WARP_CATEGORY_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
+WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
+WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
+WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
+WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
+WARP_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
+WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another warp.'
+WARP_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the warp to {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lNgân Hàng | &7Đảo ngân hàng chỉ có {0}$ bên trong.
   &e&lNgân Hàng | &7&oRút toàn bộ tiền..."

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -27,9 +28,11 @@ import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
+import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
@@ -144,7 +147,9 @@ public final class SIsland implements Island {
     private final Registry<IslandFlag, Byte> islandSettings = Registry.createRegistry();
     private final Registry<String, Integer> upgrades = Registry.createRegistry();
     private final SyncedObject<KeyMap<BigInteger>> blockCounts = SyncedObject.of(new KeyMap<>());
-    private final Registry<String, SIslandWarp> warps = Registry.createRegistry();
+    private final Registry<String, IslandWarp> warpsByName = Registry.createRegistry();
+    private final Registry<Location, IslandWarp> warpsByLocation = Registry.createRegistry();
+    private final Registry<String, WarpCategory> warpCategories = Registry.createRegistry();
     private final SyncedObject<BigDecimal> islandWorth = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<BigDecimal> bonusWorth = SyncedObject.of(BigDecimal.ZERO);
@@ -190,125 +195,131 @@ public final class SIsland implements Island {
     private final SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits = SyncedObject.of(new HashMap<>());
 
     public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
-        this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
-        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-        this.creationTime = resultSet.getLong("creationTime");
-        updateDatesFormatter();
+        try {
+            ((SIslandDataHandler) islandDataHandler).setLoadingIsland(true);
 
-        IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
-        IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
-        IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
-        IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
-        IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
-        IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this.warps);
-        IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
-        IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
-        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-        IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
-        IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
-        IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
-        IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
-        IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
-        IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
-        IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
+            this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
+            this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
+            this.creationTime = resultSet.getLong("creationTime");
+            updateDatesFormatter();
 
-        if(!resultSet.getString("uniqueVisitors").contains(";"))
-            islandDataHandler.saveUniqueVisitors();
+            IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
+            IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
+            IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
+            IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
+            IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
+            IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this);
+            IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
+            IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
+            IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
+            IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
+            IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
+            IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
+            IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
+            IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
+            IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
+            IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
+            IslandDeserializer.deserializeWarpCategories(resultSet.getString("warpCategories"), this);
 
-        parseNumbersSafe(() -> this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank"))));
-        parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
-        this.islandSize.set(new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0));
-        this.teamLimit.set(new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0));
-        this.warpsLimit.set(new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0));
-        this.cropGrowth.set(new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0));
-        this.spawnerRates.set(new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0));
-        this.mobDrops.set(new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0));
-        this.discord.set(resultSet.getString("discord"));
-        this.paypal.set(resultSet.getString("paypal"));
-        this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
-        this.locked.set(resultSet.getBoolean("locked"));
-        this.islandName.set(resultSet.getString("name"));
-        this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
-        this.description.set(resultSet.getString("description"));
-        this.ignored.set(resultSet.getBoolean("ignored"));
-        parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
+            if (!resultSet.getString("uniqueVisitors").contains(";"))
+                islandDataHandler.saveUniqueVisitors();
 
-        String generatedSchematics = resultSet.getString("generatedSchematics");
-        try{
-            this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
-        }catch(Exception ex){
-            int n = 0;
+            parseNumbersSafe(() -> this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank"))));
+            parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
+            this.islandSize.set(new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0));
+            this.teamLimit.set(new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0));
+            this.warpsLimit.set(new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0));
+            this.cropGrowth.set(new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0));
+            this.spawnerRates.set(new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0));
+            this.mobDrops.set(new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0));
+            this.discord.set(resultSet.getString("discord"));
+            this.paypal.set(resultSet.getString("paypal"));
+            this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
+            this.locked.set(resultSet.getBoolean("locked"));
+            this.islandName.set(resultSet.getString("name"));
+            this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
+            this.description.set(resultSet.getString("description"));
+            this.ignored.set(resultSet.getBoolean("ignored"));
+            parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
 
-            if(generatedSchematics.contains("normal"))
-                n |= 8;
-            if(generatedSchematics.contains("nether"))
-                n |= 4;
-            if(generatedSchematics.contains("the_end"))
-                n |= 3;
-
-            this.generatedSchematics.set(n);
-        }
-
-        this.schemName.set(resultSet.getString("schemName"));
-
-        String unlockedWorlds = resultSet.getString("unlockedWorlds");
-        try{
-            this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
-        }catch(Exception ex){
-            int n = 0;
-
-            if(unlockedWorlds.contains("nether"))
-                n |= 1;
-            if(unlockedWorlds.contains("the_end"))
-                n |= 2;
-
-            this.unlockedWorlds.set(n);
-        }
-
-        this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
-        this.coopLimit.set(new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0));
-        String bankLimit = resultSet.getString("bankLimit");
-        parseNumbersSafe(() -> this.bankLimit.set(new UpgradeValue<>(new BigDecimal(bankLimit), i -> i.compareTo(new BigDecimal(-1)) < 0)));
-
-        String blockCounts = resultSet.getString("blockCounts");
-
-        Executor.sync(() -> {
+            String generatedSchematics = resultSet.getString("generatedSchematics");
             try {
-                rawKeyPlacements = true;
-                IslandDeserializer.deserializeBlockCounts(blockCounts, this);
-            }finally {
-                rawKeyPlacements = false;
+                this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
+            } catch (Exception ex) {
+                int n = 0;
+
+                if (generatedSchematics.contains("normal"))
+                    n |= 8;
+                if (generatedSchematics.contains("nether"))
+                    n |= 4;
+                if (generatedSchematics.contains("the_end"))
+                    n |= 3;
+
+                this.generatedSchematics.set(n);
             }
 
-            if(this.blockCounts.readAndGet(Map::isEmpty))
-                calcIslandWorth(null);
-        }, 5L);
+            this.schemName.set(resultSet.getString("schemName"));
 
-        ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
+            String unlockedWorlds = resultSet.getString("unlockedWorlds");
+            try {
+                this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
+            } catch (Exception ex) {
+                int n = 0;
 
-        String uuidRaw = resultSet.getString("uuid");
-        if(uuidRaw == null || uuidRaw.isEmpty()){
-            this.uuid = owner.getUniqueId();
-        }
-        else{
-            this.uuid = UUID.fromString(uuidRaw);
-        }
+                if (unlockedWorlds.contains("nether"))
+                    n |= 1;
+                if (unlockedWorlds.contains("the_end"))
+                    n |= 2;
 
-        this.lastInterest.set(resultSet.getLong("lastInterest"));
+                this.unlockedWorlds.set(n);
+            }
 
-        if(plugin.getSettings().bankInterestEnabled) {
-            long currentTime = System.currentTimeMillis() / 1000;
-            long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
-            if (ticksToNextInterest <= 0) {
-                giveInterest(true);
+            this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
+            this.coopLimit.set(new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0));
+            String bankLimit = resultSet.getString("bankLimit");
+            parseNumbersSafe(() -> this.bankLimit.set(new UpgradeValue<>(new BigDecimal(bankLimit), i -> i.compareTo(new BigDecimal(-1)) < 0)));
+
+            String blockCounts = resultSet.getString("blockCounts");
+
+            Executor.sync(() -> {
+                try {
+                    rawKeyPlacements = true;
+                    IslandDeserializer.deserializeBlockCounts(blockCounts, this);
+                } finally {
+                    rawKeyPlacements = false;
+                }
+
+                if (this.blockCounts.readAndGet(Map::isEmpty))
+                    calcIslandWorth(null);
+            }, 5L);
+
+            ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
+
+            String uuidRaw = resultSet.getString("uuid");
+            if (uuidRaw == null || uuidRaw.isEmpty()) {
+                this.uuid = owner.getUniqueId();
             } else {
-                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                this.uuid = UUID.fromString(uuidRaw);
             }
-        }
 
-        checkMembersDuplication();
-        updateOldUpgradeValues();
-        updateUpgrades();
+            this.lastInterest.set(resultSet.getLong("lastInterest"));
+
+            if (plugin.getSettings().bankInterestEnabled) {
+                long currentTime = System.currentTimeMillis() / 1000;
+                long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
+                if (ticksToNextInterest <= 0) {
+                    giveInterest(true);
+                } else {
+                    Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                }
+            }
+
+            checkMembersDuplication();
+            updateOldUpgradeValues();
+            updateUpgrades();
+        }finally {
+            ((SIslandDataHandler) islandDataHandler).setLoadingIsland(false);
+        }
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -329,6 +340,8 @@ public final class SIsland implements Island {
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
+
+        createWarpCategory("__default__");
 
         updateLastInterest(currentTime);
 
@@ -707,7 +720,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
         }
         else{
-            setWarpLocation(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, false);
+            createWarp(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, null);
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
         }
 
@@ -794,6 +807,7 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
         return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
     }
@@ -804,6 +818,7 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
         World world = getCenter(environment).getWorld();
         return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, whenComplete);
@@ -1037,6 +1052,7 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
         SuperiorSkyblockPlugin.log("&cIt seems like a plugin developer is using a deprecated method. Please inform him about it.");
         new Throwable().printStackTrace();
@@ -1576,26 +1592,31 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public BigDecimal getMoneyInBank() {
         return islandBank.getBalance();
     }
 
     @Override
+    @Deprecated
     public void depositMoney(double amount){
         throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
+    @Deprecated
     public void depositMoney(BigDecimal amount) {
         throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
+    @Deprecated
     public void withdrawMoney(double amount){
         throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
 
     @Override
+    @Deprecated
     public void withdrawMoney(BigDecimal amount) {
         throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
     }
@@ -2476,35 +2497,123 @@ public final class SIsland implements Island {
      */
 
     @Override
+    @Deprecated
     public Location getWarpLocation(String name){
-        return warps.containsKey(name.toLowerCase()) ? warps.get(name.toLowerCase()).getLocation() : null;
+        IslandWarp islandWarp = getWarp(name);
+        return islandWarp == null ? null : islandWarp.getLocation();
     }
 
     @Override
+    @Deprecated
     public boolean isWarpPrivate(String name) {
-        return !warps.containsKey(name.toLowerCase()) || warps.get(name.toLowerCase()).hasPrivateFlag();
+        IslandWarp islandWarp = getWarp(name);
+        return islandWarp != null && islandWarp.hasPrivateFlag();
     }
 
     @Override
+    @Deprecated
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
-        SuperiorSkyblockPlugin.debug("Action: Set Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location) + ", Private: " + privateFlag);
+        IslandWarp islandWarp = createWarp(name, location, null);
+        islandWarp.setPrivateFlag(privateFlag);
+    }
 
-        warps.add(name.toLowerCase(), new SIslandWarp(location.clone(), privateFlag));
+    @Override
+    @Deprecated
+    public boolean isWarpLocation(Location location){
+        return getWarp(location) != null;
+    }
+
+    @Override
+    public WarpCategory createWarpCategory(String name) {
+        SuperiorSkyblockPlugin.debug("Action: Create Warp Category, Island: " + owner.getName() + ", Name: " + name);
+
+        WarpCategory warpCategory = warpCategories.get(name.toLowerCase());
+
+        if(warpCategory == null) {
+            List<Integer> occupiedSlots = warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
+
+            warpCategories.add(name.toLowerCase(), (warpCategory = new SWarpCategory(this, name)));
+
+            int slot = 0;
+            while (occupiedSlots.contains(slot))
+                slot++;
+
+            warpCategory.setSlot(slot);
+
+            islandDataHandler.saveWarpCategories();
+
+            MenuWarpCategories.refreshMenus(this);
+        }
+
+        return warpCategory;
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(String name) {
+        return warpCategories.get(name.toLowerCase());
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(int slot) {
+        return warpCategories.values().stream().filter(warpCategory -> warpCategory.getSlot() == slot)
+                .findAny().orElse(null);
+    }
+
+    @Override
+    public void renameCategory(WarpCategory warpCategory, String newName) {
+        warpCategories.remove(warpCategory.getName().toLowerCase());
+        warpCategories.add(newName.toLowerCase(), warpCategory);
+        warpCategory.setName(newName);
+    }
+
+    @Override
+    public Map<String, WarpCategory> getWarpCategories() {
+        return Collections.unmodifiableMap(warpCategories.toMap());
+    }
+
+    @Override
+    public IslandWarp createWarp(String name, Location location, WarpCategory warpCategory) {
+        SuperiorSkyblockPlugin.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location));
+
+        if(warpCategory == null)
+            warpCategory = getWarpCategory("__default__");
+
+        IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
+
+        IslandWarp oldWarp = warpsByName.add(name.toLowerCase(), islandWarp);
+
+        if(oldWarp != null)
+            deleteWarp(oldWarp.getName());
+
+        warpsByLocation.add(new Location(location.getWorld(), location.getBlockX(),
+                location.getBlockY(), location.getBlockZ()), islandWarp);
+
+        warpCategory.getWarps().add(islandWarp);
 
         islandDataHandler.saveWarps();
 
         MenuGlobalWarps.refreshMenus();
-        MenuWarps.refreshMenus(this);
+        MenuWarps.refreshMenus(warpCategory);
+
+        return islandWarp;
     }
 
     @Override
-    public boolean isWarpLocation(Location location){
-        for(SIslandWarp warpData : warps.values()){
-            if(LocationUtils.isSameBlock(location, warpData.getLocation()))
-                return true;
-        }
+    public void renameWarp(IslandWarp islandWarp, String newName) {
+        warpsByName.remove(islandWarp.getName().toLowerCase());
+        warpsByName.add(newName.toLowerCase(), islandWarp);
+        islandWarp.setName(newName);
+    }
 
-        return false;
+    @Override
+    public IslandWarp getWarp(Location location) {
+        Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return warpsByLocation.get(blockLocation);
+    }
+
+    @Override
+    public IslandWarp getWarp(String name) {
+        return warpsByName.get(name.toLowerCase());
     }
 
     @Override
@@ -2520,7 +2629,7 @@ public final class SIsland implements Island {
     }
 
     private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
-        Location location = warps.get(warp.toLowerCase()).getLocation();
+        Location location = warpsByName.get(warp.toLowerCase()).getLocation();
         ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
 
         if(!isInsideRange(location)){
@@ -2542,12 +2651,12 @@ public final class SIsland implements Island {
 
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
-        for(String warpName : warps.keys()){
-            if(LocationUtils.isSameBlock(location, warps.get(warpName).getLocation())){
-                deleteWarp(warpName);
-                if(superiorPlayer != null)
-                    Locale.DELETE_WARP.send(superiorPlayer, warpName);
-            }
+        Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        IslandWarp islandWarp = warpsByLocation.remove(blockLocation);
+        if(islandWarp != null){
+            deleteWarp(islandWarp.getName());
+            if(superiorPlayer != null)
+                Locale.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
         }
     }
 
@@ -2555,27 +2664,37 @@ public final class SIsland implements Island {
     public void deleteWarp(String name){
         SuperiorSkyblockPlugin.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
 
-        warps.remove(name.toLowerCase());
+        IslandWarp islandWarp = warpsByName.remove(name.toLowerCase());
+        WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
+
+        if(islandWarp != null){
+            warpsByLocation.remove(islandWarp.getLocation());
+            warpCategory.getWarps().remove(islandWarp);
+        }
 
         islandDataHandler.saveWarps();
 
         MenuGlobalWarps.refreshMenus();
-        MenuWarps.refreshMenus(this);
+
+        if(warpCategory != null)
+            MenuWarps.refreshMenus(warpCategory);
     }
 
     @Override
+    @Deprecated
     public List<String> getAllWarps(){
-        return new ArrayList<>(warps.keys());
+        return new ArrayList<>(warpsByName.keys());
     }
 
     @Override
     public Map<String, IslandWarp> getIslandWarps() {
-        return Collections.unmodifiableMap(warps.toMap());
+        return Collections.unmodifiableMap(warpsByName.toMap());
     }
 
     @Override
+    @Deprecated
     public boolean hasMoreWarpSlots() {
-        return warps.size() < getWarpsLimit();
+        return warpsByName.size() < getWarpsLimit();
     }
 
     /*
@@ -2946,6 +3065,7 @@ public final class SIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public String[] getGeneratorArray(World.Environment environment) {
         String[] newCobbleGenerator = new String[getGeneratorTotalAmount(environment)];
         int index = 0;

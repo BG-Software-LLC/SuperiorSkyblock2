@@ -37,7 +37,13 @@ import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategoryIconEdit;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategoryManage;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpIconEdit;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpsManage;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
@@ -88,7 +94,13 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(MenuUpgrades::init);
         loadMenu(MenuValues::init);
         loadMenu(MenuVisitors::init);
+        loadMenu(MenuWarpCategories::init);
+        loadMenu(MenuWarpCategoryIconEdit::init);
+        loadMenu(MenuWarpCategoryManage::init);
+        loadMenu(MenuWarpIconEdit::init);
+        loadMenu(MenuWarpManage::init);
         loadMenu(MenuWarps::init);
+        loadMenu(MenuWarpsManage::init);
 
         File guiFolder = new File(plugin.getDataFolder(), "guis");
         if(guiFolder.exists()){
@@ -235,7 +247,7 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
 
     @Override
     public void openIslandWarpsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        MenuWarps.openInventory(superiorPlayer, null, island);
+        MenuWarps.openInventory(superiorPlayer, null, null);
     }
 
     @Override

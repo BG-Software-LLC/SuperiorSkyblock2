@@ -92,6 +92,10 @@ public abstract class SuperiorMenu implements InventoryHolder {
             getData().fillItems.add(slot, itemBuilder);
     }
 
+    public ItemBuilder getFillItem(int slot){
+        return getData().fillItems.get(slot);
+    }
+
     public void setBackButton(int slot){
         addData("backSlot", slot);
     }
@@ -104,8 +108,12 @@ public abstract class SuperiorMenu implements InventoryHolder {
         getData().title = title;
     }
 
-    public void setRowsSize(int rowsSize){
+    public void setRowsSize(int rowsSize) {
         getData().rowsSize = rowsSize;
+    }
+
+    public int getRowsSize(){
+        return getData().rowsSize;
     }
 
     public void setOpeningSound(SoundWrapper openingSound){

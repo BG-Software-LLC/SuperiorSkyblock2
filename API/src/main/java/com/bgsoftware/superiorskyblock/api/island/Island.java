@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -1346,12 +1347,14 @@ public interface Island extends Comparable<Island> {
      * Get the location of a warp.
      * @param name The warp's name to check.
      */
+    @Deprecated
     Location getWarpLocation(String name);
 
     /**
      * Check whether or not a warp is private.
      * @param name The warp's name to check.
      */
+    @Deprecated
     boolean isWarpPrivate(String name);
 
     /**
@@ -1360,13 +1363,74 @@ public interface Island extends Comparable<Island> {
      * @param location The location to set.
      * @param privateFlag Flag to determine if the warp is private or not.
      */
+    @Deprecated
     void setWarpLocation(String name, Location location, boolean privateFlag);
 
     /**
      * Check whether or not a location is a warp of an island.
      * @param location The location to check.
      */
+    @Deprecated
     boolean isWarpLocation(Location location);
+
+    /**
+     * Create a new warp category.
+     * If a category already exists, it will be returned instead of a new created one.
+     * @param name The name of the category.
+     */
+    WarpCategory createWarpCategory(String name);
+
+    /**
+     * Get a warp category.
+     * @param name The name of the category.
+     */
+    WarpCategory getWarpCategory(String name);
+
+    /**
+     * Get a warp category by the slot inside the manage menu.
+     * @param slot The slot to check.
+     */
+    WarpCategory getWarpCategory(int slot);
+
+    /**
+     * Rename a category.
+     * @param warpCategory The category to rename.
+     * @param newName A new name to set.
+     */
+    void renameCategory(WarpCategory warpCategory, String newName);
+
+    /**
+     * Get all the warp categories of the island.
+     */
+    Map<String, WarpCategory> getWarpCategories();
+
+    /**
+     * Create a warp for the island.
+     * @param name The name of the warp.
+     * @param location The location of the warp.
+     * @param warpCategory The category to add the island. May be null
+     * @return The new island warp object.
+     */
+    IslandWarp createWarp(String name, Location location, WarpCategory warpCategory);
+
+    /**
+     * Rename a warp.
+     * @param islandWarp The warp to rename.
+     * @param newName A new name to set.
+     */
+    void renameWarp(IslandWarp islandWarp, String newName);
+
+    /**
+     * Get an island warp in a specific location.
+     * @param location The location to check.
+     */
+    IslandWarp getWarp(Location location);
+
+    /**
+     * Get an island warp by it's name..
+     * @param name The name to check.
+     */
+    IslandWarp getWarp(String name);
 
     /**
      * Teleport a player to a warp.
@@ -1391,6 +1455,7 @@ public interface Island extends Comparable<Island> {
     /**
      * Get all the warps' names of the island.
      */
+    @Deprecated
     List<String> getAllWarps();
 
     /**
@@ -1401,6 +1466,7 @@ public interface Island extends Comparable<Island> {
     /**
      * Check whether or not the island can create more warps.
      */
+    @Deprecated
     boolean hasMoreWarpSlots();
 
     /*

@@ -129,6 +129,7 @@ COMMAND_ARGUMENT_TIME: 时间
 COMMAND_ARGUMENT_UPGRADE_NAME: 升级项目
 COMMAND_ARGUMENT_VALUE: 数值
 COMMAND_ARGUMENT_WARP_NAME: 地标名
+COMMAND_ARGUMENT_WARP_CATEGORY: 'warp-category'
 COMMAND_ARGUMENT_WORLD: 'world'
 COMMAND_COOLDOWN_FORMAT: '&e&l岛屿 | &7你只能在 &b{0} &7后再次使用这个命令.'
 COMMAND_DESCRIPTION_ACCEPT: 同意玩家的岛屿邀请.
@@ -346,6 +347,7 @@ INVALID_ISLAND_PERMISSION: |
 INVALID_LEVEL: '&c&l错误 | &7未知等级 {0}.'
 INVALID_LIMIT: '&c&l错误 | &7未知方块限制 {0}.'
 INVALID_MATERIAL: '&c&l错误 | &7未知材质 {0}.'
+INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&l错误 | &7未知任务 {0}.'
 INVALID_MULTIPLIER: '&c&l错误 | &7未知倍率 {0}.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
@@ -363,6 +365,7 @@ INVALID_SETTINGS: |
   &c&l错误 | &7找不到这个岛屿设置 {0}.
   &c&l错误 | &7岛屿设置: {1}
 INVALID_SIZE: '&c&l错误 | &7未知尺寸 {0}.'
+INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
 INVALID_TOGGLE_MODE: '&c&l错误 | &7无法切换 {0}.'
 INVALID_UPGRADE: |
   &c&l错误 | &7无法找到岛屿升级类型 {0}.
@@ -661,6 +664,28 @@ UPDATED_SETTINGS: '&e&l岛屿 | &7更新了岛屿的 &b{0} &7设置.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
 VISITOR_BLOCK_COMMAND: '&c&l错误 | &7这个岛屿不能在他人岛屿中使用.'
 WARP_ALREADY_EXIST: '&c&l错误 | &7已经有一个岛屿地标叫这个名字了.'
+WARP_CATEGORY_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
+WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
+WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
+WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
+WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
+WARP_ICON_NEW_LORE: |
+  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
+  &e&lWarps | &7You can separate lines by using "\n".
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
+WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
+WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
+WARP_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another warp.'
+WARP_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the warp to {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&l岛屿银行 | &7岛屿银行余额: &e&l{0}
   &e&l岛屿银行 | &7取出所有余额..."

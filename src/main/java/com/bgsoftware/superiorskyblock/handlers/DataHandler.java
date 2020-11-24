@@ -175,6 +175,7 @@ public final class DataHandler extends AbstractHandler {
         addColumnIfNotExists("bankLimit", "islands", "'-2'", "TEXT");
         addColumnIfNotExists("lastInterest", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
         addColumnIfNotExists("roleLimits", "islands", "''", "TEXT");
+        addColumnIfNotExists("warpCategories", "islands", "''", "TEXT");
 
         editColumn("members", "islands", "LONGTEXT");
         editColumn("banned", "islands", "LONGTEXT");
@@ -332,7 +333,8 @@ public final class DataHandler extends AbstractHandler {
                 "uuid VARCHAR(36)," +
                 "bankLimit TEXT," +
                 "lastInterest INTEGER," +
-                "roleLimits TEXT" +
+                "roleLimits TEXT," +
+                "warpCategories TEXT" +
                 ");");
     }
 

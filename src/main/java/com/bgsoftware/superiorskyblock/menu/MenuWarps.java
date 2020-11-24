@@ -2,16 +2,17 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,55 +21,49 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public final class MenuWarps extends PagedSuperiorMenu<String> {
+public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
-    private final Island island;
+    private final WarpCategory warpCategory;
 
-    private MenuWarps(SuperiorPlayer superiorPlayer, Island island){
+    private MenuWarps(SuperiorPlayer superiorPlayer, WarpCategory warpCategory){
         super("menuWarps", superiorPlayer);
-        this.island = island;
+        this.warpCategory = warpCategory;
     }
 
     @Override
-    public void onPlayerClick(InventoryClickEvent event, String warpName) {
-        Location location = island.getWarpLocation(warpName);
-        if(location != null) {
-            Executor.sync(() -> {
-                previousMove = false;
-                superiorPlayer.asPlayer().closeInventory();
-                island.warpPlayer(superiorPlayer, warpName);
-            }, 1L);
-        }
+    public void onPlayerClick(InventoryClickEvent event, IslandWarp islandWarp) {
+        Executor.sync(() -> {
+            previousMove = false;
+            superiorPlayer.asPlayer().closeInventory();
+            warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
+        }, 1L);
     }
 
     @Override
     protected void cloneAndOpen(SuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(superiorPlayer, previousMenu, warpCategory);
     }
 
     @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, String warpName) {
+    protected ItemStack getObjectItem(ItemStack clickedItem, IslandWarp islandWarp) {
         try {
-            return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", warpName)
-                    .replaceAll("{1}", SBlockPosition.of(island.getWarpLocation(warpName)).toString())
-                    .replaceAll("{2}", island.isWarpPrivate(warpName) ?
+            return new ItemBuilder(islandWarp.getRawIcon() == null ? clickedItem : islandWarp.getIcon(superiorPlayer))
+                    .replaceAll("{0}", islandWarp.getName())
+                    .replaceAll("{1}", SBlockPosition.of(islandWarp.getLocation()).toString())
+                    .replaceAll("{2}", islandWarp.hasPrivateFlag() ?
                             ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
                             ensureNotNull(Locale.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))
                     .build(superiorPlayer);
         }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("Failed to load menu because of warp: " + warpName);
+            SuperiorSkyblockPlugin.log("Failed to load menu because of warp: " + islandWarp.getName());
             throw ex;
         }
     }
 
     @Override
-    protected List<String> requestObjects() {
-        return island.getAllWarps().stream()
-                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
-                .sorted(String::compareTo).collect(Collectors.toList());
+    protected List<IslandWarp> requestObjects() {
+        return warpCategory.getWarps();
     }
 
     public static void init(){
@@ -90,40 +85,46 @@ public final class MenuWarps extends PagedSuperiorMenu<String> {
         menuWarps.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuWarps.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuWarps.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuWarps.setSlots(getSlots(cfg, "slots", charSlots));
+
+        List<Integer> slots = getSlots(cfg, "slots", charSlots);
+        menuWarps.setSlots(slots);
+
+        SIslandWarp.DEFAULT_WARP_ICON = menuWarps.getFillItem(slots.get(0));
 
         charSlots.delete();
 
         menuWarps.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){
-        MenuWarps menuWarps = new MenuWarps(superiorPlayer, island);
-        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(island, superiorPlayer)){
-            menuWarps.onPlayerClick(null, getOnlyOneItem(island, superiorPlayer));
+    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, WarpCategory warpCategory){
+        MenuWarps menuWarps = new MenuWarps(superiorPlayer, warpCategory);
+        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(warpCategory, superiorPlayer)){
+            menuWarps.onPlayerClick(null, getOnlyOneItem(warpCategory, superiorPlayer));
         }
         else {
             menuWarps.open(previousMenu);
         }
     }
 
-    public static void refreshMenus(Island island){
-        refreshMenus(MenuWarps.class, superiorMenu -> superiorMenu.island.equals(island));
+    public static void refreshMenus(WarpCategory warpCategory){
+        refreshMenus(MenuWarps.class, superiorMenu -> superiorMenu.warpCategory.equals(warpCategory));
     }
 
     private String ensureNotNull(String check){
         return check == null ? "" : check;
     }
 
-    private static boolean hasOnlyOneItem(Island island, SuperiorPlayer superiorPlayer){
-        return island.getAllWarps().stream()
-                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
+    private static boolean hasOnlyOneItem(WarpCategory warpCategory, SuperiorPlayer superiorPlayer){
+        boolean isMember = warpCategory.getIsland().isMember(superiorPlayer);
+        return warpCategory.getWarps().stream()
+                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
                 .count() == 1;
     }
 
-    private static String getOnlyOneItem(Island island, SuperiorPlayer superiorPlayer){
-        return island.getAllWarps().stream()
-                .filter(warp -> island.equals(superiorPlayer.getIsland()) || !island.isWarpPrivate(warp))
+    private static IslandWarp getOnlyOneItem(WarpCategory warpCategory, SuperiorPlayer superiorPlayer){
+        boolean isMember = warpCategory.getIsland().isMember(superiorPlayer);
+        return warpCategory.getWarps().stream()
+                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
                 .findFirst().orElse(null);
     }
 

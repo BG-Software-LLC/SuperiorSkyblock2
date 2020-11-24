@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -1180,23 +1181,72 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    @Deprecated
     public Location getWarpLocation(String name) {
         return null;
     }
 
     @Override
+    @Deprecated
     public boolean isWarpPrivate(String name) {
         return false;
     }
 
     @Override
+    @Deprecated
     public void setWarpLocation(String name, Location location, boolean privateFlag) {
 
     }
 
     @Override
+    @Deprecated
     public boolean isWarpLocation(Location location) {
         return false;
+    }
+
+    @Override
+    public WarpCategory createWarpCategory(String name) {
+        return null;
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(String name) {
+        return null;
+    }
+
+    @Override
+    public WarpCategory getWarpCategory(int slot) {
+        return null;
+    }
+
+    @Override
+    public void renameCategory(WarpCategory warpCategory, String newName) {
+
+    }
+
+    @Override
+    public Map<String, WarpCategory> getWarpCategories() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public IslandWarp createWarp(String name, Location location, WarpCategory warpCategory) {
+        return null;
+    }
+
+    @Override
+    public void renameWarp(IslandWarp islandWarp, String newName) {
+
+    }
+
+    @Override
+    public IslandWarp getWarp(String name) {
+        return null;
+    }
+
+    @Override
+    public IslandWarp getWarp(Location location) {
+        return null;
     }
 
     @Override

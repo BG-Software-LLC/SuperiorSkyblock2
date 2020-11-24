@@ -1,0 +1,28 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+title: '&lWarp Categories'
+previous-menu: true
+
+pattern:
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+  - '@ @ @ @ @ @ @ @ @'
+
+# This lore is added to category icons.
+edit-lore:
+  - '&f '
+  - '&f '
+  - '&7&o(( &f&oLeft-Click &7&oto see island warps. ))'
+  - '&7&o(( &f&oRight-Click &7&oto edit the category. ))'
+
+items:
+  '@':
+    type: STAINED_GLASS_PANE
+    data: 15
+    name: '&f'

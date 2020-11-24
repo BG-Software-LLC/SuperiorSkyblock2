@@ -73,6 +73,12 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
+    public ItemBuilder appendLore(List<String> lore){
+        List<String> currentLore = itemMeta.getLore() == null ? new ArrayList<>() : itemMeta.getLore();
+        currentLore.addAll(lore);
+        return withLore(currentLore);
+    }
+
     public ItemBuilder withLore(String... lore){
         return withLore(Arrays.asList(lore));
     }
