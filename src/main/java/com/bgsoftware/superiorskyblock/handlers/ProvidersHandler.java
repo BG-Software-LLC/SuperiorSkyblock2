@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_RoseStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
@@ -77,7 +78,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
 
-    private List<AFKProvider> AFKProvidersList = new ArrayList<>();
+    private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -101,6 +102,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
             if(Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
                 runSafe(() -> SlimefunHook.register(plugin));
+
+            if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
+                runSafe(() -> CoreProtectHook.register(plugin));
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;

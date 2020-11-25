@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_RoseStacker;
+import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -426,6 +427,8 @@ public final class BlocksListener implements Listener {
             island.handleBlockPlace(block, amount);
         }
 
+        CoreProtectHook.recordBlockChange(player, block, true);
+
         depositedAmount.accept(amount);
 
         return true;
@@ -451,6 +454,8 @@ public final class BlocksListener implements Listener {
         plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
 
         plugin.getNMSAdapter().playBreakAnimation(block);
+
+        CoreProtectHook.recordBlockChange(player, block, false);
 
         if(plugin.getGrid().hasBlockFailed()) {
             if(island != null)
