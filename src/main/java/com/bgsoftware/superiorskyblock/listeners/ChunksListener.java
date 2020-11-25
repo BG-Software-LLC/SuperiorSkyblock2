@@ -15,6 +15,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
@@ -113,6 +114,14 @@ public final class ChunksListener implements Listener {
         }
 
         plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk())).forEach(StackedBlocksHandler.StackedBlock::updateName);
+    }
+
+    // Should potentially fix crop growth tile entities "disappearing"
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBlockGrow(BlockGrowEvent e){
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        if(island != null && island.isInsideRange(e.getBlock().getLocation()))
+            plugin.getNMSBlocks().startTickingChunk(island, e.getBlock().getChunk(), false);
     }
 
     private static boolean isHologram(ArmorStand armorStand){
