@@ -92,6 +92,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final List<String> spawnPermissions;
     public final boolean spawnWorldBorder;
     public final int spawnSize;
+    public final boolean spawnDamage;
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
     public final List<String> interactables;
@@ -281,6 +282,7 @@ public final class SettingsHandler extends AbstractHandler {
         spawnPermissions = cfg.getStringList("spawn.permissions");
         spawnWorldBorder = cfg.getBoolean("spawn.world-border", false);
         spawnSize = cfg.getInt("spawn.size", 200);
+        spawnDamage = cfg.getBoolean("spawn.players-damage", false);
         voidTeleportMembers = cfg.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = cfg.getBoolean("void-teleport.visitors", true);
         interactables = loadInteractables(plugin);

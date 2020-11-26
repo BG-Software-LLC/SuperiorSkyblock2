@@ -323,6 +323,9 @@ spawn:
   # This can exceed the max island size, but be aware that it doesn't overlap other islands.
   size: 200
 
+  # Should players get damage in the spawn?
+  players-damage: false
+
 # When enabled, players will get teleported upon void fall.
 # If they fall not in an island, they will be teleported to spawn.
 void-teleport:

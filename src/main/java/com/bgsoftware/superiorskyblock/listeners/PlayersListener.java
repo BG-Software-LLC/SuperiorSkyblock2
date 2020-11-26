@@ -307,7 +307,8 @@ public final class PlayersListener implements Listener {
 
         if(damagerPlayer == null) {
             if(island != null){
-                if((!plugin.getSettings().visitorsDamage && island.isVisitor(targetPlayer, false)) ||
+                if((plugin.getSettings().spawnProtection && island.isSpawn() && !plugin.getSettings().spawnDamage) ||
+                        (!plugin.getSettings().visitorsDamage && island.isVisitor(targetPlayer, false)) ||
                         (!plugin.getSettings().coopDamage && island.isVisitor(targetPlayer, true)))
                     e.setCancelled(true);
             }
