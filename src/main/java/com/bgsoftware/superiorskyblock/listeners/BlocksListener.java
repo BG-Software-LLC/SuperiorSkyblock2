@@ -414,7 +414,7 @@ public final class BlocksListener implements Listener {
 
         Block block = stackedBlock.getBlock();
 
-        if(!EventsCaller.callBlockStackEvent(block, blockAmount, blockAmount + amount))
+        if(!EventsCaller.callBlockStackEvent(block, player, blockAmount, blockAmount + amount))
             return false;
 
         plugin.getGrid().setBlockAmount(block, blockAmount + amount);
@@ -446,7 +446,7 @@ public final class BlocksListener implements Listener {
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
 
-        if(!EventsCaller.callBlockUnstackEvent(block, blockAmount, blockAmount - amount))
+        if(!EventsCaller.callBlockUnstackEvent(block, player, blockAmount, blockAmount - amount))
             return false;
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());

@@ -38,6 +38,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -210,20 +211,20 @@ public final class EventsCaller {
         return !preIslandCreateEvent.isCancelled();
     }
 
-    public static boolean callBlockStackEvent(Block block, int originalAmount, int newAmount){
+    public static boolean callBlockStackEvent(Block block, Player player, int originalAmount, int newAmount){
         if(plugin.getSettings().disabledEvents.contains("blockstackevent"))
             return true;
 
-        BlockStackEvent blockStackEvent = new BlockStackEvent(block, originalAmount, newAmount);
+        BlockStackEvent blockStackEvent = new BlockStackEvent(block, player, originalAmount, newAmount);
         Bukkit.getPluginManager().callEvent(blockStackEvent);
         return !blockStackEvent.isCancelled();
     }
 
-    public static boolean callBlockUnstackEvent(Block block, int originalAmount, int newAmount){
+    public static boolean callBlockUnstackEvent(Block block, Player player, int originalAmount, int newAmount){
         if(plugin.getSettings().disabledEvents.contains("blockunstackevent"))
             return true;
 
-        BlockUnstackEvent blockUnstackEvent = new BlockUnstackEvent(block, originalAmount, newAmount);
+        BlockUnstackEvent blockUnstackEvent = new BlockUnstackEvent(block, player, originalAmount, newAmount);
         Bukkit.getPluginManager().callEvent(blockUnstackEvent);
         return !blockUnstackEvent.isCancelled();
     }
