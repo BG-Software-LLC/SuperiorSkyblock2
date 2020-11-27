@@ -114,8 +114,6 @@ public final class IslandDeserializer {
     }
 
     public static void deserializeWarps(String warps, Island island){
-        island.createWarpCategory("__default__");
-
         if(warps == null)
             return;
 

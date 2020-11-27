@@ -2575,8 +2575,11 @@ public final class SIsland implements Island {
     public IslandWarp createWarp(String name, Location location, WarpCategory warpCategory) {
         SuperiorSkyblockPlugin.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location));
 
-        if(warpCategory == null)
-            warpCategory = getWarpCategory("__default__");
+        if(warpCategory == null) {
+            warpCategory = warpCategories.values().stream().findFirst().orElse(null);
+            if(warpCategory == null)
+                warpCategory = createWarpCategory("__default__");
+        }
 
         IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
 

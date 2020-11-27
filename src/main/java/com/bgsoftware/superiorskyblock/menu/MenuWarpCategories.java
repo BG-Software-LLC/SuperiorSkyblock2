@@ -109,7 +109,7 @@ public final class MenuWarpCategories extends SuperiorMenu {
     }
 
     private static WarpCategory getOnlyOneItem(Island island){
-        return island.getWarpCategories().values().stream().findFirst().orElse(island.getWarpCategory("__default__"));
+        return island.getWarpCategories().values().stream().findFirst().orElse(island.createWarpCategory("__default__"));
     }
 
 }
