@@ -27,6 +27,7 @@ import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -491,6 +492,20 @@ public final class ProtectionListener implements Listener {
     public void onPlayerLeash(PlayerLeashEntityEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onUnleashEntity(PlayerInteractAtEntityEvent e){
+        if(!(e.getRightClicked() instanceof LeashHitch))
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
 
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
             e.setCancelled(true);
