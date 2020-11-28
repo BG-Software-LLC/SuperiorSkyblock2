@@ -336,10 +336,15 @@ public final class IslandDeserializer {
                 int slot = Integer.parseInt(sections[1]);
                 ItemStack icon = ItemUtils.deserializeItem(sections[2]);
 
-                WarpCategory warpCategory = island.createWarpCategory(name);
-                warpCategory.setSlot(slot);
-                if(icon != null)
-                    warpCategory.setIcon(icon);
+                WarpCategory warpCategory = island.getWarpCategory(name);
+
+                if(warpCategory != null) {
+                    warpCategory.setSlot(slot);
+                    if (icon != null)
+                        warpCategory.setIcon(icon);
+                    if(warpCategory.getWarps().isEmpty())
+                        island.deleteCategory(warpCategory);
+                }
             }catch(Exception ignored){}
         }
     }

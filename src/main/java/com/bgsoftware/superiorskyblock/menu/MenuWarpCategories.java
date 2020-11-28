@@ -104,12 +104,16 @@ public final class MenuWarpCategories extends SuperiorMenu {
         refreshMenus(MenuWarpCategories.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
+    public static void destroyMenus(Island island){
+        destroyMenus(MenuWarpCategories.class, superiorMenu -> superiorMenu.island.equals(island));
+    }
+
     private static boolean hasOnlyOneItem(Island island){
         return island.getWarpCategories().size() <= 1;
     }
 
     private static WarpCategory getOnlyOneItem(Island island){
-        return island.getWarpCategories().values().stream().findFirst().orElse(island.createWarpCategory("__default__"));
+        return island.getWarpCategories().values().stream().findFirst().orElseGet(() -> island.createWarpCategory("Default Category"));
     }
 
 }

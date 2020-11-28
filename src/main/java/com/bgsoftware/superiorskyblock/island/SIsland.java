@@ -341,8 +341,6 @@ public final class SIsland implements Island {
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
 
-        createWarpCategory("__default__");
-
         updateLastInterest(currentTime);
 
         assignIslandChest();
@@ -2567,6 +2565,24 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public void deleteCategory(WarpCategory warpCategory) {
+        SuperiorSkyblockPlugin.debug("Action: Delete Warp-Category, Island: " + owner.getName() + ", Category: " + warpCategory.getName());
+        boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase()) != null;
+        if(validWarpRemoval) {
+            islandDataHandler.saveWarpCategories();
+
+            boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
+            if (shouldSaveWarps) {
+                new ArrayList<>(warpCategory.getWarps()).forEach(islandWarp -> deleteWarp(islandWarp.getName()));
+                islandDataHandler.saveWarps();
+                MenuWarps.destroyMenus(warpCategory);
+            }
+
+            MenuWarpCategories.destroyMenus(this);
+        }
+    }
+
+    @Override
     public Map<String, WarpCategory> getWarpCategories() {
         return Collections.unmodifiableMap(warpCategories.toMap());
     }
@@ -2575,11 +2591,8 @@ public final class SIsland implements Island {
     public IslandWarp createWarp(String name, Location location, WarpCategory warpCategory) {
         SuperiorSkyblockPlugin.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location));
 
-        if(warpCategory == null) {
-            warpCategory = warpCategories.values().stream().findFirst().orElse(null);
-            if(warpCategory == null)
-                warpCategory = createWarpCategory("__default__");
-        }
+        if(warpCategory == null)
+            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
         IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
 
@@ -2673,6 +2686,8 @@ public final class SIsland implements Island {
         if(islandWarp != null){
             warpsByLocation.remove(islandWarp.getLocation());
             warpCategory.getWarps().remove(islandWarp);
+            if(warpCategory.getWarps().isEmpty())
+                deleteCategory(warpCategory);
         }
 
         islandDataHandler.saveWarps();

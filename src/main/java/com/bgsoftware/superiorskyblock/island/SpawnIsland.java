@@ -1225,6 +1225,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void deleteCategory(WarpCategory warpCategory) {
+
+    }
+
+    @Override
     public Map<String, WarpCategory> getWarpCategories() {
         return new HashMap<>();
     }

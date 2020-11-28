@@ -1400,6 +1400,13 @@ public interface Island extends Comparable<Island> {
     void renameCategory(WarpCategory warpCategory, String newName);
 
     /**
+     * Delete a warp category.
+     * All the warps inside it will be deleted as well.
+     * @param warpCategory The category to delete.
+     */
+    void deleteCategory(WarpCategory warpCategory);
+
+    /**
      * Get all the warp categories of the island.
      */
     Map<String, WarpCategory> getWarpCategories();

@@ -110,6 +110,10 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
         refreshMenus(MenuWarps.class, superiorMenu -> superiorMenu.warpCategory.equals(warpCategory));
     }
 
+    public static void destroyMenus(WarpCategory warpCategory){
+        destroyMenus(MenuWarps.class, superiorMenu -> superiorMenu.warpCategory.equals(warpCategory));
+    }
+
     private String ensureNotNull(String check){
         return check == null ? "" : check;
     }
