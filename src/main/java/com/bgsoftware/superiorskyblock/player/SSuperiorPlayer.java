@@ -361,9 +361,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
                     continue;
 
+                int worldBuildLimit = Bukkit.getWorld(chunkSnapshot.getWorldName()).getMaxHeight();
+
                 for(int x = 0; x < 16; x++){
                     for(int z = 0; z < 16; z++){
-                        int y = chunkSnapshot.getHighestBlockYAt(x, z);
+                        int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
                         Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z),
                                 belowKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
 
@@ -709,7 +711,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.disbands = other.getDisbands();
         this.borderColor = other.getBorderColor();
         this.lastTimeStatus = other.getLastTimeStatus();
-        ((SPlayerDataHandler) playerDataHandler).executeUpdateStatement(true);
+        playerDataHandler.executeUpdateStatement(true);
         ((SPlayerDataHandler) other.getDataHandler()).executeDeleteStatement(true);
     }
 
