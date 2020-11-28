@@ -105,7 +105,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if(!message.equalsIgnoreCase("-cancel")) {
-                    itemMeta.setLore(Arrays.asList(message.split("\\n")));
+                    itemMeta.setLore(Arrays.asList(message.split("\\\\n")));
                 }
 
                 open(previousMenu);
