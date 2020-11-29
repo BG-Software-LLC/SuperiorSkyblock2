@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
@@ -63,7 +64,10 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
     @Override
     protected List<IslandWarp> requestObjects() {
-        return warpCategory.getWarps();
+        boolean isMember = warpCategory.getIsland().isMember(superiorPlayer);
+        return warpCategory.getWarps().stream()
+                .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
+                .collect(Collectors.toList());
     }
 
     public static void init(){

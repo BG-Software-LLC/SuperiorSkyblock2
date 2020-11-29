@@ -5,8 +5,10 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,17 +23,22 @@ public final class MenuWarpCategories extends SuperiorMenu {
     private static List<String> editLore;
 
     private final Island island;
+    private final boolean hasManagePerms;
 
     private MenuWarpCategories(SuperiorPlayer superiorPlayer, Island island){
         super("menuWarpCategories", superiorPlayer);
         this.island = island;
+        hasManagePerms = island != null && island.hasPermission(superiorPlayer, IslandPrivileges.SET_WARP);
     }
 
     @Override
     protected void onPlayerClick(InventoryClickEvent e) {
+        if(e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
+            return;
+
         for(WarpCategory warpCategory : island.getWarpCategories().values()){
             if(e.getRawSlot() == warpCategory.getSlot()){
-                if(e.getClick().name().contains("RIGHT")){
+                if(e.getClick().name().contains("RIGHT") && hasManagePerms){
                     previousMove = false;
                     MenuWarpCategoryManage.openInventory(superiorPlayer, this, warpCategory);
                 }
@@ -53,9 +60,17 @@ public final class MenuWarpCategories extends SuperiorMenu {
         Inventory inventory = super.buildInventory(titleReplacer);
 
         for(WarpCategory warpCategory : island.getWarpCategories().values()) {
+            boolean isMember = island.isMember(superiorPlayer);
+            long accessAmount = warpCategory.getWarps().stream().filter(
+                    islandWarp -> isMember || !islandWarp.hasPrivateFlag()
+            ).count();
+
+            if(accessAmount == 0)
+                continue;
+
             ItemStack iconItem;
 
-            if(editLore.isEmpty()){
+            if(!hasManagePerms || editLore.isEmpty()){
                 iconItem = warpCategory.getIcon(island.getOwner());
             }
             else {
