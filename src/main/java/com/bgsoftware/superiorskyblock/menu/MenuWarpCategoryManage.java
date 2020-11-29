@@ -107,7 +107,7 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
         }
         else if(warpsSlots.contains(e.getRawSlot())){
             previousMove = false;
-            MenuWarpsManage.openInventory(superiorPlayer, this, warpCategory);
+            MenuWarps.openInventory(superiorPlayer, this, warpCategory);
         }
     }
 

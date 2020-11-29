@@ -21,6 +21,13 @@ previous-page: '%'
 current-page: '*'
 next-page: '^'
 
+# This lore is added to warp icons.
+edit-lore:
+  - '&f '
+  - '&f '
+  - '&7&o(( &f&oLeft-Click &7&oto warp to the location. ))'
+  - '&7&o(( &f&oRight-Click &7&oto edit warp. ))'
+
 items:
   '@':
     type: BOOK

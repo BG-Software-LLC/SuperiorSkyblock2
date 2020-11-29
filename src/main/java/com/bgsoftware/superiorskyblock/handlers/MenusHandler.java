@@ -43,7 +43,6 @@ import com.bgsoftware.superiorskyblock.menu.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
-import com.bgsoftware.superiorskyblock.menu.MenuWarpsManage;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
@@ -100,7 +99,6 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(MenuWarpIconEdit::init);
         loadMenu(MenuWarpManage::init);
         loadMenu(MenuWarps::init);
-        loadMenu(MenuWarpsManage::init);
 
         File guiFolder = new File(plugin.getDataFolder(), "guis");
         if(guiFolder.exists()){
@@ -247,7 +245,8 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
 
     @Override
     public void openIslandWarpsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        MenuWarps.openInventory(superiorPlayer, null, null);
+        MenuWarps.openInventory(superiorPlayer, null, island.getWarpCategories().values()
+                .stream().findFirst().orElseGet(() -> island.createWarpCategory("Default Category")));
     }
 
     @Override

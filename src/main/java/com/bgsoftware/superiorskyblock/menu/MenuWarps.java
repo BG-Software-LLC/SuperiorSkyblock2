@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -25,20 +26,30 @@ import java.util.stream.Collectors;
 
 public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
+    private static List<String> editLore;
+
     private final WarpCategory warpCategory;
+    private final boolean hasManagePermission;
 
     private MenuWarps(SuperiorPlayer superiorPlayer, WarpCategory warpCategory){
         super("menuWarps", superiorPlayer);
         this.warpCategory = warpCategory;
+        this.hasManagePermission = warpCategory != null && warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP);
     }
 
     @Override
     public void onPlayerClick(InventoryClickEvent event, IslandWarp islandWarp) {
-        Executor.sync(() -> {
+        if(hasManagePermission && event.getClick().isRightClick()){
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
-            warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
-        }, 1L);
+            MenuWarpManage.openInventory(superiorPlayer, this, islandWarp);
+        }
+        else {
+            Executor.sync(() -> {
+                previousMove = false;
+                superiorPlayer.asPlayer().closeInventory();
+                warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
+            }, 1L);
+        }
     }
 
     @Override
@@ -49,8 +60,12 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandWarp islandWarp) {
         try {
-            return new ItemBuilder(islandWarp.getRawIcon() == null ? clickedItem : islandWarp.getIcon(superiorPlayer))
-                    .replaceAll("{0}", islandWarp.getName())
+            ItemBuilder itemBuilder = new ItemBuilder(islandWarp.getRawIcon() == null ? clickedItem : islandWarp.getIcon(superiorPlayer));
+
+            if(hasManagePermission && !editLore.isEmpty())
+                itemBuilder.appendLore(editLore);
+
+            return itemBuilder.replaceAll("{0}", islandWarp.getName())
                     .replaceAll("{1}", SBlockPosition.of(islandWarp.getLocation()).toString())
                     .replaceAll("{2}", islandWarp.hasPrivateFlag() ?
                             ensureNotNull(Locale.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
@@ -79,6 +94,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             FileUtils.saveResource("menus/warps.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), "items", "sounds", "sections");
 
         if(convertOldGUI(cfg)){
             cfg.save(file);
@@ -94,6 +110,8 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
         menuWarps.setSlots(slots);
 
         SIslandWarp.DEFAULT_WARP_ICON = menuWarps.getFillItem(slots.get(0));
+
+        editLore = cfg.getStringList("edit-lore");
 
         charSlots.delete();
 
