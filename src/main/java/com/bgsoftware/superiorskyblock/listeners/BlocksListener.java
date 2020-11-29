@@ -59,6 +59,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -406,20 +407,49 @@ public final class BlocksListener implements Listener {
             amount = blockLimit - blockAmount;
         }
 
-        if(amount <= 0)
+        if(amount <= 0) {
+            depositedAmount.accept(0);
             return false;
+        }
 
         Block block = stackedBlock.getBlock();
 
-        if(!EventsCaller.callBlockStackEvent(block, player, blockAmount, blockAmount + amount))
+        if(!EventsCaller.callBlockStackEvent(block, player, blockAmount, blockAmount + amount)) {
+            depositedAmount.accept(0);
             return false;
+        }
+
+        Island island = plugin.getGrid().getIslandAt(stackedBlock);
+
+        if(island != null){
+            BigInteger islandBlockLimit = BigInteger.valueOf(island.getExactBlockLimit(blockKey));
+            BigInteger islandBlockCount = island.getBlockCountAsBigInteger(blockKey);
+            BigInteger bigAmount = BigInteger.valueOf(amount);
+
+            //Checking for the specific provided key.
+            if(islandBlockLimit.compareTo(BigInteger.valueOf(IslandUtils.NO_LIMIT.get())) > 0 &&
+                    islandBlockCount.add(bigAmount).compareTo(islandBlockLimit) > 0) {
+                amount = islandBlockLimit.subtract(islandBlockCount).intValue();
+            }
+            else{
+                //Getting the global key values.
+                Key globalKey = Key.of(blockKey.getGlobalKey());
+                islandBlockLimit = BigInteger.valueOf(island.getExactBlockLimit(globalKey));
+                islandBlockCount = island.getBlockCountAsBigInteger(globalKey);
+                if(islandBlockLimit.compareTo(BigInteger.valueOf(IslandUtils.NO_LIMIT.get())) > 0 &&
+                        islandBlockCount.add(bigAmount).compareTo(islandBlockLimit) > 0) {
+                    amount = islandBlockLimit.subtract(islandBlockCount).intValue();
+                }
+            }
+        }
 
         plugin.getGrid().setBlockAmount(block, blockAmount + amount);
 
-        if(plugin.getGrid().hasBlockFailed())
+        if(plugin.getGrid().hasBlockFailed()) {
+            depositedAmount.accept(0);
             return false;
+        }
 
-        Island island = plugin.getGrid().getIslandAt(stackedBlock);
         if(island != null){
             island.handleBlockPlace(block, amount);
         }

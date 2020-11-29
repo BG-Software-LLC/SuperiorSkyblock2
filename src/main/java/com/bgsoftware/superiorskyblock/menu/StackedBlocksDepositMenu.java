@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,14 +74,14 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
             int DEPOSIT_AMOUNT = depositAmount;
             ItemStack BLOCK_ITEM = blockItem;
             boolean success = BlocksListener.tryStack(plugin, (Player) e.getPlayer(), depositAmount, stackedBlock, amount -> {
-                int leftOvers = amount - DEPOSIT_AMOUNT;
-                if(leftOvers > 0) {
-                    ItemStack toDrop = BLOCK_ITEM.clone();
-                    toDrop.setAmount(leftOvers);
-                    stackedBlock.getWorld().dropItemNaturally(stackedBlock, toDrop);
+                int leftOvers = DEPOSIT_AMOUNT - amount;
+                if (leftOvers > 0) {
+                    ItemStack toAddBack = BLOCK_ITEM.clone();
+                    toAddBack.setAmount(leftOvers);
+                    ItemUtils.addItem(toAddBack, e.getPlayer().getInventory(), stackedBlock);
                 }
             });
-            if(success)
+            if (success)
                 plugin.getNMSAdapter().playPlaceSound(stackedBlock);
         }
     }
