@@ -172,6 +172,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
     public final boolean warpCategories;
+    public final boolean physicsListener;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -419,6 +420,7 @@ public final class SettingsHandler extends AbstractHandler {
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);
         warpCategories = cfg.getBoolean("warp-categories", true);
+        physicsListener = cfg.getBoolean("physics-listener", true);
     }
 
     @Override

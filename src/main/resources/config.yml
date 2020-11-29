@@ -705,3 +705,8 @@ protected-message-delay: 60
 
 # Should players be able to create warp categories?
 warp-categories: true
+
+# Should the physics listener be activated?
+# This must be enabled if one of the stacked blocks can be affected by gravity or other things.
+# Disabling this listener can help with performance.
+physics-listener: true

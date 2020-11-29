@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -74,6 +75,8 @@ public final class BlocksListener implements Listener {
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         IMP = this;
+        if(plugin.getSettings().physicsListener)
+            Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -311,12 +314,6 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(BlockBreakEvent e){
         if(tryUnstack(e.getPlayer(), e.getBlock(), plugin))
-            e.setCancelled(true);
-    }
-
-    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onStackedBlockPhysics(BlockPhysicsEvent e){
-        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
             e.setCancelled(true);
     }
 
@@ -708,6 +705,16 @@ public final class BlocksListener implements Listener {
             if(plugin.getNMSAdapter().isChunkEmpty(block.getChunk()))
                 ChunksTracker.markEmpty(island, block, true);
         }, 2L);
+    }
+
+    private final class PhysicsListener implements Listener {
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onStackedBlockPhysics(BlockPhysicsEvent e){
+            if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
+                e.setCancelled(true);
+        }
+
     }
 
 }
