@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -15,6 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 public final class CmdSetWarp implements IPermissibleCommand {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public List<String> getAliases() {
@@ -28,9 +29,13 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "setwarp <" +
-                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "> [" +
-                Locale.COMMAND_ARGUMENT_WARP_CATEGORY.getMessage(locale) + "]";
+        StringBuilder usage = new StringBuilder("setwarp <")
+                .append(Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale)).append(">");
+
+        if(plugin.getSettings().warpCategories)
+            usage.append(" [").append(Locale.COMMAND_ARGUMENT_WARP_CATEGORY.getMessage(locale)).append("]");
+
+        return usage.toString();
     }
 
     @Override
@@ -45,7 +50,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return 3;
+        return plugin.getSettings().warpCategories ? 3 : 2;
     }
 
     @Override

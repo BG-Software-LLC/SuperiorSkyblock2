@@ -702,3 +702,6 @@ drops-upgrade-players-multiply: false
 
 # The delay between protected messages (in ticks)
 protected-message-delay: 60
+
+# Should players be able to create warp categories?
+warp-categories: true

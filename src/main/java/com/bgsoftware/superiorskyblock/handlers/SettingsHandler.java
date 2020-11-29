@@ -1,9 +1,7 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -173,6 +171,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
+    public final boolean warpCategories;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -419,6 +418,7 @@ public final class SettingsHandler extends AbstractHandler {
         tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);
+        warpCategories = cfg.getBoolean("warp-categories", true);
     }
 
     @Override
