@@ -720,6 +720,7 @@ TELEPORTED_FAILED: '&e&lNâng cấp | &7Có vẻ như hòn đảo này không c�
 TELEPORTED_SUCCESS: '&e&lĐảo Thần | &7Bạn đã được dịch chuyển đến hòn đảo của bạn.'
 TELEPORTED_TO_WARP: '&e&lĐảo Thần | &7Dịch chuyển thành công đến khu vực của hòn đảo
   này.'
+TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lIsland | &7The player {0} teleported to the island warp {1}.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7TChuyển đổi chế độ bypass : &cTẮT&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass : &aBẬT&7.'
 TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo : &cTẮT&7.'
