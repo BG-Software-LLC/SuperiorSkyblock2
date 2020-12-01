@@ -21,6 +21,7 @@ success-update-sound:
 warp-rename: '!'
 warp-icon: '~'
 warp-location: '$'
+warp-private: '$'
 
 items:
   '!':

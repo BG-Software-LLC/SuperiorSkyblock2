@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 public final class MenuWarpManage extends SuperiorMenu {
 
-    private static List<Integer> renameSlots, iconSlots, locationSlots;
+    private static List<Integer> renameSlots, iconSlots, locationSlots, privateSlots;
     private static SoundWrapper successUpdateSound;
 
     private final IslandWarp islandWarp;
@@ -93,6 +93,12 @@ public final class MenuWarpManage extends SuperiorMenu {
             if(successUpdateSound != null)
                 successUpdateSound.playSound(e.getWhoClicked());
         }
+
+        else if(privateSlots.contains(e.getRawSlot())){
+            islandWarp.setPrivateFlag(!islandWarp.hasPrivateFlag());
+            Locale.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
+        }
+
     }
 
     @Override
@@ -140,6 +146,7 @@ public final class MenuWarpManage extends SuperiorMenu {
         renameSlots = getSlots(cfg, "warp-rename", charSlots);
         iconSlots = getSlots(cfg, "warp-icon", charSlots);
         locationSlots = getSlots(cfg, "warp-location", charSlots);
+        privateSlots = getSlots(cfg, "warp-private", charSlots);
 
         if(cfg.isConfigurationSection("success-update-sound"))
             successUpdateSound = FileUtils.getSound(cfg.getConfigurationSection("success-update-sound"));

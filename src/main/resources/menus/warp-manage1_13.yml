@@ -10,7 +10,8 @@ previous-menu: true
 
 pattern:
   - '@ @ @ @ @ @ @ @ @'
-  - '@ ! @ @ ~ @ @ $ @'
+  - '@ @ ! @ % @ $ @ @'
+  - '@ @ @ @ ~ @ @ @ @'
   - '@ @ @ @ @ @ @ @ @'
 
 success-update-sound:
@@ -21,6 +22,7 @@ success-update-sound:
 warp-rename: '!'
 warp-icon: '~'
 warp-location: '$'
+warp-private: '%'
 
 items:
   '!':
@@ -43,3 +45,10 @@ items:
       - '&f '
       - '&f '
       - '&7&o(( &f&oClick &7&oto update the warp location. ))'
+  '%':
+    type: FEATHER
+    name: '&6Private Warp'
+    lore:
+      - '&f '
+      - '&f '
+      - '&7&o(( &f&oClick &7&oto toggle warp to the public. ))'
