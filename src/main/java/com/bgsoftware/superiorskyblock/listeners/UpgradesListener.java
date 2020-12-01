@@ -135,29 +135,34 @@ public final class UpgradesListener implements Listener {
                 if(itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack) &&
                         !plugin.getNMSTags().getNBTTag(itemStack).getValue().containsKey("WildChests")) {
                     int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);
-                    int stackAmounts = newAmount / itemStack.getMaxStackSize();
-                    int leftOvers = newAmount % itemStack.getMaxStackSize();
-                    boolean usedOriginal = false;
 
-                    if(stackAmounts > 0){
-                        itemStack.setAmount(itemStack.getMaxStackSize());
-                        usedOriginal = true;
-
-                        ItemStack stackItem = itemStack.clone();
-                        stackItem.setAmount(itemStack.getMaxStackSize());
-
-                        for(int i = 0; i < stackAmounts - 1; i++)
-                            e.getDrops().add(itemStack.clone());
+                    if(Bukkit.getPluginManager().isPluginEnabled("WildStacker")){
+                        itemStack.setAmount(newAmount);
                     }
+                    else {
+                        int stackAmounts = newAmount / itemStack.getMaxStackSize();
+                        int leftOvers = newAmount % itemStack.getMaxStackSize();
+                        boolean usedOriginal = false;
 
-                    if(leftOvers > 0) {
-                        if(usedOriginal){
-                            ItemStack leftOversItem = itemStack.clone();
-                            leftOversItem.setAmount(leftOvers);
-                            e.getDrops().add(leftOversItem);
+                        if (stackAmounts > 0) {
+                            itemStack.setAmount(itemStack.getMaxStackSize());
+                            usedOriginal = true;
+
+                            ItemStack stackItem = itemStack.clone();
+                            stackItem.setAmount(itemStack.getMaxStackSize());
+
+                            for (int i = 0; i < stackAmounts - 1; i++)
+                                e.getDrops().add(itemStack.clone());
                         }
-                        else {
-                            itemStack.setAmount(leftOvers);
+
+                        if (leftOvers > 0) {
+                            if (usedOriginal) {
+                                ItemStack leftOversItem = itemStack.clone();
+                                leftOversItem.setAmount(leftOvers);
+                                e.getDrops().add(leftOversItem);
+                            } else {
+                                itemStack.setAmount(leftOvers);
+                            }
                         }
                     }
                 }
