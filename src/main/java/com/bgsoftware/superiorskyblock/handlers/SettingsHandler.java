@@ -173,6 +173,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final long protectedMessageDelay;
     public final boolean warpCategories;
     public final boolean physicsListener;
+    public final double chargeOnWarp;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -421,6 +422,7 @@ public final class SettingsHandler extends AbstractHandler {
         protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);
         warpCategories = cfg.getBoolean("warp-categories", true);
         physicsListener = cfg.getBoolean("physics-listener", true);
+        chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
     }
 
     @Override

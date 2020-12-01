@@ -568,6 +568,7 @@ NO_UPGRADE_PERMISSION: '&c&lהאיגש | &7המר דועל גרדשל האשרה
 NO_WITHDRAW_PERMISSION: '&c&lהאיגש | &7יאה לש קנבהמ ףסכ ךושמל תנמ לע {0} תגרדב תוחפל תויהל בייח התא.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lהאיגש | &7יאה לש קנבל רלוד {0} ריבעהל תנמ לע ףסכ קיפסמ ךל ןיא.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lהאיגש | &7ףסכ קיפסמ ךל ןיא.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oYou''re too tired to interact with menus, don''t you think?'
 PANEL_TOGGLE_OFF: |-
   &e&lטירפת | &cתיביכ &יטמוטואה יאה טירפת בצמ תא7.

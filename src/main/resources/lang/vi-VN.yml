@@ -626,6 +626,7 @@ NO_WITHDRAW_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để rút t
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lLỗi | &7Bạn không có đủ tiền để gửi {0}$ vào ngân
   hàng đảo của bạn.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để nâng cấp.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oBạn quá mệt mỏi để tương tác với các menu, bạn không nghĩ vậy sao?'
 PANEL_TOGGLE_OFF: |-
   &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo : &cTẮT&7.

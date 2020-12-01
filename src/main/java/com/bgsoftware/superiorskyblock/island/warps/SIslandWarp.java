@@ -22,6 +22,7 @@ public final class SIslandWarp implements IslandWarp {
     private Location location;
     private boolean privateFlag = true;
     private ItemStack icon;
+    private double price = 0D;
 
     public SIslandWarp(String name, Location location, WarpCategory warpCategory){
         this.name = name;

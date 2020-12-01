@@ -675,6 +675,7 @@ NO_WITHDRAW_PERMISSION: '&c&lErrore | &7Devi essere almeno {0} per prelevare den
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErrore | &7Non hai abbastanza soldi per depositare
   {0} dollari nella banca della tua isola.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErrore | &7Non hai abbastanza soldi.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oNon credi di essere troppo stanco per interagire con
   i menu?'
 PANEL_TOGGLE_OFF: |-

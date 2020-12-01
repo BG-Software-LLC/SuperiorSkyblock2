@@ -20,6 +20,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +45,15 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             MenuWarpManage.openInventory(superiorPlayer, this, islandWarp);
         }
         else {
+            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
+                if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().chargeOnWarp)) < 0){
+                    Locale.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
+                    return;
+                }
+
+                plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().chargeOnWarp);
+            }
+
             Executor.sync(() -> {
                 previousMove = false;
                 superiorPlayer.asPlayer().closeInventory();

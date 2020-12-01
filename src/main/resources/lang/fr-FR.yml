@@ -548,6 +548,7 @@ NO_UPGRADE_PERMISSION: '&c&lErreur | &7Vous n''avez pas la permission d''augment
 NO_WITHDRAW_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de retirer de l''argent du compte de l''île.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErreur | &7Vous n''avez pas suffisamment d''argent pour déposer {0}$ sur le compte de vôtre île.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErreur | &7Vous n''avez pas suffisamment d''argent.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oVous êtes trop fatigué pour interagir avec le menu vous ne pensez pas ?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Panel de gestion de l'île &cDÉSACTIVÉ&7.

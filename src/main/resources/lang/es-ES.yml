@@ -546,6 +546,7 @@ NO_UPGRADE_PERMISSION: '&c&lError | &7No tiene permiso para actualizar a otro ni
 NO_WITHDRAW_PERMISSION: '&c&lError | &7Debe tener al menos {0} para poder retirar dinero del banco de la isla.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lError | &7No tienes suficiente dinero para depositar ${0} en el banco de tu isla.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lError | &7No tienes suficiente dinero.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oEstás demasiado cansado para interactuar con los menús, ¿no crees?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Panel de la isla &cAPAGADO&7.

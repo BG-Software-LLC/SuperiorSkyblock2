@@ -548,6 +548,7 @@ NO_UPGRADE_PERMISSION: '&c&l错误 | &7你没有权限给岛屿进行升级.'
 NO_WITHDRAW_PERMISSION: '&c&l错误 | &7你至少要达到 &b{0} &7岛屿职位才能从岛屿银行中取款.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&l错误 | &7你没有这么多的游戏币来存入岛屿银行.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&l错误 | &7你没有这么多游戏币来升级岛屿.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
 OPEN_MENU_WHILE_SLEEPING: '&7&o你太困了，先睡吧....'
 PANEL_TOGGLE_OFF: |-
   &e&l岛屿管理 | &7岛屿管理面板 &c关闭&7.
