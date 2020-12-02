@@ -96,7 +96,10 @@ public final class MenuWarpManage extends SuperiorMenu {
 
         else if(privateSlots.contains(e.getRawSlot())){
             islandWarp.setPrivateFlag(!islandWarp.hasPrivateFlag());
-            Locale.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
+            if(islandWarp.hasPrivateFlag())
+                Locale.WARP_PRIVATE_UPDATE.send(e.getWhoClicked());
+            else
+                Locale.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
         }
 
     }
