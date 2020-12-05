@@ -634,8 +634,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-        playerChunkMap.getVisibleChunk(ChunkCoordIntPair.pair(chunkX, chunkZ)).
-                sendPacketToTrackedPlayers(packet, false);
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        playerChunkMap.visibleChunks.get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
+                .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
     }
 
     private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world){
