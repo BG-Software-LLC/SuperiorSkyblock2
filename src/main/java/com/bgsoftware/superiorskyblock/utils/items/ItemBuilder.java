@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
@@ -11,10 +12,12 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
@@ -183,6 +186,24 @@ public final class ItemBuilder implements Cloneable {
     public ItemBuilder withPotionEffect(PotionEffect potionEffect){
         if(itemMeta instanceof PotionMeta)
             plugin.getNMSAdapter().addPotion((PotionMeta) itemMeta, potionEffect);
+        return this;
+    }
+
+    @SuppressWarnings("deprecation")
+    public ItemBuilder withEntityType(EntityType entityType){
+        if(ItemUtils.isValidAndSpawnEgg(itemStack)) {
+            if(ServerVersion.isLegacy()) {
+                try {
+                    ((SpawnEggMeta) itemMeta).setSpawnedType(entityType);
+                } catch (NoClassDefFoundError error) {
+                    itemStack.setDurability(entityType.getTypeId());
+                }
+            }
+            else{
+                itemStack.setType(Material.valueOf(entityType.name() + "_SPAWN_EGG"));
+            }
+        }
+
         return this;
     }
 

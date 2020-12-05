@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
@@ -110,6 +111,15 @@ public final class FileUtils {
                 }
 
                 itemBuilder.withPotionEffect(new PotionEffect(potionEffectType, duration, amplifier));
+            }
+        }
+
+        if(section.contains("entity")){
+            String entity = section.getString("entity");
+            try{
+                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase()));
+            }catch (IllegalArgumentException ex){
+                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + entity + " into an entity type, skipping...");
             }
         }
 

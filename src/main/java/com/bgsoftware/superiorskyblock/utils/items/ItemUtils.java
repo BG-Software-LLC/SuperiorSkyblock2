@@ -171,7 +171,7 @@ public final class ItemUtils {
         return null;
     }
 
-    private static boolean isValidAndSpawnEgg(ItemStack itemStack){
+    public static boolean isValidAndSpawnEgg(ItemStack itemStack){
         return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 
