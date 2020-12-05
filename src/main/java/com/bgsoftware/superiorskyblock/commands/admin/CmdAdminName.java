@@ -60,7 +60,7 @@ public final class CmdAdminName implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        String islandName = args[4];
+        String islandName = args[3];
 
         if(!StringUtils.isValidName(sender, island, islandName))
             return;
