@@ -53,6 +53,7 @@ import net.minecraft.server.v1_16_R3.Packet;
 import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.PacketPlayOutUnloadChunk;
+import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunkMap;
 import net.minecraft.server.v1_16_R3.PlayerConnection;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
@@ -99,6 +100,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
     private static final ReflectField<Collection[]> ENTITY_SLICE_ARRAY = new ReflectField<>(Chunk.class, null, "entitySlices");
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -635,8 +637,12 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        playerChunkMap.visibleChunks.get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
-                .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
+        try {
+            playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).sendPacketToTrackedPlayers(packet, false);
+        }catch (Throwable ex){
+            VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
+                    .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
+        }
     }
 
     private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world){
