@@ -55,18 +55,21 @@ public final class SettingsListener implements Listener {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            switch (e.getSpawnReason()){
-                case JOCKEY:
-                case CHUNK_GEN:
-                case NATURAL: {
+            switch (e.getSpawnReason().name()){
+                case "JOCKEY":
+                case "CHUNK_GEN":
+                case "NATURAL":
+                case "TRAP":
+                case "MOUNT":
+                    {
                     IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.NATURAL_MONSTER_SPAWN :
                             EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
                         e.setCancelled(true);
                     break;
                 }
-                case SPAWNER:
-                case SPAWNER_EGG: {
+                case "SPAWNER":
+                case "SPAWNER_EGG": {
                     IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
                             EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
