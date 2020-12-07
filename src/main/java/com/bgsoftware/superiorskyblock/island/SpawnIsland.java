@@ -290,8 +290,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        int islandDistance = plugin.getSettings().maxIslandSize;
-        return getCenter(World.Environment.NORMAL).subtract(islandDistance, 0, islandDistance);
+        return getCenter(World.Environment.NORMAL).subtract(islandSize, 0, islandSize);
     }
 
     @Override
@@ -301,8 +300,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        int islandDistance = plugin.getSettings().maxIslandSize;
-        return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
+        return getCenter(World.Environment.NORMAL).add(islandSize, 0, islandSize);
     }
 
     @Override
