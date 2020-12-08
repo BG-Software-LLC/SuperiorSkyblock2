@@ -61,7 +61,8 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withName(String name){
-        itemMeta.setDisplayName(StringUtils.translateColors(name));
+        if(name != null)
+            itemMeta.setDisplayName(StringUtils.translateColors(name));
         return this;
     }
 
@@ -72,7 +73,8 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withLore(List<String> lore){
-        itemMeta.setLore(StringUtils.translateColors(lore));
+        if(lore != null)
+            itemMeta.setLore(StringUtils.translateColors(lore));
         return this;
     }
 

@@ -27,14 +27,19 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
 
     private final IslandWarp islandWarp;
     private final ItemStack itemStack;
-    private final ItemMeta itemMeta;
+    private String itemName = null;
+    private List<String> itemLore = null;
 
     private MenuWarpIconEdit(SuperiorPlayer superiorPlayer, IslandWarp islandWarp){
         super("menuWarpIconEdit", superiorPlayer);
         this.islandWarp = islandWarp;
         this.itemStack = islandWarp == null ? null : islandWarp.getRawIcon() == null ?
                 SIslandWarp.DEFAULT_WARP_ICON.clone().build() : islandWarp.getRawIcon();
-        this.itemMeta = islandWarp == null ? null : itemStack.getItemMeta();
+        if(itemStack != null){
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemName = itemMeta.getDisplayName();
+            itemLore = itemMeta.getLore();
+        }
     }
 
     @Override
@@ -90,7 +95,7 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if(!message.equalsIgnoreCase("-cancel")) {
-                    itemMeta.setDisplayName(message);
+                    itemName = message;
                 }
 
                 open(previousMenu);
@@ -107,7 +112,7 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if(!message.equalsIgnoreCase("-cancel")) {
-                    itemMeta.setLore(Arrays.asList(message.split("\\\\n")));
+                    itemLore = Arrays.asList(message.split("\\\\n"));
                 }
 
                 open(previousMenu);
@@ -121,8 +126,7 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
 
             Locale.WARP_ICON_UPDATED.send(e.getWhoClicked());
 
-            itemStack.setItemMeta(itemMeta);
-            islandWarp.setIcon(itemStack);
+            islandWarp.setIcon(new ItemBuilder(itemStack).withName(itemName).withLore(itemLore).build());
         }
     }
 
@@ -130,17 +134,8 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
     protected Inventory buildInventory(Function<String, String> titleReplacer) {
         Inventory inventory = super.buildInventory(title -> title.replace("{0}", islandWarp.getName()));
 
-        iconSlots.forEach(slot -> {
-            ItemBuilder itemBuilder = new ItemBuilder(itemStack);
-
-            if(itemMeta.hasDisplayName())
-                itemBuilder.withName(itemMeta.getDisplayName());
-
-            if(itemMeta.hasLore())
-                itemBuilder.withLore(itemMeta.getLore());
-
-            inventory.setItem(slot, itemBuilder.build());
-        });
+        iconSlots.forEach(slot -> inventory.setItem(slot, new ItemBuilder(itemStack)
+                .withName(itemName).withLore(itemLore).build()));
 
         return inventory;
     }
