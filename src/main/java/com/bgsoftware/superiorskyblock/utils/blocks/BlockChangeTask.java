@@ -65,7 +65,8 @@ public final class BlockChangeTask {
 
                     plugin.getNMSBlocks().setBlocks(chunk, entry.getValue());
 
-                    entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
+                    if(island.getOwner().isOnline())
+                        entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
 
                     plugin.getNMSBlocks().refreshChunk(chunk);
 
