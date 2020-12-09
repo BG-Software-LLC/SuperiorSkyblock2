@@ -466,8 +466,12 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
             if(!(world.generator instanceof WorldGenerator)) {
                 ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
-                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
-                customChunkGenerator.buildBase(null, protoChunk);
+
+                try {
+                    CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
+                    customChunkGenerator.buildBase(null, protoChunk);
+                }catch (Exception ignored){}
+
                 ChunkSection[] chunkSections = protoChunk.getSections();
 
                 for(int i = -1; i < 17; ++i) {
