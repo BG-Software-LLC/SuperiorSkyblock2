@@ -552,6 +552,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("SET_WARP");
         IslandPrivilege.register("SIGN_INTERACT");
         IslandPrivilege.register("SPAWNER_BREAK");
+        if(!ServerVersion.isLegacy())
+            IslandPrivilege.register("TURTLE_EGG_TRAMPING");
         IslandPrivilege.register("UNCOOP_MEMBER");
         IslandPrivilege.register("USE");
         IslandPrivilege.register("VALUABLE_BREAK");

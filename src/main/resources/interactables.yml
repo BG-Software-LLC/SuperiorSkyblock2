@@ -164,6 +164,7 @@ interactables:
 - 'TNT'
 - 'TRAPPED_CHEST'
 - 'TRAP_DOOR'
+- 'TURTLE_EGG'
 - 'WALL_SIGN'
 - 'WHITE_BED'
 - 'WHITE_SHULKER_BOX'

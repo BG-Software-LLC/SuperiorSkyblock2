@@ -178,6 +178,7 @@ island-roles:
     - PICKUP_DROPS
     - PICKUP_FISH
     - SIGN_INTERACT
+    - TURTLE_EGG_TRAMPING
     - USE
     - VILLAGER_TRADING
 

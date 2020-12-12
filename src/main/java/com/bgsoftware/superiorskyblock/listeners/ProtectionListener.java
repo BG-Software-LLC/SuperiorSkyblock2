@@ -170,6 +170,8 @@ public final class ProtectionListener implements Listener {
         else if(blockType == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
         else if(blockType.name().equals("SOIL") || blockType.name().equals("FARMLAND"))
             islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
+        else if(blockType.name().equals("TURTLE_EGG"))
+            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
         else if(plugin.getGrid().getBlockAmount(clickedBlock) > 1) islandPermission = IslandPrivileges.BREAK;
         else islandPermission = IslandPrivileges.INTERACT;
 

@@ -64,6 +64,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege SET_WARP = IslandPrivilege.getByName("SET_WARP");
     public static IslandPrivilege SIGN_INTERACT = IslandPrivilege.getByName("SIGN_INTERACT");
     public static IslandPrivilege SPAWNER_BREAK = IslandPrivilege.getByName("SPAWNER_BREAK");
+    public static IslandPrivilege TURTLE_EGG_TRAMPING = getSafe("TURTLE_EGG_TRAMPING");
     public static IslandPrivilege UNCOOP_MEMBER = IslandPrivilege.getByName("UNCOOP_MEMBER");
     public static IslandPrivilege USE = IslandPrivilege.getByName("USE");
     public static IslandPrivilege VALUABLE_BREAK = IslandPrivilege.getByName("VALUABLE_BREAK");
