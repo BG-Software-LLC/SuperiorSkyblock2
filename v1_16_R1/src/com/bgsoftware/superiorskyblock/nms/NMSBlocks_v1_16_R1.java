@@ -165,20 +165,23 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
 
         if(plugin.getSettings().lightsUpdate) {
             // Update lights for the blocks.
-            for (BlockData blockData : blockDataList) {
-                BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-                if (blockData.getBlockLightLevel() > 0) {
-                    try {
-                        ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
-                    } catch (Exception ignored) {}
+            // We use a delayed task to avoid null nibbles
+            Executor.sync(() -> {
+                for (BlockData blockData : blockDataList) {
+                    BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+                    if (blockData.getBlockLightLevel() > 0) {
+                        try {
+                            ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
+                        } catch (Exception ignored) { }
+                    }
+                    if(blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL){
+                        try {
+                            SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
+                                    blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
+                        } catch (Exception ignored) { }
+                    }
                 }
-                if(blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL){
-                    try {
-                        SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
-                                blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
-                    } catch (Exception ignored) { }
-                }
-            }
+            }, 10L);
         }
     }
 
