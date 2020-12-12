@@ -166,6 +166,7 @@ island-roles:
     - FARM_TRAMPING
     - FERTILIZE
     - FISH
+    - HORSE_INTERACT
     - INTERACT
     - ITEM_FRAME
     - LEASH

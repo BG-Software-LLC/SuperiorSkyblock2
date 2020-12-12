@@ -521,6 +521,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("FERTILIZE");
         IslandPrivilege.register("FISH");
         IslandPrivilege.register("FLY");
+        IslandPrivilege.register("HORSE_INTERACT");
         IslandPrivilege.register("INTERACT");
         IslandPrivilege.register("INVITE_MEMBER");
         IslandPrivilege.register("ISLAND_CHEST");

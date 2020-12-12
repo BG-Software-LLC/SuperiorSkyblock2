@@ -34,6 +34,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege FERTILIZE = IslandPrivilege.getByName("FERTILIZE");
     public static IslandPrivilege FISH = IslandPrivilege.getByName("FISH");
     public static IslandPrivilege FLY = IslandPrivilege.getByName("FLY");
+    public static IslandPrivilege HORSE_INTERACT = IslandPrivilege.getByName("HORSE_INTERACT");
     public static IslandPrivilege INTERACT = IslandPrivilege.getByName("INTERACT");
     public static IslandPrivilege INVITE_MEMBER = IslandPrivilege.getByName("INVITE_MEMBER");
     public static IslandPrivilege ISLAND_CHEST = IslandPrivilege.getByName("ISLAND_CHEST");

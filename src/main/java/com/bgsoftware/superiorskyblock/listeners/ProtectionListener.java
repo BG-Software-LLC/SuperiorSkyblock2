@@ -25,6 +25,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
+import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LeashHitch;
@@ -443,7 +444,7 @@ public final class ProtectionListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
         ItemStack usedItem = e.getPlayer().getItemInHand();
 
-        boolean villagerTrading = false;
+        boolean closeInventory = false;
 
         IslandPrivilege islandPrivilege;
 
@@ -456,17 +457,22 @@ public final class ProtectionListener implements Listener {
         }
         else if(e.getRightClicked() instanceof Villager){
             islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
-            villagerTrading = true;
+            closeInventory = true;
+        }
+        else if(e.getRightClicked() instanceof Horse){
+            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
+            closeInventory = true;
         }
         else return;
 
         if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
-            if(villagerTrading) {
+            if(closeInventory) {
                 Executor.sync(() -> {
                     Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
-                    if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT)
+                    if(openInventory != null && (openInventory.getType() == InventoryType.MERCHANT ||
+                            openInventory.getType() == InventoryType.CHEST))
                         e.getPlayer().closeInventory();
                 }, 1L);
             }
@@ -487,7 +493,6 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             e.getWhoClicked().closeInventory();
         }
-
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
