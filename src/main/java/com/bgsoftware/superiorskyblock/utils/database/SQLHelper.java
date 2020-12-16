@@ -51,10 +51,14 @@ public final class SQLHelper {
                 String dbName = plugin.getSettings().databaseMySQLDBName;
                 String userName = plugin.getSettings().databaseMySQLUsername;
                 String password = plugin.getSettings().databaseMySQLPassword;
-                boolean useSSL = plugin.getSettings().databaseMySQLSSL;
                 int port = plugin.getSettings().databaseMySQLPort;
 
+                boolean useSSL = plugin.getSettings().databaseMySQLSSL;
+                boolean publicKeyRetrieval = plugin.getSettings().databaseMySQLPublicKeyRetrieval;
+
                 config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName + "?useSSL=" + useSSL);
+                config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=%b&allowPublicKeyRetrieval=%b",
+                        address, port, dbName, useSSL, publicKeyRetrieval));
                 config.setUsername(userName);
                 config.setPassword(password);
                 config.setMinimumIdle(5);

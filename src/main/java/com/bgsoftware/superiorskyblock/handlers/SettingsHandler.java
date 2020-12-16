@@ -40,6 +40,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final String databaseMySQLPassword;
     public final String databaseMySQLPrefix;
     public final boolean databaseMySQLSSL;
+    public final boolean databaseMySQLPublicKeyRetrieval;
     public final int maxIslandSize;
     public final String islandCommand;
     public final int defaultIslandSize;
@@ -198,6 +199,7 @@ public final class SettingsHandler extends AbstractHandler {
         databaseMySQLPassword = cfg.getString("database.password");
         databaseMySQLPrefix = cfg.getString("database.prefix");
         databaseMySQLSSL = cfg.getBoolean("database.useSSL");
+        databaseMySQLPublicKeyRetrieval = cfg.getBoolean("database.allowPublicKeyRetrieval");
 
         calcInterval = cfg.getLong("calc-interval", 6000);
         islandCommand = cfg.getString("island-command", "island,is,islands");
