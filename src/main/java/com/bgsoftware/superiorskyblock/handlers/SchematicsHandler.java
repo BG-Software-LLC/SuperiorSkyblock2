@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -24,7 +23,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -140,11 +138,6 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, Runnable runnable){
-        if(Bukkit.isPrimaryThread() && ServerVersion.isLessThan(ServerVersion.v1_14)){
-            Executor.async(() -> saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName, runnable));
-            return;
-        }
-
         SuperiorSkyblockPlugin.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
                 ", Pos #2: " + LocationUtils.getLocation(pos2) + ", OffsetX: " + offsetX + ", OffsetY: " + offsetY +
                 ", OffsetZ: " + offsetZ + ", Yaw: " + yaw + ", Pitch: " + pitch + ", Name: " + schematicName);
