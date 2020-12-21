@@ -2,15 +2,11 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.ArrayList;
 
 public final class BlockData {
 
@@ -91,16 +87,9 @@ public final class BlockData {
             if (inventoryType != null) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(inventoryType);
-                    Registry<Integer, ItemStack> containerContents = plugin.getSettings().defaultContainersContents.get(containerType);
-                    if(containerContents != null) {
-                        ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
-                        containerContents.entries().forEach(itemEntry -> {
-                            CompoundTag itemCompound = plugin.getNMSAdapter().getNMSCompound(itemEntry.getValue());
-                            itemCompound.setByte("Slot", (byte) (int) itemEntry.getKey());
-                            items.addTag(itemCompound);
-                        });
-                        clonedTileEntity.setTag("Items", items);
-                    }
+                    ListTag items = plugin.getSettings().defaultContainersContents.get(containerType);
+                    if(items != null)
+                        clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
                 }catch (Exception ignored){}
             }
         }

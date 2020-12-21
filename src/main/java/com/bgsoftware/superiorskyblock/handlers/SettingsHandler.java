@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +133,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean immuneToPVPWhenTeleport;
     public final List<String> blockedVisitorsCommands;
     public final boolean defaultContainersEnabled;
-    public final Registry<InventoryType, Registry<Integer, ItemStack>> defaultContainersContents;
+    public final Registry<InventoryType, ListTag> defaultContainersContents;
     public final List<String> defaultSignLines;
     public final Registry<String, List<String>> eventCommands;
     public final long warpsWarmup;
@@ -351,17 +354,23 @@ public final class SettingsHandler extends AbstractHandler {
             for (String container : cfg.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
-                    Registry<Integer, ItemStack> containerContents = Registry.createRegistry();
+                    ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
+                    defaultContainersContents.add(containerType, items);
+
                     ConfigurationSection containerSection = cfg.getConfigurationSection("default-containers.containers." + container);
                     for (String slot : containerSection.getKeys(false)) {
                         try {
+                            // Reading the item from the config
                             ItemStack itemStack = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot)).build();
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
-                            containerContents.add(Integer.parseInt(slot), itemStack);
-                        } catch (Exception ignored) {
-                        }
+
+                            // Parsing it into compound tag
+                            CompoundTag itemCompound = plugin.getNMSAdapter().getNMSCompound(itemStack);
+                            itemCompound.setByte("Slot", Byte.parseByte(slot));
+
+                            items.addTag(itemCompound);
+                        } catch (Exception ignored) {}
                     }
-                    defaultContainersContents.add(containerType, containerContents);
                 } catch (IllegalArgumentException ex) {
                     SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
                 }
