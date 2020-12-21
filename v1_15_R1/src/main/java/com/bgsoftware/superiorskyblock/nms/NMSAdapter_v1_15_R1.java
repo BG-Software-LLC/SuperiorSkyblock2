@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
@@ -20,6 +21,7 @@ import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_15_R1.PlayerInteractManager;
 import net.minecraft.server.v1_15_R1.SoundCategory;
@@ -301,6 +303,11 @@ public final class NMSAdapter_v1_15_R1 implements NMSAdapter {
     @Override
     public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
         return IRegistry.ITEM.getKey(CraftItemStack.asNMSCopy(itemStack).getItem()).toString();
+    }
+
+    @Override
+    public CompoundTag getNMSCompound(ItemStack bukkitItem) {
+        return CompoundTag.fromNBT(CraftItemStack.asNMSCopy(bukkitItem).save(new NBTTagCompound()));
     }
 
     @Override

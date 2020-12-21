@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -16,6 +17,7 @@ import net.minecraft.server.v1_8_R1.EnumWorldBorderAction;
 import net.minecraft.server.v1_8_R1.Item;
 import net.minecraft.server.v1_8_R1.MinecraftKey;
 import net.minecraft.server.v1_8_R1.MinecraftServer;
+import net.minecraft.server.v1_8_R1.NBTTagCompound;
 import net.minecraft.server.v1_8_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R1.PacketPlayOutTitle;
 import net.minecraft.server.v1_8_R1.PacketPlayOutWorldBorder;
@@ -257,6 +259,11 @@ public final class NMSAdapter_v1_8_R1 implements NMSAdapter {
     public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
         MinecraftKey minecraftKey = (MinecraftKey) Item.REGISTRY.c(CraftItemStack.asNMSCopy(itemStack).getItem());
         return minecraftKey == null ? "minecraft:air" : minecraftKey.toString();
+    }
+
+    @Override
+    public CompoundTag getNMSCompound(ItemStack bukkitItem) {
+        return CompoundTag.fromNBT(CraftItemStack.asNMSCopy(bukkitItem).save(new NBTTagCompound()));
     }
 
     @Override

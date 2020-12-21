@@ -84,6 +84,10 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         setTag(key, new IntTag(value));
     }
 
+    public void setShort(String key, short value){
+        setTag(key, new ShortTag(value));
+    }
+
     public void setByte(String key, byte value){
         setTag(key, new ByteTag(value));
     }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -80,6 +81,8 @@ public interface NMSAdapter {
     }
 
     String getMinecraftKey(ItemStack itemStack);
+
+    CompoundTag getNMSCompound(ItemStack itemStack);
 
     boolean isAnimalFood(ItemStack itemStack, Animals animals);
 

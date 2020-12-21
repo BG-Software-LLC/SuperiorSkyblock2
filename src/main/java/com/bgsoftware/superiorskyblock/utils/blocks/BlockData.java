@@ -95,9 +95,7 @@ public final class BlockData {
                     if(containerContents != null) {
                         ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
                         containerContents.entries().forEach(itemEntry -> {
-                            CompoundTag itemCompound = new CompoundTag();
-                            itemCompound.setString("id", plugin.getNMSAdapter().getMinecraftKey(itemEntry.getValue()));
-                            itemCompound.setByte("Count", (byte) itemEntry.getValue().getAmount());
+                            CompoundTag itemCompound = plugin.getNMSAdapter().getNMSCompound(itemEntry.getValue());
                             itemCompound.setByte("Slot", (byte) (int) itemEntry.getKey());
                             items.addTag(itemCompound);
                         });
