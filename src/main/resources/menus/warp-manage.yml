@@ -37,6 +37,10 @@ items:
     lore:
       - '&f '
       - '&f '
+      - '&7&oYou can use the following placeholders:'
+      - '&7&o{0} is used for the warp''s name.'
+      - '&7&o{1} is used for the warp''s location.'
+      - '&7&o{2} is used for the warp''s public status.'
       - '&7&o(( &f&oClick &7&oto edit the icon. ))'
   '$':
     type: ENDER_PEARL
