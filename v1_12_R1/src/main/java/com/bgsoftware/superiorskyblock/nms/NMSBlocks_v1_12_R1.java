@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.BlockLeaves;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.Chunk;
@@ -112,9 +111,6 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
     private void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
-
-        if(blockData.getBlock() instanceof BlockLeaves)
-            blockData = blockData.set(BlockLeaves.DECAYABLE, false);
 
         if(blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
