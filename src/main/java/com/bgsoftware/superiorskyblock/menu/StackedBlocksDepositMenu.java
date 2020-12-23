@@ -84,11 +84,6 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
             if (success) {
                 plugin.getNMSAdapter().playPlaceSound(stackedBlock);
             }
-            else {
-                ItemStack toDrop = blockItem.clone();
-                toDrop.setAmount(depositAmount);
-                stackedBlock.getWorld().dropItemNaturally(stackedBlock, toDrop);
-            }
         }
     }
 
