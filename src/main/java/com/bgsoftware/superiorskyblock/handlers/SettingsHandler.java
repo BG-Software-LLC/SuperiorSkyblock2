@@ -211,6 +211,12 @@ public final class SettingsHandler extends AbstractHandler {
         defaultBlockLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.block-limits")){
             String[] sections = line.split(":");
+
+            if(sections.length < 2){
+                SuperiorSkyblockPlugin.log("&cCouldn't parse block limit '" + line + "', skipping...");
+                continue;
+            }
+
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultBlockLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
@@ -218,6 +224,12 @@ public final class SettingsHandler extends AbstractHandler {
         defaultEntityLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.entity-limits")){
             String[] sections = line.split(":");
+
+            if(sections.length < 2){
+                SuperiorSkyblockPlugin.log("&cCouldn't parse entity limit '" + line + "', skipping...");
+                continue;
+            }
+
             String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
             defaultEntityLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
