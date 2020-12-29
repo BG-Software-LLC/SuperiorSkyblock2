@@ -436,7 +436,7 @@ public final class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onEntityInteract(PlayerInteractAtEntityEvent e){
+    public void onEntityInteract(PlayerInteractEntityEvent e){
         if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
             return;
 
