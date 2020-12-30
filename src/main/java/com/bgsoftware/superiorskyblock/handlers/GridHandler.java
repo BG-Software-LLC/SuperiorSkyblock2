@@ -450,10 +450,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             blockFailed = true;
         }
 
-        StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
-        Executor.sync(stackedBlock::updateName, 5L);
-
         if(amount > 1) {
+            StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
+            Executor.sync(stackedBlock::updateName, 5L);
+
             if (originalBlock == null) {
                 Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
                         .setString(block.getWorld().getName())
@@ -472,7 +472,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         .setInt(block.getZ())
                         .execute(true);
             }
-        }else{
+        }
+        else{
+            stackedBlocks.removeStackedBlock(SBlockPosition.of(block.getLocation()));
+
             Query.STACKED_BLOCKS_DELETE.getStatementHolder(null)
                     .setString(block.getWorld().getName())
                     .setInt(block.getX())
