@@ -40,7 +40,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
     @Override
     public void onPlayerClick(InventoryClickEvent event, IslandWarp islandWarp) {
-        if(hasManagePermission && event.getClick().isRightClick()){
+        if(hasManagePermission && event != null && event.getClick().isRightClick()){
             previousMove = false;
             MenuWarpManage.openInventory(superiorPlayer, this, islandWarp);
         }
@@ -130,7 +130,8 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, WarpCategory warpCategory){
         MenuWarps menuWarps = new MenuWarps(superiorPlayer, warpCategory);
-        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(warpCategory, superiorPlayer)){
+        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(warpCategory, superiorPlayer) &&
+                !warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP)){
             menuWarps.onPlayerClick(null, getOnlyOneItem(warpCategory, superiorPlayer));
         }
         else {

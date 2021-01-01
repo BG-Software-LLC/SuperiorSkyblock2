@@ -192,13 +192,18 @@ public final class FileUtils {
     }
 
     public static void copyResource(String resourcePath){
-        File file = new File(plugin.getDataFolder(), resourcePath);
+        String fixedPath = resourcePath + ".jar";
+        File dstFile = new File(plugin.getDataFolder(), fixedPath);
 
-        if(file.exists())
+        if(dstFile.exists())
             //noinspection ResultOfMethodCallIgnored
-            file.delete();
+            dstFile.delete();
 
         plugin.saveResource(resourcePath, true);
+
+        File file = new File(plugin.getDataFolder(), resourcePath);
+        //noinspection ResultOfMethodCallIgnored
+        file.renameTo(dstFile);
     }
 
     public static void saveResource(String resourcePath){

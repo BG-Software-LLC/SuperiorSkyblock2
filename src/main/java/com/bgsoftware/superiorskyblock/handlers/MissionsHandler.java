@@ -57,13 +57,13 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         if(!missionsDict.exists())
             missionsDict.mkdirs();
 
-        FileUtils.copyResource("missions/BlocksMissions.jar");
-        FileUtils.copyResource("missions/CraftingMissions.jar");
-        FileUtils.copyResource("missions/EnchantingMissions.jar");
-        FileUtils.copyResource("missions/IslandMissions.jar");
-        FileUtils.copyResource("missions/ItemsMissions.jar");
-        FileUtils.copyResource("missions/KillsMissions.jar");
-        FileUtils.copyResource("missions/StatisticsMissions.jar");
+        FileUtils.copyResource("missions/BlocksMissions");
+        FileUtils.copyResource("missions/CraftingMissions");
+        FileUtils.copyResource("missions/EnchantingMissions");
+        FileUtils.copyResource("missions/IslandMissions");
+        FileUtils.copyResource("missions/ItemsMissions");
+        FileUtils.copyResource("missions/KillsMissions");
+        FileUtils.copyResource("missions/StatisticsMissions");
 
         if(!file.exists())
             FileUtils.saveResource("missions/missions.yml");

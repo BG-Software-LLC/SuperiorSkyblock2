@@ -1,0 +1,137 @@
+group 'SuperiorSkyblock'
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'base'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'maven-publish'
+
+version = "1.5.1"
+
+buildscript {
+    repositories {
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    repositories {
+        maven { url 'https://repo.bg-software.com/repository/nms/' }
+        maven { url 'https://repo.bg-software.com/repository/public-libs/' }
+    }
+
+    shadowJar {
+        archiveName = "${project.name}.jar"
+        destinationDir = file("../archive/")
+    }
+
+    build {
+        dependsOn shadowJar
+    }
+}
+
+repositories {
+    maven { url 'https://repo.bg-software.com/repository/nms/' }
+    maven { url 'https://repo.bg-software.com/repository/api/' }
+    maven { url 'https://repo.bg-software.com/repository/public-libs/' }
+
+    String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
+    String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
+
+    if(mavenUsername != null && mavenPassword != null) {
+        maven {
+            url 'https://repo.bg-software.com/repository/private-libs/'
+            credentials {
+                username mavenUsername
+                password mavenPassword
+            }
+        }
+    }
+
+}
+
+dependencies {
+    compile project(":API")
+    compile fileTree("archive")
+
+    compile 'com.zaxxer:HikariCP:latest'
+
+    // Spigot jars
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
+
+    // Plugin hooks
+    compileOnly 'gcspawners:AdvancedSpawners:latest'
+    compileOnly 'com.github.games647:ChangeSkin:latest'
+    compileOnly 'com.zrips:CMI:latest'
+    compileOnly 'net.coreprotect:CoreProtect-6:latest'
+    compileOnly 'com.songoda:EpicSpawners-6:latest'
+    compileOnly 'com.earth2me:Essentials-2.16:latest'
+    compileOnly 'com.boydti:FastAsyncWorldEdit:latest'
+    compileOnly 'me.jet315:JetsMinions:latest'
+    compileOnly 'me.robin:LeaderHeads:latest'
+    compileOnly 'net.luckperms:LuckPerms:latest'
+    compileOnly 'net.luckperms:LuckPerms:latest'
+    compileOnly 'com.vk2gpz:MergedSpawner:latest'
+    compileOnly 'be.maximvdw:MVdWPlaceholderAPI:latest'
+    compileOnly 'me.clip:PlaceholderAPI:latest'
+    compileOnly 'skyblock.hassan:PvpingSpawners:latest'
+    compileOnly 'dev.rosewood:RoseStacker:latest'
+    compileOnly 'net.brcdev:ShopGUIPlus-1.20:latest'
+    compileOnly 'de.candc:SilkSpawners:latest'
+    compileOnly 'skinsrestorer:SkinsRestorer:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
+    compileOnly 'de.myzelyam:SuperVanish:latest'
+    compileOnly 'com.songoda:UltimateStacker:latest'
+    compileOnly 'org.kitteh:VanishNoPacket:latest'
+    compileOnly 'net.milkbowl:Vault:latest'
+    compileOnly 'com.bgsoftware:WildStackerAPI:latest'
+}
+
+jar {
+    from {
+        for (File file : new File("archive").listFiles()) {
+            zipTree(file)
+        }
+    }
+
+    processResources {
+        outputs.upToDateWhen {false}
+        eachFile { details ->
+            if (details.name.contentEquals('plugin.yml')) {
+                filter { String line ->
+                    line.replace('${project.version}', version)
+                }
+            }
+        }
+    }
+
+}
+
+shadowJar {
+    dependsOn(jar)
+    archiveName = rootProject.name + ".jar"
+    destinationDir = file("./target/")
+    from sourceSets.getByName("main").output
+    configurations = [project.configurations.getByName("runtimeClasspath")]
+}
+
+build {
+    dependsOn shadowJar
+    dependsOn publish
+}
+publish.shouldRunAfter shadowJar
+shadowJar.shouldRunAfter build
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+}

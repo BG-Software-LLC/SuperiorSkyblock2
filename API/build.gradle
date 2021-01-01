@@ -1,0 +1,5 @@
+group 'API'
+
+dependencies {
+    compileOnly "org.spigotmc:v1_8_R1:latest"
+}
