@@ -61,6 +61,7 @@ dependencies {
     compile fileTree("archive")
 
     compile 'com.zaxxer:HikariCP:latest'
+    compile 'org.slf4j:SLF4J:latest'
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
