@@ -19,7 +19,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -297,6 +300,30 @@ public final class FileUtils {
         } catch (Throwable ignored) { }
 
         return list;
+    }
+
+    private static final Object fileMutex = new Object();
+
+    public static void replaceString(File file, String str, String replace){
+        synchronized (fileMutex) {
+            StringBuilder stringBuilder = new StringBuilder();
+
+            try {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null)
+                        stringBuilder.append("\n").append(line);
+                }
+
+                if (stringBuilder.length() > 0) {
+                    try (FileWriter writer = new FileWriter(file)) {
+                        writer.write(stringBuilder.substring(1).replace(str, replace));
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
 }
