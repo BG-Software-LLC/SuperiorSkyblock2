@@ -126,6 +126,10 @@ public final class FileUtils {
             }
         }
 
+        if(section.contains("customModel")){
+            itemBuilder.withCustomModel(section.getInt("customModel"));
+        }
+
         return itemBuilder;
     }
 

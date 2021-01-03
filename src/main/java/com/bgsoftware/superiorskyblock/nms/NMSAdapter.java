@@ -21,6 +21,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
@@ -89,5 +90,9 @@ public interface NMSAdapter {
     void sendActionBar(Player player, String message);
 
     void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut);
+
+    default void setCustomModel(ItemMeta itemMeta, int customModel){
+
+    }
 
 }
