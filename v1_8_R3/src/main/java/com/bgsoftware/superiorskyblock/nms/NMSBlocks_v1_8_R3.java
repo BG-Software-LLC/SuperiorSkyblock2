@@ -50,6 +50,7 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -415,15 +416,15 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
         private static int random = ThreadLocalRandom.current().nextInt();
 
-        private final Island island;
-        private final Chunk chunk;
+        private final WeakReference<Island> island;
+        private final WeakReference<Chunk> chunk;
         private final int chunkX, chunkZ;
 
         private int currentTick = 0;
 
         private CropsTickingTileEntity(Island island, Chunk chunk){
-            this.island = island;
-            this.chunk = chunk;
+            this.island = new WeakReference<>(island);
+            this.chunk = new WeakReference<>(chunk);
             this.chunkX = chunk.locX;
             this.chunkZ = chunk.locZ;
             a(chunk.getWorld());
@@ -435,6 +436,14 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         public void c() {
             if(++currentTick <= plugin.getSettings().cropsInterval)
                 return;
+
+            Chunk chunk = this.chunk.get();
+            Island island = this.island.get();
+
+            if(chunk == null || island == null){
+                world.tileEntityList.remove(this);
+                return;
+            }
 
             currentTick = 0;
 
