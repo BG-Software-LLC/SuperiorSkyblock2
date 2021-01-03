@@ -642,6 +642,12 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
             this.chunkZ = chunk.getPos().z;
             setWorld(chunk.getWorld());
             setPosition(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
+
+            try {
+                // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
+                setCurrentChunk(chunk);
+            }catch (Throwable ignored){}
+
             world.tileEntityListTick.add(this);
         }
 
