@@ -113,8 +113,29 @@ public final class SuperiorSkyblockAPI {
      * @param index the index to check
      * @return the island at the index. might be null.
      */
+    @Deprecated
     public static Island getIsland(int index){
         return plugin.getGrid().getIsland(index);
+    }
+
+    /**
+     * Get an island by it's name.
+     *
+     * @param islandName The name to check.
+     * @return The island with that name. May be null.
+     */
+    public static Island getIsland(String islandName){
+        return plugin.getGrid().getIsland(islandName);
+    }
+
+    /**
+     * Get an island by it's uuid.
+     *
+     * @param uuid The uuid of the island.
+     * @return The island with that UUID. May be null.
+     */
+    public static Island getIslandByUUID(UUID uuid){
+        return plugin.getGrid().getIslandByUUID(uuid);
     }
 
     /**
