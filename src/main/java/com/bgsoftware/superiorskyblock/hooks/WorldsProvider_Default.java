@@ -145,6 +145,12 @@ public final class WorldsProvider_Default implements WorldsProvider {
     }
 
     private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){
+        if(Bukkit.getWorld(worldName) != null){
+            throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
+                    "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
+                    "- Your level-name property in server.properties is set to " + worldName + ".");
+        }
+
         World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(plugin.getGenerator()).createWorld();
         world.setDifficulty(difficulty);
 
