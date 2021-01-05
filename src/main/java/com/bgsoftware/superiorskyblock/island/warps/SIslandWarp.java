@@ -14,21 +14,23 @@ import java.util.Objects;
 
 public final class SIslandWarp implements IslandWarp {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     public static ItemBuilder DEFAULT_WARP_ICON;
 
     private final WarpCategory warpCategory;
 
     private String name;
     private Location location;
-    private boolean privateFlag = true;
+    private boolean privateFlag;
     private ItemStack icon;
-    private double price = 0D;
 
     public SIslandWarp(String name, Location location, WarpCategory warpCategory){
         this.name = name;
         this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
                 location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
         this.warpCategory = warpCategory;
+        this.privateFlag = !plugin.getSettings().publicWarps;
     }
 
     @Override

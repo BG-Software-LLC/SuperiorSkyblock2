@@ -179,6 +179,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean warpCategories;
     public final boolean physicsListener;
     public final double chargeOnWarp;
+    public final boolean publicWarps;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -448,6 +449,7 @@ public final class SettingsHandler extends AbstractHandler {
         warpCategories = cfg.getBoolean("warp-categories", true);
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
+        publicWarps = cfg.getBoolean("public-warps");
     }
 
     @Override

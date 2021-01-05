@@ -722,3 +722,6 @@ physics-listener: true
 # Should players be charged when using island warps?
 # You can set an amount of money to charge, 0 to disable the feature.
 charge-on-warp: 0
+
+# Should island warps be public by default?
+public-warps: false
