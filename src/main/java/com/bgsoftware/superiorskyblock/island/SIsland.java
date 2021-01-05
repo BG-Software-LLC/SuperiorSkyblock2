@@ -1138,6 +1138,8 @@ public final class SIsland implements Island {
             }).forEach(superiorPlayer::resetMission);
         });
 
+        plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance());
+
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
         resetChunks(true);
