@@ -372,6 +372,11 @@ spawners-provider: 'AUTO'
 # Should inventories of island members get cleared after disbanding their island?
 disband-inventory-clear: true
 
+# Should island bank balance be refunded upon island disband?
+# When set to 100, all the balance will be refunded.
+# When set to 0, no balance will be refunded.
+disband-refund: 0
+
 # All settings related to island names.
 island-names:
   # Should creation of islands will ask for name (/is create <name>)?

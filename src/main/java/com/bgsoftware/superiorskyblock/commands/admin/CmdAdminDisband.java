@@ -3,12 +3,14 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +68,11 @@ public final class CmdAdminDisband implements IAdminIslandCommand {
                 Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());
             else
                 Locale.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
+
+            if(plugin.getSettings().disbandRefund > 0 && island.getOwner().isOnline()) {
+                Locale.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
+                        .getBalance().multiply(BigDecimal.valueOf(plugin.getSettings().disbandRefund))));
+            }
 
             island.disbandIsland();
         }

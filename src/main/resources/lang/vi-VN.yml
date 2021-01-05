@@ -335,6 +335,7 @@ DISBAND_ANNOUNCEMENT: '&e&lĐảo Thần | &7Đảo của bạn đã bị giải
 DISBAND_GIVE: '&e&lĐảo Thần | &7Bạn đã nhận được {0} giải tán.'
 DISBAND_GIVE_ALL: '&e&lĐảo Thần | &7Bạn đã đưa số lần {0} tạo lại đảo cho tất cả người chơi.'
 DISBAND_GIVE_OTHER: '&e&lĐảo Thần | &7Bạn đã cho {0} giải tán đến {1}.'
+DISBAND_ISLAND_BALANCE_REFUND: '&7&oYour island was disbanded and ${0} dollars were refunded to your account from the island bank'
 DISBAND_SET: '&e&lĐảo Thần | &7Số lượng giải tán của bạn đã được đặt thành {0}.'
 DISBAND_SET_ALL: '&e&lĐảo Thần | &7Bạn đặt số lượng tạo lại đảo của tất cả người chơi thành {0}.'
 DISBAND_SET_OTHER: '&e&lĐảo Thần | &7Bạn đã đặt số lần giải tán của {0} thành {1}.'
