@@ -103,9 +103,9 @@ COMMAND_ARGUMENT_EFFECT: effet-de-potion
 COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: entité
 COMMAND_ARGUMENT_TIME: temps
-COMMAND_ARGUMENT_TITLE_DURATION: 'duration'
-COMMAND_ARGUMENT_TITLE_FADE_IN: 'fade-in'
-COMMAND_ARGUMENT_TITLE_FADE_OUT: 'fade-out'
+COMMAND_ARGUMENT_TITLE_DURATION: 'durée'
+COMMAND_ARGUMENT_TITLE_FADE_IN: 'apparition-graduelle'
+COMMAND_ARGUMENT_TITLE_FADE_OUT: 'disparition-graduelle'
 COMMAND_ARGUMENT_ISLAND: ile
 COMMAND_ARGUMENT_ISLAND_NAME: nom-de-l'ile
 COMMAND_ARGUMENT_ISLAND_ROLE: rôle-sur-l'île
@@ -132,7 +132,7 @@ COMMAND_ARGUMENT_SIZE: taille
 COMMAND_ARGUMENT_UPGRADE_NAME: nom-de-l'amélioration
 COMMAND_ARGUMENT_VALUE: valeur
 COMMAND_ARGUMENT_WARP_NAME: nom-du-warp
-COMMAND_ARGUMENT_WARP_CATEGORY: 'warp-category'
+COMMAND_ARGUMENT_WARP_CATEGORY: 'catégorie-de-warp'
 COMMAND_ARGUMENT_WORLD: monde
 COMMAND_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez patienter {0} avant de réutiliser cette commande.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: Activer ou désactiver les informations de débogage.
@@ -153,8 +153,8 @@ COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: Augmenter le multiplicateur de taux
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: Augmenter la limite de membres pour l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_ADD_WARPS_LIMIT: Augmenter la limite de warps pour l'île du joueur spécifié.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Se téléporter sur l'île d'un joueur.
-COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'
-COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Send to all island members a title.'
+COMMAND_DESCRIPTION_ADMIN_TITLE: 'Envoyer un titre au joueur.'
+COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Envoyer un titre à tous les membres de l''île.'
 COMMAND_DESCRIPTION_ADMIN_PURGE: Purger les îles.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Augmenter une amélioration pour l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Octroyer un bonus à un joueur.
@@ -323,8 +323,8 @@ GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour 
 GENERATOR_UPDATED_ALL: '&e&lIle | &7Taux du générateur modifié sur {0} pour toutes les îles.'
 GLOBAL_MESSAGE_SENT: '&e&lIle | &7Message envoyé à tous les membres de l''île de {0} !'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIle | &7Message envoyé à tous les membres de l''île {0} !'
-GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'
-GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the title!'
+GLOBAL_TITLE_SENT: '&e&lIle | &7Envoi du titre aux membres de l''île de {0} !'
+GLOBAL_TITLE_SENT_NAME: '&e&lIle | &7Envoi du titre à tous les membres de l''île {0} !'
 GOT_BANNED: '&e&lIle | &7Vous avez été BANNI de l''île de {0}.'
 GOT_DEMOTED: '&e&lIle | &7Vous avez été rétrogradé au rôle de {0} sur votre île.'
 GOT_EXPELLED: '&e&lIle | &7&oVous avez été exclu de l''île par {0}.'
@@ -373,8 +373,8 @@ INVALID_SETTINGS: |
   &c&lErreur | &7Aucun paramètre ne porte le nom: {0}.
   &c&lErreur | &7Paramètres d'île: {1}
 INVALID_SIZE: '&c&lErreur | &7Taille invalide: {0}.'
-INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
-INVALID_TITLE: '&c&lError | &7Invalid title entered.'
+INVALID_SLOT: '&c&lErreur | &7Slot invalide {0}.'
+INVALID_TITLE: '&c&lErreur | &7Titre spécifié invalide.'
 INVALID_TOGGLE_MODE: '&c&lErreur | &7Impossible d''Activer/Désactiver: {0}.'
 INVALID_UPGRADE: |
   &c&lErreur | &7Aucune amélioration ne porte le nom {0}.
@@ -637,7 +637,7 @@ TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lErreur | &7Vous n''êtes pas sûr votre �
 TELEPORT_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas vous téléporter en dehors de votre zone de protection.'
 TELEPORT_WARMUP: '&7&oVous serez téléporté dans {0}... Ne bougez pas !'
 TELEPORT_WARMUP_CANCEL: '&7&oVous vous êtes déplacé, la téléportation a donc été annulée.'
-TITLE_SENT: '&e&lIsland | &7Successfully sent {0} the title!'
+TITLE_SENT: '&e&lIle | &7Envoie du titré {0} effectué !'
 TELEPORTED_FAILED: '&e&lIle | &7Il semblerait que cette île ne soit pas sécurisée. Veuillez contacter un Administrateur.'
 TELEPORTED_SUCCESS: '&e&lIle | &7Vous avez été téléporté sur votre île.'
 TELEPORTED_TO_WARP: '&e&lIle | &7Vous avez été télporté au warp de l''île.'
