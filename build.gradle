@@ -57,8 +57,8 @@ repositories {
 }
 
 dependencies {
-    compile project(":API")
     compile fileTree("archive")
+    compile project(":API")
 
     compile 'com.zaxxer:HikariCP:latest'
     compile 'org.slf4j:SLF4J:latest'
@@ -118,7 +118,18 @@ jar {
 
 shadowJar {
     dependsOn(jar)
-    archiveName = rootProject.name + ".jar"
+
+    if(System.getenv("BUILD_NUMBER") == null){
+        archiveName = rootProject.name + ".jar"
+    }
+    else{
+        archiveName = rootProject.name + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
+    }
+
+    delete fileTree('./target/') {
+        exclude archiveName
+    }
+
     destinationDir = file("./target/")
     from sourceSets.getByName("main").output
     configurations = [project.configurations.getByName("runtimeClasspath")]

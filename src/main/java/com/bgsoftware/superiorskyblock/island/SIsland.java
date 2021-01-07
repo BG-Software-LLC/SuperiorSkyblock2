@@ -1138,6 +1138,9 @@ public final class SIsland implements Island {
             }).forEach(superiorPlayer::resetMission);
         });
 
+        if(plugin.getSettings().disbandRefund > 0)
+            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(BigDecimal.valueOf(plugin.getSettings().disbandRefund)));
+
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
         resetChunks(true);
@@ -1506,6 +1509,18 @@ public final class SIsland implements Island {
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
                 .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message, false));
+    }
+
+    @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
+        SuperiorSkyblockPlugin.debug("Action: Send Title, Island: " + owner.getName() + ", Ignored Members: " + Arrays.asList(ignoredMembers) + ", Title: " + title + ", Subtitle: " + subtitle);
+
+        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> plugin.getNMSAdapter().sendTitle(superiorPlayer.asPlayer(),
+                        title, subtitle, fadeIn, duration, fadeOut));
     }
 
     @Override

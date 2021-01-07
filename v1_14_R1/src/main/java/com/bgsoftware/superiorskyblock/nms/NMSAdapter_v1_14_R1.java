@@ -51,6 +51,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
@@ -298,6 +299,11 @@ public final class NMSAdapter_v1_14_R1 implements NMSAdapter {
     @Override
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
         player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
+    }
+
+    @Override
+    public void setCustomModel(ItemMeta itemMeta, int customModel) {
+        itemMeta.setCustomModelData(customModel);
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

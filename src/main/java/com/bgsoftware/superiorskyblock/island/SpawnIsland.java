@@ -674,6 +674,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
+
+    }
+
+    @Override
     public boolean isBeingRecalculated() {
         return false;
     }

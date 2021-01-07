@@ -209,6 +209,11 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
+    public ItemBuilder withCustomModel(int customModel){
+        plugin.getNMSAdapter().setCustomModel(itemMeta, customModel);
+        return this;
+    }
+
     public ItemMeta getItemMeta(){
         return itemMeta;
     }

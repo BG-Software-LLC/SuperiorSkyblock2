@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
@@ -37,6 +38,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -711,6 +713,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.disbands = other.getDisbands();
         this.borderColor = other.getBorderColor();
         this.lastTimeStatus = other.getLastTimeStatus();
+
+        // We want to convert the data of the missions data file
+        Executor.async(() -> FileUtils.replaceString(new File(plugin.getDataFolder(), "missions/_data.yml"),
+                other.getUniqueId() + "", uuid + ""));
+
         playerDataHandler.executeUpdateStatement(true);
         ((SPlayerDataHandler) other.getDataHandler()).executeDeleteStatement(true);
     }

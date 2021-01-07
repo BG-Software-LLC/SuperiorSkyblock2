@@ -699,6 +699,17 @@ public interface Island extends Comparable<Island> {
     void sendMessage(String message, UUID... ignoredMembers);
 
     /**
+     * Send a plain message to all the members of the island.
+     * @param title The main title to send, may be null.
+     * @param subtitle The sub title to send, may be null.
+     * @param fadeIn The fade-in duration in ticks.
+     * @param duration The title duration in ticks.
+     * @param fadeOut The fade-out duration in ticks.
+     * @param ignoredMembers An array of ignored members.
+     */
+    void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
+
+    /**
      * Checks whether or not the island is being recalculated currently.
      */
     boolean isBeingRecalculated();

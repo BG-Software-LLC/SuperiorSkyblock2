@@ -126,6 +126,9 @@ COMMAND_ARGUMENT_SCHEMATIC_NAME: 地图文件名
 COMMAND_ARGUMENT_SETTINGS: 设置
 COMMAND_ARGUMENT_SIZE: 尺寸
 COMMAND_ARGUMENT_TIME: 时间
+COMMAND_ARGUMENT_TITLE_DURATION: 'duration'
+COMMAND_ARGUMENT_TITLE_FADE_IN: 'fade-in'
+COMMAND_ARGUMENT_TITLE_FADE_OUT: 'fade-out'
 COMMAND_ARGUMENT_UPGRADE_NAME: 升级项目
 COMMAND_ARGUMENT_VALUE: 数值
 COMMAND_ARGUMENT_WARP_NAME: 地标名
@@ -207,6 +210,8 @@ COMMAND_DESCRIPTION_ADMIN_SPY: 切换聊天监视模式
 COMMAND_DESCRIPTION_ADMIN_STATS: 查看插件数据.
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: 传送到其他玩家的岛屿.
+COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'
+COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Send to all island members a title.'
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: 取消岛屿在排行榜的忽略.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: 为岛屿解锁新维度
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: 从一个岛屿银行中取款.
@@ -288,6 +293,7 @@ DISBAND_ANNOUNCEMENT: '&e&l岛屿 | &7你的岛屿被 &b{0} &7解散了.'
 DISBAND_GIVE: '&e&l岛屿 | &7你获得了 &b{0} &7次解散岛屿的机会.'
 DISBAND_GIVE_ALL: '&e&l岛屿 | &7你给予了全部玩家 &b{0} &7次解散岛屿的机会.'
 DISBAND_GIVE_OTHER: '&e&l岛屿 | &7你给予了 &b{1} {0} &7次解散岛屿的机会.'
+DISBAND_ISLAND_BALANCE_REFUND: '&7&oYour island was disbanded and ${0} dollars were refunded to your account from the island bank'
 DISBAND_SET: '&e&l岛屿 | &7你剩余解散岛屿次数为 &b{0}.'
 DISBAND_SET_ALL: '&e&l岛屿 | &7你将所有玩家的岛屿解散次数设置为 &b{0}.'
 DISBAND_SET_OTHER: '&e&l岛屿 | &7你将 &b{0} &7的岛屿解散次数设置为 &b{1}.'
@@ -317,6 +323,8 @@ GENERATOR_UPDATED_NAME: '&e&l岛屿 | &7成功将 &b{1} &7的岛屿矿机升级�
 GENERATOR_UPDATED_ALL: '&e&l岛屿 | &7成功将所有岛屿的矿机升级至 &e{0}级&7.'
 GLOBAL_MESSAGE_SENT: '&e&l岛屿 | &7成功给 &b{0} &7岛屿的所有成员发送信息！'
 GLOBAL_MESSAGE_SENT_NAME: '&e&l岛屿 | &7成功给 &b{0} &7岛屿的所有成员发送信息！'
+GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'
+GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the title!'
 GOT_BANNED: '&e&l岛屿 | &7你被 &b{0} &7的岛屿禁封了！将无法再进入他的岛屿.'
 GOT_DEMOTED: '&e&l岛屿 | &7你的岛屿职位被降职为 &b{0}&7.'
 GOT_EXPELLED: '&e&l岛屿 | &7&o你被 &b{0} &7逐出了这个岛屿.'
@@ -366,6 +374,7 @@ INVALID_SETTINGS: |
   &c&l错误 | &7岛屿设置: {1}
 INVALID_SIZE: '&c&l错误 | &7未知尺寸 {0}.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
+INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&l错误 | &7无法切换 {0}.'
 INVALID_UPGRADE: |
   &c&l错误 | &7无法找到岛屿升级类型 {0}.
@@ -628,6 +637,7 @@ TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&l错误 | &7你现在不在你的岛屿中
 TELEPORT_OUTSIDE_ISLAND: '&c&l错误 | &7你不能在岛屿范围外传送.'
 TELEPORT_WARMUP: '&7正在传送至 &b{0}&7... 请不要移动！'
 TELEPORT_WARMUP_CANCEL: '&7你移动了，传送取消.'
+TITLE_SENT: '&e&lIsland | &7Successfully sent {0} the title!'
 TELEPORTED_FAILED: '&e&l岛屿 | &7这个岛屿传送点不安全！'
 TELEPORTED_SUCCESS: '&e&l岛屿 | &7你被传送回你的岛屿.'
 TELEPORTED_TO_WARP: '&e&l岛屿 | &7岛屿地标传送成功.'

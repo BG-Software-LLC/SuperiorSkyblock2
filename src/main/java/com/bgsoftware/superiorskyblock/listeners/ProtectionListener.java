@@ -436,47 +436,13 @@ public final class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onEntityInteract(PlayerInteractAtEntityEvent e){
+        handleEntityInteract(e);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityInteract(PlayerInteractEntityEvent e){
-        if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
-            return;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
-        ItemStack usedItem = e.getPlayer().getItemInHand();
-
-        boolean closeInventory = false;
-
-        IslandPrivilege islandPrivilege;
-
-        if(e.getRightClicked() instanceof ArmorStand){
-            islandPrivilege = IslandPrivileges.INTERACT;
-        }
-        else if(usedItem != null && e.getRightClicked() instanceof Animals &&
-                plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
-            islandPrivilege = IslandPrivileges.ANIMAL_BREED;
-        }
-        else if(e.getRightClicked() instanceof Villager){
-            islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
-            closeInventory = true;
-        }
-        else if(e.getRightClicked() instanceof Horse){
-            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
-            closeInventory = true;
-        }
-        else return;
-
-        if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-            if(closeInventory) {
-                Executor.sync(() -> {
-                    Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
-                    if(openInventory != null && (openInventory.getType() == InventoryType.MERCHANT ||
-                            openInventory.getType() == InventoryType.CHEST))
-                        e.getPlayer().closeInventory();
-                }, 1L);
-            }
-        }
+        handleEntityInteract(e);
     }
 
     @EventHandler
@@ -807,6 +773,49 @@ public final class ProtectionListener implements Listener {
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.ANIMAL_SHEAR)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
+        }
+    }
+
+    private void handleEntityInteract(PlayerInteractEntityEvent e){
+        if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+        ItemStack usedItem = e.getPlayer().getItemInHand();
+
+        boolean closeInventory = false;
+
+        IslandPrivilege islandPrivilege;
+
+        if(e.getRightClicked() instanceof ArmorStand){
+            islandPrivilege = IslandPrivileges.INTERACT;
+        }
+        else if(usedItem != null && e.getRightClicked() instanceof Animals &&
+                plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
+            islandPrivilege = IslandPrivileges.ANIMAL_BREED;
+        }
+        else if(e.getRightClicked() instanceof Villager){
+            islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
+            closeInventory = true;
+        }
+        else if(e.getRightClicked() instanceof Horse){
+            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
+            closeInventory = true;
+        }
+        else return;
+
+        if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
+            e.setCancelled(true);
+            Locale.sendProtectionMessage(superiorPlayer);
+            if(closeInventory) {
+                Executor.sync(() -> {
+                    Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
+                    if(openInventory != null && (openInventory.getType() == InventoryType.MERCHANT ||
+                            openInventory.getType() == InventoryType.CHEST))
+                        e.getPlayer().closeInventory();
+                }, 1L);
+            }
         }
     }
 

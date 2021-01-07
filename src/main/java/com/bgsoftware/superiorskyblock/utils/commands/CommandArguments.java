@@ -25,7 +25,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class CommandArguments {
 
@@ -350,18 +352,55 @@ public final class CommandArguments {
         return environment;
     }
 
+    public static Pair<Integer, Boolean> getInterval(CommandSender sender, String argument){
+        Pair<Integer, Boolean> interval = getInt(sender, argument, Locale.INVALID_INTERVAL);
+
+        if(interval.getValue() && interval.getKey() < 0){
+            Locale.INVALID_INTERVAL.send(sender, argument);
+            return new Pair<>(interval.getKey(), false);
+        }
+
+        return interval;
+    }
+
+    public static Map<String, String> parseArguments(String[] args){
+        Map<String, String> parsedArgs = new HashMap<>();
+        String currentKey = null;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(String arg : args){
+            if(arg.startsWith("-")){
+                if(currentKey != null && stringBuilder.length() > 0){
+                    parsedArgs.put(currentKey, stringBuilder.substring(1));
+                }
+
+                currentKey = arg.substring(1).toLowerCase();
+                stringBuilder = new StringBuilder();
+            }
+            else if(currentKey != null){
+                stringBuilder.append(" ").append(arg);
+            }
+        }
+
+        if(currentKey != null && stringBuilder.length() > 0){
+            parsedArgs.put(currentKey, stringBuilder.substring(1));
+        }
+
+        return parsedArgs;
+    }
+
     private static Pair<Integer, Boolean> getInt(CommandSender sender, String argument, Locale locale){
-        int limit = 0;
+        int i = 0;
         boolean status = true;
 
         try{
-            limit = Integer.parseInt(argument);
+            i = Integer.parseInt(argument);
         }catch(IllegalArgumentException ex){
             locale.send(sender, argument);
             status = false;
         }
 
-        return new Pair<>(limit, status);
+        return new Pair<>(i, status);
     }
 
 }

@@ -151,7 +151,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             EventsCaller.callPluginInitializeEvent(this);
 
-            providersHandler.prepareWorlds();
+            try{
+                providersHandler.prepareWorlds();
+            }catch (RuntimeException ex){
+                shouldEnable = false;
+                new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+                Bukkit.shutdown();
+                return;
+            }
 
             reloadPlugin(true);
 
@@ -166,6 +173,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new SettingsListener(this));
                 safeEventsRegister(new UpgradesListener(this));
             }catch (RuntimeException ex){
+                shouldEnable = false;
                 new HandlerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
                         HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
                 Bukkit.shutdown();
