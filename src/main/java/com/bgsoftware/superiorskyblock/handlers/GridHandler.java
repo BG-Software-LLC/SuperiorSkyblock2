@@ -220,10 +220,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public void cancelIslandPreview(SuperiorPlayer superiorPlayer) {
         IslandPreview islandPreview = islandPreviews.remove(superiorPlayer.getUniqueId());
         if(islandPreview != null && superiorPlayer.isOnline()) {
-            Executor.ensureMain(() -> {
-                superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            });
+            Executor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
+                if(teleportResult)
+                    superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
+            }));
             PlayerChat.remove(superiorPlayer.asPlayer());
         }
     }
