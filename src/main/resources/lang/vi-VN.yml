@@ -152,6 +152,9 @@ COMMAND_ARGUMENT_SCHEMATIC_NAME: ten-schematic
 COMMAND_ARGUMENT_SETTINGS: cai-dat
 COMMAND_ARGUMENT_SIZE: kich-thuoc
 COMMAND_ARGUMENT_TIME: thoi-gian
+COMMAND_ARGUMENT_TITLE_DURATION: 'duration'
+COMMAND_ARGUMENT_TITLE_FADE_IN: 'fade-in'
+COMMAND_ARGUMENT_TITLE_FADE_OUT: 'fade-out'
 COMMAND_ARGUMENT_UPGRADE_NAME: ten-nang-cap
 COMMAND_ARGUMENT_VALUE: gia-tri
 COMMAND_ARGUMENT_WARP_NAME: ten-khu-vuc
@@ -244,6 +247,8 @@ COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò ch
 COMMAND_DESCRIPTION_ADMIN_STATS: Coi thông kê về plugin.
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Dịch chuyển đến hòn đảo khác
+COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'
+COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Send to all island members a title.'
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Ngừng bỏ qua một hòn đảo từ những hòn đảo hàng
   đầu.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Mở khóa một thế giới cho một hòn đảo.
@@ -368,6 +373,8 @@ GLOBAL_MESSAGE_SENT: '&e&lĐảo Thần | &7Gửi thành công đến tin nhắn
   đảo của {0}!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lĐảo Thần | &7Gửi thành công đến tin nhắn của thành
   viên của đảo {0}!'
+GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'
+GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the title!'
 GOT_BANNED: '&e&lĐảo Thần | &7Bạn đã được &cCẤM&7 từ đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo Thần | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
 GOT_EXPELLED: '&e&lĐảo Thần | &7&oBạn đã bị trục xuất khỏi đảo bởi {0}...'
@@ -420,6 +427,7 @@ INVALID_SETTINGS: |
   &c&lLỗi | &7Các điều chỉnh đảo: {1}
 INVALID_SIZE: '&c&lLỗi | &7Kích thước không hợp lệ {0}.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
+INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&lLỗi | &7Không thể chuyển đổi {0}.'
 INVALID_UPGRADE: |
   &c&lLỗi | &7Không thể tìm thấy bản nâng cấp được gọi là {0}.
@@ -717,6 +725,7 @@ TELEPORT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể dịch chuyển ra ng
 TELEPORT_WARMUP: '&7&oBạn sẽ được dịch chuyển trong {0}... Đừng di chuyển!'
 TELEPORT_WARMUP_CANCEL: '&7&oBạn đã di chuyển và do đó dịch chuyển tức thời đã bị
   hủy.'
+TITLE_SENT: '&e&lIsland | &7Successfully sent {0} the title!'
 TELEPORTED_FAILED: '&e&lNâng cấp | &7Có vẻ như hòn đảo này không có khối an toàn.
   Xin vui lòng   liên lạc với nhân viên.'
 TELEPORTED_SUCCESS: '&e&lĐảo Thần | &7Bạn đã được dịch chuyển đến hòn đảo của bạn.'

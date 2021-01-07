@@ -168,6 +168,9 @@ COMMAND_ARGUMENT_SCHEMATIC_NAME: nome-schematica
 COMMAND_ARGUMENT_SETTINGS: impostazioni
 COMMAND_ARGUMENT_SIZE: dimensione
 COMMAND_ARGUMENT_TIME: tempo
+COMMAND_ARGUMENT_TITLE_DURATION: 'duration'
+COMMAND_ARGUMENT_TITLE_FADE_IN: 'fade-in'
+COMMAND_ARGUMENT_TITLE_FADE_OUT: 'fade-out'
 COMMAND_ARGUMENT_UPGRADE_NAME: nome-aggiornamento
 COMMAND_ARGUMENT_VALUE: valore
 COMMAND_ARGUMENT_WARP_NAME: nome-warp
@@ -267,6 +270,8 @@ COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
 COMMAND_DESCRIPTION_ADMIN_STATS: Mostra le statistiche riguardanti il plugin.
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Sincronizza i valori di aggiornamento per un'isola.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
+COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'
+COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Send to all island members a title.'
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Smetti di ignorare un'isola dal menu delle migliori
   isole .
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Sblocca un mondo per un'isola.
@@ -400,6 +405,8 @@ GLOBAL_MESSAGE_SENT: '&e&lIsola | &7Il messaggio è stato inviato correttamente 
   membri dell''isola di {0}!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIsola | &7Il messaggio è stato inviato correttamente
   ai membri dell''isola di {0}!'
+GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'
+GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the title!'
 GOT_BANNED: '&e&lIsola | &7Sei stato bannato dall''isola di {0}.'
 GOT_DEMOTED: '&e&lIsola | &7Sei stato retrocesso a {0} nella tua isola.'
 GOT_EXPELLED: '&e&lIsola | &7&o{0} ti ha espulso dall''isola.'
@@ -453,6 +460,7 @@ INVALID_SETTINGS: |
   &c&lErrore | &7Impostazioni dell'isola: {1}
 INVALID_SIZE: '&c&lErrore | &7Dimensioni non valide {0}.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
+INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&lErrore | &7Non è possibile attivare/disattivare {0}.'
 INVALID_UPGRADE: |
   &c&lErrore | &7Impossibile trovare un aggiornamento chiamato {0}.
@@ -776,6 +784,7 @@ TELEPORT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi teletrasportarti fuori dal rag
   di protezione.'
 TELEPORT_WARMUP: '&7&oVerrai teletrasportato in {0}... Non muoverti!'
 TELEPORT_WARMUP_CANCEL: '&7&oTi sei mosso e quindi il teletrasporto è stato cancellato.'
+TITLE_SENT: '&e&lIsland | &7Successfully sent {0} the title!'
 TELEPORTED_FAILED: '&e&lIsola | &7Sembra che quest''isola non abbia blocchi sicuri.
   Si prega di contattare un membro dello staff.'
 TELEPORTED_SUCCESS: '&e&lIsola | &7Sei stato teletrasportato sulla tua isola.'

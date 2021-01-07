@@ -1512,6 +1512,18 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
+        SuperiorSkyblockPlugin.debug("Action: Send Title, Island: " + owner.getName() + ", Ignored Members: " + Arrays.asList(ignoredMembers) + ", Title: " + title + ", Subtitle: " + subtitle);
+
+        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> plugin.getNMSAdapter().sendTitle(superiorPlayer.asPlayer(),
+                        title, subtitle, fadeIn, duration, fadeOut));
+    }
+
+    @Override
     public boolean isBeingRecalculated() {
         return beingRecalculated.get();
     }

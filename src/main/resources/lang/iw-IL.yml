@@ -134,6 +134,9 @@ COMMAND_ARGUMENT_SCHEMATIC_NAME: הנבמה םש
 COMMAND_ARGUMENT_SETTINGS: תורדגה
 COMMAND_ARGUMENT_SIZE: לדוג
 COMMAND_ARGUMENT_TIME: ןמז
+COMMAND_ARGUMENT_TITLE_DURATION: 'duration'
+COMMAND_ARGUMENT_TITLE_FADE_IN: 'fade-in'
+COMMAND_ARGUMENT_TITLE_FADE_OUT: 'fade-out'
 COMMAND_ARGUMENT_UPGRADE_NAME: גורדשה םש
 COMMAND_ARGUMENT_VALUE: יווש
 COMMAND_ARGUMENT_WARP_NAME: םוקימה םש
@@ -218,6 +221,8 @@ COMMAND_DESCRIPTION_ADMIN_SPY: יומס טא'צ בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_STATS: 'Show stats about the plugin.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: רחא יא לא רגתשהל.
+COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'
+COMMAND_DESCRIPTION_ADMIN_TITLE_ALL: 'Send to all island members a title.'
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: םיבוטה םייאה תמישרל יא ריזחהל.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: יאל םלוע חותפל.
 COMMAND_DESCRIPTION_ADMIN_WITHDRAW: רחא ןקחש לש יאמ ףסכ איצוהל.
@@ -333,6 +338,8 @@ GENERATOR_UPDATED_ALL: '&e&lיא | &7החלצהב ןכדוע םייאה לכ ל�
   לש תומכה.'
 GLOBAL_MESSAGE_SENT: '&e&lיא | &7{0} לש יאה לש םינקחשל החלצהב החלשנ העדוהה!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lיא | &7{0} יאה לש םינקחשל החלצהב החלשנ העדוהה!'
+GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'
+GLOBAL_TITLE_SENT_NAME: '&e&lIsland | &7Successfully sent to the island members of {0} the title!'
 GOT_BANNED: '&e&lיא | &7רמוע לש יאה ןמ תקחרוה.'
 GOT_DEMOTED: '&e&lיא | &7ךלש יאב {0} תגרדל הגרדב תדרי.'
 GOT_EXPELLED: '&e&lיא | &7{0} ידי לע יאה ןמ תשרוג.'
@@ -383,6 +390,7 @@ INVALID_SETTINGS: |
   &c&lהאיגש | &7{1} :תורדגה
 INVALID_SIZE: '&c&lהאיגש | &7{0} יקוח אל לדוג.'
 INVALID_SLOT: '&c&lError | &7Invalid slot {0}.'
+INVALID_TITLE: '&c&lError | &7Invalid title entered.'
 INVALID_TOGGLE_MODE: '&c&lהאיגש | &7{0} בצמ ףילחהל ןתינ אל.'
 INVALID_UPGRADE: |
   &c&lהאיגש | &7{0} םשה םע גורדש אוצמל היה ןתינ אל.
@@ -649,6 +657,7 @@ TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lהאיגש | &7ךלש יאב אצמנ א�
 TELEPORT_OUTSIDE_ISLAND: '&c&lError | &7You cannot teleport outside of your protection range.'
 TELEPORT_WARMUP: '&7&oזוזת לא {0}... ב רגושת התא!'
 TELEPORT_WARMUP_CANCEL: '&7&oלטוב רוגישה ןכלו תזז.'
+TITLE_SENT: '&e&lIsland | &7Successfully sent {0} the title!'
 TELEPORTED_FAILED: '&e&lיא | &7תרשה תווצל הנפת אנא .יאב חוטב םוקמ ןיא יכ הארנ.'
 TELEPORTED_SUCCESS: '&e&lיא | &7ךלש יאל תרגוש.'
 TELEPORTED_TO_WARP: '&e&lיא | &7החלצהב יאה םוקימל תרגוש.'
