@@ -22,6 +22,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -771,6 +773,11 @@ public interface Island extends Comparable<Island> {
      * Get the last time that the bank interest was given.
      */
     long getLastInterestTime();
+
+    /**
+     * Get the duration until the bank interest will be given again, in seconds
+     */
+    long getNextInterest();
 
     /**
      * Get the money in the bank of the island.

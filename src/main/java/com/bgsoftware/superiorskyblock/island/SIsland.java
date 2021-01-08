@@ -98,6 +98,9 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1602,6 +1605,12 @@ public final class SIsland implements Island {
     @Override
     public long getLastInterestTime() {
         return lastInterest.get();
+    }
+
+    @Override
+    public long getNextInterest() {
+        long currentTime = System.currentTimeMillis() / 1000;
+        return plugin.getSettings().bankInterestInterval - (currentTime - lastInterest.get());
     }
 
     @Override
