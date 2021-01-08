@@ -170,6 +170,8 @@ permissions:
             description: Grant a bonus to a player.
           superior.admin.bypass:
             description: Toggle bypass mode.
+          superior.admin.bypass.warmup:
+            description: Bypass teleport warmup
           superior.admin.chest:
             description: Open island's chest of another island.
           superior.admin.cleargenerator:

@@ -2649,7 +2649,7 @@ public final class SIsland implements Island {
 
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
-        if(plugin.getSettings().warpsWarmup > 0 && !superiorPlayer.hasBypassModeEnabled()) {
+        if(plugin.getSettings().warpsWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().warpsWarmup));
             ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(Executor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
