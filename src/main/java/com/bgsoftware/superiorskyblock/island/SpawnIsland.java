@@ -734,6 +734,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public long getNextInterest() {
+        return -1;
+    }
+
+    @Override
     public BigDecimal getMoneyInBank() {
         return BigDecimal.ZERO;
     }

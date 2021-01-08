@@ -773,6 +773,11 @@ public interface Island extends Comparable<Island> {
     long getLastInterestTime();
 
     /**
+     * Get the duration until the bank interest will be given again, in seconds
+     */
+    long getNextInterest();
+
+    /**
      * Get the money in the bank of the island.
      *
      * @deprecated See IslandBank#getBalance

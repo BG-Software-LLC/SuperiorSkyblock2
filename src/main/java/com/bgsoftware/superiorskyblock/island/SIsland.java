@@ -1605,6 +1605,12 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public long getNextInterest() {
+        long currentTime = System.currentTimeMillis() / 1000;
+        return plugin.getSettings().bankInterestInterval - (currentTime - lastInterest.get());
+    }
+
+    @Override
     @Deprecated
     public BigDecimal getMoneyInBank() {
         return islandBank.getBalance();
