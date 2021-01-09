@@ -40,6 +40,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -463,24 +464,49 @@ public final class PlayersListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityPortalEnter(EntityPortalEnterEvent e){
+        if(!(e.getEntity() instanceof Player))
+            return;
+
+        Material originalMaterial = e.getLocation().getBlock().getType();
+
+        PlayerTeleportEvent.TeleportCause teleportCause = originalMaterial == Materials.NETHER_PORTAL.toBukkitType() ?
+                PlayerTeleportEvent.TeleportCause.NETHER_PORTAL : PlayerTeleportEvent.TeleportCause.END_PORTAL;
+
+        if(teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? Bukkit.getAllowNether() : Bukkit.getAllowEnd())
+            return;
+
+        int ticksDelay = ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
+        int portalTicks = plugin.getNMSAdapter().getPortalTicks(e.getEntity());
+
+        if(teleportCause == PlayerTeleportEvent.TeleportCause.END_PORTAL || portalTicks == ticksDelay)
+            handlePlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, null);
+    }
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        handlePlayerPortal(e.getPlayer(), e.getFrom(), e.getCause(), e);
+    }
+
+    private void handlePlayerPortal(Player player, Location from, PlayerTeleportEvent.TeleportCause teleportCause, Cancellable cancellable) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getFrom());
+        Island island = plugin.getGrid().getIslandAt(from);
 
-        if(island == null || !plugin.getGrid().isIslandsWorld(e.getFrom().getWorld()))
+        if(island == null || !plugin.getGrid().isIslandsWorld(from.getWorld()))
             return;
 
-        e.setCancelled(true);
+        if(cancellable != null)
+            cancellable.setCancelled(true);
 
-        World.Environment environment = e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
+        World.Environment environment = teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
                 World.Environment.NETHER : World.Environment.THE_END;
 
-        if(environment == e.getPlayer().getWorld().getEnvironment())
+        if(environment == superiorPlayer.getWorld().getEnvironment())
             environment = World.Environment.NORMAL;
 
         if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
@@ -504,8 +530,9 @@ public final class PlayersListener implements Listener {
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
-                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().getRelative(BlockFace.DOWN).getLocation(), () ->
-                            handleTeleport(superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport)), Throwable::printStackTrace);
+                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().
+                            getRelative(BlockFace.DOWN).getLocation(), () -> handleTeleport(superiorPlayer, island,
+                            ((BaseSchematic) schematic).getTeleportLocation(toTeleport)), Throwable::printStackTrace);
                     island.setSchematicGenerate(environment);
                 }
                 else{

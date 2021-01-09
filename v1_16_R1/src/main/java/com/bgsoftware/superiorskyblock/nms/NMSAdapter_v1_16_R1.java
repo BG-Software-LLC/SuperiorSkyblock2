@@ -16,6 +16,7 @@ import net.minecraft.server.v1_16_R1.Block;
 import net.minecraft.server.v1_16_R1.BlockPosition;
 import net.minecraft.server.v1_16_R1.ChatMessage;
 import net.minecraft.server.v1_16_R1.Chunk;
+import net.minecraft.server.v1_16_R1.Entity;
 import net.minecraft.server.v1_16_R1.EntityPlayer;
 import net.minecraft.server.v1_16_R1.IBlockData;
 import net.minecraft.server.v1_16_R1.IRegistry;
@@ -45,6 +46,7 @@ import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -68,8 +70,8 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
-    private static final ReflectField<BiomeStorage> BIOME_STORAGE =
-            new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
+    private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
+    private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "portalTicks");
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -317,6 +319,7 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
 
     @Override
     public void sendActionBar(Player player, String message) {
+        //noinspection deprecation
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
     }
 
@@ -328,6 +331,11 @@ public final class NMSAdapter_v1_16_R1 implements NMSAdapter {
     @Override
     public void setCustomModel(ItemMeta itemMeta, int customModel) {
         itemMeta.setCustomModelData(customModel);
+    }
+
+    @Override
+    public int getPortalTicks(org.bukkit.entity.Entity entity) {
+        return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

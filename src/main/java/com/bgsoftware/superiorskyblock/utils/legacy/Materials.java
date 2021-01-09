@@ -12,7 +12,8 @@ public enum Materials {
     SPAWNER("MOB_SPAWNER"),
     SUNFLOWER("DOUBLE_PLANT"),
     BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 15),
-    BONE_MEAL("INK_SACK", 15);
+    BONE_MEAL("INK_SACK", 15),
+    NETHER_PORTAL("PORTAL");
 
     Materials(String bukkitType){
         this(bukkitType, 0);

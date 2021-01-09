@@ -15,6 +15,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
@@ -94,5 +95,7 @@ public interface NMSAdapter {
     default void setCustomModel(ItemMeta itemMeta, int customModel){
 
     }
+
+    int getPortalTicks(Entity entity);
 
 }

@@ -4,12 +4,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockPosition;
 import net.minecraft.server.v1_9_R1.Chunk;
+import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.EnumParticle;
 import net.minecraft.server.v1_9_R1.Item;
@@ -39,6 +41,7 @@ import org.bukkit.craftbukkit.v1_9_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_9_R1.util.CraftChatMessage;
@@ -54,6 +57,8 @@ import java.util.Optional;
 
 @SuppressWarnings("unused")
 public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
+
+    private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "al");
 
     private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -296,6 +301,11 @@ public final class NMSAdapter_v1_9_R1 implements NMSAdapter {
 
         times = new PacketPlayOutTitle(fadeIn, duration, fadeOut);
         playerConnection.sendPacket(times);
+    }
+
+    @Override
+    public int getPortalTicks(org.bukkit.entity.Entity entity) {
+        return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
     }
 
 }
