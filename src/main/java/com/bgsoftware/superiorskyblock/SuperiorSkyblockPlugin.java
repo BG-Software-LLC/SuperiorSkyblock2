@@ -335,7 +335,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.loadData();
         }
         else{
-            Executor.sync(gridHandler::updateSpawn);
+            Executor.sync(gridHandler::updateSpawn, 1L);
             gridHandler.syncUpgrades();
         }
 

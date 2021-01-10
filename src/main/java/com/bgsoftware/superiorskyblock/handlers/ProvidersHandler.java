@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Vault;
+import com.bgsoftware.superiorskyblock.hooks.SWMHook;
 import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
@@ -105,6 +106,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
             if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
                 runSafe(() -> CoreProtectHook.register(plugin));
+
+            if(Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
+                runSafe(SWMHook::register);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
