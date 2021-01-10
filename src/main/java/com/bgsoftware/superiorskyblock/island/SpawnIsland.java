@@ -60,7 +60,7 @@ public final class SpawnIsland implements Island {
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
-    private final Location center;
+    private Location center;
     private final int islandSize;
     private final List<IslandFlag> islandSettings;
     private Biome biome = Biome.PLAINS;
@@ -72,13 +72,17 @@ public final class SpawnIsland implements Island {
         islandSize = plugin.getSettings().spawnSize;
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
-        if(center.getWorld() == null){
-            new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-            Bukkit.shutdown();
-            return;
-        }
+        if(Bukkit.getPluginManager().getPlugin("SSBSlimeWorldManager") == null) {
+            if(center.getWorld() == null){
+                new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+                Bukkit.shutdown();
+                return;
+            }
 
-        Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
+            Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
+        }else{
+            Executor.sync(() -> biome = Biome.PLAINS);
+        }
     }
 
     @Override
