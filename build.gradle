@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "1.5.1"
+version = "1.5.2"
 
 subprojects {
     apply plugin: 'java'
