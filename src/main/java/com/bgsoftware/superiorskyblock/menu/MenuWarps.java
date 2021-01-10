@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -104,10 +104,19 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             FileUtils.saveResource("menus/warps.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), "items", "sounds", "sections");
+
+        try {
+            cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), "items", "sounds", "sections");
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         if(convertOldGUI(cfg)){
-            cfg.save(file);
+            try {
+                cfg.save(file);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarps, "warps.yml", cfg);

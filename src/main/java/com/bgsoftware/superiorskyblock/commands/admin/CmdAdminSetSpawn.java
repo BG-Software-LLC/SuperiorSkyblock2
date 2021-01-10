@@ -59,9 +59,12 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
 
         String newSpawnLocation = LocationUtils.getLocation(spawnLocation).replace(",", ", ");
 
-        plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
-
-        plugin.getGrid().updateSpawn();
+        try {
+            plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
+            plugin.getGrid().updateSpawn();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         Locale.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);
     }

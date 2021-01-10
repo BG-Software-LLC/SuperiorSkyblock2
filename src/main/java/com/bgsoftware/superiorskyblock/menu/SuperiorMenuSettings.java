@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -107,8 +107,12 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     }
 
     protected static void saveConfiguration(){
-        config.save(new File(plugin.getDataFolder(), "config.yml"));
-        plugin.setSettings(new SettingsHandler(plugin));
+        try {
+            config.save(new File(plugin.getDataFolder(), "config.yml"));
+            plugin.setSettings(new SettingsHandler(plugin));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void reloadConfiguration(){

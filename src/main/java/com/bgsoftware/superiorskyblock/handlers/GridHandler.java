@@ -48,6 +48,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -616,16 +617,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         int maxIslandSize = resultSet.getInt("maxIslandSize");
         String world = resultSet.getString("world");
 
-        if(plugin.getSettings().maxIslandSize != maxIslandSize){
-            SuperiorSkyblockPlugin.log("&cYou have changed the max-island-size value without deleting database.");
-            SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
-            plugin.getSettings().updateValue("max-island-size", maxIslandSize);
-        }
+        try {
+            if (plugin.getSettings().maxIslandSize != maxIslandSize) {
+                SuperiorSkyblockPlugin.log("&cYou have changed the max-island-size value without deleting database.");
+                SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
+                plugin.getSettings().updateValue("max-island-size", maxIslandSize);
+            }
 
-        if(!plugin.getSettings().islandWorldName.equals(world)){
-            SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
-            SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
-            plugin.getSettings().updateValue("worlds.normal-world", world);
+            if (!plugin.getSettings().islandWorldName.equals(world)) {
+                SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
+                SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
+                plugin.getSettings().updateValue("worlds.normal-world", world);
+            }
+        }catch (IOException ex){
+            ex.printStackTrace();
+            Bukkit.shutdown();
+            return;
         }
 
         ChunksTracker.deserialize(this, null, resultSet.getString("dirtyChunks"));

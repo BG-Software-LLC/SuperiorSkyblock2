@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -7,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -212,10 +212,20 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             FileUtils.saveResource("menus/permissions.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), "permissions.yml", "items");
 
-        if(convertOldGUI(cfg))
-            cfg.save(file);
+        try {
+            cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), "permissions.yml", "items");
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        if(convertOldGUI(cfg)){
+            try {
+                cfg.save(file);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
 
         noRolePermission = cfg.getString("messages.no-role-permission", "");
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");

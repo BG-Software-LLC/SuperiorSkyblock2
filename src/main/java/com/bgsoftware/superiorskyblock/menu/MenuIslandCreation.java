@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -140,7 +140,11 @@ public final class MenuIslandCreation extends SuperiorMenu {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         if(convertOldGUI(cfg)){
-            cfg.save(file);
+            try {
+                cfg.save(file);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
 
         /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/

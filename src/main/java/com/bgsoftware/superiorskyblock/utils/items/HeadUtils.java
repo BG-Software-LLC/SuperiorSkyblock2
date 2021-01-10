@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -33,7 +33,12 @@ public final class HeadUtils {
             plugin.saveResource("heads.yml", false);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-        cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
+
+        try {
+            cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         for(String entityType : cfg.getConfigurationSection("").getKeys(false))
             entitySkullTextures.add(entityType, cfg.getString(entityType));

@@ -23,6 +23,7 @@ subprojects {
 
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
+        maven { url 'https://repo.bg-software.com/repository/common/' }
         maven { url 'https://repo.bg-software.com/repository/public-libs/' }
     }
 
@@ -39,6 +40,7 @@ subprojects {
 repositories {
     maven { url 'https://repo.bg-software.com/repository/nms/' }
     maven { url 'https://repo.bg-software.com/repository/api/' }
+    maven { url 'https://repo.bg-software.com/repository/common/' }
     maven { url 'https://repo.bg-software.com/repository/public-libs/' }
 
     String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
@@ -59,6 +61,8 @@ repositories {
 dependencies {
     compile fileTree("archive")
     compile project(":API")
+
+    compile 'com.bgsoftware.common.config:CommentedConfiguration:latest'
 
     compile 'com.zaxxer:HikariCP:latest'
     compile 'org.slf4j:SLF4J:latest'

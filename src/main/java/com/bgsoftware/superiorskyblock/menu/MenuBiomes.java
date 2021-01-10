@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -124,7 +124,11 @@ public final class MenuBiomes extends SuperiorMenu {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         if(convertOldGUI(cfg)){
-            cfg.save(file);
+            try {
+                cfg.save(file);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
 
         currentBiomeGlow = cfg.getBoolean("current-biome-glow", false);

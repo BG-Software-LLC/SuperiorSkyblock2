@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -191,8 +192,12 @@ public final class SettingsHandler extends AbstractHandler {
         convertData(cfg);
         convertInteractables(plugin, cfg);
 
-        cfg.syncWithConfig(file, plugin.getResource("config.yml"),  "config.yml",
-                "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
+        try {
+            cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
+                    "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
         databaseType = cfg.getString("database.type");
         databaseMySQLAddress = cfg.getString("database.address");
@@ -452,7 +457,7 @@ public final class SettingsHandler extends AbstractHandler {
         throw new UnsupportedOperationException("Not supported for SettingsHandler");
     }
 
-    public void updateValue(String path, Object value){
+    public void updateValue(String path, Object value) throws IOException {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");
 
@@ -561,7 +566,11 @@ public final class SettingsHandler extends AbstractHandler {
 
         commentedConfig.set("interactables", cfg.getStringList("interactables"));
 
-        commentedConfig.save(file);
+        try {
+            commentedConfig.save(file);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin){

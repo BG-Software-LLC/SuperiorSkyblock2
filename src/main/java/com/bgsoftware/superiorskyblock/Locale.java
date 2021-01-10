@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -763,7 +763,12 @@ public enum Locale {
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
             InputStream inputStream = plugin.getResource("lang/" + langFile.getName());
-            cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
+
+            try {
+                cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
 
             for(Locale locale : values()){
                 if(cfg.isConfigurationSection(locale.name())){

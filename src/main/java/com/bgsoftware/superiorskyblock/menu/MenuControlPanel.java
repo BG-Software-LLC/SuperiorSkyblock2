@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -62,7 +62,11 @@ public final class MenuControlPanel extends SuperiorMenu {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         if(convertOldGUI(cfg)){
-            cfg.save(file);
+            try {
+                cfg.save(file);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
 
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
