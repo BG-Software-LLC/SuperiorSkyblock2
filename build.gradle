@@ -1,21 +1,12 @@
-group 'SuperiorSkyblock'
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'base'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'maven-publish'
-
-version = "1.5.1"
-
-buildscript {
-    repositories {
-        jcenter()
-        maven { url "https://plugins.gradle.org/m2/" }
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:6.1.0'
-    }
+plugins {
+    id 'java'
+    id 'maven'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'maven-publish'
 }
+
+group 'SuperiorSkyblock'
+version = "1.5.1"
 
 subprojects {
     apply plugin: 'java'
@@ -28,8 +19,8 @@ subprojects {
     }
 
     shadowJar {
-        archiveName = "${project.name}.jar"
-        destinationDir = file("../archive/")
+        archiveFileName = "${project.name}.jar"
+        destinationDirectory = file("../archive/")
     }
 
     build {
@@ -59,13 +50,13 @@ repositories {
 }
 
 dependencies {
-    compile fileTree("archive")
-    compile project(":API")
+    implementation fileTree("archive")
+    implementation project(":API")
 
-    compile 'com.bgsoftware.common.config:CommentedConfiguration:latest'
+    implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
 
-    compile 'com.zaxxer:HikariCP:latest'
-    compile 'org.slf4j:SLF4J:latest'
+    implementation 'com.zaxxer:HikariCP:latest'
+    implementation 'org.slf4j:SLF4J:latest'
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
@@ -106,18 +97,17 @@ jar {
             zipTree(file)
         }
     }
+}
 
-    processResources {
-        outputs.upToDateWhen {false}
-        eachFile { details ->
-            if (details.name.contentEquals('plugin.yml')) {
-                filter { String line ->
-                    line.replace('${project.version}', version)
-                }
+processResources {
+    outputs.upToDateWhen {false}
+    eachFile { details ->
+        if (details.name.contentEquals('plugin.yml')) {
+            filter { String line ->
+                line.replace('${project.version}', version)
             }
         }
     }
-
 }
 
 shadowJar {
