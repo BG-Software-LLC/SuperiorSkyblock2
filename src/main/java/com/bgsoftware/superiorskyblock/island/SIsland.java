@@ -2421,7 +2421,7 @@ public final class SIsland implements Island {
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
-            islandEffects.write(map -> map.put(type, new UpgradeValue<>(level - 1, false)));
+            islandEffects.write(map -> map.put(type, new UpgradeValue<>(level, false)));
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().addPotionEffect(potionEffect, true)));
         }
 
@@ -2430,7 +2430,7 @@ public final class SIsland implements Island {
 
     @Override
     public int getPotionEffectLevel(PotionEffectType type) {
-        return islandEffects.readAndGet(map -> map.getOrDefault(type, UpgradeValue.NEGATIVE).get() + 1);
+        return islandEffects.readAndGet(map -> map.getOrDefault(type, UpgradeValue.NEGATIVE).get());
     }
 
     @Override
@@ -2449,7 +2449,7 @@ public final class SIsland implements Island {
     @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
         Player player = superiorPlayer.asPlayer();
-        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level), true));
+        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
     }
 
     @Override
