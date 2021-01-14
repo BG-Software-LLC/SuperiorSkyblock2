@@ -5,6 +5,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.entity.Player;
 
 public final class TutorialCommand extends BukkitCommand {
 
@@ -21,7 +22,7 @@ public final class TutorialCommand extends BukkitCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        if(args.length != 1){
+        if(args.length != 1 || !(sender instanceof Player)){
             return false;
         }
 
@@ -68,7 +69,7 @@ public final class TutorialCommand extends BukkitCommand {
                 return false;
         }
 
-        sender.sendMessage(stageMessage);
+        ((Player) sender).spigot().sendMessage(stageMessage);
 
         return false;
     }
