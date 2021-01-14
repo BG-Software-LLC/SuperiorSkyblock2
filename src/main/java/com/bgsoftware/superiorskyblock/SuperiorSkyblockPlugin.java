@@ -30,12 +30,14 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
+import com.bgsoftware.superiorskyblock.listeners.TutorialListener;
 import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.tutorial.TutorialCommand;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -96,6 +98,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private boolean shouldEnable = true;
     private boolean debugMode = false;
     private Pattern debugFilter = null;
+    private boolean startTutorial = false;
 
     @Override
     public void onLoad() {
@@ -108,6 +111,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         if(!loadNMSAdapter()) {
             shouldEnable = false;
+        }
+        else{
+            startTutorial = !plugin.getDataFolder().exists();
         }
     }
 
@@ -142,6 +148,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
 
             Executor.init(this);
+
+            if(startTutorial){
+                plugin.getNMSAdapter().registerCommand(new TutorialCommand(this));
+                safeEventsRegister(new TutorialListener(this));
+                return;
+            }
 
             loadSortingTypes();
             loadIslandFlags();
@@ -223,6 +235,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public void onDisable() {
         if(!shouldEnable)
             return;
+
+        if(startTutorial){
+            Executor.close();
+            return;
+        }
 
         ChunksProvider.stop();
         try {
@@ -466,6 +483,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             this.debugFilter = null;
         else
             this.debugFilter = Pattern.compile(debugFilter.toUpperCase());
+    }
+
+    public boolean isTutorialRunning(){
+        return startTutorial;
     }
 
     private void loadSortingTypes(){
