@@ -481,15 +481,15 @@ public final class PlayersListener implements Listener {
         int portalTicks = plugin.getNMSAdapter().getPortalTicks(e.getEntity());
 
         if(teleportCause == PlayerTeleportEvent.TeleportCause.END_PORTAL || portalTicks == ticksDelay)
-            handlePlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, null);
+            handlePlayerPortal(plugin, (Player) e.getEntity(), e.getLocation(), teleportCause, null);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        handlePlayerPortal(e.getPlayer(), e.getFrom(), e.getCause(), e);
+        handlePlayerPortal(plugin, e.getPlayer(), e.getFrom(), e.getCause(), e);
     }
 
-    private void handlePlayerPortal(Player player, Location from, PlayerTeleportEvent.TeleportCause teleportCause, Cancellable cancellable) {
+    public static void handlePlayerPortal(SuperiorSkyblockPlugin plugin, Player player, Location from, PlayerTeleportEvent.TeleportCause teleportCause, Cancellable cancellable) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if(superiorPlayer instanceof SuperiorNPCPlayer)
@@ -520,7 +520,8 @@ public final class PlayersListener implements Listener {
         }
 
         String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
-        Location toTeleport = environment == World.Environment.NORMAL ? island.getTeleportLocation(environment) : getLocationNoException(island, environment);
+        Location toTeleport = environment == World.Environment.NORMAL ? island.getTeleportLocation(environment) :
+                getLocationNoException(island, environment);
 
         if(toTeleport != null) {
             if(environment != World.Environment.NORMAL && !island.wasSchematicGenerated(environment)){
@@ -531,7 +532,7 @@ public final class PlayersListener implements Listener {
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
                     schematic.pasteSchematic(island, island.getCenter(environment).getBlock().
-                            getRelative(BlockFace.DOWN).getLocation(), () -> handleTeleport(superiorPlayer, island,
+                            getRelative(BlockFace.DOWN).getLocation(), () -> handleTeleport(plugin, superiorPlayer, island,
                             ((BaseSchematic) schematic).getTeleportLocation(toTeleport)), Throwable::printStackTrace);
                     island.setSchematicGenerate(environment);
                 }
@@ -542,7 +543,7 @@ public final class PlayersListener implements Listener {
             }
 
             else {
-                handleTeleport(superiorPlayer, island, toTeleport);
+                handleTeleport(plugin, superiorPlayer, island, toTeleport);
             }
         }
     }
@@ -575,7 +576,7 @@ public final class PlayersListener implements Listener {
         e.getClickedBlock().setType(Material.AIR);
     }
 
-    private void handleTeleport(SuperiorPlayer superiorPlayer, Island island, Location toTeleport){
+    private static void handleTeleport(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, Location toTeleport){
         superiorPlayer.teleport(toTeleport);
         plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
         Executor.sync(() -> {
@@ -589,7 +590,7 @@ public final class PlayersListener implements Listener {
         }, 2L);
     }
 
-    private Location getLocationNoException(Island island, World.Environment environment){
+    private static Location getLocationNoException(Island island, World.Environment environment){
         try{
             return island.getTeleportLocation(environment);
         }catch(Exception ex){
