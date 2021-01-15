@@ -132,7 +132,15 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_PvpingSpawners()));
                 } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
                         (auto || spawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_EpicSpawners()));
+                    if(Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion().startsWith("7")){
+                        try {
+                            BlocksProvider blocksProvider = (BlocksProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners7").newInstance();
+                            runSafe(() -> setSpawnersProvider(blocksProvider));
+                        }catch (Exception ignored){}
+                    }
+                    else{
+                        runSafe(() -> setSpawnersProvider(new BlocksProvider_EpicSpawners()));
+                    }
                 } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
                         (auto || spawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_UltimateStacker()));
