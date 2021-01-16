@@ -24,6 +24,7 @@ import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;
 import net.minecraft.server.v1_16_R3.PlayerInteractManager;
+import net.minecraft.server.v1_16_R3.Registry;
 import net.minecraft.server.v1_16_R3.SoundCategory;
 import net.minecraft.server.v1_16_R3.SoundEffectType;
 import net.minecraft.server.v1_16_R3.TileEntityHopper;
@@ -70,6 +71,7 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "h");
+    private static final ReflectField<Registry<BiomeBase>> BIOME_REGISTRY = new ReflectField<>(BiomeStorage.class, Registry.class, "registry", "g");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "portalTicks");
 
@@ -209,7 +211,7 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
         BiomeStorage biomeStorage = BIOME_STORAGE.get(biomeGrid);
         BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(biomeStorage);
 
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry<BiomeBase>) biomeStorage.g, biome);
+        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry<BiomeBase>) BIOME_REGISTRY.get(biomeStorage), biome);
 
         if(biomeBases == null)
             return;
