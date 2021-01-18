@@ -49,15 +49,15 @@ public final class ReflectField<T> {
         Field field = null;
 
         if(clazz != null) {
-            try {
-                for (String fieldName : fieldNames) {
+            for (String fieldName : fieldNames) {
+                try {
                     field = clazz.getDeclaredField(fieldName);
                     if (returnType == null || returnType.isAssignableFrom(field.getType())) {
                         field.setAccessible(true);
                         break;
                     }
-                }
-            } catch (Exception ignored) {}
+                }catch (Exception ignored){}
+            }
         }
 
         return field;
