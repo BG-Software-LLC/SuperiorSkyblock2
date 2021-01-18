@@ -86,11 +86,14 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
 
             // Resetting the chunks
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(island, world, true, true);
-            for(int i = 0; i < chunkPositions.size() - 1; i++)
-                IslandUtils.deleteChunk(island, chunkPositions.get(i), null);
+            
+            if(!chunkPositions.isEmpty()) {
+                for (int i = 0; i < chunkPositions.size() - 1; i++)
+                    IslandUtils.deleteChunk(island, chunkPositions.get(i), null);
 
-            IslandUtils.deleteChunk(island, chunkPositions.get(chunkPositions.size() - 1),
-                    () -> island.calcIslandWorth(null));
+                IslandUtils.deleteChunk(island, chunkPositions.get(chunkPositions.size() - 1),
+                        () -> island.calcIslandWorth(null));
+            }
 
             island.setSchematicGenerate(environment, false);
         });
