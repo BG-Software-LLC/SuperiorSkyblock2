@@ -12,6 +12,7 @@ import org.bukkit.command.CommandSender;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -34,9 +35,10 @@ public final class StringUtils {
     @SuppressWarnings("all")
     private static final Pattern HEX_COLOR_PATTERN = Pattern.compile("(&|§)(\\{HEX:([0-9A-Fa-f]*)\\})");
     private static final Pattern NUMBER_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
-    private static final Pattern DECIMAL_PATTERN = Pattern.compile("(.*)\\.(\\d)0");
+    private static Pattern DECIMAL_PATTERN;
 
-    private static NumberFormat numberFormatter;
+    private static DecimalFormat numberFormatter;
+    private static char decimalSeparator;
     private static SimpleDateFormat dateFormatter;
 
     private StringUtils(){
@@ -52,11 +54,15 @@ public final class StringUtils {
         }
 
         String[] numberFormatSections = numberFormat.split("-");
-        numberFormatter = NumberFormat.getInstance(new java.util.Locale(numberFormatSections[0], numberFormatSections[1]));
+        numberFormatter = (DecimalFormat) NumberFormat.getInstance(new java.util.Locale(numberFormatSections[0], numberFormatSections[1]));
         numberFormatter.setGroupingUsed(true);
         numberFormatter.setMinimumFractionDigits(2);
         numberFormatter.setMaximumFractionDigits(2);
         numberFormatter.setRoundingMode(RoundingMode.FLOOR);
+
+        decimalSeparator = numberFormatter.getDecimalFormatSymbols().getDecimalSeparator();
+
+        DECIMAL_PATTERN = Pattern.compile("(.*)" + Pattern.quote(decimalSeparator + "") + "(\\d)0");
     }
 
     public static void setDateFormatter(String dateFormat){
@@ -86,6 +92,7 @@ public final class StringUtils {
         return formattedKey.toString().substring(1);
     }
 
+
     public static String format(double d){
         return format(BigDecimal.valueOf(d));
     }
@@ -102,12 +109,12 @@ public final class StringUtils {
 
         Matcher matcher;
 
-        if(s.endsWith(".00")){
-            return s.replace(".00", "");
+        if(s.endsWith(decimalSeparator + "00")){
+            return s.replace(decimalSeparator + "00", "");
         }
 
         else if((matcher = DECIMAL_PATTERN.matcher(s)).matches()){
-            return s.replaceAll("\\.(\\d)0", "." + matcher.group(2));
+            return s.replaceAll(Pattern.quote(decimalSeparator + "") + "(\\d)0", decimalSeparator + matcher.group(2));
         }
 
         return s;
