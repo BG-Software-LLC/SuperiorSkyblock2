@@ -87,7 +87,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                         .replaceName("{7}", StringUtils.format(island.getTotalRating()))
                         .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
                         .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
-                        .replaceName("{10}", String.valueOf(island.getAllPlayersInside().size()));
+                        .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
 
                 if (itemBuilder.getItemMeta().hasLore()) {
                     List<String> lore = new ArrayList<>();
@@ -122,7 +122,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                                     .replace("{7}", StringUtils.format(island.getTotalRating()))
                                     .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
                                     .replace("{9}", StringUtils.format(island.getRatingAmount()))
-                                    .replace("{10}", String.valueOf(island.getAllPlayersInside().size())));
+                                    .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                         }
                     }
 
