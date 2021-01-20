@@ -12,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -102,13 +104,19 @@ public final class StringUtils {
 
         Matcher matcher;
 
-        if(s.endsWith(".00")){
-            return s.replace(".00", "");
+        // Get decimal char
+        DecimalFormat format = (DecimalFormat) DecimalFormat.getInstance(LocaleUtils.getLocale(plugin.getSettings().numberFormat));
+        DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
+        char separator = symbols.getDecimalSeparator();
+
+        if(s.endsWith(separator + "00")){
+            s = s.replace(separator +"00", "");
+        } else if((matcher = DECIMAL_PATTERN.matcher(s)).matches()){
+            s = s.replaceAll("\\.(\\d)0", separator + matcher.group(2));
         }
 
-        else if((matcher = DECIMAL_PATTERN.matcher(s)).matches()){
-            return s.replaceAll("\\.(\\d)0", "." + matcher.group(2));
-        }
+        // Remove grouping separator when there are less than 4 characters
+        if(s.length() <= 5) s = s.replace(Character.toString(symbols.getGroupingSeparator()), "");
 
         return s;
     }
