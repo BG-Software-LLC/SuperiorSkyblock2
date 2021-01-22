@@ -114,6 +114,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
 
         Executor.sync(() -> loadMissionsData(missionsToLoad), 10L);
+        Executor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
     }
 
     @Override

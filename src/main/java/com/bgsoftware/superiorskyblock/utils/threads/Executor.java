@@ -78,6 +78,13 @@ public final class Executor {
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
     }
 
+    public static void asyncTimer(Runnable runnable, long delay){
+        if(shutdown)
+            return;
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
+    }
+
     public static NestedTask<Void> createTask(){
         return new NestedTask<Void>().complete();
     }
