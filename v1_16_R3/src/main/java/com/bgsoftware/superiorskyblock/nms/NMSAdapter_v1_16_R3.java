@@ -202,8 +202,9 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     public void playPlaceSound(Location location) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         World world = ((CraftWorld) location.getWorld()).getHandle();
-        SoundEffectType soundeffecttype = world.getType(blockPosition).getStepSound();
-        world.playSound(null, blockPosition, soundeffecttype.e(), SoundCategory.BLOCKS, (soundeffecttype.a() + 1.0F) / 2.0F, soundeffecttype.b() * 0.8F);
+        SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
+        world.playSound(null, blockPosition, soundEffectType.getPlaceSound(), SoundCategory.BLOCKS,
+                (soundEffectType.a() + 1.0F) / 2.0F, soundEffectType.b() * 0.8F);
     }
 
     @Override
