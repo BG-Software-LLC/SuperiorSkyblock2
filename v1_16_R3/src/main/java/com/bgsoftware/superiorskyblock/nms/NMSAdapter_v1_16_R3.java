@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -74,6 +75,8 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     private static final ReflectField<Registry<BiomeBase>> BIOME_REGISTRY = new ReflectField<>(BiomeStorage.class, Registry.class, "registry", "g");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "portalTicks");
+    private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "getVolume");
+    private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "getPitch");
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -203,8 +206,12 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         World world = ((CraftWorld) location.getWorld()).getHandle();
         SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
-        world.playSound(null, blockPosition, soundEffectType.getPlaceSound(), SoundCategory.BLOCKS,
-                (soundEffectType.a() + 1.0F) / 2.0F, soundEffectType.b() * 0.8F);
+
+        float volume = SOUND_VOLUME.isValid() ? SOUND_VOLUME.invoke(soundEffectType) : soundEffectType.a();
+        float pitch = SOUND_PITCH.isValid() ? SOUND_PITCH.invoke(soundEffectType) : soundEffectType.b();
+
+        world.playSound(null, blockPosition, soundEffectType.getPlaceSound(),
+                SoundCategory.BLOCKS,(volume + 1.0F) / 2.0F, pitch * 0.8F);
     }
 
     @Override
