@@ -14,12 +14,14 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 
+import java.util.EnumMap;
 import java.util.Set;
 import java.util.UUID;
 
 public final class WorldsProvider_Default implements WorldsProvider {
 
     private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
+    private final EnumMap<World.Environment, World> islandWorlds = new EnumMap<>(World.Environment.class);
     private final SuperiorSkyblockPlugin plugin;
 
     public WorldsProvider_Default(SuperiorSkyblockPlugin plugin){
@@ -39,23 +41,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public World getIslandsWorld(Island island, World.Environment environment) {
-        String worldName = "";
-
-        switch (environment){
-            case NORMAL:
-                worldName = plugin.getSettings().islandWorldName;
-                break;
-            case NETHER:
-                if(isNetherEnabled())
-                    worldName = plugin.getSettings().netherWorldName;
-                break;
-            case THE_END:
-                if(isEndEnabled())
-                    worldName = plugin.getSettings().endWorldName;
-                break;
-        }
-
-        return worldName.isEmpty() ? null : Bukkit.getWorld(worldName);
+        return islandWorlds.get(environment);
     }
 
     @Override
@@ -153,6 +139,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
         World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(plugin.getGenerator()).createWorld();
         world.setDifficulty(difficulty);
+        islandWorlds.put(environment, world);
 
         if(Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")){
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
