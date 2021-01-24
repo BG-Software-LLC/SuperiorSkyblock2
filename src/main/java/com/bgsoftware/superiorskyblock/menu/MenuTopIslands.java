@@ -280,7 +280,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     }
 
                     else{
-                        menuTopIslands.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
+                        menuTopIslands.addFillItem(slot, FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + ch)));
                         menuTopIslands.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuTopIslands.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
 
