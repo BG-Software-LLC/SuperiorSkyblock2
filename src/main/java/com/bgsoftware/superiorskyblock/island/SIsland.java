@@ -1950,8 +1950,8 @@ public final class SIsland implements Island {
     public BigDecimal getWorth() {
         int bankWorthRate = plugin.getSettings().bankWorthRate;
         BigDecimal islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
-        //noinspection BigDecimalMethodWithoutRoundingCalled
-        BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(islandBank.divide(new BigDecimal(bankWorthRate)));
+        BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
+                islandBank.divide(new BigDecimal(bankWorthRate), 2, RoundingMode.HALF_DOWN));
 
         finalIslandWorth = finalIslandWorth.add(bonusWorth);
 
