@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -466,7 +467,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPortalEnter(EntityPortalEnterEvent e){
-        if(!(e.getEntity() instanceof Player))
+        if(!(e.getEntity() instanceof Player) || ServerVersion.isLessThan(ServerVersion.v1_16))
             return;
 
         Material originalMaterial = e.getLocation().getBlock().getType();
@@ -503,14 +504,14 @@ public final class PlayersListener implements Listener {
         if(cancellable != null)
             cancellable.setCancelled(true);
 
+        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
+            return;
+
         World.Environment environment = teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
                 World.Environment.NETHER : World.Environment.THE_END;
 
         if(environment == superiorPlayer.getWorld().getEnvironment())
             environment = World.Environment.NORMAL;
-
-        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
-            return;
 
         if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
                 (environment == World.Environment.THE_END && !island.isEndEnabled())){
