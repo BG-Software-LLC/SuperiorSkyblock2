@@ -126,16 +126,24 @@ public final class IslandDeserializer {
 
                 if(name.contains("-")){
                     String[] nameSections = name.split("-");
-                    warpCategory = island.createWarpCategory(nameSections[0]);
+                    String category = IslandUtils.getWarpName(nameSections[0]);
+
+                    if(!category.isEmpty())
+                        warpCategory = island.createWarpCategory(category);
+
                     name = nameSections[1];
                 }
+
+                name = IslandUtils.getWarpName(name);
+
+                if(name.isEmpty())
+                    continue;
 
                 IslandWarp islandWarp = island.createWarp(name, FileUtils.toLocation(sections[1]), warpCategory);
                 islandWarp.setPrivateFlag(privateFlag);
 
                 if(sections.length == 4)
                     islandWarp.setIcon(ItemUtils.deserializeItem(sections[3]));
-
             }catch(Exception ignored){}
         }
     }

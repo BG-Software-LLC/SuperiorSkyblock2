@@ -77,6 +77,11 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
         String warpName = IslandUtils.getWarpName(args[1]);
 
+        if(warpName.isEmpty()){
+            Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+            return;
+        }
+
         if(island.getWarp(warpName) != null){
             Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
             return;
@@ -87,7 +92,17 @@ public final class CmdSetWarp implements IPermissibleCommand {
             return;
         }
 
-        WarpCategory warpCategory = args.length == 3 ? island.createWarpCategory(IslandUtils.getWarpName(args[2])) : null;
+        String categoryName = null;
+
+        if(args.length == 3){
+            categoryName = IslandUtils.getWarpName(args[2]);
+            if(categoryName.isEmpty()){
+                Locale.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
+                return;
+            }
+        }
+
+        WarpCategory warpCategory = categoryName == null ? null : island.createWarpCategory(categoryName);
 
         island.createWarp(warpName, superiorPlayer.getLocation(), warpCategory);
 

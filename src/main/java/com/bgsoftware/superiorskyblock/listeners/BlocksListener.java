@@ -640,19 +640,27 @@ public final class BlocksListener implements Listener {
                 return true;
             }
 
-            String warpName = StringUtils.stripColors(lines[1].trim());
+            String warpName = IslandUtils.getWarpName(StringUtils.stripColors(lines[1].trim()));
             boolean privateFlag = lines[2].equalsIgnoreCase("private");
 
-            if(warpName.replace(" ", "").isEmpty() || island.getWarp(warpName) != null){
-                if(message)
-                    Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
-                for (int i = 0; i < 4; i++)
+            if(warpName.isEmpty() || island.getWarp(warpName) != null){
+                if(message) {
+                    if(warpName.isEmpty())
+                        Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+                    else
+                        Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+                }
+
+                for (int i = 0; i < 4; i++) {
                     lines[i] = "";
+                }
             }
             else {
                 List<String> signWarp = plugin.getSettings().signWarp;
+
                 for (int i = 0; i < signWarp.size(); i++)
                     lines[i] = signWarp.get(i).replace("{0}", warpName);
+
                 IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
                 islandWarp.setPrivateFlag(privateFlag);
                 if(message)
