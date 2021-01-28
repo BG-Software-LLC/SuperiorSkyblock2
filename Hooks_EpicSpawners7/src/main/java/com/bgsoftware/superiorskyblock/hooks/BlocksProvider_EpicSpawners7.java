@@ -65,13 +65,18 @@ public final class BlocksProvider_EpicSpawners7 implements BlocksProvider {
             Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
+            // When the spawner is a vanilla one, SSB already handles one placement from vanilla events
+            // However, custom ones aren't handled there and only here, so we don't subtract one from the amount.
+            if(Key.of(e.getSpawner().getLocation().getBlock()).equals(blockKey))
+                increaseAmount--;
+
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
                 e.setCancelled(true);
                 Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             }
 
             else{
-                island.handleBlockPlace(blockKey, increaseAmount - 1);
+                island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
