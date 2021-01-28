@@ -11,6 +11,7 @@ import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
 import com.songoda.epicspawners.api.events.SpawnerPlaceEvent;
+import com.songoda.epicspawners.spawners.spawner.Spawner;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -35,19 +36,18 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
         int blockCount = -1;
+        String entityType = null;
         if(Bukkit.isPrimaryThread()){
-            blockCount = instance.getSpawnerManager().getSpawnerFromWorld(location).getFirstStack().getStackSize();
+            Spawner spawner = instance.getSpawnerManager().getSpawnerFromWorld(location);
+            blockCount = spawner.getFirstStack().getStackSize();
+            entityType = spawner.getIdentifyingName();
         }
-        return new Pair<>(blockCount, null);
+        return new Pair<>(blockCount, entityType);
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
-        try {
-            return instance.getSpawnerManager().getSpawnerData(itemStack).getEntities().get(0).name();
-        }catch (Exception ex){
-            return "PIG";
-        }
+        return instance.getSpawnerManager().getSpawnerData(itemStack).getIdentifyingName();
     }
 
     @SuppressWarnings("unused")
@@ -62,7 +62,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName().toUpperCase().replace(' ', '_'));
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
@@ -82,7 +82,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName().toUpperCase().replace(' ', '_'));
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
 
             int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
@@ -103,8 +103,13 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null)
-                island.handleBlockBreak(e.getSpawner().getLocation().getBlock(), e.getSpawner().getFirstStack().getStackSize());
+
+            if(island == null)
+                return;
+
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
+
+            island.handleBlockBreak(blockKey, e.getSpawner().getFirstStack().getStackSize());
         }
 
     }
