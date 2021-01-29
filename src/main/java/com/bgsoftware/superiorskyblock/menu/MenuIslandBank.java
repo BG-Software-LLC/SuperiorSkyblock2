@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
@@ -52,7 +54,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                             BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
                             BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank()
                                     .withdrawMoney(superiorPlayer, newAmount, null);
-                            MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, withdrawSlot);
+                            handleWithdraw(superiorPlayer, island, this, bankTransaction, withdrawSlot, newAmount);
                         }catch (IllegalArgumentException ex){
                             Locale.INVALID_AMOUNT.send(superiorPlayer, message);
                         }
@@ -73,7 +75,7 @@ public final class MenuIslandBank extends SuperiorMenu {
             }
 
             BankTransaction bankTransaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, commandsToExecute);
-            handleTransaction(superiorPlayer, bankTransaction, e.getRawSlot());
+            handleWithdraw(superiorPlayer, island, this, bankTransaction, e.getRawSlot(), amount);
         }
 
         else if(containsData(e.getRawSlot() + "-deposit")){
@@ -88,7 +90,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                     try{
                         BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
                         BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, newAmount);
-                        MenuIslandBank.handleTransaction(superiorPlayer, bankTransaction, depositSlot);
+                        handleDeposit(superiorPlayer, island, this, bankTransaction, depositSlot, newAmount);
                     }catch(IllegalArgumentException ex){
                         Locale.INVALID_AMOUNT.send(superiorPlayer, message);
                     }
@@ -103,7 +105,7 @@ public final class MenuIslandBank extends SuperiorMenu {
             else {
                 BigDecimal amount = plugin.getProviders().getBalanceForBanks(superiorPlayer).multiply(BigDecimal.valueOf(depositPercentage / 100D));
                 BankTransaction bankTransaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
-                handleTransaction(superiorPlayer, bankTransaction, e.getRawSlot());
+                handleDeposit(superiorPlayer, island, this, bankTransaction, e.getRawSlot(), amount);
             }
         }
     }
@@ -181,17 +183,78 @@ public final class MenuIslandBank extends SuperiorMenu {
         SuperiorMenu.refreshMenus(MenuIslandBank.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    public static void handleTransaction(SuperiorPlayer superiorPlayer, BankTransaction bankTransaction, int clickedSlot){
-        MenuIslandBank menu = new MenuIslandBank(null, null);
-
+    public static void handleDeposit(SuperiorPlayer superiorPlayer, Island island, MenuIslandBank menuIslandBank, BankTransaction bankTransaction, int clickedSlot, BigDecimal amount){
         if(bankTransaction.getFailureReason().isEmpty()){
-            SoundWrapper successSound = (SoundWrapper) menu.getData(clickedSlot + "-success-sound");
-            if(successSound != null)
-                successSound.playSound(superiorPlayer.asPlayer());
-        }else{
-            SoundWrapper failSound = (SoundWrapper) menu.getData(clickedSlot + "-fail-sound");
-            if(failSound != null)
-                failSound.playSound(superiorPlayer.asPlayer());
+            if(menuIslandBank != null) {
+                SoundWrapper successSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-success-sound");
+                if (successSound != null)
+                    successSound.playSound(superiorPlayer.asPlayer());
+            }
+        }
+        else{
+            if(menuIslandBank != null) {
+                SoundWrapper failSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-fail-sound");
+                if (failSound != null)
+                    failSound.playSound(superiorPlayer.asPlayer());
+            }
+
+            String failureReason = bankTransaction.getFailureReason();
+
+            if(!failureReason.isEmpty()) {
+                switch (failureReason) {
+                    case "No permission":
+                        Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
+                        break;
+                    case "Invalid amount":
+                        Locale.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        break;
+                    case "Not enough money":
+                        Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, StringUtils.format(amount));
+                        break;
+                    case "Exceed bank limit":
+                        Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
+                        break;
+                    default:
+                        Locale.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
+                        break;
+                }
+            }
+        }
+    }
+
+    public static void handleWithdraw(SuperiorPlayer superiorPlayer, Island island, MenuIslandBank menuIslandBank, BankTransaction bankTransaction, int clickedSlot, BigDecimal amount){
+        if(bankTransaction.getFailureReason().isEmpty()){
+            if(menuIslandBank != null) {
+                SoundWrapper successSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-success-sound");
+                if (successSound != null)
+                    successSound.playSound(superiorPlayer.asPlayer());
+            }
+        }
+        else{
+            if(menuIslandBank != null) {
+                SoundWrapper failSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-fail-sound");
+                if (failSound != null)
+                    failSound.playSound(superiorPlayer.asPlayer());
+            }
+
+            String failureReason = bankTransaction.getFailureReason();
+
+            if(!failureReason.isEmpty()){
+                switch (failureReason){
+                    case "No permission":
+                        Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
+                        break;
+                    case "Invalid amount":
+                        Locale.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        break;
+                    case "Bank is empty":
+                        Locale.ISLAND_BANK_EMPTY.send(superiorPlayer);
+                        break;
+                    default:
+                        Locale.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
+                        break;
+                }
+            }
         }
     }
 

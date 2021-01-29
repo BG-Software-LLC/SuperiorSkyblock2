@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
@@ -75,28 +75,7 @@ public final class CmdDeposit implements ISuperiorCommand {
         }catch(IllegalArgumentException ignored){}
 
         BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
-
-        String failureReason = transaction.getFailureReason();
-
-        if(!failureReason.isEmpty()) {
-            switch (failureReason) {
-                case "No permission":
-                    Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
-                    break;
-                case "Invalid amount":
-                    Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
-                    break;
-                case "Not enough money":
-                    Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, args[1]);
-                    break;
-                case "Exceed bank limit":
-                    Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
-                    break;
-                default:
-                    Locale.DEPOSIT_ERROR.send(sender, failureReason);
-                    break;
-            }
-        }
+        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction, 0, amount);
     }
 
     @Override

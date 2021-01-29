@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
@@ -74,25 +74,7 @@ public final class CmdWithdraw implements ISuperiorCommand {
         }catch(IllegalArgumentException ignored){}
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-
-        String failureReason = transaction.getFailureReason();
-
-        if(!failureReason.isEmpty()){
-            switch (failureReason){
-                case "No permission":
-                    Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
-                    break;
-                case "Invalid amount":
-                    Locale.INVALID_AMOUNT.send(superiorPlayer, args[1]);
-                    break;
-                case "Bank is empty":
-                    Locale.ISLAND_BANK_EMPTY.send(sender);
-                    break;
-                default:
-                    Locale.WITHDRAW_ERROR.send(sender, failureReason);
-                    break;
-            }
-        }
+        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction, -1, amount);
     }
 
     @Override
