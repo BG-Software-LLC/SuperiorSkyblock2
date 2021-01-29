@@ -5,13 +5,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
 import com.songoda.epicspawners.api.events.SpawnerPlaceEvent;
 import com.songoda.epicspawners.spawners.spawner.PlacedSpawner;
+import com.songoda.epicspawners.spawners.spawner.SpawnerData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -62,21 +65,33 @@ public final class BlocksProvider_EpicSpawners7 implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
+            SpawnerData spawnerData = e.getSpawner().getFirstStack().getSpawnerData();
+
+            Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
-            // When the spawner is a vanilla one, SSB already handles one placement from vanilla events
-            // However, custom ones aren't handled there and only here, so we don't subtract one from the amount.
-            if(Key.of(e.getSpawner().getLocation().getBlock()).equals(blockKey))
+            if(spawnerData.isCustom()) {
+                // Custom spawners are egg spawners. Therefore, we want to remove one egg spawner from the counts and
+                // replace it with the custom spawner. We subtract the spawner 1 tick later, so it will be registered
+                // before removing it.
+                Executor.sync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
+            }
+            else{
+                // Vanilla spawners are listened in the vanilla listeners as well, and therefore 1 spawner is already
+                // being counted by the other listeners. We need to subtract 1 so the counts will be adjusted correctly.
                 increaseAmount--;
+            }
 
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+            if(increaseAmount <= 0)
+                return;
+
+            if(island.hasReachedBlockLimit(spawnerKey, increaseAmount)){
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(spawnerKey.toString()));
             }
 
             else{
-                island.handleBlockPlace(blockKey, increaseAmount);
+                island.handleBlockPlace(spawnerKey, increaseAmount);
             }
         }
 

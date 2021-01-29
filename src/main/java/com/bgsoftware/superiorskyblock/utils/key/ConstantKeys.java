@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.key;
 
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+
 public final class ConstantKeys {
 
     private ConstantKeys(){
@@ -18,5 +20,6 @@ public final class ConstantKeys {
     public static final Key CHEST = Key.of("CHEST");
     public static final Key AIR = Key.of("AIR");
     public static final Key CAULDRON = Key.of("CAULDRON");
+    public static final Key EGG_MOB_SPAWNER = Key.of(Materials.SPAWNER.toBukkitType() + ":EGG");
 
 }
