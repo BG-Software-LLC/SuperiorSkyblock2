@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.utils.missions.MissionUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,8 +32,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
         super("menuPlayerMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getPlayerMissions().stream()
-                    .filter(mission -> (!mission.isOnlyShowIfRequiredCompleted() || plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)) &&
-                            (!removeCompleted || superiorPlayer.canCompleteMissionAgain(mission)))
+                    .filter(mission -> MissionUtils.canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
             if(sortByCompletion)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
