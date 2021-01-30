@@ -22,8 +22,8 @@ public final class MissionUtils {
         }
 
         if(removeCompleted){
-            if(mission.getIslandMission() ? superiorPlayer.getIsland().canCompleteMissionAgain(mission) :
-                    superiorPlayer.canCompleteMissionAgain(mission))
+            if(mission.getIslandMission() ? !superiorPlayer.getIsland().canCompleteMissionAgain(mission) :
+                    !superiorPlayer.canCompleteMissionAgain(mission))
                 return false;
         }
 
