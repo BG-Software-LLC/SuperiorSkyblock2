@@ -256,7 +256,7 @@ public final class SettingsHandler extends AbstractHandler {
         islandsHeight = cfg.getInt("islands-height", 100);
         worldBordersEnabled = cfg.getBoolean("world-borders", true);
         stackedBlocksEnabled = cfg.getBoolean("stacked-blocks.enabled", true);
-        stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disfabled-worlds");
+        stackedBlocksDisabledWorlds = cfg.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = new KeySet(cfg.getStringList("stacked-blocks.whitelisted"));
         stackedBlocksName = StringUtils.translateColors(cfg.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = new KeyMap<>();

@@ -112,6 +112,9 @@ stacked-blocks:
   # Custom name for the blocks.
   custom-name: '&ex{0} {1}'
 
+  # A list of worlds that blocks cannot stack in.
+  disabled-worlds: []
+
   # A list of whitelisted blocks that will get stacked when players have stack mode toggled on.
   whitelisted:
   - 'DIAMOND_BLOCK'
