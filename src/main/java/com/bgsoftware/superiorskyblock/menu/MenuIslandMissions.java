@@ -36,7 +36,7 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
             this.missions = plugin.getMissions().getIslandMissions().stream()
                     .filter(mission -> MissionUtils.canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
-            if(sortByCompletion)
+            if(sortByCompletion && superiorPlayer.getIsland() != null)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
         }
     }
