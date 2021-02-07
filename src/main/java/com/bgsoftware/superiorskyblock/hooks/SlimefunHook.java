@@ -47,7 +47,7 @@ public final class SlimefunHook implements ProtectionModule, Listener {
         if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
             return true;
 
-        if(protectableAction == ProtectableAction.PVP)
+        if(protectableAction.name().equals("PVP") || protectableAction.name().equals("ATTACK_PLAYER"))
             return island != null && island.hasSettingsEnabled(IslandFlags.PVP);
 
         IslandPrivilege islandPrivilege;
