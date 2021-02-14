@@ -81,9 +81,11 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
     public final String netherWorldName;
+    public final boolean netherSchematicOffset;
     public final boolean endWorldEnabled;
     public final boolean endWorldUnlocked;
     public final String endWorldName;
+    public final boolean endSchematicOffset;
     public final boolean optimizeWorlds;
     public final String worldsDifficulty;
     public final String spawnLocation;
@@ -289,10 +291,12 @@ public final class SettingsHandler extends AbstractHandler {
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = cfg.getString("worlds.nether.name", "");
         this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
+        netherSchematicOffset = cfg.getBoolean("worlds.nether.schematic-offset", true);
         endWorldEnabled = cfg.getBoolean("worlds.end.enabled", false);
         endWorldUnlocked = cfg.getBoolean("worlds.end.unlock", false);
         String endWorldName = cfg.getString("worlds.end.name", "");
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
+        endSchematicOffset = cfg.getBoolean("worlds.end.schematic-offset", true);
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");

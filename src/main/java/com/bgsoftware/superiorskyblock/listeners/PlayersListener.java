@@ -66,6 +66,7 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -524,6 +525,9 @@ public final class PlayersListener implements Listener {
         Location toTeleport = environment == World.Environment.NORMAL ? island.getTeleportLocation(environment) :
                 getLocationNoException(island, environment);
 
+        boolean offsetSchematic = environment == World.Environment.NETHER ?
+                plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
+
         if(toTeleport != null) {
             if(environment != World.Environment.NORMAL && !island.wasSchematicGenerated(environment)){
                 String schematicName = island.getSchematicName();
@@ -532,9 +536,18 @@ public final class PlayersListener implements Listener {
 
                 Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
                 if(schematic != null) {
+                    BigDecimal originalWorth = island.getRawWorth(), originalLevel = island.getRawLevel();
                     schematic.pasteSchematic(island, island.getCenter(environment).getBlock().
-                            getRelative(BlockFace.DOWN).getLocation(), () -> handleTeleport(plugin, superiorPlayer, island,
-                            ((BaseSchematic) schematic).getTeleportLocation(toTeleport)), Throwable::printStackTrace);
+                            getRelative(BlockFace.DOWN).getLocation(), () -> {
+                        if(offsetSchematic) {
+                            BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth),
+                                    schematicLevel = island.getRawLevel().subtract(originalLevel);
+                            island.setBonusWorth(island.getBonusWorth().subtract(schematicWorth));
+                            island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
+                        }
+
+                        handleTeleport(plugin, superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport));
+                    }, Throwable::printStackTrace);
                     island.setSchematicGenerate(environment);
                 }
                 else{
