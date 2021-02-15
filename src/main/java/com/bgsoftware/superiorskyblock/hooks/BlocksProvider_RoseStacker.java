@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
@@ -16,6 +17,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
@@ -42,6 +48,21 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
     @Override
     public String getSpawnerType(ItemStack itemStack) {
         return StackerUtils.getStackedItemEntityType(itemStack).name();
+    }
+
+    @Override
+    public Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition) {
+        if(!Bukkit.isPrimaryThread())
+            return null;
+
+        Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blockKeys = new HashMap<>();
+        RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
+                .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
+                .forEach(entry -> {
+                    com.bgsoftware.superiorskyblock.api.key.Key blockKey = Key.of(entry.getKey());
+                    blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + 1);
+                });
+        return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
     }
 
     public static boolean isRegistered(){

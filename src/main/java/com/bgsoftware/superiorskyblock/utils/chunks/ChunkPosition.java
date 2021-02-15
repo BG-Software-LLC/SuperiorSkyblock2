@@ -40,6 +40,10 @@ public final class ChunkPosition {
         return z;
     }
 
+    public boolean isInsideChunk(Location location){
+        return location.getWorld().getName().equals(worldName) && location.getBlockX() >> 4 == x && location.getBlockZ() == z;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

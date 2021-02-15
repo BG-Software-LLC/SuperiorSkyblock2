@@ -1196,6 +1196,7 @@ public final class SIsland implements Island {
         SyncedObject<BigDecimal> islandLevel = SyncedObject.of(BigDecimal.ZERO);
 
         Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
+        Set<ChunkPosition> chunksToCheck = new HashSet<>();
         Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
 
         Executor.createTask().runAsync(v -> {
@@ -1220,18 +1221,19 @@ public final class SIsland implements Island {
                 }
 
                 // Load stacked blocks
-                if(snapshot == null){
-                    for(Pair<Integer, com.bgsoftware.superiorskyblock.api.key.Key> pair : plugin.getProviders().getBlocks(calculatedChunk.getPosition()))
-                        handleBlockPlace(pair.getValue(), pair.getKey() - 1, false, blockCounts, islandWorth, islandLevel);
+                if(snapshot != null){
+                    for(Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(calculatedChunk.getPosition())){
+                        handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey() - 1, false,
+                                blockCounts, islandWorth, islandLevel);
+                    }
                 }
-                else for(Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(calculatedChunk.getPosition())){
-                    handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey() - 1, false,
-                            blockCounts, islandWorth, islandLevel);
+                else if(plugin.getProviders().getBlocks(calculatedChunk.getPosition()) == null){
+                    chunksToCheck.add(calculatedChunk.getPosition());
                 }
 
                 for(StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
-                    handleBlockPlace(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1,
-                            false, blockCounts, islandWorth, islandLevel);
+                    handleBlockPlace(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1, false, blockCounts, islandWorth, islandLevel);
+
             }, (cF, ex) -> {
                 SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                 ex.printStackTrace();
@@ -1261,6 +1263,11 @@ public final class SIsland implements Island {
                 }catch(Throwable ignored){}
             }
             spawnersToCheck.clear();
+
+            for(ChunkPosition chunkPosition : chunksToCheck) {
+                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition))
+                    handleBlockPlace(pair.getKey(), pair.getValue() - 1, false, blockCounts, islandWorth, islandLevel);
+            }
 
             this.blockCounts.write(_blockCounts -> {
                 _blockCounts.clear();

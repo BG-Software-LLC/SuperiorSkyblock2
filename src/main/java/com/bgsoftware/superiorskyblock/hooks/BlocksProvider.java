@@ -22,7 +22,7 @@ public interface BlocksProvider extends SpawnersProvider {
         return "PIG";
     }
 
-    default Set<Pair<Integer, Key>> getBlocks(ChunkPosition chunkPosition){
+    default Set<Pair<Key, Integer>> getBlocks(ChunkPosition chunkPosition){
         return Collections.emptySet();
     }
 
