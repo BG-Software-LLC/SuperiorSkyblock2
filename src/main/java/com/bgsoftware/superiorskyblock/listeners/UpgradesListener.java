@@ -12,13 +12,13 @@ import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
@@ -61,6 +61,10 @@ public final class UpgradesListener implements Listener {
 
     public UpgradesListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+        Executor.sync(() -> {
+            if(Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
+                Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
+        }, 1L);
     }
 
     /*
@@ -69,23 +73,26 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(SpawnerSpawnEvent e) {
-        if(e.getSpawner() == null || e.getSpawner().getLocation() == null)
+        handleSpawnerSpawn(e.getSpawner());
+    }
+
+    private void handleSpawnerSpawn(CreatureSpawner spawner){
+        if(spawner == null || spawner.getLocation() == null)
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
+        Island island = plugin.getGrid().getIslandAt(spawner.getLocation());
 
         if(island == null)
             return;
 
         double spawnerRatesMultiplier = island.getSpawnerRatesMultiplier();
 
-        if(spawnerRatesMultiplier > 1){
+        if(spawnerRatesMultiplier > 1 && !alreadySet.contains(island.getOwner().getUniqueId())){
+            alreadySet.add(island.getOwner().getUniqueId());
             Executor.sync(() -> {
-                if(!alreadySet.contains(island.getOwner().getUniqueId())) {
-                    alreadySet.add(island.getOwner().getUniqueId());
-                    e.getSpawner().setDelay((int)
-                            Math.round(plugin.getNMSAdapter().getSpawnerDelay(e.getSpawner()) / spawnerRatesMultiplier));
-                    e.getSpawner().update();
+                int spawnDelay = plugin.getNMSAdapter().getSpawnerDelay(spawner);
+                if(spawnDelay > 0) {
+                    plugin.getNMSAdapter().setSpawnerDelay(spawner, (int) Math.round(spawnDelay / spawnerRatesMultiplier));
                     Executor.sync(() -> alreadySet.remove(island.getOwner().getUniqueId()), 10L);
                 }
             }, 5L);
@@ -450,6 +457,15 @@ public final class UpgradesListener implements Listener {
         }
 
         throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
+    }
+
+    private class WildStackerListener implements Listener {
+
+        @EventHandler
+        public void onWildStackerStackSpawn(com.bgsoftware.wildstacker.api.events.SpawnerStackedEntitySpawnEvent e){
+            handleSpawnerSpawn(e.getSpawner());
+        }
+
     }
 
 }

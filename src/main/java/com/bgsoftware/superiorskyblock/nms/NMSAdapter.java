@@ -34,6 +34,8 @@ public interface NMSAdapter {
 
     int getSpawnerDelay(CreatureSpawner creatureSpawner);
 
+    void setSpawnerDelay(CreatureSpawner creatureSpawner, int spawnDelay);
+
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
     void setSkinTexture(SuperiorPlayer superiorPlayer);

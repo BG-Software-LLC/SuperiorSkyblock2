@@ -99,6 +99,14 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     }
 
     @Override
+    public void setSpawnerDelay(CreatureSpawner creatureSpawner, int spawnDelay) {
+        Location location = creatureSpawner.getLocation();
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld()).getHandle().getTileEntity(blockPosition);
+        mobSpawner.getSpawner().spawnDelay = spawnDelay;
+    }
+
+    @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         try {
             if(!plugin.getSettings().worldBordersEnabled)
