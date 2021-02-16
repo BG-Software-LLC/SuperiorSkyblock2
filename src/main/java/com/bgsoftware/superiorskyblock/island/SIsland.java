@@ -1227,8 +1227,16 @@ public final class SIsland implements Island {
                                 blockCounts, islandWorth, islandLevel);
                     }
                 }
-                else if(plugin.getProviders().getBlocks(calculatedChunk.getPosition()) == null){
-                    chunksToCheck.add(calculatedChunk.getPosition());
+                else {
+                    Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
+                            plugin.getProviders().getBlocks(calculatedChunk.getPosition());
+                    if(stackedBlocks == null){
+                        chunksToCheck.add(calculatedChunk.getPosition());
+                    }
+                    else {
+                        for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : stackedBlocks)
+                            handleBlockPlace(pair.getKey(), pair.getValue() - 1, false, blockCounts, islandWorth, islandLevel);
+                    }
                 }
 
                 for(StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
@@ -1268,6 +1276,7 @@ public final class SIsland implements Island {
                 for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition))
                     handleBlockPlace(pair.getKey(), pair.getValue() - 1, false, blockCounts, islandWorth, islandLevel);
             }
+            chunksToCheck.clear();
 
             this.blockCounts.write(_blockCounts -> {
                 _blockCounts.clear();

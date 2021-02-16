@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
+import dev.rosewood.rosestacker.event.BlockStackEvent;
+import dev.rosewood.rosestacker.event.BlockUnstackEvent;
 import dev.rosewood.rosestacker.event.SpawnerStackEvent;
 import dev.rosewood.rosestacker.event.SpawnerUnstackEvent;
 import dev.rosewood.rosestacker.stack.StackedSpawner;
@@ -60,7 +62,7 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
                 .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
                 .forEach(entry -> {
                     com.bgsoftware.superiorskyblock.api.key.Key blockKey = Key.of(entry.getKey());
-                    blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + 1);
+                    blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
                 });
         return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
     }
@@ -91,6 +93,26 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
             if(island != null) {
                 Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getStack().getSpawner().getSpawnedType());
                 island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBlockStack(BlockStackEvent e){
+            Location location = e.getStack().getLocation();
+            Island island = plugin.getGrid().getIslandAt(location);
+            if(island != null) {
+                Key blockKey = Key.of(e.getStack().getBlock());
+                island.handleBlockPlace(blockKey, e.getIncreaseAmount());
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBlockUnstack(BlockUnstackEvent e){
+            Location location = e.getStack().getLocation();
+            Island island = plugin.getGrid().getIslandAt(location);
+            if(island != null) {
+                Key blockKey = Key.of(e.getStack().getBlock());
+                island.handleBlockBreak(blockKey, e.getDecreaseAmount());
             }
         }
 
