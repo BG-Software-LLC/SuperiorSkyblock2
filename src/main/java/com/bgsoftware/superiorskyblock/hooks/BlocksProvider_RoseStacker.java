@@ -6,15 +6,18 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
 import dev.rosewood.rosestacker.event.BlockUnstackEvent;
 import dev.rosewood.rosestacker.event.SpawnerStackEvent;
 import dev.rosewood.rosestacker.event.SpawnerUnstackEvent;
 import dev.rosewood.rosestacker.stack.StackedSpawner;
+import dev.rosewood.rosestacker.utils.ItemUtils;
 import dev.rosewood.rosestacker.utils.StackerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +30,7 @@ import java.util.stream.Collectors;
 
 public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
+    private static final ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
     private static boolean registered = false;
 
     public BlocksProvider_RoseStacker(){
@@ -49,7 +53,9 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
-        return StackerUtils.getStackedItemEntityType(itemStack).name();
+        return GET_STACKED_ITEM_ENTITY_TYPE.isValid() ?
+                GET_STACKED_ITEM_ENTITY_TYPE.invoke(null, itemStack).name() :
+                ItemUtils.getStackedItemEntityType(itemStack).name();
     }
 
     @Override
@@ -102,7 +108,7 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
             Island island = plugin.getGrid().getIslandAt(location);
             if(island != null) {
                 Key blockKey = Key.of(e.getStack().getBlock());
-                island.handleBlockPlace(blockKey, e.getIncreaseAmount());
+                island.handleBlockPlace(blockKey, e.isNew() ? e.getIncreaseAmount() - 1 : e.getIncreaseAmount());
             }
         }
 
