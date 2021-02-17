@@ -24,11 +24,11 @@ public final class SIslandPreview implements IslandPreview {
         this.islandName = islandName;
 
         PlayerChat.listen(superiorPlayer.asPlayer(), message -> {
-            if(message.equalsIgnoreCase("CONFIRM")){
+            if(message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CONFIRM_TEXT.toString())){
                 handleConfirm();
                 return true;
             }
-            else if(message.equalsIgnoreCase("CANCEL")){
+            else if(message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CANCEL_TEXT.toString())){
                 handleCancel();
                 return true;
             }
