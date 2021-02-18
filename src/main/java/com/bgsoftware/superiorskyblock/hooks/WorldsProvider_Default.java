@@ -31,7 +31,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareWorlds() {
         SettingsHandler settingsHandler = new SettingsHandler(plugin);
-        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty);
+        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty.toUpperCase());
         loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
         if(settingsHandler.netherWorldEnabled)
             loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
