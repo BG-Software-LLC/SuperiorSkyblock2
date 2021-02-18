@@ -24,7 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -120,20 +120,20 @@ public final class SettingsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onFireSpread(BlockSpreadEvent e){
+    public void onFireSpread(BlockBurnEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-        if(island != null){
+        if(island != null) {
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
                 return;
 
-            if(e.getNewState().getType() == Material.FIRE && !island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
+            if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
                 e.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onFireSpread(BlockBurnEvent e){
+    public void onBlockIgnite(BlockIgniteEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
