@@ -700,7 +700,8 @@ public final class ProtectionListener implements Listener {
 
         if(!island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
+            // Using this method to fix issue #76 (A NPE error)
+            Locale.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
         }
     }
 
