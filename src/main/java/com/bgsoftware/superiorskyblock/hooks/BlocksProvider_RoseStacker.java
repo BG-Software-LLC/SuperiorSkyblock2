@@ -30,13 +30,16 @@ import java.util.stream.Collectors;
 
 public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
-    private static final ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
+    private static ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = null;
     private static boolean registered = false;
 
     public BlocksProvider_RoseStacker(){
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new BlocksProvider_RoseStacker.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
+
+            GET_STACKED_ITEM_ENTITY_TYPE = new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
+
             SuperiorSkyblockPlugin.log("Using RoseStacker as a spawners provider.");
         }
     }
