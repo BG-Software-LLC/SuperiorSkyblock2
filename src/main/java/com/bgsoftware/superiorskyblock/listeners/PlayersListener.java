@@ -479,11 +479,14 @@ public final class PlayersListener implements Listener {
         if(teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ? Bukkit.getAllowNether() : Bukkit.getAllowEnd())
             return;
 
-        int ticksDelay = ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
-        int portalTicks = plugin.getNMSAdapter().getPortalTicks(e.getEntity());
+        if(teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL){
+            int ticksDelay = ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
+            int portalTicks = plugin.getNMSAdapter().getPortalTicks(e.getEntity());
+            if(portalTicks != ticksDelay)
+                return;
+        }
 
-        if(teleportCause == PlayerTeleportEvent.TeleportCause.END_PORTAL || portalTicks == ticksDelay)
-            handlePlayerPortal(plugin, (Player) e.getEntity(), e.getLocation(), teleportCause, null);
+        handlePlayerPortal(plugin, (Player) e.getEntity(), e.getLocation(), teleportCause, null);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

@@ -365,8 +365,11 @@ public final class CustomEventsListener implements Listener {
         }
 
         if(equalIslands) {
-            if(!equalWorlds)
+            if(!equalWorlds) {
                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
+                Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
+            }
             return;
         }
 
@@ -387,10 +390,8 @@ public final class CustomEventsListener implements Listener {
             }
         }
 
-        if(toIsland.isMember(superiorPlayer)){
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
-            Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
-        }
+        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
+        Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
 
         if(plugin.getSettings().spawnProtection || !toIsland.isSpawn()) {
             if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
