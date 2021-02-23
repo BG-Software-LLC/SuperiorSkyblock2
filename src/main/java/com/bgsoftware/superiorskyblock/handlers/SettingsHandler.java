@@ -121,7 +121,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean teleportOnKick;
     public final boolean clearOnJoin;
     public final boolean rateOwnIsland;
-    public final boolean bonusAffectLevel;
     public final List<String> defaultSettings;
     public final boolean disableRedstoneOffline;
     public final boolean disableRedstoneAFK;
@@ -335,7 +334,6 @@ public final class SettingsHandler extends AbstractHandler {
         teleportOnKick = cfg.getBoolean("teleport-on-kick", false);
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
-        bonusAffectLevel = cfg.getBoolean("bonus-affect-level", true);
         defaultSettings = cfg.getStringList("default-settings");
         defaultGenerator = new KeyMap[3];
         if(cfg.isConfigurationSection("default-values.generator")){
