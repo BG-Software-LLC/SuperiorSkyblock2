@@ -322,7 +322,7 @@ public final class SettingsHandler extends AbstractHandler {
         leaveConfirm = cfg.getBoolean("leave-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
-        disbandRefund = Math.max(0, Math.min(100, cfg.getDouble("disband-confirm"))) / 100D;
+        disbandRefund = Math.max(0, Math.min(100, cfg.getDouble("disband-refund"))) / 100D;
         islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
         islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
