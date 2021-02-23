@@ -134,6 +134,9 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockIgnite(BlockIgniteEvent e){
+        if(e.getCause() != BlockIgniteEvent.IgniteCause.SPREAD)
+            return;
+
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
