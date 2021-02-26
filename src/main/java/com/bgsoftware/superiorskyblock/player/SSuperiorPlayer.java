@@ -405,7 +405,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean isInsideIsland() {
-        return isOnline() && plugin.getGrid().getIslandAt(getLocation()).equals(getIsland());
+        if(!isOnline()) return false;
+        Island island = getIsland();
+        return island != null && island.equals(plugin.getGrid().getIslandAt(getLocation()));
     }
 
     /*
