@@ -26,6 +26,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
@@ -61,6 +62,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +71,10 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
+
+    private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[] {
+            BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
+    };
 
     public static BlocksListener IMP;
     private final SuperiorSkyblockPlugin plugin;
@@ -739,9 +745,24 @@ public final class BlocksListener implements Listener {
 
         island.handleBlockBreak(block);
 
+        EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
+
+        for(BlockFace nearbyFace : NEARBY_BLOCKS){
+            Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
+            if(!nearbyBlock.getGlobalKey().equals("AIR"))
+                nearbyBlocks.put(nearbyFace, nearbyBlock);
+        }
+
         Executor.sync(() -> {
             if(plugin.getNMSAdapter().isChunkEmpty(block.getChunk()))
                 ChunksTracker.markEmpty(island, block, true);
+
+            for(BlockFace nearbyFace : NEARBY_BLOCKS){
+                Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
+                Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
+                if(oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock))
+                    island.handleBlockBreak(oldNearbyBlock, 1);
+            }
         }, 2L);
     }
 
