@@ -32,6 +32,7 @@ import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -225,10 +226,21 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakByEntityEvent e){
-        if(!(e.getRemover() instanceof Player))
+        Player remover = null;
+
+        if(e.getRemover() instanceof Player){
+            remover = (Player) e.getRemover();
+        }
+        else if(e.getRemover() instanceof Projectile){
+            ProjectileSource projectileSource = ((Projectile) e.getRemover()).getShooter();
+            if(projectileSource instanceof Player)
+                remover = (Player) projectileSource;
+        }
+
+        if(remover == null)
             return;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getRemover());
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(remover);
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island == null) {
