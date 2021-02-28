@@ -18,7 +18,7 @@ public class HandlerLoadException extends Exception {
     private final ErrorLevel errorLevel;
 
     public HandlerLoadException(String message, ErrorLevel errorLevel){
-        super(message);
+        super(message == null ? "" : message);
         this.errorLevel = errorLevel;
     }
 
