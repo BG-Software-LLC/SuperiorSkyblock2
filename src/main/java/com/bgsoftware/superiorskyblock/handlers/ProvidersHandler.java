@@ -44,6 +44,7 @@ import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.hooks.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -175,6 +176,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             if(hasPaperAsyncSupport()){
                 try {
                     asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
+                    // Only added in versions 1.13+ of paper, so it can be here
+                    Bukkit.getPluginManager().registerEvents(new PaperListener(plugin), plugin);
                     SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
                 }catch (Exception ex){
                     SuperiorSkyblockPlugin.log("Detected PaperSpigot but failed to load async chunk-loading support...");
