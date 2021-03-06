@@ -158,7 +158,8 @@ public final class MenuBiomes extends SuperiorMenu {
                     if(backButtonChar == ch){
                         backButton = slot;
                     }
-                    else if(cfg.contains("items." + ch + ".biome")){
+
+                    if(cfg.contains("items." + ch + ".biome")){
                         ConfigurationSection itemSection = cfg.getConfigurationSection("items." + ch);
                         ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + ch);
                         ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + ch);
