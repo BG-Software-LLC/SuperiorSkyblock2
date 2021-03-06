@@ -671,7 +671,8 @@ public final class PlayersListener implements Listener {
             return;
 
         //Checking for out of distance from preview location.
-        if(islandPreview.getLocation().distanceSquared(superiorPlayer.getLocation()) > 10000){
+        if(!islandPreview.getLocation().getWorld().equals(superiorPlayer.getLocation().getWorld()) ||
+                islandPreview.getLocation().distanceSquared(superiorPlayer.getLocation()) > 10000){
             islandPreview.handleEscape();
         }
     }
