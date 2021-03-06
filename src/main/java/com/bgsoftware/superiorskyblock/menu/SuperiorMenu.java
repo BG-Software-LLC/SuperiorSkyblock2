@@ -34,6 +34,10 @@ import java.util.regex.Pattern;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class SuperiorMenu implements InventoryHolder {
 
+    protected static final String[] MENU_IGNORED_SECTIONS = new String[] {
+            "items", "sounds", "commands", "back"
+    };
+
     protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Pattern COMMAND_PATTERN_ARGS = Pattern.compile("\\[(.+)](.+)");
@@ -400,6 +404,12 @@ public abstract class SuperiorMenu implements InventoryHolder {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof SuperiorMenu && ((SuperiorMenu) obj).getIdentifier().equals(getIdentifier());
+    }
+
+    protected static String[] additionalMenuSections(String... ignoredSections){
+        String[] sections = Arrays.copyOf(MENU_IGNORED_SECTIONS, MENU_IGNORED_SECTIONS.length + ignoredSections.length);
+        System.arraycopy(ignoredSections, 0, sections, MENU_IGNORED_SECTIONS.length, ignoredSections.length);
+        return sections;
     }
 
     public static void killMenu(SuperiorPlayer superiorPlayer){

@@ -214,7 +214,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         try {
-            cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), "permissions.yml", "items");
+            cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), additionalMenuSections("permissions"));
         }catch (Exception ex){
             ex.printStackTrace();
         }

@@ -106,7 +106,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
         try {
-            cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), "items", "sounds", "sections");
+            cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), MENU_IGNORED_SECTIONS);
         }catch (Exception ex){
             ex.printStackTrace();
         }
