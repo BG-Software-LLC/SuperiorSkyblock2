@@ -291,8 +291,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             String permission = islandPrivilege.getName().toLowerCase();
             if (cfg.contains("permissions." + permission)) {
                 ConfigurationSection permissionSection = cfg.getConfigurationSection("permissions." + permission);
-                menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("access.sound")));
-                menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("access.commands"));
+                menuPermissions.addData(permission + "-has-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("has-access.sound")));
+                menuPermissions.addData(permission + "-has-access-commands", cfg.getStringList("has-access.commands"));
                 menuPermissions.addData(permission + "-no-access-sound", FileUtils.getSound(permissionSection.getConfigurationSection("no-access.sound")));
                 menuPermissions.addData(permission + "-no-access-commands", cfg.getStringList("no-access.commands"));
                 menuPermissions.addData(permission + "-permission-enabled", FileUtils.getItemStack("permissions.yml", permissionSection.getConfigurationSection("permission-enabled")));
