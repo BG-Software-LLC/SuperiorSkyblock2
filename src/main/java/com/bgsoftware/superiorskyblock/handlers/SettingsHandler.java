@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -86,6 +87,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean endWorldUnlocked;
     public final String endWorldName;
     public final boolean endSchematicOffset;
+    public final boolean endDragonFight;
     public final boolean optimizeWorlds;
     public final String worldsDifficulty;
     public final String spawnLocation;
@@ -296,6 +298,7 @@ public final class SettingsHandler extends AbstractHandler {
         String endWorldName = cfg.getString("worlds.end.name", "");
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = cfg.getBoolean("worlds.end.schematic-offset", true);
+        endDragonFight = endWorldEnabled && cfg.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");

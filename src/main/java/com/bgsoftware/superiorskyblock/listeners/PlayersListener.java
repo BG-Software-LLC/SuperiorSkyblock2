@@ -531,6 +531,8 @@ public final class PlayersListener implements Listener {
         boolean offsetSchematic = environment == World.Environment.NETHER ?
                 plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
 
+        boolean endPortal = environment == World.Environment.THE_END;
+
         if(toTeleport != null) {
             if(environment != World.Environment.NORMAL && !island.wasSchematicGenerated(environment)){
                 String schematicName = island.getSchematicName();
@@ -548,6 +550,12 @@ public final class PlayersListener implements Listener {
                             island.setBonusWorth(island.getBonusWorth().subtract(schematicWorth));
                             island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
                         }
+
+                        if(endPortal)
+                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
+
+                        if(endPortal && plugin.getSettings().endDragonFight)
+                            plugin.getNMSDragonFight().startDragonBattle(island, toTeleport);
 
                         handleTeleport(plugin, superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport));
                     }, Throwable::printStackTrace);

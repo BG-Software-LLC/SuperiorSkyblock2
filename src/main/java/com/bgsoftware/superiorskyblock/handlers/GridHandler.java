@@ -92,6 +92,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public void loadData(){
         lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
         Executor.sync(this::updateSpawn);
+        Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
 
     public void updateSpawn(){
@@ -244,6 +245,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         });
         islands.remove(island.getOwner().getUniqueId());
         plugin.getDataHandler().deleteIsland(island, !pluginDisable);
+        plugin.getNMSDragonFight().removeDragonBattle(island);
         ChunksTracker.removeIsland(island);
     }
 

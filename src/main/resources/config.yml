@@ -297,6 +297,9 @@ worlds:
     name: ''
     # Should the schematic of end will not be counted towards worth and level values?
     schematic-offset: true
+    # Should dragon fight be enabled? This will spawn dragons for each island.
+    # This feature is in beta, expect bugs!
+    dragon-fight: false
   # Should the plugin optimize the island worlds?
   # When enabled, only chunks of islands will be saved from the island worlds.
   optimize: false

@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
+import com.bgsoftware.superiorskyblock.listeners.DragonListener;
 import com.bgsoftware.superiorskyblock.listeners.GeneratorsListener;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
@@ -34,6 +35,7 @@ import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
+import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -53,6 +55,8 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -90,6 +94,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
     private NMSHolograms nmsHolograms;
+    private NMSDragonFight nmsDragonFight;
 
     private ChunkGenerator worldGenerator = null;
 
@@ -166,6 +171,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new BlocksListener(this));
                 safeEventsRegister(new ChunksListener(this));
                 safeEventsRegister(new CustomEventsListener(this));
+                safeEventsRegister(new DragonListener(this));
                 safeEventsRegister(new GeneratorsListener(this));
                 safeEventsRegister(new MenusListener(this));
                 safeEventsRegister(new PlayersListener(this));
@@ -265,6 +271,35 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
             nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
+            if(new SettingsHandler(this).endDragonFight)
+                nmsDragonFight = (NMSDragonFight) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSDragonFight_" + version).newInstance();
+            else
+                nmsDragonFight = new NMSDragonFight() {
+                    @Override
+                    public void startDragonBattle(Island island, Location location) {
+
+                    }
+
+                    @Override
+                    public void removeDragonBattle(Island island) {
+
+                    }
+
+                    @Override
+                    public void tickBattles() {
+
+                    }
+
+                    @Override
+                    public void setDragonPhase(EnderDragon enderDragon, Object phase) {
+
+                    }
+
+                    @Override
+                    public void awardTheEndAchievement(Player player) {
+
+                    }
+                };
             return true;
         }catch(Exception ex){
             log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
@@ -447,6 +482,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSHolograms getNMSHolograms() {
         return nmsHolograms;
+    }
+
+    public NMSDragonFight getNMSDragonFight() {
+        return nmsDragonFight;
     }
 
     public String getFileName(){
