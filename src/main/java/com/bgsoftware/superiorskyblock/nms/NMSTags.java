@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -15,7 +16,7 @@ public interface NMSTags {
 
     ItemStack getFromNBTTag(ItemStack itemStack, CompoundTag compoundTag);
 
-    CompoundTag getNBTTag(LivingEntity livingEntity);
+    CompoundTag getNBTTag(Entity entity);
 
     void spawnEntity(EntityType entityType, Location location, CompoundTag compoundTag);
 

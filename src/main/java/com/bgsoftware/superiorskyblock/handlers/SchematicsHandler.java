@@ -179,7 +179,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             }
         }
 
-        for(LivingEntity livingEntity : getEntities(min, max)){
+        for(Entity livingEntity : getEntities(min, max)){
             entities.add(new TagBuilder().applyEntity(livingEntity, min).build());
         }
 
@@ -253,16 +253,16 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         }
     }
 
-    private List<LivingEntity> getEntities(Location min, Location max){
-        List<LivingEntity> livingEntities = new ArrayList<>();
+    private List<Entity> getEntities(Location min, Location max){
+        List<Entity> livingEntities = new ArrayList<>();
 
         Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
         for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
             for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
                 Chunk currentChunk = min.getWorld().getChunkAt(x, z);
                 for(Entity entity : currentChunk.getEntities()) {
-                    if (entity instanceof LivingEntity && !(entity instanceof Player) && betweenLocations(entity.getLocation(), min, max))
-                        livingEntities.add((LivingEntity) entity);
+                    if (!(entity instanceof Player) && betweenLocations(entity.getLocation(), min, max))
+                        livingEntities.add(entity);
                 }
             }
         }

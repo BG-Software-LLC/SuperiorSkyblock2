@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import net.minecraft.server.v1_9_R1.ChunkRegionLoader;
-import net.minecraft.server.v1_9_R1.EntityLiving;
+import net.minecraft.server.v1_9_R1.Entity;
 import net.minecraft.server.v1_9_R1.ItemStack;
 import net.minecraft.server.v1_9_R1.MinecraftKey;
 import net.minecraft.server.v1_9_R1.NBTBase;
@@ -21,10 +21,9 @@ import net.minecraft.server.v1_9_R1.NBTTagShort;
 import net.minecraft.server.v1_9_R1.NBTTagString;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_9_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 
 import java.util.Set;
 
@@ -46,12 +45,12 @@ public final class NMSTags_v1_9_R1 implements NMSTags {
     }
 
     @Override
-    public CompoundTag getNBTTag(LivingEntity livingEntity) {
-        EntityLiving entityLiving = ((CraftLivingEntity) livingEntity).getHandle();
+    public CompoundTag getNBTTag(org.bukkit.entity.Entity bukkitEntity) {
+        Entity entity = ((CraftEntity) bukkitEntity).getHandle();
         NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        entityLiving.c(nbtTagCompound);
-        nbtTagCompound.set("Yaw", new NBTTagFloat(entityLiving.yaw));
-        nbtTagCompound.set("Pitch", new NBTTagFloat(entityLiving.pitch));
+        entity.c(nbtTagCompound);
+        nbtTagCompound.set("Yaw", new NBTTagFloat(entity.yaw));
+        nbtTagCompound.set("Pitch", new NBTTagFloat(entity.pitch));
         return CompoundTag.fromNBT(nbtTagCompound);
     }
 

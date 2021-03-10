@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
@@ -65,12 +66,12 @@ public final class TagBuilder {
         return this;
     }
 
-    public TagBuilder applyEntity(LivingEntity livingEntity, Location min){
-        if(!(livingEntity instanceof Player)) {
-            Location offset = livingEntity.getLocation().subtract(min);
-            compoundValue.add("entityType", new StringTag(livingEntity.getType().name()));
+    public TagBuilder applyEntity(Entity entity, Location min){
+        if(!(entity instanceof Player)) {
+            Location offset = entity.getLocation().subtract(min);
+            compoundValue.add("entityType", new StringTag(entity.getType().name()));
             compoundValue.add("offset", new StringTag(LocationUtils.getLocation(offset)));
-            compoundValue.add("NBT", plugin.getNMSTags().getNBTTag(livingEntity));
+            compoundValue.add("NBT", plugin.getNMSTags().getNBTTag(entity));
         }
         return this;
     }
