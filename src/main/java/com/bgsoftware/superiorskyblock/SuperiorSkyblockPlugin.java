@@ -171,7 +171,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new BlocksListener(this));
                 safeEventsRegister(new ChunksListener(this));
                 safeEventsRegister(new CustomEventsListener(this));
-                safeEventsRegister(new DragonListener(this));
+                if(settingsHandler.endDragonFight)
+                    safeEventsRegister(new DragonListener(this));
                 safeEventsRegister(new GeneratorsListener(this));
                 safeEventsRegister(new MenusListener(this));
                 safeEventsRegister(new PlayersListener(this));
