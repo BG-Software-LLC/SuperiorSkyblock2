@@ -201,6 +201,11 @@ public interface SuperiorPlayer {
     Island getIsland();
 
     /**
+     * Check if this player is a member of an island.
+     */
+    boolean hasIsland();
+
+    /**
      * Get the role of the player.
      */
     PlayerRole getPlayerRole();

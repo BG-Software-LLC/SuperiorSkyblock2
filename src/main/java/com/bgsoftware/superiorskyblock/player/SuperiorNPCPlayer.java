@@ -176,6 +176,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasIsland() {
+        return false;
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
         return SPlayerRole.guestRole();
     }

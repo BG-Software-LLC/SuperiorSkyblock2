@@ -447,6 +447,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean hasIsland() {
+        return getIsland() != null;
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
         if(playerRole == null)
             setPlayerRole(SPlayerRole.guestRole());
