@@ -6,8 +6,10 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgradeCost;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -31,6 +33,7 @@ import java.util.Set;
 public final class UpgradesHandler extends AbstractHandler implements UpgradesManager {
 
     private final Registry<String, SUpgrade> upgrades = Registry.createRegistry();
+    private final Registry<String, UpgradeCostProvider> upgradeCostProviders = Registry.createRegistry();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -52,7 +55,16 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
             for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
                 ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);
                 int level = Integer.parseInt(_level);
-                double price = levelSection.getDouble("price");
+                BigDecimal price = new BigDecimal(levelSection.get("price", "0.0").toString());
+                String priceType = levelSection.get("price-type", "money").toString();
+
+                // Cost Provider Validity Check
+                if (isValidUpgradesCostProvider(priceType)) {
+                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price type provider. Skipping...");
+                    continue;
+                }
+                UpgradeCostProvider costProvider = getUpgradeCostProvider(priceType);
+
                 List<String> commands = levelSection.getStringList("commands");
                 String permission = levelSection.getString("permission", "");
                 Set<Pair<String, String>> requirements = new HashSet<>();
@@ -111,7 +123,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                         }catch (NumberFormatException ignored){}
                     }
                 }
-                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, price, commands, permission, requirements,
+                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, new SUpgradeCost(price, costProvider), commands, permission, requirements,
                         cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
                         entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
             }
@@ -142,6 +154,26 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
     @Override
     public Collection<Upgrade> getUpgrades() {
         return Collections.unmodifiableCollection(upgrades.values());
+    }
+
+    @Override
+    public void registerUpgradeCostProvider(UpgradeCostProvider upgradeCostProvider) {
+        upgradeCostProviders.add(upgradeCostProvider.getName().toLowerCase(), upgradeCostProvider);
+    }
+
+    @Override
+    public Collection<UpgradeCostProvider> getUpgradesCostProviders() {
+        return Collections.unmodifiableCollection(upgradeCostProviders.values());
+    }
+
+    @Override
+    public boolean isValidUpgradesCostProvider(String s) {
+        return upgradeCostProviders.containsKey(s.toLowerCase());
+    }
+
+    @Override
+    public UpgradeCostProvider getUpgradeCostProvider(String s) {
+        return upgradeCostProviders.get(s.toLowerCase());
     }
 
 }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 
 import java.util.Collection;
@@ -35,5 +36,26 @@ public interface UpgradesManager {
      * Get all the upgrades of the plugin.
      */
     Collection<Upgrade> getUpgrades();
+
+    /**
+     * Register custom upgrade cost provider
+     * @param provider the provider you're registering
+     */
+    void registerUpgradeCostProvider(UpgradeCostProvider provider);
+
+    /**
+     * Get all registered cost providers
+     */
+    Collection<UpgradeCostProvider> getUpgradesCostProviders();
+
+    /**
+     * Check if a upgrade cost provider exists by a name lowercase
+     */
+    boolean isValidUpgradesCostProvider(String name);
+
+    /**
+     * Get upgrade cost provider by name lowercase
+     */
+    UpgradeCostProvider getUpgradeCostProvider(String name);
 
 }
