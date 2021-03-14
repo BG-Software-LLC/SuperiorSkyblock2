@@ -9,7 +9,7 @@ import java.net.URL;
 @SuppressWarnings("WeakerAccess")
 public final class Updater {
 
-    private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static String latestVersion, versionDescription;
 
@@ -21,7 +21,7 @@ public final class Updater {
     private Updater(){}
 
     public static boolean isOutdated(){
-        return !plugin.getDescription().getVersion().equals(latestVersion);
+        return !plugin.getDescription().getVersion().startsWith(latestVersion);
     }
 
     public static String getLatestVersion(){
@@ -65,6 +65,7 @@ public final class Updater {
                 versionDescription = (String) descriptionElement.getClass().getMethod("getAsString").invoke(descriptionElement);
             }
         } catch(Exception ex){
+            ex.printStackTrace();
             //Something went wrong...
             latestVersion = plugin.getDescription().getVersion();
         }
