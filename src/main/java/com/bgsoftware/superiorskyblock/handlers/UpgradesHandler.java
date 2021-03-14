@@ -59,7 +59,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                 String priceType = levelSection.get("price-type", "money").toString();
 
                 // Cost Provider Validity Check
-                if (isValidUpgradesCostProvider(priceType)) {
+                if (!isValidUpgradesCostProvider(priceType)) {
                     SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price type provider. Skipping...");
                     continue;
                 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public interface UpgradeCost {
 
     /**
-     * Get the value of the uprade cost
+     * Get the value of the upgrade cost
      */
     BigDecimal getValue();
 
