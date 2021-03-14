@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.upgrades;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -32,7 +33,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final int level;
-    private final double price;
+    private final UpgradeCost cost;
     private final List<String> commands;
     private final String permission;
     private final Set<Pair<String, String>> requirements;
@@ -46,7 +47,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, double price, List<String> commands, String permission, Set<Pair<String, String>> requirements,
+    public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<Pair<String, String>> requirements,
                          UpgradeValue<Double> cropGrowth, UpgradeValue<Double> spawnerRates, UpgradeValue<Double> mobDrops,
                          UpgradeValue<Integer> teamLimit, UpgradeValue<Integer> warpsLimit, UpgradeValue<Integer> coopLimit,
                          UpgradeValue<Integer> borderSize, KeyMap<UpgradeValue<Integer>> blockLimits,
@@ -54,7 +55,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          Map<PotionEffectType, UpgradeValue<Integer>> islandEffects, UpgradeValue<BigDecimal> bankLimit,
                          Map<Integer, UpgradeValue<Integer>> roleLimits){
         this.level = level;
-        this.price = price;
+        this.cost = cost;
         this.commands = commands;
         this.permission = permission;
         this.requirements = requirements;
@@ -78,9 +79,8 @@ public class SUpgradeLevel implements UpgradeLevel {
         return level;
     }
 
-    @Override
-    public double getPrice() {
-        return price;
+    public UpgradeCost getCost() {
+        return cost;
     }
 
     @Override

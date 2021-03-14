@@ -15,7 +15,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
     private static final DefaultUpgradeLevel INSTANCE = new DefaultUpgradeLevel();
 
     private DefaultUpgradeLevel(){
-        super(-1, 0, new ArrayList<>(), "", new HashSet<>(),
+        super(-1, new SUpgradeCost(BigDecimal.ZERO, null), new ArrayList<>(), "", new HashSet<>(),
                 newSyncedDoubleValue(v -> (double) plugin.getSettings().defaultCropGrowth),
                 newSyncedDoubleValue(v -> plugin.getSettings().defaultSpawnerRates),
                 newSyncedDoubleValue(v -> plugin.getSettings().defaultMobDrops),

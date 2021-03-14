@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
@@ -64,13 +65,13 @@ public final class MenuUpgrades extends SuperiorMenu {
             if(upgradeLevel != null){
                 UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
-                double nextLevelPrice = upgradeLevel.getPrice();
+                UpgradeCost nextlevelCost = upgradeLevel.getCost();
                 String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
                 String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextLevelPrice)) >= 0 &&
+                    boolean nextLevel = nextlevelCost.getProvider().getBalance(superiorPlayer).compareTo(nextlevelCost.getValue()) >= 0 &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }
