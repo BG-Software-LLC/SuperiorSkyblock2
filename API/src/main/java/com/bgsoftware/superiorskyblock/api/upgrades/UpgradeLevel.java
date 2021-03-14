@@ -21,7 +21,7 @@ public interface UpgradeLevel {
     /**
      * Get the price required to upgrade to the next level.
      */
-    double getPrice();
+    UpgradeCost getCost();
 
     /**
      * Get all commands that will be executed when upgrading to the next level.
