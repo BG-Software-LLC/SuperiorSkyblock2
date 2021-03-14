@@ -102,10 +102,11 @@ jar {
 
 processResources {
     outputs.upToDateWhen {false}
+    String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "-DEVb" + System.getenv("BUILD_NUMBER")
     eachFile { details ->
         if (details.name.contentEquals('plugin.yml')) {
             filter { String line ->
-                line.replace('${project.version}', version)
+                line.replace('${project.version}', versionNumber)
             }
         }
     }
