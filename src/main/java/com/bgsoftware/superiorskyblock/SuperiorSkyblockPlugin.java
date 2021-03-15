@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
@@ -39,6 +38,8 @@ import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.upgrades.providers.money.MoneyUpgradeCostProvider;
+import com.bgsoftware.superiorskyblock.upgrades.providers.placeholder.PlaceholderUpgradeCostProvider;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -65,7 +66,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,24 +230,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private void loadUpgradeCostProviders() {
-        getUpgrades().registerUpgradeCostProvider(
-                new UpgradeCostProvider() {
-                    @Override
-                    public String getName() {
-                        return "Money";
-                    }
-
-                    @Override
-                    public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
-                        return getProviders().getBalance(superiorPlayer);
-                    }
-
-                    @Override
-                    public void take(SuperiorPlayer superiorPlayer, BigDecimal bigDecimal) {
-                        getProviders().depositMoney(superiorPlayer, bigDecimal);
-                    }
-                }
-        );
+        getUpgrades()
+                .registerUpgradeCostProvider(new MoneyUpgradeCostProvider());
+        getUpgrades().registerUpgradeCostProvider(new PlaceholderUpgradeCostProvider());
     }
 
     @Override
