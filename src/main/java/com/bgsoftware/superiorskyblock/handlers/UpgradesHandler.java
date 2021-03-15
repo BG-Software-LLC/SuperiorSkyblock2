@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
@@ -19,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -55,7 +57,6 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
             for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
                 ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);
                 int level = Integer.parseInt(_level);
-                BigDecimal price = new BigDecimal(levelSection.get("price", "0.0").toString());
                 String priceType = levelSection.get("price-type", "money").toString();
 
                 // Cost Provider Validity Check
@@ -64,6 +65,12 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                     continue;
                 }
                 UpgradeCostProvider costProvider = getUpgradeCostProvider(priceType);
+
+                Pair<UpgradeCost, String> createdCost = costProvider.createCost(levelSection);
+                if (createdCost.getKey() == null) {
+                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + createdCost.getValue() + ". Skipping...");
+                    continue;
+                }
 
                 List<String> commands = levelSection.getStringList("commands");
                 String permission = levelSection.getString("permission", "");
@@ -123,7 +130,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                         }catch (NumberFormatException ignored){}
                     }
                 }
-                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, new SUpgradeCost(price, costProvider), commands, permission, requirements,
+                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, createdCost.getKey(), commands, permission, requirements,
                         cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
                         entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
             }
