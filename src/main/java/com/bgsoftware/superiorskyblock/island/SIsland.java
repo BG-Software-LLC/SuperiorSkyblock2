@@ -1964,10 +1964,10 @@ public final class SIsland implements Island {
 
     @Override
     public BigDecimal getWorth() {
-        int bankWorthRate = plugin.getSettings().bankWorthRate;
+        double bankWorthRate = plugin.getSettings().bankWorthRate;
         BigDecimal islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
-                islandBank.divide(new BigDecimal(bankWorthRate), 2, RoundingMode.HALF_DOWN));
+                islandBank.multiply(BigDecimal.valueOf(bankWorthRate)));
 
         finalIslandWorth = finalIslandWorth.add(bonusWorth);
 
