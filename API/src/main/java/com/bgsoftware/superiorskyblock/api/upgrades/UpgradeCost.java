@@ -14,4 +14,9 @@ public interface UpgradeCost {
      */
     UpgradeCostProvider getProvider();
 
+    /**
+     * Create a copy of this cost with a new value
+     */
+    UpgradeCost copyOfValue(BigDecimal value);
+
 }

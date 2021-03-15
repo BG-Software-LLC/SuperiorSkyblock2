@@ -71,7 +71,7 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = nextlevelCost.getProvider().getBalance(superiorPlayer).compareTo(nextlevelCost.getValue()) >= 0 &&
+                    boolean nextLevel = nextlevelCost.getProvider().getBalance(superiorPlayer, nextlevelCost).compareTo(nextlevelCost.getValue()) >= 0 &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }

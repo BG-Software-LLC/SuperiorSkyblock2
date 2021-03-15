@@ -109,13 +109,13 @@ public final class CmdRankup implements IPermissibleCommand {
                 if (event.isCancelled()) {
                     hasNextLevel = false;
 
-                } else if (plugin.getProviders().getBalance(superiorPlayer).compareTo(upgradeCost.getValue()) < 0) {
+                } else if (upgradeCost.getProvider().getBalance(superiorPlayer, upgradeCost).compareTo(upgradeCost.getValue()) < 0) {
                     Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
 
                 } else {
                     if (upgradeCost.getValue().compareTo(BigDecimal.ZERO) > 0)
-                        upgradeCost.getProvider().take(superiorPlayer, upgradeCost.getValue());
+                        upgradeCost.getProvider().take(superiorPlayer, upgradeCost);
 
                     for (String command : event.getResult().getKey()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command

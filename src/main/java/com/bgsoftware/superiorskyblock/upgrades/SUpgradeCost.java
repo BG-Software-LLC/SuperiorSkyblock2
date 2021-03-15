@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 
 public class SUpgradeCost implements UpgradeCost {
 
-    private BigDecimal value;
-    private UpgradeCostProvider provider;
+    private final BigDecimal value;
+    private final UpgradeCostProvider provider;
 
     public SUpgradeCost(BigDecimal value, UpgradeCostProvider provider) {
         this.value = value;
@@ -23,5 +23,10 @@ public class SUpgradeCost implements UpgradeCost {
     @Override
     public UpgradeCostProvider getProvider() {
         return provider;
+    }
+
+    @Override
+    public UpgradeCost copyOfValue(BigDecimal bigDecimal) {
+        return new SUpgradeCost(bigDecimal, provider);
     }
 }
