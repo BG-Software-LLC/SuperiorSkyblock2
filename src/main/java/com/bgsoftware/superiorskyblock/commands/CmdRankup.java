@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -19,7 +20,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,18 +102,18 @@ public final class CmdRankup implements IPermissibleCommand {
                 Locale.sendMessage(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
-
-                double nextUpgradePrice = event.getResult().getValue();
+                EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
+                UpgradeCost upgradeCost = event.getResult().getValue();
 
                 if (event.isCancelled()) {
                     hasNextLevel = false;
-                } else if (plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(nextUpgradePrice)) < 0) {
+
+                } else if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
                     Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
+
                 } else {
-                    if (nextUpgradePrice > 0)
-                        plugin.getProviders().withdrawMoney(superiorPlayer, nextUpgradePrice);
+                    upgradeCost.withdrawCost(superiorPlayer);
 
                     for (String command : event.getResult().getKey()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command

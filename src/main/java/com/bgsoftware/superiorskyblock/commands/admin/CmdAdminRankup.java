@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -76,8 +77,8 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            EventResult<Pair<List<String>, Double>> event = EventsCaller.callIslandUpgradeEvent(
-                    null, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getPrice());
+            EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(
+                    null, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
 
             if(!event.isCancelled()){
                 SuperiorPlayer owner = island.getOwner();

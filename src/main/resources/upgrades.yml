@@ -35,6 +35,7 @@ upgrades:
   hoppers-limit:
     '1':
       price: 1000000.0
+      price-type: "Money"
       block-limits:
         HOPPER: 8
       commands:
@@ -42,6 +43,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 16!'
     '2':
       price: 3000000.0
+      price-type: "Money"
       block-limits:
         HOPPER: 16
       commands:
@@ -49,6 +51,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 32!'
     '3':
       price: 9000000.0
+      price-type: "Money"
       block-limits:
         HOPPER: 32
       commands:
@@ -56,6 +59,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your hoppers limit was increased to 64!'
     '4':
       price: 0.0
+      price-type: "Money"
       block-limits:
         HOPPER: 64
       commands:
@@ -63,66 +67,77 @@ upgrades:
   crop-growth:
     '1':
       price: 100000.0
+      price-type: "Money"
       crop-growth: 1
       commands:
         - 'island admin setupgrade %player% crop-growth 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x2!'
     '2':
       price: 500000.0
+      price-type: "Money"
       crop-growth: 15
       commands:
         - 'island admin setupgrade %player% crop-growth 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x3!'
     '3':
       price: 1000000.0
+      price-type: "Money"
       crop-growth: 25
       commands:
         - 'island admin setupgrade %player% crop-growth 4'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your crop-growth multiplier was increased to x4!'
     '4':
       price: 0.0
+      price-type: "Money"
       crop-growth: 40
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for crop growth.'
   spawner-rates:
     '1':
       price: 500000.0
+      price-type: "Money"
       spawner-rates: 1
       commands:
         - 'island admin setupgrade %player% spawner-rates 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x2!'
     '2':
       price: 1000000.0
+      price-type: "Money"
       spawner-rates: 2
       commands:
         - 'island admin setupgrade %player% spawner-rates 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x3!'
     '3':
       price: 2500000.0
+      price-type: "Money"
       spawner-rates: 3
       commands:
         - 'island admin setupgrade %player% spawner-rates 4'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your spawner-rates multiplier was increased to x4!'
     '4':
       price: 0.0
+      price-type: "Money"
       spawner-rates: 4
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for spawner-rates.'
   mob-drops:
     '1':
       price: 1000000.0
+      price-type: "Money"
       mob-drops: 1
       commands:
         - 'island admin setupgrade %player% mob-drops 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your mob-drops multiplier was increased to x2!'
     '2':
       price: 2000000.0
+      price-type: "Money"
       mob-drops: 2
       commands:
         - 'island admin setupgrade %player% mob-drops 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your mob-drops multiplier was increased to x3!'
     '3':
       price: 5000000.0
+      price-type: "Money"
       mob-drops: 3
       commands:
         - 'island admin setupgrade %player% mob-drops 4'
@@ -135,42 +150,49 @@ upgrades:
   members-limit:
     '1':
       price: 100000.0
+      price-type: "Money"
       team-limit: 4
       commands:
         - 'island admin setupgrade %player% members-limit 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 8!'
     '2':
       price: 300000.0
+      price-type: "Money"
       team-limit: 8
       commands:
         - 'island admin setupgrade %player% members-limit 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 16!'
     '3':
       price: 500000.0
+      price-type: "Money"
       team-limit: 16
       commands:
         - 'island admin setupgrade %player% members-limit 4'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your members limit was increased to 32!'
     '4':
       price: 0.0
+      price-type: "Money"
       team-limit: 32
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for members limit.'
   border-size:
     '1':
       price: 30000.0
+      price-type: "Money"
       border-size: 25
       commands:
         - 'island admin setupgrade %player% border-size 2'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 100x100 blocks!'
     '2':
       price: 80000.0
+      price-type: "Money"
       border-size: 50
       commands:
         - 'island admin setupgrade %player% border-size 3'
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 150x150 blocks!'
     '3':
       price: 150000.0
+      price-type: "Money"
       permission: 'upgrade.size.donor'
       border-size: 75
       commands:
@@ -178,12 +200,14 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your border size was increased to 250x250 blocks!'
     '4':
       price: 0.0
+      price-type: "Money"
       border-size: 125
       commands:
         - 'island admin msg %player% &e&lSuperiorSkyblock &7You have reached the maximum upgrade for border size.'
   generator-rates:
     '1':
       price: 25000.0
+      price-type: "Money"
       generator-rates:
         normal:
           STONE: 95
@@ -193,6 +217,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 2!'
     '2':
       price: 75000.0
+      price-type: "Money"
       generator-rates:
         normal:
           STONE: 92
@@ -203,6 +228,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 3!'
     '3':
       price: 150000.0
+      price-type: "Money"
       permission: 'upgrade.gen.donor'
       generator-rates:
         normal:
@@ -216,6 +242,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your generator was upgraded to level 4!'
     '4':
       price: 0.0
+      price-type: "Money"
       generator-rates:
         normal:
           STONE: 65
@@ -231,6 +258,7 @@ upgrades:
   minecarts-limit:
     '1':
       price: 1000000.0
+      price-type: "Money"
       entity-limits:
         MINECART: 4
       commands:
@@ -238,6 +266,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 8!'
     '2':
       price: 3000000.0
+      price-type: "Money"
       entity-limits:
         MINECART: 8
       commands:
@@ -245,6 +274,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 16!'
     '3':
       price: 9000000.0
+      price-type: "Money"
       entity-limits:
         MINECART: 16
       commands:
@@ -252,6 +282,7 @@ upgrades:
         - 'island admin msgall %player% &e&lSuperiorSkyblock &7Your minecarts limit was increased to 32!'
     '4':
       price: 0.0
+      price-type: "Money"
       entity-limits:
         MINECART: 32
       commands:

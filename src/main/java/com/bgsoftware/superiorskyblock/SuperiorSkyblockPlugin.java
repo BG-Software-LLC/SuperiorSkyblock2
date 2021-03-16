@@ -38,6 +38,8 @@ import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.upgrades.loaders.VaultUpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -151,6 +153,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             loadSortingTypes();
             loadIslandFlags();
             loadIslandPrivileges();
+            loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();
 
@@ -606,6 +609,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("VALUABLE_BREAK");
         IslandPrivilege.register("VILLAGER_TRADING");
         IslandPrivilege.register("WITHDRAW_MONEY");
+    }
+
+    private void loadUpgradeCostLoaders(){
+        upgradesHandler.registerUpgradeCostLoader("money", new VaultUpgradeCostLoader());
+        upgradesHandler.registerUpgradeCostLoader("placeholders", new PlaceholdersUpgradeCostLoader());
     }
 
     public static void log(String message){
