@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.upgrades;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -81,7 +81,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public double getPrice() {
-        return cost.getValue().doubleValue();
+        return cost.getCost().doubleValue();
     }
 
     public UpgradeCost getCost() {

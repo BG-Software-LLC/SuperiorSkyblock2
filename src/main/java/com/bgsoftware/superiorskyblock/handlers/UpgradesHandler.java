@@ -3,25 +3,25 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgradeCost;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.google.common.base.Preconditions;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -35,7 +35,7 @@ import java.util.Set;
 public final class UpgradesHandler extends AbstractHandler implements UpgradesManager {
 
     private final Registry<String, SUpgrade> upgrades = Registry.createRegistry();
-    private final Registry<String, UpgradeCostProvider> upgradeCostProviders = Registry.createRegistry();
+    private final Registry<String, UpgradeCostLoader> upgradeCostLoaders = Registry.createRegistry();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -57,18 +57,21 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
             for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
                 ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);
                 int level = Integer.parseInt(_level);
-                String priceType = levelSection.get("price-type", "money").toString();
 
-                // Cost Provider Validity Check
-                if (!isValidUpgradesCostProvider(priceType)) {
-                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price type provider. Skipping...");
+                String priceType = levelSection.getString("price-type", "money");
+                UpgradeCostLoader costLoader = getUpgradeCostLoader(priceType);
+
+                if(costLoader == null){
+                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
                     continue;
                 }
-                UpgradeCostProvider costProvider = getUpgradeCostProvider(priceType);
 
-                Pair<UpgradeCost, String> createdCost = costProvider.createCost(levelSection);
-                if (createdCost.getKey() == null) {
-                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + createdCost.getValue() + ". Skipping...");
+                UpgradeCost upgradeCost;
+
+                try{
+                    upgradeCost = costLoader.loadCost(levelSection);
+                }catch (UpgradeCostLoadException ex){
+                    SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + ex.getMessage() + ". Skipping...");
                     continue;
                 }
 
@@ -130,7 +133,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                         }catch (NumberFormatException ignored){}
                     }
                 }
-                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, createdCost.getKey(), commands, permission, requirements,
+                upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
                         cropGrowth, spawnerRates, mobDrops, teamLimit, warpsLimit, coopLimit, borderSize, blockLimits,
                         entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
             }
@@ -164,23 +167,22 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
     }
 
     @Override
-    public void registerUpgradeCostProvider(UpgradeCostProvider upgradeCostProvider) {
-        upgradeCostProviders.add(upgradeCostProvider.getName().toLowerCase(), upgradeCostProvider);
+    public void registerUpgradeCostLoader(String id, UpgradeCostLoader costLoader) {
+        id = id.toLowerCase();
+        Preconditions.checkArgument(!upgradeCostLoaders.containsKey(id), "A loader with the id " + id + " already exists.");
+        upgradeCostLoaders.add(id, costLoader);
     }
 
     @Override
-    public Collection<UpgradeCostProvider> getUpgradesCostProviders() {
-        return Collections.unmodifiableCollection(upgradeCostProviders.values());
+    public Collection<UpgradeCostLoader> getUpgradesCostLoaders() {
+        return Collections.unmodifiableCollection(upgradeCostLoaders.values());
     }
 
+    @Nullable
     @Override
-    public boolean isValidUpgradesCostProvider(String s) {
-        return upgradeCostProviders.containsKey(s.toLowerCase());
-    }
-
-    @Override
-    public UpgradeCostProvider getUpgradeCostProvider(String s) {
-        return upgradeCostProviders.get(s.toLowerCase());
+    public UpgradeCostLoader getUpgradeCostLoader(String id) {
+        Preconditions.checkNotNull(id, "id parameter cannot be null.");
+        return upgradeCostLoaders.get(id.toLowerCase());
     }
 
 }

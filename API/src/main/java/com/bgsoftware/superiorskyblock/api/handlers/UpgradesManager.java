@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCostProvider;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public interface UpgradesManager {
@@ -38,24 +38,21 @@ public interface UpgradesManager {
     Collection<Upgrade> getUpgrades();
 
     /**
-     * Register custom upgrade cost provider
-     * @param provider the provider you're registering
+     * Register custom upgrade cost loader
+     * @param id The id of the loader.
+     * @param costLoader the loader you're registering
      */
-    void registerUpgradeCostProvider(UpgradeCostProvider provider);
+    void registerUpgradeCostLoader(String id, UpgradeCostLoader costLoader);
 
     /**
-     * Get all registered cost providers
+     * Get all registered cost loader
      */
-    Collection<UpgradeCostProvider> getUpgradesCostProviders();
+    Collection<UpgradeCostLoader> getUpgradesCostLoaders();
 
     /**
-     * Check if a upgrade cost provider exists by a name lowercase
+     * Get upgrade cost loader by its id
      */
-    boolean isValidUpgradesCostProvider(String name);
-
-    /**
-     * Get upgrade cost provider by name lowercase
-     */
-    UpgradeCostProvider getUpgradeCostProvider(String name);
+    @Nullable
+    UpgradeCostLoader getUpgradeCostLoader(String id);
 
 }

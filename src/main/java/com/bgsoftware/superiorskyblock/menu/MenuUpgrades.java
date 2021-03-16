@@ -4,7 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
@@ -23,7 +23,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -65,13 +64,13 @@ public final class MenuUpgrades extends SuperiorMenu {
             if(upgradeLevel != null){
                 UpgradeLevel nextUpgradeLevel = upgrade.getUpgradeLevel(upgradeLevel.getLevel() + 1);
 
-                UpgradeCost nextlevelCost = upgradeLevel.getCost();
+                UpgradeCost levelCost = upgradeLevel.getCost();
                 String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
                 String requirements = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
 
                 SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
                 if(itemData != null) {
-                    boolean nextLevel = nextlevelCost.getProvider().getBalance(superiorPlayer, nextlevelCost).compareTo(nextlevelCost.getValue()) >= 0 &&
+                    boolean nextLevel = levelCost.hasEnoughBalance(superiorPlayer) &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
                     inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;

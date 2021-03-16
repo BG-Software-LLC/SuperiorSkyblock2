@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeCost;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -109,13 +108,12 @@ public final class CmdRankup implements IPermissibleCommand {
                 if (event.isCancelled()) {
                     hasNextLevel = false;
 
-                } else if (upgradeCost.getProvider().getBalance(superiorPlayer, upgradeCost).compareTo(upgradeCost.getValue()) < 0) {
+                } else if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
                     Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
 
                 } else {
-                    if (upgradeCost.getValue().compareTo(BigDecimal.ZERO) > 0)
-                        upgradeCost.getProvider().take(superiorPlayer, upgradeCost);
+                    upgradeCost.withdrawCost(superiorPlayer);
 
                     for (String command : event.getResult().getKey()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
