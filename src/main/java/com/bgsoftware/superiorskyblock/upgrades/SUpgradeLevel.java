@@ -79,6 +79,11 @@ public class SUpgradeLevel implements UpgradeLevel {
         return level;
     }
 
+    @Override
+    public double getPrice() {
+        return cost.getValue().doubleValue();
+    }
+
     public UpgradeCost getCost() {
         return cost;
     }
