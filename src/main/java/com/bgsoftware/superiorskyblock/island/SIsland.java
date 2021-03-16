@@ -2485,9 +2485,11 @@ public final class SIsland implements Island {
         Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
 
         for(PotionEffectType potionEffectType : PotionEffectType.values()){
-            int level = getPotionEffectLevel(potionEffectType);
-            if(level > 0)
-                islandEffects.put(potionEffectType, level);
+            if(potionEffectType != null) {
+                int level = getPotionEffectLevel(potionEffectType);
+                if (level > 0)
+                    islandEffects.put(potionEffectType, level);
+            }
         }
 
         return islandEffects;
