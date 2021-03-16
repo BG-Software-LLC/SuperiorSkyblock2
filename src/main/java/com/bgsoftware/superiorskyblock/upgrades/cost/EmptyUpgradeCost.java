@@ -14,7 +14,7 @@ public final class EmptyUpgradeCost extends UpgradeCostAbstract {
     }
 
     private EmptyUpgradeCost(){
-        super(BigDecimal.ZERO);
+        super(BigDecimal.ZERO, "Null");
     }
 
     @Override

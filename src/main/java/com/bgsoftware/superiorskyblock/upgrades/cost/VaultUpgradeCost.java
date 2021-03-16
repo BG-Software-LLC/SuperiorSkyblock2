@@ -11,7 +11,7 @@ public final class VaultUpgradeCost extends UpgradeCostAbstract {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public VaultUpgradeCost(BigDecimal value){
-        super(value);
+        super(value, "money");
     }
 
     @Override

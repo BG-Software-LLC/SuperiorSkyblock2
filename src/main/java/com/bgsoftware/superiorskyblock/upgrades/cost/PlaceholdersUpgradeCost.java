@@ -15,7 +15,7 @@ public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
     private final List<String> withdrawCommands;
 
     public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands){
-        super(cost);
+        super(cost, "placeholders");
         this.placeholder = placeholder;
         this.withdrawCommands = Collections.unmodifiableList(withdrawCommands);
     }

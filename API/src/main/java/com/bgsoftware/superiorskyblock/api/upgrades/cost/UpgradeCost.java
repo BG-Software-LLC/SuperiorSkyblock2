@@ -7,6 +7,11 @@ import java.math.BigDecimal;
 public interface UpgradeCost {
 
     /**
+     * Get the id of this upgrade cost.
+     */
+    String getId();
+
+    /**
      * Get the cost value.
      */
     BigDecimal getCost();
