@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.upgrades.cost;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.math.BigDecimal;
@@ -21,6 +22,11 @@ public final class VaultUpgradeCost extends UpgradeCostAbstract {
     @Override
     public void withdrawCost(SuperiorPlayer superiorPlayer) {
         plugin.getProviders().withdrawMoney(superiorPlayer, cost);
+    }
+
+    @Override
+    public UpgradeCost clone(BigDecimal cost) {
+        return new VaultUpgradeCost(cost);
     }
 
 }

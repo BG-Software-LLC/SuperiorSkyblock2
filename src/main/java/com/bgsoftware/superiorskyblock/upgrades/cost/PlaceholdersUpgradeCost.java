@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.upgrades.cost;
 
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import org.bukkit.Bukkit;
@@ -36,6 +37,11 @@ public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
         String playerName = superiorPlayer.getName();
         withdrawCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%amount%", cost).replace("%player%", playerName)));
+    }
+
+    @Override
+    public UpgradeCost clone(BigDecimal cost) {
+        return new PlaceholdersUpgradeCost(cost, placeholder, withdrawCommands);
     }
 
 }

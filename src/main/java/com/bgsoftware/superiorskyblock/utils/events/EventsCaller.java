@@ -177,7 +177,7 @@ public final class EventsCaller {
 
         IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands, cost);
         Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
-        return EventResult.of(islandUpgradeEvent.isCancelled(), new Pair<>(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getCost()));
+        return EventResult.of(islandUpgradeEvent.isCancelled(), new Pair<>(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getUpgradeCost()));
     }
 
     public static void callIslandWorthCalculatedEvent(Island island, SuperiorPlayer asker, BigDecimal islandLevel, BigDecimal islandWorth){

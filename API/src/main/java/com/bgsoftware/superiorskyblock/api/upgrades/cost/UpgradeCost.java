@@ -23,4 +23,10 @@ public interface UpgradeCost {
      */
     void withdrawCost(SuperiorPlayer superiorPlayer);
 
+    /**
+     * Clone this cost with a new cost value.
+     * @param cost The new cost value
+     */
+    UpgradeCost clone(BigDecimal cost);
+
 }

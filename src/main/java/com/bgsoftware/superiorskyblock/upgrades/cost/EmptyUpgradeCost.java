@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.upgrades.cost;
 
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.math.BigDecimal;
@@ -23,6 +24,11 @@ public final class EmptyUpgradeCost extends UpgradeCostAbstract {
 
     @Override
     public void withdrawCost(SuperiorPlayer superiorPlayer) {
+    }
+
+    @Override
+    public UpgradeCost clone(BigDecimal cost) {
+        return this;
     }
 
 }
