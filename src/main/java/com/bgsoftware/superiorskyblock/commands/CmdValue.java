@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
@@ -60,7 +61,7 @@ public final class CmdValue implements ISuperiorCommand {
         String keyName = "";
 
         if(args.length == 1){
-            ItemStack inHand = superiorPlayer.asPlayer().getItemInHand();
+            ItemStack inHand = ((Player) sender).getItemInHand();
 
             if(inHand == null){
                 inHand = new ItemStack(Material.AIR);

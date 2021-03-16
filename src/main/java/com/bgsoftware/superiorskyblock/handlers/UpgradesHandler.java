@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
@@ -13,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.google.common.base.Preconditions;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -121,6 +121,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
 
     @Override
     public SUpgrade getUpgrade(String upgradeName){
+        Preconditions.checkNotNull(upgradeName, "upgradeName parameter cannot be null.");
         return upgrades.get(upgradeName.toLowerCase());
     }
 
@@ -136,6 +137,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
 
     @Override
     public boolean isUpgrade(String upgradeName){
+        Preconditions.checkNotNull(upgradeName, "upgradeName parameter cannot be null.");
         return upgrades.containsKey(upgradeName.toLowerCase());
     }
 

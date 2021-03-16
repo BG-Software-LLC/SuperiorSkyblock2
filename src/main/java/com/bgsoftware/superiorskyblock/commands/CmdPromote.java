@@ -115,7 +115,7 @@ public final class CmdPromote implements IPermissibleCommand {
         return args.length != 2 ? new ArrayList<>() : CommandTabCompletes.getIslandMembers(island, args[1], islandMember -> {
             PlayerRole playerRole = islandMember.getPlayerRole();
             PlayerRole nextRole = playerRole.getNextRole();
-            return !playerRole.isLastRole() && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&
+            return nextRole != null && !nextRole.isLastRole() && playerRole.isLessThan(superiorPlayer.getPlayerRole()) &&
                     !nextRole.isHigherThan(superiorPlayer.getPlayerRole());
         });
     }

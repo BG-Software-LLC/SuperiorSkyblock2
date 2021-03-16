@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 
+import javax.annotation.Nullable;
+
 /**
  * IslandUncoopPlayerEvent is called when a player is making another player no longer coop on their island.
  */
@@ -30,6 +32,7 @@ public class IslandUncoopPlayerEvent extends IslandEvent implements Cancellable 
     /**
      * Get the player who cooped the target, if exists.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return player;
     }

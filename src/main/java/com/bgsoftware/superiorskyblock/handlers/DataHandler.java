@@ -266,7 +266,8 @@ public final class DataHandler extends AbstractHandler {
                 while (resultSet.next()) {
                     try{
                         Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
-                        ((SIslandBank) island.getIslandBank()).loadTransaction(new SBankTransaction(resultSet));
+                        if(island != null)
+                            ((SIslandBank) island.getIslandBank()).loadTransaction(new SBankTransaction(resultSet));
                     }catch (Exception ignored){}
                 }
             });
@@ -403,7 +404,6 @@ public final class DataHandler extends AbstractHandler {
         });
     }
 
-    @SuppressWarnings("all")
     private void editColumn(String column, String table, String newType) {
         if(!isType(column, table, newType)){
             if(database == DatabaseType.SQLite){

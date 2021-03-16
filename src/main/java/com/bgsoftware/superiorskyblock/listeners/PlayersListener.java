@@ -149,7 +149,7 @@ public final class PlayersListener implements Listener {
             }
         }, 5L);
 
-        if(!plugin.getProviders().isVanished(e.getPlayer()))
+        if(!superiorPlayer.isVanished())
             handlePlayerJoin(superiorPlayer);
 
         Executor.sync(() -> {
@@ -159,7 +159,7 @@ public final class PlayersListener implements Listener {
             }
         }, 10L);
 
-        Executor.async(() -> {
+        Executor.async(() -> superiorPlayer.runIfOnline(player -> {
             java.util.Locale locale = superiorPlayer.getUserLocale();
             if(!Locale.GOT_INVITE.isEmpty(locale)){
                 for(Island _island : plugin.getGrid().getIslands()){
@@ -168,11 +168,11 @@ public final class PlayersListener implements Listener {
                         if(!Locale.GOT_INVITE_TOOLTIP.isEmpty(locale))
                             textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(locale))}));
                         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + _island.getOwner().getName()));
-                        superiorPlayer.asPlayer().spigot().sendMessage(textComponent);
+                        player.spigot().sendMessage(textComponent);
                     }
                 }
             }
-        }, 40L);
+        }), 40L);
 
     }
 
@@ -195,7 +195,7 @@ public final class PlayersListener implements Listener {
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        if(!plugin.getProviders().isVanished(e.getPlayer()))
+        if(!superiorPlayer.isVanished())
             handlePlayerQuit(superiorPlayer);
 
         for(Island _island : plugin.getGrid().getIslands()){
@@ -351,9 +351,11 @@ public final class PlayersListener implements Listener {
         if(messageToSend != null)
             messageToSend.send(damagerPlayer);
 
-        if(cancelFlames && ((EntityDamageByEntityEvent) e).getDamager() instanceof Arrow &&
-                targetPlayer.asPlayer().getFireTicks() > 0)
-            targetPlayer.asPlayer().setFireTicks(0);
+        Player target = targetPlayer.asPlayer();
+
+        if(target != null && cancelFlames && ((EntityDamageByEntityEvent) e).getDamager() instanceof Arrow &&
+                target.getFireTicks() > 0)
+            target.setFireTicks(0);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -520,7 +522,7 @@ public final class PlayersListener implements Listener {
         World.Environment environment = teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
                 World.Environment.NETHER : World.Environment.THE_END;
 
-        if(environment == superiorPlayer.getWorld().getEnvironment())
+        if(environment == player.getWorld().getEnvironment())
             environment = World.Environment.NORMAL;
 
         if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
@@ -685,8 +687,8 @@ public final class PlayersListener implements Listener {
             return;
 
         //Checking for out of distance from preview location.
-        if(!islandPreview.getLocation().getWorld().equals(superiorPlayer.getLocation().getWorld()) ||
-                islandPreview.getLocation().distanceSquared(superiorPlayer.getLocation()) > 10000){
+        if(!islandPreview.getLocation().getWorld().equals(e.getPlayer().getLocation().getWorld()) ||
+                islandPreview.getLocation().distanceSquared(e.getPlayer().getLocation()) > 10000){
             islandPreview.handleEscape();
         }
     }

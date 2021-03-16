@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.earth2me.essentials.Essentials;
+import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,6 +18,7 @@ public final class AFKProvider_Essentials implements AFKProvider {
 
     @Override
     public boolean isAFK(Player player) {
+        Preconditions.checkNotNull(player, "player parameter cannot be null.");
         return instance.getUser(player).isAfk();
     }
 

@@ -32,6 +32,9 @@ public final class MenuConfirmDisband extends SuperiorMenu {
     protected void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
+        if(island == null)
+            return;
+
         if(confirmSlot.contains(e.getRawSlot())){
             if(EventsCaller.callIslandDisbandEvent(superiorPlayer, island)){
                 IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
@@ -46,14 +49,14 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                 superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
 
                 previousMove = false;
-                superiorPlayer.asPlayer().closeInventory();
+                e.getWhoClicked().closeInventory();
 
                 island.disbandIsland();
             }
         }
         else if(cancelSlot.contains(e.getRawSlot())) {
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            e.getWhoClicked().closeInventory();
         }
     }
 

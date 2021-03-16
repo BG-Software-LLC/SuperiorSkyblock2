@@ -20,9 +20,10 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.SWMHook;
+import com.bgsoftware.superiorskyblock.island.data.SEmptyIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
+import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
@@ -30,6 +31,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -42,6 +44,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -51,13 +54,13 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer(spawnUUID);
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
@@ -71,7 +74,9 @@ public final class SpawnIsland implements Island {
 
         String spawnLocation = plugin.getSettings().spawnLocation.replace(" ", "");
 
-        center = LocationUtils.getLocation(spawnLocation).add(0.5, 0, 0.5);
+        SmartLocation smartCenter = LocationUtils.getLocation(spawnLocation);
+        assert smartCenter != null;
+        center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().spawnSize;
         islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
@@ -89,7 +94,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public SuperiorPlayer getOwner() {
-        return null;
+        return ownerPlayer;
     }
 
     @Override
@@ -251,20 +256,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Location getCenter() {
-        return getCenter(World.Environment.NORMAL);
-    }
-
-    @Override
     public Location getCenter(World.Environment environment) {
         return center.clone();
-    }
-
-    @Override
-    @Deprecated
-    public Location getTeleportLocation() {
-        return getCenter(World.Environment.NORMAL);
     }
 
     @Override
@@ -286,6 +279,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
+
+    }
+
+    @Override
+    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
 
     }
 
@@ -379,18 +377,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
-        return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
-    }
-
-    @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad) {
         return getAllChunksAsync(environment, onlyProtected, false, onChunkLoad);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
-        return IslandUtils.getAllChunksAsync(this, center.getWorld(), onlyProtected, noEmptyChunks, whenComplete);
     }
 
     @Override
@@ -509,13 +497,6 @@ public final class SpawnIsland implements Island {
     @Override
     public void resetPermissions(SuperiorPlayer superiorPlayer) {
 
-    }
-
-    @Override
-    public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
-        SuperiorSkyblockPlugin.log("&cIt seems like a plugin developer is using a deprecated method. Please inform him about it.");
-        new Throwable().printStackTrace();
-        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
     }
 
     @Override
@@ -745,31 +726,6 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public BigDecimal getMoneyInBank() {
-        return BigDecimal.ZERO;
-    }
-
-    @Override
-    public void depositMoney(double amount) {
-
-    }
-
-    @Override
-    public void depositMoney(BigDecimal amount) {
-
-    }
-
-    @Override
-    public void withdrawMoney(double amount) {
-
-    }
-
-    @Override
-    public void withdrawMoney(BigDecimal amount) {
-
-    }
-
-    @Override
     public void handleBlockPlace(Block block) {
 
     }
@@ -835,28 +791,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getBlockCount(Key key) {
-        return 0;
-    }
-
-    @Override
     public BigInteger getBlockCountAsBigInteger(Key key) {
         return BigInteger.ZERO;
     }
 
     @Override
-    public Map<Key, Integer> getBlockCounts() {
-        return new HashMap<>();
-    }
-
-    @Override
     public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
         return new HashMap<>();
-    }
-
-    @Override
-    public int getExactBlockCount(Key key) {
-        return 0;
     }
 
     @Override
@@ -910,18 +851,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getUpgradeLevel(String upgradeName) {
-        return 0;
-    }
-
-    @Override
     public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
         return upgrade.getUpgradeLevel(1);
-    }
-
-    @Override
-    public void setUpgradeLevel(String upgradeName, int level) {
-
     }
 
     @Override
@@ -1052,11 +983,6 @@ public final class SpawnIsland implements Island {
     @Override
     public int getEntityLimit(Key key) {
         return IslandUtils.NO_LIMIT.get();
-    }
-
-    @Override
-    public Map<EntityType, Integer> getEntitiesLimits() {
-        return new HashMap<>();
     }
 
     @Override
@@ -1195,30 +1121,6 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Location getWarpLocation(String name) {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWarpPrivate(String name) {
-        return false;
-    }
-
-    @Override
-    @Deprecated
-    public void setWarpLocation(String name, Location location, boolean privateFlag) {
-
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWarpLocation(Location location) {
-        return false;
-    }
-
-    @Override
     public WarpCategory createWarpCategory(String name) {
         return null;
     }
@@ -1284,18 +1186,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public List<String> getAllWarps() {
-        return new ArrayList<>();
-    }
-
-    @Override
     public Map<String, IslandWarp> getIslandWarps() {
         return new HashMap<>();
-    }
-
-    @Override
-    public boolean hasMoreWarpSlots() {
-        return false;
     }
 
     @Override
@@ -1384,18 +1276,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public void setGeneratorPercentage(Key key, int percentage) {
-
-    }
-
-    @Override
     public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
 
-    }
-
-    @Override
-    public int getGeneratorPercentage(Key key) {
-        return 0;
     }
 
     @Override
@@ -1404,18 +1286,8 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public Map<String, Integer> getGeneratorPercentages() {
-        return new HashMap<>();
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
         return new HashMap<>();
-    }
-
-    @Override
-    public void setGeneratorAmount(Key key, int amount) {
-
     }
 
     @Override
@@ -1424,17 +1296,7 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getGeneratorAmount(Key key) {
-        return 0;
-    }
-
-    @Override
     public int getGeneratorAmount(Key key, World.Environment environment) {
-        return 0;
-    }
-
-    @Override
-    public int getGeneratorTotalAmount() {
         return 0;
     }
 
@@ -1444,38 +1306,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public Map<String, Integer> getGeneratorAmounts() {
-        return new HashMap<>();
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return new HashMap<>();
-    }
-
-    @Override
-    public Map<Key, Integer> getCustomGeneratorAmounts() {
         return new HashMap<>();
     }
 
     @Override
     public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         return new HashMap<>();
-    }
-
-    @Override
-    public String[] getGeneratorArray() {
-        return new String[0];
-    }
-
-    @Override
-    public String[] getGeneratorArray(World.Environment environment) {
-        return new String[0];
-    }
-
-    @Override
-    public void clearGeneratorAmounts() {
-
     }
 
     @Override
@@ -1530,7 +1367,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public IslandDataHandler getDataHandler() {
-        return null;
+        return SEmptyIslandDataHandler.getHandler();
     }
 
     @SuppressWarnings("NullableProblems")

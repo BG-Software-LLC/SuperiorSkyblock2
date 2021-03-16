@@ -2,11 +2,13 @@ package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public abstract class Mission<V> {
      * @param name The name to set.
      */
     public void setName(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         if(this.name == null)
             this.name = name;
     }
@@ -63,7 +66,7 @@ public abstract class Mission<V> {
     /**
      * Set the clear method for the data object.
      */
-    public void setClearMethod(Consumer<V> clearMethod){
+    public void setClearMethod(@Nullable Consumer<V> clearMethod){
         this.clearMethod = clearMethod;
     }
 
@@ -72,6 +75,7 @@ public abstract class Mission<V> {
      * @param missions The array of required missions.
      */
     public void addRequiredMission(String... missions){
+        Preconditions.checkNotNull(missions, "missions parameter cannot be null.");
         requiredMissions.addAll(Arrays.asList(missions));
     }
 
@@ -81,6 +85,7 @@ public abstract class Mission<V> {
      * @param checks The array of required missions.
      */
     public void addRequiredCheck(String... checks){
+        Preconditions.checkNotNull(checks, "checks parameter cannot be null.");
         requiredChecks.addAll(Arrays.asList(checks));
     }
 
@@ -142,6 +147,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to check.
      */
     public boolean canComplete(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         if(!SuperiorSkyblockAPI.getSuperiorSkyblock().getGrid().isIslandsWorld(superiorPlayer.getWorld()))
             return false;
 
@@ -181,6 +187,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to clear the data of.
      */
     public void clearData(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);
         if(dataKey != null) {
             V data = missionData.remove(dataKey);
@@ -195,6 +202,8 @@ public abstract class Mission<V> {
      * @param newPlayer The new owner of the player.
      */
     public void transferData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer){
+        Preconditions.checkNotNull(oldPlayer, "oldPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
         V data = missionData.remove(oldPlayer);
         if(data != null)
             missionData.put(newPlayer, data);
@@ -205,6 +214,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to check.
      */
     protected SuperiorPlayer getDataKey(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return islandMission ? superiorPlayer.getIsland() == null ? null : superiorPlayer.getIsland().getOwner() : superiorPlayer;
     }
 
@@ -214,6 +224,8 @@ public abstract class Mission<V> {
      * @param value The data to insert.
      */
     protected void insertData(SuperiorPlayer superiorPlayer, V value){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(value, "value parameter cannot be null.");
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);
         if(dataKey != null)
             missionData.put(dataKey, value);
@@ -225,6 +237,9 @@ public abstract class Mission<V> {
      * @param createFunction The function that will be run when data doesn't exist yet.
      */
     protected V getOrCreate(SuperiorPlayer superiorPlayer, Function<SuperiorPlayer, ? extends V> createFunction){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(createFunction, "createFunction parameter cannot be null.");
+
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);
 
         if(dataKey == null)
@@ -238,6 +253,8 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to get data from.
      */
     protected V get(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         SuperiorPlayer dataKey = getDataKey(superiorPlayer);
 
         if(dataKey == null)

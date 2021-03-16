@@ -16,18 +16,6 @@ public class IslandEnterProtectedEvent extends IslandEnterEvent {
 
     /**
      * The constructor of the event.
-     * @param superiorPlayer The player who entered to the island's protected area.
-     * @param island The island that the player entered into.
-     *
-     * @deprecated See IslandEnterProtectedEvent(SuperiorPlayer, Island, EnterCause)
-     */
-    @Deprecated
-    public IslandEnterProtectedEvent(SuperiorPlayer superiorPlayer, Island island){
-        super(superiorPlayer, island, EnterCause.INVALID);
-    }
-
-    /**
-     * The constructor of the event.
      * @param superiorPlayer The player who entered to the island's area.
      * @param island The island that the player entered into.
      * @param enterCause The cause of entering into the island.

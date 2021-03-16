@@ -57,7 +57,7 @@ public final class CmdAdminMsg implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        if(!targetPlayer.asOfflinePlayer().isOnline()){
+        if(!targetPlayer.isOnline()){
             Locale.PLAYER_NOT_ONLINE.send(sender);
             return;
         }

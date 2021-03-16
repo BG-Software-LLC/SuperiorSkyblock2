@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface WarpCategory {
@@ -50,12 +51,12 @@ public interface WarpCategory {
      * Get the icon of the category after all placeholders are parsed.
      * @param superiorPlayer The player to parse the placeholders for
      */
-    ItemStack getIcon(SuperiorPlayer superiorPlayer);
+    ItemStack getIcon(@Nullable SuperiorPlayer superiorPlayer);
 
     /**
      * Set the icon of the category.
-     * @param icon The icon to set.
+     * @param icon The icon to set. If null, default icon will be set.
      */
-    void setIcon(ItemStack icon);
+    void setIcon(@Nullable ItemStack icon);
 
 }

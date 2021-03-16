@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island.bank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public interface IslandBank {
      *                          The commands can use {0} as player's name placeholder, and {1} for the amount.
      * @return The transaction details.
      */
-    BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, List<String> commandsToExecute);
+    BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, @Nullable List<String> commandsToExecute);
 
     /**
      * Withdraw money from the bank, without giving it to any player.

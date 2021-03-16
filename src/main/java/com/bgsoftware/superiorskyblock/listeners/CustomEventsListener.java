@@ -235,7 +235,8 @@ public final class CustomEventsListener implements Listener {
                 newOwner = targetName = ((IslandTransferEvent) e).getNewOwner().getName();
                 break;
             case "islandworthcalculatedevent":
-                playerName = ((IslandWorthCalculatedEvent) e).getPlayer().getName();
+                SuperiorPlayer superiorPlayer = ((IslandWorthCalculatedEvent) e).getPlayer();
+                playerName = superiorPlayer == null ? "" : superiorPlayer.getName();
                 worth = ((IslandWorthCalculatedEvent) e).getWorth().toString();
                 level = ((IslandWorthCalculatedEvent) e).getLevel().toString();
                 break;
@@ -266,8 +267,6 @@ public final class CustomEventsListener implements Listener {
         boolean equalIslands = fromIsland.equals(toIsland);
         boolean fromInsideRange = fromIsland.isInsideRange(fromLocation);
         boolean toInsideRange = toLocation != null && toIsland != null && toIsland.isInsideRange(toLocation);
-
-        Player player = superiorPlayer.asPlayer();
 
         //Checking for the stop leaving feature.
         if(plugin.getSettings().stopLeaving && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
@@ -300,6 +299,9 @@ public final class CustomEventsListener implements Listener {
         }
 
         fromIsland.setPlayerInside(superiorPlayer, false);
+
+        Player player = superiorPlayer.asPlayer();
+        assert player != null;
 
         player.resetPlayerTime();
         player.resetPlayerWeather();
@@ -354,6 +356,7 @@ public final class CustomEventsListener implements Listener {
         boolean fromInsideRange = fromLocation != null && fromIsland != null && fromIsland.isInsideRange(fromLocation);
         boolean equalWorlds = fromLocation != null && toLocation.getWorld().equals(fromLocation.getWorld());
         Player player = superiorPlayer.asPlayer();
+        assert player != null;
 
         if(toInsideRange && (!equalIslands || !fromInsideRange)){
             if (!EventsCaller.callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {

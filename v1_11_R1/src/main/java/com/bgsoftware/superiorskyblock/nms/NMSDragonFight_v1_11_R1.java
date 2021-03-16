@@ -59,6 +59,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public final class NMSDragonFight_v1_11_R1 implements NMSDragonFight {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -389,8 +390,10 @@ public final class NMSDragonFight_v1_11_R1 implements NMSDragonFight {
             Set<EntityPlayer> nearbyPlayers = Sets.newHashSet();
 
             for(SuperiorPlayer superiorPlayer : island.getAllPlayersInside()){
-                if(((CraftWorld) superiorPlayer.getWorld()).getHandle() == world){
-                    EntityPlayer entityPlayer = ((CraftPlayer) superiorPlayer.asPlayer()).getHandle();
+                Player player = superiorPlayer.asPlayer();
+                assert player != null;
+                if(((CraftWorld) player.getWorld()).getHandle() == world){
+                    EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
                     bossBattle.addPlayer(entityPlayer);
                     nearbyPlayers.add(entityPlayer);
                 }

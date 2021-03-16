@@ -24,6 +24,9 @@ public final class MenuConfirmBan extends SuperiorMenu {
     protected void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
+        if(island == null)
+            return;
+
         boolean closeMenu = false;
 
         if(confirmSlot.contains(e.getRawSlot())){
@@ -36,7 +39,7 @@ public final class MenuConfirmBan extends SuperiorMenu {
 
         if(closeMenu){
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            e.getWhoClicked().closeInventory();
         }
     }
 

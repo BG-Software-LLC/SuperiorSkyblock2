@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import javax.annotation.Nullable;
+
 public interface PlayerRole {
 
     /**
@@ -45,13 +47,17 @@ public interface PlayerRole {
     boolean isRoleLadder();
 
     /**
-     * Get the next role in the ladder. May be null.
+     * Get the next role in the ladder.
+     * Will return null if the role is not in the ladder, or it's the last role in the ladder.
      */
+    @Nullable
     PlayerRole getNextRole();
 
     /**
-     * Get the previous role in the ladder. May be null.
+     * Get the previous role in the ladder.
+     * Will return null if the role is not in the ladder, or it's the first role in the ladder.
      */
+    @Nullable
     PlayerRole getPreviousRole();
 
 

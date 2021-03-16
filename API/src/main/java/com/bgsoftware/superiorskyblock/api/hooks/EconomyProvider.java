@@ -7,26 +7,6 @@ import java.math.BigDecimal;
 public interface EconomyProvider {
 
     /**
-     * Returns if this economy provider is enabled.
-     * It should only return false if no economy providers were found (default economy object)
-     *
-     * @deprecated not used anymore.
-     */
-    @Deprecated
-    default boolean isEnabled(){
-        return true;
-    }
-
-    /**
-     * Get the amount of money a specific user has in his bank.
-     * @param superiorPlayer The player to check.
-     *
-     * @deprecated See getBalance
-     */
-    @Deprecated
-    double getMoneyInBank(SuperiorPlayer superiorPlayer);
-
-    /**
      * Get the amount of money a specific user has in his bank.
      * @param superiorPlayer The player to check.
      */

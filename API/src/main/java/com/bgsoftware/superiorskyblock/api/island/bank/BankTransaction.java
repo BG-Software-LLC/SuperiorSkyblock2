@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.island.bank;
 
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ public interface BankTransaction {
      * Get the player that made the transaction.
      * Can be null if the console has made the transaction.
      */
+    @Nullable
     UUID getPlayer();
 
     /**

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.google.common.base.Preconditions;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class PermissionNodeAbstract implements PermissionNode {
@@ -39,8 +40,9 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     public abstract boolean hasPermission(IslandPrivilege permission);
 
     @Override
-    public void setPermission(IslandPrivilege permission, boolean value){
-        privileges.add(permission, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
+    public void setPermission(IslandPrivilege islandPrivilege, boolean value){
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+        privileges.add(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
     }
 
     @Override

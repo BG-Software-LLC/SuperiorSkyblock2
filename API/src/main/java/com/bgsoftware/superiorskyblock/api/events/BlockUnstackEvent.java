@@ -7,6 +7,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 
+import javax.annotation.Nullable;
+
 public class BlockUnstackEvent extends BlockEvent implements Cancellable {
 
     private static final HandlerList handlers = new HandlerList();
@@ -22,6 +24,7 @@ public class BlockUnstackEvent extends BlockEvent implements Cancellable {
         this.newCount = newCount;
     }
 
+    @Nullable
     public Player getPlayer() {
         return player;
     }

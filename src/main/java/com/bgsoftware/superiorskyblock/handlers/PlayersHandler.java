@@ -72,11 +72,13 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(Player player) {
+        Preconditions.checkNotNull(player, "player parameter cannot be null.");
         return player.hasMetadata("NPC") ? new SuperiorNPCPlayer(player) : getSuperiorPlayer(player.getUniqueId());
     }
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
+        Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         if(!players.containsKey(uuid)) {
             players.add(uuid, plugin.getFactory().createPlayer(uuid));
             Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)), 1L);
@@ -105,6 +107,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public PlayerRole getPlayerRole(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         PlayerRole playerRole = rolesByName.get(name.toUpperCase());
 
         Preconditions.checkArgument(playerRole != null, "Invalid role name: " + name);
@@ -158,7 +161,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
                 .collect(Collectors.toList());
 
         List<SuperiorPlayer> modifiedPlayers = players.values().stream()
-                .filter(player -> ((DatabaseObject) player.getDataHandler()).isModified())
+                .filter(player -> player.getDataHandler() != null && ((DatabaseObject) player.getDataHandler()).isModified())
                 .collect(Collectors.toList());
 
         if(!onlinePlayers.isEmpty()){
@@ -172,8 +175,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         if(!modifiedPlayers.isEmpty()){
             StatementHolder playerUpdateHolder = Query.PLAYER_UPDATE.getStatementHolder(null);
             playerUpdateHolder.prepareBatch();
-            modifiedPlayers.forEach(player -> ((SPlayerDataHandler) player.getDataHandler())
-                    .setUpdateStatement(playerUpdateHolder).addBatch());
+            modifiedPlayers.forEach(player -> ((SPlayerDataHandler) player.getDataHandler()).setUpdateStatement(playerUpdateHolder).addBatch());
             playerUpdateHolder.execute(false);
         }
     }

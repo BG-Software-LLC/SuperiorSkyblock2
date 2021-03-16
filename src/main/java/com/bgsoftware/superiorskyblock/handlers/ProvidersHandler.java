@@ -210,29 +210,31 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     @Override
     public void setSpawnersProvider(SpawnersProvider spawnersProvider){
-        Preconditions.checkArgument(spawnersProvider != null, "SpawnersProvider cannot be null.");
+        Preconditions.checkNotNull(spawnersProvider, "spawnersProvider parameter cannot be null.");
         this.spawnersProvider = spawnersProvider;
     }
 
     @Override
     public void setEconomyProvider(EconomyProvider economyProvider) {
-        Preconditions.checkArgument(economyProvider != null, "EconomyProvider cannot be null.");
+        Preconditions.checkNotNull(economyProvider, "economyProvider parameter cannot be null.");
         this.economyProvider = economyProvider;
     }
 
     @Override
     public void setWorldsProvider(WorldsProvider worldsProvider) {
+        Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
         this.worldsProvider = worldsProvider;
     }
 
     @Override
     public void setBankEconomyProvider(EconomyProvider bankEconomyProvider) {
-        Preconditions.checkArgument(bankEconomyProvider != null, "EconomyProvider cannot be null.");
+        Preconditions.checkNotNull(bankEconomyProvider, "bankEconomyProvider parameter cannot be null.");
         this.bankEconomyProvider = bankEconomyProvider;
     }
 
     @Override
     public void addAFKProvider(AFKProvider afkProvider) {
+        Preconditions.checkNotNull(afkProvider, "afkProvider parameter cannot be null.");
         AFKProvidersList.add(afkProvider);
     }
 

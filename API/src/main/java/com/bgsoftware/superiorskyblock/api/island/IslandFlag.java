@@ -10,7 +10,7 @@ public final class IslandFlag {
 
     private static final Map<String, IslandFlag> islandFlags = new HashMap<>();
 
-    private String name;
+    private final String name;
 
     private IslandFlag(String name){
         this.name = name.toUpperCase();
@@ -35,9 +35,11 @@ public final class IslandFlag {
      * @param name The name to check.
      */
     public static IslandFlag getByName(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
         IslandFlag islandFlag = islandFlags.get(name.toUpperCase());
 
-        Preconditions.checkArgument(islandFlag != null, "Couldn't find an IslandFlag with the name " + name + ".");
+        Preconditions.checkNotNull(islandFlag, "Couldn't find an IslandFlag with the name " + name + ".");
 
         return islandFlag;
     }
@@ -52,6 +54,8 @@ public final class IslandFlag {
      * @param name The name for the island flag.
      */
     public static void register(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
         name = name.toUpperCase();
 
         Preconditions.checkState(!islandFlags.containsKey(name), "IslandFlag with the name " + name + " already exists.");

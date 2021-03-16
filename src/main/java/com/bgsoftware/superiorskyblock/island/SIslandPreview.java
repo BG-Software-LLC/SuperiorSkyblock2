@@ -6,7 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.google.common.base.Preconditions;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public final class SIslandPreview implements IslandPreview {
 
@@ -23,7 +25,10 @@ public final class SIslandPreview implements IslandPreview {
         this.schematic = schematic;
         this.islandName = islandName;
 
-        PlayerChat.listen(superiorPlayer.asPlayer(), message -> {
+        Player player = superiorPlayer.asPlayer();
+        Preconditions.checkNotNull(player, "Cannot start island preview to an offline player.");
+
+        PlayerChat.listen(player, message -> {
             if(message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CONFIRM_TEXT.getMessage(superiorPlayer.getUserLocale()))){
                 handleConfirm();
                 return true;
@@ -60,7 +65,9 @@ public final class SIslandPreview implements IslandPreview {
     @Override
     public void handleConfirm() {
         MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematic, false);
-        PlayerChat.remove(superiorPlayer.asPlayer());
+        Player player = superiorPlayer.asPlayer();
+        assert player != null;
+        PlayerChat.remove(player);
     }
 
     @Override

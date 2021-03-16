@@ -104,6 +104,8 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
         WarpCategory warpCategory = categoryName == null ? null : island.createWarpCategory(categoryName);
 
+        assert superiorPlayer.getLocation() != null;
+
         island.createWarp(warpName, superiorPlayer.getLocation(), warpCategory);
 
         Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));

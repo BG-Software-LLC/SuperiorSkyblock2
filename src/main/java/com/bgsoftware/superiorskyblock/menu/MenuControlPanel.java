@@ -28,6 +28,9 @@ public final class MenuControlPanel extends SuperiorMenu {
     public void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
+        if(island == null)
+            return;
+
         if(membersSlot.contains(e.getRawSlot())){
             MenuMembers.openInventory(superiorPlayer, this, island);
         }

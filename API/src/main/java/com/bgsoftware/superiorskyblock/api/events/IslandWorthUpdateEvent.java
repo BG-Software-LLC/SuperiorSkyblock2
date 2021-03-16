@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public class IslandWorthUpdateEvent extends IslandEvent{
 
-    private BigDecimal oldWorth, oldLevel, newWorth, newLevel;
+    private final BigDecimal oldWorth, oldLevel, newWorth, newLevel;
 
     /**
      * The constructor of the event.

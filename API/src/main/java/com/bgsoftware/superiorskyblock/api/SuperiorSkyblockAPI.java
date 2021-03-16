@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -28,20 +29,15 @@ public final class SuperiorSkyblockAPI {
 
     /**
      * Get the superior player object from a player instance.
-     *
-     * @param player player instance
-     * @return The superior player object. null if doesn't exist.
      */
     public static SuperiorPlayer getPlayer(Player player){
         return plugin.getPlayers().getSuperiorPlayer(player.getUniqueId());
     }
 
     /**
-     * Get the superior player object from a player's name.
-     *
-     * @param name player name
-     * @return The superior player object. null if doesn't exist.
+     * Get the superior player object by a player's name.
      */
+    @Nullable
     public static SuperiorPlayer getPlayer(String name){
         return plugin.getPlayers().getSuperiorPlayer(name);
     }
@@ -108,88 +104,39 @@ public final class SuperiorSkyblockAPI {
     }
 
     /**
-     * Get the island by it's index in top islands.
-     *
-     * @param index the index to check
-     * @return the island at the index. might be null.
-     */
-    @Deprecated
-    public static Island getIsland(int index){
-        return plugin.getGrid().getIsland(index);
-    }
-
-    /**
      * Get an island by it's name.
-     *
-     * @param islandName The name to check.
-     * @return The island with that name. May be null.
      */
+    @Nullable
     public static Island getIsland(String islandName){
         return plugin.getGrid().getIsland(islandName);
     }
 
     /**
      * Get an island by it's uuid.
-     *
-     * @param uuid The uuid of the island.
-     * @return The island with that UUID. May be null.
      */
+    @Nullable
     public static Island getIslandByUUID(UUID uuid){
         return plugin.getGrid().getIslandByUUID(uuid);
     }
 
     /**
      * Get the spawn island.
-     *
-     * @return the spawn island.
      */
     public static Island getSpawnIsland(){
         return plugin.getGrid().getSpawnIsland();
     }
 
     /**
-     * Get the islands normal world.
-     *
-     * @return the islands normal world.
-     *
-     * @deprecated See WorldsManager#getIslandsWorld
-     */
-    @Deprecated
-    public static World getIslandsWorld(){
-        return getIslandsWorld(World.Environment.NORMAL);
-    }
-
-    /**
-     * Get the islands world by world's environment.
-     * @param environment The environment.
-     *
-     * @return the islands world.
-     *
-     * @deprecated Unexpected behavior. Check getIslandsWorld(Island, Environment)
-     */
-    @Deprecated
-    public static World getIslandsWorld(World.Environment environment){
-        return getIslandsWorld(null, environment);
-    }
-
-    /**
      * Get the world of an island by the world's environment.
-     * @param environment The environment.
-     * @param island The island to check.
-     *
-     * @return the islands world.
      */
-    @Deprecated
     public static World getIslandsWorld(Island island, World.Environment environment){
         return plugin.getGrid().getIslandsWorld(island, environment);
     }
 
     /**
      * Get an island at a location.
-     *
-     * @param location the location to check
-     * @return the island at the location. might be null.
      */
+    @Nullable
     public static Island getIslandAt(Location location){
         return plugin.getGrid().getIslandAt(location);
     }
@@ -207,10 +154,8 @@ public final class SuperiorSkyblockAPI {
 
     /**
      * Get a schematic object by it's name
-     *
-     * @param name the name to check
-     * @return the schematic with this name. might be null.
      */
+    @Nullable
     public static Schematic getSchematic(String name){
         return plugin.getSchematics().getSchematic(name);
     }

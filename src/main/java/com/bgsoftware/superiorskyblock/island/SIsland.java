@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
+import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
@@ -26,7 +27,6 @@ import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
@@ -92,7 +92,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -101,7 +103,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -394,6 +395,8 @@ public final class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
+        Preconditions.checkNotNull(playerRoles, "playerRoles parameter cannot be null.");
+
         List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
         List<SuperiorPlayer> members = new ArrayList<>();
 
@@ -419,8 +422,7 @@ public final class SIsland implements Island {
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
         return playersInside.readAndGet(playersInside -> playersInside.stream()
-                .filter(superiorPlayer -> !isMember(superiorPlayer) &&
-                        (vanishPlayers || !plugin.getProviders().isVanished(superiorPlayer.asPlayer())))
+                .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || !superiorPlayer.isVanished()))
                 .collect(Collectors.toList()));
     }
 
@@ -441,7 +443,9 @@ public final class SIsland implements Island {
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Invite, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         invitedPlayers.write(invitedPlayers -> invitedPlayers.add(superiorPlayer));
         //Revoke the invite after 5 minutes
         Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
@@ -449,12 +453,15 @@ public final class SIsland implements Island {
 
     @Override
     public void revokeInvite(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Invite Revoke, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         invitedPlayers.write(invitedPlayers -> invitedPlayers.remove(superiorPlayer));
     }
 
     @Override
     public boolean isInvited(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return invitedPlayers.readAndGet(invitedPlayers -> invitedPlayers.contains(superiorPlayer));
     }
 
@@ -465,7 +472,10 @@ public final class SIsland implements Island {
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Add Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Role: " + playerRole);
+
         members.write(members -> members.add(superiorPlayer));
 
         superiorPlayer.setIslandLeader(owner);
@@ -485,7 +495,9 @@ public final class SIsland implements Island {
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Kick Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         members.write(members -> members.remove(superiorPlayer));
 
         superiorPlayer.setIslandLeader(superiorPlayer);
@@ -514,18 +526,23 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isMember(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return owner.equals(superiorPlayer.getIslandLeader());
     }
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Ban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         banned.write(banned -> banned.add(superiorPlayer));
 
         if (isMember(superiorPlayer))
             kickMember(superiorPlayer);
 
-        if (superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation()))
+        Location location = superiorPlayer.getLocation();
+
+        if (location != null && isInside(location))
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
 
         islandDataHandler.saveBannedPlayers();
@@ -533,29 +550,38 @@ public final class SIsland implements Island {
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Unban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         banned.write(banned -> banned.remove(superiorPlayer));
         islandDataHandler.saveBannedPlayers();
     }
 
     @Override
     public boolean isBanned(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return banned.readAndGet(banned -> banned.contains(superiorPlayer));
     }
 
     @Override
     public void addCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         coop.write(coop -> coop.add(superiorPlayer));
         MenuCoops.refreshMenus(this);
     }
 
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Uncoop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
+
         coop.write(coop -> coop.remove(superiorPlayer));
 
-        if (isLocked() && superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation())) {
+        Location location = superiorPlayer.getLocation();
+
+        if (isLocked() && location != null && isInside(location)) {
             SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
@@ -565,6 +591,7 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return coop.readAndGet(coop -> coop.contains(superiorPlayer));
     }
 
@@ -593,6 +620,8 @@ public final class SIsland implements Island {
 
     @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         playersInside.write(playersInside -> {
             if (inside)
                 playersInside.add(superiorPlayer);
@@ -607,7 +636,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Left Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         }
 
-        if(!isMember(superiorPlayer) && !plugin.getProviders().isVanished(superiorPlayer.asPlayer())){
+        if(!isMember(superiorPlayer) && !superiorPlayer.isVanished()){
             Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
                     uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
 
@@ -630,6 +659,8 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         return !isMember(superiorPlayer) && (!includeCoopStatus || !isCoop(superiorPlayer));
     }
 
@@ -638,13 +669,9 @@ public final class SIsland implements Island {
      */
 
     @Override
-    @Deprecated
-    public Location getCenter(){
-        return getCenter(World.Environment.NORMAL);
-    }
-
-    @Override
     public Location getCenter(World.Environment environment){
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         World world = plugin.getGrid().getIslandsWorld(this, environment);
 
         Preconditions.checkNotNull(world, "Couldn't find world for environment " + environment + ".");
@@ -666,13 +693,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Location getTeleportLocation() {
-        return getTeleportLocation(World.Environment.NORMAL);
-    }
-
-    @Override
     public Location getTeleportLocation(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         Location teleportLocation = teleportLocations.readAndGet(teleportLocations -> teleportLocations[environment.ordinal()]);
 
         if (teleportLocation == null)
@@ -703,9 +726,17 @@ public final class SIsland implements Island {
 
     @Override
     public void setTeleportLocation(Location teleportLocation) {
+        Preconditions.checkNotNull(teleportLocation, "teleportLocation parameter cannot be null.");
+        Preconditions.checkNotNull(teleportLocation.getWorld(), "teleportLocation's world cannot be null.");
+        setTeleportLocation(teleportLocation.getWorld().getEnvironment(), teleportLocation);
+    }
+
+    @Override
+    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Teleport Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(teleportLocation));
         teleportLocations.write(teleportLocations ->
-                teleportLocations[teleportLocation.getWorld().getEnvironment().ordinal()] = teleportLocation.clone());
+                teleportLocations[environment.ordinal()] = teleportLocation == null ? null : teleportLocation.clone());
         islandDataHandler.saveTeleportLocation();
     }
 
@@ -805,25 +836,12 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete) {
-        return getAllChunksAsync(environment, onlyProtected, false, whenComplete);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad) {
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad) {
         return getAllChunksAsync(environment, onlyProtected, false, onChunkLoad);
     }
 
     @Override
-    @Deprecated
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
-        World world = getCenter(environment).getWorld();
-        return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, whenComplete);
-    }
-
-    @Override
-    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
+    public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad) {
         World world = getCenter(environment).getWorld();
         return IslandUtils.getAllChunksAsync(this, world, onlyProtected, noEmptyChunks, onChunkLoad);
     }
@@ -834,7 +852,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish) {
+    public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
         World world = getCenter(environment).getWorld();
         List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, world, onlyProtected, true);
 
@@ -856,7 +874,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void resetChunks(boolean onlyProtected, Runnable onFinish) {
+    public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
         List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, onlyProtected, true);
 
         if(chunkPositions.isEmpty()){
@@ -873,7 +891,9 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isInside(Location location){
-        if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
+        if(location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -883,11 +903,12 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isInsideRange(Location location){
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return isInsideRange(location, 0);
     }
 
     public boolean isInsideRange(Location location, int extra){
-        if(!plugin.getGrid().isIslandsWorld(location.getWorld()))
+        if(location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
         Location min = getMinimumProtected(), max = getMaximumProtected();
@@ -897,7 +918,9 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        if(!plugin.getGrid().isIslandsWorld(chunk.getWorld()))
+        Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
+
+        if(chunk.getWorld() == null || !plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return false;
 
         Location min = getMinimumProtected(), max = getMaximumProtected();
@@ -962,11 +985,17 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasPermission(CommandSender sender, IslandPrivilege islandPrivilege){
+        Preconditions.checkNotNull(sender, "sender parameter cannot be null.");
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+
         return sender instanceof ConsoleCommandSender || hasPermission(plugin.getPlayers().getSuperiorPlayer(sender), islandPrivilege);
     }
 
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+
         PermissionNode playerNode = getPermissionNode(superiorPlayer);
         return superiorPlayer.hasBypassModeEnabled() || superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass.*") ||
                 superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
@@ -975,12 +1004,18 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+
         return getRequiredPlayerRole(islandPrivilege).getWeight() <= playerRole.getWeight();
     }
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
+
         if(value) {
             rolePermissions.add(islandPrivilege, playerRole);
 
@@ -1013,6 +1048,8 @@ public final class SIsland implements Island {
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
 
         if(!playerPermissions.containsKey(superiorPlayer))
@@ -1035,6 +1072,7 @@ public final class SIsland implements Island {
 
     @Override
     public void resetPermissions(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Permissions, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
         playerPermissions.remove(superiorPlayer);
@@ -1050,20 +1088,15 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public PermissionNodeAbstract getPermissionNode(PlayerRole playerRole) {
-        SuperiorSkyblockPlugin.log("&cIt seems like a plugin developer is using a deprecated method. Please inform him about it.");
-        new Throwable().printStackTrace();
-        return RolePermissionNode.EmptyRolePermissionNode.INSTANCE;
-    }
-
-    @Override
     public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return playerPermissions.get(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
     }
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+
         PlayerRole playerRole = rolePermissions.get(islandPrivilege);
 
         if(playerRole != null)
@@ -1105,7 +1138,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setName(String islandName) {
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Name, Island: " + owner.getName() + ", Name: " + islandName);
+
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         islandDataHandler.saveName();
@@ -1118,7 +1153,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setDescription(String description) {
+        Preconditions.checkNotNull(description, "description parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Description, Island: " + owner.getName() + ", Description: " + description);
+
         this.description.set(description);
         islandDataHandler.saveDescription();
     }
@@ -1149,12 +1186,12 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void calcIslandWorth(SuperiorPlayer asker) {
+    public void calcIslandWorth(@Nullable SuperiorPlayer asker) {
         calcIslandWorth(asker, null);
     }
 
     @Override
-    public void calcIslandWorth(SuperiorPlayer asker, Runnable callback) {
+    public void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
         if(!Bukkit.isPrimaryThread()){
             Executor.sync(() -> calcIslandWorth(asker, callback));
             return;
@@ -1311,6 +1348,7 @@ public final class SIsland implements Island {
 
     @Override
     public void updateIslandFly(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         IslandUtils.updateIslandFly(this, superiorPlayer);
     }
 
@@ -1353,7 +1391,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setDiscord(String discord) {
+        Preconditions.checkNotNull(discord, "discord parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Discord, Island: " + owner.getName() + ", Discord: " + discord);
+
         this.discord.set(discord);
         islandDataHandler.saveDiscord();
     }
@@ -1365,7 +1405,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setPaypal(String paypal) {
+        Preconditions.checkNotNull(paypal, "paypal parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Paypal, Island: " + owner.getName() + ", Paypal: " + paypal);
+
         this.paypal.set(paypal);
         islandDataHandler.savePaypal();
     }
@@ -1377,10 +1419,12 @@ public final class SIsland implements Island {
 
     @Override
     public void setBiome(Biome biome){
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         setBiome(biome, true);
     }
 
     public void setBiome(Biome biome, boolean updateBlocks){
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
 
         if(updateBlocks) {
@@ -1451,6 +1495,8 @@ public final class SIsland implements Island {
 
     @Override
     public boolean transferIsland(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         if(superiorPlayer.equals(owner))
             return false;
 
@@ -1489,6 +1535,9 @@ public final class SIsland implements Island {
 
     @Override
     public void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer){
+        Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
+
         boolean executeUpdate = false;
 
         if(owner == originalPlayer) {
@@ -1518,9 +1567,12 @@ public final class SIsland implements Island {
 
     @Override
     public void sendMessage(String message, UUID... ignoredMembers){
-        SuperiorSkyblockPlugin.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + Arrays.asList(ignoredMembers) + ", Message: " + message);
+        Preconditions.checkNotNull(message, "message parameter cannot be null.");
+        Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
         List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        SuperiorSkyblockPlugin.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Message: " + message);
 
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
@@ -1528,10 +1580,12 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
-        SuperiorSkyblockPlugin.debug("Action: Send Title, Island: " + owner.getName() + ", Ignored Members: " + Arrays.asList(ignoredMembers) + ", Title: " + title + ", Subtitle: " + subtitle);
+    public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
+        Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
         List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        SuperiorSkyblockPlugin.debug("Action: Send Title, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Title: " + title + ", Subtitle: " + subtitle);
 
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
@@ -1591,7 +1645,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setBankLimit(BigDecimal bankLimit) {
+        Preconditions.checkNotNull(bankLimit, "bankLimit parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Bank Limit, Island: " + owner.getName() + ", Bank Limit: " + bankLimit);
+
         this.bankLimit.set(new UpgradeValue<>(bankLimit, i -> i.compareTo(new BigDecimal(-1)) < 0));
         islandDataHandler.saveBankLimit();
     }
@@ -1626,72 +1682,50 @@ public final class SIsland implements Island {
         return plugin.getSettings().bankInterestInterval - (currentTime - lastInterest.get());
     }
 
-    @Override
-    @Deprecated
-    public BigDecimal getMoneyInBank() {
-        return islandBank.getBalance();
-    }
-
-    @Override
-    @Deprecated
-    public void depositMoney(double amount){
-        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
-    }
-
-    @Override
-    @Deprecated
-    public void depositMoney(BigDecimal amount) {
-        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
-    }
-
-    @Override
-    @Deprecated
-    public void withdrawMoney(double amount){
-        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
-    }
-
-    @Override
-    @Deprecated
-    public void withdrawMoney(BigDecimal amount) {
-        throw new UnsupportedOperationException("This method is not supported anymore, use IslandBank instead.");
-    }
-
     /*
      *  Worth related methods
      */
 
     @Override
     public void handleBlockPlace(Block block){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockPlace(Key.of(block), 1);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockPlace(Key.of(block), amount, true);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount, boolean save) {
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockPlace(Key.of(block), amount, save);
     }
 
     @Override
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockPlace(key, amount, true);
     }
 
     @Override
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockPlace(key, BigInteger.valueOf(amount), save);
     }
 
     @Override
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         handleBlockPlace(key, amount, save, blockCounts, islandWorth, islandLevel);
     }
 
     @Override
     public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks) {
+        Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
         handleBlocksPlace(blocks, false, this.blockCounts, this.islandWorth, this.islandLevel);
         islandDataHandler.saveBlockCounts();
         islandDataHandler.saveDirtyChunks();
@@ -1827,31 +1861,39 @@ public final class SIsland implements Island {
 
     @Override
     public void handleBlockBreak(Block block){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockBreak(Key.of(block), 1);
     }
 
     @Override
     public void handleBlockBreak(Block block, int amount){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockBreak(block, amount, true);
     }
 
     @Override
     public void handleBlockBreak(Block block, int amount, boolean save) {
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         handleBlockBreak(Key.of(block), amount, save);
     }
 
     @Override
     public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockBreak(key, amount, true);
     }
 
     @Override
     public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockBreak(key, BigInteger.valueOf(amount), save);
     }
 
     @Override
     public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);
 
@@ -1920,23 +1962,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key){
-        return getBlockCountAsBigInteger(key).min(MAX_INT).intValue();
-    }
-
-    @Override
     public BigInteger getBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockCounts.readAndGet(blockCounts -> blockCounts.getOrDefault(key, BigInteger.ZERO));
-    }
-
-    @Override
-    @Deprecated
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlockCounts() {
-        return getBlockCountsAsBigInteger().entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue().min(MAX_INT).intValue()
-        ));
     }
 
     @Override
@@ -1945,13 +1973,8 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getExactBlockCount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return getExactBlockCountAsBigInteger(key).min(MAX_INT).intValue();
-    }
-
-    @Override
     public BigInteger getExactBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockCounts.readAndGet(blockCounts -> blockCounts.getRaw(key, BigInteger.ZERO));
     }
 
@@ -1989,6 +2012,7 @@ public final class SIsland implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth){
+        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Worth, Island: " + owner.getName() + ", Bonus: " + bonusWorth);
 
         this.bonusWorth.set(bonusWorth);
@@ -2006,6 +2030,7 @@ public final class SIsland implements Island {
 
     @Override
     public void setBonusLevel(BigDecimal bonusLevel) {
+        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Bonus Level, Island: " + owner.getName() + ", Bonus: " + bonusLevel);
 
         this.bonusLevel.set(bonusLevel);
@@ -2072,24 +2097,14 @@ public final class SIsland implements Island {
      */
 
     @Override
-    @Deprecated
-    public int getUpgradeLevel(String upgradeName){
-        return getUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName)).getLevel();
-    }
-
-    @Override
     public UpgradeLevel getUpgradeLevel(Upgrade upgrade) {
+        Preconditions.checkNotNull(upgrade, "upgrade parameter cannot be null.");
         return upgrade.getUpgradeLevel(getUpgrades().getOrDefault(upgrade.getName(), 1));
     }
 
     @Override
-    @Deprecated
-    public void setUpgradeLevel(String upgradeName, int level){
-        setUpgradeLevel(plugin.getUpgrades().getUpgrade(upgradeName), level);
-    }
-
-    @Override
     public void setUpgradeLevel(Upgrade upgrade, int level) {
+        Preconditions.checkNotNull(upgrade, "upgrade parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Upgrade, Island: " + owner.getName() + ", Upgrade: " + upgrade.getName() + ", Level: " + level);
 
         int currentLevel = getUpgradeLevel(upgrade).getLevel();
@@ -2221,11 +2236,13 @@ public final class SIsland implements Island {
 
     @Override
     public int getBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.readAndGet(map -> map.getOrDefault(key, IslandUtils.NO_LIMIT).get());
     }
 
     @Override
     public int getExactBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.readAndGet(map -> map.getRaw(key, IslandUtils.NO_LIMIT).get());
     }
 
@@ -2255,6 +2272,7 @@ public final class SIsland implements Island {
 
     @Override
     public void setBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + finalLimit);
         blockLimits.write(map -> map.put(key, new UpgradeValue<>(finalLimit, false)));
@@ -2263,6 +2281,7 @@ public final class SIsland implements Island {
 
     @Override
     public void removeBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Remove Block Limit, Island: " + owner.getName() + ", Block: " + key);
         blockLimits.write(map -> map.remove(key));
         islandDataHandler.saveBlockLimits();
@@ -2270,11 +2289,13 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasReachedBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return hasReachedBlockLimit(key, 1);
     }
 
     @Override
     public boolean hasReachedBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int blockLimit = getExactBlockLimit(key);
 
         //Checking for the specific provided key.
@@ -2292,21 +2313,14 @@ public final class SIsland implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return getEntityLimit(Key.of(entityType));
     }
 
     @Override
     public int getEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return this.entityLimits.readAndGet(map -> map.getOrDefault(key, IslandUtils.NO_LIMIT).get());
-    }
-
-    @Override
-    @Deprecated
-    public Map<EntityType, Integer> getEntitiesLimits() {
-        return getEntitiesLimitsAsKeys().entrySet().stream().collect(Collectors.toMap(
-                entry -> EntityUtils.getEntityTypeOrUnknown(entry.getKey()),
-                Map.Entry::getValue
-        ));
     }
 
     @Override
@@ -2335,11 +2349,13 @@ public final class SIsland implements Island {
 
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         setEntityLimit(Key.of(entityType), limit);
     }
 
     @Override
     public void setEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + key + ", Limit: " + finalLimit);
         entityLimits.write(map -> map.put(key, new UpgradeValue<>(finalLimit, false)));
@@ -2348,21 +2364,26 @@ public final class SIsland implements Island {
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return hasReachedEntityLimit(Key.of(entityType));
     }
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return hasReachedEntityLimit(key, 1);
     }
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return hasReachedEntityLimit(Key.of(entityType), amount);
     }
 
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
         CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
         int entityLimit = getEntityLimit(key);
 
@@ -2429,16 +2450,25 @@ public final class SIsland implements Island {
 
     @Override
     public void setPotionEffect(PotionEffectType type, int level) {
+        Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Island Effect, Island: " + owner.getName() + ", Effect: " + type.getName() + ", Level: " + level);
 
         if(level <= 0) {
             islandEffects.write(map -> map.remove(type));
-            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().removePotionEffect(type)));
+            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+                Player player = superiorPlayer.asPlayer();
+                if(player != null)
+                    player.removePotionEffect(type);
+            }));
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
             islandEffects.write(map -> map.put(type, new UpgradeValue<>(level, false)));
-            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().addPotionEffect(potionEffect, true)));
+            Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+                Player player = superiorPlayer.asPlayer();
+                assert player != null;
+                player.addPotionEffect(potionEffect, true);
+            }));
         }
 
         islandDataHandler.saveIslandEffects();
@@ -2446,6 +2476,7 @@ public final class SIsland implements Island {
 
     @Override
     public int getPotionEffectLevel(PotionEffectType type) {
+        Preconditions.checkNotNull(type, "potionEffectType parameter cannot be null.");
         return islandEffects.readAndGet(map -> map.getOrDefault(type, UpgradeValue.NEGATIVE).get());
     }
 
@@ -2464,14 +2495,18 @@ public final class SIsland implements Island {
 
     @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Player player = superiorPlayer.asPlayer();
-        getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+        if(player != null)
+            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
     }
 
     @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Player player = superiorPlayer.asPlayer();
-        getPotionEffects().keySet().forEach(player::removePotionEffect);
+        if(player != null)
+            getPotionEffects().keySet().forEach(player::removePotionEffect);
     }
 
     @Override
@@ -2489,6 +2524,7 @@ public final class SIsland implements Island {
 
     @Override
     public void setRoleLimit(PlayerRole playerRole, int limit) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Role Limit, Island: " + owner.getName() + ", Role: " + playerRole.getName() + ", Limit: " + limit);
 
         if(limit < 0) {
@@ -2503,11 +2539,13 @@ public final class SIsland implements Island {
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         return roleLimits.readAndGet(map -> map.getOrDefault(playerRole, UpgradeValue.NEGATIVE).get());
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         return roleLimits.readAndGet(map -> {
             UpgradeValue<Integer> upgradeValue =  map.getOrDefault(playerRole, UpgradeValue.NEGATIVE);
             return upgradeValue.isSynced() ? -1 : upgradeValue.get();
@@ -2532,34 +2570,8 @@ public final class SIsland implements Island {
      */
 
     @Override
-    @Deprecated
-    public Location getWarpLocation(String name){
-        IslandWarp islandWarp = getWarp(name);
-        return islandWarp == null ? null : islandWarp.getLocation();
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWarpPrivate(String name) {
-        IslandWarp islandWarp = getWarp(name);
-        return islandWarp != null && islandWarp.hasPrivateFlag();
-    }
-
-    @Override
-    @Deprecated
-    public void setWarpLocation(String name, Location location, boolean privateFlag) {
-        IslandWarp islandWarp = createWarp(name, location, null);
-        islandWarp.setPrivateFlag(privateFlag);
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWarpLocation(Location location){
-        return getWarp(location) != null;
-    }
-
-    @Override
     public WarpCategory createWarpCategory(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Create Warp Category, Island: " + owner.getName() + ", Name: " + name);
 
         WarpCategory warpCategory = warpCategories.get(name.toLowerCase());
@@ -2585,6 +2597,7 @@ public final class SIsland implements Island {
 
     @Override
     public WarpCategory getWarpCategory(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         return warpCategories.get(name.toLowerCase());
     }
 
@@ -2596,6 +2609,9 @@ public final class SIsland implements Island {
 
     @Override
     public void renameCategory(WarpCategory warpCategory, String newName) {
+        Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
+        Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
+
         warpCategories.remove(warpCategory.getName().toLowerCase());
         warpCategories.add(newName.toLowerCase(), warpCategory);
         warpCategory.setName(newName);
@@ -2603,7 +2619,9 @@ public final class SIsland implements Island {
 
     @Override
     public void deleteCategory(WarpCategory warpCategory) {
+        Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Delete Warp-Category, Island: " + owner.getName() + ", Category: " + warpCategory.getName());
+
         boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase()) != null;
         if(validWarpRemoval) {
             islandDataHandler.saveWarpCategories();
@@ -2625,7 +2643,11 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public IslandWarp createWarp(String name, Location location, WarpCategory warpCategory) {
+    public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location));
 
         if(warpCategory == null)
@@ -2653,6 +2675,9 @@ public final class SIsland implements Island {
 
     @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
+        Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
+        Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
+
         warpsByName.remove(islandWarp.getName().toLowerCase());
         warpsByName.add(newName.toLowerCase(), islandWarp);
         islandWarp.setName(newName);
@@ -2660,21 +2685,28 @@ public final class SIsland implements Island {
 
     @Override
     public IslandWarp getWarp(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         return warpsByLocation.get(blockLocation);
     }
 
     @Override
     public IslandWarp getWarp(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         return warpsByName.get(name.toLowerCase());
     }
 
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(warp, "warp parameter cannot be null.");
+
         if(plugin.getSettings().warpsWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().warpsWarmup));
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(Executor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
+            BukkitTask teleportTask = Executor.sync(() -> warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50);
+            PlayerDataHandler playerDataHandler = superiorPlayer.getDataHandler();
+            if(playerDataHandler != null)
+                ((SPlayerDataHandler) playerDataHandler).setTeleportTask(teleportTask);
         }
         else {
             warpPlayerWithoutWarmup(superiorPlayer, warp);
@@ -2683,7 +2715,9 @@ public final class SIsland implements Island {
 
     private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
         Location location = warpsByName.get(warp.toLowerCase()).getLocation();
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
+        PlayerDataHandler playerDataHandler = superiorPlayer.getDataHandler();
+        if(playerDataHandler != null)
+            ((SPlayerDataHandler) playerDataHandler).setTeleportTask(null);
 
         if(!isInsideRange(location)){
             Locale.UNSAFE_WARP.send(superiorPlayer);
@@ -2706,7 +2740,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void deleteWarp(SuperiorPlayer superiorPlayer, Location location){
+    public void deleteWarp(@Nullable SuperiorPlayer superiorPlayer, Location location){
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
         Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
         IslandWarp islandWarp = warpsByLocation.remove(blockLocation);
         if(islandWarp != null){
@@ -2718,6 +2754,7 @@ public final class SIsland implements Island {
 
     @Override
     public void deleteWarp(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
 
         IslandWarp islandWarp = warpsByName.remove(name.toLowerCase());
@@ -2739,20 +2776,8 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public List<String> getAllWarps(){
-        return new ArrayList<>(warpsByName.keys());
-    }
-
-    @Override
     public Map<String, IslandWarp> getIslandWarps() {
         return Collections.unmodifiableMap(warpsByName.toMap());
-    }
-
-    @Override
-    @Deprecated
-    public boolean hasMoreWarpSlots() {
-        return warpsByName.size() < getWarpsLimit();
     }
 
     /*
@@ -2766,6 +2791,9 @@ public final class SIsland implements Island {
 
     @Override
     public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(rating, "rating parameter cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Set Rating, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Rating: " + rating);
 
         if(rating == Rating.UNKNOWN)
@@ -2814,6 +2842,7 @@ public final class SIsland implements Island {
 
     @Override
     public void completeMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
@@ -2825,6 +2854,7 @@ public final class SIsland implements Island {
 
     @Override
     public void resetMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
         if(completedMissions.get(mission, 0) > 0) {
@@ -2844,17 +2874,20 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.get(mission, 0) > 0;
     }
 
     @Override
     public boolean canCompleteMissionAgain(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
         return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) < missionDataOptional.get().resetAmount;
     }
 
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.get(mission, 0);
     }
 
@@ -2874,6 +2907,7 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
+        Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
         return islandSettings.get(settings, (byte) (plugin.getSettings().defaultSettings.contains(settings.getName()) ? 1 : 0)) == 1;
     }
 
@@ -2884,6 +2918,7 @@ public final class SIsland implements Island {
 
     @Override
     public void enableSettings(IslandFlag settings) {
+        Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Enable Settings, Island: " + owner.getName() + ", Settings: " + settings.getName());
 
         islandSettings.add(settings, (byte) 1);
@@ -2893,27 +2928,51 @@ public final class SIsland implements Island {
         //Updating times / weather if necessary
         switch (settings.getName()){
             case "ALWAYS_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(0, false));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerTime(0, false);
+                });
                 disableTime = true;
                 break;
             case "ALWAYS_MIDDLE_DAY":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(6000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerTime(6000, false);
+                });
                 disableTime = true;
                 break;
             case "ALWAYS_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(14000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerTime(14000, false);
+                });
                 disableTime = true;
                 break;
             case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerTime(18000, false));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerTime(18000, false);
+                });
                 disableTime = true;
                 break;
             case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.CLEAR));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerWeather(WeatherType.CLEAR);
+                });
                 disableWeather = true;
                 break;
             case "ALWAYS_RAIN":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().setPlayerWeather(WeatherType.DOWNFALL));
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.setPlayerWeather(WeatherType.DOWNFALL);
+                });
                 disableWeather = true;
                 break;
             case "PVP":
@@ -2951,6 +3010,7 @@ public final class SIsland implements Island {
 
     @Override
     public void disableSettings(IslandFlag settings) {
+        Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Disable Settings, Island: " + owner.getName() + ", Settings: " + settings.getName());
 
         islandSettings.add(settings, (byte) 0);
@@ -2962,11 +3022,19 @@ public final class SIsland implements Island {
             case "ALWAYS_MIDDLE_DAY":
             case "ALWAYS_NIGHT":
             case "ALWAYS_MIDDLE_NIGHT":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerTime());
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.resetPlayerTime();
+                });
                 break;
             case "ALWAYS_RAIN":
             case "ALWAYS_SHINY":
-                getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.asPlayer().resetPlayerWeather());
+                getAllPlayersInside().forEach(superiorPlayer -> {
+                    Player player = superiorPlayer.asPlayer();
+                    if(player != null)
+                        player.resetPlayerWeather();
+                });
                 break;
         }
 
@@ -2978,13 +3046,9 @@ public final class SIsland implements Island {
      */
 
     @Override
-    @Deprecated
-    public void setGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, int percentage) {
-        setGeneratorPercentage(key, percentage, World.Environment.NORMAL);
-    }
-
-    @Override
     public void setGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, int percentage, World.Environment environment) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Percentage: " + percentage + ", World: " + environment);
 
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, true);
@@ -3014,37 +3078,26 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return getGeneratorPercentage(key, World.Environment.NORMAL);
-    }
-
-    @Override
     public int getGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         int totalAmount = getGeneratorTotalAmount(environment);
         return totalAmount == 0 ? 0 : (getGeneratorAmount(key, environment) * 100) / totalAmount;
     }
 
     @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorPercentages() {
-        return getGeneratorPercentages(World.Environment.NORMAL);
-    }
-
-    @Override
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return getGeneratorAmounts(environment).keySet().stream().collect(Collectors.toMap(key -> key,
                 key -> getGeneratorAmount(Key.of(key), environment)));
     }
 
     @Override
-    @Deprecated
-    public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
-        setGeneratorAmount(key, amount, World.Environment.NORMAL);
-    }
-
-    @Override
     public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, World.Environment environment) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, true);
         int finalAmount = Math.max(0, amount);
         SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + finalAmount + ", World: " + environment);
@@ -3053,22 +3106,13 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key) {
-        return getGeneratorAmount(key, World.Environment.NORMAL);
-    }
-
-    @Override
     public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
         return (cobbleGeneratorValues == null ? UpgradeValue.ZERO : cobbleGeneratorValues
                 .readAndGet(map -> map.getOrDefault(key, UpgradeValue.ZERO))).get();
-    }
-
-    @Override
-    @Deprecated
-    public int getGeneratorTotalAmount(){
-        return getGeneratorTotalAmount(World.Environment.NORMAL);
     }
 
     @Override
@@ -3077,12 +3121,6 @@ public final class SIsland implements Island {
         for(int amt : getGeneratorAmounts(environment).values())
             totalAmount += amt;
         return totalAmount;
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, Integer> getGeneratorAmounts(){
-        return getGeneratorAmounts(World.Environment.NORMAL);
     }
 
     @Override
@@ -3096,13 +3134,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts() {
-        return getCustomGeneratorAmounts(World.Environment.NORMAL);
-    }
-
-    @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
 
         if(cobbleGeneratorValues == null)
@@ -3117,32 +3151,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public String[] getGeneratorArray() {
-        return getGeneratorArray(World.Environment.NORMAL);
-    }
-
-    @Override
-    @Deprecated
-    public String[] getGeneratorArray(World.Environment environment) {
-        String[] newCobbleGenerator = new String[getGeneratorTotalAmount(environment)];
-        int index = 0;
-        for(Map.Entry<String, Integer> entry : getGeneratorAmounts(environment).entrySet()){
-            for(int i = 0; i < entry.getValue() && index < newCobbleGenerator.length; i++, index++){
-                newCobbleGenerator[index] = entry.getKey();
-            }
-        }
-        return newCobbleGenerator;
-    }
-
-    @Override
-    @Deprecated
-    public void clearGeneratorAmounts() {
-        clearGeneratorAmounts(World.Environment.NORMAL);
-    }
-
-    @Override
     public void clearGeneratorAmounts(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
         SyncedObject<KeyMap<UpgradeValue<Integer>>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
         SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName() + ", World: " + environment);
         if(cobbleGeneratorValues != null) {
@@ -3157,18 +3168,22 @@ public final class SIsland implements Island {
 
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
         return (generatedSchematics.get() & n) == n;
     }
 
     @Override
     public void setSchematicGenerate(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         setSchematicGenerate(environment, true);
     }
 
     @Override
     public void setSchematicGenerate(World.Environment environment, boolean generated) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Schematic, Island: " + owner.getName() + ", Environment: " + environment);
+
         int generatedSchematics;
 
         if(generated) {

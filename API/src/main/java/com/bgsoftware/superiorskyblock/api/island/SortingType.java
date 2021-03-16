@@ -13,13 +13,13 @@ public final class SortingType implements Comparator<Island> {
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
 
     private static final Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
-        String firstName = o1.getName().isEmpty() ? o1.getOwner().getName() : o1.getName();
-        String secondName = o2.getName().isEmpty() ? o2.getOwner().getName() : o2.getName();
+        String firstName = o1.getName().isEmpty() ? o1.getOwner() == null ? "null" : o1.getOwner().getName() : o1.getName();
+        String secondName = o2.getName().isEmpty() ? o2.getOwner() == null ? "null" : o2.getOwner().getName() : o2.getName();
         return firstName.compareTo(secondName);
     };
 
-    private String name;
-    private Comparator<Island> comparator;
+    private final String name;
+    private final Comparator<Island> comparator;
 
     private SortingType(String name, Comparator<Island> comparator, boolean handleEqualsIslands){
         this.name = name;
@@ -74,6 +74,9 @@ public final class SortingType implements Comparator<Island> {
      * @param comparator The comparator for sorting the islands.
      */
     public static void register(String name, Comparator<Island> comparator){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkNotNull(comparator, "comparator parameter cannot be null.");
+
         register(name, comparator, true);
     }
 
@@ -85,6 +88,8 @@ public final class SortingType implements Comparator<Island> {
      *                            If that's false, you should handle it on your own.
      */
     public static void register(String name, Comparator<Island> comparator, boolean handleEqualsIslands){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        Preconditions.checkNotNull(comparator, "comparator parameter cannot be null.");
         Preconditions.checkState(!sortingTypes.containsKey(name), "SortingType with the name " + name + " already exists.");
 
         SortingType sortingType = new SortingType(name, comparator, handleEqualsIslands);

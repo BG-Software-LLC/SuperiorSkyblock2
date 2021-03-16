@@ -131,7 +131,7 @@ public final class CmdRankup implements IPermissibleCommand {
         SoundWrapper sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
 
         if(sound != null)
-            sound.playSound(superiorPlayer.asPlayer());
+            superiorPlayer.runIfOnline(sound::playSound);
     }
 
     @Override

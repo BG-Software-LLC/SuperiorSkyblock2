@@ -154,11 +154,6 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     @Override
-    public void pasteSchematic(Location location, Runnable callback){
-        pasteSchematic(null, location, callback, null);
-    }
-
-    @Override
     public void pasteSchematic(Island island, Location location, Runnable callback) {
         pasteSchematic(island, location, callback, null);
     }

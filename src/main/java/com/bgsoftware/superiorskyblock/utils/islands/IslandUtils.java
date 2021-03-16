@@ -5,24 +5,22 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
-import io.netty.util.internal.StringUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -122,24 +120,26 @@ public final class IslandUtils {
     }
 
     public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer){
-        Player player = superiorPlayer.asPlayer();
-        if(!player.isFlying() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
-            player.setAllowFlight(true);
-            player.setFlying(true);
-            Locale.ISLAND_FLY_ENABLED.send(player);
-        }
-        else if(player.isFlying() && !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
-            player.setAllowFlight(false);
-            player.setFlying(false);
-            Locale.ISLAND_FLY_DISABLED.send(player);
-        }
+        superiorPlayer.runIfOnline(player -> {
+            if(!player.isFlying() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
+                player.setAllowFlight(true);
+                player.setFlying(true);
+                Locale.ISLAND_FLY_ENABLED.send(player);
+            }
+            else if(player.isFlying() && !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)){
+                player.setAllowFlight(false);
+                player.setFlying(false);
+                Locale.ISLAND_FLY_DISABLED.send(player);
+            }
+        });
     }
 
     public static void updateTradingMenus(Island island, SuperiorPlayer superiorPlayer){
-        Player player = superiorPlayer.asPlayer();
-        Inventory openInventory = player.getOpenInventory().getTopInventory();
-        if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING))
-            player.closeInventory();
+        superiorPlayer.runIfOnline(player -> {
+            Inventory openInventory = player.getOpenInventory().getTopInventory();
+            if(openInventory != null && openInventory.getType() == InventoryType.MERCHANT && !island.hasPermission(superiorPlayer, IslandPrivileges.VILLAGER_TRADING))
+                player.closeInventory();
+        });
     }
 
     public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
@@ -188,7 +188,8 @@ public final class IslandUtils {
     }
 
     public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer){
-        if(superiorPlayer.getIsland().isMember(targetPlayer) &&
+        Island playerIsland = superiorPlayer.getIsland();
+        if(playerIsland != null && playerIsland.isMember(targetPlayer) &&
                 !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
             Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
@@ -221,7 +222,7 @@ public final class IslandUtils {
     }
 
     public static String getWarpName(String rawName){
-        return StringUtils.removeNonAlphabet(rawName, Arrays.asList('_'));
+        return StringUtils.removeNonAlphabet(rawName, Collections.singletonList('_'));
     }
 
 }

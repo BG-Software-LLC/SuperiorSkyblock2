@@ -22,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.File;
@@ -119,6 +120,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @Override
     public Mission<?> getMission(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         return missionMap.get(name.toLowerCase());
     }
 
@@ -139,6 +141,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @Override
     public boolean hasCompleted(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
         if(!missionDataOptional.isPresent())
@@ -161,6 +166,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @Override
     public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
         if(!missionDataOptional.isPresent())
@@ -183,23 +191,31 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @Override
     public boolean canComplete(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return canCompleteNoProgress(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0;
     }
 
     @Override
     public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return canCompleteAgain(superiorPlayer, mission) && hasAllRequiredMissions(superiorPlayer, mission) &&
                 canPassAllChecks(superiorPlayer, mission);
     }
 
     @Override
     public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return mission.getRequiredMissions().stream().allMatch(_mission ->
                 _mission != null && hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
     }
 
     @Override
     public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission<?> mission){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return mission.getRequiredChecks().stream().allMatch(check -> {
             check = PlaceholderHook.parse(superiorPlayer, check);
             try {
@@ -212,16 +228,23 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @Override
     public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         rewardMission(mission, superiorPlayer, checkAutoReward, false);
     }
 
     @Override
     public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, null);
     }
 
     @Override
-    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, Consumer<Boolean> result) {
+    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, @Nullable Consumer<Boolean> result) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
             return;
@@ -309,10 +332,11 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 ItemStack toGive = new ItemBuilder(itemStack)
                         .replaceAll("{0}", mission.getName())
                         .replaceAll("{1}", superiorPlayer.getName())
-                        .replaceAll("{2}", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
+                        .replaceAll("{2}", playerIsland == null ? "" : playerIsland.getName().isEmpty() ?
+                                playerIsland.getOwner() == null ? "" : playerIsland.getOwner().getName() : playerIsland.getName())
                         .build();
                 toGive.setAmount(itemStack.getAmount());
-                superiorPlayer.asPlayer().getInventory().addItem(toGive);
+                superiorPlayer.runIfOnline(player -> player.getInventory().addItem(toGive));
             }
 
             Executor.sync(() -> {
@@ -320,7 +344,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())
-                            .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ? playerIsland.getOwner().getName() : playerIsland.getName())
+                            .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ?
+                                    playerIsland.getOwner() == null ? "" : playerIsland.getOwner().getName() : playerIsland.getName())
                     );
                 }
             });
@@ -363,6 +388,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void loadMissionsData(List<Mission<?>> missionsList) {
+        Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
+
         File file = new File(plugin.getDataFolder(), "missions/_data.yml");
 
         if(!file.exists()){

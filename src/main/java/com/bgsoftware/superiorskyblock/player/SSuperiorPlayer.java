@@ -38,6 +38,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -132,7 +134,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setTextureValue(String textureValue) {
+    public void setTextureValue(@Nonnull String textureValue) {
+        Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
         this.textureValue = textureValue;
         playerDataHandler.saveTextureValue();
@@ -155,8 +158,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void updateName(){
-        this.name = asPlayer().getName();
-        playerDataHandler.savePlayerName();
+        Player player = asPlayer();
+        if(player != null) {
+            this.name = player.getName();
+            playerDataHandler.savePlayerName();
+        }
     }
 
     @Override
@@ -176,6 +182,13 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void runIfOnline(Consumer<Player> toRun) {
+        Player player = asPlayer();
+        if(player != null)
+            toRun.accept(player);
+    }
+
+    @Override
     public boolean hasFlyGamemode() {
         Player player = asPlayer();
         return player != null && (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR);
@@ -188,60 +201,45 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isVanished() {
+        Player player = asPlayer();
+        return player != null && plugin.getProviders().isVanished(player);
+    }
+
+    @Override
     public boolean hasPermission(String permission){
-        return permission.isEmpty() || asPlayer().hasPermission(permission);
+        Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
+        Player player = asPlayer();
+        return permission.isEmpty() || (player != null && player.hasPermission(permission));
     }
 
     @Override
     public boolean hasPermissionWithoutOP(String permission) {
+        Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Player player = asPlayer();
         return player != null && plugin.getProviders().hasPermission(player, permission);
     }
 
     @Override
     public boolean hasPermission(IslandPrivilege permission){
+        Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Island island = getIsland();
         return island != null && island.hasPermission(this, permission);
     }
 
-    private static HitActionResult checkPvPAllow(SuperiorPlayer player, boolean target){
-        // Checks for online status
-        if(!player.isOnline())
-            return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
-
-        // Checks for pvp warm-up
-        if(((SPlayerDataHandler) player.getDataHandler()).isImmunedToPvP())
-            return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
-
-        Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
-
-        if(standingIsland != null && (plugin.getSettings().spawnProtection || !standingIsland.isSpawn())){
-            // Checks for pvp status
-            if(!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
-                return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
-
-            // Checks for coop damage
-            if(standingIsland.isCoop(player) && !plugin.getSettings().coopDamage)
-                return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
-
-            // Checks for visitors damage
-            if(standingIsland.isVisitor(player, false) && !plugin.getSettings().visitorsDamage)
-                return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
-        }
-
-        return HitActionResult.SUCCESS;
-    }
-
     @Override
-    @SuppressWarnings("all")
-    public HitActionResult canHit(SuperiorPlayer other) {
+    public HitActionResult canHit(SuperiorPlayer otherPlayer) {
+        Preconditions.checkNotNull(otherPlayer, "otherPlayer parameter cannot be null.");
+
         // Players can hit themselves
-        if(equals(other))
+        if(equals(otherPlayer))
             return HitActionResult.SUCCESS;
 
+        World world = getWorld();
+
         // Checks for island teammates pvp
-        if(getIslandLeader().equals(other.getIslandLeader()) &&
-                !plugin.getSettings().pvpWorlds.contains(getWorld().getName()))
+        if(getIslandLeader().equals(otherPlayer.getIslandLeader()) &&
+                (world == null || !plugin.getSettings().pvpWorlds.contains(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
@@ -253,7 +251,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         // Checks if target player can bypass all pvp restrictions
         {
-            HitActionResult targetResult = checkPvPAllow(other, true);
+            HitActionResult targetResult = checkPvPAllow(otherPlayer, true);
             if (targetResult != HitActionResult.SUCCESS)
                 return targetResult;
         }
@@ -267,12 +265,14 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public World getWorld(){
-        return getLocation().getWorld();
+        Location location = getLocation();
+        return location == null ? null : location.getWorld();
     }
 
     @Override
     public Location getLocation(){
-        return asPlayer().getLocation();
+        Player player = asPlayer();
+        return player == null ? null : player.getLocation();
     }
 
     @Override
@@ -281,7 +281,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Location location, Consumer<Boolean> teleportResult) {
+    public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
         if(isOnline()) {
             TeleportUtils.teleport(asPlayer(), location, teleportResult);
             return;
@@ -293,8 +293,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island) {
-        if(isOnline())
-            teleport(island, null);
+        teleport(island, null);
     }
 
     @Override
@@ -303,6 +302,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             return;
 
         Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
+        assert islandTeleportLocation != null;
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
         Block islandCenterBlock = island.getCenter(World.Environment.NORMAL).getBlock();
 
@@ -346,7 +346,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
          *   Finding a new block to teleport the player to.
          */
 
-        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, (Consumer<Chunk>) null)
+        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, null)
                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
         Executor.createTask().runAsync(v -> {
@@ -405,9 +405,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean isInsideIsland() {
-        if(!isOnline()) return false;
+        Player player = asPlayer();
         Island island = getIsland();
-        return island != null && island.equals(plugin.getGrid().getIslandAt(getLocation()));
+        return player != null && island != null && island.equals(plugin.getGrid().getIslandAt(player.getLocation()));
     }
 
     /*
@@ -415,14 +415,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
      */
 
     @Override
-    public UUID getTeamLeader() {
-        return getIslandLeader().getUniqueId();
-    }
-
-    @Override
     public SuperiorPlayer getIslandLeader() {
         if(islandLeaderFromCache != null){
             islandLeader = plugin.getPlayers().getSuperiorPlayer(islandLeaderFromCache);
+            if(islandLeader == null)
+                islandLeader = this;
             islandLeaderFromCache = null;
         }
 
@@ -430,14 +427,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setTeamLeader(UUID teamLeader) {
-        setIslandLeader(plugin.getPlayers().getSuperiorPlayer(teamLeader));
-    }
-
-    @Override
-    public void setIslandLeader(SuperiorPlayer superiorPlayer) {
-        SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + superiorPlayer.getName());
-        this.islandLeader = superiorPlayer;
+    public void setIslandLeader(SuperiorPlayer islandLeader) {
+        Preconditions.checkNotNull(islandLeader, "islandLeader parameter cannot be null.");
+        SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + islandLeader.getName());
+        this.islandLeader = islandLeader;
         playerDataHandler.saveIslandLeader();
     }
 
@@ -461,6 +454,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
         playerDataHandler.savePlayerRole();
@@ -496,6 +490,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setUserLocale(java.util.Locale userLocale) {
+        Preconditions.checkNotNull(userLocale, "userLocale parameter cannot be null.");
         Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
         SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
@@ -552,7 +547,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean hasBypassModeEnabled() {
-        if(bypassModeEnabled && isOnline() && !asPlayer().hasPermission("superior.admin.bypass"))
+        Player player = asPlayer();
+
+        if(bypassModeEnabled && player != null && !player.hasPermission("superior.admin.bypass"))
             bypassModeEnabled = false;
 
         return bypassModeEnabled;
@@ -616,6 +613,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setBorderColor(BorderColor borderColor) {
+        Preconditions.checkNotNull(borderColor, "borderColor parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
         this.borderColor = borderColor;
         playerDataHandler.saveBorderColor();
@@ -653,6 +651,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void completeMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
         playerDataHandler.saveMissions();
@@ -660,6 +659,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void resetMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
         if(completedMissions.get(mission, 0) > 0) {
@@ -676,17 +676,20 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.get(mission, 0) > 0;
     }
 
     @Override
     public boolean canCompleteMissionAgain(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
         return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) < missionDataOptional.get().resetAmount;
     }
 
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.get(mission, 0);
     }
 
@@ -705,28 +708,30 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
      */
 
     @Override
-    public void merge(SuperiorPlayer other){
-        this.name = other.getName();
-        this.playerRole = other.getPlayerRole();
-        this.userLocale = other.getUserLocale();
-        this.worldBorderEnabled |= other.hasWorldBorderEnabled();
-        this.blocksStackerEnabled |= other.hasBlocksStackerEnabled();
-        this.schematicModeEnabled |= other.hasSchematicModeEnabled();
-        this.bypassModeEnabled |= other.hasBypassModeEnabled();
-        this.teamChatEnabled |= other.hasTeamChatEnabled();
-        this.toggledPanel |= other.hasToggledPanel();
-        this.islandFly |= other.hasToggledPanel();
-        this.adminSpyEnabled |= other.hasAdminSpyEnabled();
-        this.disbands = other.getDisbands();
-        this.borderColor = other.getBorderColor();
-        this.lastTimeStatus = other.getLastTimeStatus();
+    public void merge(SuperiorPlayer otherPlayer){
+        Preconditions.checkNotNull(otherPlayer, "otherPlayer parameter cannot be null.");
+
+        this.name = otherPlayer.getName();
+        this.playerRole = otherPlayer.getPlayerRole();
+        this.userLocale = otherPlayer.getUserLocale();
+        this.worldBorderEnabled |= otherPlayer.hasWorldBorderEnabled();
+        this.blocksStackerEnabled |= otherPlayer.hasBlocksStackerEnabled();
+        this.schematicModeEnabled |= otherPlayer.hasSchematicModeEnabled();
+        this.bypassModeEnabled |= otherPlayer.hasBypassModeEnabled();
+        this.teamChatEnabled |= otherPlayer.hasTeamChatEnabled();
+        this.toggledPanel |= otherPlayer.hasToggledPanel();
+        this.islandFly |= otherPlayer.hasToggledPanel();
+        this.adminSpyEnabled |= otherPlayer.hasAdminSpyEnabled();
+        this.disbands = otherPlayer.getDisbands();
+        this.borderColor = otherPlayer.getBorderColor();
+        this.lastTimeStatus = otherPlayer.getLastTimeStatus();
 
         // We want to convert the data of the missions data file
         Executor.async(() -> FileUtils.replaceString(new File(plugin.getDataFolder(), "missions/_data.yml"),
-                other.getUniqueId() + "", uuid + ""));
+                otherPlayer.getUniqueId() + "", uuid + ""));
 
         playerDataHandler.executeUpdateStatement(true);
-        ((SPlayerDataHandler) other.getDataHandler()).executeDeleteStatement(true);
+        ((SPlayerDataHandler) otherPlayer.getDataHandler()).executeDeleteStatement(true);
     }
 
     @Override
@@ -754,6 +759,34 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public int hashCode() {
         return uuid.hashCode();
+    }
+
+    private static HitActionResult checkPvPAllow(SuperiorPlayer player, boolean target){
+        // Checks for online status
+        if(!player.isOnline())
+            return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
+
+        // Checks for pvp warm-up
+        if(((SPlayerDataHandler) player.getDataHandler()).isImmunedToPvP())
+            return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
+
+        Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
+
+        if(standingIsland != null && (plugin.getSettings().spawnProtection || !standingIsland.isSpawn())){
+            // Checks for pvp status
+            if(!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
+                return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
+
+            // Checks for coop damage
+            if(standingIsland.isCoop(player) && !plugin.getSettings().coopDamage)
+                return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
+
+            // Checks for visitors damage
+            if(standingIsland.isVisitor(player, false) && !plugin.getSettings().visitorsDamage)
+                return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
+        }
+
+        return HitActionResult.SUCCESS;
     }
 
 }

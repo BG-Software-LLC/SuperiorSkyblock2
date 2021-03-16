@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
@@ -31,11 +32,14 @@ public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
         int blockCount = -1;
         if(Bukkit.isPrimaryThread()){
             StackedSpawner stackedSpawner = main.getProps().getStackedSpawner(main, (CreatureSpawner) location.getBlock().getState());
             blockCount = stackedSpawner.getSize();
         }
+
         return new Pair<>(blockCount, null);
     }
 

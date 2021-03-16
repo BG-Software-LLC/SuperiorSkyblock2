@@ -204,7 +204,7 @@ public final class SettingsListener implements Listener {
                 if(damagerPlayer.equals(targetPlayer))
                     continue;
 
-                targetPlayer.asPlayer().removePotionEffect(PotionEffectType.POISON);
+                ((Player) entity).removePotionEffect(PotionEffectType.POISON);
             }
         }
     }

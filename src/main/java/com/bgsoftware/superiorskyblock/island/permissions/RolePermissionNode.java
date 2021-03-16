@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 
 public class RolePermissionNode extends PermissionNodeAbstract {
 
@@ -29,37 +30,22 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
-    public boolean hasPermission(IslandPrivilege permission) {
-        PrivilegeStatus status = getStatus(permission);
+    public boolean hasPermission(IslandPrivilege islandPrivilege) {
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+
+        PrivilegeStatus status = getStatus(islandPrivilege);
 
         if(status != PrivilegeStatus.DEFAULT){
             return status == PrivilegeStatus.ENABLED;
         }
 
-        status = previousNode == null ? PrivilegeStatus.DEFAULT : previousNode.getStatus(permission);
+        status = previousNode == null ? PrivilegeStatus.DEFAULT : previousNode.getStatus(islandPrivilege);
 
         if(status != PrivilegeStatus.DEFAULT){
             return status == PrivilegeStatus.ENABLED;
         }
 
-        return playerRole != null && playerRole.getDefaultPermissions().hasPermission(permission);
-    }
-
-    public boolean hasPermissionRaw(IslandPrivilege permission) {
-        return privileges.get(permission, PrivilegeStatus.DISABLED) == PrivilegeStatus.ENABLED;
-    }
-
-    public boolean hasPermissionNoDefault(IslandPrivilege permission){
-        if(hasPermissionRaw(permission))
-            return true;
-
-        else if(previousNode != null && previousNode.hasPermissionRaw(permission)){
-            return true;
-        }
-
-        else{
-            return false;
-        }
+        return playerRole != null && playerRole.getDefaultPermissions().hasPermission(islandPrivilege);
     }
 
     public PrivilegeStatus getStatus(IslandPrivilege permission){
@@ -67,8 +53,9 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
-    public void setPermission(IslandPrivilege permission, boolean value) {
-        setPermission(permission, value, true);
+    public void setPermission(IslandPrivilege islandPrivilege, boolean value) {
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+        setPermission(islandPrivilege, value, true);
     }
 
     public void setPermission(IslandPrivilege permission, boolean value, boolean keepDisable) {

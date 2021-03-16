@@ -59,7 +59,7 @@ public final class CommandTabCompletes {
     public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish){
         String lowerArgument = argument.toLowerCase();
         return Bukkit.getOnlinePlayers().stream().map(plugin.getPlayers()::getSuperiorPlayer)
-                .filter(onlinePlayer -> (!hideVanish || !plugin.getProviders().isVanished(onlinePlayer.asPlayer())) &&
+                .filter(onlinePlayer -> (!hideVanish || !onlinePlayer.isVanished()) &&
                         onlinePlayer.getName().toLowerCase().contains(lowerArgument))
                 .map(SuperiorPlayer::getName).collect(Collectors.toList());
     }
@@ -67,7 +67,7 @@ public final class CommandTabCompletes {
     public static List<String> getOnlinePlayers(SuperiorSkyblockPlugin plugin, String argument, boolean hideVanish, Predicate<SuperiorPlayer> predicate){
         String lowerArgument = argument.toLowerCase();
         return Bukkit.getOnlinePlayers().stream().map(plugin.getPlayers()::getSuperiorPlayer)
-                .filter(onlinePlayer -> (!hideVanish || !plugin.getProviders().isVanished(onlinePlayer.asPlayer())) &&
+                .filter(onlinePlayer -> (!hideVanish || !onlinePlayer.isVanished()) &&
                         predicate.test(onlinePlayer) && onlinePlayer.getName().toLowerCase().contains(lowerArgument))
                 .map(SuperiorPlayer::getName).collect(Collectors.toList());
     }
@@ -78,7 +78,7 @@ public final class CommandTabCompletes {
 
         for(Player player : Bukkit.getOnlinePlayers()){
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            if(!hideVanish || !plugin.getProviders().isVanished(player)) {
+            if(!hideVanish || !onlinePlayer.isVanished()) {
                 Island onlineIsland = onlinePlayer.getIsland();
                 if (onlinePlayer.getName().toLowerCase().contains(lowerArgument))
                     tabArguments.add(onlinePlayer.getName());
@@ -96,7 +96,7 @@ public final class CommandTabCompletes {
 
         for(Player player : Bukkit.getOnlinePlayers()){
             SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
-            if(!hideVanish || !plugin.getProviders().isVanished(player)) {
+            if(!hideVanish || !onlinePlayer.isVanished()) {
                 Island onlineIsland = onlinePlayer.getIsland();
                 if (predicate.test(onlinePlayer, onlineIsland)) {
                     if (onlinePlayer.getName().toLowerCase().contains(lowerArgument))

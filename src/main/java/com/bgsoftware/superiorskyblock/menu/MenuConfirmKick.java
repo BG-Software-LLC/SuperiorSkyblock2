@@ -36,7 +36,7 @@ public final class MenuConfirmKick extends SuperiorMenu {
 
         if(closeMenu){
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            e.getWhoClicked().closeInventory();
         }
     }
 

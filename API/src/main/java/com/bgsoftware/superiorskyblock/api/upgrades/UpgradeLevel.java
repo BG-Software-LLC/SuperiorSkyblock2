@@ -87,14 +87,6 @@ public interface UpgradeLevel {
 
     /**
      * Get all the entity limits for this level.
-     *
-     * @deprecated Check getEntityLimitsAsKeys()
-     */
-    @Deprecated
-    Map<EntityType, Integer> getEntityLimits();
-
-    /**
-     * Get all the entity limits for this level.
      */
     Map<Key, Integer> getEntityLimitsAsKeys();
 
@@ -117,23 +109,6 @@ public interface UpgradeLevel {
      * Get the border size of this level.
      */
     int getBorderSize();
-
-    /**
-     * Get the generator rate of a block for this level.
-     * @param key The block to check.
-     *
-     * @deprecated Check getGeneratorAmount(Key, World.Environment)
-     */
-    @Deprecated
-    int getGeneratorAmount(Key key);
-
-    /**
-     * Get all the generator rates for this level.
-     *
-     * @deprecated Check getGeneratorAmounts(World.Environment)
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorAmounts();
 
     /**
      * Get the generator rate of a block for this level in a specific world.

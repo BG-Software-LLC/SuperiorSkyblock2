@@ -10,7 +10,7 @@ public final class IslandPrivilege {
 
     private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
 
-    private String name;
+    private final String name;
 
     private IslandPrivilege(String name){
         this.name = name.toUpperCase();
@@ -35,9 +35,11 @@ public final class IslandPrivilege {
      * @param name The name to check.
      */
     public static IslandPrivilege getByName(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
         IslandPrivilege islandPrivilege = islandPrivileges.get(name.toUpperCase());
 
-        Preconditions.checkArgument(islandPrivilege != null, "Couldn't find an IslandPrivilege with the name " + name + ".");
+        Preconditions.checkNotNull(islandPrivilege, "Couldn't find an IslandPrivilege with the name " + name + ".");
 
         return islandPrivilege;
     }
@@ -52,6 +54,8 @@ public final class IslandPrivilege {
      * @param name The name for the island privilege.
      */
     public static void register(String name){
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
         name = name.toUpperCase();
 
         Preconditions.checkState(!islandPrivileges.containsKey(name), "IslandPrivilege with the name " + name + " already exists.");

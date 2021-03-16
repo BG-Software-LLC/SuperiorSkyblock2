@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.base.Preconditions;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -27,34 +28,34 @@ public final class EconomyProvider_Vault implements EconomyProvider {
     }
 
     @Override
-    public double getMoneyInBank(SuperiorPlayer superiorPlayer) {
-        OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-
-        if(!econ.hasAccount(offlinePlayer))
-            econ.createPlayerAccount(offlinePlayer);
-
-        return econ.getBalance(offlinePlayer);
-    }
-
-    @Override
     public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
-        return BigDecimal.valueOf(getMoneyInBank(superiorPlayer));
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        return BigDecimal.valueOf(getMoneyInBank(superiorPlayer.asOfflinePlayer()));
     }
 
     @Override
     public String depositMoney(SuperiorPlayer superiorPlayer, double amount) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        double currentMoney = getMoneyInBank(superiorPlayer);
+        double currentMoney = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.depositPlayer(offlinePlayer, amount);
-        return getMoneyInBank(superiorPlayer) == currentMoney ? "You have exceed the limit of your bank" : economyResponse.errorMessage;
+        return getMoneyInBank(offlinePlayer) == currentMoney ? "You have exceed the limit of your bank" : economyResponse.errorMessage;
     }
 
     @Override
     public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        double currentMoney = getMoneyInBank(superiorPlayer);
+        double currentMoney = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.withdrawPlayer(offlinePlayer, amount);
-        return getMoneyInBank(superiorPlayer) == currentMoney ? "Couldn't process the transaction" : economyResponse.errorMessage;
+        return getMoneyInBank(offlinePlayer) == currentMoney ? "Couldn't process the transaction" : economyResponse.errorMessage;
+    }
+
+    private double getMoneyInBank(OfflinePlayer offlinePlayer) {
+        if(!econ.hasAccount(offlinePlayer))
+            econ.createPlayerAccount(offlinePlayer);
+
+        return econ.getBalance(offlinePlayer);
     }
 
 }

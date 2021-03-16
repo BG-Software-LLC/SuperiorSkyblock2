@@ -44,12 +44,16 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
     @Override
     protected void onPlayerClick(InventoryClickEvent event, Mission<?> mission) {
         Island island = superiorPlayer.getIsland();
+
+        if(island == null)
+            return;
+
         boolean completed = !island.canCompleteMissionAgain(mission);
         boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
 
         SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
         if(sound != null)
-            sound.playSound(superiorPlayer.asPlayer());
+            sound.playSound(event.getWhoClicked());
 
         if(canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)){
             plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {
@@ -116,7 +120,8 @@ public final class MenuIslandMissions extends PagedSuperiorMenu<Mission<?>> {
     }
 
     private int getCompletionStatus(Mission<?> mission){
-        return !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
+        return superiorPlayer.getIsland() == null ? 0 :
+                !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
                 plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
     }
 

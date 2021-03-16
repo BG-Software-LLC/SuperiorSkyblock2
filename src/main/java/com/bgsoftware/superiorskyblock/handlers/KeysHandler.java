@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -23,57 +23,44 @@ public final class KeysHandler extends AbstractHandler implements KeysManager {
     }
 
     @Override
-    public boolean isSpawner(Material type) {
-        return Materials.SPAWNER.toBukkitType() == type;
-    }
-
-    @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(ItemStack itemStack) {
-        return Key.of(itemStack).markAPIKey();
-    }
-
-    @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(Block block) {
-        return Key.of(block).markAPIKey();
-    }
-
-    @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getSpawnerKey(BlockState blockState) {
-        return Key.of(blockState).markAPIKey();
-    }
-
-    @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return Key.of(entityType).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(Entity entity) {
+        Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
         return Key.of(entity).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(Block block) {
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         return Key.of(block).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(BlockState blockState) {
+        Preconditions.checkNotNull(blockState, "blockState parameter cannot be null.");
         return Key.of(blockState).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "material parameter cannot be null.");
         return Key.of(itemStack).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(Material material, short data) {
+        Preconditions.checkNotNull(material, "material parameter cannot be null.");
         return Key.of(material, data).markAPIKey();
     }
 
     @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(String key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return Key.of(key).markAPIKey();
     }
 

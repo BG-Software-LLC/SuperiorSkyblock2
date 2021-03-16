@@ -112,7 +112,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
             SoundWrapper soundWrapper = (SoundWrapper) getData(permissionName + "-has-access-sound");
             if (soundWrapper != null)
-                soundWrapper.playSound(superiorPlayer.asPlayer());
+                soundWrapper.playSound(event.getWhoClicked());
             //noinspection unchecked
             List<String> commands = (List<String>) getData(permissionName + "-has-access-commands");
             if (commands != null)
@@ -127,7 +127,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
             SoundWrapper soundWrapper = (SoundWrapper) getData(permissionName + "-no-access-sound");
             if (soundWrapper != null)
-                soundWrapper.playSound(superiorPlayer.asPlayer());
+                soundWrapper.playSound(event.getWhoClicked());
             //noinspection unchecked
             List<String> commands = (List<String>) getData(permissionName + "-no-access-commands");
             if (commands != null)

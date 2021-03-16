@@ -179,11 +179,13 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public void registerCommand(SuperiorCommand superiorCommand) {
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
         registerCommand(superiorCommand, true);
     }
 
     @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
         adminCommand.registerCommand(superiorCommand, true);
     }
 

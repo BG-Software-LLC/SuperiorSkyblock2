@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
 import java.sql.ResultSet;
@@ -20,11 +21,13 @@ public final class FactoriesHandler implements FactoriesManager {
 
     @Override
     public void registerIslandsFactory(IslandsFactory islandsFactory) {
+        Preconditions.checkNotNull(islandsFactory, "islandsFactory parameter cannot be null.");
         this.islandsFactory = islandsFactory;
     }
 
     @Override
     public void registerPlayersFactory(PlayersFactory playersFactory) {
+        Preconditions.checkNotNull(playersFactory, "playersFactory parameter cannot be null.");
         this.playersFactory = playersFactory;
     }
 

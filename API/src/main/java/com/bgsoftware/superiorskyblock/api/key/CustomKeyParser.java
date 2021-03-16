@@ -4,6 +4,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+
 public interface CustomKeyParser {
 
     /**
@@ -11,6 +13,7 @@ public interface CustomKeyParser {
      * Please note: this method should support async calls.
      * @param location The location of the block.
      */
+    @Nullable
     default Key getCustomKey(Location location){
         return null;
     }
@@ -20,6 +23,7 @@ public interface CustomKeyParser {
      * Please note: this method should support async calls.
      * @param entity The entity to check.
      */
+    @Nullable
     default Key getCustomKey(Entity entity){
         return null;
     }

@@ -69,15 +69,16 @@ public final class CmdExpel implements IPermissibleCommand {
         CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[1]);
 
-        if(targetPlayer == null)
+        if(targetPlayer == null || sender == null)
             return;
 
-        if(!targetPlayer.isOnline()){
+        Player target = targetPlayer.asPlayer();
+
+        if(target == null){
             Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
 
-        Player target = targetPlayer.asPlayer();
         Island targetIsland = plugin.getGrid().getIslandAt(target.getLocation());
 
         if(targetIsland == null){

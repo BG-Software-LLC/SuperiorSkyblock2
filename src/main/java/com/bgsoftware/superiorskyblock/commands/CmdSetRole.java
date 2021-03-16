@@ -71,7 +71,7 @@ public final class CmdSetRole implements IPermissibleCommand {
         CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[1]);
 
-        if(targetPlayer == null)
+        if(targetPlayer == null || sender == null)
             return;
 
         if(targetPlayer.getName().equals(sender.getName())){
@@ -97,6 +97,8 @@ public final class CmdSetRole implements IPermissibleCommand {
                 Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
+
+            targetIsland = playerIsland;
 
             if(targetPlayer.getPlayerRole().isHigherThan(superiorPlayer.getPlayerRole()) ||
                     !playerRole.isLessThan(superiorPlayer.getPlayerRole())){

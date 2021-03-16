@@ -10,11 +10,6 @@ public final class EconomyProvider_Default implements EconomyProvider {
     private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
     @Override
-    public double getMoneyInBank(SuperiorPlayer superiorPlayer) {
-        return Double.MAX_VALUE;
-    }
-
-    @Override
     public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
         return MAX_DOUBLE;
     }

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
@@ -75,8 +76,8 @@ public final class SIslandChest implements IslandChest {
 
     @Override
     public void openChest(SuperiorPlayer superiorPlayer) {
-        if(superiorPlayer.isOnline())
-            superiorPlayer.asPlayer().openInventory(getInventory());
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        superiorPlayer.runIfOnline(player -> player.openInventory(getInventory()));
     }
 
     @Override

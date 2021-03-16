@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
+import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
 import dev.rosewood.rosestacker.event.BlockUnstackEvent;
@@ -46,16 +47,21 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
         int blockCount = -1;
+
         if(Bukkit.isPrimaryThread()){
             StackedSpawner stackedSpawner = RoseStackerAPI.getInstance().getStackedSpawner(location.getBlock());
             blockCount = stackedSpawner == null ? 1 : stackedSpawner.getStackSize();
         }
+
         return new Pair<>(blockCount, null);
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
         return GET_STACKED_ITEM_ENTITY_TYPE.isValid() ?
                 GET_STACKED_ITEM_ENTITY_TYPE.invoke(null, itemStack).name() :
                 ItemUtils.getStackedItemEntityType(itemStack).name();
@@ -63,6 +69,8 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
     @Override
     public Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition) {
+        Preconditions.checkNotNull(chunkPosition, "chunkPosition parameter cannot be null.");
+
         if(!Bukkit.isPrimaryThread())
             return null;
 

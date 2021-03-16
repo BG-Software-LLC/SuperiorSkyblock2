@@ -53,6 +53,8 @@ public final class MenuMemberManage extends SuperiorMenu {
         else if(kickSlot.contains(e.getRawSlot())){
             if(plugin.getSettings().kickConfirm){
                 Island island = superiorPlayer.getIsland();
+                if(island == null)
+                    return;
                 if(IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer)) {
                     previousMove = false;
                     MenuConfirmKick.openInventory(superiorPlayer, this, targetPlayer);

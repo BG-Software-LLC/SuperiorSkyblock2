@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,9 +14,10 @@ public interface PlayersManager {
     /**
      * Get a player by it's name.
      * @param name The name to check.
-     * @return The player with that name. May be null.
+     * @return The player with that name.
      */
-    SuperiorPlayer getSuperiorPlayer(String name);
+    @Nullable
+    SuperiorPlayer getSuperiorPlayer(@Nullable String name);
 
     /**
      * Get a player by a player.
@@ -38,21 +40,24 @@ public interface PlayersManager {
     /**
      * Get a player role by it's weight.
      * @param weight The weight to check.
-     * @return The player role with that weight. May be null.
+     * @return The player role with that weight.
      */
+    @Nullable
     PlayerRole getPlayerRole(int weight);
 
     /**
      * Get a player role by it's id.
      * @param id The id to check.
-     * @return The player role with that weight. May be null.
+     * @return The player role with that weight.
      */
+    @Nullable
     PlayerRole getPlayerRoleFromId(int id);
 
     /**
      * Get a player role by it's name.
      * @param name The name to check.
-     * @return The player role with that name. Throws IllegalArgumentException.
+     * @return The player role with that name.
+     * If there's no role with that name, IllegalArgumentException will be thrown.
      */
     PlayerRole getPlayerRole(String name);
 

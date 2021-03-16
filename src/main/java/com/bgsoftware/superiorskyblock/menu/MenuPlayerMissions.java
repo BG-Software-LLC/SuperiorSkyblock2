@@ -46,7 +46,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
 
         SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
         if(sound != null)
-            sound.playSound(superiorPlayer.asPlayer());
+            sound.playSound(event.getWhoClicked());
 
         if(canComplete){
             plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {

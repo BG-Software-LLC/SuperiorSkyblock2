@@ -702,8 +702,7 @@ public enum Locale {
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects){
-        if(superiorPlayer.isOnline())
-            send(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale(), objects);
+        superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
     }
 
     public void send(CommandSender sender, Object... objects){
@@ -798,7 +797,7 @@ public enum Locale {
     }
 
     public static void sendMessage(SuperiorPlayer superiorPlayer, String message, boolean translateColors){
-        sendMessage(superiorPlayer.asPlayer(), message, translateColors);
+        superiorPlayer.runIfOnline(player -> sendMessage(player, message, translateColors));
     }
 
     public static void sendMessage(CommandSender sender, String message, boolean translateColors){
@@ -806,7 +805,7 @@ public enum Locale {
     }
 
     public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
-        sendProtectionMessage(superiorPlayer.asPlayer(), superiorPlayer.getUserLocale());
+        superiorPlayer.runIfOnline(player -> sendProtectionMessage(player, superiorPlayer.getUserLocale()));
     }
 
     public static void sendProtectionMessage(Player player){

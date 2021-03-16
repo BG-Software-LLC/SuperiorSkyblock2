@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.base.Preconditions;
 import de.candc.events.SpawnerBreakEvent;
 import de.candc.events.SpawnerPlaceEvent;
 import org.bukkit.Bukkit;
@@ -28,11 +29,13 @@ public final class BlocksProvider_SilkSpawners implements BlocksProvider {
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return new Pair<>(1, null);
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
         return itemStack.getItemMeta().getLore().get(0).replaceAll("§e", "");
     }
 

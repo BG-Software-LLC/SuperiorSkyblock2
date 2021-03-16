@@ -19,18 +19,6 @@ public class IslandEnterEvent extends IslandEvent implements Cancellable {
      * The constructor of the event.
      * @param superiorPlayer The player who entered to the island's area.
      * @param island The island that the player entered into.
-     *
-     * @deprecated See IslandEnterEvent(SuperiorPlayer, Island, EnterCause)
-     */
-    @Deprecated
-    public IslandEnterEvent(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, EnterCause.INVALID);
-    }
-
-    /**
-     * The constructor of the event.
-     * @param superiorPlayer The player who entered to the island's area.
-     * @param island The island that the player entered into.
      * @param enterCause The cause of entering into the island.
      */
     public IslandEnterEvent(SuperiorPlayer superiorPlayer, Island island, EnterCause enterCause){

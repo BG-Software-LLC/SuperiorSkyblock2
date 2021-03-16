@@ -4,15 +4,15 @@ public interface PermissionNode extends Cloneable {
 
     /**
      * Check whether or not the node has a permission.
-     * @param permission The permission to check.
+     * @param islandPrivilege The privilege to check.
      */
-    boolean hasPermission(IslandPrivilege permission);
+    boolean hasPermission(IslandPrivilege islandPrivilege);
 
     /**
      * Set whether or not the node should have a permission.
-     * @param permission The permission to set.
+     * @param islandPrivilege The privilege to set.
      * @param value The value to set.
      */
-    void setPermission(IslandPrivilege permission, boolean value);
+    void setPermission(IslandPrivilege islandPrivilege, boolean value);
 
 }

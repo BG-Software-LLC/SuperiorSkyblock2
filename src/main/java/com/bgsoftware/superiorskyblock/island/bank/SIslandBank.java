@@ -17,10 +17,12 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +55,9 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+
         BankTransaction bankTransaction;
         String failureReason;
 
@@ -101,6 +106,8 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount) {
+        Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
@@ -124,7 +131,10 @@ public final class SIslandBank implements IslandBank {
     }
 
     @Override
-    public BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, List<String> commandsToExecute) {
+    public BankTransaction withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount, @Nullable List<String> commandsToExecute) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+
         BigDecimal withdrawAmount = balance.get().min(amount);
 
         BankTransaction bankTransaction;
@@ -178,7 +188,10 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction withdrawAdminMoney(CommandSender commandSender, BigDecimal amount) {
+        Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
+
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
         int position = transactions.readAndGet(List::size) + 1;

@@ -20,13 +20,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public interface Island extends Comparable<Island> {
@@ -223,31 +223,16 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
-     * Get the center location of the island.
-     *
-     * @deprecated See getCenter(Environment)
-     */
-    @Deprecated
-    Location getCenter();
-
-    /**
      * Get the center location of the island, depends on the world environment.
      * @param environment The environment.
      */
     Location getCenter(World.Environment environment);
 
     /**
-     * Get the members' teleport location of the island.
-     *
-     * @deprecated See getTeleportLocation(Environment)
-     */
-    @Deprecated
-    Location getTeleportLocation();
-
-    /**
      * Get the members' teleport location of the island, depends on the world environment.
      * @param environment The environment.
      */
+    @Nullable
     Location getTeleportLocation(World.Environment environment);
 
     /**
@@ -258,6 +243,7 @@ public interface Island extends Comparable<Island> {
     /**
      * Get the visitors' teleport location of the island.
      */
+    @Nullable
     Location getVisitorsLocation();
 
     /**
@@ -267,10 +253,17 @@ public interface Island extends Comparable<Island> {
     void setTeleportLocation(Location teleportLocation);
 
     /**
+     * Set the members' teleport location of the island.
+     * @param environment The environment to change teleport location for.
+     * @param teleportLocation The new teleport location.
+     */
+    void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation);
+
+    /**
      * Set the visitors' teleport location of the island.
      * @param visitorsLocation The new visitors location.
      */
-    void setVisitorsLocation(Location visitorsLocation);
+    void setVisitorsLocation(@Nullable Location visitorsLocation);
 
     /**
      * Get the minimum location of the island.
@@ -343,32 +336,9 @@ public interface Island extends Comparable<Island> {
      * Get all the chunks of the island asynchronized, including empty chunks.
      * @param environment The environment to get the chunks from.
      * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
-     * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
-     *
-     * @deprecated See getAllChunksAsync(World.Environment, Boolean, Consumer)
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, BiConsumer<Chunk, Throwable> whenComplete);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     * @param environment The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
      * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
      */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized.
-     * @param environment The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @param whenComplete A consumer that will be attached to all the CompletableFuture objects.
-     *
-     * @deprecated See getAllChunksAsync(World.Environment, Boolean, Boolean, Consumer)
-     */
-    @Deprecated
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete);
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Get all the chunks of the island asynchronized.
@@ -377,7 +347,7 @@ public interface Island extends Comparable<Island> {
      * @param noEmptyChunks Should empty chunks be loaded or not?
      * @param onChunkLoad A consumer that will be ran when the chunk is loaded. Can be null.
      */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad);
+    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad);
 
     /**
      * Reset all the chunks of the island (will make all chunks empty).
@@ -392,7 +362,7 @@ public interface Island extends Comparable<Island> {
      * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
      * @param onFinish Callback runnable.
      */
-    void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish);
+    void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
@@ -405,7 +375,7 @@ public interface Island extends Comparable<Island> {
      * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
      * @param onFinish Callback runnable.
      */
-    void resetChunks(boolean onlyProtected, Runnable onFinish);
+    void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
      * Check if the location is inside the island's area.
@@ -509,15 +479,6 @@ public interface Island extends Comparable<Island> {
     void resetPermissions(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get the permission-node of a role.
-     * @param playerRole The role to check.
-     *
-     * @deprecated See hasPermission(PlayerRole, IslandPrivilege)
-     */
-    @Deprecated
-    PermissionNode getPermissionNode(PlayerRole playerRole);
-
-    /**
      * Get the permission-node of a player.
      * @param superiorPlayer The player to check.
      */
@@ -596,16 +557,16 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Recalculate the island's worth value.
-     * @param asker The player who makes the operation, may be null.
+     * @param asker The player who makes the operation.
      */
-    void calcIslandWorth(SuperiorPlayer asker);
+    void calcIslandWorth(@Nullable SuperiorPlayer asker);
 
     /**
      * Recalculate the island's worth value.
-     * @param asker The player who makes the operation, may be null.
+     * @param asker The player who makes the operation.
      * @param callback Runnable which will be ran when process is finished.
      */
-    void calcIslandWorth(SuperiorPlayer asker, Runnable callback);
+    void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback);
 
     /**
      * Update the border of all the players inside the island.
@@ -700,14 +661,14 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Send a plain message to all the members of the island.
-     * @param title The main title to send, may be null.
-     * @param subtitle The sub title to send, may be null.
+     * @param title The main title to send.
+     * @param subtitle The sub title to send.
      * @param fadeIn The fade-in duration in ticks.
      * @param duration The title duration in ticks.
      * @param fadeOut The fade-out duration in ticks.
      * @param ignoredMembers An array of ignored members.
      */
-    void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
+    void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
 
     /**
      * Checks whether or not the island is being recalculated currently.
@@ -776,50 +737,6 @@ public interface Island extends Comparable<Island> {
      * Get the duration until the bank interest will be given again, in seconds
      */
     long getNextInterest();
-
-    /**
-     * Get the money in the bank of the island.
-     *
-     * @deprecated See IslandBank#getBalance
-     */
-    @Deprecated
-    BigDecimal getMoneyInBank();
-
-    /**
-     * Deposit money into the bank.
-     * @param amount The amount to deposit.
-     *
-     * @deprecated See IslandBank#depositMoney
-     */
-    @Deprecated
-    void depositMoney(double amount);
-
-    /**
-     * Deposit money into the bank.
-     * @param amount The amount to deposit.
-     *
-     * @deprecated See IslandBank#depositMoney
-     */
-    @Deprecated
-    void depositMoney(BigDecimal amount);
-
-    /**
-     * Withdraw money from the bank.
-     * @param amount The amount to withdraw.
-     *
-     * @deprecated See IslandBank#withdrawMoney
-     */
-    @Deprecated
-    void withdrawMoney(double amount);
-
-    /**
-     * Withdraw money from the bank.
-     * @param amount The amount to withdraw.
-     *
-     * @deprecated See IslandBank#withdrawMoney
-     */
-    @Deprecated
-    void withdrawMoney(BigDecimal amount);
 
     /*
      *  Worth related methods
@@ -922,38 +839,13 @@ public interface Island extends Comparable<Island> {
     /**
      * Get the amount of blocks that are on the island.
      * @param key The block's key to check.
-     * @deprecated See getBlockCountAsBigInteger
-     */
-    @Deprecated
-    int getBlockCount(Key key);
-
-    /**
-     * Get the amount of blocks that are on the island.
-     * @param key The block's key to check.
      */
     BigInteger getBlockCountAsBigInteger(Key key);
 
     /**
      * Get all the blocks that are on the island.
-     * @deprecated See getBlockCountsAsBigInteger
-     */
-    @Deprecated
-    Map<Key, Integer> getBlockCounts();
-
-    /**
-     * Get all the blocks that are on the island.
      */
     Map<Key, BigInteger> getBlockCountsAsBigInteger();
-
-    /**
-     * Get the amount of blocks that are on the island.
-     * Unlike getBlockCount(Key), this method returns the count for
-     * the exactly block that is given as a parameter.
-     * @param key The block's key to check.
-     * @deprecated See getExactBlockCountAsBigInteger
-     */
-    @Deprecated
-    int getExactBlockCount(Key key);
 
     /**
      * Get the amount of blocks that are on the island.
@@ -1016,28 +908,9 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the level of an upgrade for the island.
-     * @param upgradeName The upgrade's name to check.
-     *
-     * @deprecated see getUpgradeLevel(Upgrade)
-     */
-    @Deprecated
-    int getUpgradeLevel(String upgradeName);
-
-    /**
-     * Get the level of an upgrade for the island.
      * @param upgrade The upgrade to check.
      */
     UpgradeLevel getUpgradeLevel(Upgrade upgrade);
-
-    /**
-     * Set the level of an upgrade for the island.
-     * @param upgradeName The upgrade's name to set the level.
-     * @param level The level to set.
-     *
-     * @deprecated See setUpgradeLevel(Upgrade, Integer)
-     */
-    @Deprecated
-    void setUpgradeLevel(String upgradeName, int level);
 
     /**
      * Set the level of an upgrade for the island.
@@ -1191,14 +1064,6 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get all the entities limits for the island.
-     *
-     * @deprecated Check getEntitiesLimitsAsKeys()
-     */
-    @Deprecated
-    Map<EntityType, Integer> getEntitiesLimits();
-
-    /**
-     * Get all the entities limits for the island.
      */
     Map<Key, Integer> getEntitiesLimitsAsKeys();
 
@@ -1306,12 +1171,14 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Give all the island effects to a player.
+     * If the player is offline, nothing will happen.
      * @param superiorPlayer The player to give the effect to.
      */
     void applyEffects(SuperiorPlayer superiorPlayer);
 
     /**
      * Remove all the island effects from a player.
+     * If the player is offline, nothing will happen.
      * @param superiorPlayer The player to remove the effects to.
      */
     void removeEffects(SuperiorPlayer superiorPlayer);
@@ -1360,36 +1227,6 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
-     * Get the location of a warp.
-     * @param name The warp's name to check.
-     */
-    @Deprecated
-    Location getWarpLocation(String name);
-
-    /**
-     * Check whether or not a warp is private.
-     * @param name The warp's name to check.
-     */
-    @Deprecated
-    boolean isWarpPrivate(String name);
-
-    /**
-     * Set the location of a warp.
-     * @param name The warp's name to set the location to.
-     * @param location The location to set.
-     * @param privateFlag Flag to determine if the warp is private or not.
-     */
-    @Deprecated
-    void setWarpLocation(String name, Location location, boolean privateFlag);
-
-    /**
-     * Check whether or not a location is a warp of an island.
-     * @param location The location to check.
-     */
-    @Deprecated
-    boolean isWarpLocation(Location location);
-
-    /**
      * Create a new warp category.
      * If a category already exists, it will be returned instead of a new created one.
      * @param name The name of the category.
@@ -1400,12 +1237,14 @@ public interface Island extends Comparable<Island> {
      * Get a warp category.
      * @param name The name of the category.
      */
+    @Nullable
     WarpCategory getWarpCategory(String name);
 
     /**
      * Get a warp category by the slot inside the manage menu.
      * @param slot The slot to check.
      */
+    @Nullable
     WarpCategory getWarpCategory(int slot);
 
     /**
@@ -1431,10 +1270,10 @@ public interface Island extends Comparable<Island> {
      * Create a warp for the island.
      * @param name The name of the warp.
      * @param location The location of the warp.
-     * @param warpCategory The category to add the island. May be null
+     * @param warpCategory The category to add the island.
      * @return The new island warp object.
      */
-    IslandWarp createWarp(String name, Location location, WarpCategory warpCategory);
+    IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory);
 
     /**
      * Rename a warp.
@@ -1447,12 +1286,14 @@ public interface Island extends Comparable<Island> {
      * Get an island warp in a specific location.
      * @param location The location to check.
      */
+    @Nullable
     IslandWarp getWarp(Location location);
 
     /**
      * Get an island warp by it's name..
      * @param name The name to check.
      */
+    @Nullable
     IslandWarp getWarp(String name);
 
     /**
@@ -1464,10 +1305,10 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Delete a warp from the island.
-     * @param superiorPlayer The player who requested the operation, may be null.
+     * @param superiorPlayer The player who requested the operation.
      * @param location The location of the warp.
      */
-    void deleteWarp(SuperiorPlayer superiorPlayer, Location location);
+    void deleteWarp(@Nullable SuperiorPlayer superiorPlayer, Location location);
 
     /**
      * Delete a warp from the island.
@@ -1476,21 +1317,9 @@ public interface Island extends Comparable<Island> {
     void deleteWarp(String name);
 
     /**
-     * Get all the warps' names of the island.
-     */
-    @Deprecated
-    List<String> getAllWarps();
-
-    /**
      * Get all the warps of the island.
      */
     Map<String, IslandWarp> getIslandWarps();
-
-    /**
-     * Check whether or not the island can create more warps.
-     */
-    @Deprecated
-    boolean hasMoreWarpSlots();
 
     /*
      *  Ratings related methods
@@ -1606,12 +1435,6 @@ public interface Island extends Comparable<Island> {
      */
 
     /**
-     * @deprecated See setGeneratorPercentage(Key, Integer, World.Environment)
-     */
-    @Deprecated
-    void setGeneratorPercentage(Key key, int percentage);
-
-    /**
      * Set a percentage for a specific key in a specific world.
      * Percentage can be between 0 and 100 (0 will remove the key from the list).
      *
@@ -1626,15 +1449,6 @@ public interface Island extends Comparable<Island> {
     void setGeneratorPercentage(Key key, int percentage, World.Environment environment);
 
     /**
-     * Get the percentage for a specific key.
-     * The formula is (amount * 100) / total_amount.
-     *
-     * @deprecated See getGeneratorPercentage(Key, World.Environment)
-     */
-    @Deprecated
-    int getGeneratorPercentage(Key key);
-
-    /**
      * Get the percentage for a specific key in a specific world.
      * The formula is (amount * 100) / total_amount.
      * @param key The material key
@@ -1643,38 +1457,14 @@ public interface Island extends Comparable<Island> {
     int getGeneratorPercentage(Key key, World.Environment environment);
 
     /**
-     * Get the percentages of the materials for the cobblestone generator in the island.
-     *
-     * @deprecated See getGeneratorPercentages(World.Environment)
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorPercentages();
-
-    /**
      * Get the percentages of the materials for the cobblestone generator in the island for a specific world.
      */
     Map<String, Integer> getGeneratorPercentages(World.Environment environment);
 
     /**
-     * Set an amount for a specific key.
-     *
-     * @deprecated See setGeneratorAmount(Key, Integer, World.Environment)
-     */
-    @Deprecated
-    void setGeneratorAmount(Key key, int amount);
-
-    /**
      * Set an amount for a specific key in a specific world.
      */
     void setGeneratorAmount(Key key, int amount, World.Environment environment);
-
-    /**
-     * Get the amount of a specific key.
-     *
-     * @deprecated See getGeneratorAmount(Key, World.Environment)
-     */
-    @Deprecated
-    int getGeneratorAmount(Key key);
 
     /**
      * Get the amount of a specific key in a specific world.
@@ -1683,24 +1473,8 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the total amount of all the generator keys together.
-     *
-     * @deprecated See getGeneratorTotalAmount(World.Environment)
-     */
-    @Deprecated
-    int getGeneratorTotalAmount();
-
-    /**
-     * Get the total amount of all the generator keys together.
      */
     int getGeneratorTotalAmount(World.Environment environment);
-
-    /**
-     * Get the amounts of the materials for the cobblestone generator in the island.
-     *
-     * @deprecated See getGeneratorAmounts(World.Environment)
-     */
-    @Deprecated
-    Map<String, Integer> getGeneratorAmounts();
 
     /**
      * Get the amounts of the materials for the cobblestone generator in the island.
@@ -1709,40 +1483,8 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the custom amounts of the materials for the cobblestone generator in the island.
-     *
-     * @deprecated See getCustomGeneratorAmounts(World.Environment)
-     */
-    @Deprecated
-    Map<Key, Integer> getCustomGeneratorAmounts();
-
-    /**
-     * Get the custom amounts of the materials for the cobblestone generator in the island.
      */
     Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment);
-
-    /**
-     * Get an array of materials for the cobblestone generator.
-     *
-     * @deprecated Not used anymore.
-     */
-    @Deprecated
-    String[] getGeneratorArray();
-
-    /**
-     * Get an array of materials for the cobblestone generator.
-     *
-     * @deprecated Not used anymore.
-     */
-    @Deprecated
-    String[] getGeneratorArray(World.Environment environment);
-
-    /**
-     * Clear all the custom generator amounts for this island.
-     *
-     * @deprecated See clearGeneratorAmounts(World.Environment)
-     */
-    @Deprecated
-    void clearGeneratorAmounts();
 
     /**
      * Clear all the custom generator amounts for this island.

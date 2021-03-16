@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -11,8 +12,8 @@ public interface MissionsManager {
     /**
      * Get a mission by it's name.
      * @param name The name to check.
-     * @return The mission with that name. May be null.
      */
+    @Nullable
     Mission<?> getMission(String name);
 
     /**
@@ -103,7 +104,7 @@ public interface MissionsManager {
      * @param forceReward Should the plugin force the reward to the player (no checks will be ran)
      * @param result The result of the reward.
      */
-    void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, Consumer<Boolean> result);
+    void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, @Nullable Consumer<Boolean> result);
 
     /**
      * Save all data related to missions.

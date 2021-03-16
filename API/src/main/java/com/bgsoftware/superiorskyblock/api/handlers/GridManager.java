@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -75,6 +76,7 @@ public interface GridManager {
      * Check if a player has an ongoing island preview task.
      * @param superiorPlayer The player to check.
      */
+    @Nullable
     IslandPreview getIslandPreview(SuperiorPlayer superiorPlayer);
 
     /**
@@ -88,18 +90,8 @@ public interface GridManager {
      * @param superiorPlayer The player to check.
      * @return The island of the player. May be null.
      */
+    @Nullable
     Island getIsland(SuperiorPlayer superiorPlayer);
-
-    /**
-     * Get the island in a specific position from the top-worth list.
-     * Positions are starting from 0.
-     * @param position The position to check.
-     * @return The island in that position. May be null.
-     *
-     * @deprecated See getIsland(Integer, SortingType)
-     */
-    @Deprecated
-    Island getIsland(int position);
 
     /**
      * Get the island in a specific position from one of the top lists.
@@ -108,6 +100,7 @@ public interface GridManager {
      * @param sortingType The sorting type that should be considered.
      * @return The island in that position. May be null.
      */
+    @Nullable
     Island getIsland(int position, SortingType sortingType);
 
     /**
@@ -124,6 +117,7 @@ public interface GridManager {
      * @param uuid The uuid of the owner.
      * @return The island of the owner. May be null.
      */
+    @Nullable
     Island getIsland(UUID uuid);
 
     /**
@@ -131,6 +125,7 @@ public interface GridManager {
      * @param uuid The uuid of the island.
      * @return The island with that UUID. May be null.
      */
+    @Nullable
     Island getIslandByUUID(UUID uuid);
 
     /**
@@ -138,6 +133,7 @@ public interface GridManager {
      * @param islandName The name to check.
      * @return The island with that name. May be null.
      */
+    @Nullable
     Island getIsland(String islandName);
 
     /**
@@ -145,14 +141,16 @@ public interface GridManager {
      * @param location The position to check.
      * @return The island at that position. May be null.
      */
-    Island getIslandAt(Location location);
+    @Nullable
+    Island getIslandAt(@Nullable Location location);
 
     /**
      * Get an island from a chunk.
      * @param chunk The chunk to check.
      * @return The island at that position. May be null.
      */
-    Island getIslandAt(Chunk chunk);
+    @Nullable
+    Island getIslandAt(@Nullable Chunk chunk);
 
     /**
      * Transfer an island's leadership to another owner.
@@ -176,23 +174,6 @@ public interface GridManager {
      * Get the spawn island object.
      */
     Island getSpawnIsland();
-
-    /**
-     * Get the islands world.
-     *
-     * @deprecated See getIslandsWorld(Environment)
-     */
-    @Deprecated
-    World getIslandsWorld();
-
-    /**
-     * Get the islands world by the environment.
-     * If the environment is not the normal and that environment is disabled in config, null will be returned.
-     * @param environment The world environment.
-     * @deprecated Unexpected behavior. Check getIslandsWorld(Island, Environment)
-     */
-    @Deprecated
-    World getIslandsWorld(World.Environment environment);
 
     /**
      * Get the world of an island by the environment.
@@ -221,23 +202,6 @@ public interface GridManager {
     List<World> getRegisteredWorlds();
 
     /**
-     * Get the next location for a new island.
-     * @deprecated Moved to the separated WorldsProvider interface.
-     * Using this method can give NullPointerExceptions and many other unexpected behaviors.
-     */
-    @Deprecated
-    Location getNextLocation();
-
-    /**
-     * Get all the islands ordered by their worth.
-     * @return A list of uuids of the island owners.
-     *
-     * @deprecated See getAllIslands(SortingType)
-     */
-    @Deprecated
-    List<UUID> getAllIslands();
-
-    /**
      * Get all the islands ordered by a specific sorting type.
      * @param sortingType The sorting type to order the list by.
      * @return A list of uuids of the island owners.
@@ -255,13 +219,6 @@ public interface GridManager {
      * @return A list of uuids of the island owners.
      */
     List<Island> getIslands(SortingType sortingType);
-
-    /**
-     * Open the top islands menu for a player.
-     * @param superiorPlayer The player to open the menu for.
-     */
-    @Deprecated
-    void openTopIslands(SuperiorPlayer superiorPlayer);
 
     /**
      * Get the block amount of a specific block.
@@ -296,16 +253,7 @@ public interface GridManager {
      * Calculate the worth of all the islands on the server.
      * @param callback Runnable that will be ran when process is finished.
      */
-    void calcAllIslands(Runnable callback);
-
-    /**
-     * Checks whether or not the material is a spawner.
-     * @param material The material to check.
-     *
-     * @deprecated See KeysManager.
-     */
-    @Deprecated
-    boolean isSpawner(Material material);
+    void calcAllIslands(@Nullable Runnable callback);
 
     /**
      * Make the island to be deleted when server stops.

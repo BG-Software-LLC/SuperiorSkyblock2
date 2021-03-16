@@ -24,13 +24,12 @@ import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.Locale;
@@ -42,7 +41,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -110,16 +108,33 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(bonus, "bonus parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         createIsland(superiorPlayer, schemName, bonus, biome, islandName, false);
     }
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonus, Biome biome, String islandName, boolean offset) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(bonus, "bonus parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         createIsland(superiorPlayer, schemName, bonus, BigDecimal.ZERO, biome, islandName, false);
     }
 
     @Override
     public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
+        Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
+        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+
         if(!Bukkit.isPrimaryThread()){
             Executor.sync(() -> createIsland(superiorPlayer, schemName, bonusWorth, bonusLevel, biome, islandName, offset));
             return;
@@ -153,6 +168,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
             Schematic schematic = plugin.getSchematics().getSchematic(schemName);
             long startTime = System.currentTimeMillis();
+            assert schematic != null;
             schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
                 Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
 
@@ -167,17 +183,17 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 island.setBiome(biome);
                 island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
 
-                if (superiorPlayer.isOnline()) {
+                superiorPlayer.runIfOnline(player -> {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     if (event.getResult()) {
                         if(updateGamemode)
-                            superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
+                            player.setGameMode(GameMode.SURVIVAL);
                         superiorPlayer.teleport(island, result -> {
                             if(result)
                                 Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
                         });
                     }
-                }
+                });
 
                 plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
             }, ex -> {
@@ -201,17 +217,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return pendingCreationTasks.contains(superiorPlayer.getUniqueId());
     }
 
     @Override
     public void startIslandPreview(SuperiorPlayer superiorPlayer, String schemName, String islandName) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+
         Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schemName.toLowerCase());
         if(previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if(result){
                     islandPreviews.add(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
-                    Executor.ensureMain(() -> superiorPlayer.asPlayer().setGameMode(GameMode.SPECTATOR));
+                    Executor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
                     Locale.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
                 }
             });
@@ -220,42 +241,53 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void cancelIslandPreview(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         IslandPreview islandPreview = islandPreviews.remove(superiorPlayer.getUniqueId());
-        if(islandPreview != null && superiorPlayer.isOnline()) {
-            Executor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
-                if(teleportResult)
-                    superiorPlayer.asPlayer().setGameMode(GameMode.SURVIVAL);
-            }));
-            PlayerChat.remove(superiorPlayer.asPlayer());
+        if(islandPreview != null){
+            superiorPlayer.runIfOnline(player -> {
+                Executor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
+                    if (teleportResult && superiorPlayer.isOnline())
+                        player.setGameMode(GameMode.SURVIVAL);
+                }));
+                PlayerChat.remove(player);
+            });
         }
     }
 
     @Override
     public IslandPreview getIslandPreview(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return islandPreviews.get(superiorPlayer.getUniqueId());
     }
 
     @Override
     public void deleteIsland(Island island){
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Disband Island, Island: " + island.getOwner().getName());
+
         island.getAllPlayersInside().forEach(superiorPlayer -> {
             SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });
+
         islands.remove(island.getOwner().getUniqueId());
         plugin.getDataHandler().deleteIsland(island, !pluginDisable);
         plugin.getNMSDragonFight().removeDragonBattle(island);
+
         ChunksTracker.removeIsland(island);
     }
 
     @Override
     public Island getIsland(SuperiorPlayer superiorPlayer){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return getIsland(superiorPlayer.getIslandLeader().getUniqueId());
     }
 
     @Override
     public Island getIsland(UUID uuid){
+        Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         return islands.get(uuid);
     }
 
@@ -266,22 +298,21 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public Island getIsland(String islandName) {
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         String inputName = StringUtils.stripColors(islandName);
         return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 
     @Override
-    public Island getIsland(int index){
-        return getIsland(index, SortingTypes.getDefaultSorting());
-    }
-
-    @Override
     public Island getIsland(int index, SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         return index >= islands.size() ? null : islands.get(index, sortingType);
     }
 
     @Override
     public int getIslandPosition(Island island, SortingType sortingType) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         return islands.indexOf(island, sortingType);
     }
 
@@ -331,27 +362,21 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public World getIslandsWorld() {
-        return getIslandsWorld(World.Environment.NORMAL);
-    }
-
-    @Override
-    public World getIslandsWorld(World.Environment environment) {
-        return getIslandsWorld(null, environment);
-    }
-
-    @Override
     public World getIslandsWorld(Island island, World.Environment environment) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return plugin.getProviders().getIslandsWorld(island, environment);
     }
 
     @Override
     public boolean isIslandsWorld(World world) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
         return customWorlds.contains(world.getUID()) || plugin.getProviders().isIslandsWorld(world);
     }
 
     @Override
     public void registerIslandWorld(World world) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
         customWorlds.add(world.getUID());
     }
 
@@ -361,18 +386,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public Location getNextLocation(){
-        //lastIsland.parse().clone()
-        return plugin.getProviders().getNextLocation(
-                lastIsland.parse().clone(),
-                plugin.getSettings().islandsHeight,
-                plugin.getSettings().maxIslandSize,
-                null, null
-        );
-    }
-
-    @Override
     public void transferIsland(UUID oldOwner, UUID newOwner) {
+        Preconditions.checkNotNull(oldOwner, "oldOwner parameter cannot be null.");
+        Preconditions.checkNotNull(newOwner, "newOwner parameter cannot be null.");
         islands.transferIsland(oldOwner, newOwner);
     }
 
@@ -383,6 +399,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void sortIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         sortIslands(sortingType, null);
     }
 
@@ -396,13 +413,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public List<UUID> getAllIslands(){
-        return getAllIslands(SortingTypes.getDefaultSorting());
-    }
-
-    @Override
     public List<UUID> getAllIslands(SortingType sortingType) {
-        return Lists.newArrayList(islands.iterator(sortingType)).stream().map(island -> island.getOwner().getUniqueId()).collect(Collectors.toList());
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        return Lists.newArrayList(islands.iterator(sortingType)).stream().map(island -> {
+            SuperiorPlayer superiorPlayer = island.getOwner();
+            return superiorPlayer == null ? null : superiorPlayer.getUniqueId();
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
@@ -412,21 +428,20 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public List<Island> getIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         return Lists.newArrayList(islands.iterator(sortingType));
     }
 
     @Override
-    public void openTopIslands(SuperiorPlayer superiorPlayer){
-        MenuTopIslands.openInventory(superiorPlayer, null, SortingTypes.getDefaultSorting());
-    }
-
-    @Override
     public int getBlockAmount(Block block){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         return getBlockAmount(block.getLocation());
     }
 
     @Override
     public int getBlockAmount(Location location){
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         return stackedBlocks.getBlockAmount(SBlockPosition.of(location), 1);
     }
 
@@ -440,6 +455,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void setBlockAmount(Block block, int amount){
+        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
 
         Key originalBlock = stackedBlocks.getBlockKey(SBlockPosition.of(block.getLocation()), null);
@@ -542,24 +558,25 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public boolean isSpawner(Material material) {
-        return material == Materials.SPAWNER.toBukkitType();
-    }
-
-    @Override
     public void addIslandToPurge(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Purge Island, Island: " + island.getOwner().getName());
         islandsToPurge.add(island.getOwner().getUniqueId());
     }
 
     @Override
     public void removeIslandFromPurge(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Remove From Purge, Island: " + island.getOwner().getName());
         islandsToPurge.remove(island.getOwner().getUniqueId());
     }
 
     @Override
     public boolean isIslandPurge(Island island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
         return islandsToPurge.contains(island.getOwner().getUniqueId());
     }
 
@@ -570,6 +587,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void registerSortingType(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Register Sorting Type, Sorting Type: " + sortingType.getName());
         islands.registerSortingType(sortingType, true);
     }

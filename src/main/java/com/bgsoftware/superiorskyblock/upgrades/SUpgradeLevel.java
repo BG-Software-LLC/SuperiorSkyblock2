@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import com.google.common.base.Preconditions;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
@@ -95,6 +96,8 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public String checkRequirements(SuperiorPlayer superiorPlayer) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
         for(Pair<String, String> requirement : requirements){
             String check = PlaceholderHook.parse(superiorPlayer, requirement.getKey());
             try {
@@ -135,11 +138,13 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.getRaw(key, IslandUtils.NO_LIMIT).get();
     }
 
@@ -155,20 +160,14 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
+        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return getEntityLimit(Key.of(entityType));
     }
 
     @Override
     public int getEntityLimit(Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return entityLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
-    }
-
-    @Override
-    public Map<EntityType, Integer> getEntityLimits() {
-        return getEntityLimitsAsKeys().entrySet().stream().collect(Collectors.toMap(
-                entry -> EntityUtils.getEntityTypeOrUnknown(entry.getKey()),
-                Map.Entry::getValue
-        ));
     }
 
     @Override
@@ -218,23 +217,16 @@ public class SUpgradeLevel implements UpgradeLevel {
     }
 
     @Override
-    public int getGeneratorAmount(Key key) {
-        return getGeneratorAmount(key, World.Environment.NORMAL);
-    }
-
-    @Override
-    public Map<String, Integer> getGeneratorAmounts() {
-        return getGeneratorAmounts(World.Environment.NORMAL);
-    }
-
-    @Override
     public int getGeneratorAmount(Key key, World.Environment environment) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
         return (generatorRates == null ? UpgradeValue.ZERO : generatorRates.getOrDefault(key, UpgradeValue.ZERO)).get();
     }
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
         return generatorRates == null ? new HashMap<>() : generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
@@ -247,6 +239,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getPotionEffect(PotionEffectType potionEffectType) {
+        Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
         return islandEffects.getOrDefault(potionEffectType, UpgradeValue.ZERO).get();
     }
 
@@ -271,6 +264,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
+        Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         return roleLimits.getOrDefault(playerRole.getId(), UpgradeValue.ZERO).get();
     }
 

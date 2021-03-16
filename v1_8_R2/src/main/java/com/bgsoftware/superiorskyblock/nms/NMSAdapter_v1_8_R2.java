@@ -103,19 +103,26 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
             if(!plugin.getSettings().worldBordersEnabled)
                 return;
 
+            Player player = superiorPlayer.asPlayer();
+
+            if(player == null)
+                return;
+
+            WorldServer worldServer = ((CraftWorld) player.getWorld()).getHandle();
+
             WorldBorder worldBorder;
 
             if(!superiorPlayer.hasWorldBorderEnabled() || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())){
-                worldBorder = ((CraftWorld) superiorPlayer.getWorld()).getHandle().getWorldBorder();
+                worldBorder = worldServer.getWorldBorder();
             }
 
             else {
                 worldBorder = new WorldBorder();
 
-                worldBorder.world = ((CraftWorld) superiorPlayer.getWorld()).getHandle();
+                worldBorder.world = worldServer;
                 worldBorder.setSize((island.getIslandSize() * 2) + 1);
 
-                org.bukkit.World.Environment environment = superiorPlayer.getWorld().getEnvironment();
+                org.bukkit.World.Environment environment = player.getWorld().getEnvironment();
 
                 Location center = island.getCenter(environment);
 
@@ -136,15 +143,17 @@ public final class NMSAdapter_v1_8_R2 implements NMSAdapter {
             }
 
             PacketPlayOutWorldBorder packetPlayOutWorldBorder = new PacketPlayOutWorldBorder(worldBorder, PacketPlayOutWorldBorder.EnumWorldBorderAction.INITIALIZE);
-            ((CraftPlayer) superiorPlayer.asPlayer()).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
         } catch (NullPointerException ignored) {}
     }
 
     @Override
     public void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        EntityPlayer entityPlayer = ((CraftPlayer) superiorPlayer.asPlayer()).getHandle();
-        Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
-        optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
+        superiorPlayer.runIfOnline(player -> {
+            EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            Optional<Property> optional = entityPlayer.getProfile().getProperties().get("textures").stream().findFirst();
+            optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
+        });
     }
 
     @Override

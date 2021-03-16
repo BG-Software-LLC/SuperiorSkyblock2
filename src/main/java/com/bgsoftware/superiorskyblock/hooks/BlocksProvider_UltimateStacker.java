@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.base.Preconditions;
 import com.songoda.ultimatestacker.UltimateStacker;
 import com.songoda.ultimatestacker.events.SpawnerBreakEvent;
 import com.songoda.ultimatestacker.events.SpawnerPlaceEvent;
@@ -35,15 +36,20 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
         int blockCount = -1;
         if(Bukkit.isPrimaryThread()){
             blockCount = instance.getSpawnerStackManager().getSpawner(location).getAmount();
         }
+
         return new Pair<>(blockCount, null);
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
+
         try{
             BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
             CreatureSpawner cs = (CreatureSpawner)bsm.getBlockState();

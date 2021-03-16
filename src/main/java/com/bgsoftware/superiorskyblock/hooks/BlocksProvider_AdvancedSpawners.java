@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.base.Preconditions;
 import gcspawners.ASAPI;
 import gcspawners.AdvancedSpawnerPlaceEvent;
 import gcspawners.AdvancedSpawnersBreakEvent;
@@ -29,12 +30,14 @@ public final class BlocksProvider_AdvancedSpawners implements BlocksProvider {
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return !Bukkit.isPrimaryThread() ? new Pair<>(-1, null) :
                 new Pair<>(ASAPI.getSpawnerAmount(location), ASAPI.getSpawnerType(location).toUpperCase());
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
         return ASAPI.getSpawnerType(itemStack).toUpperCase();
     }
 

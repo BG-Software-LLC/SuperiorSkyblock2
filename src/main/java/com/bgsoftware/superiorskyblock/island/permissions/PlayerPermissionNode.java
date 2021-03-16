@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.google.common.base.Preconditions;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
@@ -31,8 +32,9 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
-    public boolean hasPermission(IslandPrivilege permission) {
-        return getStatus(IslandPrivileges.ALL) == PrivilegeStatus.ENABLED || getStatus(permission) == PrivilegeStatus.ENABLED;
+    public boolean hasPermission(IslandPrivilege islandPrivilege) {
+        Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+        return getStatus(IslandPrivileges.ALL) == PrivilegeStatus.ENABLED || getStatus(islandPrivilege) == PrivilegeStatus.ENABLED;
     }
 
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
@@ -66,8 +68,9 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         }
 
         @Override
-        public boolean hasPermission(IslandPrivilege permission) {
-            return superiorPlayer != null && island != null && super.hasPermission(permission);
+        public boolean hasPermission(IslandPrivilege islandPrivilege) {
+            Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
+            return superiorPlayer != null && island != null && super.hasPermission(islandPrivilege);
         }
 
         @Override

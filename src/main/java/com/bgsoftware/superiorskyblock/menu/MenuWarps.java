@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -56,7 +57,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
             Executor.sync(() -> {
                 previousMove = false;
-                superiorPlayer.asPlayer().closeInventory();
+                superiorPlayer.runIfOnline(Player::closeInventory);
                 warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
             }, 1L);
         }
@@ -70,7 +71,8 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandWarp islandWarp) {
         try {
-            ItemBuilder itemBuilder = new ItemBuilder(islandWarp.getRawIcon() == null ? clickedItem : islandWarp.getIcon(superiorPlayer));
+            ItemStack icon = islandWarp.getIcon(superiorPlayer);
+            ItemBuilder itemBuilder = new ItemBuilder(icon == null ? clickedItem : icon);
 
             if(hasManagePermission && !editLore.isEmpty())
                 itemBuilder.appendLore(editLore);

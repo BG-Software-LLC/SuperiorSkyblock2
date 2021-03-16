@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
@@ -38,18 +39,23 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+
         int blockCount = -1;
         String entityType = null;
+
         if(Bukkit.isPrimaryThread()){
             Spawner spawner = instance.getSpawnerManager().getSpawnerFromWorld(location);
             blockCount = spawner.getFirstStack().getStackSize();
             entityType = spawner.getIdentifyingName();
         }
+
         return new Pair<>(blockCount, entityType);
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
         return instance.getSpawnerManager().getSpawnerData(itemStack).getIdentifyingName();
     }
 

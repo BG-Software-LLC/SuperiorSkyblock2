@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 public interface BlockValuesManager {
@@ -31,10 +32,10 @@ public interface BlockValuesManager {
     /**
      * Register a value for a key.
      * @param key The key to set custom value of.
-     * @param worthValue The custom worth value of the key. May be null.
-     * @param levelValue The custom level value of the key. May be null.
+     * @param worthValue The custom worth value of the key.
+     * @param levelValue The custom level value of the key.
      */
-    void registerCustomKey(Key key, BigDecimal worthValue, BigDecimal levelValue);
+    void registerCustomKey(Key key, @Nullable BigDecimal worthValue, @Nullable BigDecimal levelValue);
 
     /**
      * Register a custom key parser.

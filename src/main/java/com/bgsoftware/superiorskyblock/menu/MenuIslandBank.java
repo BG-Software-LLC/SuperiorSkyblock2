@@ -52,8 +52,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                     PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                         try{
                             BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
-                            BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank()
-                                    .withdrawMoney(superiorPlayer, newAmount, null);
+                            BankTransaction bankTransaction = island.getIslandBank().withdrawMoney(superiorPlayer, newAmount, null);
                             handleWithdraw(superiorPlayer, island, this, bankTransaction, withdrawSlot, newAmount);
                         }catch (IllegalArgumentException ex){
                             Locale.INVALID_AMOUNT.send(superiorPlayer, message);
@@ -89,7 +88,7 @@ public final class MenuIslandBank extends SuperiorMenu {
                 PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                     try{
                         BigDecimal newAmount = BigDecimal.valueOf(Double.parseDouble(message));
-                        BankTransaction bankTransaction = superiorPlayer.getIsland().getIslandBank().depositMoney(superiorPlayer, newAmount);
+                        BankTransaction bankTransaction = island.getIslandBank().depositMoney(superiorPlayer, newAmount);
                         handleDeposit(superiorPlayer, island, this, bankTransaction, depositSlot, newAmount);
                     }catch(IllegalArgumentException ex){
                         Locale.INVALID_AMOUNT.send(superiorPlayer, message);
@@ -188,14 +187,14 @@ public final class MenuIslandBank extends SuperiorMenu {
             if(menuIslandBank != null) {
                 SoundWrapper successSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-success-sound");
                 if (successSound != null)
-                    successSound.playSound(superiorPlayer.asPlayer());
+                    superiorPlayer.runIfOnline(successSound::playSound);
             }
         }
         else{
             if(menuIslandBank != null) {
                 SoundWrapper failSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-fail-sound");
                 if (failSound != null)
-                    failSound.playSound(superiorPlayer.asPlayer());
+                    superiorPlayer.runIfOnline(failSound::playSound);
             }
 
             String failureReason = bankTransaction.getFailureReason();
@@ -227,14 +226,14 @@ public final class MenuIslandBank extends SuperiorMenu {
             if(menuIslandBank != null) {
                 SoundWrapper successSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-success-sound");
                 if (successSound != null)
-                    successSound.playSound(superiorPlayer.asPlayer());
+                    superiorPlayer.runIfOnline(successSound::playSound);
             }
         }
         else{
             if(menuIslandBank != null) {
                 SoundWrapper failSound = (SoundWrapper) menuIslandBank.getData(clickedSlot + "-fail-sound");
                 if (failSound != null)
-                    failSound.playSound(superiorPlayer.asPlayer());
+                    superiorPlayer.runIfOnline(failSound::playSound);
             }
 
             String failureReason = bankTransaction.getFailureReason();

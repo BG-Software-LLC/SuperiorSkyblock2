@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 /**
@@ -15,8 +16,8 @@ public class IslandBankWithdrawEvent extends IslandEvent {
 
     /**
      * The constructor of the event.
-     * @param superiorPlayer The player who entered to the island's area.
-     * @param island The island that the player entered into.
+     * @param superiorPlayer The player who withdrawn the money.
+     * @param island The island that the money was withdrawn from.
      * @param amount The amount that was withdrawn.
      */
     public IslandBankWithdrawEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount){
@@ -26,8 +27,10 @@ public class IslandBankWithdrawEvent extends IslandEvent {
     }
 
     /**
-     * Get the player who entered to the island's area.
+     * Get the player who withdrawn the money.
+     * When null, then the console deposited the money using the admin command.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }

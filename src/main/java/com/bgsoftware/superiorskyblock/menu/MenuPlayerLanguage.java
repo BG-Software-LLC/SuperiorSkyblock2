@@ -28,7 +28,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
         superiorPlayer.setUserLocale(locale);
         Locale.CHANGED_LANGUAGE.send(superiorPlayer);
 
-        Executor.sync(() -> superiorPlayer.asPlayer().closeInventory(), 1L);
+        Executor.sync(() -> e.getWhoClicked().closeInventory(), 1L);
     }
 
     @Override

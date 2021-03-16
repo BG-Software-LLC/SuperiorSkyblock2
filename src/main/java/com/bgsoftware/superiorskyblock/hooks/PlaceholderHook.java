@@ -79,6 +79,9 @@ public abstract class PlaceholderHook {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
         Island island = superiorPlayer.getIsland();
 
+        // Island may be null, however we catch NPE.
+        assert island != null;
+
         try {
             Matcher matcher;
 

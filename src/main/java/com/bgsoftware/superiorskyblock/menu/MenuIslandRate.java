@@ -58,7 +58,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         Executor.sync(() -> {
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            e.getWhoClicked().closeInventory();
         }, 1L);
     }
 

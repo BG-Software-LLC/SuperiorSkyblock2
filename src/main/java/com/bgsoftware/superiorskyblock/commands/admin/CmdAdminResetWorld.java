@@ -80,6 +80,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             // Sending the players that are in that world to the main island.
             // If the world that will be reset is the normal world, they will be teleported to spawn.
             for(SuperiorPlayer superiorPlayer : island.getAllPlayersInside()){
+                assert superiorPlayer.getWorld() != null;
                 if(superiorPlayer.getWorld().equals(world))
                     superiorPlayer.teleport(island);
             }

@@ -6,12 +6,14 @@ import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
+import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -44,6 +46,8 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     @Override
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key);
 
         BigDecimal customBlockValue = customBlockValues.get(key);
@@ -82,6 +86,8 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key);
 
         BigDecimal customBlockLevel = customBlockLevels.get(key);
@@ -103,12 +109,14 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     @Override
     public Key getBlockKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return ((Key) key).isAPIKey() || isValuesMenu(key) ? getValuesKey(key) :
                 blockValues.containsKey(key) ? blockValues.getKey((Key) key) : blockLevels.getKey((Key) key);
     }
 
     @Override
-    public void registerCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key, BigDecimal worthValue, BigDecimal levelValue) {
+    public void registerCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key, @Nullable BigDecimal worthValue, @Nullable BigDecimal levelValue) {
+        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         if(worthValue != null && !customBlockValues.containsKey(key)){
             customBlockValues.put(key, worthValue);
         }
@@ -119,6 +127,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     @Override
     public void registerKeyParser(CustomKeyParser customKeyParser, com.bgsoftware.superiorskyblock.api.key.Key... blockTypes) {
+        Preconditions.checkNotNull(customKeyParser, "customKeyParser parameter cannot be null.");
+        Preconditions.checkNotNull(blockTypes, "blockTypes parameter cannot be null.");
+
         for(com.bgsoftware.superiorskyblock.api.key.Key blockType : blockTypes)
             customKeyParsers.put(blockType, customKeyParser);
     }

@@ -196,7 +196,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         if(island != null) {
             SoundWrapper sound = (SoundWrapper) getData("island-sound");
             if(sound != null)
-                sound.playSound(superiorPlayer.asPlayer());
+                superiorPlayer.runIfOnline(sound::playSound);
             //noinspection unchecked
             List<String> commands = (List<String>) getData("island-commands");
             if(commands != null)
@@ -222,7 +222,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
         SoundWrapper sound = (SoundWrapper) getData("no-island-sound");
         if(sound != null)
-            sound.playSound(superiorPlayer.asPlayer());
+            superiorPlayer.runIfOnline(sound::playSound);
         //noinspection unchecked
         List<String> commands = (List<String>) getData("no-island-commands");
         if(commands != null)

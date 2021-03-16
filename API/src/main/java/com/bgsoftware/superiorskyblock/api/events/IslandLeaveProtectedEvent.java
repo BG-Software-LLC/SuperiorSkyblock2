@@ -19,31 +19,6 @@ public class IslandLeaveProtectedEvent extends IslandLeaveEvent {
      * The constructor of the event.
      * @param superiorPlayer The player who left the island's protected area.
      * @param island The island that the player left.
-     *
-     * @deprecated See IslandLeaveProtectedEvent(SuperiorPlayer, Island, LeaveCause)
-     */
-    @Deprecated
-    public IslandLeaveProtectedEvent(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, LeaveCause.INVALID);
-    }
-
-    /**
-     * The constructor of the event.
-     * @param superiorPlayer The player who left the island's protected area.
-     * @param island The island that the player left.
-     * @param leaveCause The cause of leaving the island.
-     *
-     * @deprecated See IslandLeaveProtectedEvent(SuperiorPlayer, Island, LeaveCause, Location)
-     */
-    @Deprecated
-    public IslandLeaveProtectedEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause){
-        this(superiorPlayer, island, leaveCause, superiorPlayer.getLocation());
-    }
-
-    /**
-     * The constructor of the event.
-     * @param superiorPlayer The player who left the island's protected area.
-     * @param island The island that the player left.
      * @param leaveCause The cause of leaving the island.
      * @param toLocation The location the player will be at after leaving.
      */

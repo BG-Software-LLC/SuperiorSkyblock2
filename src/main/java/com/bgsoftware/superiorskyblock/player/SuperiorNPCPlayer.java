@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.data.SEmptyPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -18,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setTextureValue(String textureValue) {
+    public void setTextureValue(@Nonnull String textureValue) {
 
     }
 
@@ -85,12 +87,22 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void runIfOnline(Consumer<Player> toRun) {
+
+    }
+
+    @Override
     public boolean hasFlyGamemode() {
         return false;
     }
 
     @Override
     public boolean isAFK() {
+        return false;
+    }
+
+    @Override
+    public boolean isVanished() {
         return false;
     }
 
@@ -116,7 +128,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public World getWorld() {
-        return getLocation().getWorld();
+        return npc.getLocation().getWorld();
     }
 
     @Override
@@ -150,19 +162,8 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public UUID getTeamLeader() {
-        return npc.getUniqueId();
-    }
-
-    @Override
     public SuperiorPlayer getIslandLeader() {
         return this;
-    }
-
-
-    @Override
-    public void setTeamLeader(UUID teamLeader) {
-
     }
 
     @Override
@@ -367,7 +368,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public PlayerDataHandler getDataHandler() {
-        return null;
+        return SEmptyPlayerDataHandler.getHandler();
     }
 
 }

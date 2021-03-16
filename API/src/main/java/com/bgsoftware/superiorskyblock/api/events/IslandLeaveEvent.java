@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 
+import javax.annotation.Nullable;
+
 /**
  * IslandLeaveEvent is called when a player is walking out from the island's area.
  */
@@ -15,31 +17,6 @@ public class IslandLeaveEvent extends IslandEvent implements Cancellable {
     private final Location toLocation;
 
     private boolean cancelled = false;
-
-    /**
-     * The constructor of the event.
-     * @param superiorPlayer The player who left the island's area.
-     * @param island The island that the player left.
-     *
-     * @deprecated See IslandLeaveEvent(SuperiorPlayer, Island, LeaveCause)
-     */
-    @Deprecated
-    public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, LeaveCause.INVALID);
-    }
-
-    /**
-     * The constructor of the event.
-     * @param superiorPlayer The player who left the island's area.
-     * @param island The island that the player left.
-     * @param leaveCause The cause of leaving the island.
-     *
-     * @deprecated See IslandLeaveEvent(SuperiorPlayer, Island, LeaveCause, Location)
-     */
-    @Deprecated
-    public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause){
-        this(superiorPlayer, island, leaveCause, superiorPlayer.getLocation());
-    }
 
     /**
      * The constructor of the event.
@@ -71,7 +48,9 @@ public class IslandLeaveEvent extends IslandEvent implements Cancellable {
 
     /**
      * Get the location the player will be after he's leaving.
+     * If the location is null, it means the player left the game.
      */
+    @Nullable
     public Location getTo() {
         return toLocation;
     }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
+import com.google.common.base.Preconditions;
 
 import java.util.List;
 
@@ -45,11 +46,13 @@ public final class SPlayerRole implements PlayerRole {
 
     @Override
     public boolean isHigherThan(PlayerRole role) {
+        Preconditions.checkNotNull(role, "playerRole parameter cannot be null.");
         return getWeight() > role.getWeight();
     }
 
     @Override
     public boolean isLessThan(PlayerRole role) {
+        Preconditions.checkNotNull(role, "playerRole parameter cannot be null.");
         return getWeight() < role.getWeight();
     }
 

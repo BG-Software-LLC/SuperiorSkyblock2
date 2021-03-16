@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -29,10 +30,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 
+import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -90,6 +91,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     @Override
     public Schematic getSchematic(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
         return schematics.get(name.toLowerCase());
     }
 
@@ -110,34 +112,53 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     @Override
     public void saveSchematic(SuperiorPlayer superiorPlayer, String schematicName){
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(superiorPlayer.getLocation(), "superiorPlayer must be online.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
+
         Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();
-        Location min = new Location(pos1.getWorld(),
-                Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
+        Location min = new Location(pos1.getWorld(), Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
         Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
+
         saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
                 offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), offset.getYaw(), offset.getPitch(), schematicName, () ->
                 Locale.SCHEMATIC_SAVED.send(superiorPlayer));
+
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
     }
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName){
+        Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
+        Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, 0, 0, schematicName);
     }
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName) {
+        Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
+        Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName, null);
     }
 
     @Override
     public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, String schematicName, Runnable callable) {
-        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, 0, 0, schematicName, null);
+        Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
+        Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
+        saveSchematic(pos1, pos2, offsetX, offsetY, offsetZ, 0, 0, schematicName, callable);
     }
 
     @Override
-    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, Runnable runnable){
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, @Nullable Runnable runnable){
+        Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
+        Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
+        Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
                 ", Pos #2: " + LocationUtils.getLocation(pos2) + ", OffsetX: " + offsetX + ", OffsetY: " + offsetY +
                 ", OffsetZ: " + offsetZ + ", Yaw: " + yaw + ", Pitch: " + pitch + ", Name: " + schematicName);

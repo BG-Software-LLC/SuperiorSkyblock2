@@ -635,6 +635,7 @@ public final class BlocksListener implements Listener {
     }
 
     public boolean onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
+        assert superiorPlayer.getLocation() != null;
         warpLocation.setYaw(superiorPlayer.getLocation().getYaw());
 
         if(lines[0].equalsIgnoreCase(plugin.getSettings().signWarpLine)){

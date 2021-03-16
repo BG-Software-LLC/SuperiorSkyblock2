@@ -46,7 +46,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         SoundWrapper noAccessSound = (SoundWrapper) getData(settingsName + "-no-access-sound");
         if(!permission.isEmpty() && !superiorPlayer.hasPermission(permission)){
             if(noAccessSound != null)
-                noAccessSound.playSound(superiorPlayer.asPlayer());
+                noAccessSound.playSound(event.getWhoClicked());
             return;
         }
 
@@ -61,7 +61,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
         SoundWrapper soundWrapper = (SoundWrapper) getData(settingsName + "-sound");
         if (soundWrapper != null)
-            soundWrapper.playSound(superiorPlayer.asPlayer());
+            soundWrapper.playSound(event.getWhoClicked());
         //noinspection unchecked
         List<String> commands = (List<String>) getData(settingsName + "-commands");
         if (commands != null)

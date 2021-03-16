@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,7 +89,7 @@ public final class CmdInvite implements IPermissibleCommand {
         if(island.isInvited(targetPlayer)){
             island.revokeInvite(targetPlayer);
             message = Locale.REVOKE_INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
-            if(targetPlayer.asOfflinePlayer().isOnline())
+            if(targetPlayer.isOnline())
                 Locale.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         }
         else {
@@ -104,13 +105,14 @@ public final class CmdInvite implements IPermissibleCommand {
             message = Locale.INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
 
             java.util.Locale targetLocal = LocaleUtils.getLocale(targetPlayer);
+            Player target = targetPlayer.asPlayer();
 
-            if(targetPlayer.asOfflinePlayer().isOnline() && !Locale.GOT_INVITE.isEmpty(targetLocal)) {
+            if(target != null && !Locale.GOT_INVITE.isEmpty(targetLocal)) {
                 TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(targetLocal, superiorPlayer.getName()));
                 if(!Locale.GOT_INVITE_TOOLTIP.isEmpty(targetLocal))
                     textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[] {new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(targetLocal))}));
                 textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + superiorPlayer.getName()));
-                targetPlayer.asPlayer().spigot().sendMessage(textComponent);
+                target.spigot().sendMessage(textComponent);
             }
         }
 

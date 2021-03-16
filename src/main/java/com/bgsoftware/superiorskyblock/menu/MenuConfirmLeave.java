@@ -26,10 +26,13 @@ public final class MenuConfirmLeave extends SuperiorMenu {
     }
 
     @Override
-    protected void onPlayerClick(InventoryClickEvent event) {
+    protected void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
-        if (confirmSlot.contains(event.getRawSlot())) {
+        if(island == null)
+            return;
+
+        if (confirmSlot.contains(e.getRawSlot())) {
             if (EventsCaller.callIslandQuitEvent(superiorPlayer, island)) {
                 island.kickMember(superiorPlayer);
 
@@ -38,11 +41,11 @@ public final class MenuConfirmLeave extends SuperiorMenu {
                 Locale.LEFT_ISLAND.send(superiorPlayer);
 
                 previousMove = false;
-                superiorPlayer.asPlayer().closeInventory();
+                e.getWhoClicked().closeInventory();
             }
-        } else if (cancelSlot.contains(event.getRawSlot())) {
+        } else if (cancelSlot.contains(e.getRawSlot())) {
             previousMove = false;
-            superiorPlayer.asPlayer().closeInventory();
+            e.getWhoClicked().closeInventory();
         }
     }
 

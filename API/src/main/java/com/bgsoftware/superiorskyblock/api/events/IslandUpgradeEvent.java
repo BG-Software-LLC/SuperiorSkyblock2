@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.event.Cancellable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -37,6 +38,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * Get the player who upgraded the island.
      * Can be null if ran by the console.
      */
+    @Nullable
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
     }
