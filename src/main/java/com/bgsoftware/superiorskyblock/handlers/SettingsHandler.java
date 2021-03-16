@@ -286,7 +286,8 @@ public final class SettingsHandler extends AbstractHandler {
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
-        bankWorthRate = 1D / cfg.getInt("bank-worth-rate", 1000);
+        int bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
+        this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
