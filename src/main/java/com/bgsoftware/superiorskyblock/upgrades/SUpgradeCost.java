@@ -25,8 +25,4 @@ public class SUpgradeCost implements UpgradeCost {
         return provider;
     }
 
-    @Override
-    public UpgradeCost copyOfValue(BigDecimal bigDecimal) {
-        return new SUpgradeCost(bigDecimal, provider);
-    }
 }
